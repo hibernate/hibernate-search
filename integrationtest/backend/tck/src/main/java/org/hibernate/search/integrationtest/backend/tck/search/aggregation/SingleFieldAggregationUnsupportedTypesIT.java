@@ -11,14 +11,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.UnsupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -87,7 +86,7 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithUnsupportedType")
 	public void simple() {
-		FieldModel<F> model = index.binding().fieldModel;
+		SimpleFieldModel<F> model = index.binding().fieldModel;
 		String fieldPath = model.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
@@ -102,37 +101,20 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 				) );
 	}
 
-	private FieldModel<F> mapField(IndexSchemaElement parent, String prefix,
+	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return FieldModel.mapper( typeDescriptor )
-				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
+				.map( parent, prefix + typeDescriptor.getUniqueName() );
 	}
 
 	private class IndexBinding {
-		final FieldModel<F> fieldModel;
+		final SimpleFieldModel<F> fieldModel;
 
 		IndexBinding(IndexSchemaElement root) {
 			fieldModel = mapField(
 					root, "",
 					c -> { }
 			);
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					FieldModel::new
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 }

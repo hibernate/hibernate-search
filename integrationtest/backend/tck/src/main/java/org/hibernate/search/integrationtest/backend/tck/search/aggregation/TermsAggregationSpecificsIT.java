@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -32,7 +31,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -619,10 +618,10 @@ public class TermsAggregationSpecificsIT<F> {
 				.hasTotalHitCount( documentCount );
 	}
 
-	private FieldModel<F> mapField(IndexSchemaElement parent, String prefix,
+	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return FieldModel.mapper( typeDescriptor )
-				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
+				.map( parent, prefix + typeDescriptor.getUniqueName() );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -642,9 +641,9 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private class IndexBinding {
-		final FieldModel<F> fieldModel;
-		final FieldModel<F> fieldWithConverterModel;
-		final FieldModel<F> fieldWithAggregationDisabledModel;
+		final SimpleFieldModel<F> fieldModel;
+		final SimpleFieldModel<F> fieldWithConverterModel;
+		final SimpleFieldModel<F> fieldWithAggregationDisabledModel;
 
 		IndexBinding(IndexSchemaElement root) {
 			fieldModel = mapField(
@@ -662,23 +661,6 @@ public class TermsAggregationSpecificsIT<F> {
 					root, "nonAggregable_",
 					c -> c.aggregable( Aggregable.NO )
 			);
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					FieldModel::new
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 
