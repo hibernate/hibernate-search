@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinFirstChildIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.index.DocValues;
@@ -150,7 +150,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 			return NumericDoubleValues.EMPTY;
 		}
 
-		JoinFirstChildIdIterator joinIterator = new JoinFirstChildIdIterator( parentDocs, childDocs, values );
+		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new NumericDoubleValues() {
 
@@ -169,14 +169,13 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 					return true;
 				}
 
-				int nextChildWithValue = joinIterator.advance( parentDoc );
-				if ( nextChildWithValue == JoinFirstChildIdIterator.NO_CHILD_WITH_VALUE ) {
+				if ( !joinIterator.advanceExact( parentDoc ) ) {
 					// No child of this parent has a value
 					return false;
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+				lastEmittedValue = mode.pick( values, joinIterator );
 				return true;
 			}
 
