@@ -82,7 +82,7 @@ public abstract class FieldTypeDescriptor<F> {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[javaType=" + javaType + "]";
+		return getUniqueName();
 	}
 
 	public final Class<F> getJavaType() {

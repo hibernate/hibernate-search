@@ -88,9 +88,6 @@ public abstract class PropertyTypeDescriptor<V> {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder( "PropertyTypeDescriptor{" );
-		sb.append( "javaType=" ).append( javaType );
-		sb.append( '}' );
-		return sb.toString();
+		return javaType.getSimpleName();
 	}
 }
