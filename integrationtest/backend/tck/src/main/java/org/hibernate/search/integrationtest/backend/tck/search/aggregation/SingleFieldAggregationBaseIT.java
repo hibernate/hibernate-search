@@ -17,7 +17,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -40,6 +39,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -762,22 +762,22 @@ public class SingleFieldAggregationBaseIT<F> {
 				.hasTotalHitCount( multiValuedIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
 	}
 
-	private FieldModel<F> mapField(IndexSchemaElement parent, String prefix,
+	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return FieldModel.mapper( typeDescriptor )
-				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
+				.map( parent, prefix + typeDescriptor.getUniqueName() );
 	}
 
-	private FieldModel<F> mapMultiValuedField(IndexSchemaElement parent, String prefix,
+	private SimpleFieldModel<F> mapMultiValuedField(IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return FieldModel.mapper( typeDescriptor )
-				.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
+				.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName() );
 	}
 
 	private class IndexBinding {
-		final FieldModel<F> fieldModel;
-		final FieldModel<F> fieldWithConverterModel;
-		final FieldModel<F> fieldWithAggregationDisabledModel;
+		final SimpleFieldModel<F> fieldModel;
+		final SimpleFieldModel<F> fieldWithConverterModel;
+		final SimpleFieldModel<F> fieldWithAggregationDisabledModel;
 
 		final ObjectBinding flattenedObject;
 		final ObjectBinding nestedObject;
@@ -806,7 +806,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	private class ObjectBinding {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
-		final FieldModel<F> fieldModel;
+		final SimpleFieldModel<F> fieldModel;
 
 		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
 			this.relativeFieldName = relativeFieldName;
@@ -819,7 +819,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private class RawFieldCompatibleIndexBinding {
-		final FieldModel<F> fieldWithConverterModel;
+		final SimpleFieldModel<F> fieldWithConverterModel;
 
 		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
@@ -855,30 +855,13 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private class MultiValuedIndexBinding {
-		final FieldModel<F> fieldModel;
+		final SimpleFieldModel<F> fieldModel;
 
 		MultiValuedIndexBinding(IndexSchemaElement root) {
 			fieldModel = mapMultiValuedField(
 					root, "",
 					c -> c.aggregable( Aggregable.YES )
 			);
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					FieldModel::new
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 
