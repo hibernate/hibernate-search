@@ -15,15 +15,16 @@ import static org.junit.Assume.assumeTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -31,7 +32,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.TermsAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -41,10 +42,9 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
-import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
-import org.hibernate.search.util.impl.test.singleinstance.SingleInstanceRunnerWithParameters;
 
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -55,103 +55,76 @@ import org.junit.runners.Parameterized;
  * Behavior common to all single-field aggregations is tested in {@link SingleFieldAggregationBaseIT}.
  */
 @RunWith(Parameterized.class)
-@Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class TermsAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
+	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
+	private static List<DataSet<?>> dataSets;
+
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] supportedTypes() {
-		List<Object[]> combinations = new ArrayList<>();
+	public static Object[][] parameters() {
+		supportedFieldTypes = new LinkedHashSet<>();
+		dataSets = new ArrayList<>();
+		List<Object[]> parameters = new ArrayList<>();
 		AggregationDescriptor aggregationDescriptor = new TermsAggregationDescriptor();
-		for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
-			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).isSupported() ) {
-				combinations.add( new Object[] {
-						fieldTypeDescriptor
-				} );
+		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
+				supportedFieldTypes.add( fieldType );
+				DataSet<?> dataSet = new DataSet<>( fieldType );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { fieldType, dataSet } );
 			}
 		}
-		return combinations.toArray( new Object[0][] );
+		return parameters.toArray( new Object[0][] );
 	}
 
-	@InstanceRule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final FieldTypeDescriptor<F> typeDescriptor;
-	private final List<F> valuesInAscendingOrder;
-	private final List<F> valuesInDescendingOrder;
-	private final List<F> valuesInAscendingDocumentCountOrder;
-	private final List<F> valuesInDescendingDocumentCountOrder;
-	private final Map<F, List<String>> documentIdPerTerm;
+	private static final SimpleMappedIndex<IndexBinding> index =
+			SimpleMappedIndex.of( "Main", IndexBinding::new );
 
-	private SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "Main", IndexBinding::new );
-
-	public TermsAggregationSpecificsIT(FieldTypeDescriptor<F> typeDescriptor) {
-		this.typeDescriptor = typeDescriptor;
-		this.documentIdPerTerm = new LinkedHashMap<>();
-
-		this.valuesInAscendingOrder = typeDescriptor.getAscendingUniqueTermValues().getSingle();
-
-		this.valuesInDescendingOrder = new ArrayList<>( valuesInAscendingOrder );
-		Collections.reverse( valuesInDescendingOrder );
-
-		this.valuesInDescendingDocumentCountOrder = new ArrayList<>( valuesInAscendingOrder );
-		/*
-		 * Mess with the value order, because some tests would be pointless
-		 * if the document count order was the same as (or the opposite of) the value order
-		 */
-		valuesInDescendingDocumentCountOrder.add( valuesInDescendingDocumentCountOrder.get( 0 ) );
-		valuesInDescendingDocumentCountOrder.remove( 0 );
-		valuesInDescendingDocumentCountOrder.add( valuesInDescendingDocumentCountOrder.get( 0 ) );
-		valuesInDescendingDocumentCountOrder.remove( 0 );
-
-		this.valuesInAscendingDocumentCountOrder = new ArrayList<>( valuesInDescendingDocumentCountOrder );
-		Collections.reverse( valuesInAscendingDocumentCountOrder );
-
-		// Simple dataset: strictly decreasing number of documents for each term
-		int documentIdAsInteger = 0;
-		int numberOfDocuments = valuesInDescendingDocumentCountOrder.size();
-		for ( F value : valuesInDescendingDocumentCountOrder ) {
-			ArrayList<String> documentIdsForTerm = new ArrayList<>();
-			documentIdPerTerm.put( value, documentIdsForTerm );
-			for ( int i = 0; i < numberOfDocuments; i++ ) {
-				String documentId = "document_" + documentIdAsInteger;
-				++documentIdAsInteger;
-				documentIdsForTerm.add( documentId );
-			}
-			--numberOfDocuments;
-		}
-	}
-
-	@BeforeAll
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
-		initData();
+		for ( DataSet<?> dataSet : dataSets ) {
+			dataSet.init();
+		}
+	}
+
+	private final FieldTypeDescriptor<F> fieldType;
+	private final DataSet<F> dataSet;
+
+	public TermsAggregationSpecificsIT(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+		this.fieldType = fieldType;
+		this.dataSet = dataSet;
 	}
 
 	@Test
 	public void superClassFieldType() {
-		Class<? super F> superClass = typeDescriptor.getJavaType().getSuperclass();
+		Class<? super F> superClass = fieldType.getJavaType().getSuperclass();
 
 		doTestSuperClassFieldType( superClass );
 	}
 
 	private <S> void doTestSuperClassFieldType(Class<S> superClass) {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<S, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, superClass ) )
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
 						// All documents should be mentioned in the aggregation, even those excluded by the limit/offset
 						containsInAnyOrder( c -> {
-							documentIdPerTerm.forEach( (key, value) -> c.accept( key, (long) value.size() ) );
+							dataSet.documentIdPerTerm.forEach( (key, value) -> c.accept( key, (long) value.size() ) );
 						} )
 				);
 	}
@@ -161,11 +134,11 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void predicate() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		Map.Entry<F, List<String>> firstTermEntry = documentIdPerTerm.entrySet().iterator().next();
+		Map.Entry<F, List<String>> firstTermEntry = dataSet.documentIdPerTerm.entrySet().iterator().next();
 
 		SearchResultAssert.assertThat(
 				index.createScope().query()
@@ -173,7 +146,8 @@ public class TermsAggregationSpecificsIT<F> {
 								.matching( firstTermEntry.getValue().get( 0 ) )
 								.matching( firstTermEntry.getValue().get( 1 ) )
 						)
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() ) )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() ) )
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -190,20 +164,20 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void limitAndOffset() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() ) )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() ) )
 						.fetch( 3, 4 )
 		)
 				.aggregation(
 						aggregationKey,
 						// All documents should be mentioned in the aggregation, even those excluded by the limit/offset
 						containsInAnyOrder( c -> {
-							documentIdPerTerm.forEach( (key, value) -> c.accept( key, (long) value.size() ) );
+							dataSet.documentIdPerTerm.forEach( (key, value) -> c.accept( key, (long) value.size() ) );
 						} )
 				);
 	}
@@ -211,21 +185,22 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testDefaultSortOrderIsCount")
 	public void order_default() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() ) )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() ) )
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
 						// The result should present buckets with decreasing term count
 						containsExactly( c -> {
-							for ( F value : valuesInDescendingDocumentCountOrder ) {
-								c.accept( value, (long) documentIdPerTerm.get( value ).size() );
+							for ( F value : dataSet.valuesInDescendingDocumentCountOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
 						} )
 				);
@@ -234,23 +209,24 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderDesc")
 	public void orderByCountDescending() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByCountDescending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
 						// The result should present buckets with decreasing term count
 						containsExactly( c -> {
-							for ( F value : valuesInDescendingDocumentCountOrder ) {
-								c.accept( value, (long) documentIdPerTerm.get( value ).size() );
+							for ( F value : dataSet.valuesInDescendingDocumentCountOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
 						} )
 				);
@@ -261,23 +237,24 @@ public class TermsAggregationSpecificsIT<F> {
 	public void orderByCountAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByCountAscending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
 						// The result should present buckets with increasing term count
 						containsExactly( c -> {
-							for ( F value : valuesInAscendingDocumentCountOrder ) {
-								c.accept( value, (long) documentIdPerTerm.get( value ).size() );
+							for ( F value : dataSet.valuesInAscendingDocumentCountOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
 						} )
 				);
@@ -287,23 +264,24 @@ public class TermsAggregationSpecificsIT<F> {
 	public void orderByTermDescending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByTermDescending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
-						// The result should present buckets with decreasing term values
+						// The result should present buckets with decreasing term dataSet.values
 						containsExactly( c -> {
-							for ( F value : valuesInDescendingOrder ) {
-								c.accept( value, (long) documentIdPerTerm.get( value ).size() );
+							for ( F value : dataSet.valuesInDescendingOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
 						} )
 				);
@@ -314,23 +292,24 @@ public class TermsAggregationSpecificsIT<F> {
 	public void orderByTermAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByTermAscending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
-						// The result should present buckets with increasing term values
+						// The result should present buckets with increasing term dataSet.values
 						containsExactly( c -> {
-							for ( F value : valuesInAscendingOrder ) {
-								c.accept( value, (long) documentIdPerTerm.get( value ).size() );
+							for ( F value : dataSet.valuesInAscendingOrder ) {
+								c.accept( value, (long) dataSet.documentIdPerTerm.get( value ).size() );
 							}
 						} )
 				);
@@ -339,22 +318,23 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsExcluded")
 	public void minDocumentCount_positive() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.minDocumentCount( 2 )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
 						// Only buckets with the minimum required document count should appear in the result
 						containsInAnyOrder( c -> {
-							documentIdPerTerm.forEach( (key, value) -> {
+							dataSet.documentIdPerTerm.forEach( (key, value) -> {
 								int documentCount = value.size();
 								if ( documentCount >= 2 ) {
 									c.accept( key, (long) documentCount );
@@ -367,11 +347,11 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsIncluded")
 	public void minDocumentCount_zero() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		Map.Entry<F, List<String>> firstTermEntry = documentIdPerTerm.entrySet().iterator().next();
+		Map.Entry<F, List<String>> firstTermEntry = dataSet.documentIdPerTerm.entrySet().iterator().next();
 
 		SearchResultAssert.assertThat(
 				index.createScope().query()
@@ -379,19 +359,20 @@ public class TermsAggregationSpecificsIT<F> {
 						.where( f -> f.matchAll().except(
 								f.id().matchingAny( firstTermEntry.getValue() )
 						) )
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.minDocumentCount( 0 )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
 						aggregationKey,
 						/*
-						 * Buckets with a count of 0 should appear for values that are in the index,
+						 * Buckets with a count of 0 should appear for dataSet.values that are in the index,
 						 * but are not encountered in any matching document.
 						 */
 						containsInAnyOrder( c -> {
-							documentIdPerTerm.entrySet().stream().skip( 1 ).forEach( e -> {
+							dataSet.documentIdPerTerm.entrySet().stream().skip( 1 ).forEach( e -> {
 								c.accept( e.getKey(), (long) e.getValue().size() );
 							} );
 							c.accept( firstTermEntry.getKey(), 0L );
@@ -401,7 +382,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void minDocumentCount_zero_noMatch() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -409,9 +390,10 @@ public class TermsAggregationSpecificsIT<F> {
 				index.createScope().query()
 						// Exclude all documents from the matches
 						.where( f -> f.id().matching( "none" ) )
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.minDocumentCount( 0 )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -420,7 +402,7 @@ public class TermsAggregationSpecificsIT<F> {
 						 * All indexed terms should appear in a bucket, in ascending value order, with a count of zero.
 						 */
 						containsInAnyOrder( c -> {
-							for ( F value : valuesInAscendingOrder ) {
+							for ( F value : dataSet.valuesInAscendingOrder ) {
 								c.accept( value, 0L );
 							}
 						} )
@@ -431,7 +413,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void minDocumentCount_zero_noMatch_orderByTermDescending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -439,10 +421,11 @@ public class TermsAggregationSpecificsIT<F> {
 				index.createScope().query()
 						// Exclude all documents from the matches
 						.where( f -> f.id().matching( "none" ) )
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.minDocumentCount( 0 )
 								.orderByTermDescending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -451,7 +434,7 @@ public class TermsAggregationSpecificsIT<F> {
 						 * All indexed terms should appear in a bucket, in descending value order, with a count of zero.
 						 */
 						containsInAnyOrder( c -> {
-							for ( F value : valuesInDescendingOrder ) {
+							for ( F value : dataSet.valuesInDescendingOrder ) {
 								c.accept( value, 0L );
 							}
 						} )
@@ -460,10 +443,10 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void minDocumentCount_negative() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
-				index.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
+				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
 						.minDocumentCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'minDocumentCount'" )
@@ -474,15 +457,16 @@ public class TermsAggregationSpecificsIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-776")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testMaxFacetCounts")
 	public void maxTermCount_positive() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.maxTermCount( 1 )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -491,30 +475,31 @@ public class TermsAggregationSpecificsIT<F> {
 						 * Only the bucket with the most documents should be returned.
 						 */
 						containsInAnyOrder( c -> {
-							F valueWithMostDocuments = valuesInDescendingDocumentCountOrder.get( 0 );
-							c.accept( valueWithMostDocuments, (long) documentIdPerTerm.get( valueWithMostDocuments ).size() );
+							F valueWithMostDocuments = dataSet.valuesInDescendingDocumentCountOrder.get( 0 );
+							c.accept( valueWithMostDocuments, (long) dataSet.documentIdPerTerm.get( valueWithMostDocuments ).size() );
 						} )
 				);
 	}
 
 	/**
 	 * Test maxTermCount with a non-default sort by ascending term value.
-	 * The returned terms should be the "lowest" values.
+	 * The returned terms should be the "lowest" dataSet.values.
 	 */
 	@Test
 	public void maxTermCount_positive_orderByTermAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.maxTermCount( 1 )
 								.orderByTermAscending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -523,8 +508,8 @@ public class TermsAggregationSpecificsIT<F> {
 						 * Only the bucket with the "lowest" value should be returned.
 						 */
 						containsInAnyOrder( c -> {
-							F lowestValue = valuesInAscendingOrder.get( 0 );
-							c.accept( lowestValue, (long) documentIdPerTerm.get( lowestValue ).size() );
+							F lowestValue = dataSet.valuesInAscendingOrder.get( 0 );
+							c.accept( lowestValue, (long) dataSet.documentIdPerTerm.get( lowestValue ).size() );
 						} )
 				);
 	}
@@ -533,16 +518,17 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_positive_orderByCountAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.maxTermCount( 1 )
 								.orderByCountAscending()
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -551,18 +537,18 @@ public class TermsAggregationSpecificsIT<F> {
 						 * Only the bucket with the least documents should be returned.
 						 */
 						containsInAnyOrder( c -> {
-							F valueWithLeastDocuments = valuesInAscendingDocumentCountOrder.get( 0 );
-							c.accept( valueWithLeastDocuments, (long) documentIdPerTerm.get( valueWithLeastDocuments ).size() );
+							F valueWithLeastDocuments = dataSet.valuesInAscendingDocumentCountOrder.get( 0 );
+							c.accept( valueWithLeastDocuments, (long) dataSet.documentIdPerTerm.get( valueWithLeastDocuments ).size() );
 						} )
 				);
 	}
 
 	@Test
 	public void maxTermCount_zero() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
-				index.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
+				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
 						.maxTermCount( 0 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
@@ -571,10 +557,10 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void maxTermCount_negative() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
-				index.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
+				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
 						.maxTermCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
@@ -592,42 +578,10 @@ public class TermsAggregationSpecificsIT<F> {
 		);
 	}
 
-	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		int documentCount = 0;
-		for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
-			F value = entry.getKey();
-			for ( String documentId : entry.getValue() ) {
-				plan.add( referenceProvider( documentId ), document -> {
-					document.addValue( index.binding().fieldModel.reference, value );
-					document.addValue( index.binding().fieldWithConverterModel.reference, value );
-				} );
-				++documentCount;
-			}
-		}
-		plan.add( referenceProvider( "document_empty" ), document -> { } );
-		++documentCount;
-		plan.execute().join();
-
-		// Check that all documents are searchable
-		SearchResultAssert.assertThat(
-				index.createScope().query()
-						.where( f -> f.matchAll() )
-						.toQuery()
-		)
-				.hasTotalHitCount( documentCount );
-	}
-
-	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
-				.map( parent, prefix + typeDescriptor.getUniqueName() );
-	}
-
 	@SuppressWarnings("unchecked")
 	private <K, V> Consumer<Map<F, V>> containsExactly(Consumer<BiConsumer<F, V>> expectationBuilder) {
 		List<Map.Entry<F, V>> expected = new ArrayList<>();
-		expectationBuilder.accept( (k, v) -> expected.add( entry( typeDescriptor.toExpectedDocValue( k ), v ) ) );
+		expectationBuilder.accept( (k, v) -> expected.add( entry( fieldType.toExpectedDocValue( k ), v ) ) );
 		return actual -> assertThat( normalize( actual ) )
 				.containsExactly( normalize( expected ).toArray( new Map.Entry[0] ) );
 	}
@@ -635,31 +589,104 @@ public class TermsAggregationSpecificsIT<F> {
 	@SuppressWarnings("unchecked")
 	private <K, V> Consumer<Map<K, V>> containsInAnyOrder(Consumer<BiConsumer<F, V>> expectationBuilder) {
 		List<Map.Entry<F, V>> expected = new ArrayList<>();
-		expectationBuilder.accept( (k, v) -> expected.add( entry( typeDescriptor.toExpectedDocValue( k ), v ) ) );
+		expectationBuilder.accept( (k, v) -> expected.add( entry( fieldType.toExpectedDocValue( k ), v ) ) );
 		return actual -> assertThat( normalize( actual ).entrySet() )
 				.containsExactlyInAnyOrder( normalize( expected ).toArray( new Map.Entry[0] ) );
 	}
 
-	private class IndexBinding {
-		final SimpleFieldModel<F> fieldModel;
-		final SimpleFieldModel<F> fieldWithConverterModel;
-		final SimpleFieldModel<F> fieldWithAggregationDisabledModel;
+	private static class DataSet<F> {
+		final FieldTypeDescriptor<F> fieldType;
+		final String name;
+		final Map<F, List<String>> documentIdPerTerm;
+		final List<F> valuesInAscendingOrder;
+		final List<F> valuesInDescendingOrder;
+		final List<F> valuesInAscendingDocumentCountOrder;
+		final List<F> valuesInDescendingDocumentCountOrder;
+
+		private DataSet(FieldTypeDescriptor<F> fieldType) {
+			this.fieldType = fieldType;
+			this.name = fieldType.getUniqueName();
+			this.documentIdPerTerm = new LinkedHashMap<>();
+
+			this.valuesInAscendingOrder = fieldType.getAscendingUniqueTermValues().getSingle();
+
+			this.valuesInDescendingOrder = new ArrayList<>( valuesInAscendingOrder );
+			Collections.reverse( valuesInDescendingOrder );
+
+			this.valuesInDescendingDocumentCountOrder = new ArrayList<>( valuesInAscendingOrder );
+			/*
+			 * Mess with the value order, because some tests would be pointless
+			 * if the document count order was the same as (or the opposite of) the value order
+			 */
+			valuesInDescendingDocumentCountOrder.add( valuesInDescendingDocumentCountOrder.get( 0 ) );
+			valuesInDescendingDocumentCountOrder.remove( 0 );
+			valuesInDescendingDocumentCountOrder.add( valuesInDescendingDocumentCountOrder.get( 0 ) );
+			valuesInDescendingDocumentCountOrder.remove( 0 );
+
+			this.valuesInAscendingDocumentCountOrder = new ArrayList<>( valuesInDescendingDocumentCountOrder );
+			Collections.reverse( valuesInAscendingDocumentCountOrder );
+
+			// Simple dataset: strictly decreasing number of documents for each term
+			int documentIdAsInteger = 0;
+			int numberOfDocuments = valuesInDescendingDocumentCountOrder.size();
+			for ( F value : valuesInDescendingDocumentCountOrder ) {
+				ArrayList<String> documentIdsForTerm = new ArrayList<>();
+				documentIdPerTerm.put( value, documentIdsForTerm );
+				for ( int i = 0; i < numberOfDocuments; i++ ) {
+					String documentId = name + "_document_" + documentIdAsInteger;
+					++documentIdAsInteger;
+					documentIdsForTerm.add( documentId );
+				}
+				--numberOfDocuments;
+			}
+		}
+
+		private void init() {
+			IndexIndexingPlan<?> plan = index.createIndexingPlan();
+			int documentCount = 0;
+			for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
+				F value = entry.getKey();
+				for ( String documentId : entry.getValue() ) {
+					plan.add( referenceProvider( documentId, name ), document -> {
+						document.addValue( index.binding().fieldModels.get( fieldType ).reference, value );
+						document.addValue( index.binding().fieldWithConverterModels.get( fieldType ).reference, value );
+					} );
+					++documentCount;
+				}
+			}
+			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
+			++documentCount;
+			plan.execute().join();
+
+			// Check that all documents are searchable
+			SearchResultAssert.assertThat(
+					index.createScope().query()
+							.where( f -> f.matchAll() )
+							.routing( name )
+							.toQuery()
+			)
+					.hasTotalHitCount( documentCount );
+		}
+
+	}
+
+	private static class IndexBinding {
+		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithConverterModels;
+		final SimpleFieldModelsByType fieldWithAggregationDisabledModels;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModel = mapField(
-					root, "",
-					c -> c.aggregable( Aggregable.YES )
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"", c -> c.aggregable( Aggregable.YES )
 							.searchable( Searchable.NO ) // Terms aggregations should not need this
 			);
-			fieldWithConverterModel = mapField(
-					root, "converted_",
-					c -> c.aggregable( Aggregable.YES )
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			);
-			fieldWithAggregationDisabledModel = mapField(
-					root, "nonAggregable_",
-					c -> c.aggregable( Aggregable.NO )
+			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"nonAggregable_", c -> c.aggregable( Aggregable.NO )
 			);
 		}
 	}
