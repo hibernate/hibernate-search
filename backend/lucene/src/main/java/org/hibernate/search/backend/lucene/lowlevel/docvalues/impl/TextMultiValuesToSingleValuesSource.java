@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinFirstChildIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.index.DocValues;
@@ -122,10 +122,9 @@ public abstract class TextMultiValuesToSingleValuesSource {
 			return DocValues.emptySorted();
 		}
 
-		JoinFirstChildIdIterator joinIterator = new JoinFirstChildIdIterator( parentDocs, childDocs, values );
+		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new SortedSetDocValuesToSortedDocValuesWrapper( values ) {
-			int docID = -1;
 			int lastSeenParentDoc = -1;
 			int lastEmittedOrd = -1;
 
@@ -136,7 +135,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 
 			@Override
 			public int docID() {
-				return docID;
+				return lastSeenParentDoc;
 			}
 
 			@Override
@@ -146,14 +145,13 @@ public abstract class TextMultiValuesToSingleValuesSource {
 					return true;
 				}
 
-				int nextChildWithValue = joinIterator.advance( parentDoc );
-				if ( nextChildWithValue == JoinFirstChildIdIterator.NO_CHILD_WITH_VALUE ) {
+				if ( !joinIterator.advanceExact( parentDoc ) ) {
 					// No child of this parent has a value
 					return false;
 				}
 
-				docID = lastSeenParentDoc = parentDoc;
-				lastEmittedOrd = (int) mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+				lastSeenParentDoc = parentDoc;
+				lastEmittedOrd = (int) mode.pick( values, joinIterator );
 				return true;
 			}
 		};

@@ -19,7 +19,7 @@ import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
 
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinFirstChildIdIterator;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinChildrenIdIterator;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
@@ -159,7 +159,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 			return DocValuesUtils.LONG_VALUES_EMPTY;
 		}
 
-		JoinFirstChildIdIterator joinIterator = new JoinFirstChildIdIterator( parentDocs, childDocs, values );
+		JoinChildrenIdIterator joinIterator = new JoinChildrenIdIterator( parentDocs, childDocs, values );
 
 		return new LongValues() {
 			int lastSeenParentDoc = -1;
@@ -177,14 +177,13 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 					return true;
 				}
 
-				int nextChildWithValue = joinIterator.advance( parentDoc );
-				if ( nextChildWithValue == JoinFirstChildIdIterator.NO_CHILD_WITH_VALUE ) {
+				if ( !joinIterator.advanceExact( parentDoc ) ) {
 					// No child of this parent has a value
 					return false;
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+				lastEmittedValue = mode.pick( values, joinIterator );
 				return true;
 			}
 		};
