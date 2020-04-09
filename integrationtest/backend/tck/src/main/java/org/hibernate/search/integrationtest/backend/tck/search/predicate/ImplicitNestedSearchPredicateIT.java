@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
-import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -25,6 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
@@ -33,7 +33,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -98,114 +98,114 @@ public class ImplicitNestedSearchPredicateIT {
 	public void nested_X2_explicit() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.nested().objectField( NESTED_1 )
 						.nest( f -> f.nested().objectField( NESTED_1_2 )
 								.nest( g -> g.match().field( NESTED_1_2 + ".numeric" ).matching( SOME_INTEGER ) )
 						) )
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void nested_X2_implicit() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.match().field( NESTED_1_2 + ".numeric" ).matching( SOME_INTEGER ) )
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void nested_X2_explicit_implicit() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.nested().objectField( NESTED_1 )
 						.nest( f -> f.match().field( NESTED_1_2 + ".numeric" ).matching( SOME_INTEGER ) )
 				)
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void nested_X3_explicitX2_implicit() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.nested().objectField( NESTED_1 )
 						.nest( f -> f.nested().objectField( NESTED_1_2 )
 								.nest( g -> g.match().field( NESTED_1_2_3 + ".string" ).matching( SOME_STRING ) )
 						) )
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void nested_X3_explicitX2_implicit_simpleQuery() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.nested().objectField( NESTED_1 )
 						.nest( f -> f.nested().objectField( NESTED_1_2 )
 								.nest( g -> g.simpleQueryString().field( NESTED_1_2_3 + ".text" ).matching( SOME_SIMPLE_QUERY_STRING ) )
 						) )
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void nested_X3_explicit_implicitX2() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.nested().objectField( NESTED_1 )
 						.nest( f -> f.match().field( NESTED_1_2_3 + ".string" ).matching( SOME_STRING ) )
 				)
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void nested_X3_explicit_implicitX2_simpleQuery() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.nested().objectField( NESTED_1 )
 							.nest( f -> f.simpleQueryString().field( NESTED_1_2_3 + ".text" ).matching( SOME_SIMPLE_QUERY_STRING ) )
 				)
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void flattenedStepIsSkipped() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.match().field( NEST_FLAT_NEST + ".numeric" ).matching( SOME_INTEGER ) )
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void flattenedStepIsSkipped_simpleQuery() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query()
+		SearchQuery<DocumentReference> query = scope.query()
 				.where( p -> p.simpleQueryString().field( NEST_FLAT_NEST + ".text" ).matching( SOME_SIMPLE_QUERY_STRING ) )
-				.fetchAllHits();
+				.toQuery();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -270,10 +270,9 @@ public class ImplicitNestedSearchPredicateIT {
 
 	@Test
 	public void predicate_simpleQueryString_multipleNestedPaths() {
-		SubTest.expectException( () -> indexManager.createScope()
+		Assertions.assertThatThrownBy( () -> indexManager.createScope()
 				.predicate().simpleQueryString().field( NESTED_1 + ".text" ).field( "text" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Simple query string targets fields" )
 				.hasMessageContaining( "spanning multiple nested paths" )
@@ -289,27 +288,27 @@ public class ImplicitNestedSearchPredicateIT {
 		SearchPredicate explicitPredicate = scope.predicate().nested().objectField( NESTED_1 ).nest( implicitPredicate ).toPredicate();
 
 		// test the explicit form
-		List<DocumentReference> docs = scope.query().selectEntityReference()
+		SearchQuery<DocumentReference> query = scope.query().selectEntityReference()
 				.where( explicitPredicate )
-				.fetchAllHits();
+				.toQuery();
 
 		if ( allMatch ) {
-			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 		else {
-			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+			assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		}
 
 		// test the implicit form
-		docs = scope.query().selectEntityReference()
+		query = scope.query().selectEntityReference()
 				.where( implicitPredicate )
-				.fetchAllHits();
+				.toQuery();
 
 		if ( allMatch ) {
-			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 		else {
-			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+			assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		}
 	}
 

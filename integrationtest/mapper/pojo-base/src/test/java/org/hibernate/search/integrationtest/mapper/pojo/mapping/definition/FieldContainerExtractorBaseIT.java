@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -120,10 +120,9 @@ public class FieldContainerExtractorBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -149,14 +148,13 @@ public class FieldContainerExtractorBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withConfiguration( builder -> {
 							builder.containerExtractors().define( RawContainerExtractor.NAME, RawContainerExtractor.class );
 						} )
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -194,10 +192,9 @@ public class FieldContainerExtractorBaseIT {
 				return numbers;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -229,10 +226,9 @@ public class FieldContainerExtractorBaseIT {
 				return numbers;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

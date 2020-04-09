@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -27,16 +27,14 @@ public class PojoModelPathTest {
 		assertThat( PojoModelPath.ofProperty( "foo" ) )
 				.satisfies( isPath( "foo" ) );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofProperty( null )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofProperty( "" )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 	}
 
@@ -45,16 +43,14 @@ public class PojoModelPathTest {
 		assertThat( PojoModelPath.ofValue( "foo" ) )
 				.satisfies( isPath( "foo", ContainerExtractorPath.defaultExtractors() ) );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofValue( null )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofValue( "" )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 	}
 
@@ -63,22 +59,19 @@ public class PojoModelPathTest {
 		assertThat( PojoModelPath.ofValue( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) )
 				.satisfies( isPath( "foo", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) ) );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofValue( null, ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofValue( "", ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.ofValue( "foo", null )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 	}
 
@@ -95,28 +88,24 @@ public class PojoModelPathTest {
 						"bar", ContainerExtractorPath.defaultExtractors()
 				) );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.parse( null )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.parse( "" )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.parse( "foo..bar" )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.parse( "foo." )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class );
 	}
 
@@ -193,38 +182,33 @@ public class PojoModelPathTest {
 
 		String errorMessage = "A PojoModelPath must include at least one property";
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().toValuePath()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().toPropertyPath()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().value( BuiltinContainerExtractors.COLLECTION )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().valueWithoutExtractors()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().valueWithDefaultExtractors()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 	}
@@ -256,19 +240,17 @@ public class PojoModelPathTest {
 
 		String errorMessage = "chain of multiple container extractors cannot include the default extractors";
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().property( "foo" )
 						.value( BuiltinContainerExtractors.COLLECTION ).valueWithDefaultExtractors()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> PojoModelPath.builder().property( "foo" )
 						.valueWithDefaultExtractors().value( BuiltinContainerExtractors.COLLECTION )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( errorMessage );
 	}

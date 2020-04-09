@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
@@ -79,10 +79,9 @@ public class FieldSearchSortUnsupportedTypesIT<F> {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = getFieldPath();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( absoluteFieldPath );
 	}

@@ -39,7 +39,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -270,9 +270,9 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.predicate().simpleQueryString().field( absoluteFieldPath )
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
 				.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -427,13 +427,12 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
-		SubTest.expectException( () -> scope.query()
+		Assertions.assertThatThrownBy( () -> scope.query()
 				.where( f -> f.simpleQueryString().field( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
 				.toQuery().fetchAll()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "this_name_does_actually_not_exist" );
 	}
@@ -475,11 +474,10 @@ public class SimpleQueryStringSearchPredicateIT {
 		for ( ByTypeFieldModel fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"simpleQueryString() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().simpleQueryString().field( absoluteFieldPath )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().simpleQueryString().field( absoluteFieldPath ),
+					"simpleQueryString() predicate with unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Text predicates" )
 					.hasMessageContaining( "are not supported by" )
@@ -497,11 +495,10 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"simpleQueryString() predicate with null value to match",
-				() -> scope.predicate().simpleQueryString().field( absoluteFieldPath ).matching( null )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().simpleQueryString().field( absoluteFieldPath ).matching( null ),
+				"simpleQueryString() predicate with null value to match"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid simple query string" )
 				.hasMessageContaining( "must be non-null" )
@@ -854,41 +851,37 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"simpleQueryString() predicate with unknown field",
-				() -> scope.predicate().simpleQueryString().field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().simpleQueryString().field( "unknown_field" ),
+				"simpleQueryString() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"simpleQueryString() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().simpleQueryString()
-						.fields( absoluteFieldPath, "unknown_field" )
+						.fields( absoluteFieldPath, "unknown_field" ),
+				"simpleQueryString() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"simpleQueryString() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().simpleQueryString().field( absoluteFieldPath )
-						.field( "unknown_field" )
+						.field( "unknown_field" ),
+				"simpleQueryString() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"simpleQueryString() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().simpleQueryString().field( absoluteFieldPath )
-						.fields( "unknown_field" )
+						.fields( "unknown_field" ),
+				"simpleQueryString() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -931,14 +924,13 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					scope.query()
 							.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( TERM_5 ) )
 							.toQuery();
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )
@@ -1000,8 +992,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () -> scope.predicate().simpleQueryString().field( absoluteFieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scope.predicate().simpleQueryString().field( absoluteFieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )

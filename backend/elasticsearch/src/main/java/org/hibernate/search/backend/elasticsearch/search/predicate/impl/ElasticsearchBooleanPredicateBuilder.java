@@ -103,6 +103,14 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		checkNestableWithin( expectedParentNestedPath, mustClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, shouldClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, filterClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, mustNotClauseBuilders );
+	}
+
+	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		contributeClauses( context, innerObject, MUST_ACCESSOR, mustClauseBuilders );
@@ -140,6 +148,15 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 
 		for ( ElasticsearchSearchPredicateBuilder clauseBuilder : clauseBuilders ) {
 			occurAccessor.add( innerObject, clauseBuilder.build( context ) );
+		}
+	}
+
+	private void checkNestableWithin(String expectedParentNestedPath, List<ElasticsearchSearchPredicateBuilder> clauseBuilders) {
+		if ( clauseBuilders == null ) {
+			return;
+		}
+		for ( ElasticsearchSearchPredicateBuilder builder : clauseBuilders ) {
+			builder.checkNestableWithin( expectedParentNestedPath );
 		}
 	}
 

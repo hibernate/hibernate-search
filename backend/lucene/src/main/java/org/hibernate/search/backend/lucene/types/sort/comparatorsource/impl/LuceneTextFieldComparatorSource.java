@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource {
@@ -23,8 +24,8 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 	private final Object missingValue;
 	private final MultiValueMode multiValueMode;
 
-	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue, MultiValueMode multiValueMode) {
-		super( nestedDocumentPath );
+	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue, MultiValueMode multiValueMode, Query luceneFilter) {
+		super( nestedDocumentPath, luceneFilter );
 		this.missingValue = missingValue;
 		this.multiValueMode = multiValueMode;
 	}

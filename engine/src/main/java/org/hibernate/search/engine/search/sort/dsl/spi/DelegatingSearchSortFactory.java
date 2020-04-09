@@ -8,14 +8,18 @@ package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedStep;
+import org.hibernate.search.engine.search.sort.dsl.impl.DistanceSortOptionsStepImpl;
+import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsStepImpl;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -23,12 +27,14 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * <p>
  * Mainly useful when implementing a {@link SearchSortFactoryExtension}.
  */
-public class DelegatingSearchSortFactory implements SearchSortFactory {
+public class DelegatingSearchSortFactory<PDF extends SearchPredicateFactory> implements ExtendedSearchSortFactory<PDF> {
 
 	private final SearchSortFactory delegate;
+	private final SearchSortDslContext<?, ?, ? extends PDF> dslContext;
 
-	public DelegatingSearchSortFactory(SearchSortFactory delegate) {
+	public DelegatingSearchSortFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?, ? extends PDF> dslContext) {
 		this.delegate = delegate;
+		this.dslContext = dslContext;
 	}
 
 	@Override
@@ -42,18 +48,13 @@ public class DelegatingSearchSortFactory implements SearchSortFactory {
 	}
 
 	@Override
-	public FieldSortOptionsStep<?> field(String absoluteFieldPath) {
-		return delegate.field( absoluteFieldPath );
+	public FieldSortOptionsStep<?, PDF> field(String absoluteFieldPath) {
+		return new FieldSortOptionsStepImpl<>( dslContext, absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location) {
-		return delegate.distance( absoluteFieldPath, location );
-	}
-
-	@Override
-	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, double latitude, double longitude) {
-		return delegate.distance( absoluteFieldPath, latitude, longitude );
+	public DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, GeoPoint location) {
+		return new DistanceSortOptionsStepImpl<>( dslContext, absoluteFieldPath, location );
 	}
 
 	@Override

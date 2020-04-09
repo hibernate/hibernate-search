@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
@@ -169,7 +170,8 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public NestedPredicateBuilder<LuceneSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		scopeModel.checkNestedField( absoluteFieldPath );
-		return new LuceneNestedPredicateBuilder( absoluteFieldPath );
+		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
+		return new LuceneNestedPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

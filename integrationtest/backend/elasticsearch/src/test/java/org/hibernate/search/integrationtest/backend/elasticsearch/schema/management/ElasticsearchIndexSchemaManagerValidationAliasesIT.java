@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -87,8 +87,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 
-		SubTest.expectException( this::setupAndValidate )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
@@ -112,8 +111,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 						simpleAliasDefinition( true, "'filter': {'term': {'user_id': 12}}" )
 				);
 
-		SubTest.expectException( this::setupAndValidate )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
@@ -136,8 +134,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( defaultWriteAlias( INDEX_NAME ).original, simpleAliasDefinition( false, "" ) );
 
-		SubTest.expectException( this::setupAndValidate )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
@@ -157,8 +154,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 
-		SubTest.expectException( this::setupAndValidate )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
@@ -179,8 +175,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( defaultReadAlias( INDEX_NAME ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
-		SubTest.expectException( this::setupAndValidate )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
@@ -19,14 +20,14 @@ import com.google.gson.JsonObject;
 
 
 public class ElasticsearchSearchSortFactoryImpl
-		extends DelegatingSearchSortFactory
+		extends DelegatingSearchSortFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchSortFactory {
 
-	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext;
+	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ?> dslContext;
 
 	public ElasticsearchSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext) {
-		super( delegate );
+			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ElasticsearchSearchPredicateFactory> dslContext) {
+		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
 

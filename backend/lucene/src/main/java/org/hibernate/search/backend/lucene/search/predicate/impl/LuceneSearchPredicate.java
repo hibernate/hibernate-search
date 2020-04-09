@@ -23,6 +23,11 @@ class LuceneSearchPredicate implements SearchPredicate, LuceneSearchPredicateBui
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		delegate.checkNestableWithin( expectedParentNestedPath );
+	}
+
+	@Override
 	public Query build(LuceneSearchPredicateContext context) {
 		return delegate.build( context );
 	}

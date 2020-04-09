@@ -118,8 +118,10 @@ public abstract class AbstractSearchQueryOptionsStep<
 	@Override
 	public S sort(Function<? super SF, ? extends SortFinalStep> sortContributor) {
 		SearchSortBuilderFactory<? super C, ?> builderFactory = indexScope.getSearchSortBuilderFactory();
+		SearchPredicateBuilderFactory<? super C, ?> predicateBuilderFactory = indexScope.getSearchPredicateBuilderFactory();
+		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
 		SearchSortFactory factory = new DefaultSearchSortFactory<>(
-				SearchSortDslContextImpl.root( builderFactory )
+				SearchSortDslContextImpl.root( builderFactory, predicateFactory, predicateBuilderFactory )
 		);
 		SearchSort sort = sortContributor.apply( extendSortFactory( factory ) ).toSort();
 		contribute( builderFactory, sort );

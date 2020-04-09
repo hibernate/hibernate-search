@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
@@ -16,6 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -25,7 +27,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class NestedSearchPredicateIT {
 
@@ -48,9 +49,6 @@ public class NestedSearchPredicateIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -223,6 +221,64 @@ public class NestedSearchPredicateIT {
 				.hasTotalHitCount( 1 );
 	}
 
+	@Test
+	public void invalidNestedPath_parent() {
+		StubMappingScope scope = indexManager.createScope();
+
+		String objectFieldPath = "nestedObject";
+		String fieldInParentPath = "string";
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.nested().objectField( objectFieldPath )
+						.nest( f.bool()
+								.must( f.match()
+										.field( fieldInParentPath )
+										.matching( "irrelevant_because_this_will_fail" )
+								)
+								.must( f.match()
+										.field( fieldInParentPath )
+										.matching( "irrelevant_because_this_will_fail" )
+								)
+						)
+				)
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
+						"Only fields that are contained in the nested object with path '" + objectFieldPath + "'"
+								+ " are allowed here."
+				);
+	}
+
+	@Test
+	public void invalidNestedPath_sibling() {
+		StubMappingScope scope = indexManager.createScope();
+
+		String objectFieldPath = "nestedObject";
+		String fieldInSiblingPath = "nestedObject2.string";
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.nested().objectField( objectFieldPath )
+						.nest( f.bool()
+								.must( f.match()
+										.field( fieldInSiblingPath )
+										.matching( "irrelevant_because_this_will_fail" )
+								)
+								.must( f.match()
+										.field( fieldInSiblingPath )
+										.matching( "irrelevant_because_this_will_fail" )
+								)
+						)
+				)
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
+						"Only fields that are contained in the nested object with path '" + objectFieldPath + "'"
+								+ " are allowed here."
+				);
+	}
+
 	private void initData() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -352,12 +408,19 @@ public class NestedSearchPredicateIT {
 	}
 
 	private static class IndexMapping {
+		final IndexFieldReference<String> string;
 		final ObjectMapping nestedObject;
+		final ObjectMapping nestedObject2;
 
 		IndexMapping(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString() ).toReference();
+
 			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
 					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
+			IndexSchemaObjectField nestedObject2Field = root.objectField( "nestedObject2", ObjectFieldStorage.NESTED )
+					.multiValued();
+			nestedObject2 = new ObjectMapping( nestedObject2Field );
 		}
 	}
 

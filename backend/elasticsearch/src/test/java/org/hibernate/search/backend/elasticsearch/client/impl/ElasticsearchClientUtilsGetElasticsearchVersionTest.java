@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.HamcrestCondition.matching;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
@@ -20,9 +22,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -31,9 +31,6 @@ import org.easymock.EasyMock;
 
 @RunWith(Parameterized.class)
 public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] data() {
@@ -87,8 +84,8 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	public void testInvalid() {
 		String invalidVersionString = versionString.substring( 0, versionString.length() - 1 ) + "-A-B";
 		doMock( invalidVersionString );
-		expectedException.expect(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+		assertThatThrownBy( () -> ElasticsearchClientUtils.getElasticsearchVersion( clientMock ) )
+				.is( matching( ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "HSEARCH400080" )
 						.causedBy( SearchException.class )
 								.withMessage( "HSEARCH400007" )
@@ -98,8 +95,7 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 								.withMessage( "'" + invalidVersionString.toLowerCase( Locale.ROOT ) + "'" )
 								.withMessage( "The version must be in the form 'x.y.z-qualifier'" )
 						.build()
-		);
-		ElasticsearchClientUtils.getElasticsearchVersion( clientMock );
+				) );
 	}
 
 	private void doMock(String theVersionString) {

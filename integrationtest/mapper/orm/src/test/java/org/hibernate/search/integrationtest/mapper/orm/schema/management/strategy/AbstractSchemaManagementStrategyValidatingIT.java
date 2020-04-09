@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -24,8 +24,7 @@ public abstract class AbstractSchemaManagementStrategyValidatingIT extends Abstr
 			return CompletableFuture.completedFuture( null );
 		} );
 
-		SubTest.expectException( this::setup )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity2.class.getName() )
@@ -44,8 +43,7 @@ public abstract class AbstractSchemaManagementStrategyValidatingIT extends Abstr
 			return CompletableFuture.completedFuture( null );
 		} );
 
-		SubTest.expectException( this::setup )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity1.class.getName() )
@@ -64,8 +62,7 @@ public abstract class AbstractSchemaManagementStrategyValidatingIT extends Abstr
 		} );
 		expectWork( IndexedEntity2.NAME, CompletableFuture.completedFuture( null ) );
 
-		SubTest.expectException( this::setup )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity1.class.getName() )

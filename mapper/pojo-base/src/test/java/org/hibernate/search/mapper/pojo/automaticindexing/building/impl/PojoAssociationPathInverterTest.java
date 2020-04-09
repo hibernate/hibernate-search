@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,9 +28,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
@@ -36,9 +36,6 @@ import org.easymock.IAnswer;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class PojoAssociationPathInverterTest extends EasyMockSupport {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock =
 			createMock( PojoTypeAdditionalMetadataProvider.class );
@@ -172,21 +169,19 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 						.value( (BoundContainerExtractorPath) BoundContainerExtractorPath.noExtractors(
 								originalSidePropertyTypeMock
 						) );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Found an infinite embedded recursion involving path '"
-				+ PojoModelPath.builder()
-						.property( inverseSideProperty1Name ).value( ContainerExtractorPath.noExtractors() )
-						.property( inverseSideProperty2Name ).value( ContainerExtractorPath.noExtractors() )
-						.property( inverseSideProperty3Name ).value( ContainerExtractorPath.noExtractors() )
-						.toValuePath()
-						.toPathString()
-				+ "' on type '" + inverseSideEntityTypeMock.getName() + "'" );
-		try {
-			inverter.invertPath( inverseSideEntityTypeMock, boundPathToInvert );
-		}
-		finally {
-			verifyAll();
-		}
+		assertThatThrownBy( () -> inverter.invertPath( inverseSideEntityTypeMock, boundPathToInvert ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Found an infinite embedded recursion involving path '"
+								+ PojoModelPath.builder()
+										.property( inverseSideProperty1Name ).value( ContainerExtractorPath.noExtractors() )
+										.property( inverseSideProperty2Name ).value( ContainerExtractorPath.noExtractors() )
+										.property( inverseSideProperty3Name ).value( ContainerExtractorPath.noExtractors() )
+										.toValuePath()
+										.toPathString()
+								+ "' on type '" + inverseSideEntityTypeMock.getName() + "'"
+				);
+		verifyAll();
 	}
 
 	private void setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,

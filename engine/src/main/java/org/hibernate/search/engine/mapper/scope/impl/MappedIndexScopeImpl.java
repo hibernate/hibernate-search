@@ -54,8 +54,13 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public SearchSortFactory sort() {
+
 		return new DefaultSearchSortFactory<>(
-				SearchSortDslContextImpl.root( delegate.getSearchSortBuilderFactory() )
+				SearchSortDslContextImpl.root(
+						delegate.getSearchSortBuilderFactory(),
+						predicate(),
+						delegate.getSearchPredicateBuilderFactory()
+				)
 		);
 	}
 

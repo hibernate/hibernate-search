@@ -34,7 +34,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -466,13 +466,12 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withAnnotatedEntityTypes( IndexedEntity.class )
 						.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
 						.setup()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -728,10 +727,9 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
-		SubTest.expectException( () -> setupHelper.start()
+		Assertions.assertThatThrownBy( () -> setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.setup() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -779,10 +777,9 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
-		SubTest.expectException( () -> setupHelper.start()
+		Assertions.assertThatThrownBy( () -> setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.setup() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

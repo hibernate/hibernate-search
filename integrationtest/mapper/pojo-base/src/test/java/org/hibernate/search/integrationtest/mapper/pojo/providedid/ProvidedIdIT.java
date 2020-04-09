@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,10 +105,9 @@ public class ProvidedIdIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> session.indexingPlan().add( entity1 )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "the provided identifier was null" );
 		}

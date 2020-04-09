@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -159,10 +159,9 @@ public class MatchIdSearchPredicateIT {
 	public void multiIndex_withIncompatibleIdConverterIndexManager_dslConverterEnabled() {
 		StubMappingScope scope = indexManager.createScope( incompatibleIdConverterIndexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().id().matching( new Object() /* Value does not matter */ )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types for identifier" )
 				.satisfies( FailureReportUtils.hasContext(

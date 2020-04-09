@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class CompositeSearchProjectionIT {
 
@@ -55,9 +54,6 @@ public class CompositeSearchProjectionIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;

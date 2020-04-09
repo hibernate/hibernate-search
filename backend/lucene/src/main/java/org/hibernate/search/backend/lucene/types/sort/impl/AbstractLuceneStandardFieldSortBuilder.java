@@ -41,7 +41,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	private final Object sortMissingValueFirstPlaceholder;
 	private final Object sortMissingValueLastPlaceholder;
 
-	protected Object missingValue;
+	protected Object missingValue = SortMissingValue.MISSING_LAST;
 
 	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,

@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
@@ -651,8 +651,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 	}
 
 	private void setupAndValidateExpectingFailure(String failureReportPattern) {
-		SubTest.expectException( this::setupAndValidate )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( failureReportPattern );
 	}

@@ -50,7 +50,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
@@ -301,26 +301,24 @@ public class SingleFieldAggregationBaseIT<F> {
 				.toAggregation();
 
 		// reuse the aggregation instance on a different scope targeting a different index
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				compatibleIndexManager.createScope().query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasMessageContaining( COMPATIBLE_INDEX_NAME );
 
 		// reuse the aggregation instance on a different scope targeting a superset of the original indexes
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope( compatibleIndexManager ).query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -406,8 +404,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), null ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'absoluteFieldPath'" )
 				.hasMessageContaining( "must not be null" );
@@ -420,8 +417,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.nullType() );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'type'" )
 				.hasMessageContaining( "must not be null" );
@@ -433,8 +429,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( typeDescriptor ) );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
 				.hasMessageContaining( "for aggregation on field" )
@@ -447,10 +442,9 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( typeDescriptor ) );
 
-		SubTest.expectException( () -> scenario.setupWithConverterSetting(
+		Assertions.assertThatThrownBy( () -> scenario.setupWithConverterSetting(
 				indexManager.createScope().aggregation(), fieldPath, ValueConvert.NO
 		) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
 				.hasMessageContaining( "for aggregation on field" )
@@ -464,8 +458,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
@@ -478,8 +471,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
@@ -492,8 +484,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
@@ -508,8 +499,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Aggregations are not enabled for field" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -543,8 +533,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		SubTest.expectException( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
 				.hasMessageContaining( "for aggregation on field" )
@@ -601,12 +590,11 @@ public class SingleFieldAggregationBaseIT<F> {
 	private <A> void doTestDuplicatedSameKey(String fieldPath, AggregationScenario<A> scenario) {
 		AggregationKey<A> key1 = AggregationKey.of( "aggregationName1" );
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple aggregations with the same key: " )
 				.hasMessageContaining( "'aggregationName1'" );
@@ -658,8 +646,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				TypeAssertionHelper.wrapper( typeDescriptor )
 		);
 
-		SubTest.expectException( () -> scenario.setup( scope.aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build an aggregation" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -685,8 +672,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		SubTest.expectException( () -> scenario.setup( scope.aggregation(), fieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build an aggregation" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -700,10 +686,9 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		SubTest.expectException( () -> scenario.setupWithConverterSetting(
+		Assertions.assertThatThrownBy( () -> scenario.setupWithConverterSetting(
 				scope.aggregation(), fieldPath, ValueConvert.NO
 		) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build an aggregation" )
 				.hasMessageContaining( "'" + fieldPath + "'" );

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.document;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
@@ -30,7 +31,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubTypeModel;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -162,14 +162,12 @@ public class DocumentElementBaseIT {
 	@Test
 	public void invalidFieldForDocumentElement_flattenedObjectChild() {
 		for ( IndexFieldReference<?> reference : indexMapping.flattenedObject.getFieldReferences() ) {
-			SubTest.expectException(
-					"Parent mismatch with reference " + reference,
-					() ->
-							executeAdd( "1", document -> {
-								document.addValue( reference, null );
-							} )
+			assertThatThrownBy(
+					() -> executeAdd( "1", document -> {
+						document.addValue( reference, null );
+					} ),
+					"Parent mismatch with reference " + reference
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid field reference for this document element" )
 					.hasMessageContaining( "this document element has path 'flattenedObject'" )
@@ -180,14 +178,12 @@ public class DocumentElementBaseIT {
 	@Test
 	public void invalidFieldForDocumentElement_nestedObjectChild() {
 		for ( IndexFieldReference<?> reference : indexMapping.nestedObject.getFieldReferences() ) {
-			SubTest.expectException(
-					"Parent mismatch with reference " + reference,
-					() ->
-							executeAdd( "1", document -> {
-								document.addValue( reference, null );
-							} )
+			assertThatThrownBy(
+					() -> executeAdd( "1", document -> {
+						document.addValue( reference, null );
+					} ),
+					"Parent mismatch with reference " + reference
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid field reference for this document element" )
 					.hasMessageContaining( "this document element has path 'nestedObject'" )
@@ -198,15 +194,13 @@ public class DocumentElementBaseIT {
 	@Test
 	public void invalidFieldForDocumentElement_rootChild() {
 		for ( IndexFieldReference<?> reference : indexMapping.getFieldReferences() ) {
-			SubTest.expectException(
-					"Parent mismatch with reference " + reference,
-					() ->
-							executeAdd( "1", document -> {
-								DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-								flattenedObject.addValue( reference, null );
-							} )
+			assertThatThrownBy(
+					() -> executeAdd( "1", document -> {
+						DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+						flattenedObject.addValue( reference, null );
+					} ),
+					"Parent mismatch with reference " + reference
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid field reference for this document element" )
 					.hasMessageContaining( "this document element has path 'null'" )

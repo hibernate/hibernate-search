@@ -139,14 +139,15 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ExistsPredicateBuilder<ElasticsearchSearchPredicateBuilder> exists(String absoluteFieldPath) {
-		if ( !scopeModel.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
+		List<String> nestedPathHierarchy;
+		if ( scopeModel.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
+			nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
+		}
+		else {
+			nestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( absoluteFieldPath );
 			// Make sure to fail for fields with different type or for unknown fields
 			// We may be able to relax this constraint, but that would require more extensive testing
 			scopeModel.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		}
-		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( absoluteFieldPath );
-		if ( nestedPathHierarchy == null ) {
-			nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
 		}
 		return new ElasticsearchExistsPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
@@ -178,7 +179,8 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		scopeModel.checkNestedField( absoluteFieldPath );
-		return new ElasticsearchNestedPredicateBuilder( absoluteFieldPath );
+		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
+		return new ElasticsearchNestedPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

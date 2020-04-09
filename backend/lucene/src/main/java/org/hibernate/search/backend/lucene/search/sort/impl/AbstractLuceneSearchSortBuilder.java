@@ -23,5 +23,4 @@ public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuild
 	public void order(SortOrder order) {
 		this.order = order;
 	}
-
 }

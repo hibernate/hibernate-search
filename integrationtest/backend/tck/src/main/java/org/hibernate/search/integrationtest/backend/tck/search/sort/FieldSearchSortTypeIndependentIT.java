@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -18,7 +20,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests related to behavior independent from the field type
@@ -33,9 +34,6 @@ public class FieldSearchSortTypeIndependentIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -57,15 +55,17 @@ public class FieldSearchSortTypeIndependentIT {
 
 		String absoluteFieldPath = "unknownField";
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( absoluteFieldPath );
-		thrown.expectMessage( INDEX_NAME );
-
-		scope.query()
+		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( absoluteFieldPath ) )
-				.toQuery();
+				.toQuery()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown field",
+						absoluteFieldPath,
+						INDEX_NAME
+				);
 	}
 
 	@Test
@@ -74,15 +74,17 @@ public class FieldSearchSortTypeIndependentIT {
 
 		String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName;
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( absoluteFieldPath );
-		thrown.expectMessage( INDEX_NAME );
-
-		scope.query()
+		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( absoluteFieldPath ) )
-				.toQuery();
+				.toQuery()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown field",
+						absoluteFieldPath,
+						INDEX_NAME
+				);
 	}
 
 	@Test
@@ -91,15 +93,17 @@ public class FieldSearchSortTypeIndependentIT {
 
 		String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName;
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( absoluteFieldPath );
-		thrown.expectMessage( INDEX_NAME );
-
-		scope.query()
+		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( absoluteFieldPath ) )
-				.toQuery();
+				.toQuery()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown field",
+						absoluteFieldPath,
+						INDEX_NAME
+				);
 	}
 
 	private static class IndexMapping {

@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -87,8 +86,7 @@ public class SearchTimeoutIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.fetchAll() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.fetchAll() )
 					.isSameAs( timeoutException );
 		}
 	}

@@ -7,12 +7,16 @@
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -26,6 +30,7 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 	protected final String absoluteFieldPath;
 	protected final String nestedDocumentPath;
 	private SortMode mode;
+	private LuceneSearchPredicateBuilder filterBuilder;
 
 	protected AbstractLuceneDocumentValueSortBuilder(String absoluteFieldPath, String nestedDocumentPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -37,6 +42,15 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 			throw log.cannotComputeMedianAcrossNested( getEventContext() );
 		}
 		this.mode = mode;
+	}
+
+	public void filter(SearchPredicate filter) {
+		if ( nestedDocumentPath == null ) {
+			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
+		}
+		LuceneSearchPredicateBuilder builder = (LuceneSearchPredicateBuilder) filter;
+		builder.checkNestableWithin( nestedDocumentPath );
+		this.filterBuilder = builder;
 	}
 
 	protected final MultiValueMode getMultiValueMode() {
@@ -66,6 +80,15 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 			}
 		}
 		return multiValueMode;
+	}
+
+	protected Query getLuceneFilter() {
+		if ( filterBuilder == null ) {
+			return null;
+		}
+
+		LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
+		return filterBuilder.build( filterContext );
 	}
 
 	protected final EventContext getEventContext() {

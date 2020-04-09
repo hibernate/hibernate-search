@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.dsl;
 
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 import com.google.gson.JsonObject;
 
 /**
  * A factory for search sorts with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchSortFactory extends SearchSortFactory {
+public interface ElasticsearchSearchSortFactory extends ExtendedSearchSortFactory<ElasticsearchSearchPredicateFactory> {
 
 	/**
 	 * Order elements according to a JSON sort definition.

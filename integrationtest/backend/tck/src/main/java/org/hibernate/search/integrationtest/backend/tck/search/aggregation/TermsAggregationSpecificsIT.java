@@ -38,7 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
@@ -471,10 +471,9 @@ public class TermsAggregationSpecificsIT<F> {
 	public void minDocumentCount_negative() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
 						.minDocumentCount( -1 ) )
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'minDocumentCount'" )
 				.hasMessageContaining( "must be positive or zero" );
@@ -571,10 +570,9 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_zero() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
 						.maxTermCount( 0 ) )
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
 				.hasMessageContaining( "must be strictly positive" );
@@ -584,10 +582,9 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_negative() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
 						.maxTermCount( -1 ) )
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
 				.hasMessageContaining( "must be strictly positive" );

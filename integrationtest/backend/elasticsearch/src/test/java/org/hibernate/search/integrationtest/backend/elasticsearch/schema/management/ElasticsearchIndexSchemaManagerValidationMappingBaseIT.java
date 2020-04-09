@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Assume;
@@ -299,8 +299,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 	private void setupAndValidateExpectingFailure(Consumer<? super IndexedEntityBindingContext> mappingContributor,
 			String failureReportRegex) {
-		SubTest.expectException( () -> setupAndValidate( mappingContributor ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> setupAndValidate( mappingContributor ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( failureReportRegex );
 	}

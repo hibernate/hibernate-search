@@ -13,6 +13,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.HamcrestCondition.matching;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
@@ -63,7 +65,6 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.extension.Parameters;
@@ -86,9 +87,6 @@ import org.apache.http.ssl.SSLContexts;
 public class ElasticsearchClientFactoryImplIT {
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
@@ -202,18 +200,18 @@ public class ElasticsearchClientFactoryImplIT {
 						.withFixedDelay( 2000 )
 				) );
 
-		thrown.expect(
-				isException( AssertionFailure.class )
+		assertThatThrownBy( () -> {
+			try ( ElasticsearchClientImplementor client = createClient() ) {
+				doPost( client, "/myIndex/myType", payload );
+			}
+		} )
+				.is( matching( isException( AssertionFailure.class )
 						.causedBy( CompletionException.class )
 						.causedBy( SearchException.class )
 								.withMessage( "HSEARCH400089" )
 						.causedBy( JsonSyntaxException.class )
-				.build()
-		);
-
-		try ( ElasticsearchClientImplementor client = createClient() ) {
-			doPost( client, "/myIndex/myType", payload );
-		}
+						.build()
+				) );
 	}
 
 	@Test
@@ -226,21 +224,21 @@ public class ElasticsearchClientFactoryImplIT {
 						.withFixedDelay( 2000 )
 				) );
 
-		thrown.expect(
-				isException( AssertionFailure.class )
+		assertThatThrownBy( () -> {
+			try ( ElasticsearchClientImplementor client = createClient(
+					properties -> {
+						properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" );
+						properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "99999" );
+					}
+			) ) {
+				doPost( client, "/myIndex/myType", payload );
+			}
+		} )
+				.is( matching( isException( AssertionFailure.class )
 						.causedBy( CompletionException.class )
 						.causedBy( IOException.class )
-				.build()
-		);
-
-		try ( ElasticsearchClientImplementor client = createClient(
-				properties -> {
-					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" );
-					properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "99999" );
-				}
-		) ) {
-			doPost( client, "/myIndex/myType", payload );
-		}
+						.build()
+				) );
 	}
 
 	@Test
@@ -254,22 +252,22 @@ public class ElasticsearchClientFactoryImplIT {
 						.withFixedDelay( 2000 )
 				) );
 
-		thrown.expect(
-				isException( AssertionFailure.class )
+		assertThatThrownBy( () -> {
+			try ( ElasticsearchClientImplementor client = createClient(
+					properties -> {
+						properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "99999" );
+						properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "1000" );
+					}
+			) ) {
+				doPost( client, "/myIndex/myType", payload );
+			}
+		} )
+				.is( matching( isException( AssertionFailure.class )
 						.causedBy( CompletionException.class )
 						.causedBy( SearchException.class )
-						.withMessage( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." )
-				.build()
-		);
-
-		try ( ElasticsearchClientImplementor client = createClient(
-				properties -> {
-					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "99999" );
-					properties.accept( ElasticsearchBackendSettings.REQUEST_TIMEOUT, "1000" );
-				}
-		) ) {
-			doPost( client, "/myIndex/myType", payload );
-		}
+								.withMessage( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." )
+						.build()
+				) );
 	}
 
 	@Test
@@ -401,7 +399,16 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_fault() throws Exception {
+	public void multipleHosts_failover_fault() {
+		SubTest.expectSuccessAfterRetry(
+				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
+				// even though no delay was configured.
+				// The exact reason is unknown though, so just try multiple times...
+				this::try_multipleHosts_failover_timeout
+		);
+	}
+
+	public void try_multipleHosts_failover_fault() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )

@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,8 +72,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, exceptionFuture( exception ) );
 
-		SubTest.expectException( this::setup )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity2.class.getName() )
@@ -88,8 +87,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 		expectWork( IndexedEntity1.NAME, exceptionFuture( exception1 ) );
 		expectWork( IndexedEntity2.NAME, exceptionFuture( exception2 ) );
 
-		SubTest.expectException( this::setup )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setup )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity1.class.getName() )

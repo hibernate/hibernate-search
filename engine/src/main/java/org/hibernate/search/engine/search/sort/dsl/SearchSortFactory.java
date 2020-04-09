@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 
@@ -43,7 +44,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "field" sort can be defined in more details.
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortOptionsStep<?> field(String absoluteFieldPath);
+	FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String absoluteFieldPath);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -55,7 +56,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String absoluteFieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -68,7 +69,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<?> distance(String absoluteFieldPath, double latitude, double longitude) {
+	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String absoluteFieldPath, double latitude, double longitude) {
 		return distance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 

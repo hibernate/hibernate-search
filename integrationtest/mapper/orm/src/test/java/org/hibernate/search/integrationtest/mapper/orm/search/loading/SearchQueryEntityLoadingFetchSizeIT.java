@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -14,9 +16,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -31,9 +31,6 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	public static List<SingleTypeLoadingModelPrimitives<?>> data() {
 		return allSingleTypeLoadingModelPrimitives();
 	}
-
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
 
 	private SessionFactory sessionFactory;
 
@@ -99,10 +96,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void override_invalid_0() {
-		thrown.expect( IllegalArgumentException.class );
-		thrown.expectMessage( "'fetchSize' must be strictly positive" );
-
-		testLoadingFetchSize(
+		assertThatThrownBy( () -> testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
 				null,
 				// Override fetch size at query level with this value
@@ -111,16 +105,15 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 				100,
 				// This does not matter, an exception should be thrown
 				0
-		);
+		) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'fetchSize' must be strictly positive" );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void override_invalid_negative() {
-		thrown.expect( IllegalArgumentException.class );
-		thrown.expectMessage( "'fetchSize' must be strictly positive" );
-
-		testLoadingFetchSize(
+		assertThatThrownBy( () -> testLoadingFetchSize(
 				// Do not configure search.loading.fetch_size
 				null,
 				// Override fetch size at query level with this value
@@ -129,7 +122,9 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 				100,
 				// This does not matter, an exception should be thrown
 				0
-		);
+		) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'fetchSize' must be strictly positive" );
 	}
 
 	@Override

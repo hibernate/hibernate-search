@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
@@ -41,8 +42,12 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -65,11 +70,10 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class LuceneExtensionIT {
 
@@ -85,9 +89,6 @@ public class LuceneExtensionIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
 
@@ -176,10 +177,9 @@ public class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Unsupported extension
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 
@@ -211,10 +211,9 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		// Non-existing document
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( "InvalidId" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Document with id 'InvalidId' does not exist in index '" + INDEX_NAME + "'"
@@ -248,10 +247,9 @@ public class LuceneExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( FIRST_ID )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
 				.hasMessageContaining(
@@ -267,10 +265,9 @@ public class LuceneExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( "NotAnIndexName", FIRST_ID )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
@@ -412,16 +409,53 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	public void sort_filter_fromLuceneQuery() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.extension( LuceneExtension.get() )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+						// The provided predicate factory should already be extended and offer Lucene-specific extensions
+						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
+								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								"included"
+						) ) ) )
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
+		);
+
+		// Check descending order, just in case the above order was reached by chance.
+		query = scope.query()
+				.extension( LuceneExtension.get() )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+						.desc()
+						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
+								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								"included"
+						) ) ) )
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID
+		);
+	}
+
+	@Test
 	public void predicate_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"match() predicate on unsupported native field",
+		Assertions.assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.match().field( "nativeField" ).matching( "37" ) )
-						.toQuery()
-				)
-				.assertThrown()
+						.toQuery(),
+				"match() predicate on unsupported native field"
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
 				.satisfies( FailureReportUtils.hasContext(
@@ -447,11 +481,10 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField_exists() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"exists() predicate on unsupported native field",
-				() -> scope.predicate().exists().field( "nativeField" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().exists().field( "nativeField" ),
+				"exists() predicate on unsupported native field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
 				.satisfies( FailureReportUtils.hasContext(
@@ -463,14 +496,13 @@ public class LuceneExtensionIT {
 	public void sort_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"sort on unsupported native field",
+		Assertions.assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.matchAll() )
 						.sort( f -> f.field( "nativeField" ) )
-						.toQuery()
-				)
-				.assertThrown()
+						.toQuery(),
+				"sort on unsupported native field"
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort." )
 				.satisfies( FailureReportUtils.hasContext(
@@ -542,11 +574,10 @@ public class LuceneExtensionIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
-		SubTest.expectException(
-				"projection on native field not supporting projections",
-				() -> scope.projection().field( "nativeField_unsupportedProjection", Integer.class )
+		Assertions.assertThatThrownBy(
+				() -> scope.projection().field( "nativeField_unsupportedProjection", Integer.class ),
+				"projection on native field not supporting projections"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -660,12 +691,12 @@ public class LuceneExtensionIT {
 	public void nativeField_invalidFieldPath() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
-		SubTest.expectException(
-				"native field contributing field with invalid field path",
+		assertThatThrownBy(
 				() -> plan.add( referenceProvider( FIRST_ID ), document -> {
 					document.addValue( indexMapping.nativeField_invalidFieldPath, 45 );
-				} ) )
-				.assertThrown()
+				} ),
+				"native field contributing field with invalid field path"
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
 	}
@@ -681,11 +712,12 @@ public class LuceneExtensionIT {
 	public void backend_unwrap_error_unknownType() {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Attempt to unwrap a Lucene backend to '" + String.class.getName() + "'" );
-		thrown.expectMessage( "this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'" );
-
-		backend.unwrap( String.class );
+		assertThatThrownBy( () -> backend.unwrap( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Attempt to unwrap a Lucene backend to '" + String.class.getName() + "'",
+						"this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'"
+				);
 	}
 
 	@Test
@@ -699,11 +731,12 @@ public class LuceneExtensionIT {
 	public void indexManager_unwrap_error_unknownType() {
 		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'" );
-		thrown.expectMessage( "this index manager can only be unwrapped to '" + LuceneIndexManager.class.getName() + "'" );
-
-		indexManager.unwrap( String.class );
+		assertThatThrownBy( () -> indexManager.unwrap( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'",
+						"this index manager can only be unwrapped to '" + LuceneIndexManager.class.getName() + "'"
+				);
 	}
 
 	private void initData() {
@@ -738,6 +771,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "a" );
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "z" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "a" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
 		} );
 		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.integer, 2 );
@@ -749,6 +789,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "a" );
 			document.addValue( indexMapping.sort3, "z" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "b" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
@@ -760,6 +807,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "a" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "c" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.nativeField, 89 );
@@ -769,6 +823,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "z" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "d" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "c" );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
@@ -779,6 +840,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "zz" );
 			document.addValue( indexMapping.sort2, "zz" );
 			document.addValue( indexMapping.sort3, "zz" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "e" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
 		} );
 		plan.execute().join();
 	}
@@ -795,6 +863,8 @@ public class LuceneExtensionIT {
 		final IndexFieldReference<String> sort1;
 		final IndexFieldReference<String> sort2;
 		final IndexFieldReference<String> sort3;
+
+		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
 			integer = root.field(
@@ -843,6 +913,36 @@ public class LuceneExtensionIT {
 			sort2 = root.field( "sort2", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ) )
+					.toReference();
+
+			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
+		}
+	}
+
+	private static class ObjectMapping {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
+
+		final IndexFieldReference<String> discriminator;
+		final IndexFieldReference<String> sort1;
+
+		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				boolean multiValued) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
+			return new ObjectMapping( relativeFieldName, objectField );
+		}
+
+		private ObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField) {
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
+
+			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
+
+			sort1 = objectField.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}

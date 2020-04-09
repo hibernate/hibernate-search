@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -18,7 +20,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Check that a failing boot correctly propagates exceptions,
@@ -34,17 +35,16 @@ public class BootstrapFailureIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void propagateException() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unable to find a default value bridge implementation" );
-		thrown.expectMessage( ContainedEntity.class.getName() );
-
-		ormSetupHelper.start()
-				.setup( FailingIndexedEntity.class, ContainedEntity.class );
+		assertThatThrownBy( () -> ormSetupHelper.start()
+						.setup( FailingIndexedEntity.class, ContainedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unable to find a default value bridge implementation",
+						ContainedEntity.class.getName()
+				);
 	}
 
 	@Entity(name = "failingindexed")

@@ -10,6 +10,8 @@ import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchPredicateBuilder {
 
+	void checkNestableWithin(String expectedParentNestedPath);
+
 	JsonObject build(ElasticsearchSearchPredicateContext context);
 
 }

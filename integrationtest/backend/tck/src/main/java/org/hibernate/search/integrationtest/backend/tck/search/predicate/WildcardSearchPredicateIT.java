@@ -33,7 +33,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -197,9 +197,9 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.predicate().wildcard().field( absoluteFieldPath )
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
 				.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -244,11 +244,10 @@ public class WildcardSearchPredicateIT {
 		for ( ByTypeFieldModel fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"wildcard() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().wildcard().field( absoluteFieldPath )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().wildcard().field( absoluteFieldPath ),
+					"wildcard() predicate with unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Text predicates" )
 					.hasMessageContaining( "are not supported by" )
@@ -264,11 +263,10 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"wildcard() predicate with null pattern",
-				() -> scope.predicate().wildcard().field( absoluteFieldPath ).matching( null )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().wildcard().field( absoluteFieldPath ).matching( null ),
+				"wildcard() predicate with null pattern"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid pattern" )
 				.hasMessageContaining( "must be non-null" )
@@ -417,41 +415,37 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"wildcard() predicate with unknown field",
-				() -> scope.predicate().wildcard().field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().wildcard().field( "unknown_field" ),
+				"wildcard() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"wildcard() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().wildcard()
-						.fields( absoluteFieldPath, "unknown_field" )
+						.fields( absoluteFieldPath, "unknown_field" ),
+				"wildcard() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"wildcard() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().wildcard().field( absoluteFieldPath )
-						.field( "unknown_field" )
+						.field( "unknown_field" ),
+				"wildcard() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"wildcard() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().wildcard().field( absoluteFieldPath )
-						.fields( "unknown_field" )
+						.fields( "unknown_field" ),
+				"wildcard() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -498,13 +492,12 @@ public class WildcardSearchPredicateIT {
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					indexManager.createScope( incompatibleIndexManager )
 							.predicate().wildcard().field( absoluteFieldPath );
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "'" + absoluteFieldPath + "'" )
@@ -518,8 +511,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () -> scope.predicate().wildcard().field( absoluteFieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scope.predicate().wildcard().field( absoluteFieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )

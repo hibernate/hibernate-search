@@ -24,7 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -144,8 +144,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 					);
 		}
 		else {
-			SubTest.expectException( () -> query.fetch( 20 ) )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.fetch( 20 ) )
 					.isInstanceOf( SearchException.class );
 		}
 	}
@@ -186,8 +185,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 					);
 		}
 		else {
-			SubTest.expectException( () -> query.fetch( 20 ) )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.fetch( 20 ) )
 					.isInstanceOf( SearchException.class );
 		}
 	}

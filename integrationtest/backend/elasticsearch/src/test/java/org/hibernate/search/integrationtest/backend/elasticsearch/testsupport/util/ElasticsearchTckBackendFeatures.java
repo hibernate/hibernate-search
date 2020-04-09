@@ -72,6 +72,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean sortByFieldValue(IndexFieldStructure indexFieldStructure, Class<?> fieldType, SortMode sortMode) {
 		if (
 				( indexFieldStructure == IndexFieldStructure.IN_NESTED
+						|| indexFieldStructure == IndexFieldStructure.IN_NESTED_REQUIRING_FILTER
 						|| indexFieldStructure == IndexFieldStructure.IN_NESTED_TWICE )
 				&& sortMode == SortMode.MAX
 				&& ( Float.class.equals( fieldType )

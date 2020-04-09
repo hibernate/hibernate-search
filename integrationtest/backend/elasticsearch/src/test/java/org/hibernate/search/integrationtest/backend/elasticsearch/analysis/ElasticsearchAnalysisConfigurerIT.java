@@ -15,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,10 +32,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_invalidReference() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( "foobar" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -52,10 +51,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_failingConfigurer() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( FailingConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -83,10 +81,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_analyzer_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( AnalyzerNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -110,10 +107,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_normalizer_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( NormalizerNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -137,10 +133,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenizer_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( TokenizerNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -163,10 +158,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenizer_missingType() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( TokenizerMissingTypeConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -188,10 +182,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_charFilter_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( CharFilterNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -214,10 +207,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_charFilter_missingType() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( CharFilterMissingTypeConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -239,10 +231,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenFilter_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( TokenFilterNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -265,10 +256,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenFilter_missingType() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( TokenFilterMissingTypeConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -290,10 +280,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_parameter_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )

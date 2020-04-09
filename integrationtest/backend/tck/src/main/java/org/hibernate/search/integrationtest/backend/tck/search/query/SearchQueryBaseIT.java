@@ -38,7 +38,6 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -109,10 +108,9 @@ public class SearchQueryBaseIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "0", "1" );
 
 		// Mandatory extension, unsupported
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.extension( new UnSupportedQueryExtension<>() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 
@@ -131,11 +129,10 @@ public class SearchQueryBaseIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, "1","2" );
 
 		// Mandatory extension, unsupported
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.query()
 				.extension( new UnSupportedQueryDslExtension<>() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 

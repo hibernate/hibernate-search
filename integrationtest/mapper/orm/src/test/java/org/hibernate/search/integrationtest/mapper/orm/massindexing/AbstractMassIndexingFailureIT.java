@@ -35,7 +35,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -495,8 +495,8 @@ public abstract class AbstractMassIndexingFailureIT {
 				runnable.run();
 			}
 			else {
-				SubTest.expectException( runnable )
-						.assertThrown()
+				Assertions.assertThatThrownBy( runnable::run )
+						.asInstanceOf( InstanceOfAssertFactories.type( Throwable.class ) )
 						.satisfies( thrownExpectation );
 			}
 			backendMock.verifyExpectationsMet();

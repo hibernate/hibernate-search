@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Optional;
 
@@ -25,9 +26,7 @@ import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropert
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -36,9 +35,6 @@ import org.easymock.EasyMockSupport;
 // We have to use raw types to mock methods returning generic types with wildcards
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
-
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
 
 	private RootBuildContext rootBuildContextMock = createMock( RootBuildContext.class );
 	private ConfigurationPropertySource configurationSourceMock =
@@ -136,11 +132,13 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( configurationSourceMock.resolve( "default_backend" ) )
 				.andReturn( Optional.of( keyPrefix + "default_backend" ) );
 		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "The name of the default backend is not set" );
-		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
-		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
-		holder.createBackends( CollectionHelper.asSet( Optional.empty() ) );
+		assertThatThrownBy( () -> holder.createBackends( CollectionHelper.asSet( Optional.empty() ) ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"The name of the default backend is not set",
+						"Set it through the configuration property 'somePrefix.default_backend'",
+						"or set the backend name explicitly for each indexed type in your mapping"
+				);
 		verifyAll();
 	}
 

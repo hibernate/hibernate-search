@@ -31,7 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -108,10 +108,9 @@ public class ToHibernateOrmIT {
 		}
 
 		Session closedSession = session;
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			Search.session( closedSession );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
@@ -187,10 +186,9 @@ public class ToHibernateOrmIT {
 							reference( IndexedEntity.NAME, "2" )
 					)
 			);
-			SubTest.expectException( () -> {
+			Assertions.assertThatThrownBy( () -> {
 				query.uniqueResult();
 			} )
-					.assertThrown()
 					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
 
@@ -257,8 +255,7 @@ public class ToHibernateOrmIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.list() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -281,8 +278,7 @@ public class ToHibernateOrmIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.list() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -305,8 +301,7 @@ public class ToHibernateOrmIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.list() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -329,8 +324,7 @@ public class ToHibernateOrmIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.list() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -358,8 +352,7 @@ public class ToHibernateOrmIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.list() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -387,8 +380,7 @@ public class ToHibernateOrmIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.list() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -404,10 +396,9 @@ public class ToHibernateOrmIT {
 		createSimpleQuery( searchSession );
 		session.close();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			createSimpleQuery( searchSession );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
@@ -419,10 +410,9 @@ public class ToHibernateOrmIT {
 		SearchSession searchSession = Search.session( session );
 		session.close();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			createSimpleQuery( searchSession );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
@@ -442,10 +432,9 @@ public class ToHibernateOrmIT {
 				StubSearchWorkBehavior.empty()
 		);
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			query.fetchAllHits();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}

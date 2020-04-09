@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,10 +48,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -75,10 +74,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -100,10 +98,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -125,10 +122,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -156,10 +152,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -202,10 +197,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -228,10 +222,9 @@ public class DocumentIdBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

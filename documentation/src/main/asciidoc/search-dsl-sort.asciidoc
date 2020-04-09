@@ -88,6 +88,8 @@ but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.
 can be <<search-dsl-sort-common-missing,controlled explicitly with `.missing()`>>.
 * The behavior on multi-valued fields
 can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
+* For fields in nested objects, all nested objects are considered by default,
+but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
 
 [[search-dsl-sort-distance]]
 == `distance`: sort by distance to a point
@@ -109,6 +111,8 @@ Several options are available:
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
 * The behavior on multi-valued fields
 can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
+* For fields in nested objects, all nested objects are considered by default,
+but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.filter(...)`>>.
 
 [[search-dsl-sort-composite]]
 == `composite`: combine sorts
@@ -239,8 +243,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 // Search 5 anchors backward compatibility
 [[_handling_missing_values]]
 
-Documents that do not have any value for a sort field will be assigned a default value
-depending on the sort and field type (`0`, an empty string, ...).
+Documents that do not have any value for a sort field will appear in the last position by default.
 
 The behavior for missing values can be controlled explicitly through the `.missing()` option:
 
@@ -320,5 +323,27 @@ Below is an example with the <<search-dsl-sort-field,field sort>>.
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=mode-avg]
+----
+====
+
+[[search-dsl-sort-common-filter]]
+=== Filter for fields in nested objects
+
+When the sort field is located in a <<mapper-orm-indexedembedded-storage-nested,nested object>>,
+by default all nested objects will be considered for the sort
+and their values will be combined using the configured <<search-dsl-sort-common-multi-value-mode,sort mode>>.
+
+It is possible to filter the nested documents whose values will be considered for the sort
+using one of the `filter(...)` methods.
+
+Below is an example with the <<search-dsl-sort-field,field sort>>:
+authors are sorted by the average page count of their books,
+but only books of the "crime fiction" genre are considered:
+
+.Sorting by field values using a filter for nested objects
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=filter]
 ----
 ====

@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,10 +48,9 @@ public class DependencyIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -79,10 +78,9 @@ public class DependencyIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -110,10 +108,9 @@ public class DependencyIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -178,13 +175,12 @@ public class DependencyIT {
 				}
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withAnnotatedEntityTypes( DerivedFromCycle.A.class )
 						.withAnnotatedTypes( DerivedFromCycle.B.class, DerivedFromCycle.C.class )
 						.setup()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( DerivedFromCycle.A.class.getName() )
@@ -234,12 +230,11 @@ public class DependencyIT {
 				}
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup(
 						CannotInvertAssociation.A.class, CannotInvertAssociation.B.class
 				)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( CannotInvertAssociation.A.class.getName() )
@@ -291,12 +286,11 @@ public class DependencyIT {
 				}
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup(
 						CannotApplyInvertAssociationPath.A.class, CannotApplyInvertAssociationPath.B.class
 				)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Cannot apply the path '.invalidPath<default value extractors>'"
@@ -346,12 +340,11 @@ public class DependencyIT {
 				}
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup(
 						CannotApplyInvertAssociationPath.A.class, CannotApplyInvertAssociationPath.B.class
 				)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Cannot apply the path '.a<default value extractors>'"

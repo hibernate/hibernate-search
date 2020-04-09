@@ -18,10 +18,9 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 
-import org.junit.Assert;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.hamcrest.MatcherAssert;
 
 public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends AbstractMassIndexingFailureIT {
 
@@ -53,7 +52,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getThrowable(),
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( exceptionMessage )
@@ -82,7 +81,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getThrowable(),
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "Exception while invoking" )
@@ -115,7 +114,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingFailureContext context = genericFailureContextCapture.getValue();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getThrowable(),
 				ExceptionMatcherBuilder.isException( exceptionType )
 						.withMessage( exceptionMessage )
@@ -144,7 +143,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext entityFailureContext = entityFailureContextCapture.getValue();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				entityFailureContext.getThrowable(),
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( failingEntityIndexingExceptionMessage )
@@ -160,7 +159,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 
 		MassIndexingFailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				massIndexerOperationFailureContext.getThrowable(),
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( failingMassIndexerOperationExceptionMessage )

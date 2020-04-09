@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -16,17 +18,11 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredicateIT {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3618")
@@ -171,54 +167,63 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_invalidType() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Distance related operations are not supported" );
-		thrown.expectMessage( "string" );
-
 		StubMappingScope scope = indexManager.createScope();
-		scope.projection()
+
+		assertThatThrownBy( () -> scope.projection()
 				.distance( "string", GeoPoint.of( 43.749828, 1.854172 ) )
-				.toProjection();
+				.toProjection()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Distance related operations are not supported",
+						"string"
+				);
 	}
 
 	@Test
 	public void distanceProjection_nullCenter() {
-		thrown.expect( IllegalArgumentException.class );
-		thrown.expectMessage( "center" );
-		thrown.expectMessage( "must not be null" );
-
 		StubMappingScope scope = indexManager.createScope();
-		scope.projection()
+
+		assertThatThrownBy( () -> scope.projection()
 				.distance( "geoPoint", null )
-				.toProjection();
+				.toProjection()
+		)
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll(
+						"center",
+						"must not be null"
+				);
 	}
 
 	@Test
 	public void distanceProjection_nullUnit() {
-		thrown.expect( IllegalArgumentException.class );
-		thrown.expectMessage( "unit" );
-		thrown.expectMessage( "must not be null" );
-
 		StubMappingScope scope = indexManager.createScope();
-		scope.projection()
+
+		assertThatThrownBy( () -> scope.projection()
 				.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).unit( null )
-				.toProjection();
+				.toProjection()
+		)
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll(
+						"unit",
+						"must not be null"
+				);
 	}
 
 	@Test
 	public void distanceProjection_nonProjectable() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			scope.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.hasMessageContaining( "nonProjectableGeoPoint" );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			scope.projection().distance( "nonProjectableGeoPoint", GeoPoint.of( 43d, 4d ) ).toProjection();
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.hasMessageContaining( "nonProjectableGeoPoint" );
@@ -228,9 +233,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceSort_unsortable() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			scope.sort().distance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Sorting is not enabled for field" )
 				.hasMessageContaining( "unsortableGeoPoint" );

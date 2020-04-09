@@ -12,7 +12,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -35,11 +35,10 @@ public class ElasticsearchIndexNamingBaseIT {
 
 	@Test
 	public void nameConflict_aliasesOfSingleIndex() {
-		SubTest.expectException( () -> setup( hardcodedStrategy(
+		Assertions.assertThatThrownBy( () -> setup( hardcodedStrategy(
 				"alias-conflicting", "alias-conflicting",
 				"index2-write", "index2-read"
 		) ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
@@ -99,11 +98,10 @@ public class ElasticsearchIndexNamingBaseIT {
 
 	private void setupExpectingCrossIndexNameConflict(String index1WriteAlias, String index1ReadAlias,
 			String index2WriteAlias, String index2ReadAlias, String conflictingName) {
-		SubTest.expectException( () -> setup( hardcodedStrategy(
+		Assertions.assertThatThrownBy( () -> setup( hardcodedStrategy(
 				index1WriteAlias, index1ReadAlias,
 				index2WriteAlias, index2ReadAlias
 		) ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()

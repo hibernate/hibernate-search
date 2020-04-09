@@ -36,6 +36,7 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 	@Override
 	public final void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		JsonObject innerObject = new JsonObject();
+
 		if ( order != null ) {
 			switch ( order ) {
 				case ASC:
@@ -46,11 +47,11 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 					break;
 			}
 		}
-		enrichInnerObject( innerObject );
+		enrichInnerObject( collector, innerObject );
 		doBuildAndAddTo( collector, innerObject );
 	}
 
-	protected void enrichInnerObject(JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 	}
 
 	protected abstract void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject);

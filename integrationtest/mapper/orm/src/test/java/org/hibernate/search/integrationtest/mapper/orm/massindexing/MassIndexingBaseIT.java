@@ -29,7 +29,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -259,10 +259,9 @@ public class MassIndexingBaseIT {
 		searchSession.massIndexer();
 		session.close();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			searchSession.massIndexer();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
@@ -274,10 +273,9 @@ public class MassIndexingBaseIT {
 		SearchSession searchSession = Search.session( session );
 		session.close();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			searchSession.massIndexer();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}

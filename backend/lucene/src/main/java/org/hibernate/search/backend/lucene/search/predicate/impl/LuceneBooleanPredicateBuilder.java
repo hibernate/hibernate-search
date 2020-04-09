@@ -97,6 +97,14 @@ class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		checkNestableWithin( expectedParentNestedPath, mustClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, shouldClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, filterClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, mustNotClauseBuilders );
+	}
+
+	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
@@ -135,6 +143,15 @@ class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 
 		for ( LuceneSearchPredicateBuilder clauseBuilder : clauseBuilders ) {
 			booleanQueryBuilder.add( clauseBuilder.build( context ), occur );
+		}
+	}
+
+	private void checkNestableWithin(String expectedParentNestedPath, List<LuceneSearchPredicateBuilder> clauseBuilders) {
+		if ( clauseBuilders == null ) {
+			return;
+		}
+		for ( LuceneSearchPredicateBuilder builder : clauseBuilders ) {
+			builder.checkNestableWithin( expectedParentNestedPath );
 		}
 	}
 

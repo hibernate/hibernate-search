@@ -12,16 +12,14 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 
 
-public abstract class AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
+public abstract class AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder
+		extends AbstractLuceneSingleFieldPredicateBuilder
 		implements SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> {
-
-	protected final String absoluteFieldPath;
 
 	protected GeoBoundingBox boundingBox;
 
 	protected AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

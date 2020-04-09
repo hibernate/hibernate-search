@@ -47,13 +47,11 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperE
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.assertj.core.api.Assertions;
 import org.easymock.EasyMockSupport;
@@ -73,9 +71,6 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -429,12 +424,11 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// reuse the same projection instance on a different scope,
 		// targeting a different index
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				anotherIndexManager.createScope().query()
 						.select( projection )
 						.where( f -> f.matchAll() )
 						.toQuery() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -442,12 +436,11 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// reuse the same projection instance on a different scope,
 		// targeting different indexes
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope( anotherIndexManager ).query()
 						.select( projection )
 						.where( f -> f.matchAll() )
 						.toQuery() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -470,10 +463,9 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
 		// Mandatory extension, unsupported
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.projection().extension( new UnSupportedExtension<>() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 
 		// Conditional extensions with orElse - two, both supported

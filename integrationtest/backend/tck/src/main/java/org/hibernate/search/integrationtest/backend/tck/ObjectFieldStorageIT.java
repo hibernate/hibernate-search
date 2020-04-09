@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
@@ -29,7 +30,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
 
 public class ObjectFieldStorageIT {
 
@@ -51,9 +52,6 @@ public class ObjectFieldStorageIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
@@ -74,46 +72,56 @@ public class ObjectFieldStorageIT {
 	public void index_error_invalidFieldForDocumentElement_root() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid field reference for this document element" );
-		thrown.expectMessage( "this document element has path 'null', but the referenced field has a parent with path 'flattenedObject'." );
+		assertThatThrownBy( () -> {
+			plan.add( referenceProvider( "willNotWork" ), document -> {
+				DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+				flattenedObject.addValue( indexMapping.string, "willNotWork" );
+			} );
 
-		plan.add( referenceProvider( "willNotWork" ), document -> {
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.string, "willNotWork" );
-		} );
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid field reference for this document element",
+						"this document element has path 'null', but the referenced field has a parent with path 'flattenedObject'."
+				);
 
-		plan.execute().join();
 	}
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_flattened() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid field reference for this document element" );
-		thrown.expectMessage( "this document element has path 'flattenedObject', but the referenced field has a parent with path 'null'." );
+		assertThatThrownBy( () -> {
+			plan.add( referenceProvider( "willNotWork" ), document -> {
+				document.addValue( indexMapping.flattenedObject.string, "willNotWork" );
+			} );
 
-		plan.add( referenceProvider( "willNotWork" ), document -> {
-			document.addValue( indexMapping.flattenedObject.string, "willNotWork" );
-		} );
-
-		plan.execute().join();
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid field reference for this document element",
+						"this document element has path 'flattenedObject', but the referenced field has a parent with path 'null'."
+				);
 	}
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_nested() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid field reference for this document element" );
-		thrown.expectMessage( "this document element has path 'nestedObject', but the referenced field has a parent with path 'null'." );
+		assertThatThrownBy( () -> {
+			plan.add( referenceProvider( "willNotWork" ), document -> {
+				document.addValue( indexMapping.nestedObject.string, "willNotWork" );
+			} );
 
-		plan.add( referenceProvider( "willNotWork" ), document -> {
-			document.addValue( indexMapping.nestedObject.string, "willNotWork" );
-		} );
-
-		plan.execute().join();
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid field reference for this document element",
+						"this document element has path 'nestedObject', but the referenced field has a parent with path 'null'."
+				);
 	}
 
 	@Test
@@ -192,30 +200,33 @@ public class ObjectFieldStorageIT {
 	public void search_error_nonNestedField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "'flattenedObject'" );
-		thrown.expectMessage( "is not stored as nested" );
-		scope.predicate().nested().objectField( "flattenedObject" );
+		assertThatThrownBy( () ->
+			scope.predicate().nested().objectField( "flattenedObject" )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "'flattenedObject'", "is not stored as nested" );
 	}
 
 	@Test
 	public void search_error_nonObjectField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "'flattenedObject.string'" );
-		thrown.expectMessage( "is not an object field" );
-		scope.predicate().nested().objectField( "flattenedObject.string" );
+		assertThatThrownBy( () ->
+				scope.predicate().nested().objectField( "flattenedObject.string" )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "'flattenedObject.string'", "is not an object field" );
 	}
 
 	@Test
 	public void search_error_missingField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( "'doesNotExist'" );
-		scope.predicate().nested().objectField( "doesNotExist" );
+		assertThatThrownBy( () ->
+				scope.predicate().nested().objectField( "doesNotExist" )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Unknown field", "'doesNotExist'" );
 	}
 
 	private void initData() {

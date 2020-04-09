@@ -16,7 +16,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -91,9 +91,9 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void within_unsearchable_circle() {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.predicate().spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 )
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
 				.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -104,13 +104,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void unsupported_field_types() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"spatial().within().circle() predicate on field with unsupported type",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within()
 						.field( "string" )
-						.circle( METRO_GARIBALDI, 400 )
+						.circle( METRO_GARIBALDI, 400 ),
+				"spatial().within().circle() predicate on field with unsupported type"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Spatial predicates are not supported by" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -381,21 +380,19 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void circle_error_null() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"spatial().within().circle() predicate with null center",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "geoPoint" )
-						.circle( null, 100 )
+						.circle( null, 100 ),
+				"spatial().within().circle() predicate with null center"
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "HSEARCH900000" );
 
-		SubTest.expectException(
-				"spatial().within().circle() predicate with null distance unit",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "geoPoint" )
-						.circle( GeoPoint.of( 45, 4 ), 100, null )
+						.circle( GeoPoint.of( 45, 4 ), 100, null ),
+				"spatial().within().circle() predicate with null distance unit"
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "HSEARCH900000" );
 	}
@@ -404,12 +401,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void unknown_field() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"spatial().within().circle() predicate on unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "unknown_field" )
-						.circle( METRO_GARIBALDI, 100 ).toPredicate()
+						.circle( METRO_GARIBALDI, 100 ).toPredicate(),
+				"spatial().within().circle() predicate on unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -430,8 +426,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void multiIndex_incompatibleSearchable() {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 
-		SubTest.expectException( () -> scope.predicate().spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scope.predicate().spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "geoPoint" )

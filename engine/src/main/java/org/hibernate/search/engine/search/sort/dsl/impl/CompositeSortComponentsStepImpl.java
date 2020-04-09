@@ -14,9 +14,9 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 class CompositeSortComponentsStepImpl<B>
 		implements CompositeSortComponentsStep<CompositeSortComponentsStepImpl<B>> {
 
-	private SearchSortDslContext<?, B> dslContext;
+	private SearchSortDslContext<?, B, ?> dslContext;
 
-	CompositeSortComponentsStepImpl(SearchSortDslContext<?, B> dslContext) {
+	CompositeSortComponentsStepImpl(SearchSortDslContext<?, B, ?> dslContext) {
 		this.dslContext = dslContext;
 	}
 

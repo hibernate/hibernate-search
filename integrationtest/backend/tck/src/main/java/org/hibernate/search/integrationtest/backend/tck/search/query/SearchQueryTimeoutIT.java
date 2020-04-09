@@ -30,11 +30,11 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 public class SearchQueryTimeoutIT {
@@ -62,21 +62,23 @@ public class SearchQueryTimeoutIT {
 	private static final String BUZZ_WORDS = "tree search avoid nested reference thread concurrency scaling reindexing node track";
 	private static final int ANY_INTEGER = 739;
 
-	private static final int ROUNDS = 1000;
+	private static final int INIT_DATA_ROUNDS = 1000;
+	private static final int TOTAL_DOCUMENT_COUNT = 3 * INIT_DATA_ROUNDS;
+	private static final int INIT_DATA_BATCH_SIZE = 200;
 
-	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private StubMappingIndexManager indexManager;
-	private IndexMapping indexMapping;
+	private static StubMappingIndexManager indexManager;
+	private static IndexMapping indexMapping;
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
+						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> SearchQueryTimeoutIT.indexManager = indexManager
 				)
 				.setup();
 
@@ -89,8 +91,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		SubTest.expectException( () -> query.fetchAll() )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> query.fetchAll() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -101,8 +102,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		SubTest.expectException( () -> query.fetchTotalHitCount() )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> query.fetchTotalHitCount() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -118,7 +118,7 @@ public class SearchQueryTimeoutIT {
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetchAll();
 
-		assertThat( result.getTotalHitCount() ).isLessThan( ROUNDS * 3 );
+		assertThat( result.getTotalHitCount() ).isLessThan( TOTAL_DOCUMENT_COUNT );
 		assertThat( result.getTook() ).isNotNull(); // May be 0 due to low resolution
 		assertThat( result.isTimedOut() ).isTrue();
 	}
@@ -158,11 +158,12 @@ public class SearchQueryTimeoutIT {
 				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
 	}
 
-	private void initData() {
+	private static void initData() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
-		// Use a batch approach for a real application
-		// Here the huge bulk is used to provoke a timeout
-		for ( int i = 0; i < ROUNDS; i++ ) {
+		for ( int i = 0; i < INIT_DATA_ROUNDS; i++ ) {
+			if ( i % INIT_DATA_BATCH_SIZE == 0 ) {
+				plan.execute().join();
+			}
 			plan.add(
 					referenceProvider( i + "a" ),
 					document -> {

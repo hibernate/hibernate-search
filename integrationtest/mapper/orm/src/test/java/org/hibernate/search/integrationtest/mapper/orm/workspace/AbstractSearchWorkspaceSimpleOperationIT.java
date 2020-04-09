@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,10 +107,9 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			RuntimeException exception = new RuntimeException();
 			futureFromBackend.completeExceptionally( exception );
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> executeSync( workspace )
 			)
-					.assertThrown()
 					.isSameAs( exception );
 		} );
 	}

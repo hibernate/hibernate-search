@@ -41,7 +41,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
@@ -343,10 +343,9 @@ public class CleanupIT {
 	}
 
 	private void failingStartup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> startup( additionalMappingContributor )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( SimulatedFailure.MESSAGE );
 	}

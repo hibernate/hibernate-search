@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -52,9 +51,6 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private StubMappingIndexManager indexManager;
 	private StubMappingIndexManager secondIndexManager;

@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -176,8 +176,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		EasyMock.expect( mappingFunction.apply( expectedValue ) ).andThrow( simulatedFailure );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.getAndMap( sourceMock, mappingFunction ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
@@ -203,8 +202,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessage( resolvedKey );
 		verifyAll();
@@ -236,8 +234,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.getAndMapOrThrow( sourceMock, mappingFunction, SimulatedFailure::new ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.getAndMapOrThrow( sourceMock, mappingFunction, SimulatedFailure::new ) )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessage( resolvedKey );
 		verifyAll();
@@ -259,8 +256,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		EasyMock.expect( mappingFunction.apply( expectedValue ) ).andThrow( simulatedFailure );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.getAndMap( sourceMock, mappingFunction ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey

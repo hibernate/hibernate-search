@@ -556,6 +556,19 @@ That can be changed using a configuration property:
 hibernate.search.backends.<backend-name>.thread_pool.size = 4
 ----
 
+[NOTE]
+====
+This number is _per backend_, not per index.
+Adding more indexes will not add more threads.
+====
+
+[TIP]
+====
+Operations happening in this thread-pool include blocking I/O,
+so raising its size above the number of processor cores available to the JVM
+can make sense and may improve performance.
+====
+
 [[backend-lucene-indexing-queues]]
 == Indexing queues
 
@@ -590,7 +603,8 @@ hibernate.search.backends.<backend name>.index_defaults.indexing.queue_size 1000
 * `indexing.queue_count` defines the number of queues.
 Expects a strictly positive integer value.
 +
-Higher values may lead to higher indexing throughput if CPU is the bottleneck when indexing.
+Higher values will lead to more indexing operations being performed in parallel,
+which may lead to higher indexing throughput if CPU power is the bottleneck when indexing.
 +
 Note that raising this number above the <<backend-lucene-threads,number of threads>> is never useful,
 as the number of threads limits how many queues can be processed in parallel.
@@ -600,6 +614,8 @@ Expects a strictly positive integer value.
 Lower values may lead to lower memory usage, especially if there are many queues,
 but values that are too low will increase the likeliness of
 <<backend-lucene-indexing-queues-blocking,application threads blocking>>
+because the queue is full,
+which may lead to lower indexing throughput.
 
 [TIP]
 [[backend-lucene-indexing-queues-blocking]]

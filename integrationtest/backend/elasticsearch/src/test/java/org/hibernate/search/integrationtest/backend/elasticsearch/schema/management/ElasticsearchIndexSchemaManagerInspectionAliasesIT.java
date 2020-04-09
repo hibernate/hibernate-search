@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -68,10 +68,9 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.deleteAndCreate()
 				.aliases().put( defaultWriteAlias( INDEX_NAME ).original );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
@@ -91,10 +90,9 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.deleteAndCreate()
 				.aliases().put( defaultReadAlias( INDEX_NAME ).original );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 							"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )

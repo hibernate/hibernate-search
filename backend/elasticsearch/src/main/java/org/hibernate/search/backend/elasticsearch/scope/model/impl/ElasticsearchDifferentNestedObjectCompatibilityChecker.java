@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -15,7 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 
 	public static ElasticsearchDifferentNestedObjectCompatibilityChecker empty(ElasticsearchScopeModel scopeModel) {
-		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, null, null );
+		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -44,10 +45,6 @@ public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 
 	public List<String> getNestedPathHierarchy() {
 		return nestedPathHierarchy;
-	}
-
-	public boolean isEmpty() {
-		return nestedPathHierarchy == null || nestedPathHierarchy.isEmpty();
 	}
 
 	private static String getLastPath(List<String> hierarchy) {

@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -31,7 +33,7 @@ import java.util.Set;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.util.common.AssertionFailure;
 
-public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchNestablePredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor SIMPLE_QUERY_STRING_ACCESSOR = JsonAccessor.root().property( "simple_query_string" ).asObject();
@@ -138,8 +140,17 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
 
-		return ( nestedCompatibilityChecker.getNestedPathHierarchy().isEmpty() ) ? outerObject :
-				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedCompatibilityChecker.getNestedPathHierarchy(), context );
+		return outerObject;
+	}
+
+	@Override
+	protected List<String> getNestedPathHierarchy() {
+		return nestedCompatibilityChecker.getNestedPathHierarchy();
+	}
+
+	@Override
+	protected List<String> getFieldPathsForErrorMessage() {
+		return new ArrayList<>( fields.keySet() );
 	}
 
 	/**

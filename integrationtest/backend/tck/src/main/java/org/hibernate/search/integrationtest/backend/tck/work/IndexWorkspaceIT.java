@@ -25,7 +25,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.assertj.core.api.Assertions;
 
@@ -47,9 +46,6 @@ public class IndexWorkspaceIT {
 
 	@Rule
 	public SearchSetupHelper multiTenancySetupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private final StubBackendSessionContext noTenantSessionContext = new StubBackendSessionContext();
 	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );

@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -32,12 +33,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.assertj.core.api.Assertions;
 
@@ -59,9 +58,6 @@ public class SearchSortIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -226,12 +222,11 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				anotherIndexManager.createScope().query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -239,12 +234,11 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting different indexes
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope( anotherIndexManager ).query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -268,10 +262,9 @@ public class SearchSortIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Mandatory extension, unsupported
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> indexManager.createScope().sort().extension( new UnSupportedExtension() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 
 		// Conditional extensions with orElse - two, both supported
@@ -421,18 +414,18 @@ public class SearchSortIT {
 	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?> dslContext) {
+				SearchSortDslContext<?, ?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			Assertions.assertThat( dslContext.getBuilderFactory() ).isNotNull();
-			return Optional.of( new MyExtendedFactory( original ) );
+			return Optional.of( new MyExtendedFactory( original, dslContext ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?> dslContext) {
+				SearchSortDslContext<?, ?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			Assertions.assertThat( dslContext.getBuilderFactory() ).isNotNull();
@@ -440,9 +433,9 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class MyExtendedFactory extends DelegatingSearchSortFactory {
-		MyExtendedFactory(SearchSortFactory delegate) {
-			super( delegate );
+	private static class MyExtendedFactory extends DelegatingSearchSortFactory<SearchPredicateFactory> {
+		MyExtendedFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?, ?> dslContext) {
+			super( delegate, dslContext );
 		}
 	}
 }
