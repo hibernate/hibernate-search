@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.Map;
+import java.util.function.Function;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 import org.hibernate.search.util.common.data.Range;
 
@@ -18,13 +20,15 @@ import org.hibernate.search.util.common.data.Range;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <N> The type of the next step.
  * @param <F> The type of the targeted field.
- */
+ * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
+*/
 public interface RangeAggregationRangeMoreStep<
-				S extends RangeAggregationRangeMoreStep<?, ?, F>,
-				N extends RangeAggregationOptionsStep<?, F, Map<Range<F>, Long>>,
-				F
+				S extends RangeAggregationRangeMoreStep<?, ?, F, PDF>,
+				N extends RangeAggregationOptionsStep<?, F, Map<Range<F>, Long>, PDF>,
+				F,
+				PDF extends SearchPredicateFactory
 		>
-		extends RangeAggregationOptionsStep<N, F, Map<Range<F>, Long>>,
-				RangeAggregationRangeStep<S, F> {
+		extends RangeAggregationOptionsStep<N, F, Map<Range<F>, Long>, PDF>,
+				RangeAggregationRangeStep<S, F, PDF> {
 
 }

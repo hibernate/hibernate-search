@@ -13,5 +13,4 @@ import org.hibernate.search.util.common.data.Range;
 public interface RangeAggregationBuilder<K> extends SearchAggregationBuilder<Map<Range<K>, Long>> {
 
 	void range(Range<? extends K> range);
-
 }

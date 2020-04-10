@@ -653,4 +653,9 @@ public interface Log extends BasicLogger {
 					+ " Only fields that are contained in the nested object with path '%1$s'"
 					+ " are allowed here.")
 	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
+
+	@Message(id = ID_OFFSET_2 + 122,
+			value = "Field '%1$s' is not contained in a nested object."
+					+ " Aggregation filters are only available if the field to sort on is contained in a nested objects.")
+	SearchException cannotFilterAggregationOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 }

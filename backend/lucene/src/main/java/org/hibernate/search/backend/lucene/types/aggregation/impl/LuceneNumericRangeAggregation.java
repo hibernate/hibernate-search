@@ -39,12 +39,9 @@ import org.apache.lucene.facet.FacetsCollector;
  * or a different type if value converters are used.
  */
 public class LuceneNumericRangeAggregation<F, E extends Number, K>
-		extends AbstractLuceneBucketAggregation<Range<K>, Long> {
+	extends AbstractLuceneBucketAggregation<Range<K>, Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final String nestedDocumentPath;
-	private final String absoluteFieldPath;
 
 	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
@@ -53,11 +50,9 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	private LuceneNumericRangeAggregation(Builder<F, E, K> builder) {
 		super( builder );
-		this.absoluteFieldPath = builder.absoluteFieldPath;
 		this.codec = builder.codec;
 		this.rangesInOrder = builder.rangesInOrder;
 		this.encodedRangesInOrder = builder.encodedRangesInOrder;
-		this.nestedDocumentPath = builder.nestedDocumentPath;
 	}
 
 	@Override
@@ -73,12 +68,12 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		NestedDocsProvider nestedDocsProvider = null;
 		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, getNestedFilter() );
 		}
 
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
 				absoluteFieldPath, facetsCollector, encodedRangesInOrder,
-				nestedDocsProvider
+				getMultiValueMode(), nestedDocsProvider
 		);
 
 		FacetResult facetResult = facetsCount.getTopChildren( rangesInOrder.size(), absoluteFieldPath );
@@ -95,9 +90,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final String nestedDocumentPath;
-		private final String absoluteFieldPath;
-
 		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
@@ -107,9 +99,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				DslConverter<?, ? extends F> toFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext );
-			this.nestedDocumentPath = nestedDocumentPath;
-			this.absoluteFieldPath = absoluteFieldPath;
+			super( searchContext, absoluteFieldPath, nestedDocumentPath );
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}
@@ -132,7 +122,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			}
 			catch (RuntimeException e) {
 				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 				);
 			}
 		}

@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.Collection;
+import java.util.function.Function;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 import org.hibernate.search.util.common.data.Range;
 
@@ -15,8 +17,9 @@ import org.hibernate.search.util.common.data.Range;
  *
  * @param <N> The type of the next step.
  * @param <F> The type of the targeted field.
- */
-public interface RangeAggregationRangeStep<N extends RangeAggregationRangeMoreStep<?, ?, F>, F> {
+ * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
+*/
+public interface RangeAggregationRangeStep<N extends RangeAggregationRangeMoreStep<?, ?, F, PDF>, F, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * Add a bucket for the range {@code [lowerBound, upperBound)} (lower bound included, upper bound excluded),

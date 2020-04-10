@@ -12,7 +12,7 @@ import org.hibernate.search.util.common.SearchException;
  * A factory for search aggregations.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
- */
+*/
 public interface SearchAggregationFactory {
 
 	/**
@@ -28,7 +28,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	RangeAggregationFieldStep range();
+	RangeAggregationFieldStep<?> range();
 
 	/**
 	 * Perform aggregation in term buckets.
@@ -43,7 +43,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	TermsAggregationFieldStep terms();
+	TermsAggregationFieldStep<?> terms();
 
 	/**
 	 * Extend the current factory with the given extension,

@@ -18,6 +18,7 @@ import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.DoubleValuesSource;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.util.NumericUtils;
 
 /**
  * A {@link DoubleMultiValuesToSingleValuesSource} that wraps the distance between a GeoPoint field
@@ -30,7 +31,7 @@ public class GeoPointDistanceMultiValuesToSingleValuesSource extends DoubleMulti
 
 	public GeoPointDistanceMultiValuesToSingleValuesSource(String field, MultiValueMode mode,
 			NestedDocsProvider nestedDocsProvider, GeoPoint center) {
-		super( mode, nestedDocsProvider );
+		super( mode, nestedDocsProvider, NumericUtils::doubleToSortableLong );
 		this.field = field;
 		this.center = center;
 	}

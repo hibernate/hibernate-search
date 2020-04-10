@@ -6,23 +6,52 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderFactory<?>>
-		implements SearchAggregationDslContext<F> {
-	public static <F extends SearchAggregationBuilderFactory<?>> SearchAggregationDslContextImpl root(F builderFactory) {
-		return new SearchAggregationDslContextImpl<>( builderFactory );
+public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderFactory<?>, PDF extends SearchPredicateFactory>
+		implements SearchAggregationDslContext<F, PDF> {
+	public static <F extends SearchAggregationBuilderFactory<?>> SearchAggregationDslContextImpl root(F builderFactory, SearchPredicateFactory predicateFactory,
+			SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory) {
+		return new SearchAggregationDslContextImpl<>( builderFactory, null, predicateFactory, predicateBuilderFactory );
 	}
 
 	private final F builderFactory;
+	private final SearchAggregationDslContextImpl<F, ?> parent;
+	private final PDF predicateFactory;
+	private final SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory;
 
-	private SearchAggregationDslContextImpl(F builderFactory) {
+	private SearchAggregationDslContextImpl(F builderFactory, SearchAggregationDslContextImpl<F, ?> parent,
+			PDF predicateFactory, SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory) {
 		this.builderFactory = builderFactory;
+		this.parent = parent;
+		this.predicateFactory = predicateFactory;
+		this.predicateBuilderFactory = predicateBuilderFactory;
 	}
 
 	@Override
 	public F getBuilderFactory() {
 		return builderFactory;
+	}
+
+	@Override
+	public PDF getPredicateFactory() {
+		return predicateFactory;
+	}
+
+	@Override
+	public <PDF2 extends SearchPredicateFactory> SearchAggregationDslContext<F, PDF2> withExtendedPredicateFactory(
+			SearchPredicateFactoryExtension<PDF2> extension) {
+		return new SearchAggregationDslContextImpl<>(
+				builderFactory, parent,
+				DslExtensionState.returnIfSupported(
+						extension, extension.extendOptional( predicateFactory, predicateBuilderFactory )
+				),
+				predicateBuilderFactory
+		);
 	}
 }

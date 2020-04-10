@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.assertj.core.api.Assertions;
+import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregatonFactory;
 
 public class AggregationBaseIT {
 
@@ -127,7 +128,7 @@ public class AggregationBaseIT {
 	private static class SupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
-				SearchAggregationDslContext<?> dslContext) {
+				SearchAggregationDslContext<?,?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
@@ -137,7 +138,7 @@ public class AggregationBaseIT {
 	private static class UnSupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
-				SearchAggregationDslContext<?> dslContext) {
+				SearchAggregationDslContext<?,?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.empty();
@@ -152,7 +153,7 @@ public class AggregationBaseIT {
 		}
 
 		public AggregationFinalStep<Map<String, Long>> extendedAggregation(String absoluteFieldPath) {
-			return delegate.terms().field( absoluteFieldPath, String.class );
+			return ((ExtendedSearchAggregatonFactory)delegate).terms().field( absoluteFieldPath, String.class );
 		}
 	}
 }

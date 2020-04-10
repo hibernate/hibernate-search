@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
-		FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
+	FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
 
 	@Override
 	public StubSortBuilder toImplementation() {

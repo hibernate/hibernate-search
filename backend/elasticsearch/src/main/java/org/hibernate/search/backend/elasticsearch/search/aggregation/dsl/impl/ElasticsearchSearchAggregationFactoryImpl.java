@@ -14,16 +14,17 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAg
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
 import com.google.gson.JsonObject;
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 
 public class ElasticsearchSearchAggregationFactoryImpl
-		extends DelegatingSearchAggregationFactory
+		extends DelegatingSearchAggregationFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchAggregationFactory {
 
-	private final SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory> dslContext;
+	private final SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory, ElasticsearchSearchPredicateFactory> dslContext;
 
 	public ElasticsearchSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory> dslContext) {
-		super( delegate );
+			SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory, ElasticsearchSearchPredicateFactory> dslContext) {
+		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
 

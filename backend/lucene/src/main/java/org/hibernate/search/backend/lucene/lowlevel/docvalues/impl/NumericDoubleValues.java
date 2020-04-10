@@ -29,7 +29,19 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	}
 
 	/**
+	 * Retrieves the number of values for the current document.This must always
+	 * be greater than zero. It is illegal to call this method after {@link #advanceExact(int)}
+	 * returned {@code false}.
+	 *
+	 * @return value count
+	 */
+	public int docValueCount() {
+		return 1;
+	}
+
+	/**
 	 * Returns numeric docvalues view of raw double bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawDoubleValues() {
@@ -38,6 +50,7 @@ public abstract class NumericDoubleValues extends DoubleValues {
 
 	/**
 	 * Returns numeric docvalues view of raw float bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawFloatValues() {
@@ -46,6 +59,7 @@ public abstract class NumericDoubleValues extends DoubleValues {
 
 	/**
 	 * Returns numeric docvalues view of raw long bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawLongValues() {

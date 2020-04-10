@@ -38,8 +38,6 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
-	protected final String nestedDocumentPath;
-	protected final String absoluteFieldPath;
 	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
 	private final BucketOrder order;
@@ -48,8 +46,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K> builder) {
 		super( builder );
-		this.nestedDocumentPath = builder.nestedDocumentPath;
-		this.absoluteFieldPath = builder.absoluteFieldPath;
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
 		this.order = builder.order;
 		this.maxTermCount = builder.maxTermCount;
@@ -129,7 +125,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		NestedDocsProvider nestedDocsProvider = null;
 		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, getNestedFilter() );
 		}
 
 		/*
@@ -174,9 +170,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final String nestedDocumentPath;
-		private final String absoluteFieldPath;
-
 		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
 		private BucketOrder order = BucketOrder.COUNT_DESC;
@@ -185,9 +178,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		AbstractBuilder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
-			super( searchContext );
-			this.nestedDocumentPath = nestedDocumentPath;
-			this.absoluteFieldPath = absoluteFieldPath;
+			super( searchContext, absoluteFieldPath, nestedDocumentPath );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
 

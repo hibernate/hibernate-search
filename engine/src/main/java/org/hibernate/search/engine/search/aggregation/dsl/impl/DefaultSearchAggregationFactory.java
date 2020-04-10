@@ -7,27 +7,28 @@
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregatonFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-public class DefaultSearchAggregationFactory implements SearchAggregationFactory {
+public class DefaultSearchAggregationFactory<PDF extends SearchPredicateFactory> implements ExtendedSearchAggregatonFactory<PDF> {
 
-	private final SearchAggregationDslContext<?> dslContext;
+	private final SearchAggregationDslContext<?, PDF> dslContext;
 
-	public DefaultSearchAggregationFactory(SearchAggregationDslContext<?> dslContext) {
+	public DefaultSearchAggregationFactory(SearchAggregationDslContext<?, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public RangeAggregationFieldStep range() {
+	public RangeAggregationFieldStep<PDF> range() {
 		return new RangeAggregationFieldStepImpl( dslContext );
 	}
 
 	@Override
-	public TermsAggregationFieldStep terms() {
+	public TermsAggregationFieldStep<PDF> terms() {
 		return new TermsAggregationFieldStepImpl( dslContext );
 	}
 

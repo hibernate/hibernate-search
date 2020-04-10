@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
+import java.util.OptionalDouble;
+import java.util.OptionalLong;
 
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.index.SortedSetDocValues;
@@ -20,75 +22,85 @@ public enum MultiValueMode {
 
 	SUM {
 		@Override
-		long pick(SortedNumericDocValues values) throws IOException {
-			final int valueCount = values.docValueCount();
+		OptionalLong pick(SortedNumericDocValues values) throws IOException {
 			long result = 0;
+			final int valueCount = values.docValueCount();
+			boolean hasValue = valueCount > 0;
 			for ( int index = 0; index < valueCount; ++index ) {
 				result += values.nextValue();
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 			long result = 0;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					final int valueCountForChild = values.docValueCount();
 					for ( int index = 0; index < valueCountForChild; ++index ) {
 						result += values.nextValue();
+						hasValue = true;
 					}
 				}
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values) throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
 			double result = 0;
+			boolean hasValue = valueCount > 0;
 			for ( int index = 0; index < valueCount; ++index ) {
 				result += values.nextValue();
 			}
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
-				throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
+			throws IOException {
 			double result = 0;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					final int valueCountForChild = values.docValueCount();
 					for ( int index = 0; index < valueCountForChild; ++index ) {
 						result += values.nextValue();
+						hasValue = true;
 					}
 				}
 			}
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
 		}
 	},
 	AVG {
 		@Override
-		long pick(SortedNumericDocValues values) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
 			long result = 0;
+			boolean hasValue = valueCount > 0;
 			for ( int index = 0; index < valueCount; ++index ) {
 				result += values.nextValue();
+				hasValue = true;
 			}
 			result = result / valueCount;
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 			long returnValue = 0;
 			int valueCount = 0;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					final int valueCountForChild = values.docValueCount();
 					for ( int index = 0; index < valueCountForChild; ++index ) {
 						returnValue += values.nextValue();
+						hasValue = true;
 					}
 					valueCount += valueCountForChild;
 				}
@@ -99,30 +111,34 @@ public enum MultiValueMode {
 			else {
 				returnValue = 0;
 			}
-			return returnValue;
+			return hasValue ? OptionalLong.of( returnValue ) : OptionalLong.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values) throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
 			double result = 0;
+			boolean hasValue = valueCount > 0;
 			for ( int index = 0; index < valueCount; ++index ) {
 				result += values.nextValue();
+				hasValue = true;
 			}
 			result = result / valueCount;
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
-				throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
+			throws IOException {
 			double result = 0;
 			int valueCount = 0;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					final int valueCountForChild = values.docValueCount();
 					for ( int index = 0; index < valueCountForChild; ++index ) {
 						result += values.nextValue();
+						hasValue = true;
 					}
 					valueCount += valueCountForChild;
 				}
@@ -133,83 +149,94 @@ public enum MultiValueMode {
 			else {
 				result = 0;
 			}
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
 		}
 	},
 	MIN {
 		@Override
-		long pick(SortedNumericDocValues values) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values) throws IOException {
+			boolean hasValue = values.docValueCount() > 0;
 			// Values are sorted; the first value is the min.
-			return values.nextValue();
+			return hasValue ? OptionalLong.of( values.nextValue() ) : OptionalLong.empty();
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 			long result = Long.MAX_VALUE;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					// Values are sorted; the first value is the min for this document.
+					hasValue = true;
 					result = Math.min( result, values.nextValue() );
 				}
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values) throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException {
+			boolean hasValue = values.docValueCount() > 0;
 			// Values are sorted; the first value is the min.
-			return values.nextValue();
+			return hasValue ? OptionalDouble.of( values.nextValue() ) : OptionalDouble.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
-				throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
+			throws IOException {
 			double result = Double.POSITIVE_INFINITY;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					// Values are sorted; the first value is the min for this document.
+					hasValue = true;
 					result = Math.min( result, values.nextValue() );
 				}
 			}
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
 		}
 
 		@Override
-		long pick(SortedSetDocValues values) throws IOException {
+		OptionalLong pick(SortedSetDocValues values) throws IOException {
 			long result = Long.MAX_VALUE;
-			for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
+			boolean hasValue = values.getValueCount() > 0;
+			for ( long ord; (ord = values.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS; ) {
 				result = Math.min( result, ord );
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		long pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+		OptionalLong pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 			long result = Long.MAX_VALUE;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
-					for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
+					for ( long ord; (ord = values.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS; ) {
 						result = Math.min( result, ord );
+						hasValue = true;
 					}
 				}
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 	},
 	MAX {
 		@Override
-		long pick(SortedNumericDocValues values) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
+			boolean hasValue = valueCount > 0;
 			// Values are sorted; the last value is the max.
 			for ( int index = 0; index < valueCount - 1; ++index ) {
 				values.nextValue();
 			}
-			return values.nextValue();
+			return hasValue ? OptionalLong.of( values.nextValue() ) : OptionalLong.empty();
 		}
 
 		@Override
-		long pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 			long result = Long.MIN_VALUE;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					final int valueCountForChild = values.docValueCount();
@@ -217,26 +244,29 @@ public enum MultiValueMode {
 					for ( int index = 0; index < valueCountForChild - 1; ++index ) {
 						values.nextValue();
 					}
+					hasValue = true;
 					result = Math.max( result, values.nextValue() );
 				}
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values) throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
+			boolean hasValue = valueCount > 0;
 			// Values are sorted; the last value is the max.
 			for ( int index = 0; index < valueCount - 1; ++index ) {
 				values.nextValue();
 			}
-			return values.nextValue();
+			return hasValue ? OptionalDouble.of( values.nextValue() ) : OptionalDouble.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
-				throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc)
+			throws IOException {
 			double result = Double.NEGATIVE_INFINITY;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
 					final int valueCountForChild = values.docValueCount();
@@ -244,85 +274,102 @@ public enum MultiValueMode {
 					for ( int index = 0; index < valueCountForChild - 1; ++index ) {
 						values.nextValue();
 					}
+					hasValue = true;
 					result = Math.max( result, values.nextValue() );
 				}
 			}
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
 		}
 
 		@Override
-		long pick(SortedSetDocValues values) throws IOException {
+		OptionalLong pick(SortedSetDocValues values) throws IOException {
 			long result = Long.MIN_VALUE;
-			for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
+			boolean hasValue = values.getValueCount() > 0;
+			for ( long ord; (ord = values.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS; ) {
 				result = Math.max( result, ord );
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		long pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+		OptionalLong pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 			long returnValue = Long.MIN_VALUE;
+			boolean hasValue = false;
 			for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 				if ( values.advanceExact( doc ) ) {
-					for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
+					for ( long ord; (ord = values.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS; ) {
 						returnValue = Math.max( returnValue, ord );
+						hasValue = true;
 					}
 				}
 			}
-			return returnValue;
+			return hasValue ? OptionalLong.of( returnValue ) : OptionalLong.empty();
 		}
 	},
 	MEDIAN {
 		@Override
-		long pick(SortedNumericDocValues values) throws IOException {
+		OptionalLong pick(SortedNumericDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
-			long result = 0;
-			for ( int i = 0; i < ( valueCount - 1 ) / 2; ++i ) {
+			long result;
+			boolean hasValue = valueCount > 0;
+			for ( int i = 0; i < (valueCount - 1) / 2; ++i ) {
 				values.nextValue();
 			}
 			if ( valueCount % 2 == 0 ) {
-				result = ( values.nextValue() + values.nextValue() ) / 2;
+				result = (values.nextValue() + values.nextValue()) / 2;
 			}
 			else {
 				result = values.nextValue();
 			}
-			return result;
+			return hasValue ? OptionalLong.of( result ) : OptionalLong.empty();
 		}
 
 		@Override
-		double pick(SortedNumericDoubleDocValues values) throws IOException {
+		OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
-			double result = 0;
-			for ( int i = 0; i < ( valueCount - 1 ) / 2; ++i ) {
+			double result;
+			boolean hasValue = valueCount > 0;
+			for ( int i = 0; i < (valueCount - 1) / 2; ++i ) {
 				values.nextValue();
 			}
 			if ( valueCount % 2 == 0 ) {
-				result = ( values.nextValue() + values.nextValue() ) / 2;
+				result = (values.nextValue() + values.nextValue()) / 2;
 			}
 			else {
 				result = values.nextValue();
 			}
-			return result;
+			return hasValue ? OptionalDouble.of( result ) : OptionalDouble.empty();
+		}
+	},
+	NONE {
+		@Override
+		OptionalLong pick(SortedNumericDocValues values) throws IOException {
+			throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		}
+
+		@Override
+		OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException {
+			throw new IllegalArgumentException( "Unsupported sort mode: " + this );
 		}
 	};
 
-	abstract long pick(SortedNumericDocValues values) throws IOException;
+	abstract OptionalLong pick(SortedNumericDocValues values) throws IOException;
 
-	long pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+	OptionalLong pick(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
 	}
 
-	abstract double pick(SortedNumericDoubleDocValues values) throws IOException;
+	abstract OptionalDouble pick(SortedNumericDoubleDocValues values) throws IOException;
 
-	double pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+	OptionalDouble pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
 	}
 
-	long pick(SortedSetDocValues values) throws IOException {
+	OptionalLong pick(SortedSetDocValues values) throws IOException {
 		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
 	}
 
-	long pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
+	OptionalLong pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
 	}
 }

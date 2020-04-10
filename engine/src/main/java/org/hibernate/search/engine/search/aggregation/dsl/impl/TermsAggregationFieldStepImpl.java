@@ -13,22 +13,23 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class TermsAggregationFieldStepImpl implements TermsAggregationFieldStep {
-	private final SearchAggregationDslContext<?> dslContext;
+public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements TermsAggregationFieldStep<PDF> {
+	private final SearchAggregationDslContext<?, PDF> dslContext;
 
-	TermsAggregationFieldStepImpl(SearchAggregationDslContext<?> dslContext) {
+	public TermsAggregationFieldStepImpl(SearchAggregationDslContext<?, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	public <F> TermsAggregationOptionsStep<?, F, Map<F, Long>, PDF> field(String absoluteFieldPath, Class<F> type,
 			ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		TermsAggregationBuilder<F> builder =
 				dslContext.getBuilderFactory().createTermsAggregationBuilder( absoluteFieldPath, type, convert );
-		return new TermsAggregationOptionsStepImpl<>( builder );
+		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

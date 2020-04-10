@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl;
 
+import java.util.function.Function;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+
 
 /**
  * The final step in a "terms" aggregation definition, where optional parameters can be set.
@@ -13,9 +16,10 @@ package org.hibernate.search.engine.search.aggregation.dsl;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of the targeted field.
  * @param <A> The type of result for this aggregation.
- */
-public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsStep<?, F, A>, F, A>
-		extends AggregationFinalStep<A> {
+ * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
+*/
+public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsStep<?, F, A, PDF>, F, A, PDF extends SearchPredicateFactory>
+		extends AggregationFinalStep<A>, AggregationModeStep<S>, AggregationFilterStep<S, PDF> {
 
 	/**
 	 * Order buckets by descending document count in the aggregation result.

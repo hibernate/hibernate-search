@@ -18,8 +18,8 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.facet.FacetResult;
+import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -49,8 +49,8 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
-		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts(
-				absoluteFieldPath, facetsCollector, nestedDocsProvider
+		Facets facetCounts = numericDomain.createTermsFacetCounts(
+				absoluteFieldPath, facetsCollector, getMultiValueMode(), nestedDocsProvider
 		);
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}

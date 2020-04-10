@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.aggregation.dsl;
 
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregatonFactory;
 
-public interface LuceneSearchAggregationFactory extends SearchAggregationFactory {
+public interface LuceneSearchAggregationFactory extends ExtendedSearchAggregatonFactory<LuceneSearchPredicateFactory> {
 }

@@ -48,6 +48,7 @@ public class LuceneTextTermsAggregation<K>
 				docValuesReaderState, facetsCollector
 		);
 
+		String absoluteFieldPath = getAbsoluteFieldPath();
 		// May throw IllegalArgumentException
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}
@@ -56,6 +57,7 @@ public class LuceneTextTermsAggregation<K>
 	Set<String> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException {
 		Set<String> collectedTerms = new LinkedHashSet<>();
+		String absoluteFieldPath = getAbsoluteFieldPath();
 
 		SortedSetDocValuesReaderState docValuesReaderState = new DefaultSortedSetDocValuesReaderState( reader );
 		OrdRange ordRange = docValuesReaderState.getOrdRange( absoluteFieldPath );
