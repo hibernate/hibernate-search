@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.cfg;
 
+import org.apache.lucene.search.QueryCache;
+import org.apache.lucene.search.QueryCachingPolicy;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
