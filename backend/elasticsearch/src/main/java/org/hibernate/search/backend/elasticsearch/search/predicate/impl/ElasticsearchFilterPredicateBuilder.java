@@ -73,4 +73,9 @@ public class ElasticsearchFilterPredicateBuilder extends AbstractElasticsearchSe
 
 		return jsonFilter;
 	}
+
+	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// Nothing to do
+	}
 }

@@ -15,10 +15,8 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.engine.search.predicate.factories.FilterFactoryContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -50,19 +48,19 @@ public class LuceneFilterSearchPredicateIT {
 	public void minimumShouldMatch_outOfBounds() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-			"bool() predicate with a minimumShouldMatch constraint providing an out-of-bounds value",
-			() -> scope.query()
-				.where( f -> {
-					return f.bool()
-						.minimumShouldMatchNumber( 3 )
-						.should( f.def( "match_fieldName" ).param( "match", "blablabla" ) )
-						.should( f.def( "nested.match_fieldName" ).param( "match", "blablabla" ) );
-				} ).toQuery()
-		)
-			.assertThrown()
-			.isInstanceOf( SearchException.class )
-			.hasMessageContaining( "Computed minimum for minimumShouldMatch constraint is out of bounds" );
+//		SubTest.expectException(
+//			"bool() predicate with a minimumShouldMatch constraint providing an out-of-bounds value",
+//			() -> scope.query()
+//				.where( f -> {
+//					return f.bool()
+//						.minimumShouldMatchNumber( 3 )
+//						.should( f.def( "match_fieldName" ).param( "match", "blablabla" ) )
+//						.should( f.def( "nested.match_fieldName" ).param( "match", "blablabla" ) );
+//				} ).toQuery()
+//		)
+//			.assertThrown()
+//			.isInstanceOf( SearchException.class )
+//			.hasMessageContaining( "Computed minimum for minimumShouldMatch constraint is out of bounds" );
 	}
 
 	private static class IndexMapping {

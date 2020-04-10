@@ -658,25 +658,25 @@ public interface Log extends BasicLogger {
 					+ " Only fields that are contained in the nested object with path '%1$s'"
 					+ " are allowed here.")
 	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
-	@Message(id = ID_OFFSET_2 + 121,
+	@Message(id = ID_OFFSET_2 + 126,
 			value = "Multiple calls to toReference() for the same filter definition."
 					+ " You must call toReference() exactly once.")
 	SearchException cannotCreateFilterReferenceMultipleTimes(@Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 122,
+	@Message(id = ID_OFFSET_2 + 127,
 			value = "Incomplete filter definition."
 					+ " You must call toReference() to complete the filter definition.")
 	SearchException incompleteFilterDefinition(@Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 123,
+	@Message(id = ID_OFFSET_2 + 128,
 		value = "Multiple conflicting models for filter definition name '%1$s'.")
 	SearchException conflictingFilterModel(String name, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 124,
+	@Message(id = ID_OFFSET_2 + 129,
 		value = "Unknown filter definition '%1$s'.")
 	SearchException unknownFilterForSearch(String name, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 125,
+	@Message(id = ID_OFFSET_2 + 130,
 		value = "Unable to create filter for name '%1$s'.")
 	SearchException unableToCreateFilterForSearch(String name);
 }

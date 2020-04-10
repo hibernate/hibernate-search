@@ -74,4 +74,9 @@ public class LuceneFilterPredicateBuilder extends AbstractLuceneSearchPredicateB
 
 		return luceneFilter;
 	}
+
+	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// Nothing to do
+	}
 }
