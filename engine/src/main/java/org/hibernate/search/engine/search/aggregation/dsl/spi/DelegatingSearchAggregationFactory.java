@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.aggregation.dsl.spi;
 
 import java.util.function.Function;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFilterStep;
 import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregatonFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -20,7 +21,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.impl.TermsAggregationF
  * A delegating {@link SearchAggregationFactory}.
  * <p>
  * Mainly useful when implementing a {@link SearchAggregationFactoryExtension}.
- * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
+ * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 public class DelegatingSearchAggregationFactory<PDF extends SearchPredicateFactory> implements ExtendedSearchAggregatonFactory<PDF> {
 

@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 
 /**
  * A base interface for subtypes of {@link SearchAggregationFactory} allowing to
@@ -18,7 +17,7 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
  * so this type should not be referenced directtly in user code.
  *
- * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
+ * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 public interface ExtendedSearchAggregatonFactory<PDF extends SearchPredicateFactory>
 	extends SearchAggregationFactory {

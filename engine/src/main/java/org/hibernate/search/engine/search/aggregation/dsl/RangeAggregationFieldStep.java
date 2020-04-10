@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
  * The initial step in a "range" aggregation definition, where the target field can be set.
- * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
+ * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
 public interface RangeAggregationFieldStep<PDF extends SearchPredicateFactory> {
 
