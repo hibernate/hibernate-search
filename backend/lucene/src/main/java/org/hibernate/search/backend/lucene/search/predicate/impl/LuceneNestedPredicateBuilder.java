@@ -26,8 +26,7 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBui
 	LuceneNestedPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		super(
 				absoluteFieldPath,
-				// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
-				nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 )
+				nestedPathHierarchy
 		);
 	}
 

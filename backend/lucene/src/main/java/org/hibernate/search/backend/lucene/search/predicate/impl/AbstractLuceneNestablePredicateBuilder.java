@@ -36,12 +36,21 @@ abstract class AbstractLuceneNestablePredicateBuilder extends AbstractLuceneSear
 		checkNestableWithin( context.getNestedPath() );
 
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
-		String expectedNestedPath = nestedPathHierarchy.isEmpty() ? null
-				: nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
+		// traversing the nestedPathHierarchy in reversed order
+		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;
+
+		String expectedNestedPath = hierarchyLastIndex < 0 ? null
+				: nestedPathHierarchy.get( hierarchyLastIndex );
 
 		if ( Objects.equals( context.getNestedPath(), expectedNestedPath ) ) {
 			// Implicit nesting is not necessary
 			return super.build( context );
+		}
+
+		if ( this instanceof LuceneNestedPredicateBuilder ) {
+			hierarchyLastIndex--;
+			expectedNestedPath = hierarchyLastIndex < 0 ? null
+				: nestedPathHierarchy.get( hierarchyLastIndex );
 		}
 
 		// The context we expect this predicate to be built in.
@@ -52,8 +61,6 @@ abstract class AbstractLuceneNestablePredicateBuilder extends AbstractLuceneSear
 
 		Query result = super.build( contextAfterImplicitNesting );
 
-		// traversing the nestedPathHierarchy in reversed order
-		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;
 		for ( int i = hierarchyLastIndex; i >= 0; i-- ) {
 			String path = nestedPathHierarchy.get( i );
 			if ( path.equals( context.getNestedPath() ) ) {
