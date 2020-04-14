@@ -15,7 +15,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -24,7 +26,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -57,6 +59,8 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class SingleFieldAggregationBaseIT<F> {
+
+	private static final int INIT_BATCH_SIZE = 1000;
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
@@ -105,9 +109,23 @@ public class SingleFieldAggregationBaseIT<F> {
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, emptyIndex, nullOnlyIndex ).setup();
 
+		List<CompletableFuture<?>> futures = new ArrayList<>();
 		for ( DataSet<?> dataSet : dataSets ) {
-			dataSet.init();
+			dataSet.init( futures::add );
+			if ( futures.size() >= INIT_BATCH_SIZE ) {
+				CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
+				futures.clear();
+			}
 		}
+
+		CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
+
+		CompletableFuture.allOf(
+				mainIndex.createWorkspace().flush(),
+				mainIndex.createWorkspace().refresh(),
+				nullOnlyIndex.createWorkspace().flush(),
+				nullOnlyIndex.createWorkspace().refresh()
+		).join();
 	}
 
 	private final SupportedSingleFieldAggregationExpectations<F> expectations;
@@ -331,54 +349,45 @@ public class SingleFieldAggregationBaseIT<F> {
 			this.valueCardinality = valueCardinality;
 		}
 
-		private void init() {
-			IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-			int mainIndexDocumentCount;
+		private void init(Consumer<CompletableFuture<?>> futureCollector) {
+			IndexIndexer indexer = mainIndex.createIndexer();
 			if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
 				List<F> values = expectations.getMainIndexDocumentFieldValues();
-				mainIndexDocumentCount = values.size();
 				for ( int i = 0; i < values.size(); i++ ) {
 					F valueForDocument = values.get( i );
-					plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
-						initSingleValued( mainIndex.binding(), document, valueForDocument );
-					} );
+					futureCollector.accept(
+							indexer.add( referenceProvider( name + "_document_" + i, name ), document -> {
+								initSingleValued( mainIndex.binding(), document, valueForDocument );
+							} )
+					);
 				}
 			}
 			else {
 				List<List<F>> values = expectations.getMultiValuedIndexDocumentFieldValues();
-				mainIndexDocumentCount = values.size();
 				for ( int i = 0; i < values.size(); i++ ) {
 					List<F> valuesForDocument = values.get( i );
-					plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
-						initMultiValued( mainIndex.binding(), document, valuesForDocument );
-					} );
+					futureCollector.accept(
+							indexer.add( referenceProvider( name + "_document_" + i, name ), document -> {
+								initMultiValued( mainIndex.binding(), document, valuesForDocument );
+							} )
+					);
 				}
 			}
-			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
-			plan.execute().join();
+			futureCollector.accept(
+					indexer.add( referenceProvider( name + "_document_empty", name ), document -> { } )
+			);
 
-			plan = nullOnlyIndex.createIndexingPlan();
-			plan.add( referenceProvider( name + "_nullOnlyIndex_document_0", name ), document -> {
-				if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
-					initSingleValued( nullOnlyIndex.binding(), document, null );
-				}
-				else {
-					initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ) );
-				}
-			} );
-			plan.execute().join();
-
-			// Check that all documents are searchable
-			SearchResultAssert.assertThat( mainIndex.createScope().query()
-					.where( f -> f.matchAll() )
-					.routing( name )
-					.toQuery() )
-					.hasTotalHitCount( mainIndexDocumentCount + 1 /* +1 for the empty document */ );
-			SearchResultAssert.assertThat( nullOnlyIndex.createScope().query()
-					.where( f -> f.matchAll() )
-					.routing( name )
-					.toQuery() )
-					.hasTotalHitCount( 1 );
+			indexer = nullOnlyIndex.createIndexer();
+			futureCollector.accept(
+				indexer.add( referenceProvider( name + "_nullOnlyIndex_document_0", name ), document -> {
+					if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+						initSingleValued( nullOnlyIndex.binding(), document, null );
+					}
+					else {
+						initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ) );
+					}
+				} )
+			);
 		}
 
 		private void initSingleValued(IndexBinding binding, DocumentElement document, F value) {
