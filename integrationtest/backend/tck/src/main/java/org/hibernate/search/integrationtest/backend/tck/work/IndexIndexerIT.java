@@ -15,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -60,7 +59,7 @@ public class IndexIndexerIT {
 		setup();
 
 		IndexIndexer indexer =
-				indexManager.createIndexer( DocumentCommitStrategy.NONE );
+				indexManager.createIndexer();
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 		IndexWorkspace workspace = indexManager.createWorkspace();
 
@@ -90,7 +89,7 @@ public class IndexIndexerIT {
 		setup();
 
 		IndexIndexer indexer =
-				indexManager.createIndexer( DocumentCommitStrategy.NONE );
+				indexManager.createIndexer();
 
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexOperationsFail( INDEX_NAME );

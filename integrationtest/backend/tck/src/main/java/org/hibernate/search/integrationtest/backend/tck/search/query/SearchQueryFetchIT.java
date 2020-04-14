@@ -19,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -286,7 +285,7 @@ public class SearchQueryFetchIT {
 
 	private void initData() {
 		IndexIndexer executor =
-				indexManager.createIndexer( DocumentCommitStrategy.NONE );
+				indexManager.createIndexer();
 		List<CompletableFuture<?>> futures = new ArrayList<>();
 		for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 			int intValue = i;
