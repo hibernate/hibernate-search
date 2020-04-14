@@ -37,7 +37,7 @@ public class MultiValueRangeFacetCounts extends Facets {
 
 	@Override
 	public FacetResult getTopChildren(int topN, String dim, String... path) {
-		if ( dim.equals( field ) == false ) {
+		if ( !dim.equals( field ) ) {
 			throw new IllegalArgumentException( "invalid dim \"" + dim + "\"; should be \"" + field + "\"" );
 		}
 		if ( path.length != 0 ) {
