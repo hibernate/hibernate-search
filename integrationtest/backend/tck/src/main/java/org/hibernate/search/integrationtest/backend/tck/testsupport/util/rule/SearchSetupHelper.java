@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +30,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -46,6 +49,8 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class SearchSetupHelper implements TestRule {
+
+	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider;
 	private final TckBackendSetupStrategy setupStrategy;
@@ -105,6 +110,12 @@ public class SearchSetupHelper implements TestRule {
 				try ( Closer<IOException> closer = new Closer<>() ) {
 					try {
 						base.evaluate();
+					}
+					catch (RuntimeException e) {
+						// When used as a @ClassRule, exceptions are not properly reported by JUnit.
+						// Log them so that we have something in the logs, at least.
+						log.warn( "Exception thrown by test and caught by SearchSetupHelper rule: " + e.getMessage(), e );
+						throw e;
 					}
 					finally {
 						cleanUp( closer );
