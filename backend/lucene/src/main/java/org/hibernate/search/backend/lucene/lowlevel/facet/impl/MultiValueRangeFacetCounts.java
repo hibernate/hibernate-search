@@ -28,7 +28,7 @@ public class MultiValueRangeFacetCounts extends Facets {
 	protected final String field;
 	protected int totCount;
 
-	protected MultiValueRangeFacetCounts(String field, Range[] ranges, Query fastMatchQuery) throws IOException {
+	protected MultiValueRangeFacetCounts(String field, Range[] ranges, Query fastMatchQuery) {
 		this.field = field;
 		this.ranges = ranges;
 		this.fastMatchQuery = fastMatchQuery;
