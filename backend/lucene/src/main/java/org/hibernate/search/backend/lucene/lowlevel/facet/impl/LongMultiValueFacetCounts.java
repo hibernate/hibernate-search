@@ -6,13 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
-import com.carrotsearch.hppc.LongHashSet;
-import com.carrotsearch.hppc.LongIntScatterMap;
-import com.carrotsearch.hppc.cursors.LongIntCursor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
+
+import com.carrotsearch.hppc.LongHashSet;
+import com.carrotsearch.hppc.LongIntScatterMap;
+import com.carrotsearch.hppc.cursors.LongIntCursor;
 import com.carrotsearch.hppc.procedures.LongProcedure;
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
@@ -20,8 +23,6 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.PriorityQueue;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 
 /**
  * <p>
@@ -51,7 +52,7 @@ public class LongMultiValueFacetCounts extends Facets {
 			LongMultiValues fv = valueSource.getValues( hits.context );
 
 			DocIdSetIterator docs = hits.bits.iterator();
-			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; ) {
+			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
 				if ( fv.advanceExact( doc ) ) {
 					totCount++;
 					while ( fv.hasNextValue() ) {
@@ -62,8 +63,6 @@ public class LongMultiValueFacetCounts extends Facets {
 					uniqueValuesForDocument.forEach( incrementCountForDocumentId );
 					uniqueValuesForDocument.clear();
 				}
-
-				doc = docs.nextDoc();
 			}
 		}
 	}
