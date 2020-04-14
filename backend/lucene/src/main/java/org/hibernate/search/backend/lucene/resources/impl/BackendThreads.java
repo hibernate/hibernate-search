@@ -49,7 +49,9 @@ public class BackendThreads {
 	}
 
 	public void onStop() {
-		writeExecutor.shutdownNow();
+		if ( writeExecutor != null ) {
+			writeExecutor.shutdownNow();
+		}
 	}
 
 	public ThreadProvider getThreadProvider() {

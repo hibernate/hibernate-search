@@ -48,7 +48,9 @@ public class BackendThreads {
 	}
 
 	public void onStop() {
-		workExecutor.shutdownNow();
+		if ( workExecutor != null ) {
+			workExecutor.shutdownNow();
+		}
 	}
 
 	public String getPrefix() {
