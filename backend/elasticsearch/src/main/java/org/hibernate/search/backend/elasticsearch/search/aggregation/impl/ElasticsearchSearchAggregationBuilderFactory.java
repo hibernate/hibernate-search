@@ -69,7 +69,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 		return fieldComponent.getComponent().createTermsAggregationBuilder(
-				searchContext, absoluteFieldPath, expectedType, convert
+				searchContext, absoluteFieldPath,
+				scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+				expectedType, convert
 		);
 	}
 
@@ -80,7 +82,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
-				searchContext, absoluteFieldPath, expectedType, convert
+				searchContext, absoluteFieldPath,
+				scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+				expectedType, convert
 		);
 	}
 

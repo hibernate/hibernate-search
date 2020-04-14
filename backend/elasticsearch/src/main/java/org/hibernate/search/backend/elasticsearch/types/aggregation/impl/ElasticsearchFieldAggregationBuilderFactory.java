@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.aggregation.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -24,10 +26,12 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 public interface ElasticsearchFieldAggregationBuilderFactory {
 
 	<K> TermsAggregationBuilder<K> createTermsAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
+			Class<K> expectedType, ValueConvert convert);
 
 	<K> RangeAggregationBuilder<K> createRangeAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
+			Class<K> expectedType, ValueConvert convert);
 
 	boolean hasCompatibleCodec(ElasticsearchFieldAggregationBuilderFactory other);
 
