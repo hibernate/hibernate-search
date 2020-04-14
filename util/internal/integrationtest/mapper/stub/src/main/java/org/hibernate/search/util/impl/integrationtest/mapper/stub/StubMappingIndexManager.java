@@ -54,12 +54,11 @@ public abstract class StubMappingIndexManager {
 				commitStrategy, refreshStrategy );
 	}
 
-	public IndexIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
-		return createIndexer( new StubBackendSessionContext(), commitStrategy );
+	public IndexIndexer createIndexer() {
+		return createIndexer( new StubBackendSessionContext() );
 	}
 
-	public IndexIndexer createIndexer(
-			StubBackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
+	public IndexIndexer createIndexer(StubBackendSessionContext sessionContext) {
 		return delegate().createIndexer( sessionContext, StubEntityReference.FACTORY );
 	}
 

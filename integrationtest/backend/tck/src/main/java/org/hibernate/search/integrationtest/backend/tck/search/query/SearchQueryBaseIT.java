@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -138,7 +137,7 @@ public class SearchQueryBaseIT {
 
 	private void initData(int documentCount) {
 		IndexIndexer executor =
-				indexManager.createIndexer( DocumentCommitStrategy.NONE );
+				indexManager.createIndexer();
 		List<CompletableFuture<?>> futures = new ArrayList<>();
 		for ( int i = 0; i < documentCount; i++ ) {
 			int intValue = i;

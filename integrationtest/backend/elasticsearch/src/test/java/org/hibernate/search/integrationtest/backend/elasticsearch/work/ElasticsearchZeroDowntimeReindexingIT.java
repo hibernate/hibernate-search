@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -64,7 +63,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 	@Test
 	public void test() {
 		IndexWorkspace workspace = indexManager.createWorkspace();
-		IndexIndexer indexer = indexManager.createIndexer( DocumentCommitStrategy.NONE );
+		IndexIndexer indexer = indexManager.createIndexer();
 
 		indexer.add( referenceProvider( "1" ), document -> {
 			document.addValue( indexMapping.text, "text1" );
