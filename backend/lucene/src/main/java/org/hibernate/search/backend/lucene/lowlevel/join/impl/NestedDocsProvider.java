@@ -22,7 +22,6 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.search.join.BitSetProducer;
-import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.util.BitSet;
 
 /**
@@ -34,7 +33,7 @@ import org.apache.lucene.util.BitSet;
  */
 public class NestedDocsProvider {
 
-	private final BitSetProducer parentFiler;
+	private final BitSetProducer parentFilter;
 	private final Query childQuery;
 
 	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
@@ -50,12 +49,15 @@ public class NestedDocsProvider {
 	}
 
 	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query originalParentQuery, Query nestedFilter) {
-		this.parentFiler = new QueryBitSetProducer( originalParentQuery );
-		this.childQuery = Queries.findChildQuery( nestedDocumentPaths, originalParentQuery, nestedFilter );
+		// Note: this filter should include *all* parents, not just the matched ones.
+		// Otherwise we will not "see" non-matched parents,
+		// and we will consider its matching children as children of the next matching parent.
+		this.parentFilter = Queries.parentFilter( null );
+		this.childQuery = Queries.findChildQuery( parentFilter, nestedDocumentPaths, originalParentQuery, nestedFilter );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {
-		return parentFiler.getBitSet( context );
+		return parentFilter.getBitSet( context );
 	}
 
 	public DocIdSetIterator childDocs(LeafReaderContext context) throws IOException {
