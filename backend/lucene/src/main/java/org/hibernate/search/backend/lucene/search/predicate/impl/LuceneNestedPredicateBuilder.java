@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.join.QueryBitSetProducer;
+import org.apache.lucene.search.join.BitSetProducer;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 
@@ -53,15 +53,12 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBui
 		childQueryBuilder.add( Queries.nestedDocumentPathQuery( nestedDocumentPath ), Occur.FILTER );
 		childQueryBuilder.add( nestedQuery, Occur.MUST );
 
-		Query parentQuery;
-		if ( parentNestedDocumentPath == null ) {
-			parentQuery = Queries.mainDocumentQuery();
-		}
-		else {
-			parentQuery = Queries.nestedDocumentPathQuery( parentNestedDocumentPath );
-		}
+		// Note: this filter should include *all* parents, not just the matched ones.
+		// Otherwise we will not "see" non-matched parents,
+		// and we will consider its matching children as children of the next matching parent.
+		BitSetProducer parentFilter = Queries.parentFilter( parentNestedDocumentPath );
 
 		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode
-		return new ToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( parentQuery ), ScoreMode.Avg );
+		return new ToParentBlockJoinQuery( childQueryBuilder.build(), parentFilter, ScoreMode.Avg );
 	}
 }
