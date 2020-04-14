@@ -58,8 +58,7 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 				),
 				new LuceneGeoPointFieldAggregationBuilderFactory(
 						resolvedAggregable, dslConverter, projectionConverter, codec
-				),
-				resolvedAggregable
+				)
 		);
 	}
 

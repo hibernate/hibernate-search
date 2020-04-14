@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,23 +64,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	public final Map<K, Long> extract(AggregationExtractContext context) throws IOException {
 		FromDocumentFieldValueConvertContext convertContext = context.getConvertContext();
 
-		List<Bucket<T>> buckets;
-		try {
-			buckets = getTopBuckets( context );
-		}
-		catch (IllegalArgumentException e) {
-			/*
-			 * Happens in two cases:
-			 * 1. There are no facets at all stored in the matching documents.
-			 * 2. There are facets stored in the matching documents in general,
-			 * but not for this specific field.
-			 * In both cases, we know the target field is correctly configured to generate facets,
-			 * because we managed to create this aggregation.
-			 * So we can safely return an empty list: the matching documents simply do not have
-			 * any value for this field.
-			 */
-			return toMap( convertContext, Collections.emptyList() );
-		}
+		List<Bucket<T>> buckets = getTopBuckets( context );
 
 		if ( BucketOrder.COUNT_DESC.equals( order ) && (minDocCount > 0 || buckets.size() >= maxTermCount ) ) {
 			/*

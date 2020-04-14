@@ -128,10 +128,6 @@ public interface Log extends BasicLogger {
 			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_1 + 265,
-			value = "Unable to build Lucene Document due to facet indexing error")
-	SearchException errorDuringFacetingIndexing(@Cause Exception e );
-
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_1 + 274, value = "Executing Lucene query '%s'" )
 	void executingLuceneQuery(Query luceneQuery);

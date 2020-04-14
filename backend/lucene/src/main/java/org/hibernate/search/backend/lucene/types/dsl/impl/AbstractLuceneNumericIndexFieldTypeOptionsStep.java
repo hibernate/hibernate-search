@@ -66,8 +66,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 						dslToIndexConverter, rawDslToIndexConverter,
 						indexToProjectionConverter, rawIndexToProjectionConverter,
 						codec
-				),
-				resolvedAggregable
+				)
 		);
 	}
 

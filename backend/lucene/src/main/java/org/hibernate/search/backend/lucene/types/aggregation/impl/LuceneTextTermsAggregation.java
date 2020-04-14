@@ -8,21 +8,19 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.FacetsConfig;
-import org.apache.lucene.facet.sortedset.DefaultSortedSetDocValuesReaderState;
-import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetCounts;
-import org.apache.lucene.facet.sortedset.SortedSetDocValuesReaderState;
-import org.apache.lucene.facet.sortedset.SortedSetDocValuesReaderState.OrdRange;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedSetDocValues;
 
 /**
@@ -41,48 +39,38 @@ public class LuceneTextTermsAggregation<K>
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
-		// May throw IllegalArgumentException
-		SortedSetDocValuesReaderState docValuesReaderState = new DefaultSortedSetDocValuesReaderState( reader );
-
-		SortedSetDocValuesFacetCounts facetCounts = new SortedSetDocValuesFacetCounts(
-				docValuesReaderState, facetsCollector
+		TextMultiValueFacetCounts facetCounts = new TextMultiValueFacetCounts(
+				reader, absoluteFieldPath, facetsCollector
 		);
 
-		// May throw IllegalArgumentException
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}
 
 	@Override
 	Set<String> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException {
-		Set<String> collectedTerms = new LinkedHashSet<>();
-
-		SortedSetDocValuesReaderState docValuesReaderState = new DefaultSortedSetDocValuesReaderState( reader );
-		OrdRange ordRange = docValuesReaderState.getOrdRange( absoluteFieldPath );
-		SortedSetDocValues docValues = docValuesReaderState.getDocValues();
-
-		// Note ordRange.end is inclusive, hence the weird index operations.
-		if ( descending ) {
-			int start = Math.max( ordRange.start, ordRange.end - limit + 1 );
-			for ( int i = ordRange.end; i >= start ; --i ) {
-				collectedTerms.add( lookupOrd( docValues, i ) );
+		TreeSet<String> collectedTerms = new TreeSet<>( descending ? STRING_COMPARATOR.reversed() : STRING_COMPARATOR );
+		for ( LeafReaderContext leaf : reader.leaves() ) {
+			final LeafReader atomicReader = leaf.reader();
+			SortedSetDocValues docValues = atomicReader.getSortedSetDocValues( absoluteFieldPath );
+			if ( docValues == null ) {
+				continue;
+			}
+			int valueCount = (int) docValues.getValueCount();
+			if ( descending ) {
+				int start = Math.max( 0, valueCount - limit );
+				for ( int i = start; i < valueCount; ++i ) {
+					collectedTerms.add( docValues.lookupOrd( i ).utf8ToString() );
+				}
+			}
+			else {
+				int end = Math.min( limit, valueCount );
+				for ( int i = 0; i < end; ++i ) {
+					collectedTerms.add( docValues.lookupOrd( i ).utf8ToString() );
+				}
 			}
 		}
-		else {
-			int end = Math.min( ordRange.start + limit - 1, ordRange.end );
-			for ( int i = ordRange.start; i <= end; ++i ) {
-				collectedTerms.add( lookupOrd( docValues, i ) );
-			}
-		}
-
 		return collectedTerms;
-	}
-
-	private String lookupOrd(SortedSetDocValues docValues, int ord) throws IOException {
-		String pathAsString = docValues.lookupOrd( ord ).utf8ToString();
-		// FacetsConfig does not store the term directly: it prepends the field name
-		String[] pathAsComponents = FacetsConfig.stringToPath( pathAsString );
-		return pathAsComponents[1];
 	}
 
 	@Override

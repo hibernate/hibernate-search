@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.facet.FacetsConfig;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
@@ -73,7 +72,6 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder = new HashMap<>();
 		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder = new HashMap<>();
 		ScopedAnalyzer.Builder scopedAnalyzerBuilder = new ScopedAnalyzer.Builder();
-		FacetsConfig facetsConfig = new FacetsConfig();
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
 			@Override
@@ -90,11 +88,6 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			public void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode node) {
 				objectNodesBuilder.put( absolutePath, node );
 			}
-
-			@Override
-			public void collectFacetConfig(String absoluteFieldPath, boolean multiValued) {
-				facetsConfig.setMultiValued( absoluteFieldPath, multiValued );
-			}
 		};
 
 		LuceneIndexSchemaObjectNode rootNode = LuceneIndexSchemaObjectNode.root();
@@ -106,8 +99,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				objectNodesBuilder,
 				fieldNodesBuilder,
-				scopedAnalyzerBuilder.build(),
-				facetsConfig.getDimConfigs().isEmpty() ? null : facetsConfig
+				scopedAnalyzerBuilder.build()
 		);
 	}
 

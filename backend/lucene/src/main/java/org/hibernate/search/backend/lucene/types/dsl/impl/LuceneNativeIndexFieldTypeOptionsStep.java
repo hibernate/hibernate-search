@@ -41,8 +41,7 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 				new LuceneStandardFieldProjectionBuilderFactory<>(
 						fieldValueExtractor != null, projectionConverter, rawProjectionConverter, codec
 				),
-				null,
-				false
+				null
 		);
 	}
 
