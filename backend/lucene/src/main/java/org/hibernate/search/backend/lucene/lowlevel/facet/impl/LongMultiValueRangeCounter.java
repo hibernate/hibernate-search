@@ -75,7 +75,6 @@ class LongMultiValueRangeCounter {
 		while ( upto0 < endsList.size() ) {
 			v = endsList.get( upto0 );
 			int flags = endsMap.get( v );
-			//System.out.println("  v=" + v + " flags=" + flags);
 			if ( flags == 3 ) {
 				// This point is both an end and a start; we need to
 				// separate it:
@@ -100,7 +99,6 @@ class LongMultiValueRangeCounter {
 				elementaryIntervals.add( new InclusiveRange( prev, v ) );
 				prev = v + 1;
 			}
-			//System.out.println("    ints=" + elementaryIntervals);
 			upto0++;
 		}
 
@@ -120,11 +118,6 @@ class LongMultiValueRangeCounter {
 		}
 
 		leafCounts = new int[boundaries.length];
-
-		//System.out.println("ranges: " + Arrays.toString(ranges));
-		//System.out.println("intervals: " + elementaryIntervals);
-		//System.out.println("boundaries: " + Arrays.toString(boundaries));
-		//System.out.println("root:\n" + root);
 	}
 
 	public void incrementCountForLeafWithIndex(int index) {
@@ -132,16 +125,6 @@ class LongMultiValueRangeCounter {
 	}
 
 	public int findLeafIndex(long v) {
-		// NOTE: this works too, but it's ~6% slower on a simple
-		// test with a high-freq TermQuery w/ range faceting on
-		// wikimediumall:
-		/*
-		int index = Arrays.binarySearch(boundaries, v);
-		if (index < 0) {
-		  index = -index-1;
-		}
-		return index;
-		 */
 		// Binary search to find matched elementary range; we
 		// are guaranteed to find a match because the last
 		// boundary is Long.MAX_VALUE:
@@ -170,7 +153,6 @@ class LongMultiValueRangeCounter {
 	 * ranges, returning the missing count (how many hits
 	 * didn't match any ranges). */
 	public int fillCounts(int[] counts) {
-		//System.out.println("  rollup");
 		missingCount = 0;
 		leafUpto = 0;
 		rollup( root, counts, false );
@@ -199,7 +181,6 @@ class LongMultiValueRangeCounter {
 				counts[rangeIndex] += count;
 			}
 		}
-		//System.out.println("  rollup node=" + node.start + " to " + node.end + ": count=" + count);
 		return count;
 	}
 
