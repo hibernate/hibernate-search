@@ -167,7 +167,6 @@ class LuceneStringIndexFieldTypeOptionsStep
 						codec,
 						analyzer != null
 				),
-				resolvedAggregable,
 				analyzerOrNormalizer
 		);
 	}

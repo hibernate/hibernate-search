@@ -17,7 +17,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.SortedSetDocValuesField;
-import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.NormsFieldExistsQuery;
@@ -64,12 +63,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 
 		if ( sortable || aggregable ) {
 			BytesRef normalized = normalize( absoluteFieldPath, value );
-			if ( sortable ) {
-				documentBuilder.addField( new SortedSetDocValuesField( absoluteFieldPath, normalized ) );
-			}
-			if ( aggregable ) {
-				documentBuilder.addField( new SortedSetDocValuesFacetField( absoluteFieldPath, normalized.utf8ToString() ) );
-			}
+			documentBuilder.addField( new SortedSetDocValuesField( absoluteFieldPath, normalized ) );
 		}
 
 		if ( !sortable && fieldType.omitNorms() ) {
@@ -103,7 +97,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		if ( !fieldType.omitNorms() ) {
 			return new NormsFieldExistsQuery( absoluteFieldPath );
 		}
-		else if ( sortable ) {
+		else if ( sortable || aggregable ) {
 			return new DocValuesFieldExistsQuery( absoluteFieldPath );
 		}
 		else {

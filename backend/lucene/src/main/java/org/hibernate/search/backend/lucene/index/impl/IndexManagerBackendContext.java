@@ -55,8 +55,6 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.apache.lucene.facet.FacetsConfig;
-
 public class IndexManagerBackendContext implements WorkExecutionBackendContext, SearchBackendContext {
 
 	private static final ConfigurationProperty<IOStrategyName> IO_STRATEGY =
@@ -175,8 +173,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return eventContext;
 	}
 
-	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName, FacetsConfig facetsConfig) {
-		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName, facetsConfig );
+	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName) {
+		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName );
 	}
 
 	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {

@@ -24,7 +24,6 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
-	private final boolean aggregable;
 	private final Analyzer analyzerOrNormalizer;
 
 	public LuceneIndexFieldType(
@@ -32,10 +31,9 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
-			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
-			boolean aggregable) {
+			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory) {
 		this( codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
-				aggregationBuilderFactory, aggregable, null );
+				aggregationBuilderFactory, null );
 	}
 
 	public LuceneIndexFieldType(LuceneFieldCodec<F> codec,
@@ -43,14 +41,12 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
 			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
-			boolean aggregable,
 			Analyzer analyzerOrNormalizer) {
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
 		this.aggregationBuilderFactory = aggregationBuilderFactory;
-		this.aggregable = aggregable;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
@@ -68,10 +64,6 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 		);
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
-
-		if ( aggregable ) {
-			collector.collectFacetConfig( schemaNode.getAbsoluteFieldPath(), multiValued );
-		}
 
 		collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
 
