@@ -18,14 +18,14 @@ import com.google.gson.JsonObject;
  * @param <V> The type of values in the returned map.
  */
 public abstract class AbstractElasticsearchBucketAggregation<K, V>
-		extends AbstractElasticsearchAggregation<Map<K, V>> {
+		extends AbstractElasticsearchNestableAggregation<Map<K, V>> {
 
 	AbstractElasticsearchBucketAggregation(AbstractBuilder<K, V> builder) {
 		super( builder );
 	}
 
 	@Override
-	public final JsonObject request(AggregationRequestContext context) {
+	protected final JsonObject doRequest(AggregationRequestContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -35,7 +35,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	}
 
 	@Override
-	public final Map<K, V> extract(JsonObject aggregationResult, AggregationExtractContext context) {
+	protected final Map<K, V> doExtract(JsonObject aggregationResult, AggregationExtractContext context) {
 		JsonElement buckets = aggregationResult.get( "buckets" );
 
 		return doExtract( context, aggregationResult, buckets );
@@ -47,7 +47,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 			JsonObject outerObject, JsonElement buckets);
 
 	public abstract static class AbstractBuilder<K, V>
-			extends AbstractElasticsearchAggregation.AbstractBuilder<Map<K, V>> {
+			extends AbstractElasticsearchNestableAggregation.AbstractBuilder<Map<K, V>> {
 
 		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
 			super( searchContext );

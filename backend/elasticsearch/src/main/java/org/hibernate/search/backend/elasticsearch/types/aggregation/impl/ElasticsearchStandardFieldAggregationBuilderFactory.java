@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.aggregation.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
@@ -50,7 +51,7 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath, aggregable );
 
 		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter = getFromFieldValueConverter(
@@ -58,13 +59,13 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 		);
 
 		return new ElasticsearchTermsAggregation.Builder<>(
-				searchContext, absoluteFieldPath, fromFieldValueConverter, codec
+				searchContext, absoluteFieldPath, nestedPathHierarchy, fromFieldValueConverter, codec
 		);
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath, aggregable );
 
 		DslConverter<?, ? extends F> toFieldValueConverter = getToFieldValueConverter(
@@ -72,7 +73,7 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 		);
 
 		return new ElasticsearchRangeAggregation.Builder<>(
-				searchContext, absoluteFieldPath, toFieldValueConverter, codec
+				searchContext, absoluteFieldPath, nestedPathHierarchy, toFieldValueConverter, codec
 		);
 	}
 
