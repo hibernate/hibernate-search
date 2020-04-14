@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldValueCardinality;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -60,7 +63,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
 	private static List<DataSet<?>> dataSets;
 
-	@Parameterized.Parameters(name = "{0}")
+	@Parameterized.Parameters(name = "{0} - {1} - {2}")
 	public static Object[][] parameters() {
 		supportedFieldTypes = new LinkedHashSet<>();
 		dataSets = new ArrayList<>();
@@ -70,10 +73,18 @@ public class SingleFieldAggregationBaseIT<F> {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getSupported();
 				if ( expectations.isPresent() ) {
-					supportedFieldTypes.add( fieldTypeDescriptor );
-					DataSet<?> dataSet = new DataSet<>( expectations.get() );
-					dataSets.add( dataSet );
-					parameters.add( new Object[] { expectations.get(), dataSet } );
+					for ( IndexFieldStructure fieldStructure : IndexFieldStructure.values() ) {
+						if ( IndexFieldStructure.IN_NESTED_REQUIRING_FILTER.equals( fieldStructure ) ) {
+							// TODO HSEARCH-3881 test filtering, too
+							continue;
+						}
+						for ( IndexFieldValueCardinality valueCardinality : IndexFieldValueCardinality.values() ) {
+							supportedFieldTypes.add( fieldTypeDescriptor );
+							DataSet<?> dataSet = new DataSet<>( expectations.get(), fieldStructure, valueCardinality );
+							dataSets.add( dataSet );
+							parameters.add( new Object[] { expectations.get(), fieldStructure, valueCardinality, dataSet } );
+						}
+					}
 				}
 			}
 		}
@@ -89,12 +100,10 @@ public class SingleFieldAggregationBaseIT<F> {
 			SimpleMappedIndex.of( "Empty", IndexBinding::new );
 	private static final SimpleMappedIndex<IndexBinding> nullOnlyIndex =
 			SimpleMappedIndex.of( "NullOnly", IndexBinding::new );
-	private static final SimpleMappedIndex<MultiValuedIndexBinding> multiValuedIndex =
-			SimpleMappedIndex.of( "MultiValued", MultiValuedIndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start().withIndexes( mainIndex, emptyIndex, nullOnlyIndex, multiValuedIndex ).setup();
+		setupHelper.start().withIndexes( mainIndex, emptyIndex, nullOnlyIndex ).setup();
 
 		for ( DataSet<?> dataSet : dataSets ) {
 			dataSet.init();
@@ -103,32 +112,44 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	private final SupportedSingleFieldAggregationExpectations<F> expectations;
 	private final FieldTypeDescriptor<F> fieldType;
+	private final IndexFieldStructure fieldStructure;
+	private final IndexFieldValueCardinality valueCardinality;
 	private final DataSet<F> dataSet;
 
 	public SingleFieldAggregationBaseIT(SupportedSingleFieldAggregationExpectations<F> expectations,
+			IndexFieldStructure fieldStructure, IndexFieldValueCardinality valueCardinality,
 			DataSet<F> dataSet) {
 		this.expectations = expectations;
 		this.fieldType = expectations.fieldType();
+		this.fieldStructure = fieldStructure;
+		this.valueCardinality = valueCardinality;
 		this.dataSet = dataSet;
 	}
 
 	@Test
-	@TestForIssue(jiraKey = { "HSEARCH-809", "HSEARCH-2376", "HSEARCH-2472", "HSEARCH-2954" })
+	@TestForIssue(jiraKey = {
+			"HSEARCH-726", "HSEARCH-900", "HSEARCH-809",
+			"HSEARCH-2376", "HSEARCH-2472", "HSEARCH-2954", "HSEARCH-2535",
+			"HSEARCH-1927", "HSEARCH-1929"
+	})
 	@PortedFromSearch5(original = {
 			"org.hibernate.search.test.query.facet.NumberFacetingTest",
 			"org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryForInteger",
 			"org.hibernate.search.test.query.facet.RangeFacetingTest.testDateRangeFaceting",
 			"org.hibernate.search.test.query.facet.SimpleFacetingTest.testSimpleDiscretFaceting",
-			"org.hibernate.search.test.query.facet.StringFacetingTest"
+			"org.hibernate.search.test.query.facet.StringFacetingTest",
+			"org.hibernate.search.test.query.facet.EmbeddedCollectionFacetingTest",
+			"org.hibernate.search.test.query.facet.ManyToOneFacetingTest",
+			"org.hibernate.search.test.query.facet.MultiValuedFacetingTest"
 	})
 	public void simple() {
 		// Need a separate method to handle the scenario generics
-		doTest_simple( expectations.simple() );
+		doTest_simple( getSimpleScenario() );
 	}
 
 	private <A> void doTest_simple(AggregationScenario<A> scenario) {
 		StubMappingScope scope = mainIndex.createScope();
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = getFieldPath( mainIndex.binding() );
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
@@ -147,12 +168,12 @@ public class SingleFieldAggregationBaseIT<F> {
 	@Test
 	public void aggregationObject() {
 		// Need a separate method to handle the scenario generics
-		doTest_aggregationObject( expectations.simple() );
+		doTest_aggregationObject( getSimpleScenario() );
 	}
 
 	private <A> void doTest_aggregationObject(AggregationScenario<A> scenario) {
 		StubMappingScope scope = mainIndex.createScope();
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = getFieldPath( mainIndex.binding() );
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath )
@@ -175,7 +196,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	@TestForIssue(jiraKey = { "HSEARCH-1968" })
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.NoQueryResultsFacetingTest")
 	public void noMatch() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = getFieldPath( mainIndex.binding() );
 
 		AggregationScenario<?> scenario = expectations.withoutMatch();
 		testValidAggregation(
@@ -196,7 +217,7 @@ public class SingleFieldAggregationBaseIT<F> {
 			"org.hibernate.search.test.query.facet.EdgeCaseFacetTest"
 	})
 	public void emptyIndex() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = getFieldPath( emptyIndex.binding() );
 
 		AggregationScenario<?> scenario = expectations.withoutMatch();
 		testValidAggregation(
@@ -212,40 +233,11 @@ public class SingleFieldAggregationBaseIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-2955")
 	@PortedFromSearch5(original = "org.hibernate.search.test.facet.NoIndexedValueFacetingTest")
 	public void nullOnlyIndex() {
-		String fieldPath = nullOnlyIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
+		String fieldPath = getFieldPath( nullOnlyIndex.binding() );
 
 		AggregationScenario<?> scenario = expectations.withoutMatch();
 		testValidAggregation(
 				scenario, nullOnlyIndex.createScope(), fieldPath
-		);
-	}
-
-	/**
-	 * Test behavior when aggregating on an multi-valued field.
-	 */
-	@Test
-	@TestForIssue(jiraKey = {"HSEARCH-726", "HSEARCH-900", "HSEARCH-2535", "HSEARCH-1927", "HSEARCH-1929"})
-	@PortedFromSearch5(original = {
-			"org.hibernate.search.test.query.facet.EmbeddedCollectionFacetingTest",
-			"org.hibernate.search.test.query.facet.ManyToOneFacetingTest",
-			"org.hibernate.search.test.query.facet.MultiValuedFacetingTest"
-	})
-	public void multiValued() {
-		String fieldPath = multiValuedIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
-
-		AggregationScenario<?> scenario = expectations.onMultiValuedIndex();
-		testValidAggregation(
-				scenario, multiValuedIndex.createScope(), fieldPath
-		);
-	}
-
-	@Test
-	public void inFlattenedObject() {
-		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
-
-		AggregationScenario<?> scenario = expectations.simple();
-		testValidAggregation(
-				scenario, mainIndex.createScope(), fieldPath
 		);
 	}
 
@@ -275,53 +267,105 @@ public class SingleFieldAggregationBaseIT<F> {
 				);
 	}
 
+	private AggregationScenario<?> getSimpleScenario() {
+		AggregationScenario<?> scenario;
+		if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+			scenario = expectations.simple();
+		}
+		else {
+			scenario = expectations.onMultiValuedIndex();
+		}
+		return scenario;
+	}
+
+	private String getFieldPath(IndexBinding indexBinding) {
+		switch ( fieldStructure ) {
+			case ROOT:
+				return getRelativeFieldName( indexBinding );
+			case IN_FLATTENED:
+				return indexBinding.flattenedObject.relativeFieldName
+						+ "." + getRelativeFieldName( indexBinding.flattenedObject );
+			case IN_NESTED:
+				return indexBinding.nestedObject.relativeFieldName
+						+ "." + getRelativeFieldName( indexBinding.nestedObject );
+			case IN_NESTED_TWICE:
+				return indexBinding.nestedObject.relativeFieldName
+						+ "." + indexBinding.nestedObject.nestedObject.relativeFieldName
+						+ "." + getRelativeFieldName( indexBinding.nestedObject.nestedObject );
+			case IN_NESTED_REQUIRING_FILTER:
+				// TODO HSEARCH-3881 test filtering, too
+			default:
+				throw new IllegalStateException( "Unexpected value: " + fieldStructure );
+		}
+	}
+
+	private String getRelativeFieldName(AbstractObjectBinding binding) {
+		return getFieldModelsByType( binding ).get( fieldType ).relativeFieldName;
+	}
+
+	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectBinding binding) {
+		switch ( valueCardinality ) {
+			case SINGLE_VALUED:
+				return binding.fieldWithSingleValueModels;
+			case MULTI_VALUED:
+				return binding.fieldWithMultipleValuesModels;
+			default:
+				throw new IllegalStateException( "Unexpected field value cardinality: " + valueCardinality );
+		}
+	}
+
 	private static class DataSet<F> {
 		final SupportedSingleFieldAggregationExpectations<F> expectations;
 		final FieldTypeDescriptor<F> fieldType;
 		final String name;
+		private final IndexFieldStructure fieldStructure;
+		private final IndexFieldValueCardinality valueCardinality;
 
-		private DataSet(SupportedSingleFieldAggregationExpectations<F> expectations) {
+		private DataSet(SupportedSingleFieldAggregationExpectations<F> expectations,
+				IndexFieldStructure fieldStructure, IndexFieldValueCardinality valueCardinality) {
 			this.expectations = expectations;
 			this.fieldType = expectations.fieldType();
-			this.name = expectations.aggregationName() + "_" + expectations.fieldType().getUniqueName();
+			this.name = expectations.aggregationName() + "_" + expectations.fieldType().getUniqueName()
+					+ "_" + fieldStructure.name() + "_" + valueCardinality.name();
+			this.fieldStructure = fieldStructure;
+			this.valueCardinality = valueCardinality;
 		}
 
 		private void init() {
-			FieldTypeDescriptor<F> fieldType = expectations.fieldType();
-
-			List<F> mainIndexDocumentFieldValues = expectations.getMainIndexDocumentFieldValues();
-			List<List<F>> multiValuedIndexDocumentFieldValues = expectations.getMultiValuedIndexDocumentFieldValues();
-
 			IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-			for ( int i = 0; i < mainIndexDocumentFieldValues.size(); i++ ) {
-				F value = mainIndexDocumentFieldValues.get( i );
-				plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
-					document.addValue( mainIndex.binding().fieldModels.get( fieldType ).reference, value );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
-					nestedObject.addValue( mainIndex.binding().nestedObject.fieldModels.get( fieldType ).reference, value );
-				} );
+			int mainIndexDocumentCount;
+			if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+				List<F> values = expectations.getMainIndexDocumentFieldValues();
+				mainIndexDocumentCount = values.size();
+				for ( int i = 0; i < values.size(); i++ ) {
+					F valueForDocument = values.get( i );
+					plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
+						initSingleValued( mainIndex.binding(), document, valueForDocument );
+					} );
+				}
+			}
+			else {
+				List<List<F>> values = expectations.getMultiValuedIndexDocumentFieldValues();
+				mainIndexDocumentCount = values.size();
+				for ( int i = 0; i < values.size(); i++ ) {
+					List<F> valuesForDocument = values.get( i );
+					plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
+						initMultiValued( mainIndex.binding(), document, valuesForDocument );
+					} );
+				}
 			}
 			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
 			plan.execute().join();
 
 			plan = nullOnlyIndex.createIndexingPlan();
 			plan.add( referenceProvider( name + "_nullOnlyIndex_document_0", name ), document -> {
-				document.addValue( nullOnlyIndex.binding().fieldModels.get( fieldType ).reference, null );
+				if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+					initSingleValued( nullOnlyIndex.binding(), document, null );
+				}
+				else {
+					initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ) );
+				}
 			} );
-			plan.execute().join();
-
-			plan = multiValuedIndex.createIndexingPlan();
-			for ( int i = 0; i < multiValuedIndexDocumentFieldValues.size(); i++ ) {
-				List<F> values = multiValuedIndexDocumentFieldValues.get( i );
-				plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
-					for ( F value : values ) {
-						document.addValue( multiValuedIndex.binding().fieldModels.get( fieldType ).reference, value );
-					}
-				} );
-			}
-			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
 			plan.execute().join();
 
 			// Check that all documents are searchable
@@ -329,47 +373,157 @@ public class SingleFieldAggregationBaseIT<F> {
 					.where( f -> f.matchAll() )
 					.routing( name )
 					.toQuery() )
-					.hasTotalHitCount( mainIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
-			SearchResultAssert.assertThat( multiValuedIndex.createScope().query()
+					.hasTotalHitCount( mainIndexDocumentCount + 1 /* +1 for the empty document */ );
+			SearchResultAssert.assertThat( nullOnlyIndex.createScope().query()
 					.where( f -> f.matchAll() )
 					.routing( name )
 					.toQuery() )
-					.hasTotalHitCount( multiValuedIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
+					.hasTotalHitCount( 1 );
+		}
+
+		private void initSingleValued(IndexBinding binding, DocumentElement document, F value) {
+			switch ( fieldStructure ) {
+				case ROOT:
+					document.addValue( binding.fieldWithSingleValueModels.get( fieldType ).reference, value );
+					break;
+				case IN_FLATTENED:
+					DocumentElement flattenedObject = document.addObject( binding.flattenedObject.self );
+					flattenedObject.addValue( binding.flattenedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+							value
+					);
+					break;
+				case IN_NESTED:
+					DocumentElement nestedObject = document.addObject( binding.nestedObject.self );
+					nestedObject.addValue( binding.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+							value
+					);
+					break;
+				case IN_NESTED_TWICE:
+					DocumentElement nestedObjectFirstLevel = document.addObject( binding.nestedObject.self );
+					DocumentElement nestedObjectSecondLevel =
+							nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
+					nestedObjectSecondLevel.addValue(
+							binding.nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+							value
+					);
+					break;
+				case IN_NESTED_REQUIRING_FILTER:
+					// TODO HSEARCH-3881 test filtering, too
+					throw new UnsupportedOperationException( "Not tested yet" );
+			}
+		}
+
+		private void initMultiValued(IndexBinding binding, DocumentElement document, List<F> values) {
+			switch ( fieldStructure ) {
+				case ROOT:
+					for ( F value : values ) {
+						document.addValue( binding.fieldWithMultipleValuesModels.get( fieldType ).reference, value );
+					}
+					break;
+				case IN_FLATTENED:
+					DocumentElement flattenedObject = document.addObject( binding.flattenedObject.self );
+					for ( F value : values ) {
+						flattenedObject.addValue(
+								binding.flattenedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					break;
+				case IN_NESTED:
+					DocumentElement nestedObject = document.addObject( binding.nestedObject.self );
+					for ( F value : values ) {
+						nestedObject.addValue(
+								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					break;
+				case IN_NESTED_TWICE:
+					DocumentElement nestedObjectFirstLevel = document.addObject( binding.nestedObject.self );
+					DocumentElement nestedObjectSecondLevel =
+							nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
+					for ( F value : values ) {
+						nestedObjectSecondLevel.addValue(
+								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					break;
+				case IN_NESTED_REQUIRING_FILTER:
+					// TODO HSEARCH-3881 test filtering, too
+					throw new UnsupportedOperationException( "Not tested yet" );
+			}
 		}
 	}
 
-	private static class IndexBinding {
-		final SimpleFieldModelsByType fieldModels;
+	private static class AbstractObjectBinding {
+		final SimpleFieldModelsByType fieldWithSingleValueModels;
+		final SimpleFieldModelsByType fieldWithMultipleValuesModels;
 
-		final ObjectBinding nestedObject;
+		AbstractObjectBinding(IndexSchemaElement self) {
+			fieldWithSingleValueModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, self,
+					"", c -> c.aggregable( Aggregable.YES ) );
+			fieldWithMultipleValuesModels = SimpleFieldModelsByType.mapAllMultiValued( supportedFieldTypes, self,
+					"multiValued_", c -> c.aggregable( Aggregable.YES ) );
+		}
+	}
+
+	private static class IndexBinding extends AbstractObjectBinding {
+		final FirstLevelObjectBinding flattenedObject;
+		final FirstLevelObjectBinding nestedObject;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
-					"", c -> c.aggregable( Aggregable.YES ) );
-
-			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED );
+			super( root );
+			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
+			nestedObject = FirstLevelObjectBinding.create( root, "nestedObject", ObjectFieldStorage.NESTED );
 		}
 	}
 
-	private static class ObjectBinding {
+	private static class FirstLevelObjectBinding extends AbstractObjectBinding {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
-		final SimpleFieldModelsByType fieldModels;
 
-		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
-			this.relativeFieldName = relativeFieldName;
+		final SecondLevelObjectBinding nestedObject;
+
+		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage) {
+			return create( parent, relativeFieldName, storage, false );
+		}
+
+		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				boolean multiValued) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
+			return new FirstLevelObjectBinding( relativeFieldName, objectField );
+		}
+
+		FirstLevelObjectBinding(String relativeFieldName, IndexSchemaObjectField objectField) {
+			super( objectField );
+			this.relativeFieldName = relativeFieldName;
 			self = objectField.toReference();
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, objectField, "" );
+			nestedObject = SecondLevelObjectBinding.create(
+					objectField, "nestedObject", ObjectFieldStorage.NESTED
+			);
 		}
 	}
 
-	private static class MultiValuedIndexBinding {
-		final SimpleFieldModelsByType fieldModels;
+	private static class SecondLevelObjectBinding extends AbstractObjectBinding {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
 
-		MultiValuedIndexBinding(IndexSchemaElement root) {
-			fieldModels = SimpleFieldModelsByType.mapAllMultiValued( supportedFieldTypes, root,
-					"", c -> c.aggregable( Aggregable.YES ) );
+		public static SecondLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			return new SecondLevelObjectBinding( relativeFieldName, objectField );
+		}
+
+		SecondLevelObjectBinding(String relativeFieldName, IndexSchemaObjectField objectField) {
+			super( objectField );
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
 		}
 	}
 
