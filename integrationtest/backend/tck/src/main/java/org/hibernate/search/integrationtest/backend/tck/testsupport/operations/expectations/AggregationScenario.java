@@ -6,13 +6,22 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public interface AggregationScenario<A> {
 
-	AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath);
+	default AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath) {
+		return setup( factory, fieldPath, null );
+	}
+
+	AggregationFinalStep<A> setup(SearchAggregationFactory factory, String fieldPath,
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull);
 
 	AggregationFinalStep<A> setupWithConverterSetting(SearchAggregationFactory factory, String fieldPath,
 			ValueConvert convert);
