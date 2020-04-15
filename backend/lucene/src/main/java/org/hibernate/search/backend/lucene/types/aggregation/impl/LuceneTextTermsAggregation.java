@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -39,8 +40,11 @@ public class LuceneTextTermsAggregation<K>
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
+		JoiningTextMultiValuesSource valueSource = JoiningTextMultiValuesSource.fromField(
+				absoluteFieldPath, nestedDocsProvider
+		);
 		TextMultiValueFacetCounts facetCounts = new TextMultiValueFacetCounts(
-				reader, absoluteFieldPath, facetsCollector
+				reader, absoluteFieldPath, valueSource, facetsCollector
 		);
 
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );

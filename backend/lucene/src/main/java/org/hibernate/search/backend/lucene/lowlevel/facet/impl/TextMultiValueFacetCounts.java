@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValuesSource;
+
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
@@ -17,7 +20,6 @@ import org.apache.lucene.facet.FacetsCollector.MatchingDocs;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.facet.TopOrdAndIntQueue;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.MultiDocValues;
 import org.apache.lucene.index.MultiDocValues.MultiSortedSetDocValues;
 import org.apache.lucene.index.OrdinalMap;
@@ -38,7 +40,7 @@ public class TextMultiValueFacetCounts extends Facets {
 	final int ordCount;
 	final int[] counts;
 
-	public TextMultiValueFacetCounts(IndexReader reader, String field, FacetsCollector hits)
+	public TextMultiValueFacetCounts(IndexReader reader, String field, TextMultiValuesSource valuesSource, FacetsCollector hits)
 			throws IOException {
 		this.field = field;
 		dv = MultiDocValues.getSortedSetValues( reader, field );
@@ -51,7 +53,7 @@ public class TextMultiValueFacetCounts extends Facets {
 		}
 		ordCount = dv == null ? 0 : (int) dv.getValueCount();
 		counts = new int[ordCount];
-		count( reader, hits.getMatchingDocs() );
+		count( reader, valuesSource, hits.getMatchingDocs() );
 	}
 
 	@Override
@@ -115,9 +117,8 @@ public class TextMultiValueFacetCounts extends Facets {
 		return new FacetResult( field, new String[0], totCount, labelValues, childCount );
 	}
 
-	private void countOneSegment(OrdinalMap ordinalMap, LeafReader reader, int segOrd, MatchingDocs hits)
+	private void countOneSegment(OrdinalMap ordinalMap, TextMultiValues segValues, int segOrd, MatchingDocs hits)
 			throws IOException {
-		SortedSetDocValues segValues = reader.getSortedSetDocValues( field );
 		if ( segValues == null ) {
 			// nothing to count
 			return;
@@ -145,10 +146,9 @@ public class TextMultiValueFacetCounts extends Facets {
 					if ( !segValues.advanceExact( doc ) ) {
 						continue; // No value for this doc
 					}
-					int term = (int) segValues.nextOrd();
-					while ( term != SortedSetDocValues.NO_MORE_ORDS ) {
+					while ( segValues.hasNextValue() ) {
+						int term = (int) segValues.nextOrd();
 						counts[(int) ordMap.get( term )]++;
-						term = (int) segValues.nextOrd();
 					}
 				}
 			}
@@ -159,10 +159,9 @@ public class TextMultiValueFacetCounts extends Facets {
 					if ( !segValues.advanceExact( doc ) ) {
 						continue; // No value for this doc
 					}
-					int term = (int) segValues.nextOrd();
-					while ( term != SortedSetDocValues.NO_MORE_ORDS ) {
+					while ( segValues.hasNextValue() ) {
+						int term = (int) segValues.nextOrd();
 						segCounts[term]++;
-						term = (int) segValues.nextOrd();
 					}
 				}
 
@@ -182,10 +181,9 @@ public class TextMultiValueFacetCounts extends Facets {
 				if ( !segValues.advanceExact( doc ) ) {
 					continue; // No value for this doc
 				}
-				int term = (int) segValues.nextOrd();
-				while ( term != SortedSetDocValues.NO_MORE_ORDS ) {
+				while ( segValues.hasNextValue() ) {
+					int term = (int) segValues.nextOrd();
 					counts[term]++;
-					term = (int) segValues.nextOrd();
 				}
 			}
 		}
@@ -194,7 +192,7 @@ public class TextMultiValueFacetCounts extends Facets {
 	/**
 	 * Does all the "real work" of tallying up the counts.
 	 */
-	private void count(IndexReader reader, List<MatchingDocs> matchingDocs) throws IOException {
+	private void count(IndexReader reader, TextMultiValuesSource valuesSource, List<MatchingDocs> matchingDocs) throws IOException {
 		OrdinalMap ordinalMap;
 
 		// TODO: is this right?  really, we need a way to
@@ -218,7 +216,7 @@ public class TextMultiValueFacetCounts extends Facets {
 						"the SortedSetDocValuesReaderState provided to this class does not match the reader being searched; you must create a new SortedSetDocValuesReaderState every time you open a new IndexReader" );
 			}
 
-			countOneSegment( ordinalMap, hits.context.reader(), hits.context.ord, hits );
+			countOneSegment( ordinalMap, valuesSource.getValues( hits.context ), hits.context.ord, hits );
 		}
 	}
 
