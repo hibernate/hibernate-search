@@ -7,13 +7,17 @@
 package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
  * The initial step in a "terms" aggregation definition, where the target field can be set.
+ *
+ * @param <PDF> The type of factory used to create predicates in {@link AggregationFilterStep#filter(Function)}.
  */
-public interface TermsAggregationFieldStep {
+public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 
 	/**
 	 * Target the given field in the terms aggregation.
@@ -23,7 +27,7 @@ public interface TermsAggregationFieldStep {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type) {
+	default <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type) {
 		return field( absoluteFieldPath, type, ValueConvert.YES );
 	}
 
@@ -37,7 +41,7 @@ public interface TermsAggregationFieldStep {
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	<F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
 			ValueConvert convert);
 
 }

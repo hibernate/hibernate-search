@@ -72,7 +72,11 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( delegate.getSearchAggregationFactory(), delegate.getSearchPredicateBuilderFactory() )
+				SearchAggregationDslContextImpl.root(
+						delegate.getSearchAggregationFactory(),
+						predicate(),
+						delegate.getSearchPredicateBuilderFactory()
+				)
 		);
 	}
 }

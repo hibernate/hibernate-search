@@ -11,17 +11,18 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class RangeAggregationFieldStepImpl implements RangeAggregationFieldStep {
-	private final SearchAggregationDslContext<?> dslContext;
+public class RangeAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements RangeAggregationFieldStep<PDF> {
+	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
 
-	RangeAggregationFieldStepImpl(SearchAggregationDslContext<?> dslContext) {
+	public RangeAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> RangeAggregationRangeStep<?, F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert) {
+	public <F> RangeAggregationRangeStep<?, PDF, F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		RangeAggregationBuilder<F> builder =

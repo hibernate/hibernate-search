@@ -139,8 +139,9 @@ public abstract class AbstractSearchQueryOptionsStep<
 	public <A> S aggregation(AggregationKey<A> key, Function<? super AF, ? extends AggregationFinalStep<A>> aggregationContributor) {
 		SearchAggregationBuilderFactory<? super C> builderFactory = indexScope.getSearchAggregationFactory();
 		SearchPredicateBuilderFactory<? super C, ?> predicateBuilderFactory = indexScope.getSearchPredicateBuilderFactory();
+		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
 		AF factory = extendAggregationFactory( new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( builderFactory, predicateBuilderFactory )
+				SearchAggregationDslContextImpl.root( builderFactory, predicateFactory, predicateBuilderFactory )
 		) );
 		SearchAggregation<A> aggregation = aggregationContributor.apply( factory ).toAggregation();
 		contribute( builderFactory, key, aggregation );

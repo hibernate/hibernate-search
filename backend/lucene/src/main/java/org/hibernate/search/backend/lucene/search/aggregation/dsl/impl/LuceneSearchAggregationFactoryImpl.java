@@ -8,20 +8,18 @@ package org.hibernate.search.backend.lucene.search.aggregation.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
 public class LuceneSearchAggregationFactoryImpl
-		extends DelegatingSearchAggregationFactory
+		extends DelegatingSearchAggregationFactory<LuceneSearchPredicateFactory>
 		implements LuceneSearchAggregationFactory {
 
-	private final SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory> dslContext;
-
 	public LuceneSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory> dslContext) {
-		super( delegate );
-		this.dslContext = dslContext;
+			SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory, LuceneSearchPredicateFactory> dslContext) {
+		super( delegate, dslContext );
 	}
 
 	// Empty: no extension at the moment.

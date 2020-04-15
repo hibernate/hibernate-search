@@ -28,7 +28,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	RangeAggregationFieldStep range();
+	RangeAggregationFieldStep<?> range();
 
 	/**
 	 * Perform aggregation in term buckets.
@@ -43,7 +43,7 @@ public interface SearchAggregationFactory {
 	 *
 	 * @return The next step.
 	 */
-	TermsAggregationFieldStep terms();
+	TermsAggregationFieldStep<?> terms();
 
 	/**
 	 * Extend the current factory with the given extension,

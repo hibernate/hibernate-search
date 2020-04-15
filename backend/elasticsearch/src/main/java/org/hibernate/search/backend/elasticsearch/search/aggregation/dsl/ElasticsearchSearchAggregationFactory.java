@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.dsl;
 
+import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregationFactory;
 
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchAggregationFactory extends SearchAggregationFactory {
+public interface ElasticsearchSearchAggregationFactory
+		extends ExtendedSearchAggregationFactory<ElasticsearchSearchPredicateFactory> {
 
 	/**
 	 * Create an aggregation from JSON.
