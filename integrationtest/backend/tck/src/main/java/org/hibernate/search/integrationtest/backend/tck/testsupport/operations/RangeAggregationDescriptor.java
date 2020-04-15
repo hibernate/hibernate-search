@@ -13,10 +13,14 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationOptionsStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
@@ -123,14 +127,23 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 					TypeAssertionHelper<F, T> helper) {
 				return new AggregationScenario<Map<Range<T>, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory factory, String fieldPath) {
-						return factory.range().field( fieldPath, helper.getJavaClass() )
-								.range( helper.create( ascendingValues.get( 0 ) ),
-										helper.create( ascendingValues.get( 2 ) ) )
-								.range( helper.create( ascendingValues.get( 2 ) ),
-										helper.create( ascendingValues.get( 5 ) ) )
-								.range( helper.create( ascendingValues.get( 5 ) ),
-										null );
+					public AggregationFinalStep<Map<Range<T>, Long>> setup(SearchAggregationFactory factory,
+							String fieldPath,
+							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
+						RangeAggregationOptionsStep<?, ?, ?, Map<Range<T>, Long>> optionsStep =
+								factory.range().field( fieldPath, helper.getJavaClass() )
+										.range( helper.create( ascendingValues.get( 0 ) ),
+												helper.create( ascendingValues.get( 2 ) ) )
+										.range( helper.create( ascendingValues.get( 2 ) ),
+												helper.create( ascendingValues.get( 5 ) ) )
+										.range( helper.create( ascendingValues.get( 5 ) ),
+												null );
+						if ( filterOrNull == null ) {
+							return optionsStep;
+						}
+						else {
+							return optionsStep.filter( filterOrNull );
+						}
 					}
 
 					@Override

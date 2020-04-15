@@ -14,10 +14,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
@@ -130,8 +134,16 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 					TypeAssertionHelper<F, T> helper) {
 				return new AggregationScenario<Map<T, Long>>() {
 					@Override
-					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory factory, String fieldPath) {
-						return factory.terms().field( fieldPath, helper.getJavaClass() );
+					public AggregationFinalStep<Map<T, Long>> setup(SearchAggregationFactory factory, String fieldPath,
+							Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
+						TermsAggregationOptionsStep<?, ?, ?, Map<T, Long>> optionsStep =
+								factory.terms().field( fieldPath, helper.getJavaClass() );
+						if ( filterOrNull == null ) {
+							return optionsStep;
+						}
+						else {
+							return optionsStep.filter( filterOrNull );
+						}
 					}
 
 					@Override

@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -78,10 +79,6 @@ public class SingleFieldAggregationBaseIT<F> {
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getSupported();
 				if ( expectations.isPresent() ) {
 					for ( IndexFieldStructure fieldStructure : IndexFieldStructure.values() ) {
-						if ( IndexFieldStructure.IN_NESTED_REQUIRING_FILTER.equals( fieldStructure ) ) {
-							// TODO HSEARCH-3881 test filtering, too
-							continue;
-						}
 						for ( IndexFieldValueCardinality valueCardinality : IndexFieldValueCardinality.values() ) {
 							supportedFieldTypes.add( fieldTypeDescriptor );
 							DataSet<?> dataSet = new DataSet<>( expectations.get(), fieldStructure, valueCardinality );
@@ -148,7 +145,8 @@ public class SingleFieldAggregationBaseIT<F> {
 	@TestForIssue(jiraKey = {
 			"HSEARCH-726", "HSEARCH-900", "HSEARCH-809",
 			"HSEARCH-2376", "HSEARCH-2472", "HSEARCH-2954", "HSEARCH-2535",
-			"HSEARCH-1927", "HSEARCH-1929"
+			"HSEARCH-1927", "HSEARCH-1929",
+			"HSEARCH-3881"
 	})
 	@PortedFromSearch5(original = {
 			"org.hibernate.search.test.query.facet.NumberFacetingTest",
@@ -173,7 +171,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		SearchResultAssert.assertThat(
 				scope.query()
 						.where( f -> f.matchAll() )
-						.aggregation( aggregationKey, f -> scenario.setup( f, fieldPath ) )
+						.aggregation( aggregationKey, f -> scenario.setup( f, fieldPath, getFilterOrNull( mainIndex.binding() ) ) )
 						.routing( dataSet.name )
 						.toQuery()
 		)
@@ -181,6 +179,17 @@ public class SingleFieldAggregationBaseIT<F> {
 						aggregationKey,
 						a -> assertThat( a ).isNotNull().satisfies( scenario::check )
 				);
+	}
+
+	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(IndexBinding binding) {
+		if ( fieldStructure == IndexFieldStructure.IN_NESTED_REQUIRING_FILTER ) {
+			return pf -> pf.match()
+					.field( binding.nestedObjectRequiringFilter.relativeFieldName + ".discriminator" )
+					.matching( "included" );
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Test
@@ -194,7 +203,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		String fieldPath = getFieldPath( mainIndex.binding() );
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath )
+		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath, getFilterOrNull( mainIndex.binding() ) )
 				.toAggregation();
 
 		SearchResultAssert.assertThat(
@@ -220,7 +229,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		testValidAggregation(
 				scenario, mainIndex.createScope(),
 				f -> f.id().matching( "none" ), // Don't match any document
-				(f, e) -> e.setup( f, fieldPath )
+				(f, e) -> e.setup( f, fieldPath, getFilterOrNull( mainIndex.binding() ) )
 		);
 	}
 
@@ -239,7 +248,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withoutMatch();
 		testValidAggregation(
-				scenario, emptyIndex.createScope(), fieldPath
+				scenario, emptyIndex.createScope(), fieldPath, null
 		);
 	}
 
@@ -255,16 +264,16 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withoutMatch();
 		testValidAggregation(
-				scenario, nullOnlyIndex.createScope(), fieldPath
+				scenario, nullOnlyIndex.createScope(), fieldPath, null
 		);
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
-			String fieldPath) {
+			String fieldPath, Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
 		testValidAggregation(
 				scenario, scope,
 				f -> f.matchAll(),
-				(f, e) -> e.setup( f, fieldPath )
+				(f, e) -> e.setup( f, fieldPath, filterOrNull )
 		);
 	}
 
@@ -311,7 +320,8 @@ public class SingleFieldAggregationBaseIT<F> {
 						+ "." + indexBinding.nestedObject.nestedObject.relativeFieldName
 						+ "." + getRelativeFieldName( indexBinding.nestedObject.nestedObject );
 			case IN_NESTED_REQUIRING_FILTER:
-				// TODO HSEARCH-3881 test filtering, too
+				return indexBinding.nestedObjectRequiringFilter.relativeFieldName
+						+ "." + getRelativeFieldName( indexBinding.nestedObjectRequiringFilter );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + fieldStructure );
 		}
@@ -355,9 +365,11 @@ public class SingleFieldAggregationBaseIT<F> {
 				List<F> values = expectations.getMainIndexDocumentFieldValues();
 				for ( int i = 0; i < values.size(); i++ ) {
 					F valueForDocument = values.get( i );
+					F garbageValueForDocument = values.get( i == 0 ? 1 : i - 1 );
 					futureCollector.accept(
 							indexer.add( referenceProvider( name + "_document_" + i, name ), document -> {
-								initSingleValued( mainIndex.binding(), document, valueForDocument );
+								initSingleValued( mainIndex.binding(), document,
+										valueForDocument, garbageValueForDocument );
 							} )
 					);
 				}
@@ -366,9 +378,11 @@ public class SingleFieldAggregationBaseIT<F> {
 				List<List<F>> values = expectations.getMultiValuedIndexDocumentFieldValues();
 				for ( int i = 0; i < values.size(); i++ ) {
 					List<F> valuesForDocument = values.get( i );
+					List<F> garbageValuesForDocument = values.get( i == 0 ? 1 : i - 1 );
 					futureCollector.accept(
 							indexer.add( referenceProvider( name + "_document_" + i, name ), document -> {
-								initMultiValued( mainIndex.binding(), document, valuesForDocument );
+								initMultiValued( mainIndex.binding(), document,
+										valuesForDocument, garbageValuesForDocument );
 							} )
 					);
 				}
@@ -381,16 +395,16 @@ public class SingleFieldAggregationBaseIT<F> {
 			futureCollector.accept(
 				indexer.add( referenceProvider( name + "_nullOnlyIndex_document_0", name ), document -> {
 					if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
-						initSingleValued( nullOnlyIndex.binding(), document, null );
+						initSingleValued( nullOnlyIndex.binding(), document, null, null );
 					}
 					else {
-						initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ) );
+						initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ), Arrays.asList( null, null ) );
 					}
 				} )
 			);
 		}
 
-		private void initSingleValued(IndexBinding binding, DocumentElement document, F value) {
+		private void initSingleValued(IndexBinding binding, DocumentElement document, F value, F garbageValue) {
 			switch ( fieldStructure ) {
 				case ROOT:
 					document.addValue( binding.fieldWithSingleValueModels.get( fieldType ).reference, value );
@@ -417,12 +431,26 @@ public class SingleFieldAggregationBaseIT<F> {
 					);
 					break;
 				case IN_NESTED_REQUIRING_FILTER:
-					// TODO HSEARCH-3881 test filtering, too
-					throw new UnsupportedOperationException( "Not tested yet" );
+					// The nested object requiring filters is split into two objects:
+					// the first one is included by the filter and holds the value that will be aggregated,
+					// and the second one is excluded by the filter and holds a garbage value that, if they were taken into account,
+					// would mess with the sort order and eventually fail at least *some* tests.
+					DocumentElement nestedObjectRequiringFilter_1 = document.addObject( binding.nestedObjectRequiringFilter.self );
+					nestedObjectRequiringFilter_1.addValue( binding.nestedObjectRequiringFilter.discriminator, "included" );
+					nestedObjectRequiringFilter_1.addValue(
+							binding.nestedObjectRequiringFilter.fieldWithSingleValueModels.get( fieldType ).reference,
+							value
+					);
+					DocumentElement nestedObjectRequiringFilter_2 = document.addObject( binding.nestedObjectRequiringFilter.self );
+					nestedObjectRequiringFilter_2.addValue( binding.nestedObjectRequiringFilter.discriminator, "excluded" );
+					nestedObjectRequiringFilter_2.addValue(
+							binding.nestedObjectRequiringFilter.fieldWithSingleValueModels.get( fieldType ).reference,
+							garbageValue
+					);
 			}
 		}
 
-		private void initMultiValued(IndexBinding binding, DocumentElement document, List<F> values) {
+		private void initMultiValued(IndexBinding binding, DocumentElement document, List<F> values, List<F> garbageValues) {
 			switch ( fieldStructure ) {
 				case ROOT:
 					for ( F value : values ) {
@@ -465,8 +493,40 @@ public class SingleFieldAggregationBaseIT<F> {
 					}
 					break;
 				case IN_NESTED_REQUIRING_FILTER:
-					// TODO HSEARCH-3881 test filtering, too
-					throw new UnsupportedOperationException( "Not tested yet" );
+					// The nested object requiring filters is split into four objects:
+					// the first two are included by the filter and each hold part of the values that will be sorted on,
+					// and the last two are excluded by the filter and hold garbage values that, if they were taken into account,
+					// would mess with the sort order and eventually fail at least *some* tests.
+					DocumentElement nestedObjectRequiringFilter_1 = document.addObject( binding.nestedObjectRequiringFilter.self );
+					nestedObjectRequiringFilter_1.addValue( binding.nestedObjectRequiringFilter.discriminator, "included" );
+					nestedObjectRequiringFilter_1.addValue(
+							binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
+							values.get( 0 )
+					);
+					DocumentElement nestedObjectRequiringFilter_2 = document.addObject( binding.nestedObjectRequiringFilter.self );
+					nestedObjectRequiringFilter_2.addValue( binding.nestedObjectRequiringFilter.discriminator, "included" );
+					for ( F value : values.subList( 1, values.size() ) ) {
+						nestedObjectRequiringFilter_2.addValue(
+								binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedObjectRequiringFilter_3 = document.addObject( binding.nestedObjectRequiringFilter.self );
+					nestedObjectRequiringFilter_3.addValue( binding.nestedObjectRequiringFilter.discriminator, "excluded" );
+					for ( F value : garbageValues ) {
+						nestedObjectRequiringFilter_3.addValue(
+								binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedObjectRequiringFilter_4 = document.addObject( binding.nestedObjectRequiringFilter.self );
+					nestedObjectRequiringFilter_4.addValue( binding.nestedObjectRequiringFilter.discriminator, "excluded" );
+					for ( F value : garbageValues ) {
+						nestedObjectRequiringFilter_4.addValue(
+								binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
 			}
 		}
 	}
@@ -486,11 +546,14 @@ public class SingleFieldAggregationBaseIT<F> {
 	private static class IndexBinding extends AbstractObjectBinding {
 		final FirstLevelObjectBinding flattenedObject;
 		final FirstLevelObjectBinding nestedObject;
+		final FirstLevelObjectBinding nestedObjectRequiringFilter;
 
 		IndexBinding(IndexSchemaElement root) {
 			super( root );
 			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = FirstLevelObjectBinding.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
+			nestedObjectRequiringFilter = FirstLevelObjectBinding.create( root, "nestedObjectRequiringFilter",
+					ObjectFieldStorage.NESTED, true );
 		}
 	}
 
@@ -498,7 +561,10 @@ public class SingleFieldAggregationBaseIT<F> {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
 
+		final IndexFieldReference<String> discriminator;
+
 		final SecondLevelObjectBinding nestedObject;
+
 
 		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectFieldStorage storage) {
@@ -519,6 +585,7 @@ public class SingleFieldAggregationBaseIT<F> {
 			super( objectField );
 			this.relativeFieldName = relativeFieldName;
 			self = objectField.toReference();
+			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 			nestedObject = SecondLevelObjectBinding.create(
 					objectField, "nestedObject", ObjectFieldStorage.NESTED
 			);
