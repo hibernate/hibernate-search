@@ -59,8 +59,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	@Override
-	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonObject outerObject,
-			JsonElement buckets) {
+	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonObject outerObject, JsonElement buckets) {
 		JsonArray bucketArray = buckets.getAsJsonArray();
 		Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
 		FromDocumentFieldValueConvertContext convertContext = context.getConvertContext();
@@ -72,7 +71,7 @@ public class ElasticsearchTermsAggregation<F, K>
 					codec.decodeAggregationKey( keyJson, keyAsStringJson ),
 					convertContext
 			);
-			long documentCount = bucket.get( "doc_count" ).getAsLong();
+			long documentCount = getBucketDocCount( bucket );
 			result.put( key, documentCount );
 		}
 		return result;

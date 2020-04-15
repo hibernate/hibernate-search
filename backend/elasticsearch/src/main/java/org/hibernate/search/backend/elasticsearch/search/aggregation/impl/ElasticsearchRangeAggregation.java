@@ -66,7 +66,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		for ( int i = 0; i < rangesJson.size(); i++ ) {
 			JsonObject bucket = bucketMap.get( String.valueOf( i ) ).getAsJsonObject();
 			Range<K> range = rangesInOrder.get( i );
-			long documentCount = bucket.get( "doc_count" ).getAsLong();
+			long documentCount = getBucketDocCount( bucket );
 			result.put( range, documentCount );
 		}
 		return result;
