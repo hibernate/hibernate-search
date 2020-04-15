@@ -77,7 +77,7 @@ public class AggregationDslIT {
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						AutomaticIndexingSynchronizationStrategyNames.SYNC
 				)
-				.setup( Book.class );
+				.setup( Book.class, BookEdition.class );
 		initData();
 	}
 
@@ -374,6 +374,32 @@ public class AggregationDslIT {
 	}
 
 	@Test
+	public void filter() {
+		withinSearchSession( searchSession -> {
+			// tag::filter[]
+			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByPriceKey, f -> f.range()
+							.field( "editions.price", Double.class )
+							.range( 0.0, 10.0 )
+							.range( 10.0, 20.0 )
+							.range( 20.0, null )
+							.filter( pf -> pf.match().field( "editions.label" ).matching( "paperback" ) )
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
+			// end::filter[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 3L ),
+							entry( Range.canonical( 10.0, 20.0 ), 1L ),
+							entry( Range.canonical( 20.0, null ), 0L )
+					);
+		} );
+	}
+
+	@Test
 	public void elasticsearch() {
 		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
 
@@ -473,6 +499,8 @@ public class AggregationDslIT {
 			book1.setPrice( 24.99 );
 			book1.setGenre( Genre.SCIENCE_FICTION );
 			book1.setReleaseDate( Date.valueOf( "1950-12-02" ) );
+			addEdition( book1, "Mass Market Paperback, 1st Edition", 9.99 );
+			addEdition( book1, "Kindle", 9.99 );
 
 			Book book2 = new Book();
 			book2.setId( BOOK2_ID );
@@ -480,6 +508,8 @@ public class AggregationDslIT {
 			book2.setPrice( 19.99 );
 			book2.setGenre( Genre.SCIENCE_FICTION );
 			book2.setReleaseDate( Date.valueOf( "1953-10-01" ) );
+			addEdition( book2, "Mass Market Paperback, 12th Edition", 4.99 );
+			addEdition( book2, "Kindle", 19.99 );
 
 			Book book3 = new Book();
 			book3.setId( BOOK3_ID );
@@ -487,6 +517,8 @@ public class AggregationDslIT {
 			book3.setPrice( 15.99 );
 			book3.setGenre( Genre.SCIENCE_FICTION );
 			book3.setReleaseDate( Date.valueOf( "1983-01-01" ) );
+			addEdition( book3, "Mass Market Paperback, 59th Edition", 3.99 );
+			addEdition( book3, "Kindle", 5.99 );
 
 			Book book4 = new Book();
 			book4.setId( BOOK4_ID );
@@ -494,11 +526,21 @@ public class AggregationDslIT {
 			book4.setPrice( 7.99 );
 			book4.setGenre( Genre.CRIME_FICTION );
 			book4.setReleaseDate( Date.valueOf( "2008-02-05" ) );
+			addEdition( book4, "Mass Market Paperback, 2nd Edition", 10.99 );
+			addEdition( book4, "Kindle", 12.99 );
 
 			entityManager.persist( book1 );
 			entityManager.persist( book2 );
 			entityManager.persist( book3 );
 			entityManager.persist( book4 );
 		} );
+	}
+
+	private void addEdition(Book book, String label, double price) {
+		BookEdition edition = new BookEdition();
+		edition.setBook( book );
+		edition.setLabel( label );
+		edition.setPrice( price );
+		book.getEditions().add( edition );
 	}
 }

@@ -7,13 +7,20 @@
 package org.hibernate.search.documentation.search.aggregation;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
@@ -35,6 +42,11 @@ public class Book {
 	// Using the legacy java.sql.Date type on purpose, to demonstrate how to ignore bridges
 	@GenericField(aggregable = Aggregable.YES)
 	private Date releaseDate;
+
+	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+	@OrderColumn
+	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
+	private List<BookEdition> editions = new ArrayList<>();
 
 	public Book() {
 	}
@@ -77,5 +89,13 @@ public class Book {
 
 	public void setReleaseDate(Date releaseDate) {
 		this.releaseDate = releaseDate;
+	}
+
+	public List<BookEdition> getEditions() {
+		return editions;
+	}
+
+	public void setEditions(List<BookEdition> editions) {
+		this.editions = editions;
 	}
 }
