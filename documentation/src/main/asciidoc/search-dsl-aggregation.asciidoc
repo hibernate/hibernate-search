@@ -170,6 +170,9 @@ When ordering entries by ascending count in a `terms` aggregation,
 link:{elasticsearchDocUrl}/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order[hit counts are approximate].
 ====
 
+For fields in nested objects, all nested objects are considered by default,
+but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.
+
 [[search-dsl-aggregation-range]]
 == `range`: grouped by ranges of values for a field
 // Search 5 anchors backward compatibility
@@ -228,6 +231,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 ----
 ====
 
+For fields in nested objects, all nested objects are considered by default,
+but that can be <<search-dsl-aggregation-common-filter,controlled explicitly with `.filter(...)`>>.
+
 [[search-dsl-aggregation-extensions]]
 == Backend-specific extensions
 
@@ -254,4 +260,30 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=elasticsearch-fromJson-string]
 ----
 <1> The aggregation result is a `JsonObject`.
+====
+
+[[search-dsl-aggregation-common]]
+== Options common to multiple aggregation types
+
+[[search-dsl-aggregation-common-filter]]
+=== Filter for fields in nested objects
+
+When the aggregation field is located in a <<mapper-orm-indexedembedded-storage-nested,nested object>>,
+by default all nested objects will be considered for the aggregation,
+and the document will be counted once for each value found in any nested object.
+
+It is possible to filter the nested documents whose values will be considered for the aggregation
+using one of the `filter(...)` methods.
+
+Below is an example with the <<search-dsl-aggregation-range,range aggregation>>:
+the result of the aggregation is a count of books for each price range,
+with only the price of "paperback" editions being taken into account;
+the price of e-book editions, for example, is ignored.
+
+.Counting hits grouped by range of values for a field, using a filter for nested objects
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=filter]
+----
 ====
