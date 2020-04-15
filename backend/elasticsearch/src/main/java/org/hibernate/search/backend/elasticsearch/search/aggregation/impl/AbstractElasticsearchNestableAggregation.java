@@ -74,6 +74,10 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	protected abstract A doExtract(JsonObject aggregationResult, AggregationExtractContext context);
 
+	protected final boolean isNested() {
+		return !nestedPathHierarchy.isEmpty();
+	}
+
 	public abstract static class AbstractBuilder<A> extends AbstractElasticsearchAggregation.AbstractBuilder<A> {
 
 		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
