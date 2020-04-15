@@ -14,9 +14,11 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationEx
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.Query;
 
@@ -29,7 +31,7 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 
 	AbstractLuceneNestableAggregation(AbstractBuilder<A> builder) {
 		this.nestedDocumentPath = builder.nestedDocumentPath;
-		this.nestedFilter = builder.getLuceneFilter();
+		this.nestedFilter = builder.nestedFilter;
 	}
 
 	protected NestedDocsProvider createNestedDocsProvider(AggregationExtractContext context) {
@@ -42,35 +44,30 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
+		protected final String absoluteFieldPath;
 		private final String nestedDocumentPath;
-		private SearchPredicate filter;
+		private Query nestedFilter;
 
-		public AbstractBuilder(String nestedDocumentPath) {
+		public AbstractBuilder(String absoluteFieldPath, String nestedDocumentPath) {
+			this.absoluteFieldPath = absoluteFieldPath;
 			this.nestedDocumentPath = nestedDocumentPath;
 		}
 
 		public void filter(SearchPredicate filter) {
-			this.filter = filter;
+			if ( nestedDocumentPath == null ) {
+				throw log.cannotFilterAggregationOnRootDocumentField( absoluteFieldPath, getEventContext() );
+			}
+			LuceneSearchPredicateBuilder builder = (LuceneSearchPredicateBuilder) filter;
+			builder.checkNestableWithin( nestedDocumentPath );
+			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
+			this.nestedFilter = builder.build( filterContext );
 		}
 
 		@Override
 		public abstract LuceneSearchAggregation<A> build();
 
-		private Query getLuceneFilter() {
-			if ( filter == null ) {
-				return null;
-			}
-
-			Query luceneFilter;
-			if ( filter instanceof LuceneSearchPredicateBuilder ) {
-				LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
-				luceneFilter = ((LuceneSearchPredicateBuilder) filter).build( filterContext );
-			}
-			else {
-				throw log.unableToCreateNestedAggregationFilter( nestedDocumentPath );
-			}
-
-			return luceneFilter;
+		protected final EventContext getEventContext() {
+			return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
 		}
 
 	}

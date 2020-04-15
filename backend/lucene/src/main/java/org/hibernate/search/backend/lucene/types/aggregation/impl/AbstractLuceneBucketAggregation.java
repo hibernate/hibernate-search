@@ -38,12 +38,10 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 			implements SearchAggregationBuilder<Map<K, V>> {
 
 		protected final LuceneSearchContext searchContext;
-		protected final String absoluteFieldPath;
 
 		public AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath) {
-			super( nestedDocumentPath );
+			super( absoluteFieldPath, nestedDocumentPath );
 			this.searchContext = searchContext;
-			this.absoluteFieldPath = absoluteFieldPath;
 		}
 
 		@Override
