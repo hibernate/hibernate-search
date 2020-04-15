@@ -106,10 +106,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
 		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
 
-		NestedDocsProvider nestedDocsProvider = null;
-		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, getNestedFilter() );
-		}
+		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
 
 		/*
 		 * TODO HSEARCH-3666 What if the sort order is by term value?

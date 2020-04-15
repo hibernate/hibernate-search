@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonObject;
@@ -80,8 +81,14 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	public abstract static class AbstractBuilder<A> extends AbstractElasticsearchAggregation.AbstractBuilder<A> {
 
+		protected SearchPredicate filter;
+
 		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
 			super( searchContext );
+		}
+
+		public void filter(SearchPredicate filter) {
+			this.filter = filter;
 		}
 
 		@Override

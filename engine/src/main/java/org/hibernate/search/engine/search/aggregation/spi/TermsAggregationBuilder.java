@@ -8,7 +8,11 @@ package org.hibernate.search.engine.search.aggregation.spi;
 
 import java.util.Map;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map<K, Long>> {
+
+	void filter(SearchPredicate filter);
 
 	void orderByCountDescending();
 
