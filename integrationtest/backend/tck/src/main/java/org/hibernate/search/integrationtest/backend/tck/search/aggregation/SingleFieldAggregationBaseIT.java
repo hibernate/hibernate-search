@@ -60,7 +60,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SingleFieldAggregationBaseIT<F> {
 
-	private static final int INIT_BATCH_SIZE = 1000;
+	private static final int INIT_BATCH_SIZE = 500;
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
