@@ -42,7 +42,7 @@ public class JoinChildrenIdIterator {
 			return values.docID() < currentParentDocId;
 		}
 
-		int prevParentDoc = parentDocs.prevSetBit( parentDocId - 1 );
+		int prevParentDoc = parentDocId == 0 ? -1 : parentDocs.prevSetBit( parentDocId - 1 );
 
 		int nextChildDocId = advanceValuesToNextChildBeyond( prevParentDoc );
 
