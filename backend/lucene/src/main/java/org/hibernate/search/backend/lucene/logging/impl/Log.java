@@ -651,6 +651,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
 
 	@Message(id = ID_OFFSET_2 + 122,
-			value = "Unable to create nested aggregation filter for name '%1$s'.")
-	SearchException unableToCreateNestedAggregationFilter(String name);
+			value = "Field '%1$s' is not contained in a nested object."
+					+ " Aggregation filters are only available if the field to aggregate on is contained in a nested object.")
+	SearchException cannotFilterAggregationOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 }
