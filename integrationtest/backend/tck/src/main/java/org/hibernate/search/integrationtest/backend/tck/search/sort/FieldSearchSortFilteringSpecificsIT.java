@@ -8,10 +8,12 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -20,7 +22,8 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
@@ -29,13 +32,30 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Tests behavior related to
  * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
- * that is not tested in {@link DistanceSearchSortBaseIT}.
+ * that is not tested in {@link FieldSearchSortBaseIT}.
  */
-public class DistanceSearchSortTypeFilteringSpecificsIT {
+@RunWith(Parameterized.class)
+public class FieldSearchSortFilteringSpecificsIT<F> {
+
+	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
+	}
+
+	@Parameterized.Parameters(name = "{0}")
+	public static Object[][] parameters() {
+		List<Object[]> parameters = new ArrayList<>();
+		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
+			parameters.add( new Object[] { fieldTypeDescriptor } );
+		} );
+		return parameters.toArray( new Object[0][] );
+	}
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -51,17 +71,24 @@ public class DistanceSearchSortTypeFilteringSpecificsIT {
 				.withIndex(
 						INDEX_NAME,
 						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> DistanceSearchSortTypeFilteringSpecificsIT.indexManager = indexManager
+						indexManager -> FieldSearchSortFilteringSpecificsIT.indexManager = indexManager
 				)
 				.setup();
 	}
 
+	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
+
+	public FieldSearchSortFilteringSpecificsIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+		this.fieldTypeDescriptor = fieldTypeDescriptor;
+	}
+
 	@Test
 	public void nonNested() {
-		String fieldPath = indexMapping.flattenedObject.relativeFieldName + ".geoPoint";
+		String fieldPath = indexMapping.flattenedObject.relativeFieldName + "."
+				+ indexMapping.flattenedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 
 		assertThatThrownBy(
-				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
+				() -> matchAllQuery( f -> f.field( fieldPath )
 						.filter( pf -> pf.exists().field( fieldPath ) ) )
 		)
 				.isInstanceOf( SearchException.class )
@@ -73,12 +100,12 @@ public class DistanceSearchSortTypeFilteringSpecificsIT {
 
 	@Test
 	public void invalidNestedPath_parent() {
-		String fieldPath = indexMapping.nestedObject1.relativeFieldName + ".geoPoint";
-		String fieldInParentPath = "geoPoint";
+		String fieldPath = indexMapping.nestedObject1.relativeFieldName + "."
+				+ indexMapping.nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		String fieldInParentPath = indexMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 
 		assertThatThrownBy(
-				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
-						.filter( pf -> pf.exists().field( fieldInParentPath ) ) )
+				() -> matchAllQuery( f -> f.field( fieldPath ).filter( pf -> pf.exists().field( fieldInParentPath ) ) )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -90,12 +117,13 @@ public class DistanceSearchSortTypeFilteringSpecificsIT {
 
 	@Test
 	public void invalidNestedPath_sibling() {
-		String fieldPath = indexMapping.nestedObject1.relativeFieldName + ".geoPoint";
-		String fieldInSiblingPath = indexMapping.nestedObject2.relativeFieldName + ".geoPoint";
+		String fieldPath = indexMapping.nestedObject1.relativeFieldName + "."
+				+ indexMapping.nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		String fieldInSiblingPath = indexMapping.nestedObject2.relativeFieldName + "."
+				+ indexMapping.nestedObject2.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 
 		assertThatThrownBy(
-				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
-						.filter( pf -> pf.exists().field( fieldInSiblingPath ) ) )
+				() -> matchAllQuery( f -> f.field( fieldPath ).filter( pf -> pf.exists().field( fieldInSiblingPath ) ) )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -119,11 +147,11 @@ public class DistanceSearchSortTypeFilteringSpecificsIT {
 	}
 
 	private static class AbstractObjectMapping {
-		final IndexFieldReference<GeoPoint> geoPoint;
+		final SimpleFieldModelsByType fieldModels;
 
 		AbstractObjectMapping(IndexSchemaElement self) {
-			geoPoint = self.field( "geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ) )
-					.toReference();
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(), self,
+					"", c -> c.sortable( Sortable.YES ) );
 		}
 	}
 
