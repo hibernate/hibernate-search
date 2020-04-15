@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 
 import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.util.BytesRef;
 
 /**
  * A per-document, unordered sequence of text ordinals.
@@ -49,30 +48,12 @@ public abstract class TextMultiValues {
 	 */
 	public abstract long nextOrd() throws IOException;
 
-
-	/** Retrieves the value for the specified ordinal. The returned
-	 * {@link BytesRef} may be re-used across calls to lookupOrd so make sure to
-	 * {@link BytesRef#deepCopyOf(BytesRef) copy it} if you want to keep it
-	 * around.
-	 * @param ord ordinal to lookup
-	 * @see #nextOrd
-	 */
-	public abstract BytesRef lookupOrd(long ord) throws IOException;
-
 	/**
 	 * Returns the number of unique values.
 	 * @return number of unique values in this SortedDocValues. This is
 	 *         also equivalent to one plus the maximum ordinal.
 	 */
 	public abstract long getValueCount();
-
-	/** If {@code key} exists, returns its ordinal, else
-	 *  returns {@code -insertionPoint-1}, like {@code
-	 *  Arrays.binarySearch}.
-	 *
-	 *  @param key Key to look up
-	 **/
-	public abstract long lookupTerm(BytesRef key) throws IOException;
 
 	public static TextMultiValues fromDocValues(SortedSetDocValues docValues) {
 		return new DocValuesTextMultiValues( docValues );
@@ -99,18 +80,8 @@ public abstract class TextMultiValues {
 		}
 
 		@Override
-		public BytesRef lookupOrd(long ord) throws IOException {
-			throw new IllegalArgumentException( "Ord " + ord + " is too large" );
-		}
-
-		@Override
 		public long getValueCount() {
 			return 0;
-		}
-
-		@Override
-		public long lookupTerm(BytesRef key) throws IOException {
-			return -1;
 		}
 	};
 
@@ -143,18 +114,8 @@ public abstract class TextMultiValues {
 		}
 
 		@Override
-		public BytesRef lookupOrd(long ord) throws IOException {
-			return values.lookupOrd( ord );
-		}
-
-		@Override
 		public long getValueCount() {
 			return values.getValueCount();
-		}
-
-		@Override
-		public long lookupTerm(BytesRef key) throws IOException {
-			return values.lookupTerm( key );
 		}
 	}
 }
