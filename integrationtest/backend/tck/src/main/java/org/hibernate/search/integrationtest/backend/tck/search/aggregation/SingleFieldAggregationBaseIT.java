@@ -439,9 +439,15 @@ public class SingleFieldAggregationBaseIT<F> {
 					}
 					break;
 				case IN_NESTED:
-					DocumentElement nestedObject = document.addObject( binding.nestedObject.self );
-					for ( F value : values ) {
-						nestedObject.addValue(
+					// Make sure to create multiple nested documents here, to test all the scenarios.
+					DocumentElement nestedObject1 = document.addObject( binding.nestedObject.self );
+					nestedObject1.addValue(
+							binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+							values.get( 0 )
+					);
+					DocumentElement nestedObject2 = document.addObject( binding.nestedObject.self );
+					for ( F value : values.subList( 1, values.size() ) ) {
+						nestedObject2.addValue(
 								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
 								value
 						);
@@ -484,7 +490,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		IndexBinding(IndexSchemaElement root) {
 			super( root );
 			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = FirstLevelObjectBinding.create( root, "nestedObject", ObjectFieldStorage.NESTED );
+			nestedObject = FirstLevelObjectBinding.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
 		}
 	}
 
