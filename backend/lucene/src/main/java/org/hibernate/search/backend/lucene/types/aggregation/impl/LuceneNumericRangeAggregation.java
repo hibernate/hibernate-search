@@ -66,10 +66,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
 
-		NestedDocsProvider nestedDocsProvider = null;
-		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, getNestedFilter() );
-		}
+		NestedDocsProvider nestedDocsProvider = createNestedDocsProvider( context );
 
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
 				absoluteFieldPath, facetsCollector, encodedRangesInOrder,
