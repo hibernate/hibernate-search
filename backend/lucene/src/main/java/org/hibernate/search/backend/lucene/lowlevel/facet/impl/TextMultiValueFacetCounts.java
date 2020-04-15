@@ -13,6 +13,8 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValues;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValuesSource;
 
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.procedures.IntProcedure;
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
@@ -123,6 +125,7 @@ public class TextMultiValueFacetCounts extends Facets {
 			// nothing to count
 			return;
 		}
+		IntHashSet uniqueOrdinalsForDocument = new IntHashSet();
 
 		DocIdSetIterator docs = hits.bits.iterator();
 
@@ -141,6 +144,7 @@ public class TextMultiValueFacetCounts extends Facets {
 			int numSegOrds = (int) segValues.getValueCount();
 
 			if ( hits.totalHits < numSegOrds / 10 ) {
+				IntProcedure incrementCountForOrdinal = ord -> counts[ord]++;
 				// Remap every ord to global ord as we iterate:
 				for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
 					if ( !segValues.advanceExact( doc ) ) {
@@ -148,21 +152,27 @@ public class TextMultiValueFacetCounts extends Facets {
 					}
 					while ( segValues.hasNextValue() ) {
 						int term = (int) segValues.nextOrd();
-						counts[(int) ordMap.get( term )]++;
+						int globalOrd = (int) ordMap.get( term );
+						uniqueOrdinalsForDocument.add( globalOrd );
 					}
+					uniqueOrdinalsForDocument.forEach( incrementCountForOrdinal );
+					uniqueOrdinalsForDocument.clear();
 				}
 			}
 			else {
 				// First count in seg-ord space:
 				final int[] segCounts = new int[numSegOrds];
+				IntProcedure incrementCountForOrdinal = ord -> segCounts[ord]++;
 				for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
 					if ( !segValues.advanceExact( doc ) ) {
 						continue; // No value for this doc
 					}
 					while ( segValues.hasNextValue() ) {
 						int term = (int) segValues.nextOrd();
-						segCounts[term]++;
+						uniqueOrdinalsForDocument.add( term );
 					}
+					uniqueOrdinalsForDocument.forEach( incrementCountForOrdinal );
+					uniqueOrdinalsForDocument.clear();
 				}
 
 				// Then, migrate to global ords:
@@ -176,15 +186,18 @@ public class TextMultiValueFacetCounts extends Facets {
 		}
 		else {
 			// No ord mapping (e.g., single segment index):
-			// just aggregate directly into counts:
+			// just aggregate directly into counts.
+			IntProcedure incrementCountForOrdinal = ord -> counts[ord]++;
 			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
 				if ( !segValues.advanceExact( doc ) ) {
 					continue; // No value for this doc
 				}
 				while ( segValues.hasNextValue() ) {
 					int term = (int) segValues.nextOrd();
-					counts[term]++;
+					uniqueOrdinalsForDocument.add( term );
 				}
+				uniqueOrdinalsForDocument.forEach( incrementCountForOrdinal );
+				uniqueOrdinalsForDocument.clear();
 			}
 		}
 	}
