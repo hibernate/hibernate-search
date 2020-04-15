@@ -80,9 +80,6 @@ public class ElasticsearchTermsAggregation<F, K>
 	public static class Builder<F, K> extends AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final String absoluteFieldPath;
-		private final List<String> nestedPathHierarchy;
-
 		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
@@ -94,9 +91,7 @@ public class ElasticsearchTermsAggregation<F, K>
 				List<String> nestedPathHierarchy,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
-			super( searchContext );
-			this.absoluteFieldPath = absoluteFieldPath;
-			this.nestedPathHierarchy = nestedPathHierarchy;
+			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 			this.codec = codec;
 		}
@@ -134,11 +129,6 @@ public class ElasticsearchTermsAggregation<F, K>
 		@Override
 		public ElasticsearchTermsAggregation<F, K> build() {
 			return new ElasticsearchTermsAggregation<>( this );
-		}
-
-		@Override
-		protected List<String> getNestedPathHierarchy() {
-			return nestedPathHierarchy;
 		}
 
 		protected final void order(String key, String order) {

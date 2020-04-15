@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
@@ -36,17 +37,25 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
+	private final ElasticsearchSearchPredicateContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	ElasticsearchSearchQueryRequestContext(
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
+			ElasticsearchSearchPredicateContext rootPredicateContext,
 			Map<DistanceSortKey, Integer> distanceSorts) {
 		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
+		this.rootPredicateContext = rootPredicateContext;
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
+	}
+
+	@Override
+	public ElasticsearchSearchPredicateContext getRootPredicateContext() {
+		return rootPredicateContext;
 	}
 
 	@Override
