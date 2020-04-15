@@ -12,7 +12,10 @@ import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.util.BytesRef;
 
 /**
- * A per-document, unordered sequence of long values.
+ * A per-document, unordered sequence of text ordinals.
+ * <p>
+ * Essentially, this is a wrapper around {@link SortedSetDocValues} that may support joins,
+ * but does not guarantee that ordinals for a given documents are returned in ascending order.
  * <p>
  * Some of this code was copied and adapted from
  * {@code org.apache.lucene.index.SortedSetDocValues}
