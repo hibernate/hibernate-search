@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.apache.lucene.index.MultiDocValues.MultiSortedSetDocValues;
 import org.apache.lucene.index.OrdinalMap;
 import org.apache.lucene.index.ReaderUtil;
 import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.search.ConjunctionDISI;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LongValues;
@@ -125,7 +123,7 @@ public class TextMultiValueFacetCounts extends Facets {
 			return;
 		}
 
-		DocIdSetIterator it = ConjunctionDISI.intersectIterators( Arrays.asList( hits.bits.iterator(), segValues ) );
+		DocIdSetIterator docs = hits.bits.iterator();
 
 		// TODO: yet another option is to count all segs
 		// first, only in seg-ord space, and then do a
@@ -143,7 +141,10 @@ public class TextMultiValueFacetCounts extends Facets {
 
 			if ( hits.totalHits < numSegOrds / 10 ) {
 				// Remap every ord to global ord as we iterate:
-				for ( int doc = it.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = it.nextDoc() ) {
+				for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
+					if ( !segValues.advanceExact( doc ) ) {
+						continue; // No value for this doc
+					}
 					int term = (int) segValues.nextOrd();
 					while ( term != SortedSetDocValues.NO_MORE_ORDS ) {
 						counts[(int) ordMap.get( term )]++;
@@ -154,7 +155,10 @@ public class TextMultiValueFacetCounts extends Facets {
 			else {
 				// First count in seg-ord space:
 				final int[] segCounts = new int[numSegOrds];
-				for ( int doc = it.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = it.nextDoc() ) {
+				for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
+					if ( !segValues.advanceExact( doc ) ) {
+						continue; // No value for this doc
+					}
 					int term = (int) segValues.nextOrd();
 					while ( term != SortedSetDocValues.NO_MORE_ORDS ) {
 						segCounts[term]++;
@@ -174,7 +178,10 @@ public class TextMultiValueFacetCounts extends Facets {
 		else {
 			// No ord mapping (e.g., single segment index):
 			// just aggregate directly into counts:
-			for ( int doc = it.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = it.nextDoc() ) {
+			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; doc = docs.nextDoc() ) {
+				if ( !segValues.advanceExact( doc ) ) {
+					continue; // No value for this doc
+				}
 				int term = (int) segValues.nextOrd();
 				while ( term != SortedSetDocValues.NO_MORE_ORDS ) {
 					counts[term]++;
