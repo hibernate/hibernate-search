@@ -7,11 +7,13 @@
 package org.hibernate.search.integrationtest.backend.lucene;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -48,11 +50,13 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -688,6 +692,33 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	public void aggregation_filter_fromLuceneQuery() {
+		StubMappingScope scope = indexManager.createScope();
+
+		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "agg" );
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.extension( LuceneExtension.get() )
+				.where( f -> f.matchAll() )
+				.aggregation( aggregationKey, f -> f.terms()
+						.field( indexMapping.nestedObject.relativeFieldName + ".aggregation1", String.class )
+						// The provided predicate factory should already be extended and offer Lucene-specific extensions
+						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
+								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								"included"
+						) ) ) )
+				)
+				.toQuery();
+		assertThat( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
+				entry( "five", 1L ),
+				entry( "four", 1L ),
+				entry( "one", 1L ),
+				entry( "three", 1L ),
+				entry( "two", 1L )
+		) );
+	}
+
+	@Test
 	public void nativeField_invalidFieldPath() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
@@ -775,9 +806,11 @@ public class LuceneExtensionIT {
 			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
 			nestedObject1.addValue( indexMapping.nestedObject.sort1, "a" );
+			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "one" );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
 			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
+			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-one" );
 		} );
 		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.integer, 2 );
@@ -793,9 +826,11 @@ public class LuceneExtensionIT {
 			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
 			nestedObject1.addValue( indexMapping.nestedObject.sort1, "b" );
+			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "two" );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
 			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
+			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-two" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
@@ -811,9 +846,11 @@ public class LuceneExtensionIT {
 			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
 			nestedObject1.addValue( indexMapping.nestedObject.sort1, "c" );
+			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "three" );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
 			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
+			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-three" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.nativeField, 89 );
@@ -827,9 +864,11 @@ public class LuceneExtensionIT {
 			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
 			nestedObject1.addValue( indexMapping.nestedObject.sort1, "d" );
+			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "four" );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
 			nestedObject2.addValue( indexMapping.nestedObject.sort1, "c" );
+			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-four" );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
@@ -844,9 +883,11 @@ public class LuceneExtensionIT {
 			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
 			nestedObject1.addValue( indexMapping.nestedObject.sort1, "e" );
+			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "five" );
 			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
 			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
 			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
+			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-five" );
 		} );
 		plan.execute().join();
 	}
@@ -925,6 +966,7 @@ public class LuceneExtensionIT {
 
 		final IndexFieldReference<String> discriminator;
 		final IndexFieldReference<String> sort1;
+		final IndexFieldReference<String> aggregation1;
 
 		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectFieldStorage storage,
@@ -943,6 +985,8 @@ public class LuceneExtensionIT {
 			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 
 			sort1 = objectField.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
+					.toReference();
+			aggregation1 = objectField.field( "aggregation1", f -> f.asString().aggregable( Aggregable.YES ) )
 					.toReference();
 		}
 	}
