@@ -12,23 +12,24 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 public class DefaultSearchAggregationFactory implements SearchAggregationFactory {
 
-	private final SearchAggregationDslContext<?> dslContext;
+	private final SearchAggregationDslContext<?, ?> dslContext;
 
-	public DefaultSearchAggregationFactory(SearchAggregationDslContext<?> dslContext) {
+	public DefaultSearchAggregationFactory(SearchAggregationDslContext<?, ?> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public RangeAggregationFieldStep range() {
-		return new RangeAggregationFieldStepImpl( dslContext );
+	public RangeAggregationFieldStep<SearchPredicateFactory> range() {
+		return new RangeAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override
-	public TermsAggregationFieldStep terms() {
-		return new TermsAggregationFieldStepImpl( dslContext );
+	public TermsAggregationFieldStep<SearchPredicateFactory> terms() {
+		return new TermsAggregationFieldStepImpl<>( dslContext );
 	}
 
 	@Override

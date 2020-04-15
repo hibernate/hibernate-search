@@ -13,17 +13,18 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class TermsAggregationFieldStepImpl implements TermsAggregationFieldStep {
-	private final SearchAggregationDslContext<?> dslContext;
+public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> implements TermsAggregationFieldStep<PDF> {
+	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
 
-	TermsAggregationFieldStepImpl(SearchAggregationDslContext<?> dslContext) {
+	public TermsAggregationFieldStepImpl(SearchAggregationDslContext<?, ? extends PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	public <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
 			ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );

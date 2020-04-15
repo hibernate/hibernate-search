@@ -203,11 +203,12 @@ public final class LuceneExtension<H, R, E, LOS>
 	@Override
 	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchAggregationBuilderFactory, the cast is safe
 	public Optional<LuceneSearchAggregationFactory> extendOptional(
-			SearchAggregationFactory original, SearchAggregationDslContext<?> dslContext) {
+			SearchAggregationFactory original, SearchAggregationDslContext<?, ?> dslContext) {
 		if ( dslContext.getBuilderFactory() instanceof LuceneSearchAggregationBuilderFactory ) {
 			return Optional.of( new LuceneSearchAggregationFactoryImpl(
 					original,
-					(SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory>) dslContext
+					((SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory, ?>) dslContext)
+							.withExtendedPredicateFactory( this )
 			) );
 		}
 		else {

@@ -7,19 +7,23 @@
 package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.function.Function;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
  * The final step in a "terms" aggregation definition, where optional parameters can be set.
  *
  * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  * @param <F> The type of the targeted field.
  * @param <A> The type of result for this aggregation.
  */
-public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsStep<?, F, A>, F, A>
-		extends AggregationFinalStep<A> {
+public interface TermsAggregationOptionsStep<
+				S extends TermsAggregationOptionsStep<?, PDF, F, A>,
+				PDF extends SearchPredicateFactory,
+				F,
+				A
+		>
+		extends AggregationFinalStep<A>, AggregationFilterStep<S, PDF> {
 
 	/**
 	 * Order buckets by descending document count in the aggregation result.
@@ -76,33 +80,4 @@ public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsSt
 	 */
 	S maxTermCount(int maxTermCount);
 
-	/**
-	 * Add a <a href="#filter">"filter" clause</a> based on a previously-built {@link SearchPredicate}.
-	 *
-	 * @param searchPredicate The predicate that must match.
-	 * @return {@code this}, for method chaining.
-	 */
-	S filter(SearchPredicate searchPredicate);
-
-	/**
-	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
-	 * <p>
-	 * Best used with lambda expressions.
-	 *
-	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
-	 * returning the final step in the predicate DSL.
-	 * Should generally be a lambda expression.
-	 * @return {@code this}, for method chaining.
-	 */
-	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
-
-	/**
-	 * Add a <a href="#filter">"filter" clause</a> based on an almost-built {@link SearchPredicate}.
-	 *
-	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
-	 * @return {@code this}, for method chaining.
-	 */
-	default S filter(PredicateFinalStep dslFinalStep) {
-		return filter( dslFinalStep.toPredicate() );
-	}
 }

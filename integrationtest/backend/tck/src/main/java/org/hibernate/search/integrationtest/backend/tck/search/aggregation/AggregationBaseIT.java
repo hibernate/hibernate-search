@@ -118,7 +118,7 @@ public class AggregationBaseIT {
 	private static class SupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
-				SearchAggregationDslContext<?> dslContext) {
+				SearchAggregationDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
@@ -128,7 +128,7 @@ public class AggregationBaseIT {
 	private static class UnSupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
-				SearchAggregationDslContext<?> dslContext) {
+				SearchAggregationDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.empty();
