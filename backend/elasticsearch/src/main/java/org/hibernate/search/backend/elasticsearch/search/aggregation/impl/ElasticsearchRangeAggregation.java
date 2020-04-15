@@ -75,9 +75,6 @@ public class ElasticsearchRangeAggregation<F, K>
 	public static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final String absoluteFieldPath;
-		private final List<String> nestedPathHierarchy;
-
 		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
@@ -88,9 +85,7 @@ public class ElasticsearchRangeAggregation<F, K>
 				List<String> nestedPathHierarchy,
 				DslConverter<?, ? extends F> toFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
-			super( searchContext );
-			this.absoluteFieldPath = absoluteFieldPath;
-			this.nestedPathHierarchy = nestedPathHierarchy;
+			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}
@@ -122,11 +117,6 @@ public class ElasticsearchRangeAggregation<F, K>
 		@Override
 		public ElasticsearchRangeAggregation<F, K> build() {
 			return new ElasticsearchRangeAggregation<>( this );
-		}
-
-		@Override
-		protected List<String> getNestedPathHierarchy() {
-			return nestedPathHierarchy;
 		}
 
 		private JsonElement convertToFieldValue(K value) {

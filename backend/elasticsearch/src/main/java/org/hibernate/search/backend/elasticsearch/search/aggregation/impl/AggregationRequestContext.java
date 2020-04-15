@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+
 public interface AggregationRequestContext {
+
+	ElasticsearchSearchPredicateContext getRootPredicateContext();
 
 }
