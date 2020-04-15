@@ -67,7 +67,7 @@ public class DistanceSearchSortFilteringSpecificsIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Field '" + fieldPath + "' is not contained in a nested object.",
-						"Sort filters are only available if the field to sort on is contained in a nested objects."
+						"Sort filters are only available if the field to sort on is contained in a nested object."
 				);
 	}
 
