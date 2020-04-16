@@ -261,33 +261,23 @@ include::todo-placeholder.asciidoc[]
 
 include::components/sharding-intro-note.asciidoc[]
 
-This feature is useful when sharding is enabled,
-and when each entity is mapped in such a way that
-<<mapper-orm-bridge-routingkeybridge,it is assigned a routing key>>.
+If, for a given index, there is one immutable value that documents are often filtered on,
+for example a "category" or a "user id",
+it is possible to match documents with this value using a routing key instead of a predicate.
 
-If a search query already uses predicates to filter documents in such a way that
-all matching documents will have a routing key in a known subset of all possible routing keys,
-it is possible to specify these routing keys to Hibernate Search
-so that only the relevant shards are queried,
-potentially improving performance.
+The main advantage of a routing key over a predicate is that, on top of filtering documents,
+the routing key will also filter <<concepts-sharding-routing,shards>>.
+If sharding is enabled, this means only part of the index
+will be scanned during query execution,
+potentially increasing search performance.
 
-[WARNING]
+[IMPORTANT]
 ====
-The main purpose of this feature is to *improve performance*.
-It should not be relied on for document filtering purposes.
-
-While setting a routing key will remove some irrelevant documents from the hits,
-it may not remove _all_ of them: the routing key will resolve into a single shard,
-but that shard may be contain documents with multiple different routing keys,
-depending on the sharding strategy.
-
-Thus, even when specifying a routing key that supposedly has the same value
-as a field in the document (e.g. a `genre` field),
-it is necessary to also add a predicate to explicitly filter out documents
-that may not have the same routing key.
+A pre-requisite to using routing in search queries is to map your entity in such a way that
+<<mapper-orm-bridge-routingkeybridge,it is assigned a routing key>> at indexing time.
 ====
 
-Specifying routing keys is done by calling the `.routing(String)` or .`routing(Collection<String>)` methods
+Specifying routing keys is done by calling the `.routing(String)` or `.routing(Collection<String>)` methods
 when building the query:
 
 .Routing a query to a subset of all shards
