@@ -14,26 +14,31 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 
 /**
- * Wrapper class around the Lucene indexing parameters defined in IndexWriterSetting.
+ * A source of index writer configuration that can be re-used on multiple writers.
+ * <p>
+ * This is mostly necessary because we don't have access to the user configuration after startup,
+ * and we don't want to re-use the same IndexWriterConfig instance multiple times in order to be safe
+ * and make sure a previous, failing index writer will never affect the configuration of
+ * the new index writer created to replace it.
  *
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class LuceneIndexingParameters {
+public class IndexWriterConfigSource {
 
 	// property path keywords
 	public static final String PROP_GROUP = "indexwriter";
 
 	private final List<IndexWriterSettingValue<?>> values;
 
-	public LuceneIndexingParameters(ConfigurationPropertySource propertySource) {
+	public IndexWriterConfigSource(ConfigurationPropertySource propertySource) {
 		ConfigurationPropertySource indexingParameters = propertySource.withMask( PROP_GROUP );
 		values = IndexWriterSettings.extractAll( indexingParameters );
 	}
 
 	@Override
 	public String toString() {
-		return "LuceneIndexingParameters{" + values + '}';
+		return "IndexWriterConfigSource{" + values + '}';
 	}
 
 	/**
