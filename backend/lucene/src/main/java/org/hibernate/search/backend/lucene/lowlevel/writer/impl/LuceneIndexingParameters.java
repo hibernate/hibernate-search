@@ -28,9 +28,8 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class LuceneIndexingParameters implements Serializable {
+public class LuceneIndexingParameters {
 
-	private static final long serialVersionUID = 5424606407623591663L;
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// value keyword

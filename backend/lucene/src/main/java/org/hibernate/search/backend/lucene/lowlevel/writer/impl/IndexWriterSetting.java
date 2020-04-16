@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
-import java.io.Serializable;
-
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.util.common.SearchException;
 
@@ -20,7 +18,7 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  *
  * @author Sanne Grinovero
  */
-public enum IndexWriterSetting implements Serializable {
+public enum IndexWriterSetting {
 
 	/**
 	 * @see IndexWriterConfig#setMaxBufferedDocs(int)
