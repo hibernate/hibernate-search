@@ -660,4 +660,13 @@ public interface Log extends BasicLogger {
 			value = "Field '%1$s' is not contained in a nested object."
 					+ " Aggregation filters are only available if the field to aggregate on is contained in a nested object.")
 	SearchException cannotFilterAggregationOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 123,
+			value = "IndexWriter setting '%1$s' cannot be set to '%2$s': %3$s")
+	SearchException illegalIndexWriterSetting(String settingName, Object settingValue, String message, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 124,
+			value = "Merge policy setting '%1$s' cannot be set to '%2$s': %3$s")
+	SearchException illegalMergePolicySetting(String settingName, Object settingValue, String message, @Cause Exception e);
+
 }

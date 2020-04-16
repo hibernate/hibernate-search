@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.logging.impl;
 
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterSettings;
 import org.hibernate.search.util.common.logging.impl.LogCategory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -25,8 +26,6 @@ public final class LuceneLogCategories {
 	 * To enable the logger, the category needs to be enabled at TRACE level and configuration
 	 * property {@code org.hibernate.search.backend.configuration.impl.IndexWriterSetting#INFOSTREAM}
 	 * needs to be enabled on the index.
-	 *
-	 * @see org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterSetting#INFOSTREAM
 	 */
 	public static final LogCategory INFOSTREAM_LOGGER_CATEGORY = new LogCategory( "org.hibernate.search.backend.lucene.infostream" );
 

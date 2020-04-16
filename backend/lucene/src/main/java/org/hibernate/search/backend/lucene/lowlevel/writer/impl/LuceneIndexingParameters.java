@@ -7,14 +7,9 @@
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.List;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -30,10 +25,6 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  */
 public class LuceneIndexingParameters {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	// value keyword
-	public static final String EXPLICIT_DEFAULT_VALUE = "default";
 	// property path keywords
 	public static final String PROP_GROUP = "indexwriter";
 
@@ -61,21 +52,10 @@ public class LuceneIndexingParameters {
 
 		private static final long serialVersionUID = -6121723702279869524L;
 
-		final Map<IndexWriterSetting, Integer> parameters = new EnumMap<IndexWriterSetting, Integer>( IndexWriterSetting.class );
+		private final List<IndexWriterSettingValue<?>> values;
 
 		public ParameterSet(ConfigurationPropertySource prop) {
-			//don't iterate on property entries as we know all the keys:
-			for ( IndexWriterSetting t : IndexWriterSetting.values() ) {
-				String key = t.getKey();
-				Object value = prop.get( key ).orElse( null );
-				if ( value instanceof String && !EXPLICIT_DEFAULT_VALUE.equalsIgnoreCase( (String) value ) ) {
-					if ( log.isDebugEnabled() ) {
-						//TODO add DirectoryProvider name when available to log message
-						log.debugf( "Set index writer parameter %s to value : %s", key, value );
-					}
-					parameters.put( t, t.parseVal( (String) value ) );
-				}
-			}
+			values = IndexWriterSettings.extractAll( prop );
 		}
 
 		/**
@@ -85,17 +65,8 @@ public class LuceneIndexingParameters {
 		 * @param writerConfig the IndexWriter configuration whereto the parameters will be applied.
 		 */
 		public void applyToWriter(IndexWriterConfig writerConfig) {
-			for ( Map.Entry<IndexWriterSetting, Integer> entry : parameters.entrySet() ) {
-				try {
-					entry.getKey().applySetting( writerConfig, entry.getValue() );
-				}
-				catch (IllegalArgumentException e) {
-					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
-					throw new SearchException(
-							"Illegal IndexWriter setting "
-									+ entry.getKey().getKey() + " " + e.getMessage(), e
-					);
-				}
+			for ( IndexWriterSettingValue<?> value : values ) {
+				value.applySetting( writerConfig );
 			}
 		}
 
@@ -105,40 +76,17 @@ public class LuceneIndexingParameters {
 		 */
 		public LogByteSizeMergePolicy getNewMergePolicy() {
 			LogByteSizeMergePolicy logByteSizeMergePolicy = new LogByteSizeMergePolicy();
-			for ( Map.Entry<IndexWriterSetting, Integer> entry : parameters.entrySet() ) {
-				try {
-					entry.getKey().applySetting( logByteSizeMergePolicy, entry.getValue() );
-				}
-				catch (IllegalArgumentException e) {
-					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
-					throw new SearchException(
-							"Illegal IndexWriter setting "
-									+ entry.getKey().getKey() + " " + e.getMessage(), e
-					);
-				}
+			for ( IndexWriterSettingValue<?> value : values ) {
+				value.applySetting( logByteSizeMergePolicy );
 			}
 			return logByteSizeMergePolicy;
-		}
-
-		public Integer getCurrentValueFor(IndexWriterSetting ws) {
-			return parameters.get( ws );
-		}
-
-		public void setCurrentValueFor(IndexWriterSetting ws, Integer newValue) {
-			if ( newValue == null ) {
-				parameters.remove( ws );
-			}
-			else {
-				parameters.put( ws, newValue );
-			}
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result
-					+ ( ( parameters == null ) ? 0 : parameters.hashCode() );
+			result = prime * result + values.hashCode();
 			return result;
 		}
 
@@ -154,22 +102,14 @@ public class LuceneIndexingParameters {
 				return false;
 			}
 			final ParameterSet other = (ParameterSet) obj;
-			if ( parameters == null ) {
-				if ( other.parameters != null ) {
-					return false;
-				}
-			}
-			else if ( !parameters.equals( other.parameters ) ) {
-				return false;
-			}
-			return true;
+			return values.equals( other.values );
 		}
 
 		@Override
 		public String toString() {
 			final StringBuilder sb = new StringBuilder();
 			sb.append( "ParameterSet" );
-			sb.append( "{parameters=" ).append( parameters );
+			sb.append( "{values=" ).append( values );
 			sb.append( '}' );
 			return sb.toString();
 		}
