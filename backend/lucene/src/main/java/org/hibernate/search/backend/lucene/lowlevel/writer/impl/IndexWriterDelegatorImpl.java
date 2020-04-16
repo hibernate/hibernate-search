@@ -145,7 +145,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		}
 	}
 
-	public void closeAfterFailure(Throwable throwable, Object failingOperation) {
+	void closeAfterFailure(Throwable throwable, Object failingOperation) {
 		Exception exceptionToReport = log.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext, throwable );
 		try {
 			close();
