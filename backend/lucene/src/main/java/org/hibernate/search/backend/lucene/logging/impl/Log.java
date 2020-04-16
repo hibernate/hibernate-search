@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.logging.impl;
 
 import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
@@ -65,10 +66,12 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 114, max = 114),
 		@ValidIdRange(min = 118, max = 118),
 		@ValidIdRange(min = 225, max = 225),
+		@ValidIdRange(min = 226, max = 226),
 		@ValidIdRange(min = 228, max = 228),
 		@ValidIdRange(min = 265, max = 265),
 		@ValidIdRange(min = 274, max = 274),
 		@ValidIdRange(min = 284, max = 284),
+		@ValidIdRange(min = 288, max = 288),
 		@ValidIdRange(min = 320, max = 320),
 		@ValidIdRange(min = 321, max = 321),
 		@ValidIdRange(min = 329, max = 329),
@@ -124,6 +127,10 @@ public interface Log extends BasicLogger {
 	)
 	void lockingFailureDuringInitialization(String directoryDescription, @Param EventContext context);
 
+	@LogMessage(level = TRACE)
+	@Message(id = ID_OFFSET_1 + 226, value = "%s: %s" )
+	void logInfoStreamMessage(String componentName, String message);
+
 	@Message(id = ID_OFFSET_1 + 228,
 			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
@@ -135,6 +142,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 284,
 			value = "An exception occurred while opening multiple indexes." )
 	SearchException failureOnMultiReaderRefresh(@Param EventContext context, @Cause Exception e);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET_1 + 288,
+			value = "The configuration property '%s' no longer applies and will be ignored." )
+	void deprecatedConfigurationPropertyIsIgnored(String string);
 
 	@Message(id = ID_OFFSET_1 + 320,
 			value = "Could not normalize value for field '%1$s'.")
