@@ -7,12 +7,9 @@
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -25,17 +22,6 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  */
 public enum IndexWriterSetting implements Serializable {
 
-	/**
-	 * @see IndexWriterConfig#setMaxBufferedDeleteTerms(int)
-	 */
-	MAX_BUFFERED_DELETE_TERMS( "max_buffered_delete_terms" ) {
-		@Override
-		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			// TODO HSEARCH-3776 this was removed in Lucene; remove it here too?
-			//   See https://github.com/apache/lucene-solr/commit/58105a203a19d18a56e09cf69dc0083c1b890315#diff-bb93628c56a21bd7065ff573d9a3d1e8L157
-//			writerConfig.setMaxBufferedDeleteTerms( value );
-		}
-	},
 	/**
 	 * @see IndexWriterConfig#setMaxBufferedDocs(int)
 	 */
@@ -113,20 +99,6 @@ public enum IndexWriterSetting implements Serializable {
 			writerConfig.setRAMBufferSizeMB( value );
 		}
 	},
-	@Deprecated
-	TERM_INDEX_INTERVAL( "term_index_interval" ) {
-		@Override
-		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			log.deprecatedConfigurationPropertyIsIgnored( "term_index_interval" );
-		}
-	},
-	@Deprecated
-	MAX_THREAD_STATES( "max_thread_states" ) {
-		@Override
-		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			log.deprecatedConfigurationPropertyIsIgnored( "max_thread_states" );
-		}
-	},
 	/**
 	 * @see IndexWriterConfig#setInfoStream(org.apache.lucene.util.InfoStream)
 	 */
@@ -146,8 +118,6 @@ public enum IndexWriterSetting implements Serializable {
 
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String cfgKey;
 

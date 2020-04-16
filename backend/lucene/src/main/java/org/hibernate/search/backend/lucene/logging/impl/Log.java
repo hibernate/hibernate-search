@@ -71,7 +71,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 265, max = 265),
 		@ValidIdRange(min = 274, max = 274),
 		@ValidIdRange(min = 284, max = 284),
-		@ValidIdRange(min = 288, max = 288),
 		@ValidIdRange(min = 320, max = 320),
 		@ValidIdRange(min = 321, max = 321),
 		@ValidIdRange(min = 329, max = 329),
@@ -142,11 +141,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 284,
 			value = "An exception occurred while opening multiple indexes." )
 	SearchException failureOnMultiReaderRefresh(@Param EventContext context, @Cause Exception e);
-
-	@LogMessage(level = Level.WARN)
-	@Message(id = ID_OFFSET_1 + 288,
-			value = "The configuration property '%s' no longer applies and will be ignored." )
-	void deprecatedConfigurationPropertyIsIgnored(String string);
 
 	@Message(id = ID_OFFSET_1 + 320,
 			value = "Could not normalize value for field '%1$s'.")
