@@ -135,6 +135,11 @@ public final class LuceneIndexSettings {
 	public static final String WRITER_INFOSTREAM = WRITER_PREFIX + WriterRadicals.INFOSTREAM;
 
 	/**
+	 * The prefix for property keys related to merge.
+	 */
+	public static final String MERGE_PREFIX = "merge.";
+
+	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeDocs(int)}.
 	 * <p>
 	 * Expects a positive Integer value,
@@ -144,7 +149,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeDocs(int)
 	 */
-	public static final String WRITER_MAX_MERGE_DOCS = WRITER_PREFIX + WriterRadicals.MAX_MERGE_DOCS;
+	public static final String MERGE_MAX_DOCS = MERGE_PREFIX + MergeRadicals.MAX_DOCS;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMergeFactor(int)}.
@@ -156,7 +161,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMergeFactor(int)
 	 */
-	public static final String WRITER_MERGE_FACTOR = WRITER_PREFIX + WriterRadicals.MERGE_FACTOR;
+	public static final String MERGE_FACTOR = MERGE_PREFIX + MergeRadicals.FACTOR;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMinMergeMB(double)}.
@@ -168,7 +173,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMinMergeMB(double)
 	 */
-	public static final String WRITER_MERGE_MIN_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MIN_SIZE;
+	public static final String MERGE_MIN_SIZE = MERGE_PREFIX + MergeRadicals.MIN_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeMB(double)}.
@@ -180,7 +185,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeMB(double)
 	 */
-	public static final String WRITER_MERGE_MAX_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MAX_SIZE;
+	public static final String MERGE_MAX_SIZE = MERGE_PREFIX + MergeRadicals.MAX_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)}.
@@ -192,7 +197,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)
 	 */
-	public static final String WRITER_MERGE_MAX_OPTIMIZE_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MAX_FORCED_SIZE;
+	public static final String MERGE_MAX_FORCED_SIZE = MERGE_PREFIX + MergeRadicals.MAX_FORCED_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)}.
@@ -204,7 +209,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)
 	 */
-	public static final String WRITER_MERGE_CALIBRATE_BY_DELETES = WRITER_PREFIX + WriterRadicals.MERGE_CALIBRATE_BY_DELETES;
+	public static final String MERGE_CALIBRATE_BY_DELETES = MERGE_PREFIX + MergeRadicals.CALIBRATE_BY_DELETES;
 
 	/**
 	 * The prefix for sharding-related property keys.
@@ -303,12 +308,23 @@ public final class LuceneIndexSettings {
 		public static final String RAM_BUFFER_SIZE = "ram_buffer_size";
 		public static final String INFOSTREAM = "infostream";
 
-		public static final String MAX_MERGE_DOCS = "max_merge_docs";
-		public static final String MERGE_FACTOR = "merge_factor";
-		public static final String MERGE_MIN_SIZE = "merge_min_size";
-		public static final String MERGE_MAX_SIZE = "merge_max_size";
-		public static final String MERGE_MAX_FORCED_SIZE = "merge_max_forced_size";
-		public static final String MERGE_CALIBRATE_BY_DELETES = "merge_calibrate_by_deletes";
+	}
+
+	/**
+	 * Configuration property keys for merge options, without the {@link #MERGE_PREFIX prefix}.
+	 */
+	public static final class MergeRadicals {
+
+		private MergeRadicals() {
+		}
+
+		public static final String MAX_DOCS = "max_docs";
+		public static final String FACTOR = "factor";
+		public static final String MIN_SIZE = "min_size";
+		public static final String MAX_SIZE = "max_size";
+		public static final String MAX_FORCED_SIZE = "max_forced_size";
+		public static final String CALIBRATE_BY_DELETES = "calibrate_by_deletes";
+
 	}
 
 	/**
