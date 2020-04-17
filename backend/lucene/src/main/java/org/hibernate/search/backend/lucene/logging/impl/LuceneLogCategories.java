@@ -28,7 +28,7 @@ public final class LuceneLogCategories {
 	 * property {@code org.hibernate.search.backend.configuration.impl.IndexWriterSetting#INFOSTREAM}
 	 * needs to be enabled on the index.
 	 *
-	 * @see org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings#WRITER_INFOSTREAM
+	 * @see org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings#IO_WRITER_INFOSTREAM
 	 */
 	public static final LogCategory INFOSTREAM_LOGGER_CATEGORY = new LogCategory( INFOSTREAM_LOGGER_CATEGORY_NAME );
 
