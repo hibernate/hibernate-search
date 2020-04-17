@@ -647,22 +647,10 @@ Again, this is only true if you rely on the document ID and not on a provided ro
 [[backend-lucene-io]]
 == Writing and reading
 
-=== Basics
-
-include::components/writing-reading-intro-note.asciidoc[]
-
-The default configuration of the Lucene backend focuses on safety and freshness:
-
-* Critical changes (automatic indexing) are only considered completed
-when they are committed.
-* Indexes are refreshed as soon as a change happens.
-
-Some techniques and custom configuration, explained in the following sections,
-can provide performance boosts in some situations at the cost of lower write safety
-and/or occasional out-of-date reads.
-
 [[backend-lucene-io-commit]]
 === Commit
+
+include::components/writing-reading-intro-note.asciidoc[]
 
 In Lucene terminology, a _commit_ is when changes buffered in an index writer
 are pushed to the index itself,
@@ -724,6 +712,8 @@ so as not to require a commit after each change.
 [[backend-lucene-io-refresh]]
 === Refresh
 
+include::components/writing-reading-intro-note.asciidoc[]
+
 In Lucene terminology, a _refresh_ is when a new index reader is opened,
 so that the next search queries will take into account the latest changes to the index.
 
@@ -747,3 +737,184 @@ hibernate.search.backends.<backend name>.indexes.<index name>.io.refresh_interva
 # OR
 hibernate.search.backends.<backend name>.index_defaults.io.refresh_interval = 0 (default)
 ----
+
+[[backend-lucene-io-writer]]
+=== `IndexWriter` settings
+// Search 5 anchors backward compatibility
+[[lucene-indexing-performance]]
+
+Lucene's `IndexWriter`, used by Hibernate Search to write to indexes,
+exposes several settings that can be tweaked to better fit your application,
+and ultimately get better performance.
+
+Hibernate Search exposes these settings through configuration properties prefixed with `io.writer.`,
+at the index level.
+
+Below is a list of all index writer settings.
+They can be set through configuration properties, at the index level.
+For example, `io.writer.ram_buffer_size` can be set like this:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.io.writer.ram_buffer_size = 32
+# OR
+hibernate.search.backends.<backend name>.index_defaults.io.writer.ram_buffer_size = 32
+----
+
+[[table-performance-parameters]]
+.Configuration properties for the `IndexWriter`
+[cols="1,2a", options="header"]
+|===============
+|Property
+|Description
+
+|`[...].io.writer.max_buffered_docs`
+|The maximum number of documents that can be buffered in-memory
+before they are flushed to the Directory.
+
+Large values mean faster indexing, but more RAM usage.
+
+When used together with `ram_buffer_size` a flush occurs for whichever event happens first.
+
+|`[...].io.writer.ram_buffer_size`
+|The maximum amount of RAM that may be used for buffering added documents and deletions
+before they are flushed to the Directory.
+
+Large values mean faster indexing, but more RAM usage.
+
+Generally for faster indexing performance it's best to use this setting rather than `max_buffered_docs`.
+
+When used together with `max_buffered_docs` a flush occurs for whichever event happens first.
+
+|`[...].io.writer.infostream`
+|Enables low level trace information about Lucene's internal components; `true` or `false`.
+
+Logs will be appended to the logger `org.hibernate.search.backend.lucene.infostream` at the TRACE level.
+
+This may cause significant performance degradation, even if the logger ignores the TRACE level,
+so this should only be used for troubleshooting purposes.
+
+Disabled by default.
+|===============
+
+[TIP]
+====
+Refer to Lucene's documentation, in particular the javadoc and source code of `IndexWriterConfig`,
+for more information about the settings and their defaults.
+====
+
+[[backend-lucene-io-merge]]
+=== Merge settings
+
+A Lucene index is not stored in a single, continuous file.
+Instead, each flush to the index will generate a small file containing all the documents added to the index.
+This file is called a "segment".
+Search can be slower on an index with too many segments,
+so Lucene regularly merges small segments to create fewer, larger segments.
+
+Lucene's merge behavior is controlled through a `MergePolicy`.
+Hibernate Search uses the `LogByteSizeMergePolicy`,
+which exposes several settings that can be tweaked to better fit your application,
+and ultimately get better performance.
+
+Below is a list of all merge settings.
+They can be set through configuration properties, at the index level.
+For example, `io.merge.factor` can be set like this:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.io.merge.factor = 10
+# OR
+hibernate.search.backends.<backend name>.index_defaults.io.merge.factor = 10
+----
+
+[cols="1,2a", options="header"]
+.Configuration properties related to merges
+|===============
+|Property
+|Description
+
+|`[...].io.merge.max_docs`
+|The maximum number of documents that a segment can have before merging.
+Segments with more than this number of documents will not be merged.
+
+Smaller values perform better on frequently changing indexes,
+larger values provide better search performance if the index does not change often.
+
+|`[...].io.merge.factor`
+|The number of segments that are merged at once.
+
+With smaller values, merging happens more often and thus uses more resources,
+but the total number of segments will be lower on average, increasing read performance.
+Thus, larger values (`> 10`) are best for <<mapper-orm-indexing-massindexer,mass indexing>>,
+and smaller values (`< 10`) are best for <<mapper-orm-indexing-automatic,automatic indexing>>.
+
+The value must not be lower than `2`.
+
+|`[...].io.merge.min_size`
+|The minimum target size of segments, in MB, for background merges.
+
+Segments smaller than this size are merged more aggressively.
+
+Setting this too large might result in expensive merge operations, even tough they are less frequent.
+
+|`[...].io.merge.max_size`
+|The maximum size of segments, in MB, for background merges.
+
+Segments larger than this size are never merged in the background.
+
+Settings this to a lower value helps reduce memory requirements and avoids some merging operations at the
+cost of optimal search speed.
+
+When <<mapper-orm-indexing-manual-merge,forcefully merging>> an index, this value is ignored and `max_forced_size` is used instead (see below).
+
+|`[...].io.merge.max_forced_size`
+|The maximum size of segments, in MB, for forced merges.
+
+This is the equivalent of `io.merge.max_size` for <<mapper-orm-indexing-manual-merge,forceful merges>>.
+You will generally want to set this to the same value as `max_size` or lower,
+but setting it too low will <<mapper-orm-indexing-merge-segments,degrade search performance as documents are deleted>>.
+
+|`[...].io.merge.calibrate_by_deletes`
+|Whether the number of deleted documents in an index should be taken into account; `true` or `false`.
+
+When enabled, Lucene will consider that a segment with 100 documents, 50 of which are deleted,
+actually contains 50 documents.
+When disabled, Lucene will consider that such a segment contains 100 documents.
+
+Setting `calibrate_by_deletes` to `false` will lead to more frequent merges caused by `io.merge.max_docs`,
+but will more aggressively merge segments with many deleted documents, improving search performance.
+|===============
+
+[NOTE]
+====
+Refer to Lucene's documentation, in particular the javadoc and source code of `LogByteSizeMergePolicy`,
+for more information about the settings and their defaults.
+====
+
+[TIP]
+[[lucene-segment-size]]
+========
+The options `io.merge.max_size` and `io.merge.max_forced_size`
+do not *directly* define the maximum size of all segment files.
+
+First, consider that merging a segment is about adding it together with another existing segment to form a larger one.
+`io.merge.max_size` is the maximum size of segments *before* merging,
+so newly merged segments can be up to twice that size.
+
+Second, merge options do not affect the size of segments initially created by the index writer, before they are merged.
+This size can be limited with the setting `io.writer.ram_buffer_size`,
+but Lucene relies on estimates to implement this limit;
+when these estimates are off,
+it is possible for newly created segments to be slightly larger than `io.writer.ram_buffer_size`.
+
+So, for example, to be fairly confident no file grows larger than 15MB,
+use something like this:
+
+[source]
+----
+hibernate.search.backends.<backend name>.index_defaults.io.writer.ram_buffer_size = 10
+hibernate.search.backends.<backend name>.index_defaults.io.merge.max_size = 7
+hibernate.search.backends.<backend name>.index_defaults.io.merge.max_forced_size = 7
+----
+========

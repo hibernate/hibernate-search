@@ -54,6 +54,16 @@ so there is no need to begin a database transaction before the `MassIndexer` is 
 or to commit a transaction after it is done.
 ====
 
+[WARNING]
+====
+A note to MySQL users: the `MassIndexer` uses forward only scrollable results
+to iterate on the primary keys to be loaded,
+but MySQL's JDBC driver will pre-load all values in memory.
+
+To avoid this "optimization" set the <<mapper-orm-indexing-massindexer-parameters-idfetchsize,`idFetchSize` parameter>>
+to `Integer.MIN_VALUE`.
+====
+
 You can also select entity types when creating a mass indexer,
 so as to reindex only these types (and their indexed subtypes, if any):
 
@@ -113,6 +123,8 @@ as explained in <<mapper-orm-indexing-massindexer-tuning-threads>>.
 
 [[mapper-orm-indexing-massindexer-parameters]]
 == `MassIndexer` parameters
+// Search 5 anchors backward compatibility
+[[_useful_parameters_for_batch_indexing]]
 
 .`MassIndexer` parameters
 |===
@@ -129,7 +141,7 @@ That is to say, the number of threads spawned for entity loading
 will be `typesToIndexInParallel * threadsToLoadObjects`
 (+ 1 thread per type to retrieve the IDs of entities to load).
 
-|`idFetchSize(int)`
+|[[mapper-orm-indexing-massindexer-parameters-idfetchsize]]`idFetchSize(int)`
 |`100`
 |The fetch size to be used when loading primary keys. Some databases
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
