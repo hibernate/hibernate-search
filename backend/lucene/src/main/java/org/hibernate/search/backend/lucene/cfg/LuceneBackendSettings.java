@@ -10,7 +10,10 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.Version;
 
 /**
@@ -94,6 +97,19 @@ public final class LuceneBackendSettings {
 			DIRECTORY_PREFIX + DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY;
 
 	/**
+	 * The {@link org.apache.lucene.search.similarities.Similarity} to be used when indexing and querying.
+	 * <p>
+	 * Expects the fully qualified name of a concrete implementation of {@link org.apache.lucene.search.similarities.Similarity},
+	 * or a reference to a bean of that type.
+	 * <p>
+	 * Defaults to {@link BM25Similarity}.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String SIMILARITY = "similarity";
+
+	/**
 	 * The multi-tenancy strategy to use.
 	 * <p>
 	 * Expects a {@link MultiTenancyStrategyName} value, or a String representation of such value.
@@ -154,6 +170,8 @@ public final class LuceneBackendSettings {
 		public static final String DIRECTORY_TYPE = "local-filesystem";
 
 		public static final String DIRECTORY_ROOT = ".";
+
+		public static final BeanReference<? extends Similarity> SIMILARITY = BeanReference.of( BM25Similarity.class );
 
 		public static final FileSystemAccessStrategyName DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
 				FileSystemAccessStrategyName.AUTO;
