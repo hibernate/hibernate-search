@@ -44,7 +44,7 @@ class ExplainWork implements ReadWork<Explanation> {
 	@Override
 	public Explanation execute(ReadWorkExecutionContext context) {
 		try {
-			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
+			IndexSearcher indexSearcher = context.createSearcher();
 
 			int luceneDocId = getLuceneDocId( context, indexSearcher );
 

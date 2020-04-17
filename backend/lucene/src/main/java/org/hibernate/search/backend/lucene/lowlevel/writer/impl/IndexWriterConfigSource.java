@@ -13,6 +13,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
+import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * A source of index writer configuration that can be re-used on multiple writers.
@@ -27,15 +28,18 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  */
 public class IndexWriterConfigSource {
 
-	public static IndexWriterConfigSource create(Analyzer analyzer, ConfigurationPropertySource propertySource) {
+	public static IndexWriterConfigSource create(Similarity similarity, Analyzer analyzer,
+			ConfigurationPropertySource propertySource) {
 		List<IndexWriterSettingValue<?>> values = IndexWriterSettings.extractAll( propertySource );
-		return new IndexWriterConfigSource( analyzer, values );
+		return new IndexWriterConfigSource( similarity, analyzer, values );
 	}
 
+	private final Similarity similarity;
 	private final Analyzer analyzer;
 	private final List<IndexWriterSettingValue<?>> values;
 
-	private IndexWriterConfigSource(Analyzer analyzer, List<IndexWriterSettingValue<?>> values) {
+	private IndexWriterConfigSource(Similarity similarity, Analyzer analyzer, List<IndexWriterSettingValue<?>> values) {
+		this.similarity = similarity;
 		this.analyzer = analyzer;
 		this.values = values;
 	}
@@ -51,6 +55,7 @@ public class IndexWriterConfigSource {
 	 */
 	public IndexWriterConfig createIndexWriterConfig() {
 		IndexWriterConfig writerConfig = new IndexWriterConfig( analyzer );
+		writerConfig.setSimilarity( similarity );
 		for ( IndexWriterSettingValue<?> value : values ) {
 			value.applySetting( writerConfig );
 		}

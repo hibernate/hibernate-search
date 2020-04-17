@@ -40,6 +40,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.util.Version;
 
 
@@ -51,6 +52,12 @@ public class LuceneBackendFactory implements BackendFactory {
 	private static final ConfigurationProperty<Optional<Version>> LUCENE_VERSION =
 			ConfigurationProperty.forKey( LuceneBackendSettings.LUCENE_VERSION )
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
+					.build();
+
+	private static final ConfigurationProperty<BeanReference<? extends Similarity>> SIMILARITY =
+			ConfigurationProperty.forKey( LuceneBackendSettings.SIMILARITY )
+					.asBeanReference( Similarity.class )
+					.withDefault( LuceneBackendSettings.Defaults.SIMILARITY )
 					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
@@ -76,6 +83,8 @@ public class LuceneBackendFactory implements BackendFactory {
 		BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
 				getDirectoryProvider( backendContext, buildContext, propertySource );
 
+		BeanHolder<? extends Similarity> similarityHolder = getSimilarity( buildContext, propertySource );
+
 		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
 		LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
@@ -85,7 +94,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		return new LuceneBackendImpl(
 				name,
 				backendThreads,
-				directoryProviderHolder,
+				directoryProviderHolder, similarityHolder,
 				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy,
@@ -123,6 +132,12 @@ public class LuceneBackendFactory implements BackendFactory {
 				propertySource.withMask( "directory" )
 		);
 		return initializationContext.createDirectoryProvider();
+	}
+
+	private BeanHolder<? extends Similarity> getSimilarity(BackendBuildContext buildContext,
+			ConfigurationPropertySource propertySource) {
+		BeanResolver beanResolver = buildContext.getBeanResolver();
+		return SIMILARITY.getAndTransform( propertySource, beanResolver::resolve );
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {

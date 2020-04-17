@@ -35,7 +35,7 @@ public class SearchWork<R> implements ReadWork<R> {
 	@Override
 	public R execute(ReadWorkExecutionContext context) {
 		try {
-			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
+			IndexSearcher indexSearcher = context.createSearcher();
 
 			return searcher.search(
 					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit

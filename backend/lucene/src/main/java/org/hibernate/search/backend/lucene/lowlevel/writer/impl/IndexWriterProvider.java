@@ -40,10 +40,6 @@ public class IndexWriterProvider {
 	private BackendThreads threads;
 	private final FailureHandler failureHandler;
 
-	/* TODO HSEARCH-3777 re-allow configuring similarity
-	private final Similarity similarity;
-	 */
-
 	/**
 	 * Current open IndexWriter, or null when closed.
 	 */
@@ -67,9 +63,6 @@ public class IndexWriterProvider {
 		this.commitInterval = commitInterval;
 		this.threads = threads;
 		this.failureHandler = failureHandler;
-		/* TODO HSEARCH-3777 re-allow configuring similarity
-		this.similarity = indexManager.getSimilarity();
-		 */
 	}
 
 	/**
@@ -148,11 +141,6 @@ public class IndexWriterProvider {
 
 	private IndexWriterConfig createWriterConfig() {
 		IndexWriterConfig writerConfig = configSource.createIndexWriterConfig();
-		/* TODO HSEARCH-3777 re-allow configuring similarity
-		if ( similarity != null ) {
-			writerConfig.setSimilarity( similarity );
-		}
-		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
 				indexName, eventContext.render(),
 				threads.getThreadProvider(), failureHandler

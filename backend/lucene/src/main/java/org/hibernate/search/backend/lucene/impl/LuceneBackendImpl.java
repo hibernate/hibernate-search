@@ -34,6 +34,8 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.search.similarities.Similarity;
+
 
 public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
@@ -43,6 +45,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final BackendThreads threads;
 	private final BeanHolder<? extends DirectoryProvider> directoryProviderHolder;
+	private final BeanHolder<? extends Similarity> similarityHolder;
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -56,6 +59,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	LuceneBackendImpl(String name,
 			BackendThreads threads,
 			BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
+			BeanHolder<? extends Similarity> similarityHolder,
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -64,18 +68,19 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		this.name = name;
 		this.threads = threads;
 		this.directoryProviderHolder = directoryProviderHolder;
+		this.similarityHolder = similarityHolder;
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
 		this.readOrchestrator = new LuceneSyncWorkOrchestratorImpl(
-				"Lucene read work orchestrator for backend " + name
+				"Lucene read work orchestrator for backend " + name, similarityHolder.get()
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
-				eventContext, threads, directoryProviderHolder.get(),
+				eventContext, threads, directoryProviderHolder.get(), similarityHolder.get(),
 				workFactory, multiTenancyStrategy,
 				timingSource, analysisDefinitionRegistry,
 				failureHandler,
@@ -108,6 +113,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( LuceneSyncWorkOrchestratorImpl::stop, readOrchestrator );
+			closer.push( BeanHolder::close, similarityHolder );
 			closer.push( holder -> holder.get().close(), directoryProviderHolder );
 			closer.push( BeanHolder::close, directoryProviderHolder );
 			closer.push( TimingSource::stop, timingSource );

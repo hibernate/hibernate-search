@@ -24,7 +24,8 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.similarities.Similarity;
 
 public class LuceneSyncWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneSyncWorkOrchestratorImpl.WorkExecution<?>>
@@ -32,15 +33,20 @@ public class LuceneSyncWorkOrchestratorImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneSyncWorkOrchestratorImpl(String name) {
+	private final Similarity similarity;
+
+	public LuceneSyncWorkOrchestratorImpl(String name, Similarity similarity) {
 		super( name );
+		this.similarity = similarity;
 		start( null ); // Nothing to start, just force the superclass to go to the right state.
 	}
 
 	@Override
 	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 			Set<String> routingKeys, ReadWork<T> work) {
-		WorkExecution<T> workExecution = new WorkExecution<>( indexNames, indexManagerContexts, routingKeys, work );
+		WorkExecution<T> workExecution = new WorkExecution<>(
+				similarity, indexNames, indexManagerContexts, routingKeys, work
+		);
 		Throwable throwable = null;
 		try {
 			submit( workExecution );
@@ -86,22 +92,27 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	static class WorkExecution<T> implements AutoCloseable, ReadWorkExecutionContext {
+		private final Similarity similarity;
 		private final Set<String> indexNames;
 		private final HibernateSearchMultiReader indexReader;
 		private final ReadWork<T> work;
 
 		private T result;
 
-		WorkExecution(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+		WorkExecution(Similarity similarity, Set<String> indexNames,
+				Set<? extends ReadIndexManagerContext> indexManagerContexts,
 				Set<String> routingKeys, ReadWork<T> work) {
+			this.similarity = similarity;
 			this.indexNames = indexNames;
 			this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 			this.work = work;
 		}
 
 		@Override
-		public IndexReader getIndexReader() {
-			return indexReader;
+		public IndexSearcher createSearcher() {
+			IndexSearcher searcher = new IndexSearcher( indexReader );
+			searcher.setSimilarity( similarity );
+			return searcher;
 		}
 
 		@Override

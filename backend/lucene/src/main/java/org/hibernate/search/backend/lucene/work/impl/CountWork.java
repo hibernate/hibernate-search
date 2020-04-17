@@ -28,7 +28,7 @@ public class CountWork implements ReadWork<Integer> {
 	@Override
 	public Integer execute(ReadWorkExecutionContext context) {
 		try {
-			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
+			IndexSearcher indexSearcher = context.createSearcher();
 
 			return searcher.count( indexSearcher );
 		}

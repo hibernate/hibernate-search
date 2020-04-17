@@ -56,6 +56,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import org.apache.lucene.search.similarities.Similarity;
+
 public class IndexManagerBackendContext implements WorkExecutionBackendContext, SearchBackendContext {
 
 	private static final ConfigurationProperty<IOStrategyName> IO_STRATEGY =
@@ -68,6 +70,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	private final BackendThreads threads;
 	private final DirectoryProvider directoryProvider;
+	private final Similarity similarity;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
@@ -78,6 +81,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public IndexManagerBackendContext(EventContext eventContext,
 			BackendThreads threads,
 			DirectoryProvider directoryProvider,
+			Similarity similarity,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
@@ -87,6 +91,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		this.eventContext = eventContext;
 		this.threads = threads;
 		this.directoryProvider = directoryProvider;
+		this.similarity = similarity;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
@@ -203,7 +208,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
-				model.getScopedAnalyzer(), propertySource
+				similarity, model.getScopedAnalyzer(), propertySource
 		);
 
 		try {
