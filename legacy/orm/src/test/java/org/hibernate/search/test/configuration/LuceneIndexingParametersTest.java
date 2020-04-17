@@ -14,6 +14,7 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.hibernate.search.testsupport.serialization.SerializationTestHelper;
 import org.junit.Test;
@@ -67,6 +68,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testSpecificTypeParametersOverride() {
 		assertValueIsSet( Book.class, MAX_MERGE_DOCS, 12 );
 		assertValueIsSet( Book.class, MAX_BUFFERED_DOCS, 14 );
