@@ -192,7 +192,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)
 	 */
-	public static final String WRITER_MERGE_MAX_OPTIMIZE_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MAX_OPTIMIZE_SIZE;
+	public static final String WRITER_MERGE_MAX_OPTIMIZE_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MAX_FORCED_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)}.
@@ -307,7 +307,7 @@ public final class LuceneIndexSettings {
 		public static final String MERGE_FACTOR = "merge_factor";
 		public static final String MERGE_MIN_SIZE = "merge_min_size";
 		public static final String MERGE_MAX_SIZE = "merge_max_size";
-		public static final String MERGE_MAX_OPTIMIZE_SIZE = "merge_max_optimize_size";
+		public static final String MERGE_MAX_FORCED_SIZE = "merge_max_forced_size";
 		public static final String MERGE_CALIBRATE_BY_DELETES = "merge_calibrate_by_deletes";
 	}
 

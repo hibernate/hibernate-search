@@ -11,7 +11,7 @@ import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.Writer
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MAX_MERGE_DOCS;
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_CALIBRATE_BY_DELETES;
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_FACTOR;
-import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MAX_OPTIMIZE_SIZE;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MAX_FORCED_SIZE;
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MAX_SIZE;
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MIN_SIZE;
 import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.RAM_BUFFER_SIZE;
@@ -69,7 +69,7 @@ public final class IndexWriterSettings implements Serializable {
 		registerIntegerMergePolicySetting( MERGE_FACTOR, LogByteSizeMergePolicy::setMergeFactor );
 		registerIntegerMergePolicySetting( MERGE_MIN_SIZE, LogByteSizeMergePolicy::setMinMergeMB );
 		registerIntegerMergePolicySetting( MERGE_MAX_SIZE, LogByteSizeMergePolicy::setMaxMergeMB );
-		registerIntegerMergePolicySetting( MERGE_MAX_OPTIMIZE_SIZE, LogByteSizeMergePolicy::setMaxMergeMBForForcedMerge );
+		registerIntegerMergePolicySetting( MERGE_MAX_FORCED_SIZE, LogByteSizeMergePolicy::setMaxMergeMBForForcedMerge );
 		registerBooleanMergePolicySetting( MERGE_CALIBRATE_BY_DELETES, LogByteSizeMergePolicy::setCalibrateSizeByDeletes );
 	}
 
