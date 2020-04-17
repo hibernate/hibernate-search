@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
@@ -22,7 +23,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
-
+import org.apache.lucene.search.similarities.Similarity;
 
 
 public class LuceneAnalysisConfigurationContextImpl
@@ -31,6 +32,8 @@ public class LuceneAnalysisConfigurationContextImpl
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneAnalysisComponentFactory factory;
+
+	private Similarity similarity;
 
 	private final Map<String, LuceneAnalyzerBuilder> analyzers = new LinkedHashMap<>();
 
@@ -79,6 +82,11 @@ public class LuceneAnalysisConfigurationContextImpl
 	}
 
 	@Override
+	public void similarity(Similarity similarity) {
+		this.similarity = similarity;
+	}
+
+	@Override
 	public void contribute(LuceneAnalysisDefinitionCollector collector) {
 		for ( Map.Entry<String, LuceneAnalyzerBuilder> entry : analyzers.entrySet() ) {
 			collector.collectAnalyzer( entry.getKey(), entry.getValue().build( factory ) );
@@ -86,6 +94,11 @@ public class LuceneAnalysisConfigurationContextImpl
 		for ( Map.Entry<String, LuceneAnalyzerBuilder> entry : normalizers.entrySet() ) {
 			collector.collectNormalizer( entry.getKey(), entry.getValue().build( factory ) );
 		}
+	}
+
+	@Override
+	public Optional<Similarity> getSimilarity() {
+		return Optional.ofNullable( similarity );
 	}
 
 	private void addAnalyzer(String name, LuceneAnalyzerBuilder definition) {
