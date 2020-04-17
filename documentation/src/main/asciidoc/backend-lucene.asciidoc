@@ -488,6 +488,9 @@ to only return search hits for the current tenant.
 [[backend-lucene-analysis]]
 == Analysis
 
+[[backend-lucene-analysis-basics]]
+=== Basics
+
 <<concepts-analysis,Analysis>> is the text processing performed by analyzers,
 both when indexing (document processing)
 and when searching (query processing).
@@ -500,9 +503,16 @@ To configure analysis in a Lucene backend, you will need to:
 to a <<configuration-property-types,bean reference>> pointing to the implementation.
 
 Hibernate Search will call the `configure` method of this implementation on startup,
-and the configurer will be able to take advantage of a DSL to define analyzers:
+and the configurer will be able to take advantage of a DSL to define
+<<backend-lucene-analysis-analyzers,analyzers and normalizers>> or even (for more advanced use) the <<backend-lucene-analysis-similarity,similarity>>.
+See below for examples.
 
-.Implementing and using an analysis configurer with the Lucene backend
+[[backend-lucene-analysis-analyzers]]
+=== Analyzers and normalizers
+
+The context passed to the configurer exposes a DSL to define analyzers and normalizers:
+
+.Implementing and using an analysis configurer to define analyzers and normalizers with the Lucene backend
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -541,6 +551,42 @@ either browse the Lucene Javadoc or read the corresponding section on the
 link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).
+====
+
+[[backend-lucene-analysis-similarity]]
+=== Similarity
+
+When searching, scores are assigned to documents based on statistics recorded at index time, using a specific formula.
+Those statistics and the formula are defined by a single component called the similarity,
+implementing Lucene's `org.apache.lucene.search.similarities.Similarity` interface.
+
+By default, Hibernate Search uses `BM25Similarity` with its defaults parameters (`k1 = 1.2`, `b = 0.75`).
+This should provide satisfying scoring in most situations.
+
+If you have advanced needs, you can set a custom `Similarity` in your analysis configurer, as shown below.
+
+[NOTE]
+====
+Remember to also reference the analysis configurer from your configuration properties,
+as explained in <<backend-lucene-analysis-analyzers>>.
+====
+
+.Implementing an analysis configurer to change the Similarity with the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/CustomSimilarityLuceneAnalysisConfigurer.java[tags=include]
+----
+<1> Set the similarity to `ClassicSimilarity`.
+<2> Define analyzers and normalizers as usual.
+====
+
+[TIP]
+====
+For more information about `Similarity`, its various implementations, and the pros and cons of each implementation,
+see the javadoc of `Similarity` and Lucene's source code.
+
+You can also find useful resources on the web, for example in Elasticsearch's documentation.
 ====
 
 [[backend-lucene-threads]]
