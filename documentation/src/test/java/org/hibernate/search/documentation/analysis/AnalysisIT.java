@@ -163,6 +163,49 @@ public class AnalysisIT {
 	}
 
 	@Test
+	public void lucene_similarity() {
+		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+
+		EntityManagerFactory entityManagerFactory = setupHelper.start()
+				.withProperty(
+						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+						AutomaticIndexingSynchronizationStrategyNames.SYNC
+				)
+				.withBackendProperty(
+						BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
+						new CustomSimilarityLuceneAnalysisConfigurer()
+				)
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
+								.type( IndexedEntity.class )
+								.property( "text" )
+								.fullTextField( "standard" ).analyzer( "english" )
+				)
+				.setup( IndexedEntity.class );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setText( "the Wording" );
+			entityManager.persist( entity );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			assertThat(
+					searchSession.search( IndexedEntity.class )
+							.where( f -> f.match()
+									.field( "standard" )
+									.matching( "wording" )
+							)
+							.fetchHits( 20 )
+			)
+					.hasSize( 1 );
+		} );
+	}
+
+	@Test
 	public void elasticsearch_advanced() {
 		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
 
