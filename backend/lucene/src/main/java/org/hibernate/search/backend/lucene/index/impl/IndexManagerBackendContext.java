@@ -203,7 +203,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
-				model.getScopedAnalyzer(), propertySource.withMask( "writer" )
+				model.getScopedAnalyzer(), propertySource
 		);
 
 		try {
