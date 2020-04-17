@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 
@@ -26,32 +27,35 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
  */
 public class IndexWriterConfigSource {
 
-	// property path keywords
-	public static final String PROP_GROUP = "indexwriter";
+	public static IndexWriterConfigSource create(Analyzer analyzer, ConfigurationPropertySource propertySource) {
+		List<IndexWriterSettingValue<?>> values = IndexWriterSettings.extractAll( propertySource );
+		return new IndexWriterConfigSource( analyzer, values );
+	}
 
+	private final Analyzer analyzer;
 	private final List<IndexWriterSettingValue<?>> values;
 
-	public IndexWriterConfigSource(ConfigurationPropertySource propertySource) {
-		ConfigurationPropertySource indexingParameters = propertySource.withMask( PROP_GROUP );
-		values = IndexWriterSettings.extractAll( indexingParameters );
+	private IndexWriterConfigSource(Analyzer analyzer, List<IndexWriterSettingValue<?>> values) {
+		this.analyzer = analyzer;
+		this.values = values;
 	}
 
 	@Override
 	public String toString() {
-		return "IndexWriterConfigSource{" + values + '}';
+		return "IndexWriterConfigSource{" + analyzer + "," + values + '}';
 	}
 
 	/**
-	 * Applies the parameters represented by this to a writer.
+	 * Creates a new {@link IndexWriterConfig}.
 	 * Undefined parameters are not set, leaving the lucene default.
-	 *
-	 * @param writerConfig the IndexWriter configuration whereto the parameters will be applied.
 	 */
-	public void applyToWriter(IndexWriterConfig writerConfig) {
+	public IndexWriterConfig createIndexWriterConfig() {
+		IndexWriterConfig writerConfig = new IndexWriterConfig( analyzer );
 		for ( IndexWriterSettingValue<?> value : values ) {
 			value.applySetting( writerConfig );
 		}
 		writerConfig.setMergePolicy( createMergePolicy() );
+		return writerConfig;
 	}
 
 	private LogByteSizeMergePolicy createMergePolicy() {

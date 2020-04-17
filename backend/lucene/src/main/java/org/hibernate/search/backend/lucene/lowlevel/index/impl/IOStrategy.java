@@ -13,14 +13,13 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreat
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterConfigSource;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import org.apache.lucene.analysis.Analyzer;
 
 public abstract class IOStrategy {
 
@@ -36,7 +35,7 @@ public abstract class IOStrategy {
 	}
 
 	public IndexAccessorImpl createIndexAccessor(String indexName, EventContext eventContext,
-			Optional<String> shardId, Analyzer analyzer) {
+			Optional<String> shardId, IndexWriterConfigSource writerConfigSource) {
 		DirectoryHolder directoryHolder;
 		DirectoryCreationContext context = new DirectoryCreationContextImpl(
 				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
@@ -47,7 +46,7 @@ public abstract class IOStrategy {
 		IndexWriterProvider indexWriterProvider = null;
 		IndexReaderProvider indexReaderProvider = null;
 		try {
-			indexWriterProvider = createIndexWriterProvider( indexName, eventContext, analyzer, directoryHolder );
+			indexWriterProvider = createIndexWriterProvider( indexName, eventContext, directoryHolder, writerConfigSource );
 			indexReaderProvider = createIndexReaderProvider( directoryHolder, indexWriterProvider );
 			return new IndexAccessorImpl(
 					eventContext,
@@ -63,8 +62,8 @@ public abstract class IOStrategy {
 		}
 	}
 
-	abstract IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext, Analyzer analyzer,
-			DirectoryHolder directoryHolder);
+	abstract IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext,
+			DirectoryHolder directoryHolder, IndexWriterConfigSource configSource);
 
 	abstract IndexReaderProvider createIndexReaderProvider(DirectoryHolder directoryHolder,
 			IndexWriterProvider indexWriterProvider);
