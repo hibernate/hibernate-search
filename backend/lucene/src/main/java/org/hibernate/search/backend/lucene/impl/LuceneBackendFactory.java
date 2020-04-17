@@ -35,6 +35,7 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -76,31 +77,44 @@ public class LuceneBackendFactory implements BackendFactory {
 			ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 
-		BackendThreads backendThreads = new BackendThreads( "Backend " + name );
+		BackendThreads backendThreads = null;
+		BeanHolder<? extends DirectoryProvider> directoryProviderHolder = null;
+		BeanHolder<? extends Similarity> similarityHolder = null;
 
-		Version luceneVersion = getLuceneVersion( backendContext, propertySource );
+		try {
+			backendThreads = new BackendThreads( "Backend " + name );
 
-		BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
-				getDirectoryProvider( backendContext, buildContext, propertySource );
+			Version luceneVersion = getLuceneVersion( backendContext, propertySource );
 
-		BeanHolder<? extends Similarity> similarityHolder = getSimilarity( buildContext, propertySource );
+			directoryProviderHolder = getDirectoryProvider( backendContext, buildContext, propertySource );
 
-		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
+			similarityHolder = getSimilarity( buildContext, propertySource );
 
-		LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
-				buildContext, propertySource, luceneVersion
-		);
+			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
-		return new LuceneBackendImpl(
-				name,
-				backendThreads,
-				directoryProviderHolder, similarityHolder,
-				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
-				analysisDefinitionRegistry,
-				multiTenancyStrategy,
-				new DefaultTimingSource(),
-				buildContext.getFailureHandler()
-		);
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
+					buildContext, propertySource, luceneVersion
+			);
+
+			return new LuceneBackendImpl(
+					name,
+					backendThreads,
+					directoryProviderHolder, similarityHolder,
+					new LuceneWorkFactoryImpl( multiTenancyStrategy ),
+					analysisDefinitionRegistry,
+					multiTenancyStrategy,
+					new DefaultTimingSource(),
+					buildContext.getFailureHandler()
+			);
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( BeanHolder::close, similarityHolder )
+					.push( holder -> holder.get().close(), directoryProviderHolder )
+					.push( BeanHolder::close, directoryProviderHolder )
+					.push( BackendThreads::onStop, backendThreads );
+			throw e;
+		}
 	}
 
 	private Version getLuceneVersion(EventContext backendContext, ConfigurationPropertySource propertySource) {
