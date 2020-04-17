@@ -98,16 +98,16 @@ public class LuceneIndexWriterSettingsIT {
 	@PortedFromSearch5(original = "org.hibernate.search.test.configuration.LuceneIndexingParametersTest.testSpecificTypeParametersOverride")
 	public void custom() {
 		setup( properties -> {
-			properties.accept( LuceneIndexSettings.WRITER_MAX_BUFFERED_DOCS, "420" );
-			properties.accept( LuceneIndexSettings.WRITER_RAM_BUFFER_SIZE, "420" );
-			properties.accept( LuceneIndexSettings.WRITER_INFOSTREAM, "true" );
+			properties.accept( LuceneIndexSettings.IO_WRITER_MAX_BUFFERED_DOCS, "420" );
+			properties.accept( LuceneIndexSettings.IO_WRITER_RAM_BUFFER_SIZE, "420" );
+			properties.accept( LuceneIndexSettings.IO_WRITER_INFOSTREAM, "true" );
 
-			properties.accept( LuceneIndexSettings.MERGE_MAX_DOCS, "42000" );
-			properties.accept( LuceneIndexSettings.MERGE_FACTOR, "42" );
-			properties.accept( LuceneIndexSettings.MERGE_MIN_SIZE, "42" );
-			properties.accept( LuceneIndexSettings.MERGE_MAX_SIZE, "420" );
-			properties.accept( LuceneIndexSettings.MERGE_MAX_FORCED_SIZE, "42000" );
-			properties.accept( LuceneIndexSettings.MERGE_CALIBRATE_BY_DELETES, "false" );
+			properties.accept( LuceneIndexSettings.IO_MERGE_MAX_DOCS, "42000" );
+			properties.accept( LuceneIndexSettings.IO_MERGE_FACTOR, "42" );
+			properties.accept( LuceneIndexSettings.IO_MERGE_MIN_SIZE, "42" );
+			properties.accept( LuceneIndexSettings.IO_MERGE_MAX_SIZE, "420" );
+			properties.accept( LuceneIndexSettings.IO_MERGE_MAX_FORCED_SIZE, "42000" );
+			properties.accept( LuceneIndexSettings.IO_MERGE_CALIBRATE_BY_DELETES, "false" );
 		} );
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );

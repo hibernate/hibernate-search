@@ -94,7 +94,7 @@ public final class LuceneIndexSettings {
 	/**
 	 * The prefix for property keys related to the index writer.
 	 */
-	public static final String WRITER_PREFIX = "writer.";
+	public static final String IO_WRITER_PREFIX = IO_PREFIX + "writer.";
 
 	/**
 	 * The value to pass to {@link IndexWriterConfig#setMaxBufferedDocs(int)}.
@@ -106,7 +106,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see IndexWriterConfig#setMaxBufferedDocs(int)
 	 */
-	public static final String WRITER_MAX_BUFFERED_DOCS = WRITER_PREFIX + WriterRadicals.MAX_BUFFERED_DOCS;
+	public static final String IO_WRITER_MAX_BUFFERED_DOCS = IO_WRITER_PREFIX + WriterRadicals.MAX_BUFFERED_DOCS;
 
 	/**
 	 * The value to pass to {@link IndexWriterConfig#setRAMBufferSizeMB(double)}.
@@ -118,7 +118,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see IndexWriterConfig#setRAMBufferSizeMB(double)
 	 */
-	public static final String WRITER_RAM_BUFFER_SIZE = WRITER_PREFIX + WriterRadicals.RAM_BUFFER_SIZE;
+	public static final String IO_WRITER_RAM_BUFFER_SIZE = IO_WRITER_PREFIX + WriterRadicals.RAM_BUFFER_SIZE;
 
 	/**
 	 * Whether to log the {@link IndexWriterConfig#setInfoStream(InfoStream)} (at the trace level) or not.
@@ -132,12 +132,12 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see IndexWriterConfig#setInfoStream(InfoStream)
 	 */
-	public static final String WRITER_INFOSTREAM = WRITER_PREFIX + WriterRadicals.INFOSTREAM;
+	public static final String IO_WRITER_INFOSTREAM = IO_WRITER_PREFIX + WriterRadicals.INFOSTREAM;
 
 	/**
 	 * The prefix for property keys related to merge.
 	 */
-	public static final String MERGE_PREFIX = "merge.";
+	public static final String IO_MERGE_PREFIX = IO_PREFIX + "merge.";
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeDocs(int)}.
@@ -149,7 +149,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeDocs(int)
 	 */
-	public static final String MERGE_MAX_DOCS = MERGE_PREFIX + MergeRadicals.MAX_DOCS;
+	public static final String IO_MERGE_MAX_DOCS = IO_MERGE_PREFIX + MergeRadicals.MAX_DOCS;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMergeFactor(int)}.
@@ -161,7 +161,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMergeFactor(int)
 	 */
-	public static final String MERGE_FACTOR = MERGE_PREFIX + MergeRadicals.FACTOR;
+	public static final String IO_MERGE_FACTOR = IO_MERGE_PREFIX + MergeRadicals.FACTOR;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMinMergeMB(double)}.
@@ -173,7 +173,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMinMergeMB(double)
 	 */
-	public static final String MERGE_MIN_SIZE = MERGE_PREFIX + MergeRadicals.MIN_SIZE;
+	public static final String IO_MERGE_MIN_SIZE = IO_MERGE_PREFIX + MergeRadicals.MIN_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeMB(double)}.
@@ -185,7 +185,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeMB(double)
 	 */
-	public static final String MERGE_MAX_SIZE = MERGE_PREFIX + MergeRadicals.MAX_SIZE;
+	public static final String IO_MERGE_MAX_SIZE = IO_MERGE_PREFIX + MergeRadicals.MAX_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)}.
@@ -197,7 +197,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)
 	 */
-	public static final String MERGE_MAX_FORCED_SIZE = MERGE_PREFIX + MergeRadicals.MAX_FORCED_SIZE;
+	public static final String IO_MERGE_MAX_FORCED_SIZE = IO_MERGE_PREFIX + MergeRadicals.MAX_FORCED_SIZE;
 
 	/**
 	 * The value to pass to {@link LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)}.
@@ -209,7 +209,7 @@ public final class LuceneIndexSettings {
 	 *
 	 * @see LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)
 	 */
-	public static final String MERGE_CALIBRATE_BY_DELETES = MERGE_PREFIX + MergeRadicals.CALIBRATE_BY_DELETES;
+	public static final String IO_MERGE_CALIBRATE_BY_DELETES = IO_MERGE_PREFIX + MergeRadicals.CALIBRATE_BY_DELETES;
 
 	/**
 	 * The prefix for sharding-related property keys.
@@ -297,7 +297,7 @@ public final class LuceneIndexSettings {
 	}
 
 	/**
-	 * Configuration property keys for index writer options, without the {@link #WRITER_PREFIX prefix}.
+	 * Configuration property keys for index writer options, without the {@link #IO_WRITER_PREFIX prefix}.
 	 */
 	public static final class WriterRadicals {
 
@@ -311,7 +311,7 @@ public final class LuceneIndexSettings {
 	}
 
 	/**
-	 * Configuration property keys for merge options, without the {@link #MERGE_PREFIX prefix}.
+	 * Configuration property keys for merge options, without the {@link #IO_MERGE_PREFIX prefix}.
 	 */
 	public static final class MergeRadicals {
 
