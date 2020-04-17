@@ -14,6 +14,15 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 // TODO This extends StubMappingIndexManager for backward compatibility; ideally we'll move everything to this class, eventually.
 public abstract class StubMappedIndex extends StubMappingIndexManager {
 
+	public static StubMappedIndex withoutFields(String indexName) {
+		return new StubMappedIndex( indexName ) {
+			@Override
+			protected void bind(IndexedEntityBindingContext context) {
+				// Nothing to do.
+			}
+		};
+	}
+
 	private final String indexName;
 	private MappedIndexManager manager;
 

@@ -133,6 +133,10 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		return DirectoryReader.openIfChanged( oldReader, delegate );
 	}
 
+	public IndexWriter getDelegateForTests() {
+		return delegate;
+	}
+
 	void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( SingletonTask::stop, delayedCommitTask );

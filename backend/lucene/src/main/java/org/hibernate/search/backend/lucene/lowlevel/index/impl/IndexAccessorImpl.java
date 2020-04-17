@@ -183,6 +183,10 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 		return directoryHolder.get();
 	}
 
+	public IndexWriter getWriterForTests() throws IOException {
+		return indexWriterProvider.getOrCreate().getDelegateForTests();
+	}
+
 	private void initializeDirectory(Directory directory) throws IOException {
 		try {
 			IndexWriterConfig iwriterConfig = new IndexWriterConfig( AnalyzerConstants.KEYWORD_ANALYZER )
