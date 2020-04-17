@@ -44,7 +44,8 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 	private final IOStrategy ioStrategy;
 	private final LuceneIndexModel model;
 	private final IndexManagerStartContext startContext;
-	private final ConfigurationPropertySource propertySource;
+	private final ConfigurationPropertySource indexPropertySource;
+	private final ConfigurationPropertySource shardingPropertySource;
 
 	private Set<String> shardIdentifiers = new LinkedHashSet<>();
 
@@ -52,12 +53,13 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 			IndexManagerBackendContext backendContext,
 			IOStrategy ioStrategy, LuceneIndexModel model,
 			IndexManagerStartContext startContext,
-			ConfigurationPropertySource propertySource) {
+			ConfigurationPropertySource indexPropertySource) {
 		this.backendContext = backendContext;
 		this.ioStrategy = ioStrategy;
 		this.model = model;
 		this.startContext = startContext;
-		this.propertySource = propertySource;
+		this.indexPropertySource = indexPropertySource;
+		this.shardingPropertySource = indexPropertySource.withMask( "sharding" );
 	}
 
 	@Override
@@ -83,12 +85,12 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	@Override
 	public ConfigurationPropertySource getConfigurationPropertySource() {
-		return propertySource;
+		return shardingPropertySource;
 	}
 
 	public BeanHolder<? extends ShardingStrategy> create(Map<String, Shard> shardCollector) {
 		BeanHolder<? extends ShardingStrategy> shardingStrategyHolder =
-				SHARDING_STRATEGY.getAndTransform( propertySource, getBeanResolver()::resolve );
+				SHARDING_STRATEGY.getAndTransform( shardingPropertySource, getBeanResolver()::resolve );
 
 		shardingStrategyHolder.get().initialize( this );
 
@@ -114,7 +116,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId) {
 		try {
 			Shard shard = backendContext.createShard(
-					ioStrategy, model, shardId
+					ioStrategy, model, shardId, indexPropertySource
 			);
 			shardCollector.put( shardId.orElse( null ), shard );
 		}

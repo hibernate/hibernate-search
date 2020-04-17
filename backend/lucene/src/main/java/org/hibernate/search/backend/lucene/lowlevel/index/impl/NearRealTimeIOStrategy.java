@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolde
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.NearRealTimeIndexReaderProvider;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterConfigSource;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
@@ -18,8 +19,6 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import org.apache.lucene.analysis.Analyzer;
 
 public class NearRealTimeIOStrategy extends IOStrategy {
 
@@ -61,14 +60,14 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 	}
 
 	@Override
-	IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext, Analyzer analyzer,
-			DirectoryHolder directoryHolder) {
+	IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext,
+			DirectoryHolder directoryHolder, IndexWriterConfigSource configSource) {
 		if ( commitInterval != 0 ) {
 			timingSource.ensureInitialized();
 		}
 		return new IndexWriterProvider(
 				indexName, eventContext,
-				directoryHolder, analyzer,
+				directoryHolder, configSource,
 				timingSource, commitInterval, threads,
 				failureHandler
 		);

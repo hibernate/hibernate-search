@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.DebugIOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.NearRealTimeIOStrategy;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterConfigSource;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestratorImpl;
@@ -194,17 +195,21 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneIndexSchemaManager( workFactory, context );
 	}
 
-	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {
+	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId,
+			ConfigurationPropertySource propertySource) {
 		LuceneParallelWorkOrchestratorImpl managementOrchestrator;
 		LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
+		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
+				model.getScopedAnalyzer(), propertySource.withMask( "writer" )
+		);
 
 		try {
 			indexAccessor = ioStrategy.createIndexAccessor(
 					indexName, shardEventContext,
-					shardId, model.getScopedAnalyzer()
+					shardId, writerConfigSource
 			);
 			managementOrchestrator = createIndexManagementOrchestrator( shardEventContext, indexAccessor );
 			indexingOrchestrator = createIndexingOrchestrator( shardEventContext, indexAccessor );

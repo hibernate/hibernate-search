@@ -19,7 +19,6 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -35,16 +34,14 @@ public class IndexWriterProvider {
 	private final String indexName;
 	private final EventContext eventContext;
 	private final DirectoryHolder directoryHolder;
-	private final Analyzer analyzer;
+	private final IndexWriterConfigSource configSource;
 	private final TimingSource timingSource;
 	private final int commitInterval;
 	private BackendThreads threads;
 	private final FailureHandler failureHandler;
 
-	/* TODO HSEARCH-3776 re-allow configuring index writers
+	/* TODO HSEARCH-3777 re-allow configuring similarity
 	private final Similarity similarity;
-	private final LuceneIndexingParameters luceneParameters;
-	private final ParameterSet indexParameters;
 	 */
 
 	/**
@@ -58,21 +55,19 @@ public class IndexWriterProvider {
 	private final ReentrantLock currentWriterModificationLock = new ReentrantLock();
 
 	public IndexWriterProvider(String indexName, EventContext eventContext,
-			DirectoryHolder directoryHolder, Analyzer analyzer,
+			DirectoryHolder directoryHolder, IndexWriterConfigSource configSource,
 			TimingSource timingSource, int commitInterval,
 			BackendThreads threads,
 			FailureHandler failureHandler) {
 		this.indexName = indexName;
 		this.eventContext = eventContext;
 		this.directoryHolder = directoryHolder;
-		this.analyzer = analyzer;
+		this.configSource = configSource;
 		this.timingSource = timingSource;
 		this.commitInterval = commitInterval;
 		this.threads = threads;
 		this.failureHandler = failureHandler;
-		/* TODO HSEARCH-3776 re-allow configuring index writers
-		this.luceneParameters = indexManager.getIndexingParameters();
-		this.indexParameters = luceneParameters.getIndexParameters();
+		/* TODO HSEARCH-3777 re-allow configuring similarity
 		this.similarity = indexManager.getSimilarity();
 		 */
 	}
@@ -152,14 +147,11 @@ public class IndexWriterProvider {
 	}
 
 	private IndexWriterConfig createWriterConfig() {
-		IndexWriterConfig writerConfig = new IndexWriterConfig( analyzer );
-		/* TODO HSEARCH-3776 re-allow configuring index writers
-		luceneParameters.applyToWriter( writerConfig );
+		IndexWriterConfig writerConfig = configSource.createIndexWriterConfig();
+		/* TODO HSEARCH-3777 re-allow configuring similarity
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
-		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO HSEARCH-3776 make it possible to configure a different policy?
-		writerConfig.setMergePolicy( newMergePolicy );
 		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
 				indexName, eventContext.render(),

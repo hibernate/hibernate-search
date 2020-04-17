@@ -62,7 +62,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 							ioStrategy,
 							model,
 							startContext,
-							propertySource.withMask( "sharding" )
+							propertySource
 					);
 			this.shardingStrategyHolder = initializationContext.create( shards );
 
