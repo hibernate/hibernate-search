@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.analysis;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 
+import org.apache.lucene.search.similarities.Similarity;
+
 /**
  * A context allowing the definition of named analyzers and normalizers in a Lucene backend.
  */
@@ -29,5 +31,14 @@ public interface LuceneAnalysisConfigurationContext {
 	 * @return The initial step of a DSL where the normalizer can be defined.
 	 */
 	LuceneNormalizerTypeStep normalizer(String name);
+
+	/**
+	 * Set the {@link Similarity}.
+	 * <p>
+	 * Defaults to {@link org.apache.lucene.search.similarities.BM25Similarity}.
+	 *
+	 * @param similarity The {@link Similarity} to use when indexing and when searching.
+	 */
+	void similarity(Similarity similarity);
 
 }

@@ -15,6 +15,8 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * A registry of analysis-related definitions for Lucene.
@@ -24,17 +26,21 @@ public final class LuceneAnalysisDefinitionRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final Similarity similarity;
+
 	private final Map<String, Analyzer> analyzerDefinitions;
 
 	private final Map<String, Analyzer> normalizerDefinitions;
 
 	public LuceneAnalysisDefinitionRegistry() {
 		// Nothing to do: we're creating an empty registry
+		similarity = createDefaultSimilarity();
 		analyzerDefinitions = Collections.emptyMap();
 		normalizerDefinitions = Collections.emptyMap();
 	}
 
 	public LuceneAnalysisDefinitionRegistry(LuceneAnalysisDefinitionContributor contributor) {
+		similarity = contributor.getSimilarity().orElseGet( LuceneAnalysisDefinitionRegistry::createDefaultSimilarity );
 		analyzerDefinitions = new TreeMap<>();
 		normalizerDefinitions = new TreeMap<>();
 		contributor.contribute( new LuceneAnalysisDefinitionCollector() {
@@ -56,6 +62,10 @@ public final class LuceneAnalysisDefinitionRegistry {
 		} );
 	}
 
+	public Similarity getSimilarity() {
+		return similarity;
+	}
+
 	/**
 	 * @param name An analyzer name
 	 * @return The analyzer definition associated with the given name,
@@ -74,4 +84,7 @@ public final class LuceneAnalysisDefinitionRegistry {
 		return normalizerDefinitions.get( name );
 	}
 
+	private static Similarity createDefaultSimilarity() {
+		return new BM25Similarity();
+	}
 }
