@@ -291,7 +291,7 @@ This is generally not useful as indexes are refreshed automatically.
 See <<concepts-commit-refresh>> for more information.
 `refreshAsync()`::
 Asynchronous version of `refresh()` returning a `CompletableFuture`.
-`mergeSegments()`::
+[[mapper-orm-indexing-manual-merge]]`mergeSegments()`::
 Merge each index targeted by this workspace into a single segment.
 This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
 `mergeSegmentsAsync()`::
