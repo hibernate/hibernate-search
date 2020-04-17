@@ -6,6 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.INFOSTREAM;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MAX_BUFFERED_DOCS;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MAX_MERGE_DOCS;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_CALIBRATE_BY_DELETES;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_FACTOR;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MAX_OPTIMIZE_SIZE;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MAX_SIZE;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.MERGE_MIN_SIZE;
+import static org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings.WriterRadicals.RAM_BUFFER_SIZE;
+
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -49,18 +59,18 @@ public final class IndexWriterSettings implements Serializable {
 	private static final List<Extractor<?, ?>> EXTRACTORS = new ArrayList<>();
 
 	static {
-		registerIntegerWriterSetting( "max_buffered_docs", IndexWriterConfig::setMaxBufferedDocs );
-		registerIntegerWriterSetting( "ram_buffer_size", IndexWriterConfig::setRAMBufferSizeMB );
+		registerIntegerWriterSetting( MAX_BUFFERED_DOCS, IndexWriterConfig::setMaxBufferedDocs );
+		registerIntegerWriterSetting( RAM_BUFFER_SIZE, IndexWriterConfig::setRAMBufferSizeMB );
 
-		registerSetting( Extractor.fromBoolean( "infostream", enabled -> enabled ? new LoggerInfoStream() : null,
+		registerSetting( Extractor.fromBoolean( INFOSTREAM, enabled -> enabled ? new LoggerInfoStream() : null,
 				IndexWriterConfig::setInfoStream, (logByteSizeMergePolicy, integer) -> { } ) );
 
-		registerIntegerMergePolicySetting( "max_merge_docs", LogByteSizeMergePolicy::setMaxMergeDocs );
-		registerIntegerMergePolicySetting( "merge_factor", LogByteSizeMergePolicy::setMergeFactor );
-		registerIntegerMergePolicySetting( "merge_min_size", LogByteSizeMergePolicy::setMinMergeMB );
-		registerIntegerMergePolicySetting( "merge_max_size", LogByteSizeMergePolicy::setMaxMergeMB );
-		registerIntegerMergePolicySetting( "merge_max_optimize_size", LogByteSizeMergePolicy::setMaxMergeMBForForcedMerge );
-		registerBooleanMergePolicySetting( "merge_calibrate_by_deletes", LogByteSizeMergePolicy::setCalibrateSizeByDeletes );
+		registerIntegerMergePolicySetting( MAX_MERGE_DOCS, LogByteSizeMergePolicy::setMaxMergeDocs );
+		registerIntegerMergePolicySetting( MERGE_FACTOR, LogByteSizeMergePolicy::setMergeFactor );
+		registerIntegerMergePolicySetting( MERGE_MIN_SIZE, LogByteSizeMergePolicy::setMinMergeMB );
+		registerIntegerMergePolicySetting( MERGE_MAX_SIZE, LogByteSizeMergePolicy::setMaxMergeMB );
+		registerIntegerMergePolicySetting( MERGE_MAX_OPTIMIZE_SIZE, LogByteSizeMergePolicy::setMaxMergeMBForForcedMerge );
+		registerBooleanMergePolicySetting( MERGE_CALIBRATE_BY_DELETES, LogByteSizeMergePolicy::setCalibrateSizeByDeletes );
 	}
 
 	private static void registerIntegerWriterSetting(String propertyKey,

@@ -6,7 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.cfg;
 
+import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
+
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.LogByteSizeMergePolicy;
+import org.apache.lucene.util.InfoStream;
 
 /**
  * Configuration properties for Lucene indexes.
@@ -85,6 +90,121 @@ public final class LuceneIndexSettings {
 	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_REFRESH_INTERVAL}.
 	 */
 	public static final String IO_REFRESH_INTERVAL = IO_PREFIX + IORadicals.REFRESH_INTERVAL;
+
+	/**
+	 * The prefix for property keys related to the index writer.
+	 */
+	public static final String WRITER_PREFIX = "writer.";
+
+	/**
+	 * The value to pass to {@link IndexWriterConfig#setMaxBufferedDocs(int)}.
+	 * <p>
+	 * Expects a positive Integer value,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see IndexWriterConfig#setMaxBufferedDocs(int)
+	 */
+	public static final String WRITER_MAX_BUFFERED_DOCS = WRITER_PREFIX + WriterRadicals.MAX_BUFFERED_DOCS;
+
+	/**
+	 * The value to pass to {@link IndexWriterConfig#setRAMBufferSizeMB(double)}.
+	 * <p>
+	 * Expects a positive Integer value in megabytes,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see IndexWriterConfig#setRAMBufferSizeMB(double)
+	 */
+	public static final String WRITER_RAM_BUFFER_SIZE = WRITER_PREFIX + WriterRadicals.RAM_BUFFER_SIZE;
+
+	/**
+	 * Whether to log the {@link IndexWriterConfig#setInfoStream(InfoStream)} (at the trace level) or not.
+	 * <p>
+	 * Logs are appended to the logger {@value LuceneLogCategories#INFOSTREAM_LOGGER_CATEGORY_NAME}.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a String that can be parsed into such Boolean value.
+	 * <p>
+	 * Default is {@code false}.
+	 *
+	 * @see IndexWriterConfig#setInfoStream(InfoStream)
+	 */
+	public static final String WRITER_INFOSTREAM = WRITER_PREFIX + WriterRadicals.INFOSTREAM;
+
+	/**
+	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeDocs(int)}.
+	 * <p>
+	 * Expects a positive Integer value,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see LogByteSizeMergePolicy#setMaxMergeDocs(int)
+	 */
+	public static final String WRITER_MAX_MERGE_DOCS = WRITER_PREFIX + WriterRadicals.MAX_MERGE_DOCS;
+
+	/**
+	 * The value to pass to {@link LogByteSizeMergePolicy#setMergeFactor(int)}.
+	 * <p>
+	 * Expects a positive Integer value,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see LogByteSizeMergePolicy#setMergeFactor(int)
+	 */
+	public static final String WRITER_MERGE_FACTOR = WRITER_PREFIX + WriterRadicals.MERGE_FACTOR;
+
+	/**
+	 * The value to pass to {@link LogByteSizeMergePolicy#setMinMergeMB(double)}.
+	 * <p>
+	 * Expects a positive Integer value in megabytes,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see LogByteSizeMergePolicy#setMinMergeMB(double)
+	 */
+	public static final String WRITER_MERGE_MIN_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MIN_SIZE;
+
+	/**
+	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeMB(double)}.
+	 * <p>
+	 * Expects a positive Integer value in megabytes,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see LogByteSizeMergePolicy#setMaxMergeMB(double)
+	 */
+	public static final String WRITER_MERGE_MAX_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MAX_SIZE;
+
+	/**
+	 * The value to pass to {@link LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)}.
+	 * <p>
+	 * Expects a positive Integer value in megabytes,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)
+	 */
+	public static final String WRITER_MERGE_MAX_OPTIMIZE_SIZE = WRITER_PREFIX + WriterRadicals.MERGE_MAX_OPTIMIZE_SIZE;
+
+	/**
+	 * The value to pass to {@link LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)}.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a String that can be parsed into such Boolean value.
+	 * <p>
+	 * The default for this setting is defined by Lucene.
+	 *
+	 * @see LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)
+	 */
+	public static final String WRITER_MERGE_CALIBRATE_BY_DELETES = WRITER_PREFIX + WriterRadicals.MERGE_CALIBRATE_BY_DELETES;
 
 	/**
 	 * The prefix for sharding-related property keys.
@@ -169,6 +289,26 @@ public final class LuceneIndexSettings {
 		public static final String STRATEGY = "strategy";
 		public static final String COMMIT_INTERVAL = "commit_interval";
 		public static final String REFRESH_INTERVAL = "refresh_interval";
+	}
+
+	/**
+	 * Configuration property keys for index writer options, without the {@link #WRITER_PREFIX prefix}.
+	 */
+	public static final class WriterRadicals {
+
+		private WriterRadicals() {
+		}
+
+		public static final String MAX_BUFFERED_DOCS = "max_buffered_docs";
+		public static final String RAM_BUFFER_SIZE = "ram_buffer_size";
+		public static final String INFOSTREAM = "infostream";
+
+		public static final String MAX_MERGE_DOCS = "max_merge_docs";
+		public static final String MERGE_FACTOR = "merge_factor";
+		public static final String MERGE_MIN_SIZE = "merge_min_size";
+		public static final String MERGE_MAX_SIZE = "merge_max_size";
+		public static final String MERGE_MAX_OPTIMIZE_SIZE = "merge_max_optimize_size";
+		public static final String MERGE_CALIBRATE_BY_DELETES = "merge_calibrate_by_deletes";
 	}
 
 	/**
