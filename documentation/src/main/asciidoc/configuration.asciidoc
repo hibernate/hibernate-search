@@ -549,7 +549,7 @@ and will then be asked to produce `BackendQueueProcessor` instances as needed.
             messages.
 |hibernate.search.<indexName>.worker.jms.login|Optional for the JMS slaves. Use it when your queue
             requires login credentials to define your login.
-|hibernate.search.<indexName>.worker.jms.login|Optional for the JMS slaves. Use it when your queue
+|hibernate.search.<indexName>.worker.jms.password|Optional for the JMS slaves. Use it when your queue
             requires login credentials to define your password.
 
 |===============
