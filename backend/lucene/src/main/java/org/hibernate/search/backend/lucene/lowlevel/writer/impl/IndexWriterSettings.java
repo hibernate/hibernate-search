@@ -28,6 +28,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -45,10 +46,11 @@ public final class IndexWriterSettings implements Serializable {
 	private IndexWriterSettings() {
 	}
 
-	public static List<IndexWriterSettingValue<?>> extractAll(ConfigurationPropertySource propertySource) {
+	public static List<IndexWriterSettingValue<?>> extractAll(ConfigurationPropertySource propertySource,
+			EventContext eventContext) {
 		List<IndexWriterSettingValue<?>> result = new ArrayList<>();
 		for ( Extractor<?, ?> extractor : EXTRACTORS ) {
-			IndexWriterSettingValue<?> extracted = extractor.extractOrNull( propertySource );
+			IndexWriterSettingValue<?> extracted = extractor.extractOrNull( propertySource, eventContext );
 			if ( extracted != null ) {
 				result.add( extracted );
 			}
@@ -131,17 +133,17 @@ public final class IndexWriterSettings implements Serializable {
 			this.mergePolicySettingApplier = mergePolicySettingApplier;
 		}
 
-		IndexWriterSettingValue<R> extractOrNull(ConfigurationPropertySource source) {
-			return property.getAndMap( source, this::createValueOrNull ).orElse( null );
+		IndexWriterSettingValue<R> extractOrNull(ConfigurationPropertySource source, EventContext eventContext) {
+			return property.getAndMap( source, rawValue -> createValueOrNull( rawValue, eventContext ) ).orElse( null );
 		}
 
-		private IndexWriterSettingValue<R> createValueOrNull(T value) {
+		private IndexWriterSettingValue<R> createValueOrNull(T value, EventContext eventContext) {
 			if ( value == null ) {
 				return null;
 			}
 			if ( log.isDebugEnabled() ) {
-				//TODO add DirectoryProvider name when available to log message
-				log.debugf( "Set index writer parameter %s to value : %s", settingName, value );
+				log.debugf( "Set index writer parameter %s to value : %s. %s",
+						settingName, value, eventContext.renderWithPrefix() );
 			}
 			R processedValue = processor.apply( value );
 			return new IndexWriterSettingValue<>( settingName, processedValue,
