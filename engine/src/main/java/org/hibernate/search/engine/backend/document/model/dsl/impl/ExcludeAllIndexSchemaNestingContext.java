@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.impl;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-
 
 class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 
@@ -19,16 +15,14 @@ class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
-			Function<String, T> nestedElementFactoryIfExcluded) {
-		return nestedElementFactoryIfExcluded.apply( relativeFieldName );
+	public <T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded) {
+		return factoryIfExcluded.create( relativeName );
 	}
 
 	@Override
-	public <T> T nest(String relativeFieldName,
-			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
-			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
-		return nestedElementFactoryIfExcluded.apply( relativeFieldName, INSTANCE );
+	public <T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded,
+			CompositeFactory<T> factoryIfExcluded) {
+		return factoryIfExcluded.create( relativeName, INSTANCE );
 	}
 
 }

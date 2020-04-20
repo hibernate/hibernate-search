@@ -82,16 +82,18 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		IndexSchemaObjectField objectField = nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
-				(prefixedName, filter) -> {
+				(prefixedName, nestedNestingContext) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.addObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
+					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder,
+							nestedNestingContext, false );
 				},
 				// If the field is filtered out
-				(prefixedName, filter) -> {
+				(prefixedName, nestedNestingContext) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
+					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder,
+							nestedNestingContext, false );
 				}
 		);
 		if ( directChildrenAreMultiValuedByDefault ) {

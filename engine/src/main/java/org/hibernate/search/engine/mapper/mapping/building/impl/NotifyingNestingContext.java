@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 
@@ -22,32 +19,30 @@ class NotifyingNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
-			Function<String, T> nestedElementFactoryIfExcluded) {
+	public <T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded) {
 		return delegate.nest(
-				relativeFieldName,
+				relativeName,
 				prefixedName -> {
 					listener.onSchemaContributed();
-					return nestedElementFactoryIfIncluded.apply( prefixedName );
+					return factoryIfIncluded.create( prefixedName );
 				},
-				nestedElementFactoryIfExcluded
+				factoryIfExcluded
 		);
 	}
 
 	@Override
-	public <T> T nest(String relativeFieldName,
-			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
-			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
+	public <T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded,
+			CompositeFactory<T> factoryIfExcluded) {
 		return delegate.nest(
-				relativeFieldName,
-				(prefixedName, nestingContext) -> {
+				relativeName,
+				(prefixedName, nestedNestingContext) -> {
 					listener.onSchemaContributed();
-					return nestedElementFactoryIfIncluded.apply(
+					return factoryIfIncluded.create(
 							prefixedName,
-							new NotifyingNestingContext( nestingContext, listener )
+							new NotifyingNestingContext( nestedNestingContext, listener )
 					);
 				},
-				nestedElementFactoryIfExcluded
+				factoryIfExcluded
 		);
 	}
 }
