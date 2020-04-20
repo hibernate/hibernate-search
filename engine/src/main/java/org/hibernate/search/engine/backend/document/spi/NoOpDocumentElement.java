@@ -36,4 +36,20 @@ public class NoOpDocumentElement implements DocumentElement {
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		// No-op
 	}
+
+	@Override
+	public void addValue(String relativeFieldName, Object value) {
+		// No-op
+	}
+
+	@Override
+	public DocumentElement addObject(String relativeFieldName) {
+		// No-op; just return a no-op child
+		return INSTANCE;
+	}
+
+	@Override
+	public void addNullObject(String relativeFieldName) {
+		// No-op
+	}
 }

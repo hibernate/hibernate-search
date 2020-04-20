@@ -88,6 +88,21 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		elasticsearchFieldReference.addTo( content, null );
 	}
 
+	@Override
+	public void addValue(String relativeFieldName, Object value) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public DocumentElement addObject(String relativeFieldName) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public void addNullObject(String relativeFieldName) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
 	public JsonObject build() {
 		return content;
 	}

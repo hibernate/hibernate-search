@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -97,6 +98,22 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 			objectField.multiValued();
 		}
 		return objectField;
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> fieldTemplate(String templateName, IndexFieldType<?> type) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> fieldTemplate(String templateName,
+			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<?>> typeContributor) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectFieldStorage storage) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	private void checkRelativeFieldName(String relativeFieldName) {

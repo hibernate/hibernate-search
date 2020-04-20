@@ -96,6 +96,21 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		// We do not add any value for null objects
 	}
 
+	@Override
+	public void addValue(String relativeFieldName, Object value) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public DocumentElement addObject(String relativeFieldName) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public void addNullObject(String relativeFieldName) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
 	abstract void checkNoValueYetForSingleValued(String absoluteFieldPath);
 
 	private void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {

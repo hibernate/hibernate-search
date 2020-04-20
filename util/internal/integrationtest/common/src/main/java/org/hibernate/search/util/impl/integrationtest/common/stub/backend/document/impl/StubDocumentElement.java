@@ -37,7 +37,7 @@ public class StubDocumentElement implements DocumentElement {
 			);
 			return;
 		}
-		builder.field( stubFieldReference.getRelativeFieldName(), value );
+		addValue( stubFieldReference.getRelativeFieldName(), value );
 	}
 
 	@Override
@@ -51,9 +51,7 @@ public class StubDocumentElement implements DocumentElement {
 			);
 			return NoOpDocumentElement.get();
 		}
-		StubDocumentNode.Builder childBuilder = StubDocumentNode.object( builder, stubFieldReference.getRelativeFieldName() );
-		builder.child( childBuilder );
-		return new StubDocumentElement( childBuilder );
+		return addObject( stubFieldReference.getRelativeFieldName() );
 	}
 
 	@Override
@@ -66,7 +64,24 @@ public class StubDocumentElement implements DocumentElement {
 					this, stubFieldReference.getAbsolutePath()
 			);
 		}
-		builder.missingObjectField( stubFieldReference.getRelativeFieldName() );
+		addNullObject( stubFieldReference.getRelativeFieldName() );
+	}
+
+	@Override
+	public void addValue(String relativeFieldName, Object value) {
+		builder.field( relativeFieldName, value );
+	}
+
+	@Override
+	public DocumentElement addObject(String relativeFieldName) {
+		StubDocumentNode.Builder childBuilder = StubDocumentNode.object( builder, relativeFieldName );
+		builder.child( childBuilder );
+		return new StubDocumentElement( childBuilder );
+	}
+
+	@Override
+	public void addNullObject(String relativeFieldName) {
+		builder.missingObjectField( relativeFieldName );
 	}
 
 }
