@@ -64,7 +64,8 @@ public final class IndexWriterSettings implements Serializable {
 		registerIntegerWriterSetting( IO_WRITER_MAX_BUFFERED_DOCS, IndexWriterConfig::setMaxBufferedDocs );
 		registerIntegerWriterSetting( IO_WRITER_RAM_BUFFER_SIZE, IndexWriterConfig::setRAMBufferSizeMB );
 
-		registerSetting( Extractor.fromBoolean( IO_WRITER_INFOSTREAM, enabled -> enabled ? new LoggerInfoStream() : null,
+		registerSetting( Extractor.fromBoolean( IO_WRITER_INFOSTREAM,
+				enabled -> Boolean.TRUE.equals( enabled ) ? new LoggerInfoStream() : null,
 				IndexWriterConfig::setInfoStream, (logByteSizeMergePolicy, integer) -> { } ) );
 
 		registerIntegerMergePolicySetting( IO_MERGE_MAX_DOCS, LogByteSizeMergePolicy::setMaxMergeDocs );
