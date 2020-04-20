@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
-import java.io.IOException;
-
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -33,5 +31,7 @@ public class LoggerInfoStream extends InfoStream {
 	}
 
 	@Override
-	public void close() throws IOException { }
+	public void close() {
+		// Nothing to do
+	}
 }
