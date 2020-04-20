@@ -208,7 +208,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
-				similarity, model.getScopedAnalyzer(), propertySource
+				similarity, model.getScopedAnalyzer(), propertySource, shardEventContext
 		);
 
 		try {

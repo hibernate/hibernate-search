@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -29,8 +30,8 @@ import org.apache.lucene.search.similarities.Similarity;
 public class IndexWriterConfigSource {
 
 	public static IndexWriterConfigSource create(Similarity similarity, Analyzer analyzer,
-			ConfigurationPropertySource propertySource) {
-		List<IndexWriterSettingValue<?>> values = IndexWriterSettings.extractAll( propertySource );
+			ConfigurationPropertySource propertySource, EventContext eventContext) {
+		List<IndexWriterSettingValue<?>> values = IndexWriterSettings.extractAll( propertySource, eventContext );
 		return new IndexWriterConfigSource( similarity, analyzer, values );
 	}
 
