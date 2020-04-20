@@ -7,8 +7,6 @@
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
@@ -47,31 +45,29 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeFieldName, Function<String, T> nestedElementFactoryIfIncluded,
-			Function<String, T> nestedElementFactoryIfExcluded) {
-		String nameRelativeToFilter = prefixFromFilter + relativeFieldName;
-		String prefixedRelativeName = unconsumedPrefix + relativeFieldName;
+	public <T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded) {
+		String nameRelativeToFilter = prefixFromFilter + relativeName;
+		String prefixedRelativeName = unconsumedPrefix + relativeName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
-			return nestedElementFactoryIfIncluded.apply( prefixedRelativeName );
+			return factoryIfIncluded.create( prefixedRelativeName );
 		}
 		else {
-			return nestedElementFactoryIfExcluded.apply( prefixedRelativeName );
+			return factoryIfExcluded.create( prefixedRelativeName );
 		}
 	}
 
 	@Override
-	public <T> T nest(String relativeFieldName,
-			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfIncluded,
-			BiFunction<String, IndexSchemaNestingContext, T> nestedElementFactoryIfExcluded) {
-		String nameRelativeToFilter = prefixFromFilter + relativeFieldName;
-		String prefixedRelativeName = unconsumedPrefix + relativeFieldName;
+	public <T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded,
+			CompositeFactory<T> factoryIfExcluded) {
+		String nameRelativeToFilter = prefixFromFilter + relativeName;
+		String prefixedRelativeName = unconsumedPrefix + relativeName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
 			ConfiguredIndexSchemaNestingContext nestedFilter =
 					new ConfiguredIndexSchemaNestingContext( filter, nameRelativeToFilter + ".", "" );
-			return nestedElementFactoryIfIncluded.apply( prefixedRelativeName, nestedFilter );
+			return factoryIfIncluded.create( prefixedRelativeName, nestedFilter );
 		}
 		else {
-			return nestedElementFactoryIfExcluded.apply( prefixedRelativeName, IndexSchemaNestingContext.excludeAll() );
+			return factoryIfExcluded.create( prefixedRelativeName, IndexSchemaNestingContext.excludeAll() );
 		}
 	}
 

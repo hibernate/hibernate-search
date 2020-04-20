@@ -17,8 +17,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
@@ -41,14 +39,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 	private final MappableTypeModel typeModel2Mock = createMock( "typeModel2Mock", MappableTypeModel.class );
 	private final MappableTypeModel typeModel3Mock = createMock( "typeModel3Mock", MappableTypeModel.class );
 	private final MappableTypeModel typeModel4Mock = createMock( "typeModel4Mock", MappableTypeModel.class );
-	private final StubLeafFactoryFunction leafFactoryIfIncludedMock =
-			createMock( "leafFactoryIfIncludedMock", StubLeafFactoryFunction.class );
-	private final StubLeafFactoryFunction leafFactoryIfExcludedMock =
-			createMock( "leafFactoryIfExcludedMock", StubLeafFactoryFunction.class );
-	private final StubCompositeFactoryFunction compositeFactoryIfIncludedMock =
-			createMock( "compositeFactoryIfIncludedMock", StubCompositeFactoryFunction.class );
-	private final StubCompositeFactoryFunction compositeFactoryIfExcludedMock =
-			createMock( "compositeFactoryIfExcludedMock", StubCompositeFactoryFunction.class );
+	private final IndexSchemaNestingContext.LeafFactory<Object> leafFactoryIfIncludedMock =
+			createMock( "leafFactoryIfIncludedMock", IndexSchemaNestingContext.LeafFactory.class );
+	private final IndexSchemaNestingContext.LeafFactory<Object> leafFactoryIfExcludedMock =
+			createMock( "leafFactoryIfExcludedMock", IndexSchemaNestingContext.LeafFactory.class );
+	private final IndexSchemaNestingContext.CompositeFactory<Object> compositeFactoryIfIncludedMock =
+			createMock( "compositeFactoryIfIncludedMock", IndexSchemaNestingContext.CompositeFactory.class );
+	private final IndexSchemaNestingContext.CompositeFactory<Object> compositeFactoryIfExcludedMock =
+			createMock( "compositeFactoryIfExcludedMock", IndexSchemaNestingContext.CompositeFactory.class );
 	private final StubNestedContextBuilder nestedContextBuilderMock =
 			createStrictMock( StubNestedContextBuilder.class );
 
@@ -910,7 +908,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 			String relativeFieldName) {
 		resetAll();
 		Object expectedReturn = new Object();
-		EasyMock.expect( leafFactoryIfIncludedMock.apply( expectedPrefixedName ) ).andReturn( expectedReturn );
+		EasyMock.expect( leafFactoryIfIncludedMock.create( expectedPrefixedName ) ).andReturn( expectedReturn );
 		replayAll();
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryIfIncludedMock, leafFactoryIfExcludedMock );
 		verifyAll();
@@ -921,7 +919,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 			String relativeFieldName) {
 		resetAll();
 		Object expectedReturn = new Object();
-		EasyMock.expect( leafFactoryIfExcludedMock.apply( expectedPrefixedName ) ).andReturn( expectedReturn );
+		EasyMock.expect( leafFactoryIfExcludedMock.create( expectedPrefixedName ) ).andReturn( expectedReturn );
 		replayAll();
 		Object actualReturn = context.nest( relativeFieldName, leafFactoryIfIncludedMock, leafFactoryIfExcludedMock );
 		verifyAll();
@@ -933,7 +931,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		Capture<IndexSchemaNestingContext> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
-		EasyMock.expect( compositeFactoryIfIncludedMock.apply(
+		EasyMock.expect( compositeFactoryIfIncludedMock.create(
 				EasyMock.eq( expectedPrefixedName ), EasyMock.capture( nestedContextCapture )
 		) )
 				.andReturn( expectedReturn );
@@ -954,7 +952,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		Capture<IndexSchemaNestingContext> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
-		EasyMock.expect( compositeFactoryIfExcludedMock.apply(
+		EasyMock.expect( compositeFactoryIfExcludedMock.create(
 				EasyMock.eq( expectedPrefixedName ), EasyMock.capture( nestedContextCapture )
 		) )
 				.andReturn( expectedReturn );
@@ -1070,12 +1068,6 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		checkSimpleIndexedEmbeddedExcluded(
 				context, typeModel, "foo", 3, includePaths
 		);
-	}
-
-	private interface StubLeafFactoryFunction extends Function<String, Object> {
-	}
-
-	private interface StubCompositeFactoryFunction extends BiFunction<String, IndexSchemaNestingContext, Object> {
 	}
 
 	private interface StubNestedContextBuilder extends ConfiguredIndexSchemaNestingContext.NestedContextBuilder<Object> {
