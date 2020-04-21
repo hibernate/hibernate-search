@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 
@@ -56,7 +57,7 @@ public class ElasticsearchIndexSchemaObjectNode {
 	}
 
 	public String getAbsolutePath(String relativeFieldName) {
-		return absolutePath == null ? relativeFieldName : absolutePath + "." + relativeFieldName;
+		return FieldPaths.compose( absolutePath, relativeFieldName );
 	}
 
 	public List<String> getNestedPathHierarchy() {
