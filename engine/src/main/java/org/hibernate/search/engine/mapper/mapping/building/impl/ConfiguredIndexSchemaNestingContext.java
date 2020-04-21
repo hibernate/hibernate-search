@@ -71,6 +71,13 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 		}
 	}
 
+	@Override
+	public <T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded) {
+		// Filters are ignored for dynamic paths: as soon as the parent element is included,
+		// all dynamic paths registered on that element are included.
+		return factoryIfIncluded.create( unconsumedPrefix );
+	}
+
 	public <T> Optional<T> addIndexedEmbeddedIfIncluded(
 			IndexedEmbeddedDefinition definition,
 			IndexedEmbeddedPathTracker pathTracker,
