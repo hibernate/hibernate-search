@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -825,6 +824,126 @@ public class TypeBridgeBaseIT {
 							listObjectField.toReference();
 							listObjectField.field( "value", f -> f.asInteger() )
 									.toReference();
+							context.setBridge( new UnusedTypeBridge() );
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that field template definitions are forwarded to the backend.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3273")
+	public void fieldTemplate() {
+		class Contained {
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "contained", b2 -> b2
+						.fieldTemplate( "stringFromBridge", String.class, b3 -> b3
+								.matchingPathGlob( "*_string" )
+						)
+						.fieldTemplate( "listFromBridge", Integer.class, b3 -> b3
+								.multiValued( true )
+								.matchingPathGlob( "*_list" )
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping().type( Contained.class )
+						.binder( (TypeBinder) context -> {
+							context.getDependencies().useRootOnly();
+							// Single-valued field
+							context.getIndexSchemaElement()
+									.fieldTemplate( "stringFromBridge", f -> f.asString() )
+									.matchingPathGlob( "*_string" );
+							// Multi-valued field
+							context.getIndexSchemaElement()
+									.fieldTemplate( "listFromBridge", f -> f.asInteger() )
+									.matchingPathGlob( "*_list" )
+									.multiValued();
+							context.setBridge( new UnusedTypeBridge() );
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that object field template definitions are forwarded to the backend.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3273")
+	public void objectFieldTemplate() {
+		class Contained {
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "contained", b2 -> b2
+						.objectFieldTemplate( "stringFromBridge", b3 -> b3
+								.matchingPathGlob( "*_string" )
+						)
+						.fieldTemplate( "stringFromBridge_value", String.class, b3 -> b3
+								.matchingPathGlob( "*_string.value" )
+						)
+						.objectFieldTemplate( "listFromBridge", ObjectFieldStorage.NESTED, b3 -> b3
+								.multiValued( true )
+								.matchingPathGlob( "*_list" )
+						)
+						.fieldTemplate( "listFromBridge_value", Integer.class, b3 -> b3
+								.matchingPathGlob( "*_list.value" )
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping().type( Contained.class )
+						.binder( (TypeBinder) context -> {
+							context.getDependencies().useRootOnly();
+							// Single-valued field
+							context.getIndexSchemaElement()
+									.objectFieldTemplate( "stringFromBridge" )
+									.matchingPathGlob( "*_string" );
+							context.getIndexSchemaElement()
+									.fieldTemplate( "stringFromBridge_value", f -> f.asString() )
+									.matchingPathGlob( "*_string.value" );
+							// Multi-valued field
+							context.getIndexSchemaElement()
+									.objectFieldTemplate( "listFromBridge", ObjectFieldStorage.NESTED )
+									.matchingPathGlob( "*_list" )
+									.multiValued();
+							context.getIndexSchemaElement()
+									.fieldTemplate( "listFromBridge_value", f -> f.asInteger() )
+									.matchingPathGlob( "*_list.value" );
 							context.setBridge( new UnusedTypeBridge() );
 						} )
 		)
