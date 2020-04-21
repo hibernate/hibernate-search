@@ -21,10 +21,14 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 public abstract class SimpleMappedIndex<B> extends StubMappedIndex {
 
 	public static <B> SimpleMappedIndex<B> of(String indexName, Function<IndexSchemaElement, B> binder) {
+		return ofAdvanced( indexName, context -> binder.apply( context.getSchemaElement() ) );
+	}
+
+	public static <B> SimpleMappedIndex<B> ofAdvanced(String indexName, Function<IndexedEntityBindingContext, B> binder) {
 		return new SimpleMappedIndex<B>( indexName ) {
 			@Override
 			protected B doBind(IndexedEntityBindingContext context) {
-				return binder.apply( context.getSchemaElement() );
+				return binder.apply( context );
 			}
 		};
 	}
