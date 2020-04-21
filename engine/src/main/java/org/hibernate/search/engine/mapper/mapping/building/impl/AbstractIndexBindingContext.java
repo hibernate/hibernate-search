@@ -79,7 +79,6 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	@Override
 	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(IndexedEmbeddedDefinition definition,
 			boolean multiValued) {
-		// FIXME HSEARCH-3684 share the path tracker among filters with the same definition
 		IndexedEmbeddedPathTracker pathTracker = mapperContext.getOrCreatePathTracker( definition );
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				definition,
