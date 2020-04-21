@@ -34,8 +34,6 @@ public class MetadataFields {
 
 	private static final String INTERNAL_FIELD_PREFIX = "__HSEARCH_";
 
-	private static final char PATH_SEPARATOR = '.';
-
 	private static final String ID_FIELD_NAME = internalFieldName( "id" );
 
 	private static final String ROUTING_KEY_FIELD_NAME = internalFieldName( "routing_key" );
@@ -103,16 +101,4 @@ public class MetadataFields {
 		return NESTED_DOCUMENT_PATH;
 	}
 
-	public static String compose(String absolutePath, String relativeFieldName) {
-		if ( absolutePath == null ) {
-			return relativeFieldName;
-		}
-
-		StringBuilder sb = new StringBuilder( absolutePath.length() + relativeFieldName.length() + 1 );
-		sb.append( absolutePath )
-				.append( PATH_SEPARATOR )
-				.append( relativeFieldName );
-
-		return sb.toString();
-	}
 }

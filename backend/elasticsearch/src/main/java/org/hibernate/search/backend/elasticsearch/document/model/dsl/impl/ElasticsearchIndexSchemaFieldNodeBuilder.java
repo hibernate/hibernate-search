@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ab
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -45,7 +45,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 			String relativeFieldName, ElasticsearchIndexFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
-		this.absoluteFieldPath = MetadataFields.compose( parent.getAbsolutePath(), relativeFieldName );
+		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
 		this.type = type;
 	}
 

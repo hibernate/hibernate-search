@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -40,7 +40,7 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 			String relativeFieldName, LuceneIndexFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
-		this.absoluteFieldPath = MetadataFields.compose( parent.getAbsolutePath(), relativeFieldName );
+		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
 		this.type = type;
 	}
 

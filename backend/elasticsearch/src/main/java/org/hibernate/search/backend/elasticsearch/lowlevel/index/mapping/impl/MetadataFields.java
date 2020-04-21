@@ -10,8 +10,6 @@ public final class MetadataFields {
 
 	private static final String INTERNAL_FIELD_PREFIX = "_";
 
-	private static final char PATH_SEPARATOR = '.';
-
 	private MetadataFields() {
 	}
 
@@ -22,16 +20,4 @@ public final class MetadataFields {
 		return sb.toString();
 	}
 
-	public static String compose(String absolutePath, String relativeFieldName) {
-		if ( absolutePath == null ) {
-			return relativeFieldName;
-		}
-
-		StringBuilder sb = new StringBuilder( absolutePath.length() + relativeFieldName.length() + 1 );
-		sb.append( absolutePath )
-				.append( PATH_SEPARATOR )
-				.append( relativeFieldName );
-
-		return sb.toString();
-	}
 }
