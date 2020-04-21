@@ -27,7 +27,9 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	private enum Type {
 		ROOT,
 		OBJECT_FIELD,
-		NON_OBJECT_FIELD
+		NON_OBJECT_FIELD,
+		OBJECT_FIELD_TEMPLATE,
+		NON_OBJECT_FIELD_TEMPLATE
 	}
 
 	public static Builder schema() {
@@ -41,6 +43,15 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static Builder field(Builder parent, String relativeFieldName) {
 		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD );
+	}
+
+	public static Builder objectFieldTemplate(Builder parent, String templateName, ObjectFieldStorage storage) {
+		return new Builder( parent, templateName, Type.OBJECT_FIELD_TEMPLATE )
+				.objectFieldStorage( storage );
+	}
+
+	public static Builder fieldTemplate(Builder parent, String templateName) {
+		return new Builder( parent, templateName, Type.NON_OBJECT_FIELD_TEMPLATE );
 	}
 
 	/*
@@ -93,11 +104,29 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder objectField(String relativeFieldName, Consumer<Builder> contributor) {
 			return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT, contributor );
-
 		}
 
 		public Builder objectField(String relativeFieldName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
 			Builder builder = StubIndexSchemaNode.objectField( this, relativeFieldName, storage );
+			contributor.accept( builder );
+			child( builder );
+			return this;
+		}
+
+		public Builder fieldTemplate(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.fieldTemplate( this, relativeFieldName )
+					.inputType( inputType );
+			contributor.accept( builder );
+			child( builder );
+			return this;
+		}
+
+		public Builder objectFieldTemplate(String relativeFieldName, Consumer<Builder> contributor) {
+			return objectFieldTemplate( relativeFieldName, ObjectFieldStorage.DEFAULT, contributor );
+		}
+
+		public Builder objectFieldTemplate(String relativeFieldName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.objectFieldTemplate( this, relativeFieldName, storage );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -195,6 +224,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder converter(StubFieldConverter<?> converter) {
 			this.converter = converter;
+			return this;
+		}
+
+		public Builder matchingPathGlob(String pathGlob) {
+			attribute( "matchingPathGlob", pathGlob );
 			return this;
 		}
 

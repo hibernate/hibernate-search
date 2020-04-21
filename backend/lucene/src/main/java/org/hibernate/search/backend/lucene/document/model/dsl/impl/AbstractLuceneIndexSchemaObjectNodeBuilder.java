@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -73,6 +74,30 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		return new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
+			IndexFieldType<?> indexFieldType, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
+			IndexFieldType<?> indexFieldType, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
+			ObjectFieldStorage storage, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
+			ObjectFieldStorage storage, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	public abstract LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder();

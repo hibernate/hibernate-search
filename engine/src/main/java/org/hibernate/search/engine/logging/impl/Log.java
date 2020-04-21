@@ -309,4 +309,13 @@ public interface Log extends BasicLogger {
 			value = "The background failure handler threw an exception while handling a previous failure."
 					+ " The failure may not have been reported.")
 	void failureInFailureHandler(@Cause Throwable t);
+
+	@Message(id = ID_OFFSET_2 + 70,
+			value = "Field template name '%1$s' is invalid: field template names cannot be null or empty.")
+	SearchException fieldTemplateNameCannotBeNullOrEmpty(String templateName, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 71,
+			value = "Field template name '%1$s' is invalid: field template names cannot contain a dot ('.').")
+	SearchException fieldTemplateNameCannotContainDot(String relativeFieldName,
+			@Param EventContext context);
 }
