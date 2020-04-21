@@ -44,6 +44,21 @@ public interface IndexSchemaNestingContext {
 	<T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded, CompositeFactory<T> factoryIfExcluded);
 
 	/**
+	 * Nest a template schema element in this context.
+	 * <p>
+	 * The schema element will be created using one of the two given factories,
+	 * depending on whether it is included or excluded.
+	 * Template elements do not take inclusion filters into account;
+	 * they are included as soon as their parent is included.
+	 *
+	 * @param factoryIfIncluded The element factory to use if the schema element is included.
+	 * @param factoryIfExcluded The element factory to use if the schema element is excluded.
+	 * @param <T> The type of the created schema element.
+	 * @return The created schema element.
+	 */
+	<T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded);
+
+	/**
 	 * @return A nesting context that always excludes all elements and does not prefix the field names.
 	 */
 	static IndexSchemaNestingContext excludeAll() {
@@ -56,6 +71,10 @@ public interface IndexSchemaNestingContext {
 
 	interface CompositeFactory<T> {
 		T create(String prefixedRelativeName, IndexSchemaNestingContext nestedNestingContext);
+	}
+
+	interface TemplateFactory<T> {
+		T create(String prefix);
 	}
 
 }

@@ -47,6 +47,10 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 			createMock( "compositeFactoryIfIncludedMock", IndexSchemaNestingContext.CompositeFactory.class );
 	private final IndexSchemaNestingContext.CompositeFactory<Object> compositeFactoryIfExcludedMock =
 			createMock( "compositeFactoryIfExcludedMock", IndexSchemaNestingContext.CompositeFactory.class );
+	private final IndexSchemaNestingContext.TemplateFactory<Object> templateFactoryIfIncludedMock =
+			createMock( "dynamicFactoryIfIncludedMock", IndexSchemaNestingContext.TemplateFactory.class );
+	private final IndexSchemaNestingContext.TemplateFactory<Object> templateFactoryIfExcludedMock =
+			createMock( "dynamicFactoryIfExcludedMock", IndexSchemaNestingContext.TemplateFactory.class );
 	private final StubNestedContextBuilder nestedContextBuilderMock =
 			createStrictMock( StubNestedContextBuilder.class );
 
@@ -939,6 +943,10 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		Object actualReturn = context.nest( relativeFieldName, compositeFactoryIfIncludedMock, compositeFactoryIfExcludedMock );
 		verifyAll();
 		assertSame( expectedReturn, actualReturn );
+
+		// Also check that dynamic leaves will be included
+		checkDynamicIncluded( "", nestedContextCapture.getValue() );
+
 		return nestedContextCapture.getValue();
 	}
 
@@ -962,9 +970,32 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		assertSame( expectedReturn, actualReturn );
 
 		if ( recurse ) {
-			// Also check that leafs will be excluded
+			// Also check that leaves will be excluded
 			checkFooBarExcluded( "", nestedContextCapture.getValue(), false );
+			checkDynamicExcluded( "", nestedContextCapture.getValue() );
 		}
+	}
+
+	private void checkDynamicIncluded(String expectedPrefix, IndexSchemaNestingContext context) {
+		resetAll();
+		Object expectedReturn = new Object();
+		EasyMock.expect( templateFactoryIfIncludedMock.create( expectedPrefix ) )
+				.andReturn( expectedReturn );
+		replayAll();
+		Object actualReturn = context.nestTemplate( templateFactoryIfIncludedMock, templateFactoryIfExcludedMock );
+		verifyAll();
+		assertSame( expectedReturn, actualReturn );
+	}
+
+	private void checkDynamicExcluded(String expectedPrefix, IndexSchemaNestingContext context) {
+		resetAll();
+		Object expectedReturn = new Object();
+		EasyMock.expect( templateFactoryIfExcludedMock.create( expectedPrefix ) )
+				.andReturn( expectedReturn );
+		replayAll();
+		Object actualReturn = context.nestTemplate( templateFactoryIfIncludedMock, templateFactoryIfExcludedMock );
+		verifyAll();
+		assertSame( expectedReturn, actualReturn );
 	}
 
 	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
@@ -997,6 +1028,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		assertTrue( "Expected the indexedEmbedded to be included in " + context, actualReturn.isPresent() );
 		verifyAll();
 		assertSame( expectedReturn, actualReturn.get() );
+
 		return nestedContextCapture.getValue();
 	}
 
@@ -1032,6 +1064,9 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Also test weird names that include dots
 		checkLeafIncluded( expectedPrefix + "foo.bar", context, "foo.bar" );
 		checkCompositeIncluded( expectedPrefix + "foo.bar", context, "foo.bar" );
+
+		// Also test dynamic fields
+		checkDynamicIncluded( expectedPrefix, context );
 	}
 
 	private void checkFooBarExcluded(String expectedPrefix, IndexSchemaNestingContext context) {

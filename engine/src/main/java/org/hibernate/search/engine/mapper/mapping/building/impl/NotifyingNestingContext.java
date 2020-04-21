@@ -45,4 +45,15 @@ class NotifyingNestingContext implements IndexSchemaNestingContext {
 				factoryIfExcluded
 		);
 	}
+
+	@Override
+	public <T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded) {
+		return delegate.nestTemplate(
+				prefix -> {
+					listener.onSchemaContributed();
+					return factoryIfIncluded.create( prefix );
+				},
+				factoryIfExcluded
+		);
+	}
 }
