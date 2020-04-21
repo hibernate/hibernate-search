@@ -15,8 +15,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
  * An easy-to-use definition of a mapped index, including the backend name, index name, type name and binding.
  * <p>
  * Set up a mapped index by {@link StubMappingInitiator#add(StubMappedIndex) adding it to the initiator}.
- * The resulting binding and index manager will be made available through
- * {@link #binding()} and {@link #manager()} after startup.
+ * The resulting binding will be made available through {@link #binding()} after startup,
+ * and index manager methods are exposed directly on this class.
  */
 public abstract class SimpleMappedIndex<B> extends StubMappedIndex {
 
