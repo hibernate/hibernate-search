@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomTypeMappingAnnotationBaseIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -723,18 +725,13 @@ public class TypeBridgeBaseIT {
 		}
 	}
 
+	/**
+	 * Test that field definitions are forwarded to the backend.
+	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3324")
-	public void multiValuedField() {
+	public void field() {
 		class Contained {
-			String string;
-			List<String> list;
-			public String getString() {
-				return string;
-			}
-			public List<String> getList() {
-				return list;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -753,7 +750,7 @@ public class TypeBridgeBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.objectField( "contained", b2 -> b2
 						.field( "stringFromBridge", String.class )
-						.field( "listFromBridge", String.class, b3 -> b3.multiValued( true ) )
+						.field( "listFromBridge", Integer.class, b3 -> b3.multiValued( true ) )
 				)
 		);
 
@@ -767,8 +764,66 @@ public class TypeBridgeBaseIT {
 									.toReference();
 							// Multi-valued field
 							context.getIndexSchemaElement()
-									.field( "listFromBridge", f -> f.asString() )
+									.field( "listFromBridge", f -> f.asInteger() )
 									.multiValued()
+									.toReference();
+							context.setBridge( new UnusedTypeBridge() );
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that object field definitions are forwarded to the backend.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3324")
+	public void objectField() {
+		class Contained {
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Contained contained;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded
+			public Contained getContained() {
+				return contained;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "contained", b2 -> b2
+						.objectField( "stringFromBridge", b3 -> b3
+								.field( "value", String.class )
+						)
+						.objectField( "listFromBridge", ObjectFieldStorage.NESTED, b3 -> b3
+								.multiValued( true )
+								.field( "value", Integer.class )
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping().type( Contained.class )
+						.binder( (TypeBinder) context -> {
+							context.getDependencies().useRootOnly();
+							// Single-valued field
+							IndexSchemaObjectField stringObjectField = context.getIndexSchemaElement()
+									.objectField( "stringFromBridge" );
+							stringObjectField.toReference();
+							stringObjectField.field( "value", f -> f.asString() )
+									.toReference();
+							// Multi-valued field
+							IndexSchemaObjectField listObjectField = context.getIndexSchemaElement()
+									.objectField( "listFromBridge", ObjectFieldStorage.NESTED )
+									.multiValued();
+							listObjectField.toReference();
+							listObjectField.field( "value", f -> f.asInteger() )
 									.toReference();
 							context.setBridge( new UnusedTypeBridge() );
 						} )
