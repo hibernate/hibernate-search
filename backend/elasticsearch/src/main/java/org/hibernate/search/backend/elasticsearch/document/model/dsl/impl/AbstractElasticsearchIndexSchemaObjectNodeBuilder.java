@@ -13,6 +13,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -70,6 +71,30 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		return new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
+			IndexFieldType<?> indexFieldType, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
+			IndexFieldType<?> indexFieldType, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
+			ObjectFieldStorage storage, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
+			ObjectFieldStorage storage, String prefix) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,

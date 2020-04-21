@@ -104,18 +104,40 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> fieldTemplate(String templateName, IndexFieldType<?> type) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		checkFieldTemplateName( templateName );
+		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
+				nestingContext.nestTemplate(
+						// If the field template is included
+						prefix -> objectNodeBuilder.addFieldTemplate( templateName, type, prefix ),
+						// If the field template is filtered out
+						prefix -> objectNodeBuilder.createExcludedFieldTemplate( templateName, type, prefix )
+				);
+		if ( directChildrenAreMultiValuedByDefault ) {
+			fieldTemplateFinalStep.multiValued();
+		}
+		return fieldTemplateFinalStep;
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> fieldTemplate(String templateName,
 			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<?>> typeContributor) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return fieldTemplate( templateName, typeContributor.apply( typeFactory ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectFieldStorage storage) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		checkFieldTemplateName( templateName );
+		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
+				nestingContext.nestTemplate(
+						// If the field template is included
+						prefix -> objectNodeBuilder.addObjectFieldTemplate( templateName, storage, prefix ),
+						// If the field template is filtered out
+						prefix -> objectNodeBuilder.createExcludedObjectFieldTemplate( templateName, storage, prefix )
+				);
+		if ( directChildrenAreMultiValuedByDefault ) {
+			fieldTemplateFinalStep.multiValued();
+		}
+		return fieldTemplateFinalStep;
 	}
 
 	private void checkRelativeFieldName(String relativeFieldName) {
@@ -124,6 +146,17 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		}
 		if ( relativeFieldName.contains( "." ) ) {
 			throw log.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.getEventContext() );
+		}
+	}
+
+	private void checkFieldTemplateName(String templateName) {
+		if ( StringHelper.isEmpty( templateName ) ) {
+			throw log.fieldTemplateNameCannotBeNullOrEmpty( templateName, objectNodeBuilder.getEventContext() );
+		}
+		// This is mostly to allow making template names absolute and unique by prepending them
+		// with the path of the schema elements they were declared on.
+		if ( templateName.contains( "." ) ) {
+			throw log.fieldTemplateNameCannotContainDot( templateName, objectNodeBuilder.getEventContext() );
 		}
 	}
 

@@ -69,11 +69,15 @@ public class StubDocumentElement implements DocumentElement {
 
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
+		// This will ignore the prefix that may need to be prepended to the field name for dynamic fields
+		// when using @IndexedEmbedded(prefix = ...), but that's fine because it's just for tests.
 		builder.field( relativeFieldName, value );
 	}
 
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
+		// This will ignore the prefix that may need to be prepended to the field name for dynamic fields
+		// when using @IndexedEmbedded(prefix = ...), but that's fine because it's just for tests.
 		StubDocumentNode.Builder childBuilder = StubDocumentNode.object( builder, relativeFieldName );
 		builder.child( childBuilder );
 		return new StubDocumentElement( childBuilder );
@@ -81,6 +85,8 @@ public class StubDocumentElement implements DocumentElement {
 
 	@Override
 	public void addNullObject(String relativeFieldName) {
+		// This will ignore the prefix that may need to be prepended to the field name for dynamic fields
+		// when using @IndexedEmbedded(prefix = ...), but that's fine because it's just for tests.
 		builder.missingObjectField( relativeFieldName );
 	}
 
