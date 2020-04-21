@@ -12,21 +12,19 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,41 +41,32 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class IndexingFieldTypesIT<F> {
 
-	private static final String INDEX_NAME = "IndexName";
+	private static final List<FieldTypeDescriptor<?>> supportedTypeDescriptors = FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getIndexingExpectations().isPresent() )
+				.collect( Collectors.toList() );
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] types() {
-		return FieldTypeDescriptor.getAll().stream()
-				.map( typeDescriptor -> new Object[] { typeDescriptor, typeDescriptor.getIndexingExpectations() } )
-				.toArray();
+	public static List<FieldTypeDescriptor<?>> parameters() {
+		return supportedTypeDescriptors;
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private final SimpleMappedIndex<IndexBinding> index =
+			SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
 
 	private final FieldTypeDescriptor<F> typeDescriptor;
 	private final IndexingExpectations<F> expectations;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	public IndexingFieldTypesIT(FieldTypeDescriptor<F> typeDescriptor, Optional<IndexingExpectations<F>> expectations) {
-		Assume.assumeTrue(
-				"Type " + typeDescriptor + " does not define indexing expectations", expectations.isPresent()
-		);
+	public IndexingFieldTypesIT(FieldTypeDescriptor<F> typeDescriptor) {
 		this.typeDescriptor = typeDescriptor;
-		this.expectations = expectations.get();
+		this.expectations = typeDescriptor.getIndexingExpectations().get();
 	}
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
@@ -87,12 +76,12 @@ public class IndexingFieldTypesIT<F> {
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
 		// Index all values, each in its own document
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );
 			plan.add( referenceProvider( documentId ), document -> {
-				document.addValue( indexMapping.fieldModel.reference, value );
+				document.addValue( index.binding().fieldModel.reference, value );
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
@@ -101,8 +90,8 @@ public class IndexingFieldTypesIT<F> {
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
 
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.fieldModel.relativeFieldName;
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = index.binding().fieldModel.relativeFieldName;
 
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
@@ -118,29 +107,12 @@ public class IndexingFieldTypesIT<F> {
 		}
 	}
 
-	private class IndexMapping {
-		final FieldModel<F> fieldModel;
+	private class IndexBinding {
+		final SimpleFieldModel<F> fieldModel;
 
-		IndexMapping(IndexSchemaElement root) {
-			this.fieldModel = FieldModel.mapper( typeDescriptor )
-					.map( root, "field_" + typeDescriptor.getUniqueName(), c -> c.projectable( Projectable.YES ) );
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					FieldModel::new
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
+		IndexBinding(IndexSchemaElement root) {
+			this.fieldModel = SimpleFieldModel.mapper( typeDescriptor, c -> c.projectable( Projectable.YES ) )
+					.map( root, "field" );
 		}
 	}
 
