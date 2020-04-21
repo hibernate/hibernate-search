@@ -9,269 +9,291 @@ package org.hibernate.search.integrationtest.backend.tck.document;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Test the behavior of implementations of {@link DocumentElement}
  * when it comes to multi-valued fields.
  */
-public class DocumentElementMultiValuedIT {
+@RunWith(Parameterized.class)
+public class DocumentElementMultiValuedIT<F> {
 
-	private static final String INDEX_NAME = "IndexName";
+	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
+		return FieldTypeDescriptor.getAll();
+	}
 
-	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@Parameterized.Parameters(name = "{0}")
+	public static List<FieldTypeDescriptor<?>> parameters() {
+		return supportedTypeDescriptors();
+	}
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Before
-	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+	private static final SimpleMappedIndex<IndexBinding> index =
+			SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
+
+	@BeforeClass
+	public static void setup() {
+		setupHelper.start().withIndex( index ).setup();
+	}
+
+	private final FieldTypeDescriptor<F> fieldType;
+
+	public DocumentElementMultiValuedIT(FieldTypeDescriptor<F> fieldType) {
+		this.fieldType = fieldType;
 	}
 
 	@Test
 	public void addValue_root() {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding() );
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding() );
 		expectSuccess( "1", document -> {
-			document.addValue( indexMapping.singleValuedString, "1" );
+			document.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "singleValuedString", document -> {
-			document.addValue( indexMapping.singleValuedString, "1" );
-			document.addValue( indexMapping.singleValuedString, "2" );
+		expectSingleValuedException( "2", singleValuedFieldModel.relativeFieldName, document -> {
+			document.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			document.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
 		} );
 		expectSuccess( "3", document -> {
-			document.addValue( indexMapping.multiValuedString, "1" );
+			document.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 		expectSuccess( "4", document -> {
-			document.addValue( indexMapping.multiValuedString, "1" );
-			document.addValue( indexMapping.multiValuedString, "2" );
-			document.addValue( indexMapping.multiValuedString, "3" );
+			document.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			document.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
+			document.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 	}
 
 	@Test
 	public void addObject_flattened() {
 		expectSuccess( "1", document -> {
-			document.addObject( indexMapping.singleValuedFlattenedObject.self );
+			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
 		expectSingleValuedException( "2", "singleValuedFlattenedObject", document -> {
-			document.addObject( indexMapping.singleValuedFlattenedObject.self );
-			document.addObject( indexMapping.singleValuedFlattenedObject.self );
+			document.addObject( index.binding().singleValuedFlattenedObject.self );
+			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
 		expectSuccess( "3", document -> {
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
 		} );
 		expectSuccess( "4", document -> {
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
 		} );
 	}
 
 	@Test
 	public void addObject_nested() {
 		expectSuccess( "1", document -> {
-			document.addObject( indexMapping.singleValuedNestedObject.self );
+			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
 		expectSingleValuedException( "2", "singleValuedNestedObject", document -> {
-			document.addObject( indexMapping.singleValuedNestedObject.self );
-			document.addObject( indexMapping.singleValuedNestedObject.self );
+			document.addObject( index.binding().singleValuedNestedObject.self );
+			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
 		expectSuccess( "3", document -> {
-			document.addObject( indexMapping.multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
 		} );
 		expectSuccess( "4", document -> {
-			document.addObject( indexMapping.multiValuedNestedObject.self );
-			document.addObject( indexMapping.multiValuedNestedObject.self );
-			document.addObject( indexMapping.multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
 		} );
 	}
 
 	@Test
 	public void addNullObject_flattened() {
 		expectSuccess( "1", document -> {
-			document.addObject( indexMapping.singleValuedFlattenedObject.self );
+			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
 		expectSingleValuedException( "2", "singleValuedFlattenedObject", document -> {
-			document.addNullObject( indexMapping.singleValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.singleValuedFlattenedObject.self );
+			document.addNullObject( index.binding().singleValuedFlattenedObject.self );
+			document.addNullObject( index.binding().singleValuedFlattenedObject.self );
 		} );
 		expectSingleValuedException( "3", "singleValuedFlattenedObject", document -> {
-			document.addObject( indexMapping.singleValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.singleValuedFlattenedObject.self );
+			document.addObject( index.binding().singleValuedFlattenedObject.self );
+			document.addNullObject( index.binding().singleValuedFlattenedObject.self );
 		} );
 		expectSingleValuedException( "4", "singleValuedFlattenedObject", document -> {
-			document.addNullObject( indexMapping.singleValuedFlattenedObject.self );
-			document.addObject( indexMapping.singleValuedFlattenedObject.self );
+			document.addNullObject( index.binding().singleValuedFlattenedObject.self );
+			document.addObject( index.binding().singleValuedFlattenedObject.self );
 		} );
 		expectSuccess( "5", document -> {
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
 		} );
 		expectSuccess( "6", document -> {
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
 		} );
 		expectSuccess( "7", document -> {
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
 		} );
 		expectSuccess( "8", document -> {
-			document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
-			document.addNullObject( indexMapping.multiValuedFlattenedObject.self );
+			document.addObject( index.binding().multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
+			document.addNullObject( index.binding().multiValuedFlattenedObject.self );
 		} );
 	}
 
 	@Test
 	public void addNullObject_nested() {
 		expectSuccess( "1", document -> {
-			document.addObject( indexMapping.singleValuedNestedObject.self );
+			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
 		expectSingleValuedException( "2", "singleValuedNestedObject", document -> {
-			document.addNullObject( indexMapping.singleValuedNestedObject.self );
-			document.addNullObject( indexMapping.singleValuedNestedObject.self );
+			document.addNullObject( index.binding().singleValuedNestedObject.self );
+			document.addNullObject( index.binding().singleValuedNestedObject.self );
 		} );
 		expectSingleValuedException( "3", "singleValuedNestedObject", document -> {
-			document.addObject( indexMapping.singleValuedNestedObject.self );
-			document.addNullObject( indexMapping.singleValuedNestedObject.self );
+			document.addObject( index.binding().singleValuedNestedObject.self );
+			document.addNullObject( index.binding().singleValuedNestedObject.self );
 		} );
 		expectSingleValuedException( "4", "singleValuedNestedObject", document -> {
-			document.addNullObject( indexMapping.singleValuedNestedObject.self );
-			document.addObject( indexMapping.singleValuedNestedObject.self );
+			document.addNullObject( index.binding().singleValuedNestedObject.self );
+			document.addObject( index.binding().singleValuedNestedObject.self );
 		} );
 		expectSuccess( "5", document -> {
-			document.addObject( indexMapping.multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
 		} );
 		expectSuccess( "6", document -> {
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
 		} );
 		expectSuccess( "7", document -> {
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
-			document.addObject( indexMapping.multiValuedNestedObject.self );
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
 		} );
 		expectSuccess( "8", document -> {
-			document.addObject( indexMapping.multiValuedNestedObject.self );
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
-			document.addNullObject( indexMapping.multiValuedNestedObject.self );
+			document.addObject( index.binding().multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
+			document.addNullObject( index.binding().multiValuedNestedObject.self );
 		} );
 	}
 
 	@Test
 	public void addValue_inSingleValuedFlattenedObject() {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedFlattenedObject );
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().singleValuedFlattenedObject );
 		expectSuccess( "1", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedFlattenedObject.self );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.singleValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "singleValuedFlattenedObject.singleValuedString", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedFlattenedObject.self );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.singleValuedString, "1" );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.singleValuedString, "2" );
+		expectSingleValuedException( "2", "singleValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName, document -> {
+			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
 		} );
 		expectSuccess( "3", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedFlattenedObject.self );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.multiValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 		expectSuccess( "4", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedFlattenedObject.self );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.multiValuedString, "1" );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.multiValuedString, "2" );
-			level1.addValue( indexMapping.singleValuedFlattenedObject.multiValuedString, "3" );
+			DocumentElement level1 = document.addObject( index.binding().singleValuedFlattenedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 	}
 
 	@Test
 	public void addValue_inMultiValuedFlattenedObject() {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedFlattenedObject );
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().multiValuedFlattenedObject );
 		expectSuccess( "1", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.singleValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "multiValuedFlattenedObject.singleValuedString", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.singleValuedString, "1" );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.singleValuedString, "2" );
+		expectSingleValuedException( "2", "multiValuedFlattenedObject." + singleValuedFieldModel.relativeFieldName, document -> {
+			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
 		} );
 		expectSuccess( "3", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.multiValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 		expectSuccess( "4", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedFlattenedObject.self );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.multiValuedString, "1" );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.multiValuedString, "2" );
-			level1.addValue( indexMapping.multiValuedFlattenedObject.multiValuedString, "3" );
+			DocumentElement level1 = document.addObject( index.binding().multiValuedFlattenedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 	}
 
 	@Test
 	public void addValue_inSingleValuedNestedObject() {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().singleValuedNestedObject );
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().singleValuedNestedObject );
 		expectSuccess( "1", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedNestedObject.self );
-			level1.addValue( indexMapping.singleValuedNestedObject.singleValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "singleValuedNestedObject.singleValuedString", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedNestedObject.self );
-			level1.addValue( indexMapping.singleValuedNestedObject.singleValuedString, "1" );
-			level1.addValue( indexMapping.singleValuedNestedObject.singleValuedString, "2" );
+		expectSingleValuedException( "2", "singleValuedNestedObject." + singleValuedFieldModel.relativeFieldName, document -> {
+			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
 		} );
 		expectSuccess( "3", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedNestedObject.self );
-			level1.addValue( indexMapping.singleValuedNestedObject.multiValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 		expectSuccess( "4", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.singleValuedNestedObject.self );
-			level1.addValue( indexMapping.singleValuedNestedObject.multiValuedString, "1" );
-			level1.addValue( indexMapping.singleValuedNestedObject.multiValuedString, "2" );
-			level1.addValue( indexMapping.singleValuedNestedObject.multiValuedString, "3" );
+			DocumentElement level1 = document.addObject( index.binding().singleValuedNestedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 	}
 
 	@Test
 	public void addValue_inMultiValuedNestedObject() {
+		SimpleFieldModel<F> singleValuedFieldModel = getSingleValuedField( index.binding().multiValuedNestedObject );
+		SimpleFieldModel<F> multiValuedFieldModel = getMultiValuedField( index.binding().multiValuedNestedObject );
 		expectSuccess( "1", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedNestedObject.self );
-			level1.addValue( indexMapping.multiValuedNestedObject.singleValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
 		} );
-		expectSingleValuedException( "2", "multiValuedNestedObject.singleValuedString", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedNestedObject.self );
-			level1.addValue( indexMapping.multiValuedNestedObject.singleValuedString, "1" );
-			level1.addValue( indexMapping.multiValuedNestedObject.singleValuedString, "2" );
+		expectSingleValuedException( "2", "multiValuedNestedObject." + singleValuedFieldModel.relativeFieldName, document -> {
+			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( singleValuedFieldModel.reference, getValue( 1 ) );
 		} );
 		expectSuccess( "3", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedNestedObject.self );
-			level1.addValue( indexMapping.multiValuedNestedObject.multiValuedString, "1" );
+			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 		expectSuccess( "4", document -> {
-			DocumentElement level1 = document.addObject( indexMapping.multiValuedNestedObject.self );
-			level1.addValue( indexMapping.multiValuedNestedObject.multiValuedString, "1" );
-			level1.addValue( indexMapping.multiValuedNestedObject.multiValuedString, "2" );
-			level1.addValue( indexMapping.multiValuedNestedObject.multiValuedString, "3" );
+			DocumentElement level1 = document.addObject( index.binding().multiValuedNestedObject.self );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 1 ) );
+			level1.addValue( multiValuedFieldModel.reference, getValue( 0 ) );
 		} );
 	}
 
@@ -290,51 +312,64 @@ public class DocumentElementMultiValuedIT {
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( id ), documentContributor::accept );
 		plan.execute().join();
 	}
 
-	private abstract static class AbstractObjectMapping {
-		final IndexFieldReference<String> singleValuedString;
-		final IndexFieldReference<String> multiValuedString;
+	private F getValue(int ordinal) {
+		return fieldType.getIndexingExpectations().get().getValues().get( ordinal );
+	}
 
-		AbstractObjectMapping(IndexSchemaElement schemaElement) {
-			singleValuedString = schemaElement.field( "singleValuedString", f -> f.asString() ).toReference();
-			multiValuedString = schemaElement.field( "multiValuedString", f -> f.asString() ).multiValued().toReference();
+	private SimpleFieldModel<F> getSingleValuedField(AbstractObjectBinding binding) {
+		return binding.singleValuedFieldModels.get( fieldType );
+	}
+
+	private SimpleFieldModel<F> getMultiValuedField(AbstractObjectBinding binding) {
+		return binding.multiValuedFieldModels.get( fieldType );
+	}
+
+	private abstract static class AbstractObjectBinding {
+		final SimpleFieldModelsByType singleValuedFieldModels;
+		final SimpleFieldModelsByType multiValuedFieldModels;
+
+		AbstractObjectBinding(IndexSchemaElement schemaElement) {
+			this.singleValuedFieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(),
+					schemaElement, "single_" );
+			this.multiValuedFieldModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(),
+					schemaElement, "multi_" );
 		}
 	}
 
-	private static class IndexMapping extends AbstractObjectMapping {
-		final FirstLevelObjectMapping singleValuedFlattenedObject;
-		final FirstLevelObjectMapping multiValuedFlattenedObject;
-		final FirstLevelObjectMapping singleValuedNestedObject;
-		final FirstLevelObjectMapping multiValuedNestedObject;
+	private static class IndexBinding extends AbstractObjectBinding {
+		final FirstLevelObjectBinding singleValuedFlattenedObject;
+		final FirstLevelObjectBinding multiValuedFlattenedObject;
+		final FirstLevelObjectBinding singleValuedNestedObject;
+		final FirstLevelObjectBinding multiValuedNestedObject;
 
-		IndexMapping(IndexBindingContext ctx) {
-			super( ctx.getSchemaElement() );
-			IndexSchemaElement root = ctx.getSchemaElement();
+		IndexBinding(IndexSchemaElement root) {
+			super( root );
 
-			singleValuedFlattenedObject = new FirstLevelObjectMapping(
+			singleValuedFlattenedObject = new FirstLevelObjectBinding(
 					root.objectField( "singleValuedFlattenedObject", ObjectFieldStorage.FLATTENED )
 			);
-			multiValuedFlattenedObject = new FirstLevelObjectMapping(
+			multiValuedFlattenedObject = new FirstLevelObjectBinding(
 					root.objectField( "multiValuedFlattenedObject", ObjectFieldStorage.FLATTENED )
 							.multiValued()
 			);
-			singleValuedNestedObject = new FirstLevelObjectMapping(
+			singleValuedNestedObject = new FirstLevelObjectBinding(
 					root.objectField( "singleValuedNestedObject", ObjectFieldStorage.NESTED )
 			);
-			multiValuedNestedObject = new FirstLevelObjectMapping(
+			multiValuedNestedObject = new FirstLevelObjectBinding(
 					root.objectField( "multiValuedNestedObject", ObjectFieldStorage.NESTED )
 							.multiValued()
 			);
 		}
 	}
 
-	private static class FirstLevelObjectMapping extends AbstractObjectMapping {
+	private static class FirstLevelObjectBinding extends AbstractObjectBinding {
 		final IndexObjectFieldReference self;
-		FirstLevelObjectMapping(IndexSchemaObjectField objectField) {
+		FirstLevelObjectBinding(IndexSchemaObjectField objectField) {
 			super( objectField );
 			self = objectField.toReference();
 		}

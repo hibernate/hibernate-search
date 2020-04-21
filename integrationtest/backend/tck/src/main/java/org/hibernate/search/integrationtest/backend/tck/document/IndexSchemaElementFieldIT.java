@@ -8,20 +8,16 @@ package org.hibernate.search.integrationtest.backend.tck.document;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldFinalStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 
 import org.junit.Rule;
@@ -41,14 +37,6 @@ public class IndexSchemaElementFieldIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private static final List<Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, ?>>> MAIN_TYPES =
-			CollectionHelper.toImmutableList( CollectionHelper.asList(
-					IndexFieldTypeFactory::asString,
-					IndexFieldTypeFactory::asInteger,
-					IndexFieldTypeFactory::asLocalDate,
-					IndexFieldTypeFactory::asGeoPoint
-			) );
 
 	@Test
 	public void nullFieldName() {
@@ -373,23 +361,21 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void missingGetReferenceCall() {
-		for ( Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
-			assertThatThrownBy(
-					() -> setup( ctx -> {
-						IndexSchemaElement root = ctx.getSchemaElement();
-						root.field( "myField", typedContextFunction::apply );
-					} ),
-					"Missing toReference() call after " + typedContextFunction
-			)
-					.isInstanceOf( SearchException.class )
-					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-							.typeContext( TYPE_NAME )
-							.indexContext( INDEX_NAME )
-							.indexFieldContext( "myField" )
-							.failure( "Incomplete field definition" )
-							.build() );
-		}
+	public void missingToReferenceCall() {
+		assertThatThrownBy(
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field( "myField", this::irrelevantTypeContributor );
+				} ),
+				"Missing toReference() call after field()"
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
+						.indexFieldContext( "myField" )
+						.failure( "Incomplete field definition" )
+						.build() );
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
@@ -407,28 +393,26 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	@Test
-	public void multipleGetReferenceCall() {
-		for ( Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
-			assertThatThrownBy(
-					() -> setup( ctx -> {
-						IndexSchemaElement root = ctx.getSchemaElement();
-						IndexSchemaFieldFinalStep<?> context = root.field(
-								"myField",
-								typedContextFunction::apply
-						);
-						context.toReference();
-						context.toReference();
-					} ),
-					"Multiple toReference() calls after " + typedContextFunction
-			)
-					.isInstanceOf( SearchException.class )
-					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-							.typeContext( TYPE_NAME )
-							.indexContext( INDEX_NAME )
-							.indexFieldContext( "myField" )
-							.failure( "Multiple calls to toReference() for the same field definition" )
-							.build() );
-		}
+	public void multipleToReferenceCall() {
+		assertThatThrownBy(
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaFieldFinalStep<?> context = root.field(
+							"myField",
+							this::irrelevantTypeContributor
+					);
+					context.toReference();
+					context.toReference();
+				} ),
+				"Multiple toReference() calls after field()"
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
+						.indexFieldContext( "myField" )
+						.failure( "Multiple calls to toReference() for the same field definition" )
+						.build() );
 		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
