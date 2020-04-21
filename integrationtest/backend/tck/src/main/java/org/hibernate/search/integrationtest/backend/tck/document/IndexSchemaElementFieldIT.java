@@ -14,14 +14,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldFinalStep;
-import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -31,13 +28,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test the behavior of implementations of the document model definition DSL.
+ * Test the behavior of implementations of {@link IndexSchemaElement} when defining fields.
  * <p>
- * This does not check the effects of the model definition on the actual index schema,
+ * This does not check the effects of the definitions on the actual index schema,
  * since this would require backend-specific code to inspect that schema.
  * However, in search and projection tests, we check that defined fields behave correctly at runtime.
  */
-public class DocumentModelDslIT {
+public class IndexSchemaElementFieldIT {
 
 	private static final String TYPE_NAME = "TypeName";
 	private static final String INDEX_NAME = "IndexName";
@@ -372,112 +369,6 @@ public class DocumentModelDslIT {
 						.indexContext( INDEX_NAME )
 						.indexFieldContext( "object1.object2" )
 						.failure( "schema node 'field1' was added twice" )
-						.build() );
-	}
-
-	@Test
-	public void analyzerOnSortableField() {
-		assertThatThrownBy(
-				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field(
-							"myField",
-							f -> f.asString()
-									.sortable( Sortable.YES )
-									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					)
-							.toReference();
-				} ),
-				"Setting an analyzer on sortable field"
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
-						.failure(
-								"Cannot apply an analyzer on a sortable field",
-								"Use a normalizer instead",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
-						)
-						.build() );
-	}
-
-	@Test
-	public void analyzerOnAggregableField() {
-		assertThatThrownBy(
-				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field(
-							"myField",
-							f -> f.asString()
-									.aggregable( Aggregable.YES )
-									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					)
-							.toReference();
-				} ),
-				"Setting an analyzer on aggregable field"
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
-						.failure(
-								"Cannot apply an analyzer on an aggregable field",
-								"Use a normalizer instead",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
-						)
-						.build() );
-	}
-
-	@Test
-	public void analyzerAndNormalizer() {
-		assertThatThrownBy(
-				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field(
-							"myField",
-							f -> f.asString()
-									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-									.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
-					)
-							.toReference();
-				} ),
-				"Setting an analyzer and a normalizer on the same field"
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
-						.failure(
-								"Cannot apply both an analyzer and a normalizer",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'",
-								"'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'"
-						)
-						.build() );
-	}
-
-	@Test
-	public void searchAnalyzerWithoutAnalyzer() {
-		assertThatThrownBy(
-				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field(
-							"myField",
-							f -> f.asString()
-									.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-					)
-							.toReference();
-				} ),
-				"Setting a search analyzer, without setting an analyzer on the same field"
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
-						.failure(
-								"Cannot apply a search analyzer if an analyzer has not been defined on the same field",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
-						)
 						.build() );
 	}
 
