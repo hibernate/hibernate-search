@@ -13,17 +13,15 @@ import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class StubLoadingContext implements LoadingContext<DocumentReference, DocumentReference> {
-	private final ProjectionHitMapper<DocumentReference, DocumentReference> projectionHitMapper;
 
 	StubLoadingContext() {
-		this.projectionHitMapper = new DefaultProjectionHitMapper<>(
-				documentReference -> documentReference,
-				EntityLoader.identity()
-		);
 	}
 
 	@Override
 	public ProjectionHitMapper<DocumentReference, DocumentReference> createProjectionHitMapper() {
-		return projectionHitMapper;
+		return new DefaultProjectionHitMapper<>(
+				documentReference -> documentReference,
+				EntityLoader.identity()
+		);
 	}
 }
