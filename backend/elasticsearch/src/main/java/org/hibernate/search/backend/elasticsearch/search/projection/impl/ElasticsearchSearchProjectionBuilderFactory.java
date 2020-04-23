@@ -182,7 +182,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 		@Override
 		public ElasticsearchFieldProjectionBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getProjectionBuilderFactory();
+			return schemaNode.getType().getProjectionBuilderFactory();
 		}
 
 		@Override

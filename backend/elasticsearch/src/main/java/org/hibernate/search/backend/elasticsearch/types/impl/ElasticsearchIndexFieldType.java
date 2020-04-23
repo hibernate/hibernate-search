@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -40,22 +36,29 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 		this.mapping = mapping;
 	}
 
-	public ElasticsearchIndexSchemaFieldNode<F> createField(ElasticsearchIndexSchemaObjectNode parentNode,
-			String relativeFieldName, boolean multiValued) {
-		return new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode,
-				relativeFieldName,
-				multiValued,
-				codec,
-				predicateBuilderFactory,
-				sortBuilderFactory,
-				projectionBuilderFactory,
-				aggregationBuilderFactory
-		);
+	@Override
+	public String toString() {
+		return mapping.toString();
 	}
 
-	public void indexNullAs(F value) {
-		mapping.setNullValue( codec.encode( value ) );
+	public ElasticsearchFieldCodec<F> getCodec() {
+		return codec;
+	}
+
+	public ElasticsearchFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+		return predicateBuilderFactory;
+	}
+
+	public ElasticsearchFieldSortBuilderFactory getSortBuilderFactory() {
+		return sortBuilderFactory;
+	}
+
+	public ElasticsearchFieldProjectionBuilderFactory getProjectionBuilderFactory() {
+		return projectionBuilderFactory;
+	}
+
+	public ElasticsearchFieldAggregationBuilderFactory getAggregationBuilderFactory() {
+		return aggregationBuilderFactory;
 	}
 
 	public PropertyMapping getMapping() {
