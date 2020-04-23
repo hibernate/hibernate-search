@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,8 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 public class ElasticsearchIndexSchemaObjectNode {
 
 	private static final ElasticsearchIndexSchemaObjectNode ROOT =
-			// at the root object level the nestedPathHierarchy is empty
-			new ElasticsearchIndexSchemaObjectNode( null, null, Collections.emptyList(), null, false );
+			new ElasticsearchIndexSchemaObjectNode( null, null, null, false );
 
 	public static ElasticsearchIndexSchemaObjectNode root() {
 		return ROOT;
@@ -33,12 +33,18 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	private final boolean multiValued;
 
-	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String absolutePath, List<String> nestedPathHierarchy,
-			ObjectFieldStorage storage,
-			boolean multiValued) {
+	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
+			ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
-		this.absolutePath = absolutePath;
-		this.nestedPathHierarchy = Collections.unmodifiableList( nestedPathHierarchy );
+		this.absolutePath = parent == null ? relativeFieldName : parent.getAbsolutePath( relativeFieldName );
+		// at the root object level the nestedPathHierarchy is empty
+		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
+		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
+			// if we found a nested object, we add it to the nestedPathHierarchy
+			theNestedPathHierarchy = new ArrayList<>( theNestedPathHierarchy );
+			theNestedPathHierarchy.add( absolutePath );
+		}
+		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
 		this.multiValued = multiValued;
 	}
