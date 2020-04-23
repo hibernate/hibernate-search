@@ -70,7 +70,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 				behavior.getTotalHitCount(),
 				getResults(
 						actualCall.projectionContext,
-						actualCall.loadingContext.getProjectionHitMapper(),
+						actualCall.loadingContext.createProjectionHitMapper(),
 						actualCall.rootProjection,
 						behavior.getRawHits()
 				),

@@ -48,7 +48,7 @@ public final class MapperEasyMockUtils {
 		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
 		 * so that the mapper can check its state (session is open in ORM, for example).
 		 */
-		expect( loadingContextMock.getProjectionHitMapper() )
+		expect( loadingContextMock.createProjectionHitMapper() )
 				.andReturn( new DefaultProjectionHitMapper<>(
 						referenceTransformerMock,
 						objectLoaderMock

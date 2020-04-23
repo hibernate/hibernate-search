@@ -76,7 +76,7 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 		return new ElasticsearchSearchQueryExtractContext(
 				this,
 				sessionContext,
-				loadingContext.getProjectionHitMapper(),
+				loadingContext.createProjectionHitMapper(),
 				responseBody
 		);
 	}

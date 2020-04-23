@@ -23,7 +23,7 @@ public class StubLoadingContext implements LoadingContext<DocumentReference, Doc
 	}
 
 	@Override
-	public ProjectionHitMapper<DocumentReference, DocumentReference> getProjectionHitMapper() {
+	public ProjectionHitMapper<DocumentReference, DocumentReference> createProjectionHitMapper() {
 		return projectionHitMapper;
 	}
 }

@@ -28,7 +28,7 @@ public final class JavaBeanLoadingContext implements LoadingContext<EntityRefere
 	}
 
 	@Override
-	public ProjectionHitMapper<EntityReference, Void> getProjectionHitMapper() {
+	public ProjectionHitMapper<EntityReference, Void> createProjectionHitMapper() {
 		return new JavaBeanProjectionHitMapper( documentReferenceConverter );
 	}
 

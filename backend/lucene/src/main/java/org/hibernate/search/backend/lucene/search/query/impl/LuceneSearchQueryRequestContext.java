@@ -50,7 +50,7 @@ class LuceneSearchQueryRequestContext {
 			LuceneCollectors luceneCollectors) {
 		return new LuceneSearchQueryExtractContext(
 				sessionContext,
-				loadingContext.getProjectionHitMapper(),
+				loadingContext.createProjectionHitMapper(),
 				indexSearcher,
 				luceneQuery,
 				luceneCollectors
