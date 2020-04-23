@@ -87,7 +87,7 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 
 		ElasticsearchIndexFieldType<F> indexFieldType = toIndexFieldType( mapping );
 		if ( indexNullAs != null ) {
-			indexFieldType.indexNullAs( indexNullAs );
+			indexFieldType.getMapping().setNullValue( indexFieldType.getCodec().encode( indexNullAs ) );
 		}
 		return indexFieldType;
 	}

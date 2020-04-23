@@ -114,7 +114,7 @@ public class ElasticsearchSearchAggregationBuilderFactory
 
 		@Override
 		public ElasticsearchFieldAggregationBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getAggregationBuilderFactory();
+			return schemaNode.getType().getAggregationBuilderFactory();
 		}
 
 		@Override

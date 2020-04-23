@@ -8,11 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 
 
 public class ElasticsearchIndexSchemaFieldNode<F> {
@@ -25,31 +21,14 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final boolean multiValued;
 
-	private final ElasticsearchFieldCodec<F> codec;
-
-	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
-
-	private final ElasticsearchFieldSortBuilderFactory sortBuilderFactory;
-
-	private final ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory;
-
-	private final ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory;
+	private final ElasticsearchIndexFieldType<F> type;
 
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
-			boolean multiValued,
-			ElasticsearchFieldCodec<F> codec,
-			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
-			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
-			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory,
-			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory) {
+			boolean multiValued, ElasticsearchIndexFieldType<F> type) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
-		this.codec = codec;
-		this.predicateBuilderFactory = predicateBuilderFactory;
-		this.sortBuilderFactory = sortBuilderFactory;
-		this.projectionBuilderFactory = projectionBuilderFactory;
-		this.aggregationBuilderFactory = aggregationBuilderFactory;
+		this.type = type;
 		this.multiValued = multiValued;
 	}
 
@@ -78,33 +57,15 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 		return multiValued;
 	}
 
-	public ElasticsearchFieldCodec<F> getCodec() {
-		return codec;
-	}
-
-	public ElasticsearchFieldPredicateBuilderFactory getPredicateBuilderFactory() {
-		return predicateBuilderFactory;
-	}
-
-	public ElasticsearchFieldSortBuilderFactory getSortBuilderFactory() {
-		return sortBuilderFactory;
-	}
-
-	public ElasticsearchFieldProjectionBuilderFactory getProjectionBuilderFactory() {
-		return projectionBuilderFactory;
-	}
-
-	public ElasticsearchFieldAggregationBuilderFactory getAggregationBuilderFactory() {
-		return aggregationBuilderFactory;
+	public ElasticsearchIndexFieldType<F> getType() {
+		return type;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
 				.append( "parent=" ).append( parent )
-				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
-				.append( ", sortBuilderFactory=" ).append( sortBuilderFactory )
-				.append( ", projectionBuilderFactory=" ).append( projectionBuilderFactory )
+				.append( ", type=" ).append( type )
 				.append( "]" );
 		return sb.toString();
 	}

@@ -42,7 +42,7 @@ public class ElasticsearchIndexFieldReference<F> implements IndexFieldReference<
 	}
 
 	void addTo(JsonObject parent, F value) {
-		relativeAccessor.add( parent, schemaNode.getCodec().encode( value ) );
+		relativeAccessor.add( parent, schemaNode.getType().getCodec().encode( value ) );
 	}
 
 	boolean hasValueIn(JsonObject parent) {
