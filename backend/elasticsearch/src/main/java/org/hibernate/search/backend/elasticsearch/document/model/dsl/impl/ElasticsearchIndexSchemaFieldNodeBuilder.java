@@ -79,9 +79,13 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		ElasticsearchIndexSchemaFieldNode<F> fieldNode = type.addField(
-				collector, parentNode, parentMapping, relativeFieldName, multiValued
+		ElasticsearchIndexSchemaFieldNode<F> fieldNode = type.createField(
+				parentNode, relativeFieldName, multiValued
 		);
+
+		collector.collect( absoluteFieldPath, fieldNode );
+		parentMapping.addProperty( relativeFieldName, type.getMapping() );
+
 		reference.enable( fieldNode );
 	}
 

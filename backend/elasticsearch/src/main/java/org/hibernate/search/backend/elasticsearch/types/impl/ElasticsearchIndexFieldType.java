@@ -40,10 +40,9 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 		this.mapping = mapping;
 	}
 
-	public ElasticsearchIndexSchemaFieldNode<F> addField(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode, AbstractTypeMapping parentMapping,
+	public ElasticsearchIndexSchemaFieldNode<F> createField(ElasticsearchIndexSchemaObjectNode parentNode,
 			String relativeFieldName, boolean multiValued) {
-		ElasticsearchIndexSchemaFieldNode<F> schemaNode = new ElasticsearchIndexSchemaFieldNode<>(
+		return new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode,
 				relativeFieldName,
 				multiValued,
@@ -53,16 +52,13 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 				projectionBuilderFactory,
 				aggregationBuilderFactory
 		);
-
-		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
-		collector.collect( absoluteFieldPath, schemaNode );
-
-		parentMapping.addProperty( relativeFieldName, mapping );
-
-		return schemaNode;
 	}
 
 	public void indexNullAs(F value) {
 		mapping.setNullValue( codec.encode( value ) );
+	}
+
+	public PropertyMapping getMapping() {
+		return mapping;
 	}
 }
