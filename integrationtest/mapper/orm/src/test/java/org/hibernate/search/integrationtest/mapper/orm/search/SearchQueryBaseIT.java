@@ -120,6 +120,39 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3896")
+	public void target_byClass_singleType_reuseQueryInstance() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			// reuse three times the same query instance
+			for ( int i = 0; i < 3; i++ ) {
+				backendMock.expectSearchObjects(
+						Arrays.asList( Book.NAME ),
+						b -> {
+						},
+						StubSearchWorkBehavior.of(
+								3L,
+								reference( Book.NAME, "1" ),
+								reference( Book.NAME, "2" ),
+								reference( Book.NAME, "3" )
+						)
+				);
+
+				Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+						session.load( Book.class, 1 ),
+						session.load( Book.class, 2 ),
+						session.load( Book.class, 3 )
+				);
+			}
+		} );
+	}
+
+	@Test
 	public void target_byClass_multipleTypes() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
@@ -658,7 +691,7 @@ public class SearchQueryBaseIT {
 		private String name;
 
 		@OneToMany(mappedBy = "author")
-		private List<Book> books = new ArrayList<>();
+		private final List<Book> books = new ArrayList<>();
 
 		public Author() {
 		}
