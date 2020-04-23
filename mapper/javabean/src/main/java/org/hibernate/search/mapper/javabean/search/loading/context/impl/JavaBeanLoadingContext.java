@@ -21,15 +21,15 @@ public final class JavaBeanLoadingContext implements LoadingContext<EntityRefere
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ProjectionHitMapper<EntityReference, Void> projectionHitMapper;
+	private final DocumentReferenceConverter<EntityReference> documentReferenceConverter;
 
-	private JavaBeanLoadingContext(ProjectionHitMapper<EntityReference, Void> projectionHitMapper) {
-		this.projectionHitMapper = projectionHitMapper;
+	private JavaBeanLoadingContext(DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+		this.documentReferenceConverter = documentReferenceConverter;
 	}
 
 	@Override
 	public ProjectionHitMapper<EntityReference, Void> getProjectionHitMapper() {
-		return projectionHitMapper;
+		return new JavaBeanProjectionHitMapper( documentReferenceConverter );
 	}
 
 	public static final class Builder implements LoadingContextBuilder<EntityReference, Void, Void> {
@@ -46,9 +46,7 @@ public final class JavaBeanLoadingContext implements LoadingContext<EntityRefere
 
 		@Override
 		public LoadingContext<EntityReference, Void> build() {
-			ProjectionHitMapper<EntityReference, Void> projectionHitMapper =
-					new JavaBeanProjectionHitMapper( documentReferenceConverter );
-			return new JavaBeanLoadingContext( projectionHitMapper );
+			return new JavaBeanLoadingContext( documentReferenceConverter );
 		}
 	}
 }
