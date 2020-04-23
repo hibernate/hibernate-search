@@ -17,6 +17,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
  */
 public interface LoadingContext<R, E> {
 
-	ProjectionHitMapper<R, E> getProjectionHitMapper();
+	ProjectionHitMapper<R, E> createProjectionHitMapper();
 
 }

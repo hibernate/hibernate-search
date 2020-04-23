@@ -47,7 +47,7 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 	}
 
 	@Override
-	public ProjectionHitMapper<EntityReference, E> getProjectionHitMapper() {
+	public ProjectionHitMapper<EntityReference, E> createProjectionHitMapper() {
 		try {
 			sessionImplementor.checkOpen();
 		}
