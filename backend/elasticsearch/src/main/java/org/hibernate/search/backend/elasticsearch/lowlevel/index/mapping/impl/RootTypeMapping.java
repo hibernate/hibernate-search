@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -21,8 +25,11 @@ import com.google.gson.annotations.SerializedName;
 @JsonAdapter(RootTypeMappingJsonAdapterFactory.class)
 public class RootTypeMapping extends AbstractTypeMapping {
 
-	@SerializedName( "_routing" )
+	@SerializedName("_routing")
 	private RoutingType routing;
+
+	@SerializedName("dynamic_templates")
+	private List<NamedDynamicTemplate> dynamicTemplates;
 
 	public RoutingType getRouting() {
 		return routing;
@@ -31,4 +38,20 @@ public class RootTypeMapping extends AbstractTypeMapping {
 	public void setRouting(RoutingType routing) {
 		this.routing = routing;
 	}
+
+	public List<NamedDynamicTemplate> getDynamicTemplates() {
+		return dynamicTemplates == null ? null : Collections.unmodifiableList( dynamicTemplates );
+	}
+
+	private List<NamedDynamicTemplate> getInitializedDynamicTemplates() {
+		if ( dynamicTemplates == null ) {
+			dynamicTemplates = new ArrayList<>();
+		}
+		return dynamicTemplates;
+	}
+
+	public void addDynamicTemplate(NamedDynamicTemplate template) {
+		getInitializedDynamicTemplates().add( template );
+	}
+
 }
