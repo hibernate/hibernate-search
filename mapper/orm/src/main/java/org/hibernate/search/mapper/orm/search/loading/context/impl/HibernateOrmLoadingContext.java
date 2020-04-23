@@ -10,9 +10,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -30,16 +32,17 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SessionImplementor sessionImplementor;
-
-	private final ProjectionHitMapper<EntityReference, E> projectionHitMapper;
-
+	private final DocumentReferenceConverter<EntityReference> referenceHitMapper;
+	private final EntityLoader<EntityReference, ? extends E> entityLoader;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmLoadingContext(SessionImplementor sessionImplementor,
-			ProjectionHitMapper<EntityReference, E> projectionHitMapper,
+			DocumentReferenceConverter<EntityReference> referenceHitMapper,
+			EntityLoader<EntityReference, ? extends E> entityLoader,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.sessionImplementor = sessionImplementor;
-		this.projectionHitMapper = projectionHitMapper;
+		this.referenceHitMapper = referenceHitMapper;
+		this.entityLoader = entityLoader;
 		this.loadingOptions = loadingOptions;
 	}
 
@@ -52,7 +55,7 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 			throw log.hibernateSessionIsClosed( e );
 		}
 
-		return projectionHitMapper;
+		return new DefaultProjectionHitMapper<>( referenceHitMapper, entityLoader );
 	}
 
 	public SessionImplementor getSessionImplementor() {
@@ -96,13 +99,11 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 
 		@Override
 		public LoadingContext<EntityReference, E> build() {
-			ProjectionHitMapper<EntityReference, E> projectionHitMapper = new DefaultProjectionHitMapper<>(
-					sessionContext.getReferenceHitMapper(),
-					entityLoaderBuilder.build( loadingOptions )
-			);
+			DocumentReferenceConverter<EntityReference> referenceHitMapper = sessionContext.getReferenceHitMapper();
+			EntityLoader<EntityReference, ? extends E> entityLoader = entityLoaderBuilder.build( loadingOptions );
 			return new HibernateOrmLoadingContext<>(
 					sessionContext.getSession(),
-					projectionHitMapper,
+					referenceHitMapper, entityLoader,
 					loadingOptions
 			);
 		}
