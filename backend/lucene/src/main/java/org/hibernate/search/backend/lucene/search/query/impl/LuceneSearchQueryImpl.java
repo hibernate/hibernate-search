@@ -116,25 +116,25 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	public Explanation explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Set<String> targetedIndexNames = searchContext.getTypeNames();
-		if ( targetedIndexNames.size() != 1 ) {
-			throw log.explainRequiresIndexName( targetedIndexNames );
+		Set<String> targetedTypeNames = searchContext.getTypeNames();
+		if ( targetedTypeNames.size() != 1 ) {
+			throw log.explainRequiresTypeName( targetedTypeNames );
 		}
 
-		return doExplain( targetedIndexNames.iterator().next(), id );
+		return doExplain( targetedTypeNames.iterator().next(), id );
 	}
 
 	@Override
-	public Explanation explain(String indexName, String id) {
-		Contracts.assertNotNull( indexName, "indexName" );
+	public Explanation explain(String typeName, String id) {
+		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
 		Set<String> targetedIndexNames = searchContext.getTypeNames();
-		if ( !targetedIndexNames.contains( indexName ) ) {
-			throw log.explainRequiresIndexTargetedByQuery( targetedIndexNames, indexName );
+		if ( !targetedIndexNames.contains( typeName ) ) {
+			throw log.explainRequiresTypeTargetedByQuery( targetedIndexNames, typeName );
 		}
 
-		return doExplain( indexName, id );
+		return doExplain( typeName, id );
 	}
 
 	private <T> T doSubmit(ReadWork<T> work) {
