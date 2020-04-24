@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,16 +69,20 @@ public final class ElasticsearchSearchContext {
 		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
 	}
 
-	public Map<String, URLEncodedString> getHibernateSearchIndexNamesToIndexReadNames() {
-		return scopeModel.getHibernateSearchIndexNamesToIndexReadNames();
+	public Set<String> getMappedTypeNames() {
+		return scopeModel.getMappedTypeNames();
 	}
 
 	public Set<String> getHibernateSearchIndexNames() {
 		return scopeModel.getHibernateSearchIndexNames();
 	}
 
-	public Set<String> getMappedTypeNames() {
-		return scopeModel.getMappedTypeNames();
+	public Collection<URLEncodedString> getElasticsearchIndexNames() {
+		return scopeModel.getElasticsearchIndexNames();
+	}
+
+	public Map<String, URLEncodedString> getMappedTypeToElasticsearchIndexNames() {
+		return scopeModel.getMappedTypeToElasticsearchIndexNames();
 	}
 
 	public JsonObject getFilterOrNull(String tenantId) {

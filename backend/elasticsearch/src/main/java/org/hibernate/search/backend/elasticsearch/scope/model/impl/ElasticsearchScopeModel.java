@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -33,30 +34,34 @@ public class ElasticsearchScopeModel {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<ElasticsearchIndexModel> indexModels;
-	private final Map<String, URLEncodedString> hibernateSearchIndexNamesToIndexReadNames;
-	private final Set<String> mappedTypeNames;
+	private final Set<String> hibernateSearchIndexNames;
+	private final Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames;
 
 	public ElasticsearchScopeModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
-		this.hibernateSearchIndexNamesToIndexReadNames = new LinkedHashMap<>();
-		this.mappedTypeNames = new LinkedHashSet<>();
+		this.hibernateSearchIndexNames = new LinkedHashSet<>();
+		this.mappedTypeToElasticsearchIndexNames = new LinkedHashMap<>();
 		for ( ElasticsearchIndexModel model : indexModels ) {
-			hibernateSearchIndexNamesToIndexReadNames.put( model.getHibernateSearchIndexName(), model.getNames().getRead() );
-			mappedTypeNames.add( model.getMappedTypeName() );
+			hibernateSearchIndexNames.add( model.getHibernateSearchIndexName() );
+			mappedTypeToElasticsearchIndexNames.put( model.getMappedTypeName(), model.getNames().getRead() );
 		}
 	}
 
-	public Set<String> getHibernateSearchIndexNames() {
-		return hibernateSearchIndexNamesToIndexReadNames.keySet();
-	}
-
-	public Map<String, URLEncodedString> getHibernateSearchIndexNamesToIndexReadNames() {
-		return hibernateSearchIndexNamesToIndexReadNames;
-	}
-
 	public Set<String> getMappedTypeNames() {
-		return mappedTypeNames;
+		return mappedTypeToElasticsearchIndexNames.keySet();
+	}
+
+	public Set<String> getHibernateSearchIndexNames() {
+		return hibernateSearchIndexNames;
+	}
+
+	public Collection<URLEncodedString> getElasticsearchIndexNames() {
+		return mappedTypeToElasticsearchIndexNames.values();
+	}
+
+	public Map<String, URLEncodedString> getMappedTypeToElasticsearchIndexNames() {
+		return mappedTypeToElasticsearchIndexNames;
 	}
 
 	public EventContext getIndexesEventContext() {
