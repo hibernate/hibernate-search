@@ -31,8 +31,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldValueCardinality;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
@@ -53,15 +52,13 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class DistanceSearchSortBaseIT {
 
-	@Parameterized.Parameters(name = "{0} - {1} - {2}")
+	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
-		for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
-			for ( IndexFieldValueCardinality indexFieldValueCardinality : IndexFieldValueCardinality.values() ) {
-				parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, null } );
-				for ( SortMode sortMode : SortMode.values() ) {
-					parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, sortMode } );
-				}
+		for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
+			parameters.add( new Object[] { fieldStructure, null } );
+			for ( SortMode sortMode : SortMode.values() ) {
+				parameters.add( new Object[] { fieldStructure, sortMode } );
 			}
 		}
 		return parameters.toArray( new Object[0][] );
@@ -104,14 +101,11 @@ public class DistanceSearchSortBaseIT {
 		initData();
 	}
 
-	private final IndexFieldStructure indexFieldStructure;
-	private final IndexFieldValueCardinality indexFieldValueCardinality;
+	private final TestedFieldStructure fieldStructure;
 	private final SortMode sortMode;
 
-	public DistanceSearchSortBaseIT(IndexFieldStructure indexFieldStructure,
-			IndexFieldValueCardinality indexFieldValueCardinality, SortMode sortMode) {
-		this.indexFieldStructure = indexFieldStructure;
-		this.indexFieldValueCardinality = indexFieldValueCardinality;
+	public DistanceSearchSortBaseIT(TestedFieldStructure fieldStructure, SortMode sortMode) {
+		this.fieldStructure = fieldStructure;
 		this.sortMode = sortMode;
 	}
 
@@ -200,10 +194,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private boolean isMedianWithNestedField() {
-		return SortMode.MEDIAN.equals( sortMode )
-				&& EnumSet.of( IndexFieldStructure.IN_NESTED, IndexFieldStructure.IN_NESTED_TWICE,
-						IndexFieldStructure.IN_NESTED_REQUIRING_FILTER )
-				.contains( indexFieldStructure );
+		return SortMode.MEDIAN.equals( sortMode ) && fieldStructure.isNested();
 	}
 
 	private boolean isSum() {
@@ -229,7 +220,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private DistanceSortOptionsStep<?, ?> applyFilter(DistanceSortOptionsStep<?, ?> optionsStep) {
-		if ( IndexFieldStructure.IN_NESTED_REQUIRING_FILTER.equals( indexFieldStructure ) ) {
+		if ( fieldStructure.isNestedFilterRequired() ) {
 			return optionsStep.filter( f -> f.match()
 					.field( "nestedObjectRequiringFilter.discriminator" )
 					.matching( "included" ) );
@@ -240,7 +231,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private String getFieldPath(SortOrder expectedOrder) {
-		switch ( indexFieldStructure ) {
+		switch ( fieldStructure.location ) {
 			case ROOT:
 				return getRelativeFieldName( expectedOrder );
 			case IN_FLATTENED:
@@ -252,45 +243,42 @@ public class DistanceSearchSortBaseIT {
 			case IN_NESTED_REQUIRING_FILTER:
 				return "nestedObjectRequiringFilter." + getRelativeFieldName( expectedOrder );
 			default:
-				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
+				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
 		}
 	}
 
 	private String getRelativeFieldName(SortOrder expectedOrder) {
-		switch ( indexFieldValueCardinality ) {
-			case SINGLE_VALUED:
-				// Sort on a single-valued field.
-				return "geoPoint";
-			case MULTI_VALUED:
-				if ( sortMode == null ) {
-					// Default sort mode: min in ascending order, max in descending order
-					switch ( expectedOrder ) {
-						case ASC:
-							return "geoPoint_ascendingMin";
-						case DESC:
-							return "geoPoint_ascendingMax";
-						default:
-							throw new IllegalStateException( "Unexpected sort order: " + expectedOrder );
-					}
+		if ( fieldStructure.isSingleValued() ) {
+			return "geoPoint";
+		}
+		else {
+			if ( sortMode == null ) {
+				// Default sort mode: min in ascending order, max in descending order
+				switch ( expectedOrder ) {
+					case ASC:
+						return "geoPoint_ascendingMin";
+					case DESC:
+						return "geoPoint_ascendingMax";
+					default:
+						throw new IllegalStateException( "Unexpected sort order: " + expectedOrder );
 				}
-				else {
-					switch ( sortMode ) {
-						case SUM:
-							return "geoPoint_ascendingSum";
-						case MIN:
-							return "geoPoint_ascendingMin";
-						case MAX:
-							return "geoPoint_ascendingMax";
-						case AVG:
-							return "geoPoint_ascendingAvg";
-						case MEDIAN:
-							return "geoPoint_ascendingMedian";
-						default:
-							throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
-					}
+			}
+			else {
+				switch ( sortMode ) {
+					case SUM:
+						return "geoPoint_ascendingSum";
+					case MIN:
+						return "geoPoint_ascendingMin";
+					case MAX:
+						return "geoPoint_ascendingMax";
+					case AVG:
+						return "geoPoint_ascendingAvg";
+					case MEDIAN:
+						return "geoPoint_ascendingMedian";
+					default:
+						throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
 				}
-			default:
-				throw new IllegalStateException( "Unexpected field value cardinality: " + indexFieldValueCardinality );
+			}
 		}
 	}
 
@@ -514,7 +502,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private static class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTermValues<GeoPoint> {
-		private static AscendingUniqueDistanceFromCenterValues INSTANCE = new AscendingUniqueDistanceFromCenterValues();
+		private static final AscendingUniqueDistanceFromCenterValues INSTANCE = new AscendingUniqueDistanceFromCenterValues();
 
 		@Override
 		protected List<GeoPoint> createSingle() {

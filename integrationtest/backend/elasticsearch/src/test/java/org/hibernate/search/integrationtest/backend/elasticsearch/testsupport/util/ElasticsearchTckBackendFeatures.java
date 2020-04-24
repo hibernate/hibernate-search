@@ -10,14 +10,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
 class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
-	private ElasticsearchTestDialect dialect;
+	private final ElasticsearchTestDialect dialect;
 
 	ElasticsearchTckBackendFeatures(ElasticsearchTestDialect dialect) {
 		this.dialect = dialect;
@@ -69,11 +69,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean sortByFieldValue(IndexFieldStructure indexFieldStructure, Class<?> fieldType, SortMode sortMode) {
+	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		if (
-				( indexFieldStructure == IndexFieldStructure.IN_NESTED
-						|| indexFieldStructure == IndexFieldStructure.IN_NESTED_REQUIRING_FILTER
-						|| indexFieldStructure == IndexFieldStructure.IN_NESTED_TWICE )
+				fieldStructure.isNested()
 				&& sortMode == SortMode.MAX
 				&& ( Float.class.equals( fieldType )
 						|| Double.class.equals( fieldType )
