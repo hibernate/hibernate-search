@@ -64,6 +64,10 @@ public final class LuceneSearchContext {
 		return analysisDefinitionRegistry;
 	}
 
+	public Set<String> getTypeNames() {
+		return scopeModel.getTypeNames();
+	}
+
 	public Set<String> getIndexNames() {
 		return scopeModel.getIndexNames();
 	}
