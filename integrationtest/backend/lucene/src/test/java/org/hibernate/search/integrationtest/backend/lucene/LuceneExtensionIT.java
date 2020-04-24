@@ -82,8 +82,12 @@ import org.junit.Test;
 public class LuceneExtensionIT {
 
 	private static final String BACKEND_NAME = "myLuceneBackend";
-	private static final String INDEX_NAME = "IndexName";
-	private static final String OTHER_INDEX_NAME = "OtherIndexName";
+
+	private static final String INDEX_NAME = "indexName";
+	private static final String TYPE_NAME = "typeName";
+
+	private static final String OTHER_INDEX_NAME = "otherIndexName";
+	private static final String OTHER_TYPE_NAME = "otherTypeName";
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -107,11 +111,13 @@ public class LuceneExtensionIT {
 		this.integration = setupHelper.start( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
+						options -> options.mappedType( TYPE_NAME ),
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withIndex(
 						OTHER_INDEX_NAME,
+						options -> options.mappedType( OTHER_TYPE_NAME ),
 						ctx -> this.otherIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.otherIndexManager = indexManager
 				)
@@ -147,7 +153,7 @@ public class LuceneExtensionIT {
 		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 
 		assertThat( result ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
@@ -177,7 +183,7 @@ public class LuceneExtensionIT {
 		LuceneSearchQuery<DocumentReference> query = genericQuery.extension( LuceneExtension.get() );
 		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 		assertThat( result ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
 
 		// Unsupported extension
@@ -220,7 +226,7 @@ public class LuceneExtensionIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Document with id 'InvalidId' does not exist in index '" + INDEX_NAME + "'"
+						"Document with id 'InvalidId' does not exist for the mapped type '" + TYPE_NAME + "'"
 				);
 	}
 
@@ -233,12 +239,12 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
+		Assertions.assertThat( query.explain( TYPE_NAME, FIRST_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
+		Assertions.assertThat( query.explain( TYPE_NAME, FIFTH_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 	}
@@ -255,9 +261,9 @@ public class LuceneExtensionIT {
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
+				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple mapped types" )
 				.hasMessageContaining(
-						"pass one of [" + INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
+						"pass one of [" + TYPE_NAME + ", " + OTHER_TYPE_NAME + "]"
 				);
 	}
 
@@ -274,8 +280,8 @@ public class LuceneExtensionIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
-								+ INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
+						"mapped type name 'NotAnIndexName' is not among the mapped types targeted by this query: ["
+								+ TYPE_NAME + ", " + OTHER_TYPE_NAME + "]"
 				);
 	}
 
@@ -297,7 +303,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
@@ -321,7 +327,7 @@ public class LuceneExtensionIT {
 				.where( booleanPredicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
@@ -341,7 +347,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 
@@ -361,7 +367,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID
 		);
 	}
@@ -393,7 +399,7 @@ public class LuceneExtensionIT {
 				.sort( f -> f.composite().add( sort1 ).add( sort2 ).add( sort3 ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
 		SearchSort sort = scope.sort()
 				.extension( LuceneExtension.get() ).fromLuceneSort( new Sort(
@@ -409,7 +415,7 @@ public class LuceneExtensionIT {
 				.sort( sort )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -428,7 +434,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 
@@ -445,7 +451,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID
 		);
 	}
@@ -478,7 +484,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID );
 	}
 
 	@Test
@@ -524,7 +530,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
@@ -575,7 +581,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
 		Assertions.assertThatThrownBy(
@@ -780,12 +786,12 @@ public class LuceneExtensionIT {
 		// Check that all documents are searchable
 		assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasDocRefHitsAnyOrder(
-						INDEX_NAME,
+						TYPE_NAME,
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 				);
 		assertThat( otherIndexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasDocRefHitsAnyOrder(
-						OTHER_INDEX_NAME,
+						OTHER_TYPE_NAME,
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 				);
 	}
