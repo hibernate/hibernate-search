@@ -77,8 +77,12 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 public class ElasticsearchExtensionIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
-	private static final String INDEX_NAME = "IndexName";
-	private static final String OTHER_INDEX_NAME = "OtherIndexName";
+
+	private static final String INDEX_NAME = "indexName";
+	private static final String TYPE_NAME = "typeName";
+
+	private static final String OTHER_INDEX_NAME = "otherIndexName";
+	private static final String OTHER_TYPE_NAME = "otherTypeName";
 
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
@@ -104,11 +108,13 @@ public class ElasticsearchExtensionIT {
 		this.integration = setupHelper.start( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
+						options -> options.mappedType( TYPE_NAME ),
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withIndex(
 						OTHER_INDEX_NAME,
+						options -> options.mappedType( OTHER_TYPE_NAME ),
 						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.otherIndexManager = indexManager
 				)
@@ -144,7 +150,7 @@ public class ElasticsearchExtensionIT {
 		ElasticsearchSearchResult<DocumentReference> result = query.fetchAll();
 
 		assertThat( result ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
@@ -174,7 +180,7 @@ public class ElasticsearchExtensionIT {
 		ElasticsearchSearchQuery<DocumentReference> query = genericQuery.extension( ElasticsearchExtension.get() );
 		ElasticsearchSearchResult<DocumentReference> result = query.fetchAll();
 		assertThat( result ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
 
 		// Unsupported extension
@@ -273,13 +279,13 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
+		Assertions.assertThat( query.explain( TYPE_NAME, FIRST_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
+		Assertions.assertThat( query.explain( TYPE_NAME, FIFTH_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
@@ -310,12 +316,12 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		Assertions.assertThatThrownBy(
-				() -> query.explain( "NotAnIndexName", FIRST_ID )
+				() -> query.explain( "NotAMappedName", FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"type name 'NotAnIndexName' is not among the mapped type targeted by this query: ["
-						+ INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
+						"type name 'NotAMappedName' is not among the mapped type targeted by this query: ["
+						+ TYPE_NAME + ", " + OTHER_TYPE_NAME + "]"
 				);
 	}
 
@@ -328,7 +334,7 @@ public class ElasticsearchExtensionIT {
 						.matching( new JsonPrimitive( "2018:01:12" ) ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FOURTH_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FOURTH_ID )
 				.hasTotalHitCount( 1 );
 	}
 
@@ -341,7 +347,7 @@ public class ElasticsearchExtensionIT {
 						.matching( new ValueWrapper<>( new JsonPrimitive( 2 ) ) ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, SECOND_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, SECOND_ID )
 				.hasTotalHitCount( 1 );
 	}
 
@@ -354,7 +360,7 @@ public class ElasticsearchExtensionIT {
 						.matching( new JsonPrimitive( 2 ), ValueConvert.NO ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, SECOND_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, SECOND_ID )
 				.hasTotalHitCount( 1 );
 	}
 
@@ -388,7 +394,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
@@ -424,7 +430,7 @@ public class ElasticsearchExtensionIT {
 				.where( booleanPredicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
@@ -456,7 +462,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
@@ -491,7 +497,7 @@ public class ElasticsearchExtensionIT {
 				.where( booleanPredicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
@@ -509,7 +515,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
 
@@ -523,7 +529,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
 	}
@@ -553,7 +559,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
 
@@ -578,7 +584,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
 	}
@@ -613,7 +619,7 @@ public class ElasticsearchExtensionIT {
 				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() ).fromJson( gson.fromJson(
 						"{'nativeField_sort1': 'desc'}", JsonObject.class
@@ -641,7 +647,7 @@ public class ElasticsearchExtensionIT {
 				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -664,7 +670,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
 
@@ -684,7 +690,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
 	}
@@ -714,7 +720,7 @@ public class ElasticsearchExtensionIT {
 				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJson( "{'nativeField_sort1': 'desc'}" )
@@ -737,7 +743,7 @@ public class ElasticsearchExtensionIT {
 				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( TYPE_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -757,7 +763,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID
 		);
 
@@ -775,7 +781,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID
 		);
 	}
@@ -1205,7 +1211,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(
-				INDEX_NAME,
+				TYPE_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID
 		);
 	}
