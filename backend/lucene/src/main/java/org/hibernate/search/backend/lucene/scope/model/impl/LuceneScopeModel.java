@@ -9,11 +9,11 @@ package org.hibernate.search.backend.lucene.scope.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
@@ -32,16 +32,26 @@ public class LuceneScopeModel {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<LuceneIndexModel> indexModels;
+	private final Set<String> typeNames;
 	private final Set<String> indexNames;
 	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
 
 	public LuceneScopeModel(Set<LuceneIndexModel> indexModels,
 			Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
 		this.indexModels = indexModels;
-		this.indexNames = indexModels.stream()
-				.map( LuceneIndexModel::getIndexName )
-				.collect( Collectors.toSet() );
+		// Use LinkedHashSet to ensure stable order when generating requests
+		this.typeNames = new LinkedHashSet<>();
+		this.indexNames = new LinkedHashSet<>();
 		this.indexManagerContexts = indexManagerContexts;
+
+		for ( LuceneIndexModel model : indexModels ) {
+			this.typeNames.add( model.getMappedTypeName() );
+			this.indexNames.add( model.getIndexName() );
+		}
+	}
+
+	public Set<String> getTypeNames() {
+		return typeNames;
 	}
 
 	public Set<String> getIndexNames() {
