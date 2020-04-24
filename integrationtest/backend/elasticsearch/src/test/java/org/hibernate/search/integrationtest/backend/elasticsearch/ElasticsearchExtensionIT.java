@@ -314,7 +314,7 @@ public class ElasticsearchExtensionIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
+						"type name 'NotAnIndexName' is not among the mapped type targeted by this query: ["
 						+ INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
 				);
 	}

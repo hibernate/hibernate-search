@@ -487,8 +487,8 @@ public interface Log extends BasicLogger {
 	SearchException explainRequiresIndexName(Set<String> targetedIndexNames);
 
 	@Message(id = ID_OFFSET_3 + 65,
-			value = "The given index name '%2$s' is not among the indexes targeted by this query: %1$s." )
-	SearchException explainRequiresIndexTargetedByQuery(Set<String> targetedIndexNames, String indexName);
+			value = "The given mapped type name '%2$s' is not among the mapped type targeted by this query: %1$s." )
+	SearchException explainRequiresTypeTargetedByQuery(Set<String> targetedTypeNames, String typeName);
 
 	@Message(id = ID_OFFSET_3 + 66,
 			value = "Document with id '%1$s' does not exist in the targeted index and thus its match cannot be explained." )

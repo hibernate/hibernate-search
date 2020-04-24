@@ -7,35 +7,35 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
-import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 
 
 public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, ElasticsearchSearchResult<H>>
@@ -107,7 +107,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
-				.indexes( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
+				.indexes( searchContext.getElasticsearchIndexNames() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -135,7 +135,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		NonBulkableWork<Long> work = workFactory.count( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
+		NonBulkableWork<Long> work = workFactory.count( searchContext.getElasticsearchIndexNames() )
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -150,26 +150,26 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public JsonObject explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Map<String, URLEncodedString> targetedIndexNames = searchContext.getHibernateSearchIndexNamesToIndexReadNames();
+		Collection<URLEncodedString> targetedIndexNames = searchContext.getElasticsearchIndexNames();
 		if ( targetedIndexNames.size() != 1 ) {
-			throw log.explainRequiresIndexName( targetedIndexNames.keySet() );
+			throw log.explainRequiresIndexName( searchContext.getHibernateSearchIndexNames() );
 		}
 
-		return doExplain( targetedIndexNames.entrySet().iterator().next().getValue(), id );
+		return doExplain( targetedIndexNames.iterator().next(), id );
 	}
 
 	@Override
-	public JsonObject explain(String indexName, String id) {
-		Contracts.assertNotNull( indexName, "indexName" );
+	public JsonObject explain(String typeName, String id) {
+		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
-		Map<String, URLEncodedString> targetedIndexNames = searchContext.getHibernateSearchIndexNamesToIndexReadNames();
-		URLEncodedString indexReadName = targetedIndexNames.get( indexName );
-		if ( indexReadName == null ) {
-			throw log.explainRequiresIndexTargetedByQuery( targetedIndexNames.keySet(), indexName );
+
+		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames = searchContext.getMappedTypeToElasticsearchIndexNames();
+		if ( !mappedTypeNamesToIndexReadNames.containsKey( typeName ) ) {
+			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNamesToIndexReadNames.keySet(), typeName );
 		}
 
-		return doExplain( indexReadName, id );
+		return doExplain( mappedTypeNamesToIndexReadNames.get( typeName ), id );
 	}
 
 	private Integer defaultedLimit(Integer limit, Integer offset) {
