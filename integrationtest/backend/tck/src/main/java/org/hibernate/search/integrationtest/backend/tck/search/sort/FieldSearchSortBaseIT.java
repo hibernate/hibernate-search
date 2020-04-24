@@ -40,8 +40,8 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldValueCardinality;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -70,18 +70,16 @@ public class FieldSearchSortBaseIT<F> {
 				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
 	}
 
-	@Parameterized.Parameters(name = "{0} - {1} - {3} - {2}")
+	@Parameterized.Parameters(name = "{0} - {2} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
 			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
-				for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
-					for ( IndexFieldValueCardinality indexFieldValueCardinality : IndexFieldValueCardinality.values() ) {
-						parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, fieldTypeDescriptor, null } );
-						for ( SortMode sortMode : SortMode.values() ) {
-							parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, fieldTypeDescriptor, sortMode } );
-						}
+				for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
+					parameters.add( new Object[] { fieldStructure, fieldTypeDescriptor, null } );
+					for ( SortMode sortMode : SortMode.values() ) {
+						parameters.add( new Object[] { fieldStructure, fieldTypeDescriptor, sortMode } );
 					}
 				}
 			}
@@ -127,15 +125,13 @@ public class FieldSearchSortBaseIT<F> {
 		initData();
 	}
 
-	private final IndexFieldStructure indexFieldStructure;
-	private final IndexFieldValueCardinality indexFieldValueCardinality;
+	private final TestedFieldStructure fieldStructure;
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 	private final SortMode sortMode;
 
-	public FieldSearchSortBaseIT(IndexFieldStructure indexFieldStructure, IndexFieldValueCardinality indexFieldValueCardinality,
+	public FieldSearchSortBaseIT(TestedFieldStructure fieldStructure,
 			FieldTypeDescriptor<F> fieldTypeDescriptor, SortMode sortMode) {
-		this.indexFieldStructure = indexFieldStructure;
-		this.indexFieldValueCardinality = indexFieldValueCardinality;
+		this.fieldStructure = fieldStructure;
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 		this.sortMode = sortMode;
 	}
@@ -431,7 +427,7 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private FieldSortOptionsStep<?, ?> applyFilter(FieldSortOptionsStep<?, ?> optionsStep) {
-		if ( IndexFieldStructure.IN_NESTED_REQUIRING_FILTER.equals( indexFieldStructure ) ) {
+		if ( IndexFieldLocation.IN_NESTED_REQUIRING_FILTER.equals( fieldStructure.location ) ) {
 			return optionsStep.filter( f -> f.match()
 					.field( indexMapping.nestedObjectRequiringFilter.relativeFieldName + ".discriminator" )
 					.matching( "included" ) );
@@ -449,7 +445,7 @@ public class FieldSearchSortBaseIT<F> {
 		Assume.assumeTrue(
 				"This combination is buggy with this backend",
 				TckConfiguration.get().getBackendFeatures()
-						.sortByFieldValue( indexFieldStructure, fieldTypeDescriptor.getJavaType(), sortMode )
+						.sortByFieldValue( fieldStructure, fieldTypeDescriptor.getJavaType(), sortMode )
 		);
 	}
 
@@ -468,13 +464,11 @@ public class FieldSearchSortBaseIT<F> {
 
 	private boolean isMedianWithNestedField() {
 		return SortMode.MEDIAN.equals( sortMode )
-				&& EnumSet.of( IndexFieldStructure.IN_NESTED, IndexFieldStructure.IN_NESTED_TWICE,
-						IndexFieldStructure.IN_NESTED_REQUIRING_FILTER )
-				.contains( indexFieldStructure );
+				&& fieldStructure.isNested();
 	}
 
 	private String getFieldPath(SortOrder expectedOrder) {
-		switch ( indexFieldStructure ) {
+		switch ( fieldStructure.location ) {
 			case ROOT:
 				return getRelativeFieldName( indexMapping, expectedOrder );
 			case IN_FLATTENED:
@@ -491,7 +485,7 @@ public class FieldSearchSortBaseIT<F> {
 				return indexMapping.nestedObjectRequiringFilter.relativeFieldName
 						+ "." + getRelativeFieldName( indexMapping.nestedObjectRequiringFilter, expectedOrder );
 			default:
-				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
+				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
 		}
 	}
 
@@ -500,42 +494,38 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectMapping mapping, SortOrder expectedOrder) {
-		switch ( indexFieldValueCardinality ) {
-			case SINGLE_VALUED:
-				// Sort on a single-valued field.
-				return mapping.fieldWithSingleValueModels;
-			case MULTI_VALUED:
-				// Sort on a multi-valued field.
-				// We must chose the field carefuly so that documents are in the expected order for the configured sort mode.
-				if ( sortMode == null ) {
-					// Default sort mode: min in ascending order, max in descending order
-					switch ( expectedOrder ) {
-						case ASC:
-							return mapping.fieldWithAscendingMinModels;
-						case DESC:
-							return mapping.fieldWithAscendingMaxModels;
-						default:
-							throw new IllegalStateException( "Unexpected sort order: " + expectedOrder );
-					}
+		if ( fieldStructure.isSingleValued() ) {
+			return mapping.fieldWithSingleValueModels;
+		}
+		else {
+			// We must chose the field carefuly so that documents are in the expected order for the configured sort mode.
+			if ( sortMode == null ) {
+				// Default sort mode: min in ascending order, max in descending order
+				switch ( expectedOrder ) {
+					case ASC:
+						return mapping.fieldWithAscendingMinModels;
+					case DESC:
+						return mapping.fieldWithAscendingMaxModels;
+					default:
+						throw new IllegalStateException( "Unexpected sort order: " + expectedOrder );
 				}
-				else {
-					switch ( sortMode ) {
-						case SUM:
-							return mapping.fieldWithAscendingSumModels;
-						case MIN:
-							return mapping.fieldWithAscendingMinModels;
-						case MAX:
-							return mapping.fieldWithAscendingMaxModels;
-						case AVG:
-							return mapping.fieldWithAscendingAvgModels;
-						case MEDIAN:
-							return mapping.fieldWithAscendingMedianModels;
-						default:
-							throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
-					}
+			}
+			else {
+				switch ( sortMode ) {
+					case SUM:
+						return mapping.fieldWithAscendingSumModels;
+					case MIN:
+						return mapping.fieldWithAscendingMinModels;
+					case MAX:
+						return mapping.fieldWithAscendingMaxModels;
+					case AVG:
+						return mapping.fieldWithAscendingAvgModels;
+					case MEDIAN:
+						return mapping.fieldWithAscendingMedianModels;
+					default:
+						throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
 				}
-			default:
-				throw new IllegalStateException( "Unexpected field value cardinality: " + indexFieldValueCardinality );
+			}
 		}
 	}
 

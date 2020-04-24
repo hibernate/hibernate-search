@@ -38,8 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldValueCardinality;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -68,7 +67,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
 	private static List<DataSet<?>> dataSets;
 
-	@Parameterized.Parameters(name = "{0} - {1} - {2}")
+	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		supportedFieldTypes = new LinkedHashSet<>();
 		dataSets = new ArrayList<>();
@@ -78,13 +77,11 @@ public class SingleFieldAggregationBaseIT<F> {
 				Optional<? extends SupportedSingleFieldAggregationExpectations<?>> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getSupported();
 				if ( expectations.isPresent() ) {
-					for ( IndexFieldStructure fieldStructure : IndexFieldStructure.values() ) {
-						for ( IndexFieldValueCardinality valueCardinality : IndexFieldValueCardinality.values() ) {
-							supportedFieldTypes.add( fieldTypeDescriptor );
-							DataSet<?> dataSet = new DataSet<>( expectations.get(), fieldStructure, valueCardinality );
-							dataSets.add( dataSet );
-							parameters.add( new Object[] { expectations.get(), fieldStructure, valueCardinality, dataSet } );
-						}
+					for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
+						supportedFieldTypes.add( fieldTypeDescriptor );
+						DataSet<?> dataSet = new DataSet<>( expectations.get(), fieldStructure );
+						dataSets.add( dataSet );
+						parameters.add( new Object[] { expectations.get(), fieldStructure, dataSet } );
 					}
 				}
 			}
@@ -127,17 +124,14 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	private final SupportedSingleFieldAggregationExpectations<F> expectations;
 	private final FieldTypeDescriptor<F> fieldType;
-	private final IndexFieldStructure fieldStructure;
-	private final IndexFieldValueCardinality valueCardinality;
+	private final TestedFieldStructure fieldStructure;
 	private final DataSet<F> dataSet;
 
 	public SingleFieldAggregationBaseIT(SupportedSingleFieldAggregationExpectations<F> expectations,
-			IndexFieldStructure fieldStructure, IndexFieldValueCardinality valueCardinality,
-			DataSet<F> dataSet) {
+			TestedFieldStructure fieldStructure, DataSet<F> dataSet) {
 		this.expectations = expectations;
 		this.fieldType = expectations.fieldType();
 		this.fieldStructure = fieldStructure;
-		this.valueCardinality = valueCardinality;
 		this.dataSet = dataSet;
 	}
 
@@ -182,7 +176,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(IndexBinding binding) {
-		if ( fieldStructure == IndexFieldStructure.IN_NESTED_REQUIRING_FILTER ) {
+		if ( fieldStructure.isNestedFilterRequired() ) {
 			return pf -> pf.match()
 					.field( binding.nestedObjectRequiringFilter.relativeFieldName + ".discriminator" )
 					.matching( "included" );
@@ -296,7 +290,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	private AggregationScenario<?> getSimpleScenario() {
 		AggregationScenario<?> scenario;
-		if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+		if ( fieldStructure.isSingleValued() ) {
 			scenario = expectations.simple();
 		}
 		else {
@@ -306,7 +300,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private String getFieldPath(IndexBinding indexBinding) {
-		switch ( fieldStructure ) {
+		switch ( fieldStructure.location ) {
 			case ROOT:
 				return getRelativeFieldName( indexBinding );
 			case IN_FLATTENED:
@@ -323,7 +317,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				return indexBinding.nestedObjectRequiringFilter.relativeFieldName
 						+ "." + getRelativeFieldName( indexBinding.nestedObjectRequiringFilter );
 			default:
-				throw new IllegalStateException( "Unexpected value: " + fieldStructure );
+				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
 		}
 	}
 
@@ -332,13 +326,11 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectBinding binding) {
-		switch ( valueCardinality ) {
-			case SINGLE_VALUED:
-				return binding.fieldWithSingleValueModels;
-			case MULTI_VALUED:
-				return binding.fieldWithMultipleValuesModels;
-			default:
-				throw new IllegalStateException( "Unexpected field value cardinality: " + valueCardinality );
+		if ( fieldStructure.isSingleValued() ) {
+			return binding.fieldWithSingleValueModels;
+		}
+		else {
+			return binding.fieldWithMultipleValuesModels;
 		}
 	}
 
@@ -346,22 +338,20 @@ public class SingleFieldAggregationBaseIT<F> {
 		final SupportedSingleFieldAggregationExpectations<F> expectations;
 		final FieldTypeDescriptor<F> fieldType;
 		final String name;
-		private final IndexFieldStructure fieldStructure;
-		private final IndexFieldValueCardinality valueCardinality;
+		private final TestedFieldStructure fieldStructure;
 
 		private DataSet(SupportedSingleFieldAggregationExpectations<F> expectations,
-				IndexFieldStructure fieldStructure, IndexFieldValueCardinality valueCardinality) {
+				TestedFieldStructure fieldStructure) {
 			this.expectations = expectations;
 			this.fieldType = expectations.fieldType();
 			this.name = expectations.aggregationName() + "_" + expectations.fieldType().getUniqueName()
-					+ "_" + fieldStructure.name() + "_" + valueCardinality.name();
+					+ "_" + fieldStructure.getUniqueName();
 			this.fieldStructure = fieldStructure;
-			this.valueCardinality = valueCardinality;
 		}
 
 		private void init(Consumer<CompletableFuture<?>> futureCollector) {
 			IndexIndexer indexer = mainIndex.createIndexer();
-			if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+			if ( fieldStructure.isSingleValued() ) {
 				List<F> values = expectations.getMainIndexDocumentFieldValues();
 				for ( int i = 0; i < values.size(); i++ ) {
 					F valueForDocument = values.get( i );
@@ -394,7 +384,7 @@ public class SingleFieldAggregationBaseIT<F> {
 			indexer = nullOnlyIndex.createIndexer();
 			futureCollector.accept(
 				indexer.add( referenceProvider( name + "_nullOnlyIndex_document_0", name ), document -> {
-					if ( IndexFieldValueCardinality.SINGLE_VALUED.equals( valueCardinality ) ) {
+					if ( fieldStructure.isSingleValued() ) {
 						initSingleValued( nullOnlyIndex.binding(), document, null, null );
 					}
 					else {
@@ -405,7 +395,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		}
 
 		private void initSingleValued(IndexBinding binding, DocumentElement document, F value, F garbageValue) {
-			switch ( fieldStructure ) {
+			switch ( fieldStructure.location ) {
 				case ROOT:
 					document.addValue( binding.fieldWithSingleValueModels.get( fieldType ).reference, value );
 					break;
@@ -451,7 +441,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		}
 
 		private void initMultiValued(IndexBinding binding, DocumentElement document, List<F> values, List<F> garbageValues) {
-			switch ( fieldStructure ) {
+			switch ( fieldStructure.location ) {
 				case ROOT:
 					for ( F value : values ) {
 						document.addValue( binding.fieldWithMultipleValuesModels.get( fieldType ).reference, value );

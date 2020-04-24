@@ -55,7 +55,7 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean sortByFieldValue(IndexFieldStructure indexFieldStructure, Class<?> fieldType, SortMode sortMode) {
+	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		return true;
 	}
 }

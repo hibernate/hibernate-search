@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
-public enum IndexFieldStructure {
+public enum IndexFieldLocation {
 	/**
 	 * The field is at the document root.
 	 */
