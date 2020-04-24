@@ -461,18 +461,20 @@ public interface Log extends BasicLogger {
 	)
 	SearchException multipleValuesForSingleValuedField(String absoluteFieldPath);
 
+	// TODO HSEARCH-3899 avoiding merging index concepts (e.g.: documentId) and entity concepts (e.g.: mapped type)
 	@Message(id = ID_OFFSET_2 + 75,
-			value = "explain(String id) cannot be used when the query targets multiple indexes."
-					+ " Use explain(String indexName, String id) and pass one of %1$s as the index name." )
-	SearchException explainRequiresIndexName(Set<String> targetedIndexNames);
+			value = "explain(String id) cannot be used when the query targets multiple mapped types."
+					+ " Use explain(String typeName, String id) and pass one of %1$s as the mapped type name." )
+	SearchException explainRequiresTypeName(Set<String> targetedTypeNames);
 
 	@Message(id = ID_OFFSET_2 + 76,
-			value = "The given index name '%2$s' is not among the indexes targeted by this query: %1$s." )
-	SearchException explainRequiresIndexTargetedByQuery(Set<String> targetedIndexNames, String indexName);
+			value = "The given mapped type name '%2$s' is not among the mapped types targeted by this query: %1$s." )
+	SearchException explainRequiresTypeTargetedByQuery(Set<String> targetedTypeNames, String typeName);
 
+	// TODO HSEARCH-3899 avoiding merging index concepts (e.g.: documentId) and entity concepts (e.g.: mapped type)
 	@Message(id = ID_OFFSET_2 + 77,
-			value = "Document with id '%2$s' does not exist in index '%1$s' and thus its match cannot be explained." )
-	SearchException explainUnkownDocument(String indexName, String d);
+			value = "Document with id '%2$s' does not exist for the mapped type '%1$s' and thus its match cannot be explained." )
+	SearchException explainUnkownDocument(String typeName, String id);
 
 	@Message(id = ID_OFFSET_2 + 78,
 			value = "Unable to merge index segments.")
