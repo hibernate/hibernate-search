@@ -85,4 +85,8 @@ public class TestedFieldStructure {
 	public boolean isSingleValued() {
 		return IndexFieldValueCardinality.SINGLE_VALUED.equals( cardinality );
 	}
+
+	public boolean isMultiValued() {
+		return !isSingleValued();
+	}
 }
