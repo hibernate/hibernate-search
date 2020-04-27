@@ -77,14 +77,9 @@ public class TestedFieldStructure {
 		return location.name() + "_" + cardinality.name();
 	}
 
-	public boolean isNested() {
+	public boolean isInNested() {
 		return location == IndexFieldLocation.IN_NESTED
-				|| location == IndexFieldLocation.IN_NESTED_REQUIRING_FILTER
 				|| location == IndexFieldLocation.IN_NESTED_TWICE;
-	}
-
-	public boolean isNestedFilterRequired() {
-		return location == IndexFieldLocation.IN_NESTED_REQUIRING_FILTER;
 	}
 
 	public boolean isSingleValued() {

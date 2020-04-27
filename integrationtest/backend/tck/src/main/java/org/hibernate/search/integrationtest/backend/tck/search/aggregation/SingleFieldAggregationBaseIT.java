@@ -176,9 +176,9 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(IndexBinding binding) {
-		if ( fieldStructure.isNestedFilterRequired() ) {
+		if ( fieldStructure.isInNested() ) {
 			return pf -> pf.match()
-					.field( binding.nestedObjectRequiringFilter.relativeFieldName + ".discriminator" )
+					.field( getFieldPath( binding, parent -> "discriminator" ) )
 					.matching( "included" );
 		}
 		else {
@@ -300,22 +300,23 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private String getFieldPath(IndexBinding indexBinding) {
+		return getFieldPath( indexBinding, this::getRelativeFieldName );
+	}
+
+	private String getFieldPath(IndexBinding indexBinding, Function<AbstractObjectBinding, String> relativeFieldNameFunction) {
 		switch ( fieldStructure.location ) {
 			case ROOT:
-				return getRelativeFieldName( indexBinding );
+				return relativeFieldNameFunction.apply( indexBinding );
 			case IN_FLATTENED:
 				return indexBinding.flattenedObject.relativeFieldName
-						+ "." + getRelativeFieldName( indexBinding.flattenedObject );
+						+ "." + relativeFieldNameFunction.apply( indexBinding.flattenedObject );
 			case IN_NESTED:
 				return indexBinding.nestedObject.relativeFieldName
-						+ "." + getRelativeFieldName( indexBinding.nestedObject );
+						+ "." + relativeFieldNameFunction.apply( indexBinding.nestedObject );
 			case IN_NESTED_TWICE:
 				return indexBinding.nestedObject.relativeFieldName
 						+ "." + indexBinding.nestedObject.nestedObject.relativeFieldName
-						+ "." + getRelativeFieldName( indexBinding.nestedObject.nestedObject );
-			case IN_NESTED_REQUIRING_FILTER:
-				return indexBinding.nestedObjectRequiringFilter.relativeFieldName
-						+ "." + getRelativeFieldName( indexBinding.nestedObjectRequiringFilter );
+						+ "." + relativeFieldNameFunction.apply( indexBinding.nestedObject.nestedObject );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
 		}
@@ -406,37 +407,35 @@ public class SingleFieldAggregationBaseIT<F> {
 					);
 					break;
 				case IN_NESTED:
-					DocumentElement nestedObject = document.addObject( binding.nestedObject.self );
-					nestedObject.addValue( binding.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+					// Make sure to create multiple nested documents here, to test all the scenarios.
+					DocumentElement nestedObject0 = document.addObject( binding.nestedObject.self );
+					nestedObject0.addValue( binding.nestedObject.discriminator, "included" );
+					nestedObject0.addValue(
+							binding.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 							value
 					);
-					break;
+					DocumentElement nestedObject1 = document.addObject( binding.nestedObject.self );
+					nestedObject1.addValue( binding.nestedObject.discriminator, "excluded" );
+					nestedObject1.addValue(
+							binding.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+							garbageValue
+					);
 				case IN_NESTED_TWICE:
+					// Same as for IN_NESTED, but one level deeper
 					DocumentElement nestedObjectFirstLevel = document.addObject( binding.nestedObject.self );
-					DocumentElement nestedObjectSecondLevel =
-							nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
-					nestedObjectSecondLevel.addValue(
+					DocumentElement nestedNestedObject0 = nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
+					nestedNestedObject0.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
+					nestedNestedObject0.addValue(
 							binding.nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 							value
 					);
-					break;
-				case IN_NESTED_REQUIRING_FILTER:
-					// The nested object requiring filters is split into two objects:
-					// the first one is included by the filter and holds the value that will be aggregated,
-					// and the second one is excluded by the filter and holds a garbage value that, if they were taken into account,
-					// would mess with the sort order and eventually fail at least *some* tests.
-					DocumentElement nestedObjectRequiringFilter_1 = document.addObject( binding.nestedObjectRequiringFilter.self );
-					nestedObjectRequiringFilter_1.addValue( binding.nestedObjectRequiringFilter.discriminator, "included" );
-					nestedObjectRequiringFilter_1.addValue(
-							binding.nestedObjectRequiringFilter.fieldWithSingleValueModels.get( fieldType ).reference,
-							value
-					);
-					DocumentElement nestedObjectRequiringFilter_2 = document.addObject( binding.nestedObjectRequiringFilter.self );
-					nestedObjectRequiringFilter_2.addValue( binding.nestedObjectRequiringFilter.discriminator, "excluded" );
-					nestedObjectRequiringFilter_2.addValue(
-							binding.nestedObjectRequiringFilter.fieldWithSingleValueModels.get( fieldType ).reference,
+					DocumentElement nestedNestedObject1 = nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
+					nestedNestedObject1.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
+					nestedNestedObject1.addValue(
+							binding.nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 							garbageValue
 					);
+					break;
 			}
 		}
 
@@ -457,66 +456,76 @@ public class SingleFieldAggregationBaseIT<F> {
 					}
 					break;
 				case IN_NESTED:
-					// Make sure to create multiple nested documents here, to test all the scenarios.
-					DocumentElement nestedObject1 = document.addObject( binding.nestedObject.self );
-					nestedObject1.addValue(
+					// The nested object requiring filters is split into four objects:
+					// the first two are included by the filter and each hold part of the values that will be sorted on,
+					// and the last two are excluded by the filter and hold garbage values that, if they were taken into account,
+					// would mess with the sort order and eventually fail at least *some* tests.
+					DocumentElement nestedObject0 = document.addObject( binding.nestedObject.self );
+					nestedObject0.addValue( binding.nestedObject.discriminator, "included" );
+					nestedObject0.addValue(
 							binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
 							values.get( 0 )
 					);
-					DocumentElement nestedObject2 = document.addObject( binding.nestedObject.self );
+					DocumentElement nestedObject1 = document.addObject( binding.nestedObject.self );
+					nestedObject1.addValue( binding.nestedObject.discriminator, "included" );
 					for ( F value : values.subList( 1, values.size() ) ) {
+						nestedObject1.addValue(
+								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedObject2 = document.addObject( binding.nestedObject.self );
+					nestedObject2.addValue( binding.nestedObject.discriminator, "excluded" );
+					for ( F value : garbageValues ) {
 						nestedObject2.addValue(
+								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedObject3 = document.addObject( binding.nestedObject.self );
+					nestedObject3.addValue( binding.nestedObject.discriminator, "excluded" );
+					for ( F value : garbageValues ) {
+						nestedObject3.addValue(
 								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
 								value
 						);
 					}
 					break;
 				case IN_NESTED_TWICE:
-					DocumentElement nestedObjectFirstLevel = document.addObject( binding.nestedObject.self );
-					DocumentElement nestedObjectSecondLevel =
-							nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
-					for ( F value : values ) {
-						nestedObjectSecondLevel.addValue(
+					// Same as for IN_NESTED, but one level deeper
+					DocumentElement nestedObjectFirstLevel0 = document.addObject( binding.nestedObject.self );
+					DocumentElement nestedObjectFirstLevel1 = document.addObject( binding.nestedObject.self );
+					DocumentElement nestedNestedObject0 = nestedObjectFirstLevel0.addObject( binding.nestedObject.nestedObject.self );
+					nestedNestedObject0.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
+					nestedNestedObject0.addValue(
+							binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+							values.get( 0 )
+					);
+					DocumentElement nestedNestedObject1 = nestedObjectFirstLevel1.addObject( binding.nestedObject.nestedObject.self );
+					nestedNestedObject1.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
+					for ( F value : values.subList( 1, values.size() ) ) {
+						nestedNestedObject1.addValue(
+								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedNestedObject2 = nestedObjectFirstLevel0.addObject( binding.nestedObject.nestedObject.self );
+					nestedNestedObject2.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
+					for ( F value : garbageValues ) {
+						nestedNestedObject2.addValue(
+								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
+								value
+						);
+					}
+					DocumentElement nestedNestedObject3 = nestedObjectFirstLevel1.addObject( binding.nestedObject.nestedObject.self );
+					nestedNestedObject3.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
+					for ( F value : garbageValues ) {
+						nestedNestedObject3.addValue(
 								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
 								value
 						);
 					}
 					break;
-				case IN_NESTED_REQUIRING_FILTER:
-					// The nested object requiring filters is split into four objects:
-					// the first two are included by the filter and each hold part of the values that will be sorted on,
-					// and the last two are excluded by the filter and hold garbage values that, if they were taken into account,
-					// would mess with the sort order and eventually fail at least *some* tests.
-					DocumentElement nestedObjectRequiringFilter_1 = document.addObject( binding.nestedObjectRequiringFilter.self );
-					nestedObjectRequiringFilter_1.addValue( binding.nestedObjectRequiringFilter.discriminator, "included" );
-					nestedObjectRequiringFilter_1.addValue(
-							binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							values.get( 0 )
-					);
-					DocumentElement nestedObjectRequiringFilter_2 = document.addObject( binding.nestedObjectRequiringFilter.self );
-					nestedObjectRequiringFilter_2.addValue( binding.nestedObjectRequiringFilter.discriminator, "included" );
-					for ( F value : values.subList( 1, values.size() ) ) {
-						nestedObjectRequiringFilter_2.addValue(
-								binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					DocumentElement nestedObjectRequiringFilter_3 = document.addObject( binding.nestedObjectRequiringFilter.self );
-					nestedObjectRequiringFilter_3.addValue( binding.nestedObjectRequiringFilter.discriminator, "excluded" );
-					for ( F value : garbageValues ) {
-						nestedObjectRequiringFilter_3.addValue(
-								binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					DocumentElement nestedObjectRequiringFilter_4 = document.addObject( binding.nestedObjectRequiringFilter.self );
-					nestedObjectRequiringFilter_4.addValue( binding.nestedObjectRequiringFilter.discriminator, "excluded" );
-					for ( F value : garbageValues ) {
-						nestedObjectRequiringFilter_4.addValue(
-								binding.nestedObjectRequiringFilter.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
 			}
 		}
 	}
@@ -536,14 +545,11 @@ public class SingleFieldAggregationBaseIT<F> {
 	private static class IndexBinding extends AbstractObjectBinding {
 		final FirstLevelObjectBinding flattenedObject;
 		final FirstLevelObjectBinding nestedObject;
-		final FirstLevelObjectBinding nestedObjectRequiringFilter;
 
 		IndexBinding(IndexSchemaElement root) {
 			super( root );
-			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
+			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED, false );
 			nestedObject = FirstLevelObjectBinding.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
-			nestedObjectRequiringFilter = FirstLevelObjectBinding.create( root, "nestedObjectRequiringFilter",
-					ObjectFieldStorage.NESTED, true );
 		}
 	}
 
@@ -554,12 +560,6 @@ public class SingleFieldAggregationBaseIT<F> {
 		final IndexFieldReference<String> discriminator;
 
 		final SecondLevelObjectBinding nestedObject;
-
-
-		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage) {
-			return create( parent, relativeFieldName, storage, false );
-		}
 
 		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectFieldStorage storage,
@@ -586,9 +586,12 @@ public class SingleFieldAggregationBaseIT<F> {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
 
+		final IndexFieldReference<String> discriminator;
+
 		public static SecondLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectFieldStorage storage) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			objectField.multiValued();
 			return new SecondLevelObjectBinding( relativeFieldName, objectField );
 		}
 
@@ -596,6 +599,7 @@ public class SingleFieldAggregationBaseIT<F> {
 			super( objectField );
 			this.relativeFieldName = relativeFieldName;
 			self = objectField.toReference();
+			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 		}
 	}
 
