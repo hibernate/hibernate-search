@@ -20,12 +20,6 @@ public enum IndexFieldLocation {
 	 */
 	IN_NESTED,
 	/**
-	 * The field is in a nested object field (nested document),
-	 * but accessing the values we're interested in requires applying a filter on nested documents,
-	 * to only select some of the nested documents.
-	 */
-	IN_NESTED_REQUIRING_FILTER,
-	/**
 	 * The field is in a nested object field (nested document)
 	 * which itself is in a nested object field (nested document).
 	 */
