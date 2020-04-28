@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -26,23 +29,33 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
+	private final LuceneIndexSchemaObjectNode rootNode;
 	private final Map<String, LuceneIndexSchemaObjectNode> objectNodes;
-
 	private final Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes;
+	private final List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates;
+	private final List<LuceneIndexSchemaFieldTemplate> fieldTemplates;
+	private final ConcurrentMap<String, LuceneIndexSchemaObjectNode> dynamicObjectNodesCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, LuceneIndexSchemaFieldNode<?>> dynamicFieldNodesCache = new ConcurrentHashMap<>();
 
 	private final ModelBasedScopedAnalyzer indexingAnalyzer;
 
 	public LuceneIndexModel(String indexName,
 			String mappedTypeName,
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
-			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
-			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder) {
+			LuceneIndexSchemaObjectNode rootNode,
+			Map<String, LuceneIndexSchemaObjectNode> objectNodes,
+			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes,
+			List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates,
+			List<LuceneIndexSchemaFieldTemplate> fieldTemplates) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
-		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
-		this.objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
+		this.rootNode = rootNode;
+		this.objectNodes = CollectionHelper.toImmutableMap( objectNodes );
+		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodes );
 		this.indexingAnalyzer = new ModelBasedScopedAnalyzer();
+		this.objectFieldTemplates = objectFieldTemplates;
+		this.fieldTemplates = fieldTemplates;
 	}
 
 	@Override
@@ -66,12 +79,16 @@ public class LuceneIndexModel implements AutoCloseable {
 		return idDslConverter;
 	}
 
-	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absoluteFieldPath) {
-		return fieldNodes.get( absoluteFieldPath );
+	public LuceneIndexSchemaObjectNode getRootNode() {
+		return rootNode;
 	}
 
 	public LuceneIndexSchemaObjectNode getObjectNode(String absolutePath) {
-		return objectNodes.get( absolutePath );
+		return getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+	}
+
+	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absolutePath) {
+		return getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
 	}
 
 	public Analyzer getIndexingAnalyzer() {
@@ -85,6 +102,34 @@ public class LuceneIndexModel implements AutoCloseable {
 				.append( "indexName=" ).append( indexName )
 				.append( "]" )
 				.toString();
+	}
+
+	private <N> N getNode(Map<String, N> staticNodes,
+			List<? extends AbstractLuceneIndexSchemaFieldTemplate<N>> templates,
+			ConcurrentMap<String, N> dynamicNodesCache,
+			String absolutePath) {
+		N node = staticNodes.get( absolutePath );
+		if ( node != null ) {
+			return node;
+		}
+		node = dynamicNodesCache.get( absolutePath );
+		if ( node != null ) {
+			return node;
+		}
+		for ( AbstractLuceneIndexSchemaFieldTemplate<N> template : templates ) {
+			node = template.createNodeIfMatching( this, absolutePath );
+			if ( node == null ) {
+				continue;
+			}
+			N previous = dynamicNodesCache.putIfAbsent( absolutePath, node );
+			if ( previous != null ) {
+				// Some other thread created the node before us.
+				// Keep the first created node, discard ours: they are identical.
+				node = previous;
+			}
+			break;
+		}
+		return node;
 	}
 
 	/**

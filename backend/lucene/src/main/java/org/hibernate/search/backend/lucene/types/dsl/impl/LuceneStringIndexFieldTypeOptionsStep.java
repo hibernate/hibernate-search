@@ -149,6 +149,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		);
 
 		return new LuceneIndexFieldType<>(
+				getFieldType(),
 				codec,
 				new LuceneTextFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslConverter, rawDslConverter, codec,

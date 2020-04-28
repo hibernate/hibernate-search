@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.apache.lucene.analysis.Analyzer;
 
 public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
+	private final Class<F> valueType;
 	private final LuceneFieldCodec<F> codec;
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
@@ -23,22 +24,22 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneIndexFieldType(
-			LuceneFieldCodec<F> codec,
+	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
 			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory) {
-		this( codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
+		this( valueType, codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
 				aggregationBuilderFactory, null );
 	}
 
-	public LuceneIndexFieldType(LuceneFieldCodec<F> codec,
+	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
 			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
 			Analyzer analyzerOrNormalizer) {
+		this.valueType = valueType;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
@@ -53,6 +54,10 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 				+ "codec=" + codec
 				+ ", analyzerOrNormalizer=" + analyzerOrNormalizer
 				+ "]";
+	}
+
+	public Class<F> getValueType() {
+		return valueType;
 	}
 
 	public LuceneFieldCodec<F> getCodec() {

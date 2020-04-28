@@ -6,18 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public class LuceneIndexSchemaFieldNode<F> {
 
-	private final String relativeFieldName;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneIndexSchemaObjectNode parent;
 
-	private final String absoluteFieldPath;
+	private final String absolutePath;
 
 	private final List<String> nestedPathHierarchy;
 
@@ -25,12 +30,11 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final LuceneIndexFieldType<F> type;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
+	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			boolean multiValued,
 			LuceneIndexFieldType<F> type) {
 		this.parent = parent;
-		this.relativeFieldName = relativeFieldName;
-		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
+		this.absolutePath = parent.getAbsolutePath( relativeName );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.multiValued = multiValued;
 		this.type = type;
@@ -40,8 +44,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return parent;
 	}
 
-	public String getAbsoluteFieldPath() {
-		return absoluteFieldPath;
+	public String getAbsolutePath() {
+		return absolutePath;
 	}
 
 	public String getNestedDocumentPath() {
@@ -65,11 +69,19 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return type;
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> LuceneIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
+		if ( !type.getValueType().isAssignableFrom( expectedSubType ) ) {
+			throw log.invalidFieldValueType( type.getValueType(), expectedSubType,
+					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
+		}
+		return (LuceneIndexSchemaFieldNode<? super T>) this;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
-				.append( "parent=" ).append( parent )
-				.append( ", relativeFieldName=" ).append( relativeFieldName )
+				.append( ", absolutePath=" ).append( absolutePath )
 				.append( ", type=" ).append( type )
 				.append( "]" );
 		return sb.toString();

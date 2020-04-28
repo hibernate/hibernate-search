@@ -57,7 +57,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 		if ( reference != null ) {
 			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
 		}
-		this.reference = new LuceneIndexObjectFieldReference( storage );
+		this.reference = new LuceneIndexObjectFieldReference();
 		return reference;
 	}
 

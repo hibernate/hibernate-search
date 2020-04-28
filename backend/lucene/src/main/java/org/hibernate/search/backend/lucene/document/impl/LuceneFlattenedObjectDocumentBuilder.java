@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -25,8 +26,9 @@ class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder
 
 	private final Set<String> encounteredFields = new HashSet<>();
 
-	LuceneFlattenedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode, AbstractLuceneDocumentBuilder parent) {
-		super( schemaNode );
+	LuceneFlattenedObjectDocumentBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectNode schemaNode,
+			AbstractLuceneDocumentBuilder parent) {
+		super( model, schemaNode );
 		this.parent = parent;
 	}
 

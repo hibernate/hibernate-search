@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -29,8 +30,8 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 	final Document document = new Document();
 	private final Map<String, EncounteredFieldStatus> fieldStatus = new HashMap<>();
 
-	AbstractLuceneNonFlattenedDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
-		super( schemaNode );
+	AbstractLuceneNonFlattenedDocumentBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectNode schemaNode) {
+		super( model, schemaNode );
 	}
 
 	@Override

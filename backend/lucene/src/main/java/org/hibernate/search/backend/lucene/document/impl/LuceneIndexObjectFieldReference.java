@@ -8,18 +8,11 @@ package org.hibernate.search.backend.lucene.document.impl;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 
 public class LuceneIndexObjectFieldReference implements IndexObjectFieldReference {
 
-	private final ObjectFieldStorage storage;
-
 	private LuceneIndexSchemaObjectNode schemaNode;
-
-	public LuceneIndexObjectFieldReference(ObjectFieldStorage storage) {
-		this.storage = storage;
-	}
 
 	public void enable(LuceneIndexSchemaObjectNode schemaNode) {
 		this.schemaNode = schemaNode;
@@ -31,9 +24,5 @@ public class LuceneIndexObjectFieldReference implements IndexObjectFieldReferenc
 
 	LuceneIndexSchemaObjectNode getSchemaNode() {
 		return schemaNode;
-	}
-
-	ObjectFieldStorage getStorage() {
-		return storage;
 	}
 }

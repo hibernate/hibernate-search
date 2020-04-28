@@ -668,4 +668,22 @@ public interface Log extends BasicLogger {
 			value = "Merge policy setting '%1$s' cannot be set to '%2$s': %3$s")
 	SearchException illegalMergePolicySetting(String settingName, Object settingValue, String message, @Cause Exception e);
 
+	@Message(id = ID_OFFSET_2 + 125,
+			value = "The index field template '%1$s' was added twice."
+					+ " Multiple bridges may be trying to access the same index field template, "
+					+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
+					+ " or you may have declared multiple conflicting mappings."
+					+ " In any case, there is something wrong with your mapping and you should fix it.")
+	SearchException indexSchemaFieldTemplateNameConflict(String name, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 126,
+			value = "Invalid value type. This field's values are of type '%1$s', which is not assignable from '%2$s'.")
+	SearchException invalidFieldValueType(@FormatWith(ClassFormatter.class) Class<?> fieldValueType,
+			@FormatWith(ClassFormatter.class) Class<?> invalidValueType,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 127,
+			value = "Unknown field '%1$s'.")
+	SearchException unknownFieldForIndexing(String absoluteFieldPath, @Param EventContext context);
+
 }

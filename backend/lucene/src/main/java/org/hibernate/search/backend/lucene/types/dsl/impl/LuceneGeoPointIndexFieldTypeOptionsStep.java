@@ -48,6 +48,7 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		);
 
 		return new LuceneIndexFieldType<>(
+				getFieldType(),
 				codec,
 				new LuceneGeoPointFieldPredicateBuilderFactory(
 						resolvedSearchable, dslConverter, codec
