@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.impl;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -50,9 +49,9 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
-	public LuceneIndexSchemaFieldNode<F> addField(LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode, String relativeFieldName, boolean multiValued) {
-		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(
+	public LuceneIndexSchemaFieldNode<F> createField(LuceneIndexSchemaObjectNode parentNode,
+			String relativeFieldName, boolean multiValued) {
+		return new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				relativeFieldName,
 				multiValued,
@@ -62,11 +61,9 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 				projectionBuilderFactory,
 				aggregationBuilderFactory
 		);
+	}
 
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
-
-		collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
-
-		return schemaNode;
+	public Analyzer getAnalyzerOrNormalizer() {
+		return analyzerOrNormalizer;
 	}
 }
