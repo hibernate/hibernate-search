@@ -8,13 +8,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 
 
 public class LuceneIndexSchemaFieldNode<F> {
@@ -29,33 +23,17 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final boolean multiValued;
 
-	private final LuceneFieldCodec<F> codec;
-
-	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
-
-	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
-
-	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
-
-	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
+	private final LuceneIndexFieldType<F> type;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
 			boolean multiValued,
-			LuceneFieldCodec<F> codec,
-			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
-			LuceneFieldSortBuilderFactory sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
-			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory) {
+			LuceneIndexFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.multiValued = multiValued;
-		this.codec = codec;
-		this.predicateBuilderFactory = predicateBuilderFactory;
-		this.sortBuilderFactory = sortBuilderFactory;
-		this.projectionBuilderFactory = projectionBuilderFactory;
-		this.aggregationBuilderFactory = aggregationBuilderFactory;
+		this.type = type;
 	}
 
 	public LuceneIndexSchemaObjectNode getParent() {
@@ -83,20 +61,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return multiValued;
 	}
 
-	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
-		return predicateBuilderFactory;
-	}
-
-	public LuceneFieldSortBuilderFactory getSortBuilderFactory() {
-		return sortBuilderFactory;
-	}
-
-	public LuceneFieldProjectionBuilderFactory getProjectionBuilderFactory() {
-		return projectionBuilderFactory;
-	}
-
-	public LuceneFieldAggregationBuilderFactory getAggregationBuilderFactory() {
-		return aggregationBuilderFactory;
+	public LuceneIndexFieldType<F> getType() {
+		return type;
 	}
 
 	@Override
@@ -104,19 +70,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
 				.append( "parent=" ).append( parent )
 				.append( ", relativeFieldName=" ).append( relativeFieldName )
-				.append( ", codec=" ).append( codec )
-				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
-				.append( ", sortContributor=" ).append( sortBuilderFactory )
-				.append( ", projectionBuilderFactory=" ).append( projectionBuilderFactory )
+				.append( ", type=" ).append( type )
 				.append( "]" );
 		return sb.toString();
-	}
-
-	private EventContext getEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
-	}
-
-	public LuceneFieldCodec<F> getCodec() {
-		return codec;
 	}
 }

@@ -51,7 +51,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 			checkNoValueYetForSingleValued( fieldSchemaNode.getAbsoluteFieldPath() );
 		}
 
-		fieldSchemaNode.getCodec().encode( this, fieldSchemaNode.getAbsoluteFieldPath(), value );
+		fieldSchemaNode.getType().getCodec().encode( this, fieldSchemaNode.getAbsoluteFieldPath(), value );
 	}
 
 	@Override

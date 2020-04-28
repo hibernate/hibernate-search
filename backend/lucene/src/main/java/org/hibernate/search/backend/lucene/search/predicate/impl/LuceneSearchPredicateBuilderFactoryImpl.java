@@ -184,7 +184,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 		@Override
 		public LuceneFieldPredicateBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getPredicateBuilderFactory();
+			return schemaNode.getType().getPredicateBuilderFactory();
 		}
 
 		@Override

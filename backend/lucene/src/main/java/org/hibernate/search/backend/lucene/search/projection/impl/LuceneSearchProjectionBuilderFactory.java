@@ -160,7 +160,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 		@Override
 		public LuceneFieldProjectionBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getProjectionBuilderFactory();
+			return schemaNode.getType().getProjectionBuilderFactory();
 		}
 
 		@Override

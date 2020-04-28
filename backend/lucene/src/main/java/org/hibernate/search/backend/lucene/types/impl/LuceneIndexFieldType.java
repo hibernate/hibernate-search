@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -49,18 +47,32 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
-	public LuceneIndexSchemaFieldNode<F> createField(LuceneIndexSchemaObjectNode parentNode,
-			String relativeFieldName, boolean multiValued) {
-		return new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				relativeFieldName,
-				multiValued,
-				codec,
-				predicateBuilderFactory,
-				sortBuilderFactory,
-				projectionBuilderFactory,
-				aggregationBuilderFactory
-		);
+	@Override
+	public String toString() {
+		return "LuceneIndexFieldType["
+				+ "codec=" + codec
+				+ ", analyzerOrNormalizer=" + analyzerOrNormalizer
+				+ "]";
+	}
+
+	public LuceneFieldCodec<F> getCodec() {
+		return codec;
+	}
+
+	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+		return predicateBuilderFactory;
+	}
+
+	public LuceneFieldSortBuilderFactory getSortBuilderFactory() {
+		return sortBuilderFactory;
+	}
+
+	public LuceneFieldProjectionBuilderFactory getProjectionBuilderFactory() {
+		return projectionBuilderFactory;
+	}
+
+	public LuceneFieldAggregationBuilderFactory getAggregationBuilderFactory() {
+		return aggregationBuilderFactory;
 	}
 
 	public Analyzer getAnalyzerOrNormalizer() {

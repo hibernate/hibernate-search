@@ -73,7 +73,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 			LuceneIndexSchemaFieldNode<?> fieldNode = indexModel.getFieldNode( childPath );
 			if ( fieldNode != null ) {
-				leafFields.put( childPath, fieldNode.getPredicateBuilderFactory() );
+				leafFields.put( childPath, fieldNode.getType().getPredicateBuilderFactory() );
 			}
 		}
 	}
