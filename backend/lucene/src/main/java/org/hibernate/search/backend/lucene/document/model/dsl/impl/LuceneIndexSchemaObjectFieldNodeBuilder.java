@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -29,6 +27,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String absoluteFieldPath;
+	private final String relativeFieldName;
 	private final ObjectFieldStorage storage;
 	private boolean multiValued = false;
 
@@ -38,6 +37,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			String relativeFieldName, ObjectFieldStorage storage) {
 		this.parent = parent;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
+		this.relativeFieldName = relativeFieldName;
 		this.storage = storage;
 	}
 
@@ -67,15 +67,9 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		List<String> nestedPathHierarchy = parentNode.getNestedPathHierarchy();
-		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
-			// if we found a nested object, we add it to the nestedPathHierarchy
-			nestedPathHierarchy = new ArrayList<>( nestedPathHierarchy );
-			nestedPathHierarchy.add( absoluteFieldPath );
-		}
 		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode(
-				parentNode, absoluteFieldPath, nestedPathHierarchy, storage, multiValued, getChildrenNames()
-				);
+				parentNode, relativeFieldName, storage, multiValued, getChildrenNames()
+		);
 		collector.collectObjectNode( absoluteFieldPath, node );
 
 		reference.enable( node );

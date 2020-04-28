@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +18,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT = new LuceneIndexSchemaObjectNode(
-			null, null, Collections.emptyList(),
+			null, null,
 			null, false,
-			// we do not store childrenAbsolutePaths for the root node
+			// we do not store childrenPaths for the root node
 			Collections.emptyList()
 	);
 
@@ -39,16 +40,22 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final List<String> childrenAbsolutePaths;
 
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, List<String> nestedPathHierarchy,
+	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
 			ObjectFieldStorage storage, boolean multiValued,
 			List<String> childrenRelativeNames) {
 		this.parent = parent;
-		this.absolutePath = absolutePath;
-		this.nestedPathHierarchy = Collections.unmodifiableList( nestedPathHierarchy );
+		this.absolutePath = parent == null ? relativeFieldName : parent.getAbsolutePath( relativeFieldName );
+		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
+		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
+			// if we found a nested object, we add it to the nestedPathHierarchy
+			theNestedPathHierarchy = new ArrayList<>( theNestedPathHierarchy );
+			theNestedPathHierarchy.add( absolutePath );
+		}
+		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.storage = storage;
 		this.multiValued = multiValued;
 		this.childrenAbsolutePaths = childrenRelativeNames.stream()
-				.map( relativeFieldName -> FieldPaths.compose( absolutePath, relativeFieldName ) )
+				.map( childName -> FieldPaths.compose( absolutePath, childName ) )
 				.collect( Collectors.toList() );
 	}
 
