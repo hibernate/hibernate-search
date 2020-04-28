@@ -51,6 +51,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		);
 
 		return new LuceneIndexFieldType<>(
+				getFieldType(),
 				codec,
 				new LuceneNumericFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec

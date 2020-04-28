@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -19,17 +20,15 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final String indexName;
 
-	LuceneRootDocumentBuilder(MultiTenancyStrategy multiTenancyStrategy, String indexName) {
-		super( LuceneIndexSchemaObjectNode.root() );
+	LuceneRootDocumentBuilder(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy) {
+		super( model, LuceneIndexSchemaObjectNode.root() );
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.indexName = indexName;
 	}
 
 	public LuceneIndexEntry build(String tenantId, String id, String routingKey) {
 		return new LuceneIndexEntry(
-				indexName, id,
+				model.getIndexName(), id,
 				assembleDocuments( multiTenancyStrategy, tenantId, id, routingKey )
 		);
 	}

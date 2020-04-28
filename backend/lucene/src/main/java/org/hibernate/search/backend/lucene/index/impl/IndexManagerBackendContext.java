@@ -179,8 +179,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return eventContext;
 	}
 
-	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName) {
-		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName );
+	LuceneIndexEntryFactory createLuceneIndexEntryFactory(LuceneIndexModel model) {
+		return new LuceneIndexEntryFactory( model, multiTenancyStrategy );
 	}
 
 	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {

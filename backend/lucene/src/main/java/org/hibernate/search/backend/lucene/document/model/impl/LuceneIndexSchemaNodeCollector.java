@@ -11,4 +11,8 @@ public interface LuceneIndexSchemaNodeCollector {
 	void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode schemaObjectNode);
 
 	void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> schemaFieldNode);
+
+	void collect(LuceneIndexSchemaObjectFieldTemplate template);
+
+	void collect(LuceneIndexSchemaFieldTemplate template);
 }

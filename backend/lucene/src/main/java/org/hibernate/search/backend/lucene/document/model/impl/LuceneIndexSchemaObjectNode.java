@@ -40,11 +40,11 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final List<String> childrenAbsolutePaths;
 
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
+	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			ObjectFieldStorage storage, boolean multiValued,
 			List<String> childrenRelativeNames) {
 		this.parent = parent;
-		this.absolutePath = parent == null ? relativeFieldName : parent.getAbsolutePath( relativeFieldName );
+		this.absolutePath = parent == null ? relativeName : parent.getAbsolutePath( relativeName );
 		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy

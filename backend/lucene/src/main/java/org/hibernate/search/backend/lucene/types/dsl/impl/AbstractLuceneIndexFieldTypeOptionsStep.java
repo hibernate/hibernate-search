@@ -41,6 +41,10 @@ abstract class AbstractLuceneIndexFieldTypeOptionsStep<S extends AbstractLuceneI
 
 	protected abstract S thisAsS();
 
+	final Class<F> getFieldType() {
+		return fieldType;
+	}
+
 	final DslConverter<?, ? extends F> createDslConverter() {
 		return dslConverter == null ? createRawDslConverter() : dslConverter;
 	}

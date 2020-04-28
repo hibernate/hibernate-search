@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
@@ -32,7 +33,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, LuceneIndexSchemaNodeContributor> content = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
@@ -79,25 +81,44 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
 			IndexFieldType<?> indexFieldType, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		LuceneIndexFieldType<?> elasticsearchIndexFieldType = (LuceneIndexFieldType<?>) indexFieldType;
+		LuceneIndexSchemaFieldTemplateBuilder templateBuilder = new LuceneIndexSchemaFieldTemplateBuilder(
+				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
+		);
+		putTemplate( prefixedTemplateName, templateBuilder );
+		return templateBuilder;
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
 			IndexFieldType<?> indexFieldType, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		LuceneIndexFieldType<?> elasticsearchIndexFieldType = (LuceneIndexFieldType<?>) indexFieldType;
+		return new LuceneIndexSchemaFieldTemplateBuilder(
+				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
+		);
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
 			ObjectFieldStorage storage, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		LuceneIndexSchemaObjectFieldTemplateBuilder templateBuilder =
+				new LuceneIndexSchemaObjectFieldTemplateBuilder(
+						this, prefixedTemplateName, storage, prefix
+				);
+		putTemplate( prefixedTemplateName, templateBuilder );
+		return templateBuilder;
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
 			ObjectFieldStorage storage, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		return new LuceneIndexSchemaObjectFieldTemplateBuilder(
+				this, prefixedTemplateName, storage, prefix
+		);
 	}
 
 	public abstract LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder();
@@ -105,20 +126,33 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	abstract String getAbsolutePath();
 
 	final void contributeChildren(LuceneIndexSchemaObjectNode node, LuceneIndexSchemaNodeCollector collector) {
-		for ( LuceneIndexSchemaNodeContributor contributor : content.values() ) {
+		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
 			contributor.contribute( collector, node );
+		}
+		// Contribute templates depth-first, so do ours after the children's.
+		// The reason is templates defined in children have more precise path globs and thus
+		// should be appear first in the list.
+		for ( LuceneIndexSchemaNodeContributor template : templates.values() ) {
+			template.contribute( collector, node );
 		}
 	}
 
 	final List<String> getChildrenNames() {
 		// The Map#keySet() method for LinkedHashMap will return the set in insertion order
-		return new ArrayList<>( content.keySet() );
+		return new ArrayList<>( fields.keySet() );
 	}
 
 	private void putField(String name, LuceneIndexSchemaNodeContributor contributor) {
-		Object previous = content.putIfAbsent( name, contributor );
+		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, getEventContext() );
+		}
+	}
+
+	private void putTemplate(String name, LuceneIndexSchemaNodeContributor contributor) {
+		Object previous = templates.putIfAbsent( name, contributor );
+		if ( previous != null ) {
+			throw log.indexSchemaFieldTemplateNameConflict( name, getEventContext() );
 		}
 	}
 }

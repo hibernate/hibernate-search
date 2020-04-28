@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
@@ -66,18 +70,30 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	public LuceneIndexModel build(String indexName) {
-		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder = new HashMap<>();
-		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder = new HashMap<>();
+		Map<String, LuceneIndexSchemaObjectNode> objectNodes = new HashMap<>();
+		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
+		List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates = new ArrayList<>();
+		List<LuceneIndexSchemaFieldTemplate> fieldTemplates = new ArrayList<>();
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
 			@Override
 			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node) {
-				fieldNodesBuilder.put( absoluteFieldPath, node );
+				fieldNodes.put( absoluteFieldPath, node );
 			}
 
 			@Override
 			public void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode node) {
-				objectNodesBuilder.put( absolutePath, node );
+				objectNodes.put( absolutePath, node );
+			}
+
+			@Override
+			public void collect(LuceneIndexSchemaObjectFieldTemplate template) {
+				objectFieldTemplates.add( template );
+			}
+
+			@Override
+			public void collect(LuceneIndexSchemaFieldTemplate template) {
+				fieldTemplates.add( template );
 			}
 		};
 
@@ -88,8 +104,8 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 				indexName,
 				mappedTypeName,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				objectNodesBuilder,
-				fieldNodesBuilder
+				rootNode, objectNodes, fieldNodes,
+				objectFieldTemplates, fieldTemplates
 		);
 	}
 

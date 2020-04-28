@@ -38,6 +38,7 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
 
 		return new LuceneIndexFieldType<>(
+				getFieldType(),
 				codec,
 				LuceneNativeFieldPredicateBuilderFactory.INSTANCE,
 				LuceneNativeFieldSortBuilderFactory.INSTANCE,
