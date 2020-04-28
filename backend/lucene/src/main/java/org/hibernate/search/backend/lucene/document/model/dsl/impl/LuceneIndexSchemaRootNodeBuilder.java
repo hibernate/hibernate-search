@@ -9,14 +9,11 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
-
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -71,14 +68,8 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	public LuceneIndexModel build(String indexName) {
 		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder = new HashMap<>();
 		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder = new HashMap<>();
-		ScopedAnalyzer.Builder scopedAnalyzerBuilder = new ScopedAnalyzer.Builder();
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
-			@Override
-			public void collectAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
-				scopedAnalyzerBuilder.setAnalyzer( absoluteFieldPath, analyzer );
-			}
-
 			@Override
 			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node) {
 				fieldNodesBuilder.put( absoluteFieldPath, node );
@@ -98,8 +89,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 				mappedTypeName,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				objectNodesBuilder,
-				fieldNodesBuilder,
-				scopedAnalyzerBuilder.build()
+				fieldNodesBuilder
 		);
 	}
 
