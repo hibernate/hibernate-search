@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNativeFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNativeFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNativeFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
@@ -36,12 +39,12 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				null,
-				null,
+				LuceneNativeFieldPredicateBuilderFactory.INSTANCE,
+				LuceneNativeFieldSortBuilderFactory.INSTANCE,
 				new LuceneStandardFieldProjectionBuilderFactory<>(
 						fieldValueExtractor != null, projectionConverter, rawProjectionConverter, codec
 				),
-				null
+				LuceneNativeFieldAggregationBuilderFactory.INSTANCE
 		);
 	}
 
