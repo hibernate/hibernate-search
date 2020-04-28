@@ -106,7 +106,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 		@Override
 		public LuceneFieldSortBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getSortBuilderFactory();
+			return schemaNode.getType().getSortBuilderFactory();
 		}
 
 		@Override
