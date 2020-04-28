@@ -7,10 +7,16 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
+
 public interface ElasticsearchIndexSchemaNodeCollector {
 
 	void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node);
 
 	void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node);
+
+	void collect(ElasticsearchIndexSchemaObjectFieldTemplate template, NamedDynamicTemplate templateForMapping);
+
+	void collect(ElasticsearchIndexSchemaFieldTemplate template, NamedDynamicTemplate templateForMapping);
 
 }

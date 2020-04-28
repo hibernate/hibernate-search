@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -24,8 +23,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBui
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import com.google.gson.JsonElement;
 
 class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 		implements IndexSchemaFieldOptionsStep<ElasticsearchIndexSchemaFieldNodeBuilder<F>, IndexFieldReference<F>>,
@@ -66,8 +63,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 		if ( reference != null ) {
 			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
 		}
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		this.reference = new ElasticsearchIndexFieldReference<>( jsonAccessor );
+		this.reference = new ElasticsearchIndexFieldReference<>();
 		return reference;
 	}
 

@@ -172,7 +172,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 
 		return new ElasticsearchIndexFieldType<>(
-				codec,
+				getFieldType(), codec,
 				new ElasticsearchTextFieldPredicateBuilderFactory(
 						resolvedSearchable, dslConverter, rawDslConverter, codec, mapping
 				),

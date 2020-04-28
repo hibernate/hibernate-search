@@ -7,26 +7,19 @@
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 
 public class ElasticsearchIndexFieldReference<F> implements IndexFieldReference<F> {
 
-	private final JsonAccessor<JsonElement> relativeAccessor;
-
 	private ElasticsearchIndexSchemaFieldNode<F> schemaNode;
 
-	public ElasticsearchIndexFieldReference(JsonAccessor<JsonElement> relativeAccessor) {
-		this.relativeAccessor = relativeAccessor;
+	public ElasticsearchIndexFieldReference() {
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[schemaNode=" + schemaNode + ", relativeAccessor=" + relativeAccessor + "]";
+		return getClass().getSimpleName() + "[schemaNode=" + schemaNode + "]";
 	}
 
 	public void enable(ElasticsearchIndexSchemaFieldNode<F> schemaNode) {
@@ -39,13 +32,5 @@ public class ElasticsearchIndexFieldReference<F> implements IndexFieldReference<
 
 	ElasticsearchIndexSchemaFieldNode<F> getSchemaNode() {
 		return schemaNode;
-	}
-
-	void addTo(JsonObject parent, F value) {
-		relativeAccessor.add( parent, schemaNode.getType().getCodec().encode( value ) );
-	}
-
-	boolean hasValueIn(JsonObject parent) {
-		return relativeAccessor.hasExplicitValue( parent );
 	}
 }

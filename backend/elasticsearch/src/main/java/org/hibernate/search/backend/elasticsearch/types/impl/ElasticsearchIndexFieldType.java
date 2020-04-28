@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchF
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
+	private final Class<F> valueType;
 	private final ElasticsearchFieldCodec<F> codec;
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory sortBuilderFactory;
@@ -22,12 +23,13 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 	private final ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory;
 	private final PropertyMapping mapping;
 
-	public ElasticsearchIndexFieldType(ElasticsearchFieldCodec<F> codec,
+	public ElasticsearchIndexFieldType(Class<F> valueType, ElasticsearchFieldCodec<F> codec,
 			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
 			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
 			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory,
 			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory,
 			PropertyMapping mapping) {
+		this.valueType = valueType;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
@@ -39,6 +41,10 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 	@Override
 	public String toString() {
 		return mapping.toString();
+	}
+
+	public Class<F> getValueType() {
+		return valueType;
 	}
 
 	public ElasticsearchFieldCodec<F> getCodec() {

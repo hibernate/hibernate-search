@@ -38,7 +38,7 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter = createRawProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
-				codec,
+				getFieldType(), codec,
 				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ),
 				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new ElasticsearchGeoPointFieldProjectionBuilderFactory(

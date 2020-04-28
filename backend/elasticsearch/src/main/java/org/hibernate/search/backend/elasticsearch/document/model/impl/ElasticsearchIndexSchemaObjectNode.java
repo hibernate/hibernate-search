@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+
+import com.google.gson.JsonElement;
 
 
 public class ElasticsearchIndexSchemaObjectNode {
@@ -24,6 +27,7 @@ public class ElasticsearchIndexSchemaObjectNode {
 	}
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
+	private final JsonAccessor<JsonElement> relativeAccessor;
 
 	private final String absolutePath;
 
@@ -37,6 +41,7 @@ public class ElasticsearchIndexSchemaObjectNode {
 			ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = parent == null ? relativeFieldName : parent.getAbsolutePath( relativeFieldName );
+		this.relativeAccessor = relativeFieldName == null ? null : JsonAccessor.root().property( relativeFieldName );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
@@ -56,6 +61,10 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
+	}
+
+	public JsonAccessor<JsonElement> getRelativeAccessor() {
+		return relativeAccessor;
 	}
 
 	public String getAbsolutePath() {
@@ -80,4 +89,5 @@ public class ElasticsearchIndexSchemaObjectNode {
 	public boolean isMultiValued() {
 		return multiValued;
 	}
+
 }

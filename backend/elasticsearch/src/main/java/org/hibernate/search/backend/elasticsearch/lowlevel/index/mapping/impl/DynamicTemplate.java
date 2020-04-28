@@ -24,6 +24,9 @@ import com.google.gson.annotations.SerializedName;
 @JsonAdapter(DynamicTemplateJsonAdapterFactory.class)
 public class DynamicTemplate {
 
+	@SerializedName("match_mapping_type")
+	private String matchMappingType;
+
 	@SerializedName("path_match")
 	private String pathMatch;
 
@@ -35,6 +38,14 @@ public class DynamicTemplate {
 	@Override
 	public String toString() {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+	}
+
+	public String getMatchMappingType() {
+		return matchMappingType;
+	}
+
+	public void setMatchMappingType(String matchMappingType) {
+		this.matchMappingType = matchMappingType;
 	}
 
 	public String getPathMatch() {
