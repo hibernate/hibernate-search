@@ -7,7 +7,9 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
@@ -15,10 +17,14 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 public abstract class StubMappedIndex extends StubMappingIndexManager {
 
 	public static StubMappedIndex withoutFields(String indexName) {
+		return withoutRetrievableBinding( indexName, ignored -> { } );
+	}
+
+	public static StubMappedIndex withoutRetrievableBinding(String indexName, Consumer<? super IndexSchemaElement> binder) {
 		return new StubMappedIndex( indexName ) {
 			@Override
 			protected void bind(IndexedEntityBindingContext context) {
-				// Nothing to do.
+				binder.accept( context.getSchemaElement() );
 			}
 		};
 	}
