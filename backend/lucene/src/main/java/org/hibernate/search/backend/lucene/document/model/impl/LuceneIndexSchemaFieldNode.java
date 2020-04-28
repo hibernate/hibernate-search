@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -17,12 +15,9 @@ import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProj
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 public class LuceneIndexSchemaFieldNode<F> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String relativeFieldName;
 
@@ -89,30 +84,18 @@ public class LuceneIndexSchemaFieldNode<F> {
 	}
 
 	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
-		if ( predicateBuilderFactory == null ) {
-			throw log.unsupportedDSLPredicates( getEventContext() );
-		}
 		return predicateBuilderFactory;
 	}
 
 	public LuceneFieldSortBuilderFactory getSortBuilderFactory() {
-		if ( sortBuilderFactory == null ) {
-			throw log.unsupportedDSLSorts( getEventContext() );
-		}
 		return sortBuilderFactory;
 	}
 
 	public LuceneFieldProjectionBuilderFactory getProjectionBuilderFactory() {
-		if ( projectionBuilderFactory == null ) {
-			throw log.unsupportedDSLProjections( getEventContext() );
-		}
 		return projectionBuilderFactory;
 	}
 
 	public LuceneFieldAggregationBuilderFactory getAggregationBuilderFactory() {
-		if ( aggregationBuilderFactory == null ) {
-			throw log.unsupportedDSLAggregations( getEventContext() );
-		}
 		return aggregationBuilderFactory;
 	}
 

@@ -46,7 +46,7 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 	@Override
 	public F decode(Document document, String absoluteFieldPath) {
 		if ( fieldValueExtractor == null ) {
-			throw log.unsupportedProjection(
+			throw log.unsupportedProjectionForNativeField(
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}

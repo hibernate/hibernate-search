@@ -341,15 +341,15 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 46,
 			value = "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query.")
-	SearchException unsupportedDSLPredicates(@Param EventContext context);
+	SearchException unsupportedDSLPredicatesForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 47,
 			value = "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort.")
-	SearchException unsupportedDSLSorts(@Param EventContext context);
+	SearchException unsupportedDSLSortsForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 48,
 			value = "This native field does not support projection.")
-	SearchException unsupportedProjection(@Param EventContext context);
+	SearchException unsupportedProjectionForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 49,
 			value = "Invalid field path; expected path '%1$s', got '%2$s'.")
@@ -387,9 +387,6 @@ public interface Log extends BasicLogger {
 	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> type,
 			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 57, value = "This field does not support projections.")
-	SearchException unsupportedDSLProjections(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 58,
 			value = "Multiple conflicting types to build a predicate for field '%1$s': '%2$s' vs. '%3$s'.")
@@ -579,7 +576,7 @@ public interface Log extends BasicLogger {
 	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
 
 	@Message(id = ID_OFFSET_2 + 103, value = "This field does not support aggregations.")
-	SearchException unsupportedDSLAggregations(@Param EventContext context);
+	SearchException unsupportedDSLAggregationsForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 104, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
 			" Search analyzer: '%1$s'.")
