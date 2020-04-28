@@ -70,9 +70,13 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
-		LuceneIndexSchemaFieldNode<F> fieldNode = type.addField(
-				collector, parentNode, relativeFieldName, multiValued
+		LuceneIndexSchemaFieldNode<F> fieldNode = type.createField(
+				parentNode, relativeFieldName, multiValued
 		);
+
+		collector.collectFieldNode( fieldNode.getAbsoluteFieldPath(), fieldNode );
+		collector.collectAnalyzer( fieldNode.getAbsoluteFieldPath(), type.getAnalyzerOrNormalizer() );
+
 		reference.enable( fieldNode );
 	}
 
