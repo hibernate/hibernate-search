@@ -6,11 +6,31 @@
  */
 package org.hibernate.search.engine.backend.common.spi;
 
+import java.util.Optional;
+
+import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
+
 public class FieldPaths {
 
 	private static final char PATH_SEPARATOR = '.';
 
 	private FieldPaths() {
+	}
+
+	public static String prefix(String prefix, String relativeFieldName) {
+		if ( prefix == null ) {
+			return relativeFieldName;
+		}
+
+		return prefix + relativeFieldName;
+	}
+
+	public static SimpleGlobPattern prefix(String prefix, SimpleGlobPattern relativeFieldPathGlob) {
+		if ( prefix == null ) {
+			return relativeFieldPathGlob;
+		}
+
+		return relativeFieldPathGlob.prependLiteral( prefix );
 	}
 
 	public static String compose(String absolutePath, String relativeFieldName) {
@@ -19,5 +39,43 @@ public class FieldPaths {
 		}
 
 		return absolutePath + PATH_SEPARATOR + relativeFieldName;
+	}
+
+	public static SimpleGlobPattern compose(String absolutePath, SimpleGlobPattern relativeFieldPathGlob) {
+		if ( absolutePath == null ) {
+			return relativeFieldPathGlob;
+		}
+
+		return relativeFieldPathGlob.prependLiteral( absolutePath + PATH_SEPARATOR );
+	}
+
+	public static SimpleGlobPattern absolutize(String absoluteParentPath, String prefix, SimpleGlobPattern relativeFieldPathGlob) {
+		return compose( absoluteParentPath, prefix( prefix, relativeFieldPathGlob ) );
+	}
+
+	public static String absolutize(String absoluteParentPath, String prefix, String relativeFieldName) {
+		return compose( absoluteParentPath, prefix( prefix, relativeFieldName ) );
+	}
+
+	public static RelativizedPath relativize(String absolutePath) {
+		int lastSeparatorIndex = absolutePath.lastIndexOf( PATH_SEPARATOR );
+		if ( lastSeparatorIndex < 0 ) {
+			return new RelativizedPath( Optional.empty(), absolutePath );
+		}
+
+		return new RelativizedPath(
+				Optional.of( absolutePath.substring( 0, lastSeparatorIndex ) ),
+				absolutePath.substring( lastSeparatorIndex + 1 )
+		);
+	}
+
+	public static final class RelativizedPath {
+		public final Optional<String> parentPath;
+		public final String relativePath;
+
+		private RelativizedPath(Optional<String> parentPath, String relativePath) {
+			this.parentPath = parentPath;
+			this.relativePath = relativePath;
+		}
 	}
 }

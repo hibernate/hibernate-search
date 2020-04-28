@@ -16,8 +16,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ab
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -65,8 +63,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		if ( reference != null ) {
 			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
 		}
-		JsonObjectAccessor jsonAccessor = JsonAccessor.root().property( relativeFieldName ).asObject();
-		this.reference = new ElasticsearchIndexObjectFieldReference( jsonAccessor );
+		this.reference = new ElasticsearchIndexObjectFieldReference();
 		return reference;
 	}
 
@@ -83,22 +80,12 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		reference.enable( fieldNode );
 
-		PropertyMapping mapping = new PropertyMapping();
-		String dataType = DataTypes.OBJECT;
-		switch ( storage ) {
-			case DEFAULT:
-				break;
-			case FLATTENED:
-				dataType = DataTypes.OBJECT;
-				break;
-			case NESTED:
-				dataType = DataTypes.NESTED;
-				break;
+		DynamicType dynamicType = parentMapping.getDynamic();
+		if ( DynamicType.STRICT.equals( dynamicType ) ) {
+			dynamicType = resolveSelfDynamicType();
 		}
-		mapping.setType( dataType );
 
-		// TODO HSEARCH-3273 allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
-		mapping.setDynamic( DynamicType.STRICT );
+		PropertyMapping mapping = createPropertyMapping( storage, dynamicType );
 
 		parentMapping.addProperty( relativeFieldName, mapping );
 
@@ -113,5 +100,24 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	@Override
 	String getAbsolutePath() {
 		return absoluteFieldPath;
+	}
+
+	static PropertyMapping createPropertyMapping(ObjectFieldStorage storage,
+			DynamicType dynamicType) {
+		PropertyMapping mapping = new PropertyMapping();
+		String dataType = DataTypes.OBJECT;
+		switch ( storage ) {
+			case DEFAULT:
+				break;
+			case FLATTENED:
+				dataType = DataTypes.OBJECT;
+				break;
+			case NESTED:
+				dataType = DataTypes.NESTED;
+				break;
+		}
+		mapping.setType( dataType );
+		mapping.setDynamic( dynamicType );
+		return mapping;
 	}
 }

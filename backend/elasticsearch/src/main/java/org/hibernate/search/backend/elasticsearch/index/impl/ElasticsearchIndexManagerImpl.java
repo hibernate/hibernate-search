@@ -163,7 +163,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	@Override
 	public JsonObject createDocument(String tenantId, String id,
 			DocumentContributor documentContributor) {
-		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder( model );
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build();
 

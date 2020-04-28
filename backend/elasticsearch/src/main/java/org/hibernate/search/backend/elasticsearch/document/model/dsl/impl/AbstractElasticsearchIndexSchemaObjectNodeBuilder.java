@@ -10,7 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
@@ -29,7 +31,8 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, ElasticsearchIndexSchemaNodeContributor> content = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
@@ -76,32 +79,57 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
 			IndexFieldType<?> indexFieldType, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		ElasticsearchIndexFieldType<?> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<?>) indexFieldType;
+		ElasticsearchIndexSchemaFieldTemplateBuilder templateBuilder = new ElasticsearchIndexSchemaFieldTemplateBuilder(
+				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
+		);
+		putTemplate( prefixedTemplateName, templateBuilder );
+		return templateBuilder;
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
 			IndexFieldType<?> indexFieldType, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		ElasticsearchIndexFieldType<?> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<?>) indexFieldType;
+		return new ElasticsearchIndexSchemaFieldTemplateBuilder(
+				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
+		);
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
 			ObjectFieldStorage storage, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		ElasticsearchIndexSchemaObjectFieldTemplateBuilder templateBuilder =
+				new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
+						this, prefixedTemplateName, storage, prefix
+				);
+		putTemplate( prefixedTemplateName, templateBuilder );
+		return templateBuilder;
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
 			ObjectFieldStorage storage, String prefix) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
+		return new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
+				this, prefixedTemplateName, storage, prefix
+		);
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
 			ElasticsearchIndexSchemaNodeCollector collector) {
-		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : content.entrySet() ) {
+		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : fields.entrySet() ) {
 			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
 			propertyContributor.contribute( collector, node, mapping );
+		}
+		// Contribute templates depth-first, so do ours after the children's.
+		// The reason is templates defined in children have more precise path globs and thus
+		// should be appear first in the list.
+		for ( ElasticsearchIndexSchemaNodeContributor template : templates.values() ) {
+			template.contribute( collector, node, mapping );
 		}
 	}
 
@@ -109,10 +137,27 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	abstract String getAbsolutePath();
 
+	final DynamicType resolveSelfDynamicType() {
+		if ( templates.isEmpty() ) {
+			// TODO HSEARCH-3273 allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
+			return DynamicType.STRICT;
+		}
+		else {
+			return DynamicType.TRUE;
+		}
+	}
+
 	private void putField(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
-		Object previous = content.putIfAbsent( name, contributor );
+		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, getEventContext() );
+		}
+	}
+
+	private void putTemplate(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
+		Object previous = templates.putIfAbsent( name, contributor );
+		if ( previous != null ) {
+			throw log.indexSchemaFieldTemplateNameConflict( name, getEventContext() );
 		}
 	}
 

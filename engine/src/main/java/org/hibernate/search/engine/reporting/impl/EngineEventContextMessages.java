@@ -81,6 +81,9 @@ public interface EngineEventContextMessages {
 	@Message(value = "fields %1$s")
 	String indexFieldAbsolutePaths(List<String> absolutePaths);
 
+	@Message(value = "field template '%1$s'")
+	String fieldTemplate(String absolutePath);
+
 	@Message(value = "analyzer '%1$s'")
 	String analyzer(String name);
 

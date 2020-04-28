@@ -169,6 +169,15 @@ public class EventContexts {
 		} );
 	}
 
+	public static EventContext fromFieldTemplateAbsolutePath(String templateAbsolutePath) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( templateAbsolutePath ) {
+			@Override
+			public String render(String param) {
+				return MESSAGES.fieldTemplate( param );
+			}
+		} );
+	}
+
 	public static EventContext fromAnalyzer(String analyzerName) {
 		return EventContext.create( new AbstractSimpleEventContextElement<String>( analyzerName ) {
 			@Override

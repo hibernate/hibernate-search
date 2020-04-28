@@ -27,19 +27,20 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
-import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.data.Range;
-import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.reporting.EventContext;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -667,4 +668,23 @@ public interface Log extends BasicLogger {
 			value = "Field '%1$s' is not contained in a nested object."
 					+ " Aggregation filters are only available if the field to aggregate on is contained in a nested object.")
 	SearchException cannotFilterAggregationOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 107,
+			value = "The index field template '%1$s' was added twice."
+					+ " Multiple bridges may be trying to access the same index field template, "
+					+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
+					+ " or you may have declared multiple conflicting mappings."
+					+ " In any case, there is something wrong with your mapping and you should fix it.")
+	SearchException indexSchemaFieldTemplateNameConflict(String name, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 108,
+			value = "Invalid value type. This field's values are of type '%1$s', which is not assignable from '%2$s'.")
+	SearchException invalidFieldValueType(@FormatWith(ClassFormatter.class) Class<?> fieldValueType,
+			@FormatWith(ClassFormatter.class) Class<?> invalidValueType,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 109,
+			value = "Unknown field '%1$s'.")
+	SearchException unknownFieldForIndexing(String absoluteFieldPath, @Param EventContext context);
+
 }
