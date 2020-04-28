@@ -8,11 +8,14 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 
 
 public class LuceneIndexModel implements AutoCloseable {
@@ -27,25 +30,24 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes;
 
-	private final ScopedAnalyzer scopedAnalyzer;
+	private final ModelBasedScopedAnalyzer indexingAnalyzer;
 
 	public LuceneIndexModel(String indexName,
 			String mappedTypeName,
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
-			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
-			ScopedAnalyzer scopedAnalyzer) {
+			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
 		this.objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
-		this.scopedAnalyzer = scopedAnalyzer;
+		this.indexingAnalyzer = new ModelBasedScopedAnalyzer();
 	}
 
 	@Override
 	public void close() {
-		scopedAnalyzer.close();
+		indexingAnalyzer.close();
 	}
 
 	public String getIndexName() {
@@ -72,8 +74,8 @@ public class LuceneIndexModel implements AutoCloseable {
 		return objectNodes.get( absolutePath );
 	}
 
-	public ScopedAnalyzer getScopedAnalyzer() {
-		return scopedAnalyzer;
+	public Analyzer getIndexingAnalyzer() {
+		return indexingAnalyzer;
 	}
 
 	@Override
@@ -83,5 +85,28 @@ public class LuceneIndexModel implements AutoCloseable {
 				.append( "indexName=" ).append( indexName )
 				.append( "]" )
 				.toString();
+	}
+
+	/**
+	 * An analyzer similar to {@link org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer},
+	 * except the field &rarr; analyzer map is implemented by querying the model.
+	 * This allows taking into account dynamic fields created through templates.
+	 */
+	private class ModelBasedScopedAnalyzer extends DelegatingAnalyzerWrapper {
+		protected ModelBasedScopedAnalyzer() {
+			super( PER_FIELD_REUSE_STRATEGY );
+		}
+
+		@Override
+		protected Analyzer getWrappedAnalyzer(String fieldName) {
+			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName );
+			Analyzer analyzer = field.getType().getAnalyzerOrNormalizer();
+
+			if ( analyzer == null ) {
+				return AnalyzerConstants.KEYWORD_ANALYZER;
+			}
+
+			return analyzer;
+		}
 	}
 }

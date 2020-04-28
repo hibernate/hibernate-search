@@ -6,14 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import org.apache.lucene.analysis.Analyzer;
-
 
 public interface LuceneIndexSchemaNodeCollector {
-
 	void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode schemaObjectNode);
 
 	void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> schemaFieldNode);
-
-	void collectAnalyzer(String absoluteFieldPath, Analyzer analyzer);
 }

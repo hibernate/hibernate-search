@@ -75,7 +75,6 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 		);
 
 		collector.collectFieldNode( fieldNode.getAbsoluteFieldPath(), fieldNode );
-		collector.collectAnalyzer( fieldNode.getAbsoluteFieldPath(), type.getAnalyzerOrNormalizer() );
 
 		reference.enable( fieldNode );
 	}
