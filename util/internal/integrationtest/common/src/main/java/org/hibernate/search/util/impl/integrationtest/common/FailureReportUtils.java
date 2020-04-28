@@ -107,6 +107,14 @@ public final class FailureReportUtils {
 			return contextLiteral( "attribute '" + exactName + "'" );
 		}
 
+		public FailureReportPatternBuilder indexFieldTemplateContext(String exactPath) {
+			return contextLiteral( "field template '" + exactPath + "'" );
+		}
+
+		public FailureReportPatternBuilder fieldTemplateAttributeContext(String exactPath) {
+			return contextLiteral( "attribute '" + exactPath + "'" );
+		}
+
 		public FailureReportPatternBuilder analyzerContext(String exactName) {
 			return contextLiteral( "analyzer '" + exactName + "'" );
 		}
