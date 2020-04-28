@@ -74,8 +74,8 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			nestedPathHierarchy.add( absoluteFieldPath );
 		}
 		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode(
-				parentNode, absoluteFieldPath, nestedPathHierarchy, getChildrenNames(), storage, multiValued
-		);
+				parentNode, absoluteFieldPath, nestedPathHierarchy, storage, multiValued, getChildrenNames()
+				);
 		collector.collectObjectNode( absoluteFieldPath, node );
 
 		reference.enable( node );

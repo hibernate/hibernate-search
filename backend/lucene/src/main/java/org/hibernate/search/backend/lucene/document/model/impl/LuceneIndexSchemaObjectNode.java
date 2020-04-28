@@ -16,9 +16,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 
 public class LuceneIndexSchemaObjectNode {
 
-	private static final LuceneIndexSchemaObjectNode ROOT =
-			// we do not store childrenPaths for the root node
-			new LuceneIndexSchemaObjectNode( null, null, Collections.emptyList(), Collections.emptyList(), null, false );
+	private static final LuceneIndexSchemaObjectNode ROOT = new LuceneIndexSchemaObjectNode(
+			null, null, Collections.emptyList(),
+			null, false,
+			// we do not store childrenAbsolutePaths for the root node
+			Collections.emptyList()
+	);
 
 	public static LuceneIndexSchemaObjectNode root() {
 		return ROOT;
@@ -30,20 +33,21 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final List<String> nestedPathHierarchy;
 
-	private final List<String> childrenAbsolutePaths;
-
 	private final ObjectFieldStorage storage;
 
 	private final boolean multiValued;
 
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, List<String> nestedPathHierarchy, List<String> childrenAbsolutePaths,
-			ObjectFieldStorage storage, boolean multiValued) {
+	private final List<String> childrenAbsolutePaths;
+
+	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, List<String> nestedPathHierarchy,
+			ObjectFieldStorage storage, boolean multiValued,
+			List<String> childrenRelativeNames) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
 		this.nestedPathHierarchy = Collections.unmodifiableList( nestedPathHierarchy );
 		this.storage = storage;
 		this.multiValued = multiValued;
-		this.childrenAbsolutePaths = childrenAbsolutePaths.stream()
+		this.childrenAbsolutePaths = childrenRelativeNames.stream()
 				.map( relativeFieldName -> FieldPaths.compose( absolutePath, relativeFieldName ) )
 				.collect( Collectors.toList() );
 	}
