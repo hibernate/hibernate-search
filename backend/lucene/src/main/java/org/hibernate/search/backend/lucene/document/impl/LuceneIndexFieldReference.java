@@ -14,17 +14,13 @@ public class LuceneIndexFieldReference<F> implements IndexFieldReference<F> {
 
 	private LuceneIndexSchemaFieldNode<F> schemaNode;
 
-	public void enable(LuceneIndexSchemaFieldNode<F> schemaNode) {
+	public void setSchemaNode(LuceneIndexSchemaFieldNode<F> schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[schemaNode=" + schemaNode + "]";
-	}
-
-	boolean isEnabled() {
-		return schemaNode != null;
 	}
 
 	LuceneIndexSchemaFieldNode<F> getSchemaNode() {

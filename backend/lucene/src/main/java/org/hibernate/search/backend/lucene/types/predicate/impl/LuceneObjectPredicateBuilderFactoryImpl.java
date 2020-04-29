@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPredicateBuilderFactory {
@@ -64,14 +65,14 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	private void addLeafFields(LuceneIndexModel indexModel, LuceneIndexSchemaObjectNode objectNode) {
 		for ( String childPath : objectNode.getChildrenAbsolutePaths() ) {
-			LuceneIndexSchemaObjectNode innerObjectNode = indexModel.getObjectNode( childPath );
+			LuceneIndexSchemaObjectNode innerObjectNode = indexModel.getObjectNode( childPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( innerObjectNode != null && innerObjectNode.getStorage().equals( ObjectFieldStorage.FLATTENED ) ) {
 				// add recursively flattened nested object fields: this is the ES behavior
 				addLeafFields( indexModel, innerObjectNode );
 				continue;
 			}
 
-			LuceneIndexSchemaFieldNode<?> fieldNode = indexModel.getFieldNode( childPath );
+			LuceneIndexSchemaFieldNode<?> fieldNode = indexModel.getFieldNode( childPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( fieldNode != null ) {
 				leafFields.put( childPath, fieldNode.getType().getPredicateBuilderFactory() );
 			}

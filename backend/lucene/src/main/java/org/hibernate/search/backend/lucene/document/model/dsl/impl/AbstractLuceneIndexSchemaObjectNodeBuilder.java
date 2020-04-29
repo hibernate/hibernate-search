@@ -51,11 +51,9 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
 		LuceneIndexSchemaFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, luceneIndexFieldType
+				this, relativeFieldName, inclusion, luceneIndexFieldType
 		);
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putField( relativeFieldName, childBuilder );
-		}
+		putField( relativeFieldName, childBuilder );
 		return childBuilder;
 	}
 
@@ -63,10 +61,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectFieldStorage storage) {
 		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putField( relativeFieldName, objectFieldBuilder );
-		}
+				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, storage );
+		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
 
@@ -76,11 +72,9 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexFieldType<?> elasticsearchIndexFieldType = (LuceneIndexFieldType<?>) indexFieldType;
 		LuceneIndexSchemaFieldTemplateBuilder templateBuilder = new LuceneIndexSchemaFieldTemplateBuilder(
-				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
+				this, prefixedTemplateName, inclusion, elasticsearchIndexFieldType, prefix
 		);
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putTemplate( prefixedTemplateName, templateBuilder );
-		}
+		putTemplate( prefixedTemplateName, templateBuilder );
 		return templateBuilder;
 	}
 
@@ -90,11 +84,9 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexSchemaObjectFieldTemplateBuilder templateBuilder =
 				new LuceneIndexSchemaObjectFieldTemplateBuilder(
-						this, prefixedTemplateName, storage, prefix
+						this, prefixedTemplateName, inclusion, storage, prefix
 				);
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putTemplate( prefixedTemplateName, templateBuilder );
-		}
+		putTemplate( prefixedTemplateName, templateBuilder );
 		return templateBuilder;
 	}
 

@@ -13,12 +13,13 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 
 
 public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT = new LuceneIndexSchemaObjectNode(
-			null, null,
+			null, null, IndexFieldInclusion.INCLUDED,
 			null, false,
 			// we do not store childrenPaths for the root node
 			Collections.emptyList()
@@ -29,8 +30,8 @@ public class LuceneIndexSchemaObjectNode {
 	}
 
 	private final LuceneIndexSchemaObjectNode parent;
-
 	private final String absolutePath;
+	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
 
@@ -41,10 +42,11 @@ public class LuceneIndexSchemaObjectNode {
 	private final List<String> childrenAbsolutePaths;
 
 	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			ObjectFieldStorage storage, boolean multiValued,
+			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
 			List<String> childrenRelativeNames) {
 		this.parent = parent;
 		this.absolutePath = parent == null ? relativeName : parent.getAbsolutePath( relativeName );
+		this.inclusion = parent == null ? inclusion : parent.getInclusion().compose( inclusion );
 		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy
@@ -69,6 +71,10 @@ public class LuceneIndexSchemaObjectNode {
 
 	public String getAbsolutePath(String relativeFieldName) {
 		return FieldPaths.compose( absolutePath, relativeFieldName );
+	}
+
+	public IndexFieldInclusion getInclusion() {
+		return inclusion;
 	}
 
 	public List<String> getNestedPathHierarchy() {
