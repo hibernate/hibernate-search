@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class ElasticsearchIndexSchemaFieldTemplateBuilder
@@ -22,8 +23,8 @@ class ElasticsearchIndexSchemaFieldTemplateBuilder
 	private final ElasticsearchIndexFieldType<?> type;
 
 	ElasticsearchIndexSchemaFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String templateName, ElasticsearchIndexFieldType<?> type, String prefix) {
-		super( parent, templateName, prefix );
+			String templateName, IndexFieldInclusion inclusion, ElasticsearchIndexFieldType<?> type, String prefix) {
+		super( parent, templateName, inclusion, prefix );
 		this.type = type;
 	}
 
@@ -34,17 +35,22 @@ class ElasticsearchIndexSchemaFieldTemplateBuilder
 
 	@Override
 	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode, SimpleGlobPattern absolutePathGlob, boolean multiValued) {
+			ElasticsearchIndexSchemaObjectNode parentNode, IndexFieldInclusion inclusion,
+			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexSchemaFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaFieldTemplate(
-				absolutePathGlob, multiValued, type
+				parentNode, absolutePathGlob, inclusion, multiValued, type
 		);
 
-		DynamicTemplate dynamicTemplate = new DynamicTemplate();
-		dynamicTemplate.setPathMatch( absolutePathGlob.toPatternString() );
-		dynamicTemplate.setMapping( type.getMapping() );
-		NamedDynamicTemplate namedDynamicTemplate = new NamedDynamicTemplate( absolutePath, dynamicTemplate );
+		collector.collect( fieldTemplate );
 
-		collector.collect( fieldTemplate, namedDynamicTemplate );
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldTemplate.getInclusion() ) ) {
+			DynamicTemplate dynamicTemplate = new DynamicTemplate();
+			dynamicTemplate.setPathMatch( absolutePathGlob.toPatternString() );
+			dynamicTemplate.setMapping( type.getMapping() );
+			NamedDynamicTemplate namedDynamicTemplate = new NamedDynamicTemplate( absolutePath, dynamicTemplate );
+
+			collector.collect( namedDynamicTemplate );
+		}
 	}
 
 }

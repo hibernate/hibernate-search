@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -84,12 +85,16 @@ public class ElasticsearchIndexModel {
 		return rootNode;
 	}
 
-	public ElasticsearchIndexSchemaObjectNode getObjectNode(String absolutePath) {
-		return getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+	public ElasticsearchIndexSchemaObjectNode getObjectNode(String absolutePath, IndexFieldFilter filter) {
+		ElasticsearchIndexSchemaObjectNode node =
+				getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+		return node == null ? null : filter.filter( node, node.getInclusion() );
 	}
 
-	public ElasticsearchIndexSchemaFieldNode<?> getFieldNode(String absolutePath) {
-		return getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
+	public ElasticsearchIndexSchemaFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
+		ElasticsearchIndexSchemaFieldNode<?> node =
+				getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
+		return node == null ? null : filter.filter( node, node.getInclusion() );
 	}
 
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {

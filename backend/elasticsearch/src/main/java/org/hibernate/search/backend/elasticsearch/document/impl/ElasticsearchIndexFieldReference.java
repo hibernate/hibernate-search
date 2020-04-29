@@ -22,12 +22,8 @@ public class ElasticsearchIndexFieldReference<F> implements IndexFieldReference<
 		return getClass().getSimpleName() + "[schemaNode=" + schemaNode + "]";
 	}
 
-	public void enable(ElasticsearchIndexSchemaFieldNode<F> schemaNode) {
+	public void setSchemaNode(ElasticsearchIndexSchemaFieldNode<F> schemaNode) {
 		this.schemaNode = schemaNode;
-	}
-
-	boolean isEnabled() {
-		return schemaNode != null;
 	}
 
 	ElasticsearchIndexSchemaFieldNode<F> getSchemaNode() {

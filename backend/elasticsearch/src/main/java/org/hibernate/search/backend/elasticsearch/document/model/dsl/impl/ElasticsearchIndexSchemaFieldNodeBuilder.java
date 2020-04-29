@@ -13,13 +13,14 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -33,16 +34,18 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
+	private final IndexFieldInclusion inclusion;
 	private final ElasticsearchIndexFieldType<F> type;
 	private boolean multiValued = false;
 
 	private ElasticsearchIndexFieldReference<F> reference;
 
 	ElasticsearchIndexSchemaFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String relativeFieldName, ElasticsearchIndexFieldType<F> type) {
+			String relativeFieldName, IndexFieldInclusion inclusion, ElasticsearchIndexFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
+		this.inclusion = inclusion;
 		this.type = type;
 	}
 
@@ -76,13 +79,16 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 		}
 
 		ElasticsearchIndexSchemaFieldNode<F> fieldNode = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, relativeFieldName, multiValued, type
+				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 
 		collector.collect( absoluteFieldPath, fieldNode );
-		parentMapping.addProperty( relativeFieldName, type.getMapping() );
 
-		reference.enable( fieldNode );
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.getInclusion() ) ) {
+			parentMapping.addProperty( relativeFieldName, type.getMapping() );
+		}
+
+		reference.setSchemaNode( fieldNode );
 	}
 
 }

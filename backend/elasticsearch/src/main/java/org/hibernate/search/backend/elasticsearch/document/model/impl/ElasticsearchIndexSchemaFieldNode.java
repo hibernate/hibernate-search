@@ -12,6 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -27,6 +28,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final String absolutePath;
 	private final JsonAccessor<JsonElement> relativeAccessor;
+	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
 
@@ -35,10 +37,11 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 	private final ElasticsearchIndexFieldType<F> type;
 
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
-			boolean multiValued, ElasticsearchIndexFieldType<F> type) {
+			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexFieldType<F> type) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
 		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
+		this.inclusion = inclusion;
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.type = type;
 		this.multiValued = multiValued;
@@ -54,6 +57,10 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public IndexFieldInclusion getInclusion() {
+		return inclusion;
 	}
 
 	public String getNestedPath() {

@@ -110,15 +110,17 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			}
 
 			@Override
-			public void collect(ElasticsearchIndexSchemaObjectFieldTemplate template,
-					NamedDynamicTemplate templateForMapping) {
+			public void collect(ElasticsearchIndexSchemaObjectFieldTemplate template) {
 				objectFieldTemplates.add( template );
-				mapping.addDynamicTemplate( templateForMapping );
 			}
 
 			@Override
-			public void collect(ElasticsearchIndexSchemaFieldTemplate template, NamedDynamicTemplate templateForMapping) {
+			public void collect(ElasticsearchIndexSchemaFieldTemplate template) {
 				fieldTemplates.add( template );
+			}
+
+			@Override
+			public void collect(NamedDynamicTemplate templateForMapping) {
 				mapping.addDynamicTemplate( templateForMapping );
 			}
 		};

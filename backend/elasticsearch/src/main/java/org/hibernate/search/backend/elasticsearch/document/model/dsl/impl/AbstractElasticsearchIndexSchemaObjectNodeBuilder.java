@@ -49,11 +49,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
 		ElasticsearchIndexSchemaFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, elasticsearchIndexFieldType
+				this, relativeFieldName, inclusion, elasticsearchIndexFieldType
 		);
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putField( relativeFieldName, childBuilder );
-		}
+		putField( relativeFieldName, childBuilder );
 		return childBuilder;
 	}
 
@@ -61,10 +59,8 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectFieldStorage storage) {
 		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putField( relativeFieldName, objectFieldBuilder );
-		}
+				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, storage );
+		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
 
@@ -74,11 +70,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexFieldType<?> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<?>) indexFieldType;
 		ElasticsearchIndexSchemaFieldTemplateBuilder templateBuilder = new ElasticsearchIndexSchemaFieldTemplateBuilder(
-				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
+				this, prefixedTemplateName, inclusion, elasticsearchIndexFieldType, prefix
 		);
-		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
-			putTemplate( prefixedTemplateName, templateBuilder );
-		}
+		putTemplate( prefixedTemplateName, templateBuilder );
 		return templateBuilder;
 	}
 
@@ -88,7 +82,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexSchemaObjectFieldTemplateBuilder templateBuilder =
 				new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
-						this, prefixedTemplateName, storage, prefix
+						this, prefixedTemplateName, inclusion, storage, prefix
 				);
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			putTemplate( prefixedTemplateName, templateBuilder );

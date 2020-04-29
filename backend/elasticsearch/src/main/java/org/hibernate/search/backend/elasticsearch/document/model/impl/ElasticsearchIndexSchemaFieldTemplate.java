@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
@@ -15,15 +16,16 @@ public class ElasticsearchIndexSchemaFieldTemplate
 
 	private final ElasticsearchIndexFieldType<?> type;
 
-	public ElasticsearchIndexSchemaFieldTemplate(SimpleGlobPattern absolutePathGlob, boolean multiValued,
-			ElasticsearchIndexFieldType<?> type) {
-		super( absolutePathGlob, multiValued );
+	public ElasticsearchIndexSchemaFieldTemplate(ElasticsearchIndexSchemaObjectNode declaringParent,
+			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
+			boolean multiValued, ElasticsearchIndexFieldType<?> type) {
+		super( declaringParent, absolutePathGlob, inclusion, multiValued );
 		this.type = type;
 	}
 
 	@Override
 	protected ElasticsearchIndexSchemaFieldNode<?> createNode(ElasticsearchIndexSchemaObjectNode parent,
-			String relativePath, boolean multiValued) {
-		return new ElasticsearchIndexSchemaFieldNode<>( parent, relativePath, multiValued, type );
+			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
+		return new ElasticsearchIndexSchemaFieldNode<>( parent, relativePath, inclusion, multiValued, type );
 	}
 }

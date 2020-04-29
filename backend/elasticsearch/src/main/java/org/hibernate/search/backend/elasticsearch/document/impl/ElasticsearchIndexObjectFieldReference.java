@@ -14,12 +14,8 @@ public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldR
 
 	private ElasticsearchIndexSchemaObjectNode schemaNode;
 
-	public void enable(ElasticsearchIndexSchemaObjectNode schemaNode) {
+	public void setSchemaNode(ElasticsearchIndexSchemaObjectNode schemaNode) {
 		this.schemaNode = schemaNode;
-	}
-
-	boolean isEnabled() {
-		return schemaNode != null;
 	}
 
 	ElasticsearchIndexSchemaObjectNode getSchemaNode() {
