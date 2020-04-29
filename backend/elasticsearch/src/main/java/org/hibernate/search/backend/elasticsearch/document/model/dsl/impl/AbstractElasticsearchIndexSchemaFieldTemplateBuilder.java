@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ab
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -27,15 +28,17 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	protected final String absolutePath;
+	private final IndexFieldInclusion inclusion;
 	private final String prefix;
 
 	private SimpleGlobPattern relativePathGlob;
 	private boolean multiValued = false;
 
 	AbstractElasticsearchIndexSchemaFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String templateName, String prefix) {
+			String templateName, IndexFieldInclusion inclusion, String prefix) {
 		this.parent = parent;
 		this.absolutePath = FieldPaths.compose( parent.getAbsolutePath(), templateName );
+		this.inclusion = inclusion;
 		this.prefix = prefix;
 	}
 
@@ -67,13 +70,14 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 				prefix,
 				relativePathGlob != null ? relativePathGlob : SimpleGlobPattern.compile( "*" )
 		);
-		doContribute( collector, parentNode, absolutePathGlob, multiValued );
+		doContribute( collector, parentNode, inclusion, absolutePathGlob, multiValued );
 	}
 
 	protected abstract S thisAsS();
 
 	protected abstract void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode,
+			IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob,
 			boolean multiValued);
 

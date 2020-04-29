@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -32,18 +33,21 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
+	private final IndexFieldInclusion inclusion;
+
 	private final ObjectFieldStorage storage;
 	private boolean multiValued = false;
 
 	private ElasticsearchIndexObjectFieldReference reference;
 
 	ElasticsearchIndexSchemaObjectFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String relativeFieldName, ObjectFieldStorage storage) {
+			String relativeFieldName, IndexFieldInclusion inclusion, ObjectFieldStorage storage) {
 		this.parent = parent;
 		String parentAbsolutePath = parent.getAbsolutePath();
 		this.absoluteFieldPath = parentAbsolutePath == null ? relativeFieldName
 				: FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 		this.relativeFieldName = relativeFieldName;
+		this.inclusion = inclusion;
 		this.storage = storage;
 	}
 
@@ -74,11 +78,11 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 		ElasticsearchIndexSchemaObjectNode fieldNode = new ElasticsearchIndexSchemaObjectNode(
-				parentNode, relativeFieldName, storage, multiValued
+				parentNode, relativeFieldName, inclusion, storage, multiValued
 		);
 		collector.collect( absoluteFieldPath, fieldNode );
 
-		reference.enable( fieldNode );
+		reference.setSchemaNode( fieldNode );
 
 		DynamicType dynamicType = parentMapping.getDynamic();
 		if ( DynamicType.STRICT.equals( dynamicType ) ) {
@@ -87,7 +91,9 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		PropertyMapping mapping = createPropertyMapping( storage, dynamicType );
 
-		parentMapping.addProperty( relativeFieldName, mapping );
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.getInclusion() ) ) {
+			parentMapping.addProperty( relativeFieldName, mapping );
+		}
 
 		contributeChildren( mapping, fieldNode, collector );
 	}

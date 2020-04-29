@@ -19,6 +19,8 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -48,9 +50,6 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
 		ElasticsearchIndexFieldReference<F> elasticsearchFieldReference = (ElasticsearchIndexFieldReference<F>) fieldReference;
-		if ( !elasticsearchFieldReference.isEnabled() ) {
-			return;
-		}
 
 		ElasticsearchIndexSchemaFieldNode<F> fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 		addValue( fieldSchemaNode, value );
@@ -59,33 +58,26 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
 		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference = (ElasticsearchIndexObjectFieldReference) fieldReference;
-		if ( !elasticsearchFieldReference.isEnabled() ) {
-			return NoOpDocumentElement.get();
-		}
 
 		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 
 		JsonObject jsonObject = new JsonObject();
-		addObject( fieldSchemaNode, jsonObject );
-
-		return new ElasticsearchDocumentObjectBuilder( model, fieldSchemaNode, jsonObject );
+		return addObject( fieldSchemaNode, jsonObject );
 	}
 
 	@Override
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference = (ElasticsearchIndexObjectFieldReference) fieldReference;
-		if ( !elasticsearchFieldReference.isEnabled() ) {
-			return;
-		}
 
 		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
+
 		addObject( fieldSchemaNode, null );
 	}
 
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = FieldPaths.compose( schemaNode.getAbsolutePath(), relativeFieldName );
-		ElasticsearchIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath );
+		ElasticsearchIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -97,7 +89,8 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath );
+		ElasticsearchIndexSchemaObjectNode fieldSchemaNode =
+				model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -112,7 +105,8 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath );
+		ElasticsearchIndexSchemaObjectNode fieldSchemaNode =
+				model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -128,6 +122,10 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	private <F> void addValue(ElasticsearchIndexSchemaFieldNode<F> node, F value) {
 		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.getParent();
 		checkTreeConsistency( expectedParentNode );
+
+		if ( IndexFieldInclusion.EXCLUDED.equals( node.getInclusion() ) ) {
+			return;
+		}
 
 		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
 		ElasticsearchIndexFieldType<F> type = node.getType();
@@ -151,9 +149,13 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		}
 	}
 
-	private void addObject(ElasticsearchIndexSchemaObjectNode node, JsonObject value) {
+	private DocumentElement addObject(ElasticsearchIndexSchemaObjectNode node, JsonObject value) {
 		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.getParent();
 		checkTreeConsistency( expectedParentNode );
+
+		if ( IndexFieldInclusion.EXCLUDED.equals( node.getInclusion() ) ) {
+			return NoOpDocumentElement.get();
+		}
 
 		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
 
@@ -161,6 +163,13 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 			throw log.multipleValuesForSingleValuedField( node.getAbsolutePath() );
 		}
 		accessor.add( content, value );
+
+		if ( value == null ) {
+			return NoOpDocumentElement.get(); // Will not be used
+		}
+		else {
+			return new ElasticsearchDocumentObjectBuilder( model, node, value );
+		}
 	}
 
 	private void checkTreeConsistency(ElasticsearchIndexSchemaObjectNode expectedParentNode) {

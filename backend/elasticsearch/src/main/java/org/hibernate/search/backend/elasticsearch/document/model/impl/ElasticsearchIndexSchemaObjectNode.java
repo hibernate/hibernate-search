@@ -13,6 +13,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 
 import com.google.gson.JsonElement;
 
@@ -20,7 +21,8 @@ import com.google.gson.JsonElement;
 public class ElasticsearchIndexSchemaObjectNode {
 
 	private static final ElasticsearchIndexSchemaObjectNode ROOT =
-			new ElasticsearchIndexSchemaObjectNode( null, null, null, false );
+			new ElasticsearchIndexSchemaObjectNode( null, null, IndexFieldInclusion.INCLUDED,
+					null, false );
 
 	public static ElasticsearchIndexSchemaObjectNode root() {
 		return ROOT;
@@ -28,8 +30,8 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
 	private final JsonAccessor<JsonElement> relativeAccessor;
-
 	private final String absolutePath;
+	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
 
@@ -38,10 +40,11 @@ public class ElasticsearchIndexSchemaObjectNode {
 	private final boolean multiValued;
 
 	public ElasticsearchIndexSchemaObjectNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
-			ObjectFieldStorage storage, boolean multiValued) {
+			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = parent == null ? relativeFieldName : parent.getAbsolutePath( relativeFieldName );
 		this.relativeAccessor = relativeFieldName == null ? null : JsonAccessor.root().property( relativeFieldName );
+		this.inclusion = parent == null ? inclusion : parent.getInclusion().compose( inclusion );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
@@ -73,6 +76,10 @@ public class ElasticsearchIndexSchemaObjectNode {
 
 	public String getAbsolutePath(String relativeFieldName) {
 		return FieldPaths.compose( absolutePath, relativeFieldName );
+	}
+
+	public IndexFieldInclusion getInclusion() {
+		return inclusion;
 	}
 
 	public List<String> getNestedPathHierarchy() {

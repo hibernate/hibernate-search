@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
@@ -15,15 +16,16 @@ public class ElasticsearchIndexSchemaObjectFieldTemplate
 
 	private final ObjectFieldStorage storage;
 
-	public ElasticsearchIndexSchemaObjectFieldTemplate(SimpleGlobPattern absolutePathGlob, boolean multiValued,
-			ObjectFieldStorage storage) {
-		super( absolutePathGlob, multiValued );
+	public ElasticsearchIndexSchemaObjectFieldTemplate(ElasticsearchIndexSchemaObjectNode declaringParent,
+			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
+			boolean multiValued, ObjectFieldStorage storage) {
+		super( declaringParent, absolutePathGlob, inclusion, multiValued );
 		this.storage = storage;
 	}
 
 	@Override
 	protected ElasticsearchIndexSchemaObjectNode createNode(ElasticsearchIndexSchemaObjectNode parent,
-			String relativePath, boolean multiValued) {
-		return new ElasticsearchIndexSchemaObjectNode( parent, relativePath, storage, multiValued );
+			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
+		return new ElasticsearchIndexSchemaObjectNode( parent, relativePath, inclusion, storage, multiValued );
 	}
 }
