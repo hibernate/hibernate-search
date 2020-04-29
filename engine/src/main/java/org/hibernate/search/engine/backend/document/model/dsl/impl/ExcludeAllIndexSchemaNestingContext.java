@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.backend.document.model.dsl.impl;
 
 
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+
 class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 
 	static final ExcludeAllIndexSchemaNestingContext INSTANCE = new ExcludeAllIndexSchemaNestingContext();
@@ -15,18 +17,17 @@ class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded) {
-		return factoryIfExcluded.create( relativeName );
+	public <T> T nest(String relativeName, LeafFactory<T> factory) {
+		return factory.create( relativeName, IndexFieldInclusion.EXCLUDED );
 	}
 
 	@Override
-	public <T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded,
-			CompositeFactory<T> factoryIfExcluded) {
-		return factoryIfExcluded.create( relativeName, INSTANCE );
+	public <T> T nest(String relativeName, CompositeFactory<T> factory) {
+		return factory.create( relativeName, IndexFieldInclusion.EXCLUDED, INSTANCE );
 	}
 
 	@Override
-	public <T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded) {
-		return factoryIfExcluded.create( "" );
+	public <T> T nestTemplate(TemplateFactory<T> factory) {
+		return factory.create( IndexFieldInclusion.EXCLUDED, "" );
 	}
 }

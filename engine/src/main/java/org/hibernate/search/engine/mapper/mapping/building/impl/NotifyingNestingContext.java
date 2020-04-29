@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 
 class NotifyingNestingContext implements IndexSchemaNestingContext {
@@ -19,41 +20,43 @@ class NotifyingNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded) {
+	public <T> T nest(String relativeName, LeafFactory<T> factory) {
 		return delegate.nest(
 				relativeName,
-				prefixedName -> {
-					listener.onSchemaContributed();
-					return factoryIfIncluded.create( prefixedName );
-				},
-				factoryIfExcluded
+				(prefixedName, inclusion) -> {
+					if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+						listener.onSchemaContributed();
+					}
+					return factory.create( prefixedName, inclusion );
+				}
 		);
 	}
 
 	@Override
-	public <T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded,
-			CompositeFactory<T> factoryIfExcluded) {
+	public <T> T nest(String relativeName, CompositeFactory<T> factory) {
 		return delegate.nest(
 				relativeName,
-				(prefixedName, nestedNestingContext) -> {
-					listener.onSchemaContributed();
-					return factoryIfIncluded.create(
-							prefixedName,
-							new NotifyingNestingContext( nestedNestingContext, listener )
-					);
-				},
-				factoryIfExcluded
+				(prefixedName, inclusion, nestedNestingContext) -> {
+					if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+						listener.onSchemaContributed();
+					}
+					// No need to wrap the nested context:
+					// if we're included, the listener was notified;
+					// if we're excluded, children will be excluded as well.
+					return factory.create( prefixedName, inclusion, nestedNestingContext );
+				}
 		);
 	}
 
 	@Override
-	public <T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded) {
+	public <T> T nestTemplate(TemplateFactory<T> factory) {
 		return delegate.nestTemplate(
-				prefix -> {
-					listener.onSchemaContributed();
-					return factoryIfIncluded.create( prefix );
-				},
-				factoryIfExcluded
+				(inclusion, prefix) -> {
+					if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+						listener.onSchemaContributed();
+					}
+					return factory.create( inclusion, prefix );
+				}
 		);
 	}
 }

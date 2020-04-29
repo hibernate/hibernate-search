@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -45,78 +46,54 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
 		ElasticsearchIndexSchemaFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaFieldNodeBuilder<>(
 				this, relativeFieldName, elasticsearchIndexFieldType
 		);
-		putField( relativeFieldName, childBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putField( relativeFieldName, childBuilder );
+		}
 		return childBuilder;
 	}
 
 	@Override
-	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
-		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
-		return new ElasticsearchIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, elasticsearchIndexFieldType
-		);
-	}
-
-	@Override
-	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
+	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+			ObjectFieldStorage storage) {
 		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-		putField( relativeFieldName, objectFieldBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putField( relativeFieldName, objectFieldBuilder );
+		}
 		return objectFieldBuilder;
 	}
 
 	@Override
-	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		return new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-	}
-
-	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
-			IndexFieldType<?> indexFieldType, String prefix) {
+			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexFieldType<?> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<?>) indexFieldType;
 		ElasticsearchIndexSchemaFieldTemplateBuilder templateBuilder = new ElasticsearchIndexSchemaFieldTemplateBuilder(
 				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
 		);
-		putTemplate( prefixedTemplateName, templateBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putTemplate( prefixedTemplateName, templateBuilder );
+		}
 		return templateBuilder;
 	}
 
 	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
-			IndexFieldType<?> indexFieldType, String prefix) {
-		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		ElasticsearchIndexFieldType<?> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<?>) indexFieldType;
-		return new ElasticsearchIndexSchemaFieldTemplateBuilder(
-				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
-		);
-	}
-
-	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix) {
+			ObjectFieldStorage storage, String prefix, IndexFieldInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexSchemaObjectFieldTemplateBuilder templateBuilder =
 				new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
 						this, prefixedTemplateName, storage, prefix
 				);
-		putTemplate( prefixedTemplateName, templateBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putTemplate( prefixedTemplateName, templateBuilder );
+		}
 		return templateBuilder;
-	}
-
-	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix) {
-		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		return new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
-				this, prefixedTemplateName, storage, prefix
-		);
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
