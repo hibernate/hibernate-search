@@ -8,17 +8,27 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths.RelativizedPath;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
 public abstract class AbstractLuceneIndexSchemaFieldTemplate<N> {
 
+	private final IndexFieldInclusion inclusion;
+
 	private final SimpleGlobPattern absolutePathGlob;
 	private final boolean multiValued;
 
-	AbstractLuceneIndexSchemaFieldTemplate(SimpleGlobPattern absolutePathGlob, boolean multiValued) {
+	AbstractLuceneIndexSchemaFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
+			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
+		this.inclusion = declaringParent.getInclusion().compose( inclusion );
 		this.absolutePathGlob = absolutePathGlob;
 		this.multiValued = multiValued;
+	}
+
+	public IndexFieldInclusion getInclusion() {
+		return inclusion;
 	}
 
 	N createNodeIfMatching(LuceneIndexModel model, String absolutePath) {
@@ -28,10 +38,12 @@ public abstract class AbstractLuceneIndexSchemaFieldTemplate<N> {
 
 		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
 		LuceneIndexSchemaObjectNode parent =
-				relativizedPath.parentPath.map( model::getObjectNode ).orElseGet( model::getRootNode );
+				relativizedPath.parentPath.map( path -> model.getObjectNode( path, IndexFieldFilter.ALL ) )
+						.orElseGet( model::getRootNode );
 
-		return createNode( parent, relativizedPath.relativePath, multiValued );
+		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );
 	}
 
-	protected abstract N createNode(LuceneIndexSchemaObjectNode parent, String relativePath, boolean multiValued);
+	protected abstract N createNode(LuceneIndexSchemaObjectNode parent, String relativePath,
+			IndexFieldInclusion inclusion, boolean multiValued);
 }

@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -21,8 +22,8 @@ public class LuceneIndexSchemaFieldNode<F> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneIndexSchemaObjectNode parent;
-
 	private final String absolutePath;
+	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
 
@@ -31,10 +32,10 @@ public class LuceneIndexSchemaFieldNode<F> {
 	private final LuceneIndexFieldType<F> type;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			boolean multiValued,
-			LuceneIndexFieldType<F> type) {
+			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexFieldType<F> type) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeName );
+		this.inclusion = parent.getInclusion().compose( inclusion );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.multiValued = multiValued;
 		this.type = type;
@@ -46,6 +47,10 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	public IndexFieldInclusion getInclusion() {
+		return inclusion;
 	}
 
 	public String getNestedDocumentPath() {

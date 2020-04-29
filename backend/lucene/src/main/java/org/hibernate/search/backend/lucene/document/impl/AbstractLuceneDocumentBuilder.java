@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -45,9 +46,6 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
 		LuceneIndexFieldReference<F> luceneFieldReference = (LuceneIndexFieldReference<F>) fieldReference;
-		if ( !luceneFieldReference.isEnabled() ) {
-			return;
-		}
 
 		LuceneIndexSchemaFieldNode<F> fieldSchemaNode = luceneFieldReference.getSchemaNode();
 
@@ -57,35 +55,25 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
 		LuceneIndexObjectFieldReference luceneFieldReference = (LuceneIndexObjectFieldReference) fieldReference;
-		if ( !luceneFieldReference.isEnabled() ) {
-			return NoOpDocumentElement.get();
-		}
 
 		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
 
-		return addObject( fieldSchemaNode );
+		return addObject( fieldSchemaNode, false );
 	}
 
 	@Override
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		LuceneIndexObjectFieldReference luceneFieldReference = (LuceneIndexObjectFieldReference) fieldReference;
-		if ( !luceneFieldReference.isEnabled() ) {
-			return;
-		}
 
 		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
-		checkTreeConsistency( fieldSchemaNode.getParent() );
-		if ( !fieldSchemaNode.isMultiValued() ) {
-			checkNoValueYetForSingleValued( fieldSchemaNode.getAbsolutePath() );
-		}
 
-		// We do not add any value for null objects
+		addObject( fieldSchemaNode, true );
 	}
 
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = FieldPaths.compose( schemaNode.getAbsolutePath(), relativeFieldName );
-		LuceneIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath );
+		LuceneIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -97,25 +85,25 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		LuceneIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath );
+		LuceneIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		return addObject( fieldSchemaNode );
+		return addObject( fieldSchemaNode, false );
 	}
 
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		LuceneIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath );
+		LuceneIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		// We do not add any value for null objects
+		addObject( fieldSchemaNode, true );
 	}
 
 	abstract void checkNoValueYetForSingleValued(String absoluteFieldPath);
@@ -178,7 +166,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		type.getCodec().encode( this, absolutePath, value );
 	}
 
-	private AbstractLuceneDocumentBuilder addObject(LuceneIndexSchemaObjectNode node) {
+	private DocumentElement addObject(LuceneIndexSchemaObjectNode node, boolean nullObject) {
 		LuceneIndexSchemaObjectNode expectedParentNode = node.getParent();
 		checkTreeConsistency( expectedParentNode );
 
@@ -186,6 +174,10 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 		if ( !node.isMultiValued() ) {
 			checkNoValueYetForSingleValued( absolutePath );
+		}
+
+		if ( nullObject ) {
+			return NoOpDocumentElement.get();
 		}
 
 		switch ( node.getStorage() ) {

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
@@ -17,17 +18,18 @@ public class LuceneIndexSchemaObjectFieldTemplate
 
 	private final ObjectFieldStorage storage;
 
-	public LuceneIndexSchemaObjectFieldTemplate(SimpleGlobPattern absolutePathGlob, boolean multiValued,
+	public LuceneIndexSchemaObjectFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
+			SimpleGlobPattern absolutePathGlob, boolean multiValued,
 			ObjectFieldStorage storage) {
-		super( absolutePathGlob, multiValued );
+		super( declaringParent, inclusion, absolutePathGlob, multiValued );
 		this.storage = storage;
 	}
 
 	@Override
 	protected LuceneIndexSchemaObjectNode createNode(LuceneIndexSchemaObjectNode parent,
-			String relativePath, boolean multiValued) {
+			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
 		return new LuceneIndexSchemaObjectNode(
-				parent, relativePath, storage, multiValued,
+				parent, relativePath, inclusion, storage, multiValued,
 				// TODO HSEARCH-3273 we don't know the children, so we should find another way to implement the exists predicate
 				Collections.emptyList()
 		);

@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -83,12 +84,16 @@ public class LuceneIndexModel implements AutoCloseable {
 		return rootNode;
 	}
 
-	public LuceneIndexSchemaObjectNode getObjectNode(String absolutePath) {
-		return getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+	public LuceneIndexSchemaObjectNode getObjectNode(String absolutePath, IndexFieldFilter filter) {
+		LuceneIndexSchemaObjectNode node =
+				getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+		return node == null ? null : filter.filter( node, node.getInclusion() );
 	}
 
-	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absolutePath) {
-		return getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
+	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
+		LuceneIndexSchemaFieldNode<?> node =
+				getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
+		return node == null ? null : filter.filter( node, node.getInclusion() );
 	}
 
 	public Analyzer getIndexingAnalyzer() {
@@ -144,7 +149,7 @@ public class LuceneIndexModel implements AutoCloseable {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName );
+			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
 			Analyzer analyzer = field.getType().getAnalyzerOrNormalizer();
 
 			if ( analyzer == null ) {

@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -31,16 +32,18 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
+	private final IndexFieldInclusion inclusion;
 	private final LuceneIndexFieldType<F> type;
 	private boolean multiValued = false;
 
 	private LuceneIndexFieldReference<F> reference;
 
 	LuceneIndexSchemaFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
-			String relativeFieldName, LuceneIndexFieldType<F> type) {
+			String relativeFieldName, IndexFieldInclusion inclusion, LuceneIndexFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
+		this.inclusion = inclusion;
 		this.type = type;
 	}
 
@@ -71,12 +74,12 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 		LuceneIndexSchemaFieldNode<F> fieldNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode, relativeFieldName, multiValued, type
+				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 
 		collector.collectFieldNode( fieldNode.getAbsolutePath(), fieldNode );
 
-		reference.enable( fieldNode );
+		reference.setSchemaNode( fieldNode );
 	}
 
 }
