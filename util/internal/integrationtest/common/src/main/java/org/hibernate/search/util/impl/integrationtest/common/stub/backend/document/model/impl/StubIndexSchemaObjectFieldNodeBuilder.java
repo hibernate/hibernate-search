@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexObjectFieldReference;
@@ -17,14 +18,15 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 		implements IndexSchemaObjectFieldNodeBuilder {
 
 	private final AbstractStubIndexSchemaObjectNodeBuilder parent;
-	private final boolean included;
+	private final IndexFieldInclusion inclusion;
+
 	private IndexObjectFieldReference reference;
 
 	StubIndexSchemaObjectFieldNodeBuilder(AbstractStubIndexSchemaObjectNodeBuilder parent,
-			StubIndexSchemaNode.Builder builder, boolean included) {
+			StubIndexSchemaNode.Builder builder, IndexFieldInclusion inclusion) {
 		super( builder );
 		this.parent = parent;
-		this.included = included;
+		this.inclusion = inclusion;
 	}
 
 	@Override
@@ -42,7 +44,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 	public IndexObjectFieldReference toReference() {
 		if ( reference == null ) {
 			reference = new StubIndexObjectFieldReference(
-					builder.getAbsolutePath(), builder.getRelativeName(), included
+					builder.getAbsolutePath(), builder.getRelativeName(), inclusion
 			);
 		}
 		return reference;

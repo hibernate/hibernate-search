@@ -7,17 +7,18 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 
 public class StubIndexFieldReference<F> implements IndexFieldReference<F> {
 
 	private final String absolutePath;
 	private final String relativeFieldName;
-	private final boolean enabled;
+	private final IndexFieldInclusion inclusion;
 
-	public StubIndexFieldReference(String absolutePath, String relativeFieldName, boolean enabled) {
+	public StubIndexFieldReference(String absolutePath, String relativeFieldName, IndexFieldInclusion inclusion) {
 		this.absolutePath = absolutePath;
 		this.relativeFieldName = relativeFieldName;
-		this.enabled = enabled;
+		this.inclusion = inclusion;
 	}
 
 	@Override
@@ -25,8 +26,8 @@ public class StubIndexFieldReference<F> implements IndexFieldReference<F> {
 		return getClass().getSimpleName() + "[" + absolutePath + "]";
 	}
 
-	boolean isEnabled() {
-		return enabled;
+	public IndexFieldInclusion getInclusion() {
+		return inclusion;
 	}
 
 	String getAbsolutePath() {

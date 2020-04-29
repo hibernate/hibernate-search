@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -47,78 +48,54 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
 		LuceneIndexSchemaFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaFieldNodeBuilder<>(
 				this, relativeFieldName, luceneIndexFieldType
 		);
-		putField( relativeFieldName, childBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putField( relativeFieldName, childBuilder );
+		}
 		return childBuilder;
 	}
 
 	@Override
-	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
-		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
-		return new LuceneIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, luceneIndexFieldType
-		);
-	}
-
-	@Override
-	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
+	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+			ObjectFieldStorage storage) {
 		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-		putField( relativeFieldName, objectFieldBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putField( relativeFieldName, objectFieldBuilder );
+		}
 		return objectFieldBuilder;
 	}
 
 	@Override
-	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		return new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-	}
-
-	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
-			IndexFieldType<?> indexFieldType, String prefix) {
+			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexFieldType<?> elasticsearchIndexFieldType = (LuceneIndexFieldType<?>) indexFieldType;
 		LuceneIndexSchemaFieldTemplateBuilder templateBuilder = new LuceneIndexSchemaFieldTemplateBuilder(
 				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
 		);
-		putTemplate( prefixedTemplateName, templateBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putTemplate( prefixedTemplateName, templateBuilder );
+		}
 		return templateBuilder;
 	}
 
 	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
-			IndexFieldType<?> indexFieldType, String prefix) {
-		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		LuceneIndexFieldType<?> elasticsearchIndexFieldType = (LuceneIndexFieldType<?>) indexFieldType;
-		return new LuceneIndexSchemaFieldTemplateBuilder(
-				this, prefixedTemplateName, elasticsearchIndexFieldType, prefix
-		);
-	}
-
-	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix) {
+			ObjectFieldStorage storage, String prefix, IndexFieldInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexSchemaObjectFieldTemplateBuilder templateBuilder =
 				new LuceneIndexSchemaObjectFieldTemplateBuilder(
 						this, prefixedTemplateName, storage, prefix
 				);
-		putTemplate( prefixedTemplateName, templateBuilder );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			putTemplate( prefixedTemplateName, templateBuilder );
+		}
 		return templateBuilder;
-	}
-
-	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix) {
-		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		return new LuceneIndexSchemaObjectFieldTemplateBuilder(
-				this, prefixedTemplateName, storage, prefix
-		);
 	}
 
 	public abstract LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder();

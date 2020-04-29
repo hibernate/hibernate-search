@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.backend.document.model.dsl.impl;
 
 
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+
 public interface IndexSchemaNestingContext {
 
 	/**
@@ -19,12 +21,11 @@ public interface IndexSchemaNestingContext {
 	 * but may be prefixed as required by this context's configuration.
 	 *
 	 * @param relativeName The base of the relative field name, which may get prefixed before it is passed to the factory.
-	 * @param factoryIfIncluded The element factory to use if the schema element is included.
-	 * @param factoryIfExcluded The element factory to use if the schema element is excluded.
+	 * @param factory The element factory to use.
 	 * @param <T> The type of the created schema element.
 	 * @return The created schema element.
 	 */
-	<T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded);
+	<T> T nest(String relativeName, LeafFactory<T> factory);
 
 	/**
 	 * Nest a composite schema element in this context.
@@ -36,12 +37,11 @@ public interface IndexSchemaNestingContext {
 	 * but may be prefixed as required by this context's configuration.
 	 *
 	 * @param relativeName The base of the relative field name, which may get prefixed before it is passed to the factory.
-	 * @param factoryIfIncluded The element factory to use if the schema element is included.
-	 * @param factoryIfExcluded The element factory to use if the schema element is excluded.
+	 * @param factory The element factory to use.
 	 * @param <T> The type of the created schema element.
 	 * @return The created schema element.
 	 */
-	<T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded, CompositeFactory<T> factoryIfExcluded);
+	<T> T nest(String relativeName, CompositeFactory<T> factory);
 
 	/**
 	 * Nest a template schema element in this context.
@@ -51,12 +51,11 @@ public interface IndexSchemaNestingContext {
 	 * Template elements do not take inclusion filters into account;
 	 * they are included as soon as their parent is included.
 	 *
-	 * @param factoryIfIncluded The element factory to use if the schema element is included.
-	 * @param factoryIfExcluded The element factory to use if the schema element is excluded.
+	 * @param factory The element factory to use.
 	 * @param <T> The type of the created schema element.
 	 * @return The created schema element.
 	 */
-	<T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded);
+	<T> T nestTemplate(TemplateFactory<T> factory);
 
 	/**
 	 * @return A nesting context that always excludes all elements and does not prefix the field names.
@@ -66,15 +65,16 @@ public interface IndexSchemaNestingContext {
 	}
 
 	interface LeafFactory<T> {
-		T create(String prefixedRelativeName);
+		T create(String prefixedRelativeName, IndexFieldInclusion inclusion);
 	}
 
 	interface CompositeFactory<T> {
-		T create(String prefixedRelativeName, IndexSchemaNestingContext nestedNestingContext);
+		T create(String prefixedRelativeName, IndexFieldInclusion inclusion,
+				IndexSchemaNestingContext nestedNestingContext);
 	}
 
 	interface TemplateFactory<T> {
-		T create(String prefix);
+		T create(IndexFieldInclusion inclusion, String prefix);
 	}
 
 }

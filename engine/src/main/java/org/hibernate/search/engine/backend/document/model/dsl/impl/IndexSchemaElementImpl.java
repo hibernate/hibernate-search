@@ -59,10 +59,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 				// Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
 				nestingContext.<IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>>>nest(
 						relativeFieldName,
-						// If the field is included
-						prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
-						// If the field is filtered out
-						prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
+						(prefixedName, inclusion) -> objectNodeBuilder.addField( prefixedName, inclusion, type )
 				);
 		if ( directChildrenAreMultiValuedByDefault ) {
 			fieldFinalStep.multiValued();
@@ -81,17 +78,9 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		checkRelativeFieldName( relativeFieldName );
 		IndexSchemaObjectField objectField = nestingContext.nest(
 				relativeFieldName,
-				// If the field is included
-				(prefixedName, nestedNestingContext) -> {
+				(prefixedName, inclusion, nestedNestingContext) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-							this.objectNodeBuilder.addObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder,
-							nestedNestingContext, false );
-				},
-				// If the field is filtered out
-				(prefixedName, nestedNestingContext) -> {
-					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
+							this.objectNodeBuilder.addObjectField( prefixedName, inclusion, storage );
 					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder,
 							nestedNestingContext, false );
 				}
@@ -107,10 +96,9 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		checkFieldTemplateName( templateName );
 		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
 				nestingContext.nestTemplate(
-						// If the field template is included
-						prefix -> objectNodeBuilder.addFieldTemplate( templateName, type, prefix ),
-						// If the field template is filtered out
-						prefix -> objectNodeBuilder.createExcludedFieldTemplate( templateName, type, prefix )
+						(inclusion, prefix) -> objectNodeBuilder.addFieldTemplate(
+								templateName, inclusion, type, prefix
+						)
 				);
 		if ( directChildrenAreMultiValuedByDefault ) {
 			fieldTemplateFinalStep.multiValued();
@@ -129,10 +117,9 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		checkFieldTemplateName( templateName );
 		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
 				nestingContext.nestTemplate(
-						// If the field template is included
-						prefix -> objectNodeBuilder.addObjectFieldTemplate( templateName, storage, prefix ),
-						// If the field template is filtered out
-						prefix -> objectNodeBuilder.createExcludedObjectFieldTemplate( templateName, storage, prefix )
+						(inclusion, prefix) -> objectNodeBuilder.addObjectFieldTemplate(
+								templateName, storage, prefix, inclusion
+						)
 				);
 		if ( directChildrenAreMultiValuedByDefault ) {
 			fieldTemplateFinalStep.multiValued();

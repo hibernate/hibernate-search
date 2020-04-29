@@ -9,6 +9,7 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 
@@ -45,37 +46,35 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nest(String relativeName, LeafFactory<T> factoryIfIncluded, LeafFactory<T> factoryIfExcluded) {
+	public <T> T nest(String relativeName, LeafFactory<T> factory) {
 		String nameRelativeToFilter = prefixFromFilter + relativeName;
 		String prefixedRelativeName = unconsumedPrefix + relativeName;
-		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
-			return factoryIfIncluded.create( prefixedRelativeName );
-		}
-		else {
-			return factoryIfExcluded.create( prefixedRelativeName );
-		}
+		boolean included = filter.isPathIncluded( nameRelativeToFilter );
+		return factory.create( prefixedRelativeName,
+				included ? IndexFieldInclusion.INCLUDED : IndexFieldInclusion.EXCLUDED );
 	}
 
 	@Override
-	public <T> T nest(String relativeName, CompositeFactory<T> factoryIfIncluded,
-			CompositeFactory<T> factoryIfExcluded) {
+	public <T> T nest(String relativeName, CompositeFactory<T> factory) {
 		String nameRelativeToFilter = prefixFromFilter + relativeName;
 		String prefixedRelativeName = unconsumedPrefix + relativeName;
-		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
+		boolean included = filter.isPathIncluded( nameRelativeToFilter );
+		if ( included ) {
 			ConfiguredIndexSchemaNestingContext nestedFilter =
 					new ConfiguredIndexSchemaNestingContext( filter, nameRelativeToFilter + ".", "" );
-			return factoryIfIncluded.create( prefixedRelativeName, nestedFilter );
+			return factory.create( prefixedRelativeName, IndexFieldInclusion.INCLUDED, nestedFilter );
 		}
 		else {
-			return factoryIfExcluded.create( prefixedRelativeName, IndexSchemaNestingContext.excludeAll() );
+			return factory.create( prefixedRelativeName, IndexFieldInclusion.EXCLUDED,
+					IndexSchemaNestingContext.excludeAll() );
 		}
 	}
 
 	@Override
-	public <T> T nestTemplate(TemplateFactory<T> factoryIfIncluded, TemplateFactory<T> factoryIfExcluded) {
+	public <T> T nestTemplate(TemplateFactory<T> factory) {
 		// Filters are ignored for dynamic paths: as soon as the parent element is included,
 		// all dynamic paths registered on that element are included.
-		return factoryIfIncluded.create( unconsumedPrefix );
+		return factory.create( IndexFieldInclusion.INCLUDED, unconsumedPrefix );
 	}
 
 	public <T> Optional<T> addIndexedEmbeddedIfIncluded(

@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -26,78 +27,56 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(String relativeFieldName,
-			IndexFieldType<F> indexFieldType) {
+			IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
-		getRootNodeBuilder().getBackendBehavior().onAddField(
-				getRootNodeBuilder().getIndexName(),
-				childBuilder.getAbsolutePath()
-		);
 		StubIndexFieldType<F> stubIndexFieldType = (StubIndexFieldType<F>) indexFieldType;
 		stubIndexFieldType.addField( childBuilder );
-		builder.child( childBuilder );
-		return new StubIndexSchemaFieldNodeBuilder<>( childBuilder, true );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			getRootNodeBuilder().getBackendBehavior().onAddField(
+					getRootNodeBuilder().getIndexName(),
+					childBuilder.getAbsolutePath()
+			);
+			builder.child( childBuilder );
+		}
+		return new StubIndexSchemaFieldNodeBuilder<>( childBuilder, inclusion );
 	}
 
 	@Override
-	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(String relativeFieldName,
-			IndexFieldType<F> indexFieldType) {
-		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
-		return new StubIndexSchemaFieldNodeBuilder<>( childBuilder, false );
-	}
-
-	@Override
-	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		StubIndexSchemaNode.Builder childBuilder =
-				StubIndexSchemaNode.objectField( builder, relativeFieldName, storage );
-		getRootNodeBuilder().getBackendBehavior().onAddField(
-				getRootNodeBuilder().getIndexName(),
-				childBuilder.getAbsolutePath()
-		);
-		builder.child( childBuilder );
-		return new StubIndexSchemaObjectFieldNodeBuilder( this, childBuilder, true );
-	}
-
-	@Override
-	public IndexSchemaObjectFieldNodeBuilder createExcludedObjectField(String relativeFieldName,
+	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectFieldStorage storage) {
 		StubIndexSchemaNode.Builder childBuilder =
 				StubIndexSchemaNode.objectField( builder, relativeFieldName, storage );
-		return new StubIndexSchemaObjectFieldNodeBuilder( this, childBuilder, false );
+		getRootNodeBuilder().getBackendBehavior().onAddField(
+				getRootNodeBuilder().getIndexName(),
+				childBuilder.getAbsolutePath()
+		);
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			builder.child( childBuilder );
+		}
+		return new StubIndexSchemaObjectFieldNodeBuilder( this, childBuilder, inclusion );
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
-			IndexFieldType<?> indexFieldType, String prefix) {
+			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		StubIndexSchemaNode.Builder childBuilder =
 				StubIndexSchemaNode.fieldTemplate( builder, templateName );
 		StubIndexFieldType<?> stubIndexFieldType = (StubIndexFieldType<?>) indexFieldType;
 		stubIndexFieldType.addField( childBuilder );
-		builder.child( childBuilder );
-		return new StubIndexSchemaFieldTemplateNodeBuilder( childBuilder );
-	}
-
-	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedFieldTemplate(String templateName,
-			IndexFieldType<?> indexFieldType, String prefix) {
-		StubIndexSchemaNode.Builder childBuilder =
-				StubIndexSchemaNode.fieldTemplate( builder, templateName );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			builder.child( childBuilder );
+		}
 		return new StubIndexSchemaFieldTemplateNodeBuilder( childBuilder );
 	}
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix) {
+			ObjectFieldStorage storage, String prefix, IndexFieldInclusion inclusion) {
 		StubIndexSchemaNode.Builder childBuilder =
 				StubIndexSchemaNode.objectFieldTemplate( builder, templateName, storage );
-		builder.child( childBuilder );
-		return new StubIndexSchemaFieldTemplateNodeBuilder( childBuilder );
-	}
-
-	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> createExcludedObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix) {
-		StubIndexSchemaNode.Builder childBuilder =
-				StubIndexSchemaNode.objectFieldTemplate( builder, templateName, storage );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			builder.child( childBuilder );
+		}
 		return new StubIndexSchemaFieldTemplateNodeBuilder( childBuilder );
 	}
 

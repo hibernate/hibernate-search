@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaElementImpl;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -125,7 +126,9 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		@Override
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
-					currentNodeBuilder.addObjectField( objectName, definition.getStorage() );
+					currentNodeBuilder.addObjectField( objectName, IndexFieldInclusion.INCLUDED,
+							definition.getStorage()
+					);
 			if ( multiValued ) {
 				// Only mark the first object as multi-valued
 				multiValued = false;
