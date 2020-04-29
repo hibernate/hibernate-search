@@ -903,6 +903,17 @@ if `includePaths` is empty, the default is `Integer.MAX_VALUE` (no limit)
 if `includePaths` is *not* empty, the default is `0`
 (only include fields included explicitly).
 
+[NOTE]
+.Dynamic fields and filtering
+====
+<<mapper-orm-bridge-index-field-dsl-dynamic,Dynamic fields>> are not directly affected by filtering rules:
+a dynamic field will be included if and only if its parent is included.
+
+This means in particular that `maxDepth` and `includePaths`
+constraints only need to match the nearest static parent of a dynamic field
+in order for that field to be included.
+====
+
 Below are two examples: one leveraging `includePaths` only,
 and one leveraging `includePaths` and `maxDepth`.
 
