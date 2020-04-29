@@ -833,6 +833,10 @@ Changing the prefix to a string that does not include any dot at the end (`my_Pr
 or that includes a dot anywhere but at the very end (`my.Property.`),
 will lead to complex, undocumented, legacy behavior.
 Do this at your own risk.
+
+In particular, a prefix that does not end with a dot will lead to incorrect behavior
+in <<mapper-orm-bridge-index-field-dsl,some APIs exposed to custom bridges>>:
+the `addValue`/`addObject` methods that accept a field name.
 ====
 
 [[mapper-orm-indexedembedded-reindexing]]
