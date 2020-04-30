@@ -58,4 +58,8 @@ public class TckBackendFeatures {
 	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		return true;
 	}
+
+	public boolean supportsDynamicChildFieldsInExistsPredicate() {
+		return true;
+	}
 }
