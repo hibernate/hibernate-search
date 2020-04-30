@@ -34,7 +34,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaCreationIT")
-public class ElasticsearchIndexSchemaManagerCreationMappingIT {
+public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -53,7 +53,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingIT {
 
 	private StubMappingIndexManager indexManager;
 
-	public ElasticsearchIndexSchemaManagerCreationMappingIT(ElasticsearchIndexSchemaManagerOperation operation) {
+	public ElasticsearchIndexSchemaManagerCreationMappingBaseIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
 	}
 
