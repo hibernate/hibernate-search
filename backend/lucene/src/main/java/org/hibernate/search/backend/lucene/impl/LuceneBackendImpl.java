@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -34,6 +35,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 
 
@@ -132,6 +134,16 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	@Override
 	public Backend toAPI() {
 		return this;
+	}
+
+	@Override
+	public Optional<Analyzer> analyzer(String name) {
+		return Optional.ofNullable( analysisDefinitionRegistry.getAnalyzerDefinition( name ) );
+	}
+
+	@Override
+	public Optional<Analyzer> normalizer(String name) {
+		return Optional.ofNullable( analysisDefinitionRegistry.getNormalizerDefinition( name ) );
 	}
 
 	@Override
