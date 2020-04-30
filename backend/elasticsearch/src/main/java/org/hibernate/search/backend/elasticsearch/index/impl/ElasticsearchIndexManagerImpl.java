@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -233,6 +234,11 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	@Override
 	public IndexManager toAPI() {
 		return this;
+	}
+
+	@Override
+	public IndexDescriptor descriptor() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
