@@ -123,16 +123,15 @@ public class LuceneIndexModel implements AutoCloseable {
 		}
 		for ( AbstractLuceneIndexSchemaFieldTemplate<N> template : templates ) {
 			node = template.createNodeIfMatching( this, absolutePath );
-			if ( node == null ) {
-				continue;
+			if ( node != null ) {
+				N previous = dynamicNodesCache.putIfAbsent( absolutePath, node );
+				if ( previous != null ) {
+					// Some other thread created the node before us.
+					// Keep the first created node, discard ours: they are identical.
+					node = previous;
+				}
+				break;
 			}
-			N previous = dynamicNodesCache.putIfAbsent( absolutePath, node );
-			if ( previous != null ) {
-				// Some other thread created the node before us.
-				// Keep the first created node, discard ours: they are identical.
-				node = previous;
-			}
-			break;
 		}
 		return node;
 	}
