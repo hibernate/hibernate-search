@@ -34,7 +34,7 @@ import org.junit.Test;
  * Tests related to the mapping when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaMigrationIT")
-public class ElasticsearchIndexSchemaManagerUpdateMappingIT {
+public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 
 	private static final String UPDATE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
