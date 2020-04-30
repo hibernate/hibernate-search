@@ -99,4 +99,23 @@ public interface ElasticsearchValidationMessages {
 	)
 	String invalidAnalysisDefinitionType(String expected, String actual);
 
+	@Message(
+			value = "Invalid order for dynamic field templates. Expected %1$s, actual is %2$s"
+	)
+	String dynamicTemplatesInvalidOrder(List<String> expectedValue, List<String> actualValue);
+
+	@Message(
+			value = "Missing dynamic field template"
+	)
+	String dynamicTemplateMissing();
+
+	@Message(
+			value = "Unexpected dynamic field template"
+	)
+	String dynamicTemplateUnexpected();
+
+	@Message(
+			value = "Multiple dynamic field templates with this name. The names of dynamic field template must be unique."
+	)
+	String dynamicTemplateDuplicate();
 }

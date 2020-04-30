@@ -51,4 +51,13 @@ public final class ElasticsearchEventContexts {
 			}
 		} );
 	}
+
+	public static EventContext fromFieldTemplateAttribute(String name) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( name ) {
+			@Override
+			public String render(String name) {
+				return MESSAGES.fieldTemplateAttribute( name );
+			}
+		} );
+	}
 }
