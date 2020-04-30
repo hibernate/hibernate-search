@@ -110,7 +110,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	final DynamicType resolveSelfDynamicType() {
 		if ( templates.isEmpty() ) {
-			// TODO HSEARCH-3273 allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
+			// TODO HSEARCH-3122 allow configuring this at index level (configuration properties)
 			return DynamicType.STRICT;
 		}
 		else {

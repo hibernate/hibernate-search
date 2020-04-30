@@ -30,7 +30,7 @@ public class LuceneIndexSchemaObjectFieldTemplate
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
 		return new LuceneIndexSchemaObjectNode(
 				parent, relativePath, inclusion, storage, multiValued,
-				// TODO HSEARCH-3273 we don't know the children, so we should find another way to implement the exists predicate
+				// TODO HSEARCH-3905 we don't know the children, so we should find another way to implement the exists predicate
 				Collections.emptyList()
 		);
 	}
