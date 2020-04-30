@@ -21,10 +21,12 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -151,6 +153,12 @@ public class IndexingFieldTypesIT<F> {
 
 	@Test
 	public void dynamic_withPath() {
+		Assume.assumeTrue(
+				"This backend does not support dynamic fields for this type",
+				TckConfiguration.get().getBackendFeatures()
+						.supportsValuesForDynamicField( typeDescriptor.getJavaType() )
+		);
+
 		List<F> values = new ArrayList<>( expectations.getValues() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
