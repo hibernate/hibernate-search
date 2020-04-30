@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderC
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -152,6 +153,11 @@ public class LuceneIndexManagerImpl
 	@Override
 	public IndexManager toAPI() {
 		return this;
+	}
+
+	@Override
+	public IndexDescriptor descriptor() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
