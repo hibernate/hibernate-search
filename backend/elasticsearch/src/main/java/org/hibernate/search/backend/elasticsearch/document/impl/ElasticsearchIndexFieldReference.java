@@ -14,9 +14,6 @@ public class ElasticsearchIndexFieldReference<F> implements IndexFieldReference<
 
 	private ElasticsearchIndexSchemaFieldNode<F> schemaNode;
 
-	public ElasticsearchIndexFieldReference() {
-	}
-
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "[schemaNode=" + schemaNode + "]";
