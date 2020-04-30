@@ -16,33 +16,33 @@ import java.util.Map;
  */
 class AnalysisParameterEquivalenceRegistry {
 
-	private static final AnalysisJsonElementEquivalence DEFAULT_ELEMENT_EQUIVALENCE =
-			new AnalysisJsonElementEquivalence();
+	private static final JsonElementEquivalence DEFAULT_ELEMENT_EQUIVALENCE =
+			new JsonElementEquivalence();
 
 	// Nested arrays are not considered unordered.
-	private static final AnalysisJsonElementEquivalence UNORDERED_ARRAY_EQUIVALENCE =
-			new AnalysisJsonElementUnorderedArrayEquivalence( DEFAULT_ELEMENT_EQUIVALENCE );
+	private static final JsonElementEquivalence UNORDERED_ARRAY_EQUIVALENCE =
+			new JsonElementUnorderedArrayEquivalence( DEFAULT_ELEMENT_EQUIVALENCE );
 
-	private final Map<String, Map<String, AnalysisJsonElementEquivalence>> equivalences;
+	private final Map<String, Map<String, JsonElementEquivalence>> equivalences;
 
 	private AnalysisParameterEquivalenceRegistry(
-			Map<String, Map<String, AnalysisJsonElementEquivalence>> equivalences) {
+			Map<String, Map<String, JsonElementEquivalence>> equivalences) {
 		super();
 		this.equivalences = equivalences;
 	}
 
-	public AnalysisJsonElementEquivalence get(String type, String parameter) {
-		Map<String, AnalysisJsonElementEquivalence> mapForType = equivalences.get( type );
-		AnalysisJsonElementEquivalence result = mapForType == null ? null : mapForType.get( parameter );
+	public JsonElementEquivalence get(String type, String parameter) {
+		Map<String, JsonElementEquivalence> mapForType = equivalences.get( type );
+		JsonElementEquivalence result = mapForType == null ? null : mapForType.get( parameter );
 		return result == null ? DEFAULT_ELEMENT_EQUIVALENCE : result;
 	}
 
 	public static class Builder {
 
-		private final Map<String, Map<String, AnalysisJsonElementEquivalence>> equivalences = new HashMap<>();
+		private final Map<String, Map<String, JsonElementEquivalence>> equivalences = new HashMap<>();
 
 		public TypeBuilder type(String name) {
-			Map<String, AnalysisJsonElementEquivalence> mapForType = equivalences.get( name );
+			Map<String, JsonElementEquivalence> mapForType = equivalences.get( name );
 			if ( mapForType == null ) {
 				mapForType = new HashMap<>();
 				equivalences.put( name, mapForType );
@@ -58,9 +58,9 @@ class AnalysisParameterEquivalenceRegistry {
 	public static class TypeBuilder {
 
 		private final Builder parent;
-		private final Map<String, AnalysisJsonElementEquivalence> equivalences;
+		private final Map<String, JsonElementEquivalence> equivalences;
 
-		private TypeBuilder(Builder parent, Map<String, AnalysisJsonElementEquivalence> equivalences) {
+		private TypeBuilder(Builder parent, Map<String, JsonElementEquivalence> equivalences) {
 			super();
 			this.parent = parent;
 			this.equivalences = equivalences;
@@ -70,7 +70,7 @@ class AnalysisParameterEquivalenceRegistry {
 			return new ParameterBuilder( this, name );
 		}
 
-		private void add(String parameterName, AnalysisJsonElementEquivalence equivalence) {
+		private void add(String parameterName, JsonElementEquivalence equivalence) {
 			equivalences.put( parameterName, equivalence );
 		}
 

@@ -11,12 +11,12 @@ import com.google.gson.JsonElement;
 
 
 /**
- * An {@link AnalysisJsonElementEquivalence} that considers that arrays are unordered containers.
+ * An {@link JsonElementEquivalence} that considers that arrays are unordered containers.
  *
  */
-class AnalysisJsonElementUnorderedArrayEquivalence extends AnalysisJsonElementEquivalence {
+class JsonElementUnorderedArrayEquivalence extends JsonElementEquivalence {
 
-	AnalysisJsonElementUnorderedArrayEquivalence(AnalysisJsonElementEquivalence nestedEquivalence) {
+	JsonElementUnorderedArrayEquivalence(JsonElementEquivalence nestedEquivalence) {
 		super( nestedEquivalence );
 	}
 

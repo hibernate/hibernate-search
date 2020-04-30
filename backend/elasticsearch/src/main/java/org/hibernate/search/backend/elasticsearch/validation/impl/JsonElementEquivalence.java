@@ -19,15 +19,15 @@ import com.google.gson.JsonPrimitive;
  * Determines whether two {@link JsonElement}s should be considered equivalent.
  *
  */
-class AnalysisJsonElementEquivalence {
+class JsonElementEquivalence {
 
-	private final AnalysisJsonElementEquivalence nestedEquivalence;
+	private final JsonElementEquivalence nestedEquivalence;
 
-	AnalysisJsonElementEquivalence() {
+	JsonElementEquivalence() {
 		this.nestedEquivalence = this; // Use the same equivalence for array items and object properties
 	}
 
-	AnalysisJsonElementEquivalence(AnalysisJsonElementEquivalence itemEquivalence) {
+	JsonElementEquivalence(JsonElementEquivalence itemEquivalence) {
 		this.nestedEquivalence = itemEquivalence; // Use the given equivalence for array items and object properties
 	}
 

@@ -33,15 +33,9 @@ class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Valid
 		}
 
 		String typeName = expectedDefinition.getType();
-
-		Validator<JsonElement> parameterValidator = (theErrorCollector, expected, actual) -> {
-			AnalysisJsonElementEquivalence parameterEquivalence = equivalences.get( typeName, theErrorCollector.getCurrentName() );
-			if ( ! parameterEquivalence.isEquivalent( expected, actual ) ) {
-				theErrorCollector.addError(
-						ElasticsearchValidationMessages.INSTANCE.invalidValue( expected, actual )
-				);
-			}
-		};
+		Validator<JsonElement> parameterValidator = new JsonElementValidator(
+				name -> equivalences.get( typeName, name )
+		);
 
 		parameterValidator.validateAllIncludingUnexpected(
 				errorCollector, ValidationContextType.ANALYSIS_DEFINITION_PARAMETER,
