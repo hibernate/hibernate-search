@@ -59,4 +59,13 @@ class ElasticsearchIndexSchemaManagerTestUtils {
 		String mapping = defaultMetadataMappingForInitialization();
 		return mapping.isEmpty() ? "" : mapping + ", ";
 	}
+
+	static String defaultMetadataMappingForExpectations() {
+		return "'_entity_type': " + discriminatorMappingOmitDefaults().toString();
+	}
+
+	static String defaultMetadataMappingAndCommaForExpectations() {
+		String mapping = defaultMetadataMappingForExpectations();
+		return mapping.isEmpty() ? "" : mapping + ", ";
+	}
 }
