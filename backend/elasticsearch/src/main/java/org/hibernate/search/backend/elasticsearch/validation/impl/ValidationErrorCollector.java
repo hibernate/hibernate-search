@@ -122,6 +122,10 @@ public final class ValidationErrorCollector {
 					return currentResult.withContext( EventContexts.fromTokenFilter( name ) );
 				case ANALYSIS_DEFINITION_PARAMETER:
 					return currentResult.withContext( ElasticsearchEventContexts.fromAnalysisDefinitionParameter( name ) );
+				case DYNAMIC_TEMPLATE:
+					return currentResult.withContext( EventContexts.fromFieldTemplateAbsolutePath( name ) );
+				case DYNAMIC_TEMPLATE_ATTRIBUTE:
+					return currentResult.withContext( ElasticsearchEventContexts.fromFieldTemplateAttribute( name ) );
 				default:
 					throw new AssertionFailure( "Unexpected validation context element type: " + type );
 			}

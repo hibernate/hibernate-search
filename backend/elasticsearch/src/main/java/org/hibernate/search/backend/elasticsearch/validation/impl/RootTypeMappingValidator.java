@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
+import java.util.List;
+
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 
 public class RootTypeMappingValidator extends AbstractTypeMappingValidator<RootTypeMapping> {
+	private final Validator<List<NamedDynamicTemplate>> dynamicTemplatesValidator = new NamedDynamicTemplateListValidator();
 	private final Validator<PropertyMapping> propertyMappingValidator = new PropertyMappingValidator();
 
 	@Override
@@ -22,7 +26,11 @@ public class RootTypeMappingValidator extends AbstractTypeMappingValidator<RootT
 			errorCollector.addError( ElasticsearchValidationMessages.INSTANCE.mappingMissing() );
 			return;
 		}
+
 		super.validate( errorCollector, expectedMapping, actualMapping );
+
+		dynamicTemplatesValidator.validate( errorCollector, expectedMapping.getDynamicTemplates(),
+				actualMapping.getDynamicTemplates() );
 	}
 
 	@Override

@@ -31,4 +31,7 @@ public interface ElasticsearchEventContextMessages {
 
 	@Message(value = "attribute '%1$s'")
 	String analysisDefinitionAttribute(String name);
+
+	@Message(value = "attribute '%1$s'")
+	String fieldTemplateAttribute(String name);
 }
