@@ -23,6 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -30,6 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityRefe
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -366,6 +368,8 @@ public class ObjectFieldTemplateIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
 	public void exists_staticObjectField() {
+		assumeBackendSupportsDynamicChildFieldsInExistsPredicate();
+
 		Consumer<IndexSchemaElement> rootTemplatesBinder = root -> { };
 		Consumer<IndexSchemaElement> staticObjectTemplatesBinder = staticObject -> {
 			staticObject.fieldTemplate( "fieldTemplate", f -> f.asString() )
@@ -429,6 +433,8 @@ public class ObjectFieldTemplateIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3273")
 	public void exists_dynamicObjectField() {
+		assumeBackendSupportsDynamicChildFieldsInExistsPredicate();
+
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -482,6 +488,13 @@ public class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_flattened" ) ) )
 				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+	}
+
+	private void assumeBackendSupportsDynamicChildFieldsInExistsPredicate() {
+		Assume.assumeTrue(
+				"This backend doesn't take dynamic child fields into account when creating exists predicates on object fields.",
+				TckConfiguration.get().getBackendFeatures().supportsDynamicChildFieldsInExistsPredicate()
+		);
 	}
 
 	private SearchQuery<DocumentReference> query(
