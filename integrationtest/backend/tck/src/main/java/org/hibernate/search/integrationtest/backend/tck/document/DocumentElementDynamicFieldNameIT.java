@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -41,7 +43,10 @@ import org.junit.runners.Parameterized;
 public class DocumentElementDynamicFieldNameIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
-		return FieldTypeDescriptor.getAll();
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( fieldType -> TckConfiguration.get().getBackendFeatures()
+						.supportsValuesForDynamicField( fieldType.getJavaType() ) )
+				.collect( Collectors.toList() );
 	}
 
 	@Parameterized.Parameters(name = "{0}")

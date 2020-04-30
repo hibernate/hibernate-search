@@ -72,4 +72,9 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public boolean hasBugForSortMaxOnNegativeFloats() {
 		return true;
 	}
+
+	@Override
+	public boolean hasBugForBigIntegerValuesForDynamicField() {
+		return true;
+	}
 }

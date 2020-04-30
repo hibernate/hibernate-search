@@ -92,4 +92,17 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			return true;
 		}
 	}
+
+	@Override
+	public boolean supportsValuesForDynamicField(Class<?> javaType) {
+		if ( BigInteger.class.equals( javaType ) ) {
+			// For some reason, ES 5.6 to 7.2 fail to index BigInteger values
+			// with "No matching token for number_type [BIG_INTEGER]".
+			// It's fixed in Elasticsearch 7.3, though.
+			return ! dialect.hasBugForBigIntegerValuesForDynamicField();
+		}
+		else {
+			return true;
+		}
+	}
 }

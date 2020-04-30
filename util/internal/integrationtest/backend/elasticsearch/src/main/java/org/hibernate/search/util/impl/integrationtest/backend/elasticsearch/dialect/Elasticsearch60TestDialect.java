@@ -70,4 +70,9 @@ public class Elasticsearch60TestDialect implements ElasticsearchTestDialect {
 	public boolean supportsIsWriteIndex() {
 		return false;
 	}
+
+	@Override
+	public boolean hasBugForBigIntegerValuesForDynamicField() {
+		return true;
+	}
 }

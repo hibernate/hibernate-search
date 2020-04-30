@@ -67,4 +67,8 @@ public interface ElasticsearchTestDialect {
 	default boolean hasBugForSortMaxOnNegativeFloats() {
 		return false;
 	}
+
+	default boolean hasBugForBigIntegerValuesForDynamicField() {
+		return false;
+	}
 }
