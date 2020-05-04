@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
+public class Elasticsearch70TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public boolean isEmptyMappingPossible() {
