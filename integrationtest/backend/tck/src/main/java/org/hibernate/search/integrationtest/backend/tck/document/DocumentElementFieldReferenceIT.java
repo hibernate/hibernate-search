@@ -37,10 +37,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * Test the basic behavior of implementations of {@link DocumentElement}.
+ * Test the basic behavior of implementations of {@link DocumentElement}
+ * when referencing fields using a {@link IndexFieldReference}.
  */
 @RunWith(Parameterized.class)
-public class DocumentElementBaseIT<F> {
+public class DocumentElementFieldReferenceIT<F> {
 
 	private static List<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll();
@@ -64,7 +65,7 @@ public class DocumentElementBaseIT<F> {
 
 	private final FieldTypeDescriptor<F> fieldType;
 
-	public DocumentElementBaseIT(FieldTypeDescriptor<F> fieldType) {
+	public DocumentElementFieldReferenceIT(FieldTypeDescriptor<F> fieldType) {
 		this.fieldType = fieldType;
 	}
 
@@ -144,7 +145,9 @@ public class DocumentElementBaseIT<F> {
 	}
 
 	/**
-	 * Test that DocumentElement.addValue does not throw any exception when passing a reference to an excluded field.
+	 * Test that DocumentElement.addValue/addObject do not throw any exception when
+	 * adding a value to a static field on an object field that excludes all static children
+	 * (due to IndexedEmbedded filters).
 	 */
 	@Test
 	public void addValue_excludedFields() {
@@ -228,9 +231,6 @@ public class DocumentElementBaseIT<F> {
 		plan.execute().join();
 	}
 
-	/**
-	 * Defines one field for each field type.
-	 */
 	private static class AbstractObjectBinding {
 		final SimpleFieldModelsByType fieldModels;
 

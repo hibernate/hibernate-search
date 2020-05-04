@@ -70,10 +70,12 @@ public class IndexingFieldTypesIT<F> {
 	}
 
 	@Test
-	public void index() {
+	public void withReference() {
 		List<F> values = new ArrayList<>( expectations.getValues() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
+
+		SimpleFieldModel<F> fieldModel = index.binding().fieldModel;
 
 		// Index all values, each in its own document
 		IndexIndexingPlan<?> plan = index.createIndexingPlan();
@@ -81,7 +83,7 @@ public class IndexingFieldTypesIT<F> {
 			String documentId = "document_" + i;
 			F value = values.get( i );
 			plan.add( referenceProvider( documentId ), document -> {
-				document.addValue( index.binding().fieldModel.reference, value );
+				document.addValue( fieldModel.reference, value );
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
@@ -91,7 +93,88 @@ public class IndexingFieldTypesIT<F> {
 		// However, it may have failed silently... Let's check the documents are there, with the right value.
 
 		StubMappingScope scope = index.createScope();
-		String absoluteFieldPath = index.binding().fieldModel.relativeFieldName;
+		String absoluteFieldPath = fieldModel.relativeFieldName;
+
+		for ( int i = 0; i < values.size(); i++ ) {
+			SearchQuery<IdAndValue<F>> query = scope.query()
+					.select( f -> f.composite(
+							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
+							f.entityReference(),
+							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
+					) )
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			assertThat( query ).hasHitsAnyOrder( expectedDocuments );
+		}
+	}
+
+	@Test
+	public void withPath() {
+		List<F> values = new ArrayList<>( expectations.getValues() );
+		values.add( null ); // Also test null
+		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
+
+		SimpleFieldModel<F> fieldModel = index.binding().fieldModel;
+
+		// Index all values, each in its own document
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		for ( int i = 0; i < values.size(); i++ ) {
+			String documentId = "document_" + i;
+			F value = values.get( i );
+			plan.add( referenceProvider( documentId ), document -> {
+				document.addValue( fieldModel.relativeFieldName, value );
+			} );
+			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
+		}
+		plan.execute().join();
+
+		// If we get here, indexing went well.
+		// However, it may have failed silently... Let's check the documents are there, with the right value.
+
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = fieldModel.relativeFieldName;
+
+		for ( int i = 0; i < values.size(); i++ ) {
+			SearchQuery<IdAndValue<F>> query = scope.query()
+					.select( f -> f.composite(
+							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
+							f.entityReference(),
+							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
+					) )
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			assertThat( query ).hasHitsAnyOrder( expectedDocuments );
+		}
+	}
+
+	@Test
+	public void dynamic_withPath() {
+		List<F> values = new ArrayList<>( expectations.getValues() );
+		values.add( null ); // Also test null
+		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
+
+		// Matches the template defined in IndexBinding
+		String relativeFieldName = "foo_" + typeDescriptor.getUniqueName();
+
+		// Index all values, each in its own document
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		for ( int i = 0; i < values.size(); i++ ) {
+			String documentId = "document_" + i;
+			F value = values.get( i );
+			plan.add( referenceProvider( documentId ), document -> {
+				document.addValue( relativeFieldName, value );
+			} );
+			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
+		}
+		plan.execute().join();
+
+		// If we get here, indexing went well.
+		// However, it may have failed silently... Let's check the documents are there, with the right value.
+
+		StubMappingScope scope = index.createScope();
+		String absoluteFieldPath = relativeFieldName;
 
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
@@ -113,6 +196,11 @@ public class IndexingFieldTypesIT<F> {
 		IndexBinding(IndexSchemaElement root) {
 			this.fieldModel = SimpleFieldModel.mapper( typeDescriptor, c -> c.projectable( Projectable.YES ) )
 					.map( root, "field" );
+			supportedTypeDescriptors.forEach( fieldType -> {
+				root.fieldTemplate( fieldType.getUniqueName(),
+						f -> fieldType.configure( f ).projectable( Projectable.YES ) )
+						.matchingPathGlob( "*_" + fieldType.getUniqueName() );
+			} );
 		}
 	}
 
