@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,6 +59,11 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	@Override
 	public List<String> getNestedPathHierarchy() {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 }

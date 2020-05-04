@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -87,6 +88,11 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	public IndexObjectFieldTypeDescriptor type() {
 		// We don't bother creating a dedicated object to represent the type, which is very simple.
 		return this;
+	}
+
+	@Override
+	public Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override

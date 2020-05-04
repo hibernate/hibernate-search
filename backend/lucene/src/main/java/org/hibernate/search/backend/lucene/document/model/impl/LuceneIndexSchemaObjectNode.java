@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -21,5 +22,8 @@ public interface LuceneIndexSchemaObjectNode extends IndexCompositeElementDescri
 	IndexFieldInclusion getInclusion();
 
 	List<String> getNestedPathHierarchy();
+
+	@Override
+	Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren();
 
 }

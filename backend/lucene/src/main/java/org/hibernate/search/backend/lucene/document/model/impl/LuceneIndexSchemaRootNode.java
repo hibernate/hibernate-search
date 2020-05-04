@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,6 +59,11 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 	@Override
 	public List<String> getNestedPathHierarchy() {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 }
