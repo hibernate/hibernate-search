@@ -15,7 +15,24 @@ public class DefaultITAnalysisConfigurer implements ElasticsearchAnalysisConfigu
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).type( "standard" )
 				.param( "stopwords", "_english_" );
+
 		context.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
 				.tokenFilters( "lowercase" );
+
+		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ).custom()
+				.tokenizer( "whitespace" );
+
+		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ).custom()
+				.tokenizer( "whitespace" )
+				.tokenFilters( "lowercase" );
+
+		String tokenizerName = DefaultAnalysisDefinitions.ANALYZER_NGRAM.name + "_tokenizer";
+		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name ).custom()
+				.tokenizer( tokenizerName );
+
+		context.tokenizer( tokenizerName )
+				.type( "ngram" )
+				.param( "min_gram", 5 )
+				.param( "max_gram", 6 );
 	}
 }

@@ -25,11 +25,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -78,7 +76,7 @@ public class PhraseSearchPredicateIT {
 	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 = "compatible_search_analyzer_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisOverrideBackendSetupStrategy );
+	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -267,7 +265,7 @@ public class PhraseSearchPredicateIT {
 		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.where( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -284,7 +282,7 @@ public class PhraseSearchPredicateIT {
 		// since the overriding takes precedence over the search analyzer.
 		query = scope.query()
 				.where( f -> f.phrase().field( whitespaceLowercaseSearchAnalyzedField ).matching( "ONCE UPON" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -721,7 +719,7 @@ public class PhraseSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -922,16 +920,16 @@ public class PhraseSearchPredicateIT {
 			)
 					.map( root, "analyzedStringWithDslConverter" );
 			whitespaceAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name )
 			)
 					.map( root, "whitespaceAnalyzed" );
 			whitespaceLowercaseAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseAnalyzed" );
 			whitespaceLowercaseSearchAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
-							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+							.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
 			nonAnalyzedField = MainFieldModel.mapper( c -> c.asString() )
@@ -964,7 +962,7 @@ public class PhraseSearchPredicateIT {
 			return new OtherIndexMapping(
 					MainFieldModel.mapper(
 							// Using a different analyzer
-							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 					)
 							.map( root, "analyzedString1" )
 			);
@@ -974,7 +972,7 @@ public class PhraseSearchPredicateIT {
 			return new OtherIndexMapping(
 					MainFieldModel.mapper(
 							// Using a different analyzer
-							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 									// Overriding it with a compatible one
 									.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)

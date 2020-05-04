@@ -18,6 +18,18 @@ public enum DefaultAnalysisDefinitions {
 	 */
 	ANALYZER_STANDARD_ENGLISH("standard-english"),
 	/**
+	 * Analyzer with a tokenizer on whitespaces.
+	 */
+	ANALYZER_WHITESPACE("analyzer_whitespace"),
+	/**
+	 * Analyzer with a tokenizer on whitespaces and a lowercase token filter.
+	 */
+	ANALYZER_WHITESPACE_LOWERCASE("analyzer_whitespace_lowercase"),
+	/**
+	 * Ngram analyzer defined for query only.
+	 */
+	ANALYZER_NGRAM("analyzer_ngram"),
+	/**
 	 * A normalizer that lowercases the input.
 	 */
 	NORMALIZER_LOWERCASE("lowercase")
