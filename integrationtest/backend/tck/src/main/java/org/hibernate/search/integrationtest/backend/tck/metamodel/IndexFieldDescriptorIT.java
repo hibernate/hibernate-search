@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -36,6 +37,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Tests for field descriptor features.
@@ -120,6 +123,9 @@ public class IndexFieldDescriptorIT {
 							"Invalid type: the index root is not an object field"
 					);
 			assertThat( elementDescriptor ).isSameAs( indexDescriptor.root() );
+			assertThat( elementDescriptor.staticChildren() )
+					.extracting( IndexFieldDescriptor::absolutePath )
+					.containsExactlyInAnyOrder( "myField", "myMultiValuedField", "nestedObject", "flattenedObject" );
 			return;
 		}
 
@@ -149,6 +155,38 @@ public class IndexFieldDescriptorIT {
 		// More advanced tests in IndexObjectFieldTypeDescriptorIT
 		IndexObjectFieldTypeDescriptor type = fieldDescriptor.type();
 		assertThat( type ).isNotNull();
+
+		// Static children
+		Collection<? extends IndexFieldDescriptor> children = fieldDescriptor.staticChildren();
+		Assertions.<IndexFieldDescriptor>assertThat( children ).contains( childFieldDescriptor );
+
+		switch ( fieldStructure.location ) {
+			case IN_FLATTENED:
+				assertThat( children )
+						.extracting( IndexFieldDescriptor::absolutePath )
+						.containsExactlyInAnyOrder(
+								"flattenedObject.myField",
+								"flattenedObject.myMultiValuedField"
+						);
+				break;
+			case IN_NESTED:
+				assertThat( children )
+						.extracting( IndexFieldDescriptor::absolutePath )
+						.containsExactlyInAnyOrder(
+								"nestedObject.myField",
+								"nestedObject.myMultiValuedField",
+								"nestedObject.nestedObject"
+						);
+				break;
+			case IN_NESTED_TWICE:
+				assertThat( children )
+						.extracting( IndexFieldDescriptor::absolutePath )
+						.containsExactlyInAnyOrder(
+								"nestedObject.nestedObject.myField",
+								"nestedObject.nestedObject.myMultiValuedField"
+						);
+				break;
+		}
 
 		IndexCompositeElementDescriptor parentParentDescriptor = fieldDescriptor.parent();
 		if ( IndexFieldLocation.IN_NESTED_TWICE.equals( fieldStructure.location ) ) {
