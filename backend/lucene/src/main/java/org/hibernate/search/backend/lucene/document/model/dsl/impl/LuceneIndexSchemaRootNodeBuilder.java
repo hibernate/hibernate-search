@@ -16,8 +16,10 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaRootNode;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -70,7 +72,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	public LuceneIndexModel build(String indexName) {
-		Map<String, LuceneIndexSchemaObjectNode> objectNodes = new HashMap<>();
+		Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes = new HashMap<>();
 		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
 		List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates = new ArrayList<>();
 		List<LuceneIndexSchemaFieldTemplate> fieldTemplates = new ArrayList<>();
@@ -82,8 +84,8 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 
 			@Override
-			public void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode node) {
-				objectNodes.put( absolutePath, node );
+			public void collectObjectFieldNode(String absolutePath, LuceneIndexSchemaObjectFieldNode node) {
+				objectFieldNodes.put( absolutePath, node );
 			}
 
 			@Override
@@ -97,14 +99,14 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 		};
 
-		LuceneIndexSchemaObjectNode rootNode = LuceneIndexSchemaObjectNode.root();
+		LuceneIndexSchemaObjectNode rootNode = new LuceneIndexSchemaRootNode();
 		contributeChildren( rootNode, collector );
 
 		return new LuceneIndexModel(
 				indexName,
 				mappedTypeName,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, objectNodes, fieldNodes,
+				rootNode, objectFieldNodes, fieldNodes,
 				objectFieldTemplates, fieldTemplates
 		);
 	}

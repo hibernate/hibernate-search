@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -70,10 +71,10 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode(
+		LuceneIndexSchemaObjectFieldNode node = new LuceneIndexSchemaObjectFieldNode(
 				parentNode, relativeFieldName, inclusion, storage, multiValued, getChildrenNames()
 		);
-		collector.collectObjectNode( absoluteFieldPath, node );
+		collector.collectObjectFieldNode( absoluteFieldPath, node );
 
 		reference.setSchemaNode( node );
 

@@ -13,7 +13,6 @@ import org.apache.lucene.document.Document;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
 
@@ -22,7 +21,7 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	LuceneRootDocumentBuilder(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy) {
-		super( model, LuceneIndexSchemaObjectNode.root() );
+		super( model, model.getRootNode() );
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 

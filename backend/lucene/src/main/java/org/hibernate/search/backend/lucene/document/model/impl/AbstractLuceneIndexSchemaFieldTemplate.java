@@ -38,7 +38,8 @@ public abstract class AbstractLuceneIndexSchemaFieldTemplate<N> {
 
 		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
 		LuceneIndexSchemaObjectNode parent =
-				relativizedPath.parentPath.map( path -> model.getObjectNode( path, IndexFieldFilter.ALL ) )
+				relativizedPath.parentPath
+						.<LuceneIndexSchemaObjectNode>map( path -> model.getObjectFieldNode( path, IndexFieldFilter.ALL ) )
 						.orElseGet( model::getRootNode );
 
 		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );

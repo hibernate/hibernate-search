@@ -13,11 +13,11 @@ import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -56,7 +56,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
 		LuceneIndexObjectFieldReference luceneFieldReference = (LuceneIndexObjectFieldReference) fieldReference;
 
-		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
+		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
 
 		return addObject( fieldSchemaNode, false );
 	}
@@ -65,14 +65,14 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		LuceneIndexObjectFieldReference luceneFieldReference = (LuceneIndexObjectFieldReference) fieldReference;
 
-		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
+		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
 
 		addObject( fieldSchemaNode, true );
 	}
 
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
-		String absoluteFieldPath = FieldPaths.compose( schemaNode.getAbsolutePath(), relativeFieldName );
+		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
 		LuceneIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
@@ -85,7 +85,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		LuceneIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -97,7 +97,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		LuceneIndexSchemaObjectNode fieldSchemaNode = model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -166,7 +166,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		type.getCodec().encode( this, absolutePath, value );
 	}
 
-	private DocumentElement addObject(LuceneIndexSchemaObjectNode node, boolean nullObject) {
+	private DocumentElement addObject(LuceneIndexSchemaObjectFieldNode node, boolean nullObject) {
 		LuceneIndexSchemaObjectNode expectedParentNode = node.getParent();
 		checkTreeConsistency( expectedParentNode );
 

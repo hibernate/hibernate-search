@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 
 public class LuceneIndexObjectFieldReference implements IndexObjectFieldReference {
 
-	private LuceneIndexSchemaObjectNode schemaNode;
+	private LuceneIndexSchemaObjectFieldNode schemaNode;
 
-	public void setSchemaNode(LuceneIndexSchemaObjectNode schemaNode) {
+	public void setSchemaNode(LuceneIndexSchemaObjectFieldNode schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 
-	LuceneIndexSchemaObjectNode getSchemaNode() {
+	LuceneIndexSchemaObjectFieldNode getSchemaNode() {
 		return schemaNode;
 	}
 }

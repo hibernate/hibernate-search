@@ -31,11 +31,11 @@ public class LuceneIndexModel implements AutoCloseable {
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	private final LuceneIndexSchemaObjectNode rootNode;
-	private final Map<String, LuceneIndexSchemaObjectNode> objectNodes;
+	private final Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes;
 	private final Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes;
 	private final List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates;
 	private final List<LuceneIndexSchemaFieldTemplate> fieldTemplates;
-	private final ConcurrentMap<String, LuceneIndexSchemaObjectNode> dynamicObjectNodesCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, LuceneIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, LuceneIndexSchemaFieldNode<?>> dynamicFieldNodesCache = new ConcurrentHashMap<>();
 
 	private final ModelBasedScopedAnalyzer indexingAnalyzer;
@@ -44,7 +44,7 @@ public class LuceneIndexModel implements AutoCloseable {
 			String mappedTypeName,
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			LuceneIndexSchemaObjectNode rootNode,
-			Map<String, LuceneIndexSchemaObjectNode> objectNodes,
+			Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes,
 			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes,
 			List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates,
 			List<LuceneIndexSchemaFieldTemplate> fieldTemplates) {
@@ -52,7 +52,7 @@ public class LuceneIndexModel implements AutoCloseable {
 		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;
-		this.objectNodes = CollectionHelper.toImmutableMap( objectNodes );
+		this.objectFieldNodes = CollectionHelper.toImmutableMap( objectFieldNodes );
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodes );
 		this.indexingAnalyzer = new ModelBasedScopedAnalyzer();
 		this.objectFieldTemplates = objectFieldTemplates;
@@ -84,9 +84,9 @@ public class LuceneIndexModel implements AutoCloseable {
 		return rootNode;
 	}
 
-	public LuceneIndexSchemaObjectNode getObjectNode(String absolutePath, IndexFieldFilter filter) {
-		LuceneIndexSchemaObjectNode node =
-				getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+	public LuceneIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
+		LuceneIndexSchemaObjectFieldNode node =
+				getNode( objectFieldNodes, objectFieldTemplates, dynamicObjectFieldNodesCache, absolutePath );
 		return node == null ? null : filter.filter( node, node.getInclusion() );
 	}
 
