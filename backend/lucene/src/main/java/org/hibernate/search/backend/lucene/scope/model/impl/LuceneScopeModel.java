@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
@@ -104,7 +104,7 @@ public class LuceneScopeModel {
 	public LuceneObjectPredicateBuilderFactory getObjectPredicateBuilderFactory(String absoluteFieldPath) {
 		LuceneObjectPredicateBuilderFactory result = null;
 
-		LuceneIndexSchemaObjectNode objectNode = null;
+		LuceneIndexSchemaObjectFieldNode objectNode = null;
 		String objectNodeIndexName = null;
 		LuceneIndexSchemaFieldNode<?> fieldNode = null;
 		String fieldNodeIndexName = null;
@@ -125,8 +125,8 @@ public class LuceneScopeModel {
 				continue;
 			}
 
-			LuceneIndexSchemaObjectNode currentObjectNode =
-					indexModel.getObjectNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			LuceneIndexSchemaObjectFieldNode currentObjectNode =
+					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( currentObjectNode == null ) {
 				continue;
 			}
@@ -210,8 +210,8 @@ public class LuceneScopeModel {
 		boolean found = false;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
-			LuceneIndexSchemaObjectNode schemaNode =
-					indexModel.getObjectNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			LuceneIndexSchemaObjectFieldNode schemaNode =
+					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
@@ -273,7 +273,7 @@ public class LuceneScopeModel {
 
 	public List<String> getNestedPathHierarchyForObject(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getObjectNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
+				.map( indexModel -> indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
 				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {

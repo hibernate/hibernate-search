@@ -6,98 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 
 
-public class LuceneIndexSchemaObjectNode {
+public interface LuceneIndexSchemaObjectNode {
 
-	private static final LuceneIndexSchemaObjectNode ROOT = new LuceneIndexSchemaObjectNode(
-			null, null, IndexFieldInclusion.INCLUDED,
-			null, false,
-			// we do not store childrenPaths for the root node
-			Collections.emptyList()
-	);
+	String getAbsolutePath();
 
-	public static LuceneIndexSchemaObjectNode root() {
-		return ROOT;
-	}
+	String getAbsolutePath(String relativeFieldName);
 
-	private final LuceneIndexSchemaObjectNode parent;
-	private final String absolutePath;
-	private final IndexFieldInclusion inclusion;
+	IndexFieldInclusion getInclusion();
 
-	private final List<String> nestedPathHierarchy;
+	List<String> getNestedPathHierarchy();
 
-	private final ObjectFieldStorage storage;
-
-	private final boolean multiValued;
-
-	private final List<String> childrenAbsolutePaths;
-
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
-			List<String> childrenRelativeNames) {
-		this.parent = parent;
-		this.absolutePath = parent == null ? relativeName : parent.getAbsolutePath( relativeName );
-		this.inclusion = parent == null ? inclusion : parent.getInclusion().compose( inclusion );
-		List<String> theNestedPathHierarchy = parent == null ? Collections.emptyList() : parent.getNestedPathHierarchy();
-		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
-			// if we found a nested object, we add it to the nestedPathHierarchy
-			theNestedPathHierarchy = new ArrayList<>( theNestedPathHierarchy );
-			theNestedPathHierarchy.add( absolutePath );
-		}
-		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
-		this.storage = storage;
-		this.multiValued = multiValued;
-		this.childrenAbsolutePaths = childrenRelativeNames.stream()
-				.map( childName -> FieldPaths.compose( absolutePath, childName ) )
-				.collect( Collectors.toList() );
-	}
-
-	public LuceneIndexSchemaObjectNode getParent() {
-		return parent;
-	}
-
-	public String getAbsolutePath() {
-		return absolutePath;
-	}
-
-	public String getAbsolutePath(String relativeFieldName) {
-		return FieldPaths.compose( absolutePath, relativeFieldName );
-	}
-
-	public IndexFieldInclusion getInclusion() {
-		return inclusion;
-	}
-
-	public List<String> getNestedPathHierarchy() {
-		return nestedPathHierarchy;
-	}
-
-	public List<String> getChildrenAbsolutePaths() {
-		return childrenAbsolutePaths;
-	}
-
-	public ObjectFieldStorage getStorage() {
-		return storage;
-	}
-
-	/**
-	 * @return {@code true} if this node is multi-valued in its parent object.
-	 */
-	public boolean isMultiValued() {
-		return multiValued;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[absolutePath=" + absolutePath + ", storage=" + storage + "]";
-	}
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -25,7 +25,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 	private final List<String> nestedPathHierarchy;
 	private final Map<String, LuceneFieldPredicateBuilderFactory> leafFields = new HashMap<>();
 
-	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexModel indexModel, LuceneIndexSchemaObjectNode objectNode) {
+	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexModel indexModel, LuceneIndexSchemaObjectFieldNode objectNode) {
 		absoluteFieldPath = objectNode.getAbsolutePath();
 		nestedPathHierarchy = objectNode.getNestedPathHierarchy();
 		addLeafFields( indexModel, objectNode );
@@ -63,9 +63,9 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		return objectPredicateBuilder;
 	}
 
-	private void addLeafFields(LuceneIndexModel indexModel, LuceneIndexSchemaObjectNode objectNode) {
+	private void addLeafFields(LuceneIndexModel indexModel, LuceneIndexSchemaObjectFieldNode objectNode) {
 		for ( String childPath : objectNode.getChildrenAbsolutePaths() ) {
-			LuceneIndexSchemaObjectNode innerObjectNode = indexModel.getObjectNode( childPath, IndexFieldFilter.INCLUDED_ONLY );
+			LuceneIndexSchemaObjectFieldNode innerObjectNode = indexModel.getObjectFieldNode( childPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( innerObjectNode != null && innerObjectNode.getStorage().equals( ObjectFieldStorage.FLATTENED ) ) {
 				// add recursively flattened nested object fields: this is the ES behavior
 				addLeafFields( indexModel, innerObjectNode );

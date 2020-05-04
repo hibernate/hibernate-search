@@ -8,9 +8,9 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 
 public interface LuceneIndexSchemaNodeCollector {
-	void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode schemaObjectNode);
+	void collectObjectFieldNode(String absolutePath, LuceneIndexSchemaObjectFieldNode node);
 
-	void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> schemaFieldNode);
+	void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node);
 
 	void collect(LuceneIndexSchemaObjectFieldTemplate template);
 

@@ -14,7 +14,7 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
 public class LuceneIndexSchemaObjectFieldTemplate
-		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexSchemaObjectNode> {
+		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexSchemaObjectFieldNode> {
 
 	private final ObjectFieldStorage storage;
 
@@ -26,9 +26,9 @@ public class LuceneIndexSchemaObjectFieldTemplate
 	}
 
 	@Override
-	protected LuceneIndexSchemaObjectNode createNode(LuceneIndexSchemaObjectNode parent,
+	protected LuceneIndexSchemaObjectFieldNode createNode(LuceneIndexSchemaObjectNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new LuceneIndexSchemaObjectNode(
+		return new LuceneIndexSchemaObjectFieldNode(
 				parent, relativePath, inclusion, storage, multiValued,
 				// TODO HSEARCH-3905 we don't know the children, so we should find another way to implement the exists predicate
 				Collections.emptyList()
