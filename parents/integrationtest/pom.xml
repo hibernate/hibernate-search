@@ -381,9 +381,33 @@
             </build>
         </profile>
 
-        <!-- Elasticsearch 7.0+ test environment (default) -->
+        <!-- Elasticsearch 7.0 to 7.2 test environment -->
         <profile>
             <id>elasticsearch-7.0</id>
+            <properties>
+                <test.elasticsearch.connection.version>7.2.1</test.elasticsearch.connection.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch70TestDialect</test.elasticsearch.testdialect>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
+                            <configuration>
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.0/init/init.script</pathInitScript>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 7.3+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-7.3</id>
             <activation>
                 <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
                 <property>
@@ -392,7 +416,7 @@
             </activation>
             <properties>
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.main}</test.elasticsearch.connection.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch73TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
