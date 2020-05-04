@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
-import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -37,12 +36,6 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
-	}
-
-	@Override
-	public TckBackendSetupStrategy createAnalysisOverrideBackendSetupStrategy() {
-		return new LuceneTckBackendSetupStrategy()
-				.setProperty( "analysis.configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override

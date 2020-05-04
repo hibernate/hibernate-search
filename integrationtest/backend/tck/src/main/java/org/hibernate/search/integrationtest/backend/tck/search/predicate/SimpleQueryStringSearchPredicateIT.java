@@ -28,11 +28,9 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -86,7 +84,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 = "compatible_search_analyzer_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisOverrideBackendSetupStrategy );
+	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -399,7 +397,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.where( f -> f.simpleQueryString().field( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -416,7 +414,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		// since the overriding takes the precedence over the search analyzer.
 		query = scope.query()
 				.where( f -> f.simpleQueryString().field( whitespaceLowercaseSearchAnalyzedField ).matching( "HERE | PANDA" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -947,7 +945,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( TERM_5 )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -1189,16 +1187,16 @@ public class SimpleQueryStringSearchPredicateIT {
 			)
 					.map( root, "analyzedStringWithDslConverter" );
 			whitespaceAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name )
 			)
 					.map( root, "whitespaceAnalyzed" );
 			whitespaceLowercaseAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseAnalyzed" );
 			whitespaceLowercaseSearchAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
-							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+							.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
 			// A field without any analyzer or normalizer
@@ -1232,7 +1230,7 @@ public class SimpleQueryStringSearchPredicateIT {
 			return new OtherIndexMapping(
 					MainFieldModel.mapper(
 							// Using a different analyzer
-							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 					)
 							.map( root, "analyzedString1" )
 			);
@@ -1242,7 +1240,7 @@ public class SimpleQueryStringSearchPredicateIT {
 			return new OtherIndexMapping(
 					MainFieldModel.mapper(
 							// Using a different analyzer
-							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 								// Overriding it with a compatible one
 								.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)

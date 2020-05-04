@@ -27,13 +27,11 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -73,7 +71,7 @@ public class MatchSearchPredicateIT {
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 = "incompatible_decimal_scale_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisOverrideBackendSetupStrategy );
+	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -802,7 +800,7 @@ public class MatchSearchPredicateIT {
 		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.where( f -> f.match().field( whitespaceAnalyzedField ).matching( "NEW WORLD" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -819,7 +817,7 @@ public class MatchSearchPredicateIT {
 		// since the overriding takes precedence over the search analyzer.
 		query = scope.query()
 				.where( f -> f.match().field( whitespaceLowercaseSearchAnalyzedField ).matching( "NEW WORLD" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -850,7 +848,7 @@ public class MatchSearchPredicateIT {
 		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.where( f -> f.match().field( whitespaceAnalyzedField ).matching( "WORD" ).fuzzy()
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -867,7 +865,7 @@ public class MatchSearchPredicateIT {
 		// since the overriding takes precedence over the search analyzer.
 		query = scope.query()
 				.where( f -> f.match().field( whitespaceLowercaseSearchAnalyzedField ).matching( "WORD" ).fuzzy()
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -971,7 +969,7 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				// the matching parameter will be tokenized even if the field has a normalizer
 				.where( f -> f.match().field( absoluteFieldPath ).matching( "Auster Coe" )
-					.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 
 		assertThat( query )
@@ -995,7 +993,7 @@ public class MatchSearchPredicateIT {
 		// the same query matches all values.
 		query = scope.query()
 				.where( f -> f.match().field( absoluteFieldPath ).matching( "worldofwordcraft" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
@@ -1304,7 +1302,7 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( absoluteFieldPath ).matching( "fox" )
-						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
+						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -1610,24 +1608,24 @@ public class MatchSearchPredicateIT {
 			)
 					.map( root, "string2FieldWithDslConverter" );
 			whitespaceAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
 					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
 			)
 					.map( root, "whitespaceAnalyzed" );
 			whitespaceLowercaseAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ),
 					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
 			)
 					.map( root, "whitespaceLowercaseAnalyzed" );
 			whitespaceLowercaseSearchAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
-							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+							.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ),
 					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
 			ngramSearchAnalyzedField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
-							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+							.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name ),
 					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
 			)
 					.map( root, "ngramSearchAnalyzed" );
@@ -1686,7 +1684,7 @@ public class MatchSearchPredicateIT {
 		 */
 		IncompatibleAnalyzerIndexMapping(IndexSchemaElement root) {
 			analyzedStringField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
 					"quick brown fox", "another word", "a"
 			)
 					.map( root, "analyzedString" );
@@ -1702,7 +1700,7 @@ public class MatchSearchPredicateIT {
 		 */
 		CompatibleSearchAnalyzerIndexMapping(IndexSchemaElement root) {
 			analyzedStringField = MainFieldModel.mapper(
-					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name )
 						// Overriding it with a compatible one
 						.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ),
 					"quick brown fox", "another word", "a"

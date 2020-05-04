@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -43,12 +42,6 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
-	}
-
-	@Override
-	public TckBackendSetupStrategy createAnalysisOverrideBackendSetupStrategy() {
-		return new ElasticsearchTckBackendSetupStrategy()
-				.setProperty( "analysis.configurer", AnalysisOverrideITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
