@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Na
 
 public interface ElasticsearchIndexSchemaNodeCollector {
 
-	void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node);
+	void collect(String absolutePath, ElasticsearchIndexSchemaObjectFieldNode node);
 
 	void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node);
 

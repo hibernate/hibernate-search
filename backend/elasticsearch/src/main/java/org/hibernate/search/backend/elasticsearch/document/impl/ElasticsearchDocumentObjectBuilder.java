@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -37,7 +38,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	private final JsonObject content;
 
 	public ElasticsearchDocumentObjectBuilder(ElasticsearchIndexModel model) {
-		this( model, ElasticsearchIndexSchemaObjectNode.root(), new JsonObject() );
+		this( model, model.getRootNode(), new JsonObject() );
 	}
 
 	ElasticsearchDocumentObjectBuilder(ElasticsearchIndexModel model, ElasticsearchIndexSchemaObjectNode schemaNode,
@@ -59,7 +60,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
 		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference = (ElasticsearchIndexObjectFieldReference) fieldReference;
 
-		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
+		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 
 		JsonObject jsonObject = new JsonObject();
 		return addObject( fieldSchemaNode, jsonObject );
@@ -69,7 +70,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
 		ElasticsearchIndexObjectFieldReference elasticsearchFieldReference = (ElasticsearchIndexObjectFieldReference) fieldReference;
 
-		ElasticsearchIndexSchemaObjectNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
+		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 
 		addObject( fieldSchemaNode, null );
 	}
@@ -89,8 +90,8 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		ElasticsearchIndexSchemaObjectNode fieldSchemaNode =
-				model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode =
+				model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -105,8 +106,8 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
-		ElasticsearchIndexSchemaObjectNode fieldSchemaNode =
-				model.getObjectNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode =
+				model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -149,7 +150,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		}
 	}
 
-	private DocumentElement addObject(ElasticsearchIndexSchemaObjectNode node, JsonObject value) {
+	private DocumentElement addObject(ElasticsearchIndexSchemaObjectFieldNode node, JsonObject value) {
 		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.getParent();
 		checkTreeConsistency( expectedParentNode );
 

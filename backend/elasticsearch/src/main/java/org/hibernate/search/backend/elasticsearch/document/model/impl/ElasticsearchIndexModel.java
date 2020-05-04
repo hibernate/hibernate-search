@@ -32,11 +32,11 @@ public class ElasticsearchIndexModel {
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 	private final ElasticsearchIndexSchemaObjectNode rootNode;
-	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes;
+	private final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes;
 	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
 	private final List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates;
 	private final List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates;
-	private final ConcurrentMap<String, ElasticsearchIndexSchemaObjectNode> dynamicObjectNodesCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ElasticsearchIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, ElasticsearchIndexSchemaFieldNode<?>> dynamicFieldNodesCache = new ConcurrentHashMap<>();
 
 	public ElasticsearchIndexModel(IndexNames names,
@@ -44,7 +44,7 @@ public class ElasticsearchIndexModel {
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaObjectNode rootNode,
-			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
+			Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes,
 			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes,
 			List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates,
 			List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates) {
@@ -55,7 +55,7 @@ public class ElasticsearchIndexModel {
 		this.mapping = mapping;
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;
-		this.objectNodes = objectNodes;
+		this.objectFieldNodes = objectFieldNodes;
 		this.fieldNodes = fieldNodes;
 		this.objectFieldTemplates = objectFieldTemplates;
 		this.fieldTemplates = fieldTemplates;
@@ -81,13 +81,13 @@ public class ElasticsearchIndexModel {
 		return idDslConverter;
 	}
 
-	ElasticsearchIndexSchemaObjectNode getRootNode() {
+	public ElasticsearchIndexSchemaObjectNode getRootNode() {
 		return rootNode;
 	}
 
-	public ElasticsearchIndexSchemaObjectNode getObjectNode(String absolutePath, IndexFieldFilter filter) {
-		ElasticsearchIndexSchemaObjectNode node =
-				getNode( objectNodes, objectFieldTemplates, dynamicObjectNodesCache, absolutePath );
+	public ElasticsearchIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
+		ElasticsearchIndexSchemaObjectFieldNode node =
+				getNode( objectFieldNodes, objectFieldTemplates, dynamicObjectFieldNodesCache, absolutePath );
 		return node == null ? null : filter.filter( node, node.getInclusion() );
 	}
 

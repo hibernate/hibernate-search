@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -156,8 +156,8 @@ public class ElasticsearchScopeModel {
 
 	public boolean hasSchemaObjectNodeComponent(String absoluteFieldPath) {
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaObjectNode objectNode =
-					indexModel.getObjectNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			ElasticsearchIndexSchemaObjectFieldNode objectNode =
+					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			// Even if we have an inconsistency with the Lucene backend,
 			// we decide to be very lenient here,
 			// allowing ALL the model incompatibilities Elasticsearch allows.
@@ -173,8 +173,8 @@ public class ElasticsearchScopeModel {
 		boolean found = false;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaObjectNode schemaNode =
-					indexModel.getObjectNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			ElasticsearchIndexSchemaObjectFieldNode schemaNode =
+					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
@@ -236,7 +236,7 @@ public class ElasticsearchScopeModel {
 
 	public List<String> getNestedPathHierarchyForObject(String absoluteObjectPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getObjectNode( absoluteObjectPath, IndexFieldFilter.INCLUDED_ONLY ) )
+				.map( indexModel -> indexModel.getObjectFieldNode( absoluteObjectPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
 				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
