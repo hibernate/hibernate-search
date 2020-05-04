@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 
 public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldReference {
 
-	private ElasticsearchIndexSchemaObjectNode schemaNode;
+	private ElasticsearchIndexSchemaObjectFieldNode schemaNode;
 
-	public void setSchemaNode(ElasticsearchIndexSchemaObjectNode schemaNode) {
+	public void setSchemaNode(ElasticsearchIndexSchemaObjectFieldNode schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 
-	ElasticsearchIndexSchemaObjectNode getSchemaNode() {
+	ElasticsearchIndexSchemaObjectFieldNode getSchemaNode() {
 		return schemaNode;
 	}
 }
