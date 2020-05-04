@@ -45,6 +45,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 						context.getFailureCollector()
 				);
 			case DROP_ON_SHUTDOWN_ONLY:
+			case NONE:
 			default:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );
@@ -61,6 +62,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 						context.getFailureCollector()
 				);
 			case DROP_AND_CREATE_ON_STARTUP_ONLY:
+			case NONE:
 			default:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );

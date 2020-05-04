@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
@@ -49,6 +50,10 @@ public abstract class StubMappedIndex extends StubMappingIndexManager {
 
 	public Optional<String> backendName() {
 		return Optional.empty();
+	}
+
+	public IndexManager toApi() {
+		return manager.toAPI();
 	}
 
 	protected abstract void bind(IndexedEntityBindingContext context);
