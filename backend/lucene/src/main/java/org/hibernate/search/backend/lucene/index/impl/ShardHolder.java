@@ -48,7 +48,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[indexName=" + model.getIndexName() + "]";
+		return getClass().getSimpleName() + "[indexName=" + model.hibernateSearchName() + "]";
 	}
 
 	void start(IndexManagerStartContext startContext) {
@@ -114,7 +114,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 	@Override
 	public String getIndexName() {
-		return model.getIndexName();
+		return model.hibernateSearchName();
 	}
 
 	@Override

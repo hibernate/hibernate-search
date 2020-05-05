@@ -13,10 +13,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
-import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -43,7 +41,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> implements IndexValueFieldDesc
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexFieldType<F> type) {
 		this.parent = parent;
-		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
+		this.absolutePath = parent.absolutePath( relativeFieldName );
 		this.relativeName = relativeFieldName;
 		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
 		this.inclusion = inclusion;
@@ -73,20 +71,12 @@ public class ElasticsearchIndexSchemaFieldNode<F> implements IndexValueFieldDesc
 	}
 
 	@Override
-	public IndexCompositeElementDescriptor parent() {
-		return parent;
-	}
-
-	public ElasticsearchIndexSchemaObjectNode getParent() {
+	public ElasticsearchIndexSchemaObjectNode parent() {
 		return parent;
 	}
 
 	@Override
 	public String absolutePath() {
-		return absolutePath;
-	}
-
-	public String getAbsolutePath() {
 		return absolutePath;
 	}
 
@@ -119,11 +109,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> implements IndexValueFieldDesc
 	}
 
 	@Override
-	public IndexValueFieldTypeDescriptor type() {
-		return type;
-	}
-
-	public ElasticsearchIndexFieldType<F> getType() {
+	public ElasticsearchIndexFieldType<F> type() {
 		return type;
 	}
 

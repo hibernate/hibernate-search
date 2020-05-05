@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentMap;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -86,7 +85,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	}
 
 	@Override
-	public IndexCompositeElementDescriptor root() {
+	public LuceneIndexSchemaObjectNode root() {
 		return rootNode;
 	}
 
@@ -104,10 +103,6 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return staticFields;
 	}
 
-	public String getIndexName() {
-		return indexName;
-	}
-
 	public String getMappedTypeName() {
 		return mappedTypeName;
 	}
@@ -118,10 +113,6 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
-	}
-
-	public LuceneIndexSchemaObjectNode getRootNode() {
-		return rootNode;
 	}
 
 	public LuceneIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
@@ -189,7 +180,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
 			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
-			Analyzer analyzer = field.getType().getAnalyzerOrNormalizer();
+			Analyzer analyzer = field.type().getAnalyzerOrNormalizer();
 
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;

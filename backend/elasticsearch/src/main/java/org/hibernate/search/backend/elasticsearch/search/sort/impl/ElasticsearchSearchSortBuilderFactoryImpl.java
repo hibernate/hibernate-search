@@ -106,7 +106,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 		@Override
 		public ElasticsearchFieldSortBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getType().getSortBuilderFactory();
+			return schemaNode.type().getSortBuilderFactory();
 		}
 
 		@Override

@@ -44,7 +44,7 @@ public class ElasticsearchScopeModel {
 		this.hibernateSearchIndexNames = new LinkedHashSet<>();
 		this.mappedTypeToElasticsearchIndexNames = new LinkedHashMap<>();
 		for ( ElasticsearchIndexModel model : indexModels ) {
-			hibernateSearchIndexNames.add( model.getHibernateSearchIndexName() );
+			hibernateSearchIndexNames.add( model.hibernateSearchName() );
 			mappedTypeToElasticsearchIndexNames.put( model.getMappedTypeName(), model.getNames().getRead() );
 		}
 	}
@@ -92,8 +92,8 @@ public class ElasticsearchScopeModel {
 						new ElasticsearchFailingIdCompatibilityChecker(
 								selectedIdConverter, idConverter,
 								EventContexts.fromIndexNames(
-										indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
-										indexModel.getHibernateSearchIndexName()
+										indexModelForSelectedIdConverter.hibernateSearchName(),
+										indexModel.hibernateSearchName()
 								)
 						);
 				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
@@ -130,14 +130,14 @@ public class ElasticsearchScopeModel {
 						scopedIndexFieldComponent.getComponent(),
 						component,
 						EventContexts.fromIndexNames(
-								indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
-								indexModel.getHibernateSearchIndexName()
+								indexModelForSelectedSchemaNode.hibernateSearchName(),
+								indexModel.hibernateSearchName()
 						)
 				);
 			}
 			ElasticsearchFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingFieldCompatibilityChecker<>(
 					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
-					indexModelForSelectedSchemaNode.getHibernateSearchIndexName(), indexModel.getHibernateSearchIndexName()
+					indexModelForSelectedSchemaNode.hibernateSearchName(), indexModel.hibernateSearchName()
 			), componentRetrievalStrategy );
 
 			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {

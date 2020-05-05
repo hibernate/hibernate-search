@@ -105,7 +105,7 @@ public class LuceneSearchAggregationBuilderFactory
 
 		@Override
 		public LuceneFieldAggregationBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getType().getAggregationBuilderFactory();
+			return schemaNode.type().getAggregationBuilderFactory();
 		}
 
 		@Override

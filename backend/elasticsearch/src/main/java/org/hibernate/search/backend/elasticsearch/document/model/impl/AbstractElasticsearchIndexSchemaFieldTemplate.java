@@ -40,7 +40,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N> {
 		ElasticsearchIndexSchemaObjectNode parent =
 				relativizedPath.parentPath
 						.<ElasticsearchIndexSchemaObjectNode>map( path -> model.getObjectFieldNode( path, IndexFieldFilter.ALL ) )
-						.orElseGet( model::getRootNode );
+						.orElseGet( model::root );
 
 		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );
 	}

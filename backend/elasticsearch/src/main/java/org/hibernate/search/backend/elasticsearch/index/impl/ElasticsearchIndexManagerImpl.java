@@ -88,7 +88,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		this.backendContext = backendContext;
 		this.model = model;
 		this.documentMetadataContributors = documentMetadataContributors;
-		this.indexingOrchestrator = backendContext.createIndexingOrchestrator( model.getHibernateSearchIndexName() );
+		this.indexingOrchestrator = backendContext.createIndexingOrchestrator( model.hibernateSearchName() );
 	}
 
 	@Override
@@ -142,7 +142,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 			schemaManager = null;
 		}
 		catch (IOException e) {
-			throw log.failedToShutdownIndexManager( model.getHibernateSearchIndexName(), e, backendContext.getEventContext() );
+			throw log.failedToShutdownIndexManager( model.hibernateSearchName(), e, backendContext.getEventContext() );
 		}
 	}
 
@@ -254,7 +254,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	private EventContext getBackendAndIndexEventContext() {
 		return backendContext.getEventContext().append(
-				EventContexts.fromIndexName( model.getHibernateSearchIndexName() )
+				EventContexts.fromIndexName( model.hibernateSearchName() )
 		);
 	}
 

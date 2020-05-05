@@ -28,7 +28,7 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocume
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.idFieldName(), rootId ) );
 
-		document.add( MetadataFields.searchableMetadataField( MetadataFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath() ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.nestedDocumentPathFieldName(), schemaNode.absolutePath() ) );
 
 		// all the ancestors of a subdocument must be added after it
 		super.contribute( multiTenancyStrategy, tenantId, routingKey, rootId, nestedDocuments );
