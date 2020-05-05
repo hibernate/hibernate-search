@@ -6,47 +6,31 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
-import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class LuceneIndexSchemaObjectFieldNode
+public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaFieldNode
 		implements IndexObjectFieldDescriptor, LuceneIndexSchemaObjectNode, IndexObjectFieldTypeDescriptor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final LuceneIndexSchemaObjectNode parent;
-	private final String absolutePath;
-	private final String relativeName;
-	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
 
 	private final ObjectFieldStorage storage;
-
-	private final boolean multiValued;
 
 	private final List<String> childrenAbsolutePaths;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
 			List<String> childrenRelativeNames) {
-		this.parent = parent;
-		this.absolutePath = parent.absolutePath( relativeName );
-		this.relativeName = relativeName;
-		this.inclusion = parent.getInclusion().compose( inclusion );
+		super( parent, relativeName, inclusion, multiValued );
 		List<String> theNestedPathHierarchy = parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy
@@ -55,7 +39,6 @@ public class LuceneIndexSchemaObjectFieldNode
 		}
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.storage = storage;
-		this.multiValued = multiValued;
 		this.childrenAbsolutePaths = childrenRelativeNames.stream()
 				.map( childName -> FieldPaths.compose( absolutePath, childName ) )
 				.collect( Collectors.toList() );
@@ -82,38 +65,18 @@ public class LuceneIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public IndexObjectFieldDescriptor toObjectField() {
+	public LuceneIndexSchemaObjectFieldNode toObjectField() {
 		return this;
 	}
 
 	@Override
-	public IndexValueFieldDescriptor toValueField() {
+	public LuceneIndexSchemaFieldNode<?> toValueField() {
 		throw log.invalidIndexElementTypeObjectFieldIsNotValueField( absolutePath );
-	}
-
-	@Override
-	public LuceneIndexSchemaObjectNode parent() {
-		return parent;
-	}
-
-	@Override
-	public String absolutePath() {
-		return absolutePath;
 	}
 
 	@Override
 	public String absolutePath(String relativeFieldName) {
 		return FieldPaths.compose( absolutePath, relativeFieldName );
-	}
-
-	@Override
-	public String relativeName() {
-		return relativeName;
-	}
-
-	@Override
-	public IndexFieldInclusion getInclusion() {
-		return inclusion;
 	}
 
 	@Override
@@ -123,11 +86,6 @@ public class LuceneIndexSchemaObjectFieldNode
 
 	public List<String> getChildrenAbsolutePaths() {
 		return childrenAbsolutePaths;
-	}
-
-	@Override
-	public boolean isMultiValued() {
-		return multiValued;
 	}
 
 	@Override

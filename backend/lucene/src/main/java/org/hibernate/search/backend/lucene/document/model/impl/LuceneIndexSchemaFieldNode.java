@@ -12,36 +12,25 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor {
+public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFieldNode
+		implements IndexValueFieldDescriptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneIndexSchemaObjectNode parent;
-	private final String absolutePath;
-	private final String relativeName;
-	private final IndexFieldInclusion inclusion;
-
 	private final List<String> nestedPathHierarchy;
-
-	private final boolean multiValued;
 
 	private final LuceneIndexFieldType<F> type;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexFieldType<F> type) {
-		this.parent = parent;
-		this.absolutePath = parent.absolutePath( relativeName );
-		this.relativeName = relativeName;
-		this.inclusion = parent.getInclusion().compose( inclusion );
+		super( parent, relativeName, inclusion, multiValued );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
-		this.multiValued = multiValued;
 		this.type = type;
 	}
 
@@ -61,32 +50,13 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 	}
 
 	@Override
-	public IndexObjectFieldDescriptor toObjectField() {
+	public LuceneIndexSchemaObjectFieldNode toObjectField() {
 		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
 	}
 
 	@Override
-	public IndexValueFieldDescriptor toValueField() {
+	public LuceneIndexSchemaFieldNode<F> toValueField() {
 		return this;
-	}
-
-	@Override
-	public LuceneIndexSchemaObjectNode parent() {
-		return parent;
-	}
-
-	@Override
-	public String absolutePath() {
-		return absolutePath;
-	}
-
-	@Override
-	public String relativeName() {
-		return relativeName;
-	}
-
-	public IndexFieldInclusion getInclusion() {
-		return inclusion;
 	}
 
 	public String getNestedDocumentPath() {
@@ -97,11 +67,6 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 
 	public List<String> getNestedPathHierarchy() {
 		return nestedPathHierarchy;
-	}
-
-	@Override
-	public boolean isMultiValued() {
-		return multiValued;
 	}
 
 	@Override
