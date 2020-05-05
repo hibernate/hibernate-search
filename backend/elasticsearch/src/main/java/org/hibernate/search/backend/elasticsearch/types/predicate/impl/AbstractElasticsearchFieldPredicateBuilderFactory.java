@@ -12,6 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -20,9 +21,29 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPred
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
+abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
+		implements ElasticsearchFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	protected final boolean searchable;
+
+	protected final ElasticsearchFieldCodec<F> codec;
+
+	AbstractElasticsearchFieldPredicateBuilderFactory(boolean searchable, ElasticsearchFieldCodec<F> codec) {
+		this.searchable = searchable;
+		this.codec = codec;
+	}
+
+	@Override
+	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		AbstractElasticsearchFieldPredicateBuilderFactory<?> castedOther =
+				(AbstractElasticsearchFieldPredicateBuilderFactory<?>) other;
+		return searchable == castedOther.searchable && codec.isCompatibleWith( castedOther.codec );
+	}
 
 	@Override
 	public boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory other) {
@@ -76,5 +97,11 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 		throw log.spatialPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
+	}
+
+	protected void checkSearchable(String absoluteFieldPath) {
+		if ( !searchable ) {
+			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 }

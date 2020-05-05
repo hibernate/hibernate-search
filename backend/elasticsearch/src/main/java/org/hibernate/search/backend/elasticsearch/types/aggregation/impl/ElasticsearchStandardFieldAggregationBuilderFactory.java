@@ -6,34 +6,24 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.aggregation.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
-		implements ElasticsearchFieldAggregationBuilderFactory {
+		extends AbstractElasticsearchFieldAggregationBuilderFactory<F> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final boolean aggregable;
-
-	private final DslConverter<?, ? extends F> toFieldValueConverter;
 	private final DslConverter<? super F, ? extends F> rawToFieldValueConverter;
-	private final ProjectionConverter<? super F, ?> fromFieldValueConverter;
 	private final ProjectionConverter<? super F, F> rawFromFieldValueConverter;
-	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldAggregationBuilderFactory(boolean aggregable,
 			DslConverter<?, ? extends F> toFieldValueConverter,
@@ -41,12 +31,9 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			ProjectionConverter<? super F, ?> fromFieldValueConverter,
 			ProjectionConverter<? super F, F> rawFromFieldValueConverter,
 			ElasticsearchFieldCodec<F> codec) {
-		this.aggregable = aggregable;
-		this.toFieldValueConverter = toFieldValueConverter;
+		super( aggregable, toFieldValueConverter, fromFieldValueConverter, codec );
 		this.rawToFieldValueConverter = rawToFieldValueConverter;
-		this.fromFieldValueConverter = fromFieldValueConverter;
 		this.rawFromFieldValueConverter = rawFromFieldValueConverter;
-		this.codec = codec;
 	}
 
 	@Override
@@ -75,34 +62,6 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 		return new ElasticsearchRangeAggregation.Builder<>(
 				searchContext, absoluteFieldPath, nestedPathHierarchy, toFieldValueConverter, codec
 		);
-	}
-
-	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchStandardFieldAggregationBuilderFactory<?> castedOther =
-				(ElasticsearchStandardFieldAggregationBuilderFactory<?>) other;
-		return aggregable == castedOther.aggregable && codec.isCompatibleWith( castedOther.codec );
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(ElasticsearchFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchStandardFieldAggregationBuilderFactory<?> castedOther =
-				(ElasticsearchStandardFieldAggregationBuilderFactory<?>) other;
-		return toFieldValueConverter.isCompatibleWith( castedOther.toFieldValueConverter )
-				&& fromFieldValueConverter.isCompatibleWith( castedOther.fromFieldValueConverter );
-	}
-
-	private static void checkAggregable(String absoluteFieldPath, boolean aggregable) {
-		if ( !aggregable ) {
-				throw log.nonAggregableField( absoluteFieldPath,
-						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
-		}
 	}
 
 	private <T> DslConverter<?, ? extends F> getToFieldValueConverter(

@@ -6,50 +6,29 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
-		extends AbstractElasticsearchFieldPredicateBuilderFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+		extends AbstractElasticsearchFieldPredicateBuilderFactory<F> {
 
 	protected final DslConverter<?, ? extends F> converter;
 	protected final DslConverter<F, ? extends F> rawConverter;
 
-	protected final ElasticsearchFieldCodec<F> codec;
-
-	private final boolean searchable;
-
 	public ElasticsearchStandardFieldPredicateBuilderFactory(boolean searchable,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
-		this.searchable = searchable;
+		super( searchable, codec );
 		this.converter = converter;
 		this.rawConverter = rawConverter;
-		this.codec = codec;
-	}
-
-	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchStandardFieldPredicateBuilderFactory<?> castedOther =
-				(ElasticsearchStandardFieldPredicateBuilderFactory<?>) other;
-		return searchable == castedOther.searchable && codec.isCompatibleWith( castedOther.codec );
 	}
 
 	@Override
@@ -67,7 +46,10 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+		return new ElasticsearchStandardMatchPredicateBuilder<>(
+				searchContext, absoluteFieldPath, nestedPathHierarchy,
+				converter, rawConverter, converterChecker,
+				codec );
 	}
 
 	@Override
@@ -75,12 +57,10 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy
 			, ElasticsearchCompatibilityChecker converterChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+		return new ElasticsearchRangePredicateBuilder<>(
+				searchContext, absoluteFieldPath, nestedPathHierarchy,
+				converter, rawConverter, converterChecker,
+				codec );
 	}
 
-	protected void checkSearchable(String absoluteFieldPath) {
-		if ( !searchable ) {
-			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
-		}
-	}
 }

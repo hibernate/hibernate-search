@@ -20,29 +20,16 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchGeoPointFieldPredicateBuilderFactory
-		extends AbstractElasticsearchFieldPredicateBuilderFactory {
+		extends AbstractElasticsearchFieldPredicateBuilderFactory<GeoPoint> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ElasticsearchGeoPointFieldCodec CODEC = ElasticsearchGeoPointFieldCodec.INSTANCE;
-
-	private final boolean searchable;
-
 	public ElasticsearchGeoPointFieldPredicateBuilderFactory(boolean searchable) {
-		this.searchable = searchable;
-	}
-
-	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchGeoPointFieldPredicateBuilderFactory castedOther =
-				(ElasticsearchGeoPointFieldPredicateBuilderFactory) other;
-		return searchable == castedOther.searchable;
+		super( searchable, ElasticsearchGeoPointFieldCodec.INSTANCE );
 	}
 
 	@Override
@@ -72,7 +59,7 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, CODEC );
+		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, codec );
 	}
 
 	@Override
@@ -86,12 +73,6 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, nestedPathHierarchy, CODEC );
-	}
-
-	private void checkSearchable(String absoluteFieldPath) {
-		if ( !searchable ) {
-			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
-		}
+		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, nestedPathHierarchy, codec );
 	}
 }

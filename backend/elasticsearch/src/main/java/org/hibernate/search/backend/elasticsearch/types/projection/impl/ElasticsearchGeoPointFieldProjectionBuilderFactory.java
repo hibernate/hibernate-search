@@ -6,53 +6,21 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjectionBuilder;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements ElasticsearchFieldProjectionBuilderFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final boolean projectable;
-
-	private final ProjectionConverter<? super GeoPoint, ?> converter;
-	private final ProjectionConverter<? super GeoPoint, GeoPoint> rawConverter;
-	private final ElasticsearchFieldCodec<GeoPoint> codec;
+public class ElasticsearchGeoPointFieldProjectionBuilderFactory
+		extends ElasticsearchStandardFieldProjectionBuilderFactory<GeoPoint> {
 
 	public ElasticsearchGeoPointFieldProjectionBuilderFactory(boolean projectable,
 			ProjectionConverter<? super GeoPoint, ?> converter, ProjectionConverter<? super GeoPoint, GeoPoint> rawConverter,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
-		this.projectable = projectable;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.codec = codec;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			Class<T> expectedType, ValueConvert convert) {
-		checkProjectable( absoluteFieldPath, projectable );
-
-		ProjectionConverter<? super GeoPoint, ?> requestConverter = getConverter( convert );
-		if ( !requestConverter.isConvertedTypeAssignableTo( expectedType ) ) {
-			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
-		}
-
-		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>( indexNames, absoluteFieldPath, requestConverter, codec );
+		super( projectable, converter, rawConverter, codec );
 	}
 
 	@Override
@@ -61,42 +29,5 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 		checkProjectable( absoluteFieldPath, projectable );
 
 		return new ElasticsearchDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedPath, center );
-	}
-
-	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchGeoPointFieldProjectionBuilderFactory castedOther =
-				(ElasticsearchGeoPointFieldProjectionBuilderFactory) other;
-		return projectable == castedOther.projectable && codec.isCompatibleWith( castedOther.codec );
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchGeoPointFieldProjectionBuilderFactory castedOther =
-				(ElasticsearchGeoPointFieldProjectionBuilderFactory) other;
-		return converter.isCompatibleWith( castedOther.converter );
-	}
-
-	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {
-		if ( !projectable ) {
-				throw log.nonProjectableField( absoluteFieldPath,
-						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
-		}
-	}
-
-	private ProjectionConverter<? super GeoPoint, ?> getConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				return converter;
-		}
 	}
 }

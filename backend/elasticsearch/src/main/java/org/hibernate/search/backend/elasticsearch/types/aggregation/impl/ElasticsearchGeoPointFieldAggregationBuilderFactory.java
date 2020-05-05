@@ -22,24 +22,15 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchGeoPointFieldAggregationBuilderFactory
-		implements ElasticsearchFieldAggregationBuilderFactory {
+		extends AbstractElasticsearchFieldAggregationBuilderFactory<GeoPoint> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final boolean aggregable;
-
-	private final DslConverter<?, ? extends GeoPoint> toFieldValueConverter;
-	private final ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter;
-	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	public ElasticsearchGeoPointFieldAggregationBuilderFactory(boolean aggregable,
 			DslConverter<?, ? extends GeoPoint> toFieldValueConverter,
 			ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
-		this.aggregable = aggregable;
-		this.toFieldValueConverter = toFieldValueConverter;
-		this.fromFieldValueConverter = fromFieldValueConverter;
-		this.codec = codec;
+		super( aggregable, toFieldValueConverter, fromFieldValueConverter, codec );
 	}
 
 	@Override
@@ -56,26 +47,5 @@ public class ElasticsearchGeoPointFieldAggregationBuilderFactory
 		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
-	}
-
-	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchGeoPointFieldAggregationBuilderFactory castedOther =
-				(ElasticsearchGeoPointFieldAggregationBuilderFactory) other;
-		return aggregable == castedOther.aggregable && codec.isCompatibleWith( castedOther.codec );
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(ElasticsearchFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		ElasticsearchGeoPointFieldAggregationBuilderFactory castedOther =
-				(ElasticsearchGeoPointFieldAggregationBuilderFactory) other;
-		return toFieldValueConverter.isCompatibleWith( castedOther.toFieldValueConverter )
-				&& fromFieldValueConverter.isCompatibleWith( castedOther.fromFieldValueConverter );
 	}
 }
