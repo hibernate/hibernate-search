@@ -13,6 +13,10 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -20,13 +24,13 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import com.google.gson.JsonElement;
 
 
-public class ElasticsearchIndexSchemaFieldNode<F> {
+public class ElasticsearchIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchIndexSchemaObjectNode parent;
-
 	private final String absolutePath;
+	private final String relativeName;
 	private final JsonAccessor<JsonElement> relativeAccessor;
 	private final IndexFieldInclusion inclusion;
 
@@ -40,6 +44,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexFieldType<F> type) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
+		this.relativeName = relativeFieldName;
 		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
 		this.inclusion = inclusion;
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
@@ -47,16 +52,51 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 		this.multiValued = multiValued;
 	}
 
+	@Override
+	public boolean isObjectField() {
+		return false;
+	}
+
+	@Override
+	public boolean isValueField() {
+		return true;
+	}
+
+	@Override
+	public IndexObjectFieldDescriptor toObjectField() {
+		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
+	}
+
+	@Override
+	public IndexValueFieldDescriptor toValueField() {
+		return this;
+	}
+
+	@Override
+	public IndexCompositeElementDescriptor parent() {
+		return parent;
+	}
+
 	public ElasticsearchIndexSchemaObjectNode getParent() {
 		return parent;
 	}
 
-	public JsonAccessor<JsonElement> getRelativeAccessor() {
-		return relativeAccessor;
+	@Override
+	public String absolutePath() {
+		return absolutePath;
 	}
 
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	@Override
+	public String relativeName() {
+		return relativeName;
+	}
+
+	public JsonAccessor<JsonElement> getRelativeAccessor() {
+		return relativeAccessor;
 	}
 
 	public IndexFieldInclusion getInclusion() {
@@ -73,11 +113,14 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 		return nestedPathHierarchy;
 	}
 
-	/**
-	 * @return {@code true} if this node is multi-valued in its parent object.
-	 */
+	@Override
 	public boolean isMultiValued() {
 		return multiValued;
+	}
+
+	@Override
+	public IndexValueFieldTypeDescriptor type() {
+		return type;
 	}
 
 	public ElasticsearchIndexFieldType<F> getType() {

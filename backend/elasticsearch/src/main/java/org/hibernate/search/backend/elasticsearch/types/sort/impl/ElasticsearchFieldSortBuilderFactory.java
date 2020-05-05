@@ -34,6 +34,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface ElasticsearchFieldSortBuilderFactory {
 
+	boolean isSortable();
+
 	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker converterChecker);
 

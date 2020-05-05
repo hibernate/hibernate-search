@@ -35,7 +35,8 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 		ProjectionConverter<? super F, F> rawProjectionConverter = createRawProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), codec,
+				getFieldType(), dslConverter, projectionConverter,
+				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslConverter, rawDslConverter, codec
 				),

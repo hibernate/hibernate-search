@@ -36,6 +36,11 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
+	public boolean isSearchable() {
+		return searchable;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;

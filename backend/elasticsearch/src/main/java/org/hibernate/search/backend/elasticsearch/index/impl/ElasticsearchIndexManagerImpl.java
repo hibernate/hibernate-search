@@ -238,7 +238,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	@Override
 	public IndexDescriptor descriptor() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return model;
 	}
 
 	@Override
