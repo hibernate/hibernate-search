@@ -24,7 +24,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final boolean projectable;
+	protected final boolean projectable;
 
 	private final ProjectionConverter<? super F, ?> converter;
 	private final ProjectionConverter<? super F, F> rawConverter;
@@ -83,14 +83,14 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 		return converter.isCompatibleWith( castedOther.converter );
 	}
 
-	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {
+	protected static void checkProjectable(String absoluteFieldPath, boolean projectable) {
 		if ( !projectable ) {
 				throw log.nonProjectableField( absoluteFieldPath,
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 	}
 
-	private ProjectionConverter<? super F, ?> getConverter(ValueConvert convert) {
+	protected ProjectionConverter<? super F, ?> getConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

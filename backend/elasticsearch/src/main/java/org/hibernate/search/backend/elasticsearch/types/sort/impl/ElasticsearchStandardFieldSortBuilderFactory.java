@@ -21,24 +21,21 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class ElasticsearchStandardFieldSortBuilderFactory<F> implements ElasticsearchFieldSortBuilderFactory {
+public class ElasticsearchStandardFieldSortBuilderFactory<F>
+		extends AbstractElasticsearchFieldSortBuilderFactory<F>
+		implements ElasticsearchFieldSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final boolean sortable;
 
 	protected final DslConverter<?, ? extends F> converter;
 	protected final DslConverter<F, ? extends F> rawConverter;
 
-	protected final ElasticsearchFieldCodec<F> codec;
-
 	public ElasticsearchStandardFieldSortBuilderFactory(boolean sortable,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
-		this.sortable = sortable;
+		super( sortable, codec );
 		this.converter = converter;
 		this.rawConverter = rawConverter;
-		this.codec = codec;
 	}
 
 	@Override
@@ -59,19 +56,6 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( obj.getClass() != getClass() ) {
-			return false;
-		}
-
-		ElasticsearchStandardFieldSortBuilderFactory<?> other = (ElasticsearchStandardFieldSortBuilderFactory<?>) obj;
-		return sortable == other.sortable && codec.isCompatibleWith( other.codec );
-	}
-
-	@Override
 	public boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory obj) {
 		if ( this == obj ) {
 			return true;
@@ -82,12 +66,5 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 
 		ElasticsearchStandardFieldSortBuilderFactory<?> other = (ElasticsearchStandardFieldSortBuilderFactory<?>) obj;
 		return converter.isCompatibleWith( other.converter );
-	}
-
-	protected final void checkSortable(String absoluteFieldPath) {
-		if ( !sortable ) {
-			throw log.unsortableField( absoluteFieldPath,
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
-		}
 	}
 }
