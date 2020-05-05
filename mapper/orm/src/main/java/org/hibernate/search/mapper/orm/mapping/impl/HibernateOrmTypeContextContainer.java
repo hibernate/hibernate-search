@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -61,7 +61,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 	}
 
 	@Override
-	public HibernateOrmSessionIndexedTypeContext<?> getIndexedByJpaEntityName(String indexName) {
+	public HibernateOrmIndexedTypeContext<?> getIndexedByJpaEntityName(String indexName) {
 		return indexedTypeContextsByJpaEntityName.get( indexName );
 	}
 
@@ -105,6 +105,10 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 			throw log.invalidEntityName( entityName, typeIdentifierResolver.getKnownJpaOrHibernateOrmEntityNames() );
 		}
 		return result;
+	}
+
+	Collection<HibernateOrmIndexedTypeContext<?>> getAllIndexed() {
+		return indexedTypeContexts.values();
 	}
 
 	static class Builder {

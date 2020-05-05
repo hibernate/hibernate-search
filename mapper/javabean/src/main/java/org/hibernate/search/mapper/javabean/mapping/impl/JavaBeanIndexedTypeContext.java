@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -56,6 +57,11 @@ class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext
 		@Override
 		public void identifierMapping(IdentifierMapping identifierMapping) {
 			this.identifierMapping = identifierMapping;
+		}
+
+		@Override
+		public void indexManager(MappedIndexManager indexManager) {
+			// Nothing to do
 		}
 
 		JavaBeanIndexedTypeContext<E> build() {
