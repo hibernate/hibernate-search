@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -26,11 +25,11 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	private final ObjectFieldStorage storage;
 
-	private final List<String> childrenAbsolutePaths;
+	private final List<AbstractLuceneIndexSchemaFieldNode> staticChildren;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
-			List<String> childrenRelativeNames) {
+			List<AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeName, inclusion, multiValued );
 		List<String> theNestedPathHierarchy = parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
@@ -40,9 +39,8 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		}
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.storage = storage;
-		this.childrenAbsolutePaths = childrenRelativeNames.stream()
-				.map( childName -> FieldPaths.compose( absolutePath, childName ) )
-				.collect( Collectors.toList() );
+		// We expect the children to be added to the list externally, just after the constructor call.
+		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
 	}
 
 	@Override
@@ -85,10 +83,6 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		return nestedPathHierarchy;
 	}
 
-	public List<String> getChildrenAbsolutePaths() {
-		return childrenAbsolutePaths;
-	}
-
 	@Override
 	public IndexObjectFieldTypeDescriptor type() {
 		// We don't bother creating a dedicated object to represent the type, which is very simple.
@@ -97,7 +91,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	@Override
 	public Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return staticChildren;
 	}
 
 	@Override

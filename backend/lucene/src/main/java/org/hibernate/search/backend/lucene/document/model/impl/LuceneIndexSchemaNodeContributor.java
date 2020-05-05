@@ -7,7 +7,11 @@
 package org.hibernate.search.backend.lucene.document.model.impl;
 
 
+import java.util.List;
+
 public interface LuceneIndexSchemaNodeContributor {
 
-	void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode);
+	void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
+			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent);
+
 }
