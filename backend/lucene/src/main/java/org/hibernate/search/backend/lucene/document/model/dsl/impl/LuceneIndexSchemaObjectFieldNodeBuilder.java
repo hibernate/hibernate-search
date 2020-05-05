@@ -7,7 +7,10 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -66,19 +69,23 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
+	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
+			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
+		List<AbstractLuceneIndexSchemaFieldNode> staticChildren = new ArrayList<>();
 		LuceneIndexSchemaObjectFieldNode node = new LuceneIndexSchemaObjectFieldNode(
-				parentNode, relativeFieldName, inclusion, storage, multiValued, getChildrenNames()
+				parentNode, relativeFieldName, inclusion, storage, multiValued, staticChildren
 		);
+
+		staticChildrenForParent.add( node );
 		collector.collectObjectFieldNode( absoluteFieldPath, node );
 
 		reference.setSchemaNode( node );
 
-		contributeChildren( node, collector );
+		contributeChildren( node, collector, staticChildren );
 	}
 
 	@Override

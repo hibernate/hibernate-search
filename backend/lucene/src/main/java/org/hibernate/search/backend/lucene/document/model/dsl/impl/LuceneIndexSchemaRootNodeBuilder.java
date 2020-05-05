@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldTemplate;
@@ -99,8 +100,9 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 		};
 
-		LuceneIndexSchemaObjectNode rootNode = new LuceneIndexSchemaRootNode();
-		contributeChildren( rootNode, collector );
+		List<AbstractLuceneIndexSchemaFieldNode> staticChildren = new ArrayList<>();
+		LuceneIndexSchemaObjectNode rootNode = new LuceneIndexSchemaRootNode( staticChildren );
+		contributeChildren( rootNode, collector, staticChildren );
 
 		return new LuceneIndexModel(
 				indexName,

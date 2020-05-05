@@ -21,6 +21,13 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final List<AbstractLuceneIndexSchemaFieldNode> staticChildren;
+
+	public LuceneIndexSchemaRootNode(List<AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+		// We expect the children to be added to the list externally, just after the constructor call.
+		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
+	}
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
@@ -63,7 +70,7 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 
 	@Override
 	public Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return staticChildren;
 	}
 
 }

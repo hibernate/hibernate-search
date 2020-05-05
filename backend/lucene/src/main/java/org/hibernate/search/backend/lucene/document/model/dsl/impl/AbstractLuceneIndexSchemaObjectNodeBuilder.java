@@ -7,11 +7,11 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -94,21 +94,17 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	abstract String getAbsolutePath();
 
-	final void contributeChildren(LuceneIndexSchemaObjectNode node, LuceneIndexSchemaNodeCollector collector) {
+	final void contributeChildren(LuceneIndexSchemaObjectNode node, LuceneIndexSchemaNodeCollector collector,
+			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent) {
 		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
-			contributor.contribute( collector, node );
+			contributor.contribute( collector, node, staticChildrenForParent );
 		}
 		// Contribute templates depth-first, so do ours after the children's.
 		// The reason is templates defined in children have more precise path globs and thus
 		// should be appear first in the list.
 		for ( LuceneIndexSchemaNodeContributor template : templates.values() ) {
-			template.contribute( collector, node );
+			template.contribute( collector, node, staticChildrenForParent );
 		}
-	}
-
-	final List<String> getChildrenNames() {
-		// The Map#keySet() method for LinkedHashMap will return the set in insertion order
-		return new ArrayList<>( fields.keySet() );
 	}
 
 	private void putField(String name, LuceneIndexSchemaNodeContributor contributor) {

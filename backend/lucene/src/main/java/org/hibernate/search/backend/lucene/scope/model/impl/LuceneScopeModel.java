@@ -138,7 +138,7 @@ public class LuceneScopeModel {
 			}
 
 			LuceneObjectPredicateBuilderFactoryImpl predicateBuilderFactory =
-					new LuceneObjectPredicateBuilderFactoryImpl( indexModel, currentObjectNode );
+					new LuceneObjectPredicateBuilderFactoryImpl( currentObjectNode );
 			if ( result == null ) {
 				result = predicateBuilderFactory;
 				objectNode = currentObjectNode;
