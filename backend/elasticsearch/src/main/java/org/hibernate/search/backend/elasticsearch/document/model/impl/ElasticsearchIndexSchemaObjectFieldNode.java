@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
@@ -45,7 +44,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
-		this.absolutePath = parent.getAbsolutePath( relativeFieldName );
+		this.absolutePath = parent.absolutePath( relativeFieldName );
 		this.relativeName = relativeFieldName;
 		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
 		this.inclusion = parent.getInclusion().compose( inclusion );
@@ -92,11 +91,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public IndexCompositeElementDescriptor parent() {
-		return parent;
-	}
-
-	public ElasticsearchIndexSchemaObjectNode getParent() {
+	public ElasticsearchIndexSchemaObjectNode parent() {
 		return parent;
 	}
 
@@ -106,12 +101,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public String getAbsolutePath() {
-		return absolutePath;
-	}
-
-	@Override
-	public String getAbsolutePath(String relativeFieldName) {
+	public String absolutePath(String relativeFieldName) {
 		return FieldPaths.compose( absolutePath, relativeFieldName );
 	}
 

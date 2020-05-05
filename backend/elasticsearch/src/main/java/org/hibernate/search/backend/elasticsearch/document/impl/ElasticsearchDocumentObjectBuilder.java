@@ -38,7 +38,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	private final JsonObject content;
 
 	public ElasticsearchDocumentObjectBuilder(ElasticsearchIndexModel model) {
-		this( model, model.getRootNode(), new JsonObject() );
+		this( model, model.root(), new JsonObject() );
 	}
 
 	ElasticsearchDocumentObjectBuilder(ElasticsearchIndexModel model, ElasticsearchIndexSchemaObjectNode schemaNode,
@@ -77,7 +77,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
-		String absoluteFieldPath = FieldPaths.compose( schemaNode.getAbsolutePath(), relativeFieldName );
+		String absoluteFieldPath = FieldPaths.compose( schemaNode.absolutePath(), relativeFieldName );
 		ElasticsearchIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
@@ -89,7 +89,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
-		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
+		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
 		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode =
 				model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
@@ -105,7 +105,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	@Override
 	public void addNullObject(String relativeFieldName) {
-		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
+		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
 		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode =
 				model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
@@ -121,7 +121,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	}
 
 	private <F> void addValue(ElasticsearchIndexSchemaFieldNode<F> node, F value) {
-		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.getParent();
+		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
 		if ( IndexFieldInclusion.EXCLUDED.equals( node.getInclusion() ) ) {
@@ -129,10 +129,10 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		}
 
 		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
-		ElasticsearchIndexFieldType<F> type = node.getType();
+		ElasticsearchIndexFieldType<F> type = node.type();
 
 		if ( !node.isMultiValued() && accessor.hasExplicitValue( content ) ) {
-			throw log.multipleValuesForSingleValuedField( node.getAbsolutePath() );
+			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
 		accessor.add( content, type.getCodec().encode( value ) );
 	}
@@ -151,7 +151,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	}
 
 	private DocumentElement addObject(ElasticsearchIndexSchemaObjectFieldNode node, JsonObject value) {
-		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.getParent();
+		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
 		if ( IndexFieldInclusion.EXCLUDED.equals( node.getInclusion() ) ) {
@@ -161,7 +161,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
 
 		if ( !node.isMultiValued() && accessor.hasExplicitValue( content ) ) {
-			throw log.multipleValuesForSingleValuedField( node.getAbsolutePath() );
+			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
 		accessor.add( content, value );
 
@@ -175,7 +175,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	private void checkTreeConsistency(ElasticsearchIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
-			throw log.invalidFieldForDocumentElement( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
+			throw log.invalidFieldForDocumentElement( expectedParentNode.absolutePath(), schemaNode.absolutePath() );
 		}
 	}
 

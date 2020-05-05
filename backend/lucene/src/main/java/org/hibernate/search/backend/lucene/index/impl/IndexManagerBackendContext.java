@@ -205,8 +205,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		LuceneParallelWorkOrchestratorImpl managementOrchestrator;
 		LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
-		String indexName = model.getIndexName();
-		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
+		String indexName = model.hibernateSearchName();
+		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.hibernateSearchName(), shardId );
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
 				similarity, model.getIndexingAnalyzer(), propertySource, shardEventContext
 		);

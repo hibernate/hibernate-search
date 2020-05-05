@@ -77,7 +77,7 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 
-		collector.collectFieldNode( fieldNode.getAbsolutePath(), fieldNode );
+		collector.collectFieldNode( fieldNode.absolutePath(), fieldNode );
 
 		reference.setSchemaNode( fieldNode );
 	}

@@ -47,7 +47,7 @@ public class LuceneScopeModel {
 
 		for ( LuceneIndexModel model : indexModels ) {
 			this.typeNames.add( model.getMappedTypeName() );
-			this.indexNames.add( model.getIndexName() );
+			this.indexNames.add( model.hibernateSearchName() );
 		}
 	}
 
@@ -90,8 +90,8 @@ public class LuceneScopeModel {
 						new LuceneFailingIdCompatibilityChecker(
 								selectedIdConverter, idConverter,
 								EventContexts.fromIndexNames(
-										indexModelForSelectedIdConverter.getIndexName(),
-										indexModel.getIndexName()
+										indexModelForSelectedIdConverter.hibernateSearchName(),
+										indexModel.hibernateSearchName()
 								)
 						);
 				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
@@ -110,7 +110,7 @@ public class LuceneScopeModel {
 		String fieldNodeIndexName = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
-			String indexName = indexModel.getIndexName();
+			String indexName = indexModel.hibernateSearchName();
 
 			LuceneIndexSchemaFieldNode<?> currentFieldNode =
 					indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
@@ -182,15 +182,15 @@ public class LuceneScopeModel {
 						scopedIndexFieldComponent.getComponent(),
 						component,
 						EventContexts.fromIndexNames(
-								indexModelForSelectedSchemaNode.getIndexName(),
-								indexModel.getIndexName()
+								indexModelForSelectedSchemaNode.hibernateSearchName(),
+								indexModel.hibernateSearchName()
 						)
 				);
 			}
 
 			LuceneFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new LuceneFailingFieldCompatibilityChecker<>(
 					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
-					indexModelForSelectedSchemaNode.getIndexName(), indexModel.getIndexName()
+					indexModelForSelectedSchemaNode.hibernateSearchName(), indexModel.hibernateSearchName()
 			), componentRetrievalStrategy );
 
 			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {

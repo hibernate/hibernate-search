@@ -26,7 +26,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 	private final Map<String, LuceneFieldPredicateBuilderFactory> leafFields = new HashMap<>();
 
 	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexModel indexModel, LuceneIndexSchemaObjectFieldNode objectNode) {
-		absoluteFieldPath = objectNode.getAbsolutePath();
+		absoluteFieldPath = objectNode.absolutePath();
 		nestedPathHierarchy = objectNode.getNestedPathHierarchy();
 		addLeafFields( indexModel, objectNode );
 	}
@@ -74,7 +74,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 			LuceneIndexSchemaFieldNode<?> fieldNode = indexModel.getFieldNode( childPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( fieldNode != null ) {
-				leafFields.put( childPath, fieldNode.getType().getPredicateBuilderFactory() );
+				leafFields.put( childPath, fieldNode.type().getPredicateBuilderFactory() );
 			}
 		}
 	}

@@ -72,7 +72,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
-		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
+		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
 		LuceneIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
@@ -84,7 +84,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
-		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
+		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
 		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
@@ -96,7 +96,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	@Override
 	public void addNullObject(String relativeFieldName) {
-		String absoluteFieldPath = schemaNode.getAbsolutePath( relativeFieldName );
+		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
 		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
@@ -127,7 +127,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 	private void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
-			throw log.invalidFieldForDocumentElement( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
+			throw log.invalidFieldForDocumentElement( expectedParentNode.absolutePath(), schemaNode.absolutePath() );
 		}
 	}
 
@@ -153,11 +153,11 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	}
 
 	private <F> void addValue(LuceneIndexSchemaFieldNode<F> node, F value) {
-		LuceneIndexSchemaObjectNode expectedParentNode = node.getParent();
+		LuceneIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		LuceneIndexFieldType<F> type = node.getType();
-		String absolutePath = node.getAbsolutePath();
+		LuceneIndexFieldType<F> type = node.type();
+		String absolutePath = node.absolutePath();
 
 		if ( !node.isMultiValued() ) {
 			checkNoValueYetForSingleValued( absolutePath );
@@ -167,10 +167,10 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	}
 
 	private DocumentElement addObject(LuceneIndexSchemaObjectFieldNode node, boolean nullObject) {
-		LuceneIndexSchemaObjectNode expectedParentNode = node.getParent();
+		LuceneIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		String absolutePath = node.getAbsolutePath();
+		String absolutePath = node.absolutePath();
 
 		if ( !node.isMultiValued() ) {
 			checkNoValueYetForSingleValued( absolutePath );

@@ -198,7 +198,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 		@Override
 		public ElasticsearchFieldPredicateBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.getType().getPredicateBuilderFactory();
+			return schemaNode.type().getPredicateBuilderFactory();
 		}
 
 		@Override

@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.L
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -59,7 +58,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 			List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
-		this.eventContext = EventContexts.fromIndexName( getHibernateSearchIndexName() );
+		this.eventContext = EventContexts.fromIndexName( hibernateSearchName() );
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.mapping = mapping;
 		this.idDslConverter = idDslConverter;
@@ -83,12 +82,8 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 		return names.getHibernateSearch();
 	}
 
-	public String getHibernateSearchIndexName() {
-		return names.getHibernateSearch();
-	}
-
 	@Override
-	public IndexCompositeElementDescriptor root() {
+	public ElasticsearchIndexSchemaObjectNode root() {
 		return rootNode;
 	}
 
@@ -120,10 +115,6 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
-	}
-
-	public ElasticsearchIndexSchemaObjectNode getRootNode() {
-		return rootNode;
 	}
 
 	public ElasticsearchIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {

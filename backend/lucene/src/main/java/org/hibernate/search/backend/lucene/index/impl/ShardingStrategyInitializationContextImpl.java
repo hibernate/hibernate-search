@@ -75,7 +75,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	@Override
 	public String getIndexName() {
-		return model.getIndexName();
+		return model.hibernateSearchName();
 	}
 
 	@Override

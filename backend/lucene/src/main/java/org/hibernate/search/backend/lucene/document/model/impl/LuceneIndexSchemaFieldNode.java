@@ -12,10 +12,8 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
-import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -39,7 +37,7 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexFieldType<F> type) {
 		this.parent = parent;
-		this.absolutePath = parent.getAbsolutePath( relativeName );
+		this.absolutePath = parent.absolutePath( relativeName );
 		this.relativeName = relativeName;
 		this.inclusion = parent.getInclusion().compose( inclusion );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
@@ -73,20 +71,12 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 	}
 
 	@Override
-	public IndexCompositeElementDescriptor parent() {
-		return parent;
-	}
-
-	public LuceneIndexSchemaObjectNode getParent() {
+	public LuceneIndexSchemaObjectNode parent() {
 		return parent;
 	}
 
 	@Override
 	public String absolutePath() {
-		return absolutePath;
-	}
-
-	public String getAbsolutePath() {
 		return absolutePath;
 	}
 
@@ -115,11 +105,7 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 	}
 
 	@Override
-	public IndexValueFieldTypeDescriptor type() {
-		return type;
-	}
-
-	public LuceneIndexFieldType<F> getType() {
+	public LuceneIndexFieldType<F> type() {
 		return type;
 	}
 

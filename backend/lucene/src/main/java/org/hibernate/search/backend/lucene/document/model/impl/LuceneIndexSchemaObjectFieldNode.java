@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
@@ -45,7 +44,7 @@ public class LuceneIndexSchemaObjectFieldNode
 			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
 			List<String> childrenRelativeNames) {
 		this.parent = parent;
-		this.absolutePath = parent.getAbsolutePath( relativeName );
+		this.absolutePath = parent.absolutePath( relativeName );
 		this.relativeName = relativeName;
 		this.inclusion = parent.getInclusion().compose( inclusion );
 		List<String> theNestedPathHierarchy = parent.getNestedPathHierarchy();
@@ -93,11 +92,7 @@ public class LuceneIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public IndexCompositeElementDescriptor parent() {
-		return parent;
-	}
-
-	public LuceneIndexSchemaObjectNode getParent() {
+	public LuceneIndexSchemaObjectNode parent() {
 		return parent;
 	}
 
@@ -107,12 +102,7 @@ public class LuceneIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public String getAbsolutePath() {
-		return absolutePath;
-	}
-
-	@Override
-	public String getAbsolutePath(String relativeFieldName) {
+	public String absolutePath(String relativeFieldName) {
 		return FieldPaths.compose( absolutePath, relativeFieldName );
 	}
 

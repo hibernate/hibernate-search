@@ -21,13 +21,13 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	LuceneRootDocumentBuilder(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy) {
-		super( model, model.getRootNode() );
+		super( model, model.root() );
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
 	public LuceneIndexEntry build(String tenantId, String id, String routingKey) {
 		return new LuceneIndexEntry(
-				model.getIndexName(), id,
+				model.hibernateSearchName(), id,
 				assembleDocuments( multiTenancyStrategy, tenantId, id, routingKey )
 		);
 	}

@@ -14,9 +14,9 @@ import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescri
 
 public interface LuceneIndexSchemaObjectNode extends IndexCompositeElementDescriptor {
 
-	String getAbsolutePath();
+	String absolutePath();
 
-	String getAbsolutePath(String relativeFieldName);
+	String absolutePath(String relativeFieldName);
 
 	IndexFieldInclusion getInclusion();
 

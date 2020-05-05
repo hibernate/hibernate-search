@@ -41,12 +41,12 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
-	public String getAbsolutePath() {
+	public String absolutePath() {
 		return null;
 	}
 
 	@Override
-	public String getAbsolutePath(String relativeFieldName) {
+	public String absolutePath(String relativeFieldName) {
 		return relativeFieldName;
 	}
 
