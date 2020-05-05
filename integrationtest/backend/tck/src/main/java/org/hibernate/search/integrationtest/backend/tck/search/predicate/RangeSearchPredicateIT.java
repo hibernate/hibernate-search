@@ -69,6 +69,7 @@ public class RangeSearchPredicateIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
+	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
 
 	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
@@ -91,7 +92,7 @@ public class RangeSearchPredicateIT {
 				)
 				.withIndex(
 						COMPATIBLE_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
@@ -1043,8 +1044,8 @@ public class RangeSearchPredicateIT {
 
 		plan = compatibleIndexManager.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
