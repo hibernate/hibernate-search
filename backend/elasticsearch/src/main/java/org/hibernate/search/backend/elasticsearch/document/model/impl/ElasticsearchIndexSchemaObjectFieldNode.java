@@ -11,43 +11,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
-import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import com.google.gson.JsonElement;
 
-
-public class ElasticsearchIndexSchemaObjectFieldNode
+public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsearchIndexSchemaFieldNode
 		implements IndexObjectFieldDescriptor, ElasticsearchIndexSchemaObjectNode, IndexObjectFieldTypeDescriptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final ElasticsearchIndexSchemaObjectNode parent;
-	private final String absolutePath;
-	private final String relativeName;
-	private final JsonAccessor<JsonElement> relativeAccessor;
-	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
 
 	private final ObjectFieldStorage storage;
 
-	private final boolean multiValued;
-
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued) {
-		this.parent = parent;
-		this.absolutePath = parent.absolutePath( relativeFieldName );
-		this.relativeName = relativeFieldName;
-		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
-		this.inclusion = parent.getInclusion().compose( inclusion );
+		super( parent, relativeFieldName, inclusion, multiValued );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent.getNestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
@@ -57,7 +41,6 @@ public class ElasticsearchIndexSchemaObjectFieldNode
 		}
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
-		this.multiValued = multiValued;
 	}
 
 	@Override
@@ -81,23 +64,13 @@ public class ElasticsearchIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public IndexObjectFieldDescriptor toObjectField() {
+	public ElasticsearchIndexSchemaObjectFieldNode toObjectField() {
 		return this;
 	}
 
 	@Override
-	public IndexValueFieldDescriptor toValueField() {
+	public ElasticsearchIndexSchemaFieldNode<?> toValueField() {
 		throw log.invalidIndexElementTypeObjectFieldIsNotValueField( absolutePath );
-	}
-
-	@Override
-	public ElasticsearchIndexSchemaObjectNode parent() {
-		return parent;
-	}
-
-	@Override
-	public String absolutePath() {
-		return absolutePath;
 	}
 
 	@Override
@@ -106,27 +79,8 @@ public class ElasticsearchIndexSchemaObjectFieldNode
 	}
 
 	@Override
-	public String relativeName() {
-		return relativeName;
-	}
-
-	public JsonAccessor<JsonElement> getRelativeAccessor() {
-		return relativeAccessor;
-	}
-
-	@Override
-	public IndexFieldInclusion getInclusion() {
-		return inclusion;
-	}
-
-	@Override
 	public List<String> getNestedPathHierarchy() {
 		return nestedPathHierarchy;
-	}
-
-	@Override
-	public boolean isMultiValued() {
-		return multiValued;
 	}
 
 	@Override
