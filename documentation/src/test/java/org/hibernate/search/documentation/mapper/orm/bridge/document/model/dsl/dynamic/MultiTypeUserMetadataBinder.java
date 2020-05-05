@@ -18,9 +18,9 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
+//tag::bind[]
 public class MultiTypeUserMetadataBinder implements PropertyBinder {
 
-	//tag::bind[]
 	@Override
 	public void bind(PropertyBindingContext context) {
 		context.getDependencies()
@@ -49,6 +49,7 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 	}
 	//end::bind[]
 
+	//tag::write[]
 	private static class Bridge implements PropertyBridge {
 
 		private final IndexObjectFieldReference userMetadataFieldReference;
@@ -57,7 +58,6 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 			this.userMetadataFieldReference = userMetadataFieldReference;
 		}
 
-		//tag::write[]
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			Map<String, Object> userMetadata = (Map<String, Object>) bridgedElement;
@@ -70,6 +70,8 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 				indexedUserMetadata.addValue( fieldName, fieldValue ); // <2>
 			}
 		}
-		//end::write[]
 	}
+	//end::write[]
+	//tag::bind[]
 }
+//end::bind[]
