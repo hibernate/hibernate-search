@@ -21,6 +21,14 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren;
+
+	public ElasticsearchIndexSchemaRootNode(
+			List<AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+		// We expect the children to be added to the list externally, just after the constructor call.
+		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
+	}
+
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
@@ -63,7 +71,7 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 
 	@Override
 	public Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return staticChildren;
 	}
 
 }

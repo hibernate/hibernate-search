@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldTemplate;
@@ -127,8 +128,9 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			}
 		};
 
-		ElasticsearchIndexSchemaObjectNode rootNode = new ElasticsearchIndexSchemaRootNode();
-		contributeChildren( mapping, rootNode, collector );
+		List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren = new ArrayList<>();
+		ElasticsearchIndexSchemaObjectNode rootNode = new ElasticsearchIndexSchemaRootNode( staticChildren );
+		contributeChildren( mapping, rootNode, collector, staticChildren );
 
 		return new ElasticsearchIndexModel(
 				indexNames,
