@@ -10,6 +10,9 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmByIdEntityLoader;
@@ -22,10 +25,13 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
-		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
+		implements SearchIndexedEntity, HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
+
 	private final boolean documentIdIsEntityId;
 	private final EntityLoaderFactory loaderFactory;
 	private final IdentifierMapping identifierMapping;
+
+	private final MappedIndexManager indexManager;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
@@ -49,6 +55,22 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		}
 
 		this.identifierMapping = builder.identifierMapping;
+		this.indexManager = builder.indexManager;
+	}
+
+	@Override
+	public String jpaName() {
+		return getJpaEntityName();
+	}
+
+	@Override
+	public Class<?> javaClass() {
+		return getTypeIdentifier().getJavaClass();
+	}
+
+	@Override
+	public IndexManager indexManager() {
+		return indexManager.toAPI();
 	}
 
 	@Override
@@ -83,6 +105,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
 		private IdentifierMapping identifierMapping;
 
+		private MappedIndexManager indexManager;
+
 		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
 			this.typeIdentifier = typeIdentifier;
 			this.jpaEntityName = jpaEntityName;
@@ -98,6 +122,11 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		@Override
 		public void identifierMapping(IdentifierMapping identifierMapping) {
 			this.identifierMapping = identifierMapping;
+		}
+
+		@Override
+		public void indexManager(MappedIndexManager indexManager) {
+			this.indexManager = indexManager;
 		}
 
 		public HibernateOrmIndexedTypeContext<E> build(SessionFactoryImplementor sessionFactory) {

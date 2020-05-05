@@ -266,4 +266,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 32, value = "Invalid schema management strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_2 + 33, value = "Type '%1$s' is not an entity type, or the entity is not indexed.")
+	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
+
+	@Message(id = ID_OFFSET_2 + 34, value = "Entity '%1$s' is not indexed.")
+	SearchException notIndexedEntityName(String name);
 }

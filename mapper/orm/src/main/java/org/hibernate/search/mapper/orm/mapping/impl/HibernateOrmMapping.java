@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +38,7 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
@@ -193,6 +195,33 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public SessionFactory toOrmSessionFactory() {
 		return sessionFactory;
+	}
+
+	@Override
+	public SearchIndexedEntity indexedEntity(Class<?> entityType) {
+		PojoRawTypeIdentifier<?> typeIdentifier =
+				typeContextContainer.getTypeIdentifierByJavaClass( entityType );
+		SearchIndexedEntity type = typeContextContainer.getIndexedByExactType( typeIdentifier );
+		if ( type == null ) {
+			throw log.notIndexedEntityType( entityType );
+		}
+		return type;
+	}
+
+	@Override
+	public SearchIndexedEntity indexedEntity(String entityName) {
+		PojoRawTypeIdentifier<?> typeIdentifier =
+				typeContextContainer.getTypeIdentifierByEntityName( entityName );
+		SearchIndexedEntity type = typeContextContainer.getIndexedByExactType( typeIdentifier );
+		if ( type == null ) {
+			throw log.notIndexedEntityName( entityName );
+		}
+		return type;
+	}
+
+	@Override
+	public Collection<SearchIndexedEntity> allIndexedEntities() {
+		return Collections.unmodifiableCollection( typeContextContainer.getAllIndexed() );
 	}
 
 	@Override

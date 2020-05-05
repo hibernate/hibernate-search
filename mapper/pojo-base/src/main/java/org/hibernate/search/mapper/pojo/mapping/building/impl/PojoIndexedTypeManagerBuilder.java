@@ -14,6 +14,7 @@ import java.util.Set;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
@@ -128,12 +129,15 @@ class PojoIndexedTypeManagerBuilder<E> {
 		Optional<PojoImplicitReindexingResolver<E, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
+		MappedIndexManager indexManager = indexManagerBuilder.build();
+		extendedMappingCollector.indexManager( indexManager );
+
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.getTypeIdentifier(), typeModel.getCaster(),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,
-				indexManagerBuilder.build(),
+				indexManager,
 				reindexingResolverOptional.orElseGet( PojoImplicitReindexingResolver::noOp )
 		);
 		log.createdPojoIndexedTypeManager( typeManager );
