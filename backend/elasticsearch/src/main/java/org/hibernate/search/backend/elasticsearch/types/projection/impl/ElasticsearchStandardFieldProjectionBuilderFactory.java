@@ -41,6 +41,11 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 	}
 
 	@Override
+	public boolean isProjectable() {
+		return projectable;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<T> expectedType, ValueConvert convert) {

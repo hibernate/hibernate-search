@@ -50,7 +50,8 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		ElasticsearchJsonElementFieldCodec codec = new ElasticsearchJsonElementFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), codec,
+				getFieldType(), dslConverter, projectionConverter,
+				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, dslConverter, rawDslConverter, codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslConverter, rawDslConverter, codec ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>(

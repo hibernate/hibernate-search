@@ -39,6 +39,8 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
  */
 public interface ElasticsearchFieldPredicateBuilderFactory {
 
+	boolean isSearchable();
+
 	boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other);
 
 	boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other);

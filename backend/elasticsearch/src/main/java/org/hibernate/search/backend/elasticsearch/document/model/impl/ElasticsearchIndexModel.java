@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -16,12 +19,17 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class ElasticsearchIndexModel {
+public class ElasticsearchIndexModel implements IndexDescriptor {
 
 	private final IndexNames names;
 	private final String mappedTypeName;
@@ -34,6 +42,7 @@ public class ElasticsearchIndexModel {
 	private final ElasticsearchIndexSchemaObjectNode rootNode;
 	private final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes;
 	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
+	private final List<IndexFieldDescriptor> staticFields;
 	private final List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates;
 	private final List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates;
 	private final ConcurrentMap<String, ElasticsearchIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
@@ -57,12 +66,44 @@ public class ElasticsearchIndexModel {
 		this.rootNode = rootNode;
 		this.objectFieldNodes = objectFieldNodes;
 		this.fieldNodes = fieldNodes;
+		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
+		objectFieldNodes.values().stream()
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.forEach( theStaticFields::add );
+		fieldNodes.values().stream()
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.forEach( theStaticFields::add );
+		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
 		this.objectFieldTemplates = objectFieldTemplates;
 		this.fieldTemplates = fieldTemplates;
 	}
 
+	@Override
+	public String hibernateSearchName() {
+		return names.getHibernateSearch();
+	}
+
 	public String getHibernateSearchIndexName() {
 		return names.getHibernateSearch();
+	}
+
+	@Override
+	public IndexCompositeElementDescriptor root() {
+		return rootNode;
+	}
+
+	@Override
+	public Optional<IndexFieldDescriptor> field(String absolutePath) {
+		IndexFieldDescriptor fieldDescriptor = getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+		if ( fieldDescriptor == null ) {
+			fieldDescriptor = getObjectFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+		}
+		return Optional.ofNullable( fieldDescriptor );
+	}
+
+	@Override
+	public Collection<IndexFieldDescriptor> staticFields() {
+		return staticFields;
 	}
 
 	public IndexNames getNames() {

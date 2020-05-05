@@ -37,6 +37,11 @@ public abstract class AbstractElasticsearchFieldAggregationBuilderFactory<F>
 	}
 
 	@Override
+	public boolean isAggregable() {
+		return aggregable;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(ElasticsearchFieldAggregationBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;

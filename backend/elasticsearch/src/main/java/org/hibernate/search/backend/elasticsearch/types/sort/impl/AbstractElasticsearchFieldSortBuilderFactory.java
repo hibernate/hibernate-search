@@ -26,6 +26,11 @@ public abstract class AbstractElasticsearchFieldSortBuilderFactory<F>
 	}
 
 	@Override
+	public boolean isSortable() {
+		return sortable;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory obj) {
 		if ( this == obj ) {
 			return true;

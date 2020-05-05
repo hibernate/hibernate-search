@@ -25,6 +25,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  */
 public interface ElasticsearchFieldAggregationBuilderFactory {
 
+	boolean isAggregable();
+
 	<K> TermsAggregationBuilder<K> createTermsAggregationBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			Class<K> expectedType, ValueConvert convert);

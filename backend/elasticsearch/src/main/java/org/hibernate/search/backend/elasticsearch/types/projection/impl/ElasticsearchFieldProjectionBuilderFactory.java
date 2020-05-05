@@ -25,6 +25,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface ElasticsearchFieldProjectionBuilderFactory {
 
+	boolean isProjectable();
+
 	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
 			Class<T> expectedType, ValueConvert convert);
 

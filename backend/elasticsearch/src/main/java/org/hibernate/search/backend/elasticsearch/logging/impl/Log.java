@@ -687,4 +687,16 @@ public interface Log extends BasicLogger {
 			value = "Unknown field '%1$s'.")
 	SearchException unknownFieldForIndexing(String absoluteFieldPath, @Param EventContext context);
 
+	@Message(id = ID_OFFSET_3 + 110,
+			value = "Invalid type: the index root is not an object field.")
+	SearchException invalidIndexElementTypeRootIsNotObjectField();
+
+	@Message(id = ID_OFFSET_3 + 111,
+			value = "Invalid type: '%1$s' is a value field, not an object field.")
+	SearchException invalidIndexElementTypeValueFieldIsNotObjectField(String absolutePath);
+
+	@Message(id = ID_OFFSET_3 + 112,
+			value = "Invalid type: '%1$s' is an object field, not a value field.")
+	SearchException invalidIndexElementTypeObjectFieldIsNotValueField(String absolutePath);
+
 }

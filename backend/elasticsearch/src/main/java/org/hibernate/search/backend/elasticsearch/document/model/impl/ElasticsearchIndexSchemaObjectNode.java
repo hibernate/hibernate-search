@@ -9,9 +9,10 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 
 
-public interface ElasticsearchIndexSchemaObjectNode {
+public interface ElasticsearchIndexSchemaObjectNode extends IndexCompositeElementDescriptor {
 
 	String getAbsolutePath();
 
