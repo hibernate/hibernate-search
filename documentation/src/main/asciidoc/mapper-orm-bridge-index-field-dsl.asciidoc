@@ -1,5 +1,5 @@
 [[mapper-orm-bridge-index-field-dsl]]
-= Declaring index fields
+= Declaring and writing to index fields
 
 == Basics
 
@@ -8,13 +8,19 @@ or <<mapper-orm-bridge-typebridge,`TypeBinder`>>,
 it is necessary to declare the index fields that the bridge will contribute to.
 This declaration is performed using a dedicated DSL.
 
-The entry point to this DSL is the `IndexSchemaElement`.
+The entry point to this DSL is the `IndexSchemaElement`,
 which represents the part of the document structure that the binder will push data to.
-
 From the `IndexSchemaElement`, it is possible to declare fields.
-Below is a simple example using the DSL to declare a single field.
 
-.Declaring a simple index field
+The declaration of each field yields a field _reference_.
+This reference is to be stored in the bridge,
+which will use it at runtime to set the value of this field in a given document,
+represented by a `DocumentElement`.
+
+Below is a simple example using the DSL to declare a single field in a property binder
+and then write to that field in a property bridge.
+
+.Declaring a simple index field and writing to that field
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -28,20 +34,12 @@ This is done through a lambda taking advantage of another DSL.
 See <<mapper-orm-bridge-index-field-type-dsl>> for more information.
 <5> Get a reference to the declared field.
 <6> Pass the reference to the bridge for later use.
-====
 
-As shown above, the declaration of each field yields a field _reference_.
-This reference is to be stored in the bridge,
-which will use it at runtime to set the value of this field in a given document,
-represented by a `DocumentElement`.
-
-.Using a field reference to write to a document
-====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/document/model/dsl/simple/ISBNBinder.java[tags=write]
 ----
-<1> Add a value to the field for the current document.
+<1> In the bridge, use the reference obtained above to add a value to the field for the current document.
 ====
 
 == Type objects
@@ -184,11 +182,18 @@ but omits the field names.
 
 A field template is always declared in a binder: either in a <<mapper-orm-bridge-typebridge,type binder>>
 or in a <<mapper-orm-bridge-propertybridge,property binder>>.
-You just need to call the `fieldTemplate` method on the schema element passed to the binder's `bind(...)` method.
+As for static fields, the entry point to declaring a template is the `IndexSchemaElement`
+passed to the binder's `bind(...)` method
+A call to the `fieldTemplate` method on the schema element will declare a field template.
 
-Below is an example of declaring a field template in a property binder.
+Assuming a field template was declared during binding,
+the bridge can then add dynamic fields to the `DocumentElement` when indexing,
+by calling `addValue` and passing the field name (as a string) and the field value.
 
-.Declaring a field template
+Below is a simple example using the DSL to declare a field template in a property binder
+and then write to that field in a property bridge.
+
+.Declaring a field template and writing to a dynamic field
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -204,19 +209,7 @@ to avoid conflicts with other templates.
 because you won't need it when writing to the document.
 <6> Get a reference to the declared object field
 and pass it to the bridge for later use.
-====
 
-[NOTE]
-====
-Though rarely necessary, you can also declare templates for object fields using the `objectFieldTemplate` methods.
-====
-
-Assuming a field template was declared,
-the bridge can then add dynamic fields to the document when indexing,
-as shown in the example below.
-
-.Writing to a dynamic field
-====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/document/model/dsl/dynamic/UserMetadataBinder.java[tags=write]
@@ -227,6 +220,11 @@ and get a reference to that object.
 with the field name and field value defined by the user.
 Note that field names should usually be validated before that point,
 in order to avoid exotic characters (whitespaces, dots, ...).
+====
+
+[NOTE]
+====
+Though rarely necessary, you can also declare templates for object fields using the `objectFieldTemplate` methods.
 ====
 
 It is also possible to add multiple fields with different types to the same object.

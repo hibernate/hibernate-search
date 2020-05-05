@@ -17,9 +17,9 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
+//tag::bind[]
 public class UserMetadataBinder implements PropertyBinder {
 
-	//tag::bind[]
 	@Override
 	public void bind(PropertyBindingContext context) {
 		context.getDependencies()
@@ -38,19 +38,19 @@ public class UserMetadataBinder implements PropertyBinder {
 				f -> f.asString().analyzer( "english" ) // <4>
 		); // <5>
 
-		context.setBridge( new Bridge( userMetadataField.toReference() ) ); // <6>
+		context.setBridge( new UserMetadataBridge( userMetadataField.toReference() ) ); // <6>
 	}
 	//end::bind[]
 
-	private static class Bridge implements PropertyBridge {
+	//tag::write[]
+	private static class UserMetadataBridge implements PropertyBridge {
 
 		private final IndexObjectFieldReference userMetadataFieldReference;
 
-		private Bridge(IndexObjectFieldReference userMetadataFieldReference) {
+		private UserMetadataBridge(IndexObjectFieldReference userMetadataFieldReference) {
 			this.userMetadataFieldReference = userMetadataFieldReference;
 		}
 
-		//tag::write[]
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			Map<String, String> userMetadata = (Map<String, String>) bridgedElement;
@@ -63,6 +63,8 @@ public class UserMetadataBinder implements PropertyBinder {
 				indexedUserMetadata.addValue( fieldName, fieldValue ); // <2>
 			}
 		}
-		//end::write[]
 	}
+	//end::write[]
+	//tag::bind[]
 }
+//end::bind[]

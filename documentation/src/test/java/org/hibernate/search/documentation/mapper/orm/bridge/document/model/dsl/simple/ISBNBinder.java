@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
+//tag::bind[]
 public class ISBNBinder implements PropertyBinder {
 
-	//tag::bind[]
 	@Override
 	public void bind(PropertyBindingContext context) {
 		context.getDependencies()
@@ -36,19 +36,19 @@ public class ISBNBinder implements PropertyBinder {
 				)
 						.toReference(); // <5>
 
-		context.setBridge( new Bridge( field ) ); // <6>
+		context.setBridge( new ISBNBridge( field ) ); // <6>
 	}
 	//end::bind[]
 
-	private static class Bridge implements PropertyBridge {
+	//tag::write[]
+	private static class ISBNBridge implements PropertyBridge {
 
 		private final IndexFieldReference<String> fieldReference;
 
-		private Bridge(IndexFieldReference<String> fieldReference) {
+		private ISBNBridge(IndexFieldReference<String> fieldReference) {
 			this.fieldReference = fieldReference;
 		}
 
-		//tag::write[]
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			String indexedValue = /* ... (extraction of data, not relevant) ... */
@@ -57,6 +57,8 @@ public class ISBNBinder implements PropertyBinder {
 			//tag::write[]
 			target.addValue( this.fieldReference, indexedValue ); // <1>
 		}
-		//end::write[]
 	}
+	//end::write[]
+//tag::bind[]
 }
+//end::bind[]
