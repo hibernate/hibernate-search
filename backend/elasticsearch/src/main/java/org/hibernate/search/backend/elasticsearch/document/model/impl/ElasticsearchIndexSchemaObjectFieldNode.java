@@ -30,8 +30,11 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	private final ObjectFieldStorage storage;
 
+	private final List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren;
+
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
-			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued) {
+			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
+			List<AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeFieldName, inclusion, multiValued );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent.getNestedPathHierarchy();
@@ -42,6 +45,8 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 		}
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
+		// We expect the children to be added to the list externally, just after the constructor call.
+		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
 	}
 
 	@Override
@@ -92,7 +97,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	@Override
 	public Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return staticChildren;
 	}
 
 	@Override

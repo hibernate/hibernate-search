@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 
 
 public interface ElasticsearchIndexSchemaNodeContributor {
 
 	void contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchIndexSchemaObjectNode parentNode,
-			AbstractTypeMapping parentMapping);
+			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent, AbstractTypeMapping parentMapping);
 
 }

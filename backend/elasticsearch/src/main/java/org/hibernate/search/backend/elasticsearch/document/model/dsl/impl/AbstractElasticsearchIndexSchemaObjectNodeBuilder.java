@@ -8,8 +8,10 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -91,16 +93,17 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
-			ElasticsearchIndexSchemaNodeCollector collector) {
+			ElasticsearchIndexSchemaNodeCollector collector,
+			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent) {
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : fields.entrySet() ) {
 			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
-			propertyContributor.contribute( collector, node, mapping );
+			propertyContributor.contribute( collector, node, staticChildrenForParent, mapping );
 		}
 		// Contribute templates depth-first, so do ours after the children's.
 		// The reason is templates defined in children have more precise path globs and thus
 		// should be appear first in the list.
 		for ( ElasticsearchIndexSchemaNodeContributor template : templates.values() ) {
-			template.contribute( collector, node, mapping );
+			template.contribute( collector, node, staticChildrenForParent, mapping );
 		}
 	}
 

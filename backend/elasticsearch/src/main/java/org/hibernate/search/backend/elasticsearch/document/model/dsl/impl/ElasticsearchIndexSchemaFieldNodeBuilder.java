@@ -7,8 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
@@ -73,6 +75,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode,
+			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( getEventContext() );
@@ -82,6 +85,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 
+		staticChildrenForParent.add( fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );
 
 		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.getInclusion() ) ) {

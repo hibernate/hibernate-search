@@ -7,8 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
@@ -74,13 +77,19 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode, AbstractTypeMapping parentMapping) {
+			ElasticsearchIndexSchemaObjectNode parentNode,
+			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent,
+			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
+
+		List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren = new ArrayList<>();
 		ElasticsearchIndexSchemaObjectFieldNode fieldNode = new ElasticsearchIndexSchemaObjectFieldNode(
-				parentNode, relativeFieldName, inclusion, storage, multiValued
+				parentNode, relativeFieldName, inclusion, storage, multiValued, staticChildren
 		);
+
+		staticChildrenForParent.add( fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );
 
 		reference.setSchemaNode( fieldNode );
@@ -96,7 +105,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 			parentMapping.addProperty( relativeFieldName, mapping );
 		}
 
-		contributeChildren( mapping, fieldNode, collector );
+		contributeChildren( mapping, fieldNode, collector, staticChildren );
 	}
 
 	@Override
