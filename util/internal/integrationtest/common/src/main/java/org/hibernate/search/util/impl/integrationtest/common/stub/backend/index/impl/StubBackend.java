@@ -31,6 +31,10 @@ public class StubBackend implements BackendImplementor, Backend {
 		return StubBackend.class.getSimpleName() + "[" + name + "]";
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	public void start(BackendStartContext context) {
 		// Nothing to do

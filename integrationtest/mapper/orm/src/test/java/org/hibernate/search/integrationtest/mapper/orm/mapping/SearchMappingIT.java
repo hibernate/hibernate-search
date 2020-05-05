@@ -6,26 +6,38 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.mapping;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.Collection;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.hibernate.testing.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactories;
 
-@TestForIssue( jiraKey = "HSEARCH-3640" )
 public class SearchMappingIT {
 
 	private static final String BACKEND_1_NAME = "stubBackend1";
@@ -40,45 +52,139 @@ public class SearchMappingIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backendMock1, backendMock2 );
 
-	private SessionFactory sessionFactory;
+	private SearchMapping mapping;
 
 	@Before
 	public void before() {
 		backendMock1.expectAnySchema( Person.INDEX_NAME );
 		backendMock2.expectAnySchema( Pet.JPA_ENTITY_NAME );
-		sessionFactory = ormSetupHelper.start().setup( Person.class, Pet.class );
+		SessionFactory sessionFactory = ormSetupHelper.start().setup( Person.class, Pet.class, Toy.class );
 		backendMock1.verifyExpectationsMet();
 		backendMock2.verifyExpectationsMet();
+		mapping = Search.mapping( sessionFactory );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void indexedEntity_byName() {
+		SearchIndexedEntity entity = mapping.indexedEntity( Person.JPA_ENTITY_NAME );
+		assertThat( entity )
+				.isNotNull()
+				.returns( Person.JPA_ENTITY_NAME, SearchIndexedEntity::jpaName )
+				.returns( Person.class, SearchIndexedEntity::javaClass );
+		checkIndexManager( Person.INDEX_NAME, entity.indexManager() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void indexedEntity_byName_notEntity() {
+		assertThatThrownBy( () -> mapping.indexedEntity( "invalid" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown entity name: 'invalid'",
+						"Available entity names:",
+						Person.class.getName(),
+						Person.JPA_ENTITY_NAME,
+						Pet.class.getName(),
+						Pet.JPA_ENTITY_NAME,
+						Toy.class.getName(),
+						Toy.JPA_ENTITY_NAME
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void indexedEntity_byName_notIndexed() {
+		assertThatThrownBy( () -> mapping.indexedEntity( Toy.JPA_ENTITY_NAME ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Entity '" + Toy.JPA_ENTITY_NAME + "' is not indexed"
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void indexedEntity_byJavaClass() {
+		SearchIndexedEntity entity = mapping.indexedEntity( Person.class );
+		assertThat( entity )
+				.isNotNull()
+				.returns( Person.JPA_ENTITY_NAME, SearchIndexedEntity::jpaName )
+				.returns( Person.class, SearchIndexedEntity::javaClass );
+		checkIndexManager( Person.INDEX_NAME, entity.indexManager() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void indexedEntity_byJavaClass_notEntity() {
+		assertThatThrownBy( () -> mapping.indexedEntity( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Type '" + String.class.getName() + "' is not an entity type, or the entity is not indexed"
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void indexedEntity_byJavaClass_notIndexed() {
+		assertThatThrownBy( () -> mapping.indexedEntity( Toy.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Type '" + Toy.class.getName() + "' is not an entity type, or the entity is not indexed"
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void allIndexedEntities() {
+		Collection<? extends SearchIndexedEntity> entities = mapping.allIndexedEntities();
+		Assertions.<SearchIndexedEntity>assertThat( entities )
+				.extracting( SearchIndexedEntity::jpaName )
+				.containsExactlyInAnyOrder(
+						Person.JPA_ENTITY_NAME,
+						Pet.JPA_ENTITY_NAME
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void getIndexManager_customIndexName() {
-		SearchMapping target = Search.mapping( sessionFactory );
-		IndexManager indexManager = target.getIndexManager( Person.INDEX_NAME );
-		Assertions.assertThat( indexManager ).isNotNull();
+		IndexManager indexManager = mapping.getIndexManager( Person.INDEX_NAME );
+		checkIndexManager( Person.INDEX_NAME, indexManager );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void getIndexManager_defaultIndexName() {
-		SearchMapping target = Search.mapping( sessionFactory );
-		IndexManager indexManager = target.getIndexManager( Pet.JPA_ENTITY_NAME );
-		Assertions.assertThat( indexManager ).isNotNull();
+		IndexManager indexManager = mapping.getIndexManager( Pet.JPA_ENTITY_NAME );
+		checkIndexManager( Pet.JPA_ENTITY_NAME, indexManager );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void getBackendByName() {
-		SearchMapping target = Search.mapping( sessionFactory );
+		Backend backend = mapping.getBackend( BACKEND_1_NAME );
+		checkBackend( BACKEND_1_NAME, backend );
 
-		Object backend = target.getBackend( BACKEND_1_NAME );
-		Assertions.assertThat( backend ).isNotNull();
-
-		backend = target.getBackend( BACKEND_2_NAME );
-		Assertions.assertThat( backend ).isNotNull();
+		backend = mapping.getBackend( BACKEND_2_NAME );
+		checkBackend( BACKEND_2_NAME, backend );
 	}
 
-	@Entity(name = "PersonEntity")
+	private void checkIndexManager(String expectedIndexName, IndexManager indexManager) {
+		assertThat( indexManager )
+				.asInstanceOf( InstanceOfAssertFactories.type( StubIndexManager.class ) )
+				.returns( expectedIndexName, StubIndexManager::getName );
+	}
+
+	private void checkBackend(String expectedBackendName, Backend indexManager) {
+		assertThat( indexManager )
+				.asInstanceOf( InstanceOfAssertFactories.type( StubBackend.class ) )
+				.returns( expectedBackendName, StubBackend::getName );
+	}
+
+	@Entity(name = Person.JPA_ENTITY_NAME)
 	@Indexed(index = Person.INDEX_NAME, backend = BACKEND_1_NAME)
 	private static class Person {
+		public static final String JPA_ENTITY_NAME = "PersonEntity";
 		public static final String INDEX_NAME = "Person";
 
 		@Id
@@ -106,6 +212,8 @@ public class SearchMappingIT {
 		private Integer id;
 		@GenericField
 		private String nickname;
+		@OneToMany(mappedBy = "owner")
+		private List<Toy> toys;
 
 		public Pet() {
 		}
@@ -115,6 +223,34 @@ public class SearchMappingIT {
 		}
 		public String getNickname() {
 			return nickname;
+		}
+		public List<Toy> getToys() {
+			return toys;
+		}
+	}
+
+	@Entity(name = Toy.JPA_ENTITY_NAME)
+	private static class Toy {
+		public static final String JPA_ENTITY_NAME = "Toy";
+
+		@Id
+		private Integer id;
+		@GenericField
+		private String name;
+		@ManyToOne
+		private Pet owner;
+
+		public Toy() {
+		}
+
+		public Integer getId() {
+			return id;
+		}
+		public String getName() {
+			return name;
+		}
+		public Pet getOwner() {
+			return owner;
 		}
 	}
 }

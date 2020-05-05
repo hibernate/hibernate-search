@@ -82,6 +82,10 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 		return StubIndexManager.class.getSimpleName() + "[" + name + "]";
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	public IndexSchemaManager getSchemaManager() {
 		checkStarted();
