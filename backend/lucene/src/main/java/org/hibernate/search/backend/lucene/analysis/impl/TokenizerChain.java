@@ -18,7 +18,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 /**
  * Inspired by Apache Solr's org.apache.solr.analysis.TokenizerChain.TokenizerChain
  */
-final class TokenizerChain extends Analyzer {
+public final class TokenizerChain extends Analyzer {
 
 	private final CharFilterFactory[] charFilters;
 	private final TokenizerFactory tokenizer;

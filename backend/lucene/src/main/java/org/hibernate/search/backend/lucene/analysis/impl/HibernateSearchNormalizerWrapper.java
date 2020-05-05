@@ -10,7 +10,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 
 
-final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
+public final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
 
 	private final String normalizerName;
 
