@@ -48,6 +48,11 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[absolutePath=" + absolutePath + ", type=" + type + "]";
+	}
+
+	@Override
 	public boolean isObjectField() {
 		return false;
 	}
@@ -125,14 +130,5 @@ public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor 
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (LuceneIndexSchemaFieldNode<? super T>) this;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
-				.append( ", absolutePath=" ).append( absolutePath )
-				.append( ", type=" ).append( type )
-				.append( "]" );
-		return sb.toString();
 	}
 }
