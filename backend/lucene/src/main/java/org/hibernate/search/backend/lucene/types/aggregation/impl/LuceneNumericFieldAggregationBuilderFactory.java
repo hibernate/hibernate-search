@@ -15,8 +15,7 @@ import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilde
 import org.hibernate.search.engine.search.common.ValueConvert;
 
 public class LuceneNumericFieldAggregationBuilderFactory<F>
-		extends AbstractLuceneStandardFieldAggregationBuilderFactory<F>
-		implements LuceneFieldAggregationBuilderFactory {
+		extends AbstractLuceneStandardFieldAggregationBuilderFactory<F> {
 
 	private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 
