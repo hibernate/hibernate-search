@@ -80,7 +80,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
-				eventContext, threads, directoryProviderHolder.get(), similarity,
+				this, eventContext, threads, directoryProviderHolder.get(), similarity,
 				workFactory, multiTenancyStrategy,
 				timingSource, analysisDefinitionRegistry,
 				failureHandler,

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
@@ -130,6 +131,11 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	@Override
 	public IndexManager toAPI() {
 		return this;
+	}
+
+	@Override
+	public Backend backend() {
+		return backend;
 	}
 
 	@Override

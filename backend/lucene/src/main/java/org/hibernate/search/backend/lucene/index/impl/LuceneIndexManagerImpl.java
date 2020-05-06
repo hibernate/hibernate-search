@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
@@ -155,6 +156,11 @@ public class LuceneIndexManagerImpl
 	@Override
 	public IndexManager toAPI() {
 		return this;
+	}
+
+	@Override
+	public LuceneBackend backend() {
+		return backendContext.toAPI();
 	}
 
 	@Override

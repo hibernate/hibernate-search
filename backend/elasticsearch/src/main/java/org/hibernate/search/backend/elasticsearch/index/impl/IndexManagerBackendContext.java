@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
@@ -46,6 +47,7 @@ import com.google.gson.Gson;
 
 public class IndexManagerBackendContext implements SearchBackendContext, WorkExecutionBackendContext {
 
+	private final ElasticsearchBackend backendAPI;
 	private final EventContext eventContext;
 	private final BackendThreads threads;
 	private final ElasticsearchLink link;
@@ -57,13 +59,15 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
-	public IndexManagerBackendContext(EventContext eventContext,
+	public IndexManagerBackendContext(ElasticsearchBackend backendAPI,
+			EventContext eventContext,
 			BackendThreads threads, ElasticsearchLink link, Gson userFacingGson,
 			MultiTenancyStrategy multiTenancyStrategy,
 			IndexLayoutStrategy indexLayoutStrategy,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler,
 			ElasticsearchParallelWorkOrchestrator generalPurposeOrchestrator) {
+		this.backendAPI = backendAPI;
 		this.eventContext = eventContext;
 		this.threads = threads;
 		this.link = link;
@@ -151,6 +155,10 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				generalPurposeOrchestrator,
 				searchContext, sessionContext, loadingContextBuilder, rootProjection
 		);
+	}
+
+	ElasticsearchBackend toAPI() {
+		return backendAPI;
 	}
 
 	EventContext getEventContext() {

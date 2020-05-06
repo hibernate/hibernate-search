@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.index;
 
+import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 
 import org.apache.lucene.analysis.Analyzer;
 
 public interface LuceneIndexManager extends IndexManager {
+
+	@Override
+	LuceneBackend backend();
 
 	/**
 	 * @return The analyzer used when indexing.

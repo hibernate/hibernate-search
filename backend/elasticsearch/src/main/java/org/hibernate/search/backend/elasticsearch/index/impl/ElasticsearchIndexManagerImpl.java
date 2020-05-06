@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -234,6 +235,11 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	@Override
 	public IndexManager toAPI() {
 		return this;
+	}
+
+	@Override
+	public ElasticsearchBackend backend() {
+		return backendContext.toAPI();
 	}
 
 	@Override
