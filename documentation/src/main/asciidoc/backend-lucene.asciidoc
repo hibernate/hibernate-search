@@ -964,3 +964,49 @@ hibernate.search.backends.<backend name>.index_defaults.io.merge.max_size = 7
 hibernate.search.backends.<backend name>.index_defaults.io.merge.max_forced_size = 7
 ----
 ========
+
+[[backend-lucene-access-analyzers]]
+== Retrieving analyzers and normalizers
+
+Lucene analyzers and normalizers <<backend-lucene-analysis,defined in Hibernate Search>>
+can be retrieved from the Lucene backend.
+
+.Retrieving the Lucene analyzers by name from the backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromBackend]
+----
+<1> Retrieve the `SearchMapping`.
+<2> Retrieve the `Backend`.
+<3> Narrow down the backend to the `LuceneBackend` type.
+<4> Get an analyzer by name.
+The method returns an `Optional`, which is empty if the analyzer does not exist.
+The analyzer must have been <<backend-lucene-analysis,defined in Hibernate Search>>,
+otherwise it won't exist.
+<5> Get a normalizer by name.
+The method returns an `Optional`, which is empty if the normalizer does not exist.
+The normalizer must have been <<backend-lucene-analysis,defined in Hibernate Search>>,
+otherwise it won't exist.
+====
+
+Alternatively, you can also retrieve the (composite) analyzers for a whole index.
+These analyzers behaves differently for each field,
+delegating to the analyzer configured in the mapping for each field.
+
+.Retrieving the Lucene analyzers for a whole index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/analyzer/LuceneGetAnalyzerIT.java[tags=fromIndexManager]
+----
+<1> Retrieve the `SearchMapping`.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `LuceneIndexManager` type.
+<4> Get the indexing analyzer.
+This is the analyzer used when indexing documents.
+It ignores the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>> in particular.
+<5> Get the search analyzer.
+This is the analyzer used when building search queries through the <<search-dsl,Search DSL>>.
+On contrary to the indexing analyzer, it takes into account the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>.
+====
