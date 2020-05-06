@@ -168,7 +168,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 						codec,
 						analyzer != null
 				),
-				analyzerOrNormalizer, analyzerName, searchAnalyzerName != null ? searchAnalyzerName : analyzerName,
+				analyzerOrNormalizer, searchAnalyzer != null ? searchAnalyzer : analyzerOrNormalizer,
+				analyzerName, searchAnalyzerName != null ? searchAnalyzerName : analyzerName,
 				normalizerName
 		);
 	}

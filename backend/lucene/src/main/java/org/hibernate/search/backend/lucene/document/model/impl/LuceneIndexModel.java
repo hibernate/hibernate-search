@@ -45,7 +45,8 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	private final ConcurrentMap<String, LuceneIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, LuceneIndexSchemaFieldNode<?>> dynamicFieldNodesCache = new ConcurrentHashMap<>();
 
-	private final ModelBasedScopedAnalyzer indexingAnalyzer;
+	private final IndexingScopedAnalyzer indexingAnalyzer;
+	private final SearchScopedAnalyzer searchAnalyzer;
 
 	public LuceneIndexModel(String indexName,
 			String mappedTypeName,
@@ -69,7 +70,8 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
 				.forEach( theStaticFields::add );
 		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
-		this.indexingAnalyzer = new ModelBasedScopedAnalyzer();
+		this.indexingAnalyzer = new IndexingScopedAnalyzer();
+		this.searchAnalyzer = new SearchScopedAnalyzer();
 		this.objectFieldTemplates = objectFieldTemplates;
 		this.fieldTemplates = fieldTemplates;
 	}
@@ -131,6 +133,10 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return indexingAnalyzer;
 	}
 
+	public Analyzer getSearchAnalyzer() {
+		return searchAnalyzer;
+	}
+
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
@@ -169,11 +175,12 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	/**
 	 * An analyzer similar to {@link org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer},
-	 * except the field &rarr; analyzer map is implemented by querying the model.
+	 * except the field &rarr; analyzer map is implemented by querying the model
+	 * and retrieving the indexing analyzer.
 	 * This allows taking into account dynamic fields created through templates.
 	 */
-	private class ModelBasedScopedAnalyzer extends DelegatingAnalyzerWrapper {
-		protected ModelBasedScopedAnalyzer() {
+	private class IndexingScopedAnalyzer extends DelegatingAnalyzerWrapper {
+		protected IndexingScopedAnalyzer() {
 			super( PER_FIELD_REUSE_STRATEGY );
 		}
 
@@ -184,7 +191,33 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
 
-			Analyzer analyzer = field.type().getAnalyzerOrNormalizer();
+			Analyzer analyzer = field.type().getIndexingAnalyzerOrNormalizer();
+			if ( analyzer == null ) {
+				return AnalyzerConstants.KEYWORD_ANALYZER;
+			}
+
+			return analyzer;
+		}
+	}
+	/**
+	 * An analyzer similar to {@link org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer},
+	 * except the field &rarr; analyzer map is implemented by querying the model
+	 * and retrieving the search analyzer.
+	 * This allows taking into account dynamic fields created through templates.
+	 */
+	private class SearchScopedAnalyzer extends DelegatingAnalyzerWrapper {
+		protected SearchScopedAnalyzer() {
+			super( PER_FIELD_REUSE_STRATEGY );
+		}
+
+		@Override
+		protected Analyzer getWrappedAnalyzer(String fieldName) {
+			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
+			if ( field == null ) {
+				return AnalyzerConstants.KEYWORD_ANALYZER;
+			}
+
+			Analyzer analyzer = field.type().getSearchAnalyzerOrNormalizer();
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
