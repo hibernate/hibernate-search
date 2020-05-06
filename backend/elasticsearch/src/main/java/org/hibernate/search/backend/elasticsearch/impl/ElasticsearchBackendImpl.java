@@ -93,7 +93,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
-				eventContext, threads, link,
+				this, eventContext, threads, link,
 				userFacingGson,
 				multiTenancyStrategy,
 				indexLayoutStrategyHolder.get(),

@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.index;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 
 public interface ElasticsearchIndexManager extends IndexManager {
 
-	// No Elasticsearch-specific index manager APIs yet.
+	@Override
+	ElasticsearchBackend backend();
 
 }

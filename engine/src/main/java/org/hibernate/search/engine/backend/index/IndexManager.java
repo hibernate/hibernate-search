@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.index;
 
+import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.util.common.SearchException;
 
@@ -16,6 +17,11 @@ import org.hibernate.search.util.common.SearchException;
  * should be able to execute directly on the index manager, without having to go through mapper-specific APIs.
  */
 public interface IndexManager {
+
+	/**
+	 * @return The backend in which this index manager is defined.
+	 */
+	Backend backend();
 
 	/**
 	 * @return A descriptor of this index, exposing in particular a list of field and their characteristics.

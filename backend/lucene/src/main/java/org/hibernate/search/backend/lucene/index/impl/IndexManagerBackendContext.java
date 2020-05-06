@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
@@ -66,6 +67,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 					.withDefault( LuceneIndexSettings.Defaults.IO_STRATEGY )
 					.build();
 
+	private final LuceneBackend backendAPI;
 	private final EventContext eventContext;
 
 	private final BackendThreads threads;
@@ -78,7 +80,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	private final FailureHandler failureHandler;
 	private final LuceneSyncWorkOrchestrator readOrchestrator;
 
-	public IndexManagerBackendContext(EventContext eventContext,
+	public IndexManagerBackendContext(LuceneBackend backendAPI,
+			EventContext eventContext,
 			BackendThreads threads,
 			DirectoryProvider directoryProvider,
 			Similarity similarity,
@@ -88,6 +91,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			FailureHandler failureHandler,
 			LuceneSyncWorkOrchestrator readOrchestrator) {
+		this.backendAPI = backendAPI;
 		this.eventContext = eventContext;
 		this.threads = threads;
 		this.directoryProvider = directoryProvider;
@@ -173,6 +177,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				loadingContextBuilder,
 				rootProjection
 		);
+	}
+
+	LuceneBackend toAPI() {
+		return backendAPI;
 	}
 
 	EventContext getEventContext() {
