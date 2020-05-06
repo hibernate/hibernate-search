@@ -33,6 +33,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface LuceneFieldSortBuilderFactory {
 
+	boolean isSortable();
+
 	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath, LuceneCompatibilityChecker converterChecker);
 

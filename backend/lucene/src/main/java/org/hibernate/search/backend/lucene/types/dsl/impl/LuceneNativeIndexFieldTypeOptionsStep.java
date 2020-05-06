@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNativeFiel
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNativeFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 
@@ -33,12 +34,13 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 
 	@Override
 	public IndexFieldType<F> toIndexFieldType() {
+		DslConverter<?, ? extends F> dslConverter = createDslConverter();
 		ProjectionConverter<? super F, ?> projectionConverter = createProjectionConverter();
 		ProjectionConverter<? super F, F> rawProjectionConverter = createRawProjectionConverter();
 		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
 
 		return new LuceneIndexFieldType<>(
-				getFieldType(),
+				getFieldType(), dslConverter, projectionConverter,
 				codec,
 				LuceneNativeFieldPredicateBuilderFactory.INSTANCE,
 				LuceneNativeFieldSortBuilderFactory.INSTANCE,

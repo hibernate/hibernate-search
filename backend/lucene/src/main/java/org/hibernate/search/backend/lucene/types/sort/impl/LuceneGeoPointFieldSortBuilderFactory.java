@@ -23,6 +23,11 @@ public class LuceneGeoPointFieldSortBuilderFactory
 	}
 
 	@Override
+	public boolean isSortable() {
+		return sortable;
+	}
+
+	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath, LuceneCompatibilityChecker converterChecker) {
 		throw log.traditionalSortNotSupportedByGeoPoint(

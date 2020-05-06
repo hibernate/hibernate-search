@@ -36,6 +36,11 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 	}
 
 	@Override
+	public boolean isSearchable() {
+		return searchable;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;

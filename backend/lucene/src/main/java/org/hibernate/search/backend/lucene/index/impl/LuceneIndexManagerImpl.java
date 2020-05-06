@@ -157,7 +157,7 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public IndexDescriptor descriptor() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return model;
 	}
 
 	@Override

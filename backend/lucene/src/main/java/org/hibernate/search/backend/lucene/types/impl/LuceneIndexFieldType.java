@@ -6,46 +6,69 @@
  */
 package org.hibernate.search.backend.lucene.types.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
+public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, IndexFieldType<F> {
 	private final Class<F> valueType;
+	private final DslConverter<?, ? extends F> dslConverter;
+	private final ProjectionConverter<? super F, ?> projectionConverter;
 	private final LuceneFieldCodec<F> codec;
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
 	private final Analyzer analyzerOrNormalizer;
+	private final String analyzerName;
+	private final String searchAnalyzerName;
+	private final String normalizerName;
 
-	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
+	public LuceneIndexFieldType(Class<F> valueType,
+			DslConverter<?, ? extends F> dslConverter,
+			ProjectionConverter<? super F, ?> projectionConverter,
+			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
 			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory) {
-		this( valueType, codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
-				aggregationBuilderFactory, null );
+		this( valueType, dslConverter, projectionConverter,
+				codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
+				aggregationBuilderFactory,
+				null, null, null, null );
 	}
 
-	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
+	public LuceneIndexFieldType(Class<F> valueType,
+			DslConverter<?, ? extends F> dslConverter,
+			ProjectionConverter<? super F, ?> projectionConverter,
+			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
 			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
-			Analyzer analyzerOrNormalizer) {
+			Analyzer analyzerOrNormalizer, String analyzerName, String searchAnalyzerName, String normalizerName) {
 		this.valueType = valueType;
+		this.dslConverter = dslConverter;
+		this.projectionConverter = projectionConverter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
 		this.aggregationBuilderFactory = aggregationBuilderFactory;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
+		this.analyzerName = analyzerName;
+		this.searchAnalyzerName = searchAnalyzerName;
+		this.normalizerName = normalizerName;
 	}
 
 	@Override
@@ -54,6 +77,56 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 				+ "codec=" + codec
 				+ ", analyzerOrNormalizer=" + analyzerOrNormalizer
 				+ "]";
+	}
+
+	@Override
+	public boolean isSearchable() {
+		return predicateBuilderFactory.isSearchable();
+	}
+
+	@Override
+	public boolean isSortable() {
+		return sortBuilderFactory.isSortable();
+	}
+
+	@Override
+	public boolean isProjectable() {
+		return projectionBuilderFactory.isProjectable();
+	}
+
+	@Override
+	public boolean isAggregable() {
+		return aggregationBuilderFactory.isAggregable();
+	}
+
+	@Override
+	public Class<?> dslArgumentClass() {
+		return dslConverter.getValueType();
+	}
+
+	@Override
+	public Class<?> projectedValueClass() {
+		return projectionConverter.getValueType();
+	}
+
+	@Override
+	public Class<?> valueClass() {
+		return valueType;
+	}
+
+	@Override
+	public Optional<String> analyzerName() {
+		return Optional.ofNullable( analyzerName );
+	}
+
+	@Override
+	public Optional<String> normalizerName() {
+		return Optional.ofNullable( normalizerName );
+	}
+
+	@Override
+	public Optional<String> searchAnalyzerName() {
+		return Optional.ofNullable( searchAnalyzerName );
 	}
 
 	public Class<F> getValueType() {

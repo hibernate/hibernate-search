@@ -33,6 +33,11 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 	}
 
 	@Override
+	public boolean isSortable() {
+		return sortable;
+	}
+
+	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
 			String nestedDocumentPath, GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(

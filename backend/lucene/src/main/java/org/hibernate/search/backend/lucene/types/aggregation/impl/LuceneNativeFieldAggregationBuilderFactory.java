@@ -28,6 +28,11 @@ public class LuceneNativeFieldAggregationBuilderFactory implements LuceneFieldAg
 	}
 
 	@Override
+	public boolean isAggregable() {
+		return false;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other) {
 		return other == INSTANCE;
 	}

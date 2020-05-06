@@ -36,6 +36,11 @@ public class LuceneGeoPointFieldAggregationBuilderFactory
 	}
 
 	@Override
+	public boolean isAggregable() {
+		return aggregable;
+	}
+
+	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
 			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		throw log.directValueLookupNotSupportedByGeoPoint(

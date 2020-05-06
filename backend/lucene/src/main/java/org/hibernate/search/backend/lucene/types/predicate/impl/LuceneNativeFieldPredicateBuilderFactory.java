@@ -37,6 +37,11 @@ public class LuceneNativeFieldPredicateBuilderFactory implements LuceneFieldPred
 	}
 
 	@Override
+	public boolean isSearchable() {
+		return false;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
 		return other == INSTANCE;
 	}
