@@ -180,8 +180,11 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
 			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
-			Analyzer analyzer = field.type().getAnalyzerOrNormalizer();
+			if ( field == null ) {
+				return AnalyzerConstants.KEYWORD_ANALYZER;
+			}
 
+			Analyzer analyzer = field.type().getAnalyzerOrNormalizer();
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
