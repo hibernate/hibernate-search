@@ -14,4 +14,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
  * The context passed to {@link PropertyMappingAnnotationProcessor#process(PropertyMappingStep, Annotation, PropertyMappingAnnotationProcessorContext)}.
  */
 public interface PropertyMappingAnnotationProcessorContext extends MappingAnnotationProcessorContext {
+
+	@Override
+	MappingAnnotatedProperty annotatedElement();
+
 }

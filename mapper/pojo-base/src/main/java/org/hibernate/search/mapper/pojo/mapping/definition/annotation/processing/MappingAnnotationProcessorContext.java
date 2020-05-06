@@ -20,6 +20,11 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public interface MappingAnnotationProcessorContext {
 
 	/**
+	 * @return A representation of the annotated element.
+	 */
+	MappingAnnotatedElement annotatedElement();
+
+	/**
 	 * Convert an {@link ObjectPath} annotation to a {@link PojoModelPathValueNode}.
 	 * @param objectPath The annotation to convert.
 	 * @return The corresponding path, or an empty optional if the path was empty.
