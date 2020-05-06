@@ -14,4 +14,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
  * The context passed to {@link TypeMappingAnnotationProcessor#process(TypeMappingStep, Annotation, TypeMappingAnnotationProcessorContext)}.
  */
 public interface TypeMappingAnnotationProcessorContext extends MappingAnnotationProcessorContext {
+
+	@Override
+	MappingAnnotatedType annotatedElement();
+
 }

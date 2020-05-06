@@ -16,9 +16,12 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.MappingAnnotationProcessorContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyMappingAnnotationProcessorContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeMappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
@@ -33,23 +36,22 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private final FailureCollector rootFailureCollector;
 	private final AnnotationHelper annotationHelper;
 	private final AnnotationProcessorProvider annotationProcessorProvider;
-	private final MappingAnnotationProcessorContextImpl context = new MappingAnnotationProcessorContextImpl();
 
 	AnnotationPojoTypeMetadataContributorFactory(BeanResolver beanResolver, FailureCollector rootFailureCollector,
 			AnnotationHelper annotationHelper) {
 		this.rootFailureCollector = rootFailureCollector;
 		this.annotationHelper = annotationHelper;
-		this.annotationProcessorProvider = new AnnotationProcessorProvider( beanResolver, rootFailureCollector, context );
+		this.annotationProcessorProvider = new AnnotationProcessorProvider( beanResolver, rootFailureCollector );
 	}
 
 	public Optional<PojoTypeMetadataContributor> createIfAnnotated(PojoRawTypeModel<?> typeModel) {
 		// Create a programmatic type mapping object
-		TypeMappingStepImpl typeMappingContext = new TypeMappingStepImpl( typeModel );
+		TypeMappingStepImpl typeMappingStep = new TypeMappingStepImpl( typeModel );
 
 		// Process annotations and add metadata to the type mapping
-		boolean processedTypeLevelAnnotation = processTypeLevelAnnotations( typeMappingContext, typeModel );
+		boolean processedTypeLevelAnnotation = processTypeLevelAnnotations( typeMappingStep, typeModel );
 		boolean processedPropertyLevelAnnotation = typeModel.getDeclaredProperties()
-				.map( propertyModel -> processPropertyLevelAnnotations( typeMappingContext, typeModel, propertyModel ) )
+				.map( propertyModel -> processPropertyLevelAnnotations( typeMappingStep, typeModel, propertyModel ) )
 				.reduce( (processedAnnotationHere, processedAnnotationThere) -> processedAnnotationHere || processedAnnotationThere )
 				.orElse( false );
 
@@ -59,7 +61,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		}
 
 		// Return the resulting mapping, which includes all the metadata extracted from annotations
-		return Optional.of( typeMappingContext );
+		return Optional.of( typeMappingStep );
 	}
 
 	private boolean processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
@@ -99,6 +101,8 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			return false;
 		}
 
+		TypeMappingAnnotationProcessorContext context = new TypeMappingAnnotationProcessorContextImpl( typeModel );
+
 		try ( BeanHolder<? extends TypeMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {
 			processorHolder.get().process( mapping, annotation, context );
@@ -121,6 +125,9 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		if ( !processorOptional.isPresent() ) {
 			return false;
 		}
+
+		PropertyMappingAnnotationProcessorContext context =
+				new PropertyMappingAnnotationProcessorContextImpl( propertyModel );
 
 		try ( BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {

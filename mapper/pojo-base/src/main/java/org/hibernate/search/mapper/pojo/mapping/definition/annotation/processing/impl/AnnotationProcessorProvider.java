@@ -17,7 +17,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
@@ -37,18 +36,15 @@ public class AnnotationProcessorProvider {
 
 	private final BeanResolver beanResolver;
 	private final FailureCollector rootFailureCollector;
-	private final MappingAnnotationProcessorContext context;
 
 	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends TypeMappingAnnotationProcessor>>>
 			typeAnnotationProcessorReferenceCache = new HashMap<>();
 	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends PropertyMappingAnnotationProcessor>>>
 			propertyAnnotationProcessorReferenceCache = new HashMap<>();
 
-	public AnnotationProcessorProvider(BeanResolver beanResolver, FailureCollector rootFailureCollector,
-			MappingAnnotationProcessorContext context) {
+	public AnnotationProcessorProvider(BeanResolver beanResolver, FailureCollector rootFailureCollector) {
 		this.beanResolver = beanResolver;
 		this.rootFailureCollector = rootFailureCollector;
-		this.context = context;
 	}
 
 	@SuppressWarnings("unchecked") // Checked using reflection in createProcessorBean
@@ -133,7 +129,7 @@ public class AnnotationProcessorProvider {
 
 		TypeMappingAnnotationProcessorRef referenceAnnotation = mapping.processor();
 		Optional<BeanReference<? extends TypeMappingAnnotationProcessor>> processorReference =
-				context.toBeanReference(
+				MappingAnnotationProcessorUtils.toBeanReference(
 						TypeMappingAnnotationProcessor.class,
 						TypeMappingAnnotationProcessorRef.UndefinedProcessorImplementationType.class,
 						referenceAnnotation.type(), referenceAnnotation.name()
@@ -154,7 +150,7 @@ public class AnnotationProcessorProvider {
 
 		PropertyMappingAnnotationProcessorRef referenceAnnotation = mapping.processor();
 		Optional<BeanReference<? extends PropertyMappingAnnotationProcessor>> processorReference =
-				context.toBeanReference(
+				MappingAnnotationProcessorUtils.toBeanReference(
 						PropertyMappingAnnotationProcessor.class,
 						PropertyMappingAnnotationProcessorRef.UndefinedProcessorImplementationType.class,
 						referenceAnnotation.type(), referenceAnnotation.name()
