@@ -33,6 +33,11 @@ public abstract class AbstractLuceneFieldAggregationBuilderFactory<F>
 	}
 
 	@Override
+	public boolean isAggregable() {
+		return aggregable;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;

@@ -34,6 +34,10 @@ public final class ProjectionConverter<F, V> {
 		return getClass().getSimpleName() + "[valueType=" + valueType.getName() + ",delegate=" + delegate + "]";
 	}
 
+	public Class<V> getValueType() {
+		return valueType;
+	}
+
 	/**
 	 * Check whether converted values can be assigned to the given type.
 	 * @param superTypeCandidate A candidate type for assignment of converted values.

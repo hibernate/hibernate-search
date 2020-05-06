@@ -149,7 +149,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		);
 
 		return new LuceneIndexFieldType<>(
-				getFieldType(),
+				getFieldType(), dslConverter, projectionConverter,
 				codec,
 				new LuceneTextFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslConverter, rawDslConverter, codec,
@@ -168,7 +168,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 						codec,
 						analyzer != null
 				),
-				analyzerOrNormalizer
+				analyzerOrNormalizer, analyzerName, searchAnalyzerName != null ? searchAnalyzerName : analyzerName,
+				normalizerName
 		);
 	}
 

@@ -39,6 +39,8 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
  */
 public interface LuceneFieldPredicateBuilderFactory {
 
+	boolean isSearchable();
+
 	boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other);
 
 	boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other);

@@ -6,13 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -22,7 +29,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 
 
-public class LuceneIndexModel implements AutoCloseable {
+public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	private final String indexName;
 
@@ -33,6 +40,7 @@ public class LuceneIndexModel implements AutoCloseable {
 	private final LuceneIndexSchemaObjectNode rootNode;
 	private final Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes;
 	private final Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes;
+	private final List<IndexFieldDescriptor> staticFields;
 	private final List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates;
 	private final List<LuceneIndexSchemaFieldTemplate> fieldTemplates;
 	private final ConcurrentMap<String, LuceneIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
@@ -54,6 +62,14 @@ public class LuceneIndexModel implements AutoCloseable {
 		this.rootNode = rootNode;
 		this.objectFieldNodes = CollectionHelper.toImmutableMap( objectFieldNodes );
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodes );
+		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
+		objectFieldNodes.values().stream()
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.forEach( theStaticFields::add );
+		fieldNodes.values().stream()
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.forEach( theStaticFields::add );
+		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
 		this.indexingAnalyzer = new ModelBasedScopedAnalyzer();
 		this.objectFieldTemplates = objectFieldTemplates;
 		this.fieldTemplates = fieldTemplates;
@@ -62,6 +78,30 @@ public class LuceneIndexModel implements AutoCloseable {
 	@Override
 	public void close() {
 		indexingAnalyzer.close();
+	}
+
+	@Override
+	public String hibernateSearchName() {
+		return indexName;
+	}
+
+	@Override
+	public IndexCompositeElementDescriptor root() {
+		return rootNode;
+	}
+
+	@Override
+	public Optional<IndexFieldDescriptor> field(String absolutePath) {
+		IndexFieldDescriptor fieldDescriptor = getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+		if ( fieldDescriptor == null ) {
+			fieldDescriptor = getObjectFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+		}
+		return Optional.ofNullable( fieldDescriptor );
+	}
+
+	@Override
+	public Collection<IndexFieldDescriptor> staticFields() {
+		return staticFields;
 	}
 
 	public String getIndexName() {

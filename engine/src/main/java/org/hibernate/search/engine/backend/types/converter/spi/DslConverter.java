@@ -33,6 +33,10 @@ public final class DslConverter<V, F> {
 		return getClass().getSimpleName() + "[valueType=" + valueType.getName() + ",delegate=" + delegate + "]";
 	}
 
+	public Class<V> getValueType() {
+		return valueType;
+	}
+
 	/**
 	 * Check whether the given type is a valid type for values passed
 	 * to {@link #convert(Object, ToDocumentFieldValueConvertContext)},

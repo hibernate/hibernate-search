@@ -38,6 +38,11 @@ public abstract class AbstractLuceneFieldProjectionBuilderFactory<F> implements 
 	}
 
 	@Override
+	public boolean isProjectable() {
+		return projectable;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
 			Class<T> expectedType, ValueConvert convert) {

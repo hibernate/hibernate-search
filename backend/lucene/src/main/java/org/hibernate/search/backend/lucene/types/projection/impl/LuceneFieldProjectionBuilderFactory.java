@@ -25,6 +25,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface LuceneFieldProjectionBuilderFactory {
 
+	boolean isProjectable();
+
 	<U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
 			Class<U> expectedType, ValueConvert convert);
 

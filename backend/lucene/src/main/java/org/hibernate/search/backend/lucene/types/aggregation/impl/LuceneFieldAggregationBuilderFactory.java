@@ -23,6 +23,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  */
 public interface LuceneFieldAggregationBuilderFactory {
 
+	boolean isAggregable();
+
 	<K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
 			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
 

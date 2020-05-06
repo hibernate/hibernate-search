@@ -12,17 +12,22 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
+import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class LuceneIndexSchemaFieldNode<F> {
+public class LuceneIndexSchemaFieldNode<F> implements IndexValueFieldDescriptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneIndexSchemaObjectNode parent;
 	private final String absolutePath;
+	private final String relativeName;
 	private final IndexFieldInclusion inclusion;
 
 	private final List<String> nestedPathHierarchy;
@@ -35,18 +40,54 @@ public class LuceneIndexSchemaFieldNode<F> {
 			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexFieldType<F> type) {
 		this.parent = parent;
 		this.absolutePath = parent.getAbsolutePath( relativeName );
+		this.relativeName = relativeName;
 		this.inclusion = parent.getInclusion().compose( inclusion );
 		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.multiValued = multiValued;
 		this.type = type;
 	}
 
+	@Override
+	public boolean isObjectField() {
+		return false;
+	}
+
+	@Override
+	public boolean isValueField() {
+		return true;
+	}
+
+	@Override
+	public IndexObjectFieldDescriptor toObjectField() {
+		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
+	}
+
+	@Override
+	public IndexValueFieldDescriptor toValueField() {
+		return this;
+	}
+
+	@Override
+	public IndexCompositeElementDescriptor parent() {
+		return parent;
+	}
+
 	public LuceneIndexSchemaObjectNode getParent() {
 		return parent;
 	}
 
+	@Override
+	public String absolutePath() {
+		return absolutePath;
+	}
+
 	public String getAbsolutePath() {
 		return absolutePath;
+	}
+
+	@Override
+	public String relativeName() {
+		return relativeName;
 	}
 
 	public IndexFieldInclusion getInclusion() {
@@ -63,11 +104,14 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return nestedPathHierarchy;
 	}
 
-	/**
-	 * @return {@code true} if this node is multi-valued in its parent object.
-	 */
+	@Override
 	public boolean isMultiValued() {
 		return multiValued;
+	}
+
+	@Override
+	public IndexValueFieldTypeDescriptor type() {
+		return type;
 	}
 
 	public LuceneIndexFieldType<F> getType() {

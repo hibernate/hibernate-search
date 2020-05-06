@@ -30,6 +30,11 @@ public class LuceneNativeFieldSortBuilderFactory implements LuceneFieldSortBuild
 	}
 
 	@Override
+	public boolean isSortable() {
+		return false;
+	}
+
+	@Override
 	public boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other) {
 		return other == INSTANCE;
 	}
