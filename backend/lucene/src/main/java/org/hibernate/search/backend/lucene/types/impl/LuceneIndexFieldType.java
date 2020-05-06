@@ -29,7 +29,8 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
-	private final Analyzer analyzerOrNormalizer;
+	private final Analyzer indexingAnalyzerOrNormalizer;
+	private final Analyzer searchAnalyzerOrNormalizer;
 	private final String analyzerName;
 	private final String searchAnalyzerName;
 	private final String normalizerName;
@@ -45,7 +46,7 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 		this( valueType, dslConverter, projectionConverter,
 				codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
 				aggregationBuilderFactory,
-				null, null, null, null );
+				null, null, null, null, null );
 	}
 
 	public LuceneIndexFieldType(Class<F> valueType,
@@ -56,7 +57,8 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
 			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
-			Analyzer analyzerOrNormalizer, String analyzerName, String searchAnalyzerName, String normalizerName) {
+			Analyzer indexingAnalyzerOrNormalizer, Analyzer searchAnalyzerOrNormalizer,
+			String analyzerName, String searchAnalyzerName, String normalizerName) {
 		this.valueType = valueType;
 		this.dslConverter = dslConverter;
 		this.projectionConverter = projectionConverter;
@@ -65,7 +67,8 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
 		this.aggregationBuilderFactory = aggregationBuilderFactory;
-		this.analyzerOrNormalizer = analyzerOrNormalizer;
+		this.indexingAnalyzerOrNormalizer = indexingAnalyzerOrNormalizer;
+		this.searchAnalyzerOrNormalizer = searchAnalyzerOrNormalizer;
 		this.analyzerName = analyzerName;
 		this.searchAnalyzerName = searchAnalyzerName;
 		this.normalizerName = normalizerName;
@@ -75,7 +78,9 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 	public String toString() {
 		return "LuceneIndexFieldType["
 				+ "codec=" + codec
-				+ ", analyzerOrNormalizer=" + analyzerOrNormalizer
+				+ ", analyzerName=" + analyzerName
+				+ ", searchAnalyzerName=" + searchAnalyzerName
+				+ ", normalizerName=" + normalizerName
 				+ "]";
 	}
 
@@ -153,7 +158,11 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 		return aggregationBuilderFactory;
 	}
 
-	public Analyzer getAnalyzerOrNormalizer() {
-		return analyzerOrNormalizer;
+	public Analyzer getIndexingAnalyzerOrNormalizer() {
+		return indexingAnalyzerOrNormalizer;
+	}
+
+	public Analyzer getSearchAnalyzerOrNormalizer() {
+		return searchAnalyzerOrNormalizer;
 	}
 }

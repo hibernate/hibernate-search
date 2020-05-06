@@ -39,6 +39,8 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.analysis.Analyzer;
+
 public class LuceneIndexManagerImpl
 		implements IndexManagerImplementor, LuceneIndexManager,
 		LuceneScopeIndexManagerContext {
@@ -158,6 +160,16 @@ public class LuceneIndexManagerImpl
 	@Override
 	public IndexDescriptor descriptor() {
 		return model;
+	}
+
+	@Override
+	public Analyzer indexingAnalyzer() {
+		return model.getIndexingAnalyzer();
+	}
+
+	@Override
+	public Analyzer searchAnalyzer() {
+		return model.getSearchAnalyzer();
 	}
 
 	@Override

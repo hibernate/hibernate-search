@@ -8,8 +8,22 @@ package org.hibernate.search.backend.lucene.index;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 
+import org.apache.lucene.analysis.Analyzer;
+
 public interface LuceneIndexManager extends IndexManager {
 
-	// No Lucene-specific backend APIs yet
+	/**
+	 * @return The analyzer used when indexing.
+	 * This analyzer behaves differently for each field,
+	 * delegating to the analyzer configured in the mapping.
+	 */
+	Analyzer indexingAnalyzer();
+
+	/**
+	 * @return The analyzer used in search queries.
+	 * This analyzer behaves differently for each field,
+	 * delegating to the analyzer configured in the mapping.
+	 */
+	Analyzer searchAnalyzer();
 
 }
