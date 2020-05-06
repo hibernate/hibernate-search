@@ -11,11 +11,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedType;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
@@ -169,4 +171,108 @@ public class CustomTypeMappingAnnotationBaseIT {
 			}
 		}
 	}
+
+	@Test
+	public void annotatedElement() {
+		final String index1Name = "index1";
+		final String index2Name = "index2";
+		final String index3Name = "index3";
+		@Indexed(index = index1Name)
+		@AnnotatedElementAwareAnnotation
+		@AnalyzerAnnotation(name = "foo")
+		class IndexedEntityType1 {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getText() {
+				return text;
+			}
+		}
+		@Indexed(index = index2Name)
+		@AnnotatedElementAwareAnnotation
+		class IndexedEntityType2 {
+			Integer id;
+			String keyword;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getKeyword() {
+				return keyword;
+			}
+		}
+		@Indexed(index = index3Name)
+		@AnnotatedElementAwareAnnotation
+		class IndexedEntityType3 {
+			Integer id;
+			Integer integer;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public Integer getInteger() {
+				return integer;
+			}
+		}
+
+		backendMock.expectSchema( index1Name, b -> b
+				.field( "myText", String.class, b2 -> b2.analyzerName( "foo" ) )
+		);
+		backendMock.expectSchema( index2Name, b -> b
+				.field( "myKeyword", String.class )
+		);
+		backendMock.expectSchema( index3Name, b -> b
+				.field( "myInteger", Integer.class )
+		);
+
+		SearchMapping mapping = setupHelper.start()
+				.setup( IndexedEntityType1.class, IndexedEntityType2.class, IndexedEntityType3.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.TYPE})
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = AnnotatedElementAwareAnnotation.Processor.class))
+	private @interface AnnotatedElementAwareAnnotation {
+		class Processor implements TypeMappingAnnotationProcessor<AnnotatedElementAwareAnnotation> {
+			@Override
+			public void process(TypeMappingStep mapping, AnnotatedElementAwareAnnotation annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				MappingAnnotatedType annotatedElement = context.annotatedElement();
+				if ( annotatedElement.javaClass().getName().endsWith( "IndexedEntityType1" )
+						|| annotatedElement.javaClass().getName().endsWith( "IndexedEntityType2" ) ) {
+					Optional<String> analyzer = annotatedElement.allAnnotations()
+							.filter( a -> AnalyzerAnnotation.class.equals( a.annotationType() ) )
+							.map( a -> ( (AnalyzerAnnotation) a ).name() )
+							.reduce( (a, b) -> {
+								throw new IllegalStateException( "should not happen" );
+							} );
+					if ( analyzer.isPresent() ) {
+						mapping.property( "text" )
+								.fullTextField( "myText" ).analyzer( analyzer.get() );
+					}
+					else {
+						mapping.property( "keyword" )
+								.keywordField( "myKeyword" );
+					}
+				}
+				else if ( annotatedElement.javaClass().getName().endsWith( "IndexedEntityType3" ) ) {
+					mapping.property( "integer" ).genericField( "myInteger" );
+				}
+			}
+		}
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.TYPE})
+	private @interface AnalyzerAnnotation {
+
+		String name();
+
+	}
+
+
 }

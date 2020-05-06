@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedProperty;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
@@ -24,11 +28,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Test common use cases of (custom) property mapping annotations.
@@ -167,6 +172,84 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				return TO_STRING;
 			}
 		}
+	}
+
+	@Test
+	public void annotatedElement() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String text;
+			String keyword;
+			Integer integer;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@AnnotatedElementAwareAnnotation
+			@AnalyzerAnnotation(name = "foo")
+			public String getText() {
+				return text;
+			}
+			@AnnotatedElementAwareAnnotation
+			public String getKeyword() {
+				return keyword;
+			}
+			@AnnotatedElementAwareAnnotation
+			public Integer getInteger() {
+				return integer;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "myText", String.class, b2 -> b2.analyzerName( "foo" ) )
+				.field( "myKeyword", String.class )
+				.field( "myInteger", Integer.class )
+		);
+
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AnnotatedElementAwareAnnotation.Processor.class))
+	private @interface AnnotatedElementAwareAnnotation {
+		class Processor implements PropertyMappingAnnotationProcessor<AnnotatedElementAwareAnnotation> {
+			@Override
+			public void process(PropertyMappingStep mapping, AnnotatedElementAwareAnnotation annotation,
+					PropertyMappingAnnotationProcessorContext context) {
+				MappingAnnotatedProperty annotatedElement = context.annotatedElement();
+				if ( String.class.equals( annotatedElement.javaClass() ) ) {
+					Optional<String> analyzer = annotatedElement.allAnnotations()
+							.filter( a -> AnalyzerAnnotation.class.equals( a.annotationType() ) )
+							.map( a -> ( (AnalyzerAnnotation) a ).name() )
+							.reduce( (a, b) -> {
+								throw new IllegalStateException( "should not happen" );
+							} );
+					if ( analyzer.isPresent() ) {
+						assertThat( annotatedElement.name() ).isEqualTo( "text" );
+						mapping.fullTextField( "myText" ).analyzer( analyzer.get() );
+					}
+					else {
+						assertThat( annotatedElement.name() ).isEqualTo( "keyword" );
+						mapping.keywordField( "myKeyword" );
+					}
+				}
+				else if ( Integer.class.equals( annotatedElement.javaClass() ) ) {
+					assertThat( annotatedElement.name() ).isEqualTo( "integer" );
+					mapping.genericField( "myInteger" );
+				}
+			}
+		}
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	private @interface AnalyzerAnnotation {
+
+		String name();
+
 	}
 
 }
