@@ -21,23 +21,17 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneGeoPointFieldAggregationBuilderFactory
-		implements LuceneFieldAggregationBuilderFactory {
+		extends AbstractLuceneFieldAggregationBuilderFactory<GeoPoint> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final boolean aggregable;
-
-	private final DslConverter<?, ? extends GeoPoint> toFieldValueConverter;
-	private final ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter;
 	private final LuceneFieldCodec<GeoPoint> codec;
 
 	public LuceneGeoPointFieldAggregationBuilderFactory(boolean aggregable,
 			DslConverter<?, ? extends GeoPoint> toFieldValueConverter,
 			ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter,
 			LuceneFieldCodec<GeoPoint> codec) {
-		this.aggregable = aggregable;
-		this.toFieldValueConverter = toFieldValueConverter;
-		this.fromFieldValueConverter = fromFieldValueConverter;
+		super( aggregable, toFieldValueConverter, fromFieldValueConverter );
 		this.codec = codec;
 	}
 
@@ -58,23 +52,7 @@ public class LuceneGeoPointFieldAggregationBuilderFactory
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		LuceneGeoPointFieldAggregationBuilderFactory castedOther =
-				(LuceneGeoPointFieldAggregationBuilderFactory) other;
-		return aggregable == castedOther.aggregable && codec.isCompatibleWith( castedOther.codec );
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		LuceneGeoPointFieldAggregationBuilderFactory castedOther =
-				(LuceneGeoPointFieldAggregationBuilderFactory) other;
-		return toFieldValueConverter.isCompatibleWith( castedOther.toFieldValueConverter )
-				&& fromFieldValueConverter.isCompatibleWith( castedOther.fromFieldValueConverter );
+	protected LuceneFieldCodec<GeoPoint> getCodec() {
+		return codec;
 	}
 }

@@ -53,7 +53,7 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 				new LuceneGeoPointFieldPredicateBuilderFactory(
 						resolvedSearchable, dslConverter, codec
 				),
-				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
+				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable, codec ),
 				new LuceneGeoPointFieldProjectionBuilderFactory(
 						resolvedProjectable, codec, projectionConverter, rawProjectionConverter
 				),
