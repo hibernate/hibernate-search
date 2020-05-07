@@ -101,7 +101,7 @@ public class BytecodeEnhancementIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3584")
+	@TestForIssue(jiraKey = "HSEARCH-3581")
 	public void test() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
