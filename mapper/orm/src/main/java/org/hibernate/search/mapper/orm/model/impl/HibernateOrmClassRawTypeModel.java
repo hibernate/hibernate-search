@@ -129,14 +129,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 			declaredXProperties.add( fieldAccessXProperty );
 		}
 
-		HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata;
-		if ( ormTypeMetadata == null ) {
-			// There isn't any Hibernate ORM metadata for this type
-			ormPropertyMetadata = null;
-		}
-		else {
-			ormPropertyMetadata = ormTypeMetadata.getClassPropertyMetadataOrNull( propertyName );
-		}
+		HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata = findOrmPropertyMetadata( propertyName );
 
 		Member member = findPropertyMember(
 				propertyName, methodAccessXProperty, fieldAccessXProperty, ormPropertyMetadata
@@ -150,6 +143,17 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 				introspector, this, propertyName,
 				declaredXProperties, ormPropertyMetadata, member
 		);
+	}
+
+	private HibernateOrmBasicClassPropertyMetadata findOrmPropertyMetadata(String propertyName) {
+		HibernateOrmBasicClassPropertyMetadata propertyMetadata = null;
+		if ( ormTypeMetadata != null ) {
+			propertyMetadata = ormTypeMetadata.getClassPropertyMetadataOrNull( propertyName );
+		}
+		if ( propertyMetadata == null ) {
+			propertyMetadata = getOrmPropertyMetadataFromParentTypes( propertyName );
+		}
+		return propertyMetadata;
 	}
 
 	private Member findPropertyMember(String propertyName,
@@ -231,6 +235,17 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 			// The property is not declared in this type.
 			return null;
 		}
+	}
+
+	private HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadataFromParentTypes(String propertyName) {
+		// TODO HSEARCH-3056 remove lambdas if possible
+		return getAscendingSuperTypes()
+				.skip( 1 ) // Ignore self
+				.map( type -> type.getPropertyOrNull( propertyName ) )
+				.filter( Objects::nonNull )
+				.findFirst()
+				.map( HibernateOrmClassPropertyModel::getOrmPropertyMetadata )
+				.orElse( null );
 	}
 
 	private Member getPropertyMemberFromParentTypes(String propertyName) {

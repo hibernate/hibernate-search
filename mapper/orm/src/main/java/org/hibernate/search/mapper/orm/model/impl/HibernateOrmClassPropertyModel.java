@@ -119,4 +119,8 @@ class HibernateOrmClassPropertyModel<T> implements PojoPropertyModel<T> {
 	Member getMember() {
 		return member;
 	}
+
+	HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadata() {
+		return ormPropertyMetadata;
+	}
 }
