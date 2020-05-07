@@ -7,7 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,12 +22,16 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyGroup;
+import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -38,7 +44,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.hibernate.testing.bytecode.enhancement.BytecodeEnhancerRunner;
-import org.hibernate.testing.bytecode.enhancement.EnhancerTestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,10 +63,8 @@ public class BytecodeEnhancementIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 				.field( "mappedSuperClassText", String.class )
 				.field( "entitySuperClassText", String.class )
-				 */
 				.field( "id", Integer.class )
 				.objectField( "containedEntityList", b2 -> b2
 						.multiValued( true )
@@ -88,10 +91,8 @@ public class BytecodeEnhancementIT {
 				 */
 				.withTcclLookupPrecedenceBefore()
 				.setup(
-						/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 						IndexedMappedSuperClass.class,
 						IndexedEntitySuperClass.class,
-						 */
 						IndexedEntity.class,
 						ContainedEntity.class,
 						ContainedEmbeddable.class
@@ -104,11 +105,12 @@ public class BytecodeEnhancementIT {
 	public void test() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
-			entity1.id = 1;
-			/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
-			entity1.mappedSuperClassText = "initialValue";
-			entity1.entitySuperClassText = "initialValue";
-			 */
+			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006
+			( (IndexedEntitySuperClass) entity1 ).id = 1;
+			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006
+			( (IndexedMappedSuperClass) entity1 ).mappedSuperClassText = "initialValue";
+			// This cast is necessary to work around https://hibernate.atlassian.net/browse/HHH-14006
+			( (IndexedEntitySuperClass) entity1 ).entitySuperClassText = "initialValue";
 			entity1.containedEntityList = new ArrayList<>();
 			entity1.text1 = "initialValue";
 			entity1.text2 = "initialValue";
@@ -141,10 +143,8 @@ public class BytecodeEnhancementIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 							.field( "mappedSuperClassText", "initialValue" )
 							.field( "entitySuperClassText", "initialValue" )
-							 */
 							.field( "id", 1 )
 							.objectField( "containedEntityList", b2 -> b2
 									.field( "text", "initialValue1" )
@@ -189,10 +189,8 @@ public class BytecodeEnhancementIT {
 				// Expect all properties to be correctly loaded, even though we're using bytecode enhancement
 				backendMock.expectWorks( IndexedEntity.INDEX )
 						.update( "1", b -> b
-								/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 								.field( "mappedSuperClassText", "initialValue" )
 								.field( "entitySuperClassText", "initialValue" )
-								 */
 								.field( "id", 1 )
 								.objectField( "containedEntityList", b2 -> b2
 										.field( "text", "initialValue1" )
@@ -240,7 +238,7 @@ public class BytecodeEnhancementIT {
 
 	private static void assertPropertiesAreNotLoaded(Object object, Set<String> expectedNotLoadedProperties) {
 		for ( String propertyName : expectedNotLoadedProperties ) {
-			Object loadedValue = EnhancerTestUtils.getFieldByReflection( object, propertyName );
+			Object loadedValue = getFieldByReflection( object, propertyName );
 			assertThat( loadedValue )
 					.as(
 							"Loaded value of '" + propertyName + "' in object of type '"
@@ -254,7 +252,20 @@ public class BytecodeEnhancementIT {
 		}
 	}
 
-	/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
+	// EnhancerTestUtils.getFieldByReflection uses getDeclaredField and thus doesn't work in our case.
+	// Maybe this will be fixed as part of https://hibernate.atlassian.net/browse/HHH-14006 ?
+	private static Object getFieldByReflection(Object entity, String fieldName) {
+		try {
+			Field field = entity.getClass().getField( fieldName );
+			ReflectHelper.ensureAccessibility( field );
+			return field.get( entity );
+		}
+		catch (NoSuchFieldException | IllegalAccessException e) {
+			fail( "Fail to get field '" + fieldName + "' in entity " + entity + ": " + e.getMessage() );
+		}
+		return null;
+	}
+
 	@MappedSuperclass
 	public static class IndexedMappedSuperClass {
 
@@ -279,21 +290,16 @@ public class BytecodeEnhancementIT {
 		public String entitySuperClassText;
 
 	}
-	 */
 
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity
-	/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
-			extends IndexedEntitySuperClass
-	 */ {
+			extends IndexedEntitySuperClass {
 		public static final String INDEX = "IndexedEntity";
 
 		private static final String[] LAZY_PROPERTY_NAMES = new String[] {
-				/* TODO HSEARCH-3584 For some reason, it seems fields in superclasses trigger errors during bytecode enhancement.
 				"mappedSuperClassText",
 				"entitySuperClassText",
-				 */
 				"notIndexedText",
 				"containedEntityList",
 				"text1",
@@ -304,10 +310,6 @@ public class BytecodeEnhancementIT {
 				"primitiveDouble",
 				"primitiveBoolean"
 		};
-
-		@Id
-		@GenericField
-		public Integer id;
 
 		@Basic(fetch = FetchType.LAZY)
 		@LazyGroup("group1")
