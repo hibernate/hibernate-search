@@ -174,17 +174,15 @@ public class BytecodeEnhancementIT {
 				entityFromTransaction.set( entity );
 
 				assertOnlyLoadedPropertiesAre( entity, "id" );
-				/* TODO HSEARCH-3584 For some reason, lazy loading doesn't work in the embeddable
-				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable );
-				 */
+				// Because of HHH-10480, lazy loading through bytecode enhancement doesn't work on embeddables
+				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable, "text" );
 
 				// Trigger reindexing
 				entity.text1 = "updatedValue";
 
 				assertOnlyLoadedPropertiesAre( entity, "id", "text1" );
-				/* TODO HSEARCH-3584 For some reason, lazy loading doesn't work in the embeddable
-				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable );
-				 */
+				// Because of HHH-10480, lazy loading through bytecode enhancement doesn't work on embeddables
+				assertOnlyLoadedPropertiesAre( entity.containedEmbeddable, "text" );
 
 				// Expect all properties to be correctly loaded, even though we're using bytecode enhancement
 				backendMock.expectWorks( IndexedEntity.INDEX )
