@@ -1537,7 +1537,7 @@ using the <<mapper-orm-programmatic-mapping,programmatic mapping API>>.
 * An `annotation` parameter representing the annotation instance.
 * A `context` object with various helpers.
 
-Custom annotations are most frequently used to apply to apply custom, parameterized bridges.
+Custom annotations are most frequently used to apply custom, parameterized bridges.
 You can find examples in these sections in particular:
 
 * <<mapper-orm-bridge-valuebridge-parameters,Passing parameters to a value bridge>>
