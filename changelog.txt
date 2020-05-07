@@ -1,6 +1,43 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta7 (07-05-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3897 explain() fails for indexes with a custom name
+    * HSEARCH-3894 Lucene text aggregations count nested documents twice when they include the same term multiple times
+    * HSEARCH-3893 Elasticsearch aggregations return the count of nested (leaf) documents
+    * HSEARCH-3883 NullPointerException when building a SimpleQueryString predicate
+    * HSEARCH-1929 @Facet on multi value field breaks indexing (be it for discrete or range faceting)
+    * HSEARCH-1927 Range faceting on multiple numeric values does not work
+
+** Improvement
+    * HSEARCH-3911 Allow to extract native Lucene ScoreDoc data
+    * HSEARCH-3901 Expose metadata about the annotated type in the context passed to PropertyMappingAnnotationProcessor/TypeMappingAnnotationProcessor
+    * HSEARCH-3886 Missing values should be last by default in field sorts
+    * HSEARCH-3885 Throw exceptions when attempting to use predicate with incompatible nested path hierarchy in a nested predicate
+    * HSEARCH-3879 Clarify documentation of thread pool and indexing settings
+    * HSEARCH-2461 API/SPI overhaul in HS 6.0
+
+** New Feature
+    * HSEARCH-3914 Expose the Lucene Sort in LuceneSearchQuery
+    * HSEARCH-3892 Aggregations on fields in nested documents
+    * HSEARCH-3881 Filtering for aggregations on multi-valued fields in nested documents
+    * HSEARCH-3846 Filtering for sorts on multi-valued fields in nested documents
+    * HSEARCH-3273 Dynamic fields
+
+** Task
+    * HSEARCH-3907 Upgrade to Hibernate ORM 5.4.15.Final
+    * HSEARCH-3898 Change the explain API so that the type name is used, instead of index name
+    * HSEARCH-3896 Verify multiple loading with the DefaultProjectionHitMapper on the same query instance
+    * HSEARCH-3890 Upgrade to Hibernate ORM 5.4.14.Final
+    * HSEARCH-3887 Update documentation about routing in the Search DSL
+    * HSEARCH-3877 Upgrade test dependencies to the latest available version
+    * HSEARCH-3777 Restore configuration of the Similarity in the Lucene backend
+    * HSEARCH-3776 Restore advanced configuration options of the Lucene Writer
+    * HSEARCH-3589 Search 6 groundwork - Restore support for index metadata lookup
+
 6.0.0.Beta6 (31-03-2020)
 -------------------------
 
