@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query;
 import org.hibernate.search.engine.search.query.ExtendedSearchQuery;
 
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Sort;
 
 public interface LuceneSearchQuery<H>
 		extends ExtendedSearchQuery<H, LuceneSearchResult<H>>, LuceneSearchFetchable<H> {
@@ -38,4 +39,10 @@ public interface LuceneSearchQuery<H>
 	 */
 	// TODO HSEARCH-3899 avoiding merging index concepts (e.g.: documentId) and entity concepts (e.g.: mapped type)
 	Explanation explain(String typeName, String id);
+
+	/**
+	 * @return The Lucene {@link org.apache.lucene.search.Sort} this query relies on.
+	 */
+	Sort getLuceneSort();
+
 }

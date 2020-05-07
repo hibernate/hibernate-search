@@ -137,6 +137,11 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return doExplain( typeName, id );
 	}
 
+	@Override
+	public Sort getLuceneSort() {
+		return luceneSort;
+	}
+
 	private <T> T doSubmit(ReadWork<T> work) {
 		return queryOrchestrator.submit(
 				searchContext.getIndexNames(),
