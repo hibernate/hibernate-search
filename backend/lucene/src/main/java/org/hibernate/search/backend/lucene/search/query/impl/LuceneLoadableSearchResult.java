@@ -88,6 +88,6 @@ public class LuceneLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;
 
-		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut );
+		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut, extractContext.getTopDocs() );
 	}
 }
