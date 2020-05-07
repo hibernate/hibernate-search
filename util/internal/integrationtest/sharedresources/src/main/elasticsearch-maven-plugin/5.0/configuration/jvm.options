@@ -22,8 +22,8 @@
 # For Hibernate Search, we don't need as much as the default 1g
 # Let's keep it low, so that we'll be able to run tests
 # on memory-constrained CI slaves
--Xms256m
--Xmx256m
+-Xms512m
+-Xmx512m
 
 ################################################################
 ## Expert settings
