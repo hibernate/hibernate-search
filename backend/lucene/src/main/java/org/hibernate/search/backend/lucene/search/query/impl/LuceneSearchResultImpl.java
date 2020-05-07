@@ -27,6 +27,7 @@ class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 		this.topDocs = topDocs;
 	}
 
+	@Override
 	public TopDocs getTopDocs() {
 		return topDocs;
 	}
