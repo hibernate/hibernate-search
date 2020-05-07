@@ -154,7 +154,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	ValueReadHandle<?> createValueReadHandle(Member member,
+	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
@@ -164,7 +164,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
 			if ( ormPropertyMetadata != null && !ormPropertyMetadata.isId() ) {
-				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( field );
+				Method bytecodeEnhancerReaderMethod = getBytecodeEnhancerReaderMethod( holderClass, field );
 				if ( bytecodeEnhancerReaderMethod != null ) {
 					setAccessible( bytecodeEnhancerReaderMethod );
 					return valueReadHandleFactory.createForMethod( bytecodeEnhancerReaderMethod );
@@ -213,24 +213,23 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	/**
+	 * @param holderClass A class exposing the given field.
 	 * @param field A member field from the Hibernate metamodel or from a XProperty.
 	 * @return A method generated through bytecode enhancement that triggers lazy-loading before returning the member's value,
 	 * or {@code null} if there is no such method.
 	 */
-	private static Method getBytecodeEnhancerReaderMethod(Field field) {
-		Class<?> declaringClass = field.getDeclaringClass();
-
-		if ( !PersistentAttributeInterceptable.class.isAssignableFrom( declaringClass ) ) {
+	private static Method getBytecodeEnhancerReaderMethod(Class<?> holderClass, Field field) {
+		if ( !PersistentAttributeInterceptable.class.isAssignableFrom( holderClass ) ) {
 			// The declaring class is not enhanced, the only way to access the field is to read it directly.
 			return null;
 		}
 
 		/*
-		 * The declaring class is enhanced.
+		 * The class is enhanced.
 		 * Use the "magic" methods that trigger lazy loading instead of accessing the field directly.
 		 */
 		try {
-			return declaringClass.getDeclaredMethod( EnhancerConstants.PERSISTENT_FIELD_READER_PREFIX + field.getName() );
+			return holderClass.getMethod( EnhancerConstants.PERSISTENT_FIELD_READER_PREFIX + field.getName() );
 		}
 		catch (NoSuchMethodException e) {
 			throw new AssertionFailure( "Read method for enhanced field " + field + " is unexpectedly missing.", e );

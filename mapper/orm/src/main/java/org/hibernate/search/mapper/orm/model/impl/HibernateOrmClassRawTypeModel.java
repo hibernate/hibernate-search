@@ -119,7 +119,6 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	private HibernateOrmClassPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
-		// Add the method first on purpose: the first XProperty may be used as a default to create the value accessor handle
 		XProperty methodAccessXProperty = getDeclaredMethodAccessXPropertiesByName().get( propertyName );
 		if ( methodAccessXProperty != null ) {
 			declaredXProperties.add( methodAccessXProperty );
@@ -130,10 +129,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 		}
 
 		HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata = findOrmPropertyMetadata( propertyName );
-
-		Member member = findPropertyMember(
-				propertyName, methodAccessXProperty, fieldAccessXProperty, ormPropertyMetadata
-		);
+		Member member = findPropertyMember( propertyName, ormPropertyMetadata );
 
 		if ( member == null ) {
 			return null;
@@ -146,10 +142,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	}
 
 	private HibernateOrmBasicClassPropertyMetadata findOrmPropertyMetadata(String propertyName) {
-		HibernateOrmBasicClassPropertyMetadata propertyMetadata = null;
-		if ( ormTypeMetadata != null ) {
-			propertyMetadata = ormTypeMetadata.getClassPropertyMetadataOrNull( propertyName );
-		}
+		HibernateOrmBasicClassPropertyMetadata propertyMetadata = getOrmPropertyMetadataFromThisType( propertyName );
 		if ( propertyMetadata == null ) {
 			propertyMetadata = getOrmPropertyMetadataFromParentTypes( propertyName );
 		}
@@ -157,31 +150,66 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	}
 
 	private Member findPropertyMember(String propertyName,
-			XProperty methodAccessXProperty, XProperty fieldAccessXProperty,
+			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) {
+		Member result = getPropertyMemberFromThisType( propertyName, ormPropertyMetadata );
+
+		if ( result == null ) {
+			// There is no member for this property on the current type.
+			// Try to find one in the closest supertype.
+			result = getPropertyMemberFromParentTypes( propertyName, ormPropertyMetadata );
+		}
+
+		return result;
+	}
+
+	private HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadataFromParentTypes(String propertyName) {
+		// TODO HSEARCH-3056 remove lambdas if possible
+		return getAscendingSuperTypes()
+				.skip( 1 ) // Ignore self
+				.map( type -> type.getOrmPropertyMetadataFromThisType( propertyName ) )
+				.filter( Objects::nonNull )
+				.findFirst()
+				.orElse( null );
+	}
+
+	private HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadataFromThisType(String propertyName) {
+		if ( ormTypeMetadata != null ) {
+			return ormTypeMetadata.getClassPropertyMetadataOrNull( propertyName );
+		}
+		else {
+			return null;
+		}
+	}
+
+	private Member getPropertyMemberFromParentTypes(String propertyName,
+			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) {
+		// TODO HSEARCH-3056 remove lambdas if possible
+		return getAscendingSuperTypes()
+				.skip( 1 ) // Ignore self
+				.map( type -> type.getPropertyMemberFromThisType( propertyName, ormPropertyMetadata ) )
+				.filter( Objects::nonNull )
+				.findFirst()
+				.orElse( null );
+	}
+
+	private Member getPropertyMemberFromThisType(String propertyName,
 			HibernateOrmBasicClassPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
-		Member result;
+		XProperty methodAccessXProperty = getDeclaredMethodAccessXPropertiesByName().get( propertyName );
+		XProperty fieldAccessXProperty = getDeclaredFieldAccessXPropertiesByName().get( propertyName );
 		if ( propertyMetadataFromHibernateOrmMetamodel != null ) {
 			// Hibernate ORM has metadata for this property (the property is persisted).
 			// Use ORM metadata to find the corresponding member (field/method).
-			result = getPropertyMemberUsingHibernateOrmMetadataFromThisType(
+			return getPropertyMemberUsingHibernateOrmMetadataFromThisType(
 					methodAccessXProperty, fieldAccessXProperty, propertyMetadataFromHibernateOrmMetamodel
 			);
 		}
 		else {
 			// Hibernate ORM doesn't have any metadata for this property (the property is transient).
 			// Use reflection to find the corresponding member (field/method).
-			result = getPropertyMemberUsingReflectionFromThisType(
+			return getPropertyMemberUsingReflectionFromThisType(
 					methodAccessXProperty, fieldAccessXProperty
 			);
 		}
-
-		if ( result == null ) {
-			// There is no member for this property on the current type.
-			// Try to find one in the closest supertype.
-			result = getPropertyMemberFromParentTypes( propertyName );
-		}
-
-		return result;
 	}
 
 	private Member getPropertyMemberUsingHibernateOrmMetadataFromThisType(XProperty methodAccessXProperty,
@@ -235,27 +263,5 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 			// The property is not declared in this type.
 			return null;
 		}
-	}
-
-	private HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadataFromParentTypes(String propertyName) {
-		// TODO HSEARCH-3056 remove lambdas if possible
-		return getAscendingSuperTypes()
-				.skip( 1 ) // Ignore self
-				.map( type -> type.getPropertyOrNull( propertyName ) )
-				.filter( Objects::nonNull )
-				.findFirst()
-				.map( HibernateOrmClassPropertyModel::getOrmPropertyMetadata )
-				.orElse( null );
-	}
-
-	private Member getPropertyMemberFromParentTypes(String propertyName) {
-		// TODO HSEARCH-3056 remove lambdas if possible
-		return getAscendingSuperTypes()
-				.skip( 1 ) // Ignore self
-				.map( type -> type.getPropertyOrNull( propertyName ) )
-				.filter( Objects::nonNull )
-				.findFirst()
-				.map( HibernateOrmClassPropertyModel::getMember )
-				.orElse( null );
 	}
 }
