@@ -157,7 +157,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 			HibernateOrmBasicClassPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
 		Member result;
 		if ( propertyMetadataFromHibernateOrmMetamodel != null ) {
-			// Hibernate ORM doesn't have any metadata for this property (the property is persisted).
+			// Hibernate ORM has metadata for this property (the property is persisted).
 			// Use ORM metadata to find the corresponding member (field/method).
 			result = getPropertyMemberUsingHibernateOrmMetadataFromThisType(
 					methodAccessXProperty, fieldAccessXProperty, propertyMetadataFromHibernateOrmMetamodel
