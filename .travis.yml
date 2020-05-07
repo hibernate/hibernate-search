@@ -3,10 +3,10 @@
 # therefore deactivated. Activating Travis for your own fork is as easy as
 # activating it in the travis site of your fork.
 
-dist: trusty
+dist: bionic
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk8
 cache:
   directories:
     - $HOME/.m2
