@@ -194,6 +194,17 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	public void query_topDocs() {
+		StubMappingScope scope = indexManager.createScope();
+
+		LuceneSearchResult<DocumentReference> result = scope.query().extension( LuceneExtension.get() )
+				.where( f -> f.matchAll() )
+				.fetchAll();
+
+		Assertions.assertThat( result.getTopDocs() ).isNotNull();
+	}
+
+	@Test
 	public void query_explain_singleIndex() {
 		StubMappingScope scope = indexManager.createScope();
 
