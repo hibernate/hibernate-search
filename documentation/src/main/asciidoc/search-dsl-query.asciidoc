@@ -689,7 +689,7 @@ so that Elasticsearch will return more data in the response.
 Here we're asking Elasticsearch to apply a link:{elasticsearchDocUrl}/search-suggesters.html[suggester].
 <4> Retrieve the result as usual.
 Since we used the Elasticsearch extension when building the query,
-the result will have an Elasticsearch-specific type: `ElasticsearchSearchResult`.
+the result is an `ElasticsearchSearchResult` instead of the usual `SearchResult`.
 <5> Get the response body as a `JsonObject`.
 <6> Extract useful information from the response body.
 Here we're extracting the result of the suggester we configured above.
@@ -711,4 +711,27 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 When data needs to be extracted from each hit,
 it is often more convenient to use the <<search-dsl-projection-extensions-elasticsearch-jsonHit,`jsonHit` projection>>
 than parsing the whole response.
+====
+
+[[search-dsl-query-lucene-low-level]]
+== Lucene: retrieving low-level components
+
+Lucene queries allow to retrieve some low-level components.
+This should only be useful to integrators, but is documented here for the sake of completeness.
+
+.Accessing low-level components in a Lucene search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=lucene-lowLevel]
+----
+<1> Build the query as usual,
+but using the Lucene extension so that Lucene-specific options are available.
+<2> Since we used the Lucene extension when building the query,
+the query is a `LuceneSearchQuery` instead of the usual `SearchQuery`.
+<3> Retrieve the `org.apache.lucene.search.Sort` this query relies on.
+<4> Retrieve the result as usual.
+`LuceneSearchQuery` returns a `LuceneSearchResult` instead of the usual `SearchResult`.
+<5> Retrieve the `org.apache.lucene.search.TopDocs` for this result.
+Note that the `TopDocs` are offset according to the arguments to the `fetch` method, if any.
 ====

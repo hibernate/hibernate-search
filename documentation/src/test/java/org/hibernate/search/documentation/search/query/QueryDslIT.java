@@ -25,6 +25,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
@@ -51,6 +52,9 @@ import org.junit.runners.Parameterized;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopDocs;
 
 @RunWith(Parameterized.class)
 public class QueryDslIT {
@@ -535,6 +539,41 @@ public class QueryDslIT {
 			assertThat( mySuggestResult0Option0.get( "text" ).getAsString() )
 					.isEqualTo( "robot" );
 
+		} );
+	}
+
+	@Test
+	public void lucene_lowLevel() {
+		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::lucene-lowLevel[]
+			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
+					.extension( LuceneExtension.get() ) // <1>
+					.where( f -> f.match()
+							.field( "title" )
+							.matching( "robot" ) )
+					.sort( f -> f.field( "title_sort" ) )
+					.toQuery(); // <2>
+
+			Sort sort = query.getLuceneSort(); // <3>
+
+			LuceneSearchResult<Book> result = query.fetch( 20 ); // <4>
+
+			TopDocs topDocs = result.getTopDocs(); // <5>
+			// end::lucene-lowLevel[]
+
+			assertThat( result.getHits() ).extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK3_ID );
+
+			assertThat( sort ).isNotNull();
+			assertThat( sort.getSort() ).hasSize( 1 );
+			assertThat( sort.getSort()[0].getType() ).isEqualTo( SortField.Type.CUSTOM );
+
+			assertThat( topDocs ).isNotNull();
+			assertThat( topDocs.totalHits.value ).isEqualTo( 2L );
+			assertThat( topDocs.scoreDocs ).hasSize( 2 );
 		} );
 	}
 

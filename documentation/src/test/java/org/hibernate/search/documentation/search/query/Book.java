@@ -11,8 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
 @Indexed
@@ -23,6 +25,7 @@ public class Book {
 	private Integer id;
 
 	@FullTextField(analyzer = "english", projectable = Projectable.YES)
+	@KeywordField(name = "title_sort", normalizer = "english", sortable = Sortable.YES)
 	private String title;
 
 	public Book() {
