@@ -437,4 +437,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 69,
 			value = "Cannot set both the name and prefix in @IndexedEmbedded. Name was '%1$s', prefix was '%2$s'.")
 	SearchException cannotSetBothIndexedEmbeddedNameAndPrefix(String relativeFieldName, String prefix);
+
+	@Message(id = ID_OFFSET_2 + 70,
+			value = "Index field name '%1$s' is invalid: field names cannot contain a dot ('.').")
+	SearchException invalidFieldNameDotNotAllowed(String relativeFieldName);
 }

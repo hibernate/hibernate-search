@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
@@ -131,7 +132,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		if ( StringHelper.isEmpty( relativeFieldName ) ) {
 			throw log.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName, objectNodeBuilder.getEventContext() );
 		}
-		if ( relativeFieldName.contains( "." ) ) {
+		if ( relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
 			throw log.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.getEventContext() );
 		}
 	}
@@ -142,7 +143,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		}
 		// This is mostly to allow making template names absolute and unique by prepending them
 		// with the path of the schema elements they were declared on.
-		if ( templateName.contains( "." ) ) {
+		if ( templateName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
 			throw log.fieldTemplateNameCannotContainDot( templateName, objectNodeBuilder.getEventContext() );
 		}
 	}
