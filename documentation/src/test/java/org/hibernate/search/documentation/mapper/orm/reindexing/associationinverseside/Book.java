@@ -50,7 +50,7 @@ public class Book {
 	@Column(name = "price")
 	@OrderBy("edition_id asc")
 	@IndexedEmbedded( // <2>
-			prefix = "editionsForSale.",
+			name = "editionsForSale",
 			extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
 	)
 	@AssociationInverseSide( // <3>
