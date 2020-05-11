@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.AbstractConfiguredExtraPropertiesJsonAdapterFactory;
 
-class DynamicTemplateJsonAdapterFactory extends AbstractConfiguredExtraPropertiesJsonAdapterFactory {
+public class DynamicTemplateJsonAdapterFactory extends AbstractConfiguredExtraPropertiesJsonAdapterFactory {
 
 	@Override
 	protected <T> void addFields(Builder<T> builder) {
