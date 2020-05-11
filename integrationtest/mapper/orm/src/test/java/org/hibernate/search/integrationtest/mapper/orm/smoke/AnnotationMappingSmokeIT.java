@@ -77,10 +77,10 @@ public class AnnotationMappingSmokeIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
-				.objectField( "embeddedList", b2 -> b2
+				.objectField( "myEmbeddedList", b2 -> b2
 						.multiValued( true )
-						.objectField( "otherPrefix_embedded", b3 -> b3
-								.objectField( "prefix_customBridgeOnClass", b4 -> b4
+						.objectField( "myEmbedded", b3 -> b3
+								.objectField( "customBridgeOnClass", b4 -> b4
 										.field( "text", String.class )
 								)
 						)
@@ -88,8 +88,8 @@ public class AnnotationMappingSmokeIT {
 				.field( "embeddedMapKeys", String.class, b2 -> b2.multiValued( true ) )
 				.objectField( "embeddedMap", b2 -> b2
 						.multiValued( true )
-						.objectField( "embedded", b3 -> b3
-								.field( "prefix_myLocalDateField", LocalDate.class )
+						.objectField( "myEmbedded", b3 -> b3
+								.field( "myLocalDateField", LocalDate.class )
 						)
 				)
 		);
@@ -102,22 +102,22 @@ public class AnnotationMappingSmokeIT {
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
 				)
-				.objectField( "embedded", b2 -> b2
-						.objectField( "prefix_customBridgeOnClass", b3 -> b3
+				.objectField( "myEmbedded", b2 -> b2
+						.objectField( "customBridgeOnClass", b3 -> b3
 								.field( "date", LocalDate.class )
 								.field( "text", String.class )
 						)
-						.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+						.objectField( "customBridgeOnProperty", b3 -> b3
 								.field( "date", LocalDate.class )
 								.field( "text", String.class )
 						)
-						.objectField( "prefix_embedded", b3 -> b3
-								.objectField( "prefix_customBridgeOnClass", b4 -> b4
+						.objectField( "myEmbedded", b3 -> b3
+								.objectField( "customBridgeOnClass", b4 -> b4
 										.field( "text", String.class )
 								)
 						)
-						.field( "prefix_myLocalDateField", LocalDate.class )
-						.field( "prefix_myTextField", String.class )
+						.field( "myLocalDateField", LocalDate.class )
+						.field( "myTextField", String.class )
 				)
 				.field( "myTextField", String.class )
 				.field( "myLocalDateField", LocalDate.class )
@@ -196,19 +196,19 @@ public class AnnotationMappingSmokeIT {
 									.field( "text", entity2.getEmbedded().getText() )
 									.field( "date", entity2.getEmbedded().getLocalDate() )
 							)
-							.objectField( "embedded", b2 -> b2
-									.field( "prefix_myTextField", entity2.getEmbedded().getText() )
-									.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
-									.objectField( "prefix_customBridgeOnClass", b3 -> b3
+							.objectField( "myEmbedded", b2 -> b2
+									.field( "myTextField", entity2.getEmbedded().getText() )
+									.field( "myLocalDateField", entity2.getEmbedded().getLocalDate() )
+									.objectField( "customBridgeOnClass", b3 -> b3
 											.field( "text", entity2.getEmbedded().getText() )
 											.field( "date", entity2.getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+									.objectField( "customBridgeOnProperty", b3 -> b3
 											.field( "text", entity2.getEmbedded().getEmbedded().getText() )
 											.field( "date", entity2.getEmbedded().getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity2.getEmbedded().getEmbedded().getText() )
 											)
 									)
@@ -225,19 +225,19 @@ public class AnnotationMappingSmokeIT {
 									.field( "text", entity3.getEmbedded().getText() )
 									.field( "date", entity3.getEmbedded().getLocalDate() )
 							)
-							.objectField( "embedded", b2 -> b2
-									.field( "prefix_myTextField", entity3.getEmbedded().getText() )
-									.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
-									.objectField( "prefix_customBridgeOnClass", b3 -> b3
+							.objectField( "myEmbedded", b2 -> b2
+									.field( "myTextField", entity3.getEmbedded().getText() )
+									.field( "myLocalDateField", entity3.getEmbedded().getLocalDate() )
+									.objectField( "customBridgeOnClass", b3 -> b3
 											.field( "text", entity3.getEmbedded().getText() )
 											.field( "date", entity3.getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+									.objectField( "customBridgeOnProperty", b3 -> b3
 											.field( "text", entity3.getEmbedded().getEmbedded().getText() )
 											.field( "date", entity3.getEmbedded().getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity3.getEmbedded().getEmbedded().getText() )
 											)
 									)
@@ -262,30 +262,30 @@ public class AnnotationMappingSmokeIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
-							.objectField( "embeddedList", b2 -> b2
-									.objectField( "otherPrefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+							.objectField( "myEmbeddedList", b2 -> b2
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity2.getEmbedded().getText() )
 											)
 									)
 							)
-							.objectField( "embeddedList", b2 -> b2
-									.objectField( "otherPrefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+							.objectField( "myEmbeddedList", b2 -> b2
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity3.getEmbedded().getText() )
 											)
 									)
 							)
-							.objectField( "embeddedList", b2 -> { } )
+							.objectField( "myEmbeddedList", b2 -> { } )
 							.objectField( "embeddedMap", b2 -> b2
-									.objectField( "embedded", b3 -> b3
-											.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
+									.objectField( "myEmbedded", b3 -> b3
+											.field( "myLocalDateField", entity3.getEmbedded().getLocalDate() )
 									)
 							)
 							.field( "embeddedMapKeys", "entity3", "entity2" )
 							.objectField( "embeddedMap", b2 -> b2
-									.objectField( "embedded", b3 -> b3
-											.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
+									.objectField( "myEmbedded", b3 -> b3
+											.field( "myLocalDateField", entity2.getEmbedded().getLocalDate() )
 									)
 							)
 					)
@@ -410,8 +410,8 @@ public class AnnotationMappingSmokeIT {
 		}
 
 		@Override
-		@IndexedEmbedded(prefix = "embedded.prefix_", maxDepth = 1,
-				includePaths = { "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" })
+		@IndexedEmbedded(name = "myEmbedded", maxDepth = 1,
+				includePaths = { "customBridgeOnClass.text", "myEmbedded.customBridgeOnClass.text" })
 		public IndexedEntity getEmbedded() {
 			return super.getEmbedded();
 		}
@@ -503,7 +503,7 @@ public class AnnotationMappingSmokeIT {
 			this.numeric = numeric;
 		}
 
-		@IndexedEmbedded(prefix = "embeddedList.otherPrefix_", includePaths = "embedded.prefix_customBridgeOnClass.text")
+		@IndexedEmbedded(name = "myEmbeddedList", includePaths = "myEmbedded.customBridgeOnClass.text")
 		public List<IndexedEntity> getEmbeddedList() {
 			return embeddedList;
 		}
@@ -512,7 +512,7 @@ public class AnnotationMappingSmokeIT {
 			this.embeddedList = embeddedList;
 		}
 
-		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
+		@IndexedEmbedded(includePaths = "myEmbedded.myLocalDateField")
 		@GenericField(
 				name = "embeddedMapKeys",
 				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)

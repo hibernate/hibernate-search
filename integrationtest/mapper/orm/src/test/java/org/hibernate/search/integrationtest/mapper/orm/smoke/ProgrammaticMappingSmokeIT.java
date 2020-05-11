@@ -75,10 +75,10 @@ public class ProgrammaticMappingSmokeIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
-				.objectField( "embeddedList", b2 -> b2
+				.objectField( "myEmbeddedList", b2 -> b2
 						.multiValued( true )
-						.objectField( "otherPrefix_embedded", b3 -> b3
-								.objectField( "prefix_customBridgeOnClass", b4 -> b4
+						.objectField( "myEmbedded", b3 -> b3
+								.objectField( "customBridgeOnClass", b4 -> b4
 										.field( "text", String.class )
 								)
 						)
@@ -86,8 +86,8 @@ public class ProgrammaticMappingSmokeIT {
 				.field( "embeddedMapKeys", String.class, b2 -> b2.multiValued( true ) )
 				.objectField( "embeddedMap", b2 -> b2
 						.multiValued( true )
-						.objectField( "embedded", b3 -> b3
-								.field( "prefix_myLocalDateField", LocalDate.class )
+						.objectField( "myEmbedded", b3 -> b3
+								.field( "myLocalDateField", LocalDate.class )
 						)
 				)
 		);
@@ -100,22 +100,22 @@ public class ProgrammaticMappingSmokeIT {
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
 				)
-				.objectField( "embedded", b2 -> b2
-						.objectField( "prefix_customBridgeOnClass", b3 -> b3
+				.objectField( "myEmbedded", b2 -> b2
+						.objectField( "customBridgeOnClass", b3 -> b3
 								.field( "date", LocalDate.class )
 								.field( "text", String.class )
 						)
-						.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+						.objectField( "customBridgeOnProperty", b3 -> b3
 								.field( "date", LocalDate.class )
 								.field( "text", String.class )
 						)
-						.objectField( "prefix_embedded", b3 -> b3
-								.objectField( "prefix_customBridgeOnClass", b4 -> b4
+						.objectField( "myEmbedded", b3 -> b3
+								.objectField( "customBridgeOnClass", b4 -> b4
 										.field( "text", String.class )
 								)
 						)
-						.field( "prefix_myLocalDateField", LocalDate.class )
-						.field( "prefix_myTextField", String.class )
+						.field( "myLocalDateField", LocalDate.class )
+						.field( "myTextField", String.class )
 				)
 				.field( "myTextField", String.class )
 				.field( "myLocalDateField", LocalDate.class )
@@ -195,19 +195,19 @@ public class ProgrammaticMappingSmokeIT {
 									.field( "text", entity2.getEmbedded().getText() )
 									.field( "date", entity2.getEmbedded().getLocalDate() )
 							)
-							.objectField( "embedded", b2 -> b2
-									.field( "prefix_myTextField", entity2.getEmbedded().getText() )
-									.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
-									.objectField( "prefix_customBridgeOnClass", b3 -> b3
+							.objectField( "myEmbedded", b2 -> b2
+									.field( "myTextField", entity2.getEmbedded().getText() )
+									.field( "myLocalDateField", entity2.getEmbedded().getLocalDate() )
+									.objectField( "customBridgeOnClass", b3 -> b3
 											.field( "text", entity2.getEmbedded().getText() )
 											.field( "date", entity2.getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+									.objectField( "customBridgeOnProperty", b3 -> b3
 											.field( "text", entity2.getEmbedded().getEmbedded().getText() )
 											.field( "date", entity2.getEmbedded().getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity2.getEmbedded().getEmbedded().getText() )
 											)
 									)
@@ -224,19 +224,19 @@ public class ProgrammaticMappingSmokeIT {
 									.field( "text", entity3.getEmbedded().getText() )
 									.field( "date", entity3.getEmbedded().getLocalDate() )
 							)
-							.objectField( "embedded", b2 -> b2
-									.field( "prefix_myTextField", entity3.getEmbedded().getText() )
-									.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
-									.objectField( "prefix_customBridgeOnClass", b3 -> b3
+							.objectField( "myEmbedded", b2 -> b2
+									.field( "myTextField", entity3.getEmbedded().getText() )
+									.field( "myLocalDateField", entity3.getEmbedded().getLocalDate() )
+									.objectField( "customBridgeOnClass", b3 -> b3
 											.field( "text", entity3.getEmbedded().getText() )
 											.field( "date", entity3.getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_customBridgeOnProperty", b3 -> b3
+									.objectField( "customBridgeOnProperty", b3 -> b3
 											.field( "text", entity3.getEmbedded().getEmbedded().getText() )
 											.field( "date", entity3.getEmbedded().getEmbedded().getLocalDate() )
 									)
-									.objectField( "prefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity3.getEmbedded().getEmbedded().getText() )
 											)
 									)
@@ -261,30 +261,30 @@ public class ProgrammaticMappingSmokeIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
-							.objectField( "embeddedList", b2 -> b2
-									.objectField( "otherPrefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+							.objectField( "myEmbeddedList", b2 -> b2
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity2.getEmbedded().getText() )
 											)
 									)
 							)
-							.objectField( "embeddedList", b2 -> b2
-									.objectField( "otherPrefix_embedded", b3 -> b3
-											.objectField( "prefix_customBridgeOnClass", b4 -> b4
+							.objectField( "myEmbeddedList", b2 -> b2
+									.objectField( "myEmbedded", b3 -> b3
+											.objectField( "customBridgeOnClass", b4 -> b4
 													.field( "text", entity3.getEmbedded().getText() )
 											)
 									)
 							)
-							.objectField( "embeddedList", b2 -> { } )
+							.objectField( "myEmbeddedList", b2 -> { } )
 							.objectField( "embeddedMap", b2 -> b2
-									.objectField( "embedded", b3 -> b3
-											.field( "prefix_myLocalDateField", entity3.getEmbedded().getLocalDate() )
+									.objectField( "myEmbedded", b3 -> b3
+											.field( "myLocalDateField", entity3.getEmbedded().getLocalDate() )
 									)
 							)
 							.field( "embeddedMapKeys", "entity3", "entity2" )
 							.objectField( "embeddedMap", b2 -> b2
-									.objectField( "embedded", b3 -> b3
-											.field( "prefix_myLocalDateField", entity2.getEmbedded().getLocalDate() )
+									.objectField( "myEmbedded", b3 -> b3
+											.field( "myLocalDateField", entity2.getEmbedded().getLocalDate() )
 									)
 							)
 					)
@@ -353,10 +353,9 @@ public class ProgrammaticMappingSmokeIT {
 			indexedEntityMapping.property( "id" ).documentId();
 			indexedEntityMapping.property( "text" ).genericField( "myTextField" );
 			indexedEntityMapping.property( "embedded" )
-					.indexedEmbedded()
-							.prefix( "embedded.prefix_" )
+					.indexedEmbedded( "myEmbedded" )
 							.maxDepth( 1 )
-							.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
+							.includePaths( "customBridgeOnClass.text", "myEmbedded.customBridgeOnClass.text" );
 
 			ProgrammaticMappingConfigurationContext secondMapping = context.programmaticMapping();
 
@@ -382,12 +381,11 @@ public class ProgrammaticMappingSmokeIT {
 			yetAnotherIndexedEntityMapping.property( "id" ).documentId();
 			yetAnotherIndexedEntityMapping.property( "numeric" ).genericField();
 			yetAnotherIndexedEntityMapping.property( "embeddedList" )
-					.indexedEmbedded()
-							.prefix( "embeddedList.otherPrefix_" )
-							.includePaths( "embedded.prefix_customBridgeOnClass.text" );
+					.indexedEmbedded( "myEmbeddedList" )
+							.includePaths( "myEmbedded.customBridgeOnClass.text" );
 			yetAnotherIndexedEntityMapping.property( "embeddedMap" )
 					.genericField( "embeddedMapKeys" ).extractor( BuiltinContainerExtractors.MAP_KEY )
-					.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
+					.indexedEmbedded().includePaths( "myEmbedded.myLocalDateField" );
 		}
 	}
 

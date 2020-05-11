@@ -274,14 +274,14 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void repeatedIndexedEmbedded() {
 		class Embedded {
-			String direct;
+			String forDefault;
 			String flat;
 			String nest;
 			String common;
 
-			@GenericField
-			public String getDirect() {
-				return direct;
+			@GenericField(name = "default")
+			public String getForDefault() {
+				return forDefault;
 			}
 			@GenericField
 			public String getFlat() {
@@ -296,7 +296,6 @@ public class IndexedEmbeddedBaseIT {
 				return common;
 			}
 		}
-
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -304,7 +303,7 @@ public class IndexedEmbeddedBaseIT {
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.embedded = new Embedded();
-				this.embedded.direct = value;
+				this.embedded.forDefault = value;
 				this.embedded.flat = value;
 				this.embedded.nest = value;
 				this.embedded.common = value;
@@ -313,10 +312,10 @@ public class IndexedEmbeddedBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IndexedEmbedded(prefix = "direct_", includePaths = {"direct", "common"})
-			@IndexedEmbedded(prefix = "flat.", includePaths = {"flat", "common"},
+			@IndexedEmbedded(name = "default", includePaths = {"default", "common"})
+			@IndexedEmbedded(name = "flat", includePaths = {"flat", "common"},
 					storage = ObjectFieldStorage.FLATTENED)
-			@IndexedEmbedded(prefix = "nest.", includePaths = {"nest", "common"},
+			@IndexedEmbedded(name = "nest", includePaths = {"nest", "common"},
 					storage = ObjectFieldStorage.NESTED)
 			public Embedded getEmbedded() {
 				return embedded;
@@ -324,8 +323,10 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> {
-				b.field( "direct_direct", String.class );
-				b.field( "direct_common", String.class );
+				b.objectField( "default", ObjectFieldStorage.DEFAULT, b2 -> {
+					b2.field( "default", String.class );
+					b2.field( "common", String.class );
+				} );
 				b.objectField( "flat", ObjectFieldStorage.FLATTENED, b2 -> {
 					b2.field( "flat", String.class );
 					b2.field( "common", String.class );
