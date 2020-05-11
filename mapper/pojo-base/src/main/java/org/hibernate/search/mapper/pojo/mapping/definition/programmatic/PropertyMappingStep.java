@@ -148,12 +148,24 @@ public interface PropertyMappingStep {
 	PropertyMappingFieldOptionsStep<?> nonStandardField(String relativeFieldName);
 
 	/**
-	 * Maps the property to an object field whose fields are the same as those defined in the property type.
+	 * Maps the property to an object field whose fields are the same as those defined in the property type,
+	 * using the name of this property as the name of the object field.
 	 * @return A DSL step where the indexed-embedded mapping can be defined in more details,
 	 * or where other elements can be mapped to the property.
 	 * @see IndexedEmbedded
 	 */
 	PropertyMappingIndexedEmbeddedStep indexedEmbedded();
+
+	/**
+	 * Maps the property to an object field whose fields are the same as those defined in the property type,
+	 * using the given custom name as the name of the object field.
+	 * @param relativeFieldName The name of the object field created for this indexed-embedded mapping.
+	 * @return A DSL step where the indexed-embedded mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 * @see IndexedEmbedded
+	 * @see IndexedEmbedded#name()
+	 */
+	PropertyMappingIndexedEmbeddedStep indexedEmbedded(String relativeFieldName);
 
 	/**
 	 * Assuming the property represents an association on a entity type A to entity type B,

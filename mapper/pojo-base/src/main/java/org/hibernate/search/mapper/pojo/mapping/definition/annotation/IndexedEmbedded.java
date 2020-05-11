@@ -105,8 +105,16 @@ public @interface IndexedEmbedded {
 	 * meaning an object field with the same name as the property
 	 * will be defined in the parent document
 	 * to host the value of the child document.
+	 * Must not be set if {@link #name()} is set.
 	 */
 	String prefix() default "";
+
+	/**
+	 * @return The name of the object field created to represent this {@code @IndexedEmbedded}.
+	 * Defaults to the property name.
+	 * Must not be set if {@link #prefix()} is set.
+	 */
+	String name() default "";
 
 	/**
 	 * The paths of index fields from the indexed-embedded element that should be embedded.
@@ -118,7 +126,7 @@ public @interface IndexedEmbedded {
 	 *
 	 * @return The paths of index fields to include explicitly.
 	 * Provided paths must be relative to the indexed-embedded element,
-	 * i.e. they must not include the {@link #prefix()}.
+	 * i.e. they must not include the {@link #name()}.
 	 */
 	String[] includePaths() default {};
 

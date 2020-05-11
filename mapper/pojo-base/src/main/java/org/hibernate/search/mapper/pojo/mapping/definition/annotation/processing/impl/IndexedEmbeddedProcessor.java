@@ -26,6 +26,11 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 			cleanedUpPrefix = null;
 		}
 
+		String cleanedUpName = annotation.name();
+		if ( cleanedUpName.isEmpty() ) {
+			cleanedUpName = null;
+		}
+
 		Integer cleanedUpMaxDepth = annotation.maxDepth();
 		if ( cleanedUpMaxDepth.equals( -1 ) ) {
 			cleanedUpMaxDepth = null;
@@ -43,7 +48,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 
 		ContainerExtractorPath extractorPath = context.toContainerExtractorPath( annotation.extraction() );
 
-		mappingContext.indexedEmbedded()
+		mappingContext.indexedEmbedded( cleanedUpName )
 				.extractors( extractorPath )
 				.prefix( cleanedUpPrefix )
 				.storage( annotation.storage() )

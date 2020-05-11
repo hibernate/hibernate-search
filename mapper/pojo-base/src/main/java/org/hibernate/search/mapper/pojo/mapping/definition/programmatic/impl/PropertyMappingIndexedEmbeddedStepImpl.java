@@ -6,24 +6,32 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingStep
 		implements PropertyMappingIndexedEmbeddedStep, PojoPropertyMetadataContributor {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final PojoRawTypeModel<?> definingTypeModel;
+
+	private final String relativeFieldName;
 
 	private String prefix;
 
@@ -35,9 +43,11 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent, PojoRawTypeModel<?> definingTypeModel) {
+	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent, PojoRawTypeModel<?> definingTypeModel,
+			String relativeFieldName) {
 		super( parent );
 		this.definingTypeModel = definingTypeModel;
+		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
@@ -47,13 +57,23 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+		String actualPrefix;
+		if ( relativeFieldName != null ) {
+			actualPrefix = relativeFieldName + FieldPaths.PATH_SEPARATOR;
+		}
+		else {
+			actualPrefix = prefix;
+		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, prefix, storage, maxDepth, includePaths
+				definingTypeModel, actualPrefix, storage, maxDepth, includePaths
 		);
 	}
 
 	@Override
 	public PropertyMappingIndexedEmbeddedStep prefix(String prefix) {
+		if ( relativeFieldName != null && prefix != null ) {
+			throw log.cannotSetBothIndexedEmbeddedNameAndPrefix( relativeFieldName, prefix );
+		}
 		this.prefix = prefix;
 		return this;
 	}
