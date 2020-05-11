@@ -106,7 +106,9 @@ public @interface IndexedEmbedded {
 	 * will be defined in the parent document
 	 * to host the value of the child document.
 	 * Must not be set if {@link #name()} is set.
+	 * @deprecated Use {@link #name()} instead. Note that {@link #name()} does not allow dots.
 	 */
+	@Deprecated
 	String prefix() default "";
 
 	/**
