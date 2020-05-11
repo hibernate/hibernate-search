@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,7 +28,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,6 +41,83 @@ public class ScaledNumberFieldIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+
+	@Test
+	public void defaultAttributes() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			BigDecimal value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@ScaledNumberField
+			public BigDecimal getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "value", BigDecimal.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			BigDecimal value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@ScaledNumberField(name = "explicitName")
+			public BigDecimal getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "explicitName", BigDecimal.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name_invalid_dot() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			BigDecimal value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@ScaledNumberField(name = "invalid.withdot")
+			public BigDecimal getValue() {
+				return value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.annotationContextAnyParameters( ScaledNumberField.class )
+						.failure(
+								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
+						)
+						.build()
+				);
+	}
 
 	@Test
 	public void validDecimalScales_bigDecimals() {
@@ -139,7 +217,7 @@ public class ScaledNumberFieldIT {
 			}
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -317,7 +395,7 @@ public class ScaledNumberFieldIT {
 			}
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -352,7 +430,7 @@ public class ScaledNumberFieldIT {
 			}
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )

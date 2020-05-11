@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
@@ -55,7 +57,7 @@ public class KeywordFieldIT {
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void noNormalizer() {
+	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -76,6 +78,60 @@ public class KeywordFieldIT {
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@KeywordField(name = "explicitName")
+			public String getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "explicitName", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name_invalid_dot() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@KeywordField(name = "invalid.withdot")
+			public String getValue() {
+				return value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.annotationContextAnyParameters( KeywordField.class )
+						.failure(
+								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
+						)
+						.build()
+				);
 	}
 
 	@Test
