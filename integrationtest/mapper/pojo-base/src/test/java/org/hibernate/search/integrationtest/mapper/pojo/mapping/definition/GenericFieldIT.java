@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,7 +29,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendExtension;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +42,83 @@ public class GenericFieldIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+
+	@Test
+	public void defaultAttributes() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			Long value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Long getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "value", Long.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			LocalDate value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(name = "explicitName")
+			public LocalDate getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "explicitName", LocalDate.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name_invalid_dot() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			Long value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(name = "invalid.withdot")
+			public Long getValue() {
+				return value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.annotationContextAnyParameters( GenericField.class )
+						.failure(
+								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
+						)
+						.build()
+				);
+	}
 
 	@Test
 	public void searchable() {
@@ -205,7 +283,7 @@ public class GenericFieldIT {
 			}
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )

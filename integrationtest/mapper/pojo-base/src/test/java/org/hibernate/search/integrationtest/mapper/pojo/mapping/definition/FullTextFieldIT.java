@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
@@ -54,6 +56,83 @@ public class FullTextFieldIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+
+	@Test
+	public void defaultAttributes() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(analyzer = ANALYZER_NAME)
+			public String getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "value", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(name = "explicitName", analyzer = ANALYZER_NAME)
+			public String getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "explicitName", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name_invalid_dot() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(name = "invalid.withdot", analyzer = ANALYZER_NAME)
+			public String getValue() {
+				return value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.annotationContextAnyParameters( FullTextField.class )
+						.failure(
+								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
+						)
+						.build()
+				);
+	}
 
 	@Test
 	public void defaultBridge() {

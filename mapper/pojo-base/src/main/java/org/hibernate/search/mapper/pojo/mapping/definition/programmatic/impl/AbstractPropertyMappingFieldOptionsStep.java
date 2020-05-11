@@ -28,7 +28,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 		implements PojoPropertyMetadataContributor, PropertyMappingFieldOptionsStep<S> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	
+
 	protected final String relativeFieldName;
 	final PojoCompositeFieldModelContributor fieldModelContributor;
 	private ValueBinder binder;

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -22,7 +24,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendExtension;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +47,84 @@ public class NonStandardFieldIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+
+	@Test
+	public void defaultAttributes() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			WrappedValue value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@NonStandardField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			public WrappedValue getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "value", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			WrappedValue value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@NonStandardField(name = "explicitName",
+					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			public WrappedValue getValue() {
+				return value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "explicitName", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void name_invalid_dot() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			WrappedValue value;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@NonStandardField(name = "invalid.withdot", valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			public WrappedValue getValue() {
+				return value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.annotationContextAnyParameters( NonStandardField.class )
+						.failure(
+								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
+						)
+						.build()
+				);
+	}
 
 	@Test
 	public void customBridge_explicitFieldType() {
@@ -87,7 +166,7 @@ public class NonStandardFieldIT {
 				return myProperty;
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -122,7 +201,7 @@ public class NonStandardFieldIT {
 			}
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
