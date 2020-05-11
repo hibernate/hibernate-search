@@ -12,7 +12,7 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 public class FieldPaths {
 
-	private static final char PATH_SEPARATOR = '.';
+	public static final char PATH_SEPARATOR = '.';
 
 	private FieldPaths() {
 	}

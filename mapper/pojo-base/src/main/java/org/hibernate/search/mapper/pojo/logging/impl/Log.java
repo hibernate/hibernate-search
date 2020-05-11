@@ -434,4 +434,7 @@ public interface Log extends BasicLogger {
 	SearchException missingProcessorReferenceInMappingAnnotation(
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType);
 
+	@Message(id = ID_OFFSET_2 + 69,
+			value = "Cannot set both the name and prefix in @IndexedEmbedded. Name was '%1$s', prefix was '%2$s'.")
+	SearchException cannotSetBothIndexedEmbeddedNameAndPrefix(String relativeFieldName, String prefix);
 }

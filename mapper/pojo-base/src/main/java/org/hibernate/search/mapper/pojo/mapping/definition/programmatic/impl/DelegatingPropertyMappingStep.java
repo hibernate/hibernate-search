@@ -101,6 +101,11 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	}
 
 	@Override
+	public PropertyMappingIndexedEmbeddedStep indexedEmbedded(String relativeFieldName) {
+		return delegate.indexedEmbedded( relativeFieldName );
+	}
+
+	@Override
 	public AssociationInverseSideOptionsStep associationInverseSide(PojoModelPathValueNode inversePath) {
 		return delegate.associationInverseSide( inversePath );
 	}
