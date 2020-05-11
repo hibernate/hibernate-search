@@ -836,6 +836,12 @@ The name must not contain the dot character (`.`).
 [[mapper-orm-indexedembedded-prefix]]
 === Setting the field name prefix with `prefix`
 
+[WARNING]
+====
+The `prefix` attribute in `@IndexedEmbedded` is deprecated and will ultimately be removed.
+Use <<mapper-orm-indexedembedded-name,`name`>> instead.
+====
+
 By default, `@IndexedEmbedded` will prepend the name of embedded fields
 with the name of the property it is applied to followed by a dot.
 So if `@IndexedEmbedded` is applied to a property named `authors` in a `Book` entity,

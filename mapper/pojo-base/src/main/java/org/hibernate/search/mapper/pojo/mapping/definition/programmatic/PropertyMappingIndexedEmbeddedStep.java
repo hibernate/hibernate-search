@@ -22,7 +22,10 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @param prefix The prefix used when embedding.
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#prefix()
+	 * @deprecated Pass a field name to {@link PropertyMappingStep#indexedEmbedded(String)} instead.
+	 * Note that the name passed to that method does not allow dots.
 	 */
+	@Deprecated
 	PropertyMappingIndexedEmbeddedStep prefix(String prefix);
 
 	/**

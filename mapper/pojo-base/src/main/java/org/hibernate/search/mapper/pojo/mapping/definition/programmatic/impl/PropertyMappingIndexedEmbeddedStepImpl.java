@@ -73,6 +73,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	}
 
 	@Override
+	@Deprecated
 	public PropertyMappingIndexedEmbeddedStep prefix(String prefix) {
 		if ( relativeFieldName != null && prefix != null ) {
 			throw log.cannotSetBothIndexedEmbeddedNameAndPrefix( relativeFieldName, prefix );
