@@ -814,6 +814,24 @@ For example for a property of type `List<MyEntity>`, elements of type `MyEntity`
 This default behavior and ways to override it are described
 in the section <<mapper-orm-containerextractor>>.
 
+[[mapper-orm-indexedembedded-name]]
+=== Setting the object field name with `name`
+
+By default, `@IndexedEmbedded` will create an object field with the same name as the annotated property,
+and will add embedded fields to that object field.
+So if `@IndexedEmbedded` is applied to a property named `authors` in a `Book` entity,
+the index field `name` of the authors will be copied to the index field `authors.name` when `Book` is indexed.
+
+It is possible to change the name of the object field by setting the `name` attribute;
+for example using `@IndexedEmbedded(name = "allAuthors")` in the example above will result
+in the name of authors being copied to the index field `allAuthors.name`
+instead of `authors.name`.
+
+[NOTE]
+====
+The name must not contain the dot character (`.`).
+====
+
 [[mapper-orm-indexedembedded-prefix]]
 === Setting the field name prefix with `prefix`
 
@@ -884,7 +902,8 @@ Two filtering attributes are available on `@IndexedEmbedded` and may be combined
 The paths of index fields from the indexed-embedded element that should be embedded.
 +
 Provided paths must be relative to the indexed-embedded element,
-i.e. they must not include the <<mapper-orm-indexedembedded-prefix,prefix>>.
+i.e. they must not include its <<mapper-orm-indexedembedded-name,name>>
+or <<mapper-orm-indexedembedded-prefix,prefix>>.
 +
 This takes precedence over `maxDepth` (see below).
 `maxDepth`::
