@@ -6,21 +6,29 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMappingFieldOptionsStep<?>>
 		extends DelegatingPropertyMappingStep
 		implements PojoPropertyMetadataContributor, PropertyMappingFieldOptionsStep<S> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	
 	protected final String relativeFieldName;
 	final PojoCompositeFieldModelContributor fieldModelContributor;
 	private ValueBinder binder;
@@ -30,6 +38,9 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 			FieldModelContributor fieldTypeChecker) {
 		super( delegate );
 		this.relativeFieldName = relativeFieldName;
+		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
+			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
+		}
 		this.fieldModelContributor = new PojoCompositeFieldModelContributor();
 		// The very first field contributor will just check that the field type is appropriate.
 		// It is only useful if no option is set, since setting an option will perform that check too.

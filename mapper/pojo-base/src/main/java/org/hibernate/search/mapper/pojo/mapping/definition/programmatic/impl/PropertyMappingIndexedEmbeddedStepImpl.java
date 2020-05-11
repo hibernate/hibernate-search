@@ -47,6 +47,9 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			String relativeFieldName) {
 		super( parent );
 		this.definingTypeModel = definingTypeModel;
+		if ( relativeFieldName != null && relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
+			throw log.invalidFieldNameDotNotAllowed( relativeFieldName );
+		}
 		this.relativeFieldName = relativeFieldName;
 	}
 
