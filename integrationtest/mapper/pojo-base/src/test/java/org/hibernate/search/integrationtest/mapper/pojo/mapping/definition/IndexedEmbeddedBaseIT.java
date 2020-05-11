@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import java.lang.invoke.MethodHandles;
@@ -66,7 +67,7 @@ public class IndexedEmbeddedBaseIT {
 	public StaticCounters counters = new StaticCounters();
 
 	@Test
-	public void noParameter() {
+	public void defaultAttributes() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
 			@GenericField
@@ -131,6 +132,142 @@ public class IndexedEmbeddedBaseIT {
 						)
 				)
 		);
+	}
+
+	@Test
+	public void name() {
+		class IndexedEmbeddedLevel1 {
+			String level1Property;
+			@GenericField
+			public String getLevel1Property() {
+				return level1Property;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String value) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.level1Property = value;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(name = "explicitName")
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "explicitName", b2 -> b2
+						.field( "level1Property", String.class )
+				)
+		);
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Value" ),
+				document -> document
+						.objectField( "explicitName", b2 -> b2
+								.field( "level1Property", "level1Value" )
+				)
+		);
+	}
+
+	@Test
+	public void name_invalid_dot() {
+		class IndexedEmbeddedLevel1 {
+			String level1Property;
+			@GenericField
+			public String getLevel1Property() {
+				return level1Property;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String value) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.level1Property = value;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(name = "invalid.withdot")
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".level1" )
+						.annotationContextAnyParameters( IndexedEmbedded.class )
+						.failure(
+								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void name_andPrefix() {
+		class IndexedEmbeddedLevel1 {
+			String level1Property;
+			@GenericField
+			public String getLevel1Property() {
+				return level1Property;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String value) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.level1Property = value;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(name = "somename", prefix = "someprefix.")
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".level1" )
+						.annotationContextAnyParameters( IndexedEmbedded.class )
+						.failure(
+								"Cannot set both the name and prefix in @IndexedEmbedded",
+								"Name was 'somename', prefix was 'someprefix.'."
+						)
+						.build()
+				);
 	}
 
 	@Test
