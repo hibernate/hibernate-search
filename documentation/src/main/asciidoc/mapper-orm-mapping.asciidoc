@@ -327,7 +327,8 @@ see <<mapper-orm-directfieldmapping-annotations>>.
 The name of the index field. By default, it is the same as the property name.
 You may want to change it in particular when mapping a single property to multiple fields.
 +
-Value: `String`. Defaults to the name of the property.
+Value: `String`. The name must not contain the dot character (`.`).
+Defaults to the name of the property.
 
 [[mapper-orm-directfieldmapping-sortable]] `sortable`::
 Whether the field can be <<search-dsl-sort, sorted on>>,
