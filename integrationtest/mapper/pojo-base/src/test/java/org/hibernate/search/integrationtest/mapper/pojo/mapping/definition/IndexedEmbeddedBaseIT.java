@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -340,6 +341,80 @@ public class IndexedEmbeddedBaseIT {
 				.withAnnotatedTypes( Embedded.class )
 				.setup();
 		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Check @IndexedEmbedded on a multi-valued property
+	 * results in the corresponding object field being automatically marked as multi-valued
+	 * (and not its own fields).
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3324")
+	public void multiValued() {
+		class IndexedEmbeddedLevel1 {
+			String level1SingleValuedProperty;
+			List<String> level1MultiValuedProperty;
+			@GenericField
+			public String getLevel1SingleValuedProperty() {
+				return level1SingleValuedProperty;
+			}
+			@GenericField
+			public List<String> getLevel1MultiValuedProperty() {
+				return level1MultiValuedProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded
+			public List<IndexedEmbeddedLevel1> getLevel1() {
+				return level1;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", ObjectFieldStorage.DEFAULT, b2 -> b2
+						.multiValued( true )
+						.field( "level1SingleValuedProperty", String.class )
+						.field( "level1MultiValuedProperty", String.class, b3 -> b3.multiValued( true ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					IndexedEmbeddedLevel1 level1_1 = new IndexedEmbeddedLevel1();
+					level1_1.level1SingleValuedProperty = "1";
+					level1_1.level1MultiValuedProperty = Arrays.asList( "1_1", "1_2" );
+					entity.level1.add( level1_1 );
+					IndexedEmbeddedLevel1 level1_2 = new IndexedEmbeddedLevel1();
+					level1_2.level1SingleValuedProperty = "2";
+					level1_2.level1MultiValuedProperty = Arrays.asList( "2_1", "2_2" );
+					entity.level1.add( level1_2 );
+					return entity;
+				},
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "level1SingleValuedProperty", "1" )
+								.field( "level1MultiValuedProperty", "1_1", "1_2" )
+						)
+						.objectField( "level1", b2 -> b2
+								.field( "level1SingleValuedProperty", "2" )
+								.field( "level1MultiValuedProperty", "2_1", "2_2" )
+						)
+		);
 	}
 
 	/**
