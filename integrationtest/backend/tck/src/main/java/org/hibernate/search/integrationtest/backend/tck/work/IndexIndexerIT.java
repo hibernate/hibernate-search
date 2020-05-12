@@ -21,11 +21,10 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.FutureAssert;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,34 +38,28 @@ public class IndexIndexerIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String INDEX_NAME = "lordOfTheRingsChapters";
 	private static final int NUMBER_OF_BOOKS = 200;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
 
-	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
-
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	@Before
+	public void setup() {
+		setupHelper.start().withIndex( index ).setup();
+	}
 
 	@Test
 	public void success() {
-		setup();
-
-		IndexIndexer indexer =
-				indexManager.createIndexer();
+		IndexIndexer indexer = index.createIndexer();
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
-		IndexWorkspace workspace = indexManager.createWorkspace();
+		IndexWorkspace workspace = index.createWorkspace();
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
 			tasks[i] = indexer.add( referenceProvider( id ), document -> {
-				document.addValue( indexMapping.title, "The Lord of the Rings cap. " + id );
+				document.addValue( index.binding().title, "The Lord of the Rings cap. " + id );
 			} );
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
@@ -77,7 +70,7 @@ public class IndexIndexerIT {
 
 		workspace.refresh().join();
 
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -86,16 +79,13 @@ public class IndexIndexerIT {
 
 	@Test
 	public void failure() {
-		setup();
-
-		IndexIndexer indexer =
-				indexManager.createIndexer();
+		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( INDEX_NAME );
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
 
 		CompletableFuture<?> future = indexer.add( referenceProvider( "1" ), document -> {
-			document.addValue( indexMapping.title, "Document #1" );
+			document.addValue( index.binding().title, "Document #1" );
 		} );
 		Awaitility.await().until( future::isDone );
 
@@ -111,20 +101,10 @@ public class IndexIndexerIT {
 		}
 	}
 
-	private void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-	}
-
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> title;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			title = root.field( "title", f -> f.asString() ).toReference();
 		}
 	}
