@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -116,17 +114,14 @@ public class IndexWorkspaceIT {
 	}
 
 	private void createBookIndexes(StubBackendSessionContext sessionContext) {
-		IndexIndexer indexer =
-				indexManager.createIndexer( sessionContext );
-		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
-
-		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
-			final String id = i + "";
-			tasks[i] = indexer.add( referenceProvider( id ), document -> {
-				document.addValue( indexMapping.title, "The Lord of the Rings cap. " + id );
-			} );
-		}
-		CompletableFuture.allOf( tasks ).join();
+		indexManager.initAsync(
+				sessionContext,
+				NUMBER_OF_BOOKS, i -> documentProvider(
+						String.valueOf( i ),
+						document -> document.addValue( indexMapping.title, "The Lord of the Rings cap. " + i )
+				),
+				false // Do not commit and refresh
+		).join();
 	}
 
 	private void assertBookNumberIsEqualsTo(long bookNumber, StubBackendSessionContext sessionContext) {

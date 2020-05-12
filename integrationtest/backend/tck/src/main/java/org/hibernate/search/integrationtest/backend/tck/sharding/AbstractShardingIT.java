@@ -6,21 +6,19 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubDocumentProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
@@ -54,23 +52,17 @@ public abstract class AbstractShardingIT {
 	}
 
 	protected final void initData(Map<String, List<String>> docIdByRoutingKey) {
-		IndexIndexer indexer =
-				indexManager.createIndexer();
-		List<CompletableFuture<?>> tasks = new ArrayList<>();
-
+		List<StubDocumentProvider> documentProviders = new ArrayList<>();
 		for ( Map.Entry<String, List<String>> entry : docIdByRoutingKey.entrySet() ) {
 			String routingKey = entry.getKey();
 			for ( String documentId : entry.getValue() ) {
-				tasks.add( indexer.add(
-						referenceProvider( documentId, routingKey ),
+				documentProviders.add( documentProvider(
+						documentId, routingKey,
 						document -> document.addValue( indexMapping.indexedRoutingKey, routingKey )
 				) );
 			}
 		}
-		CompletableFuture.allOf( tasks.toArray( new CompletableFuture<?>[0] ) ).join();
-
-		IndexWorkspace workspace = indexManager.createWorkspace();
-		workspace.refresh().join();
+		indexManager.initAsync( documentProviders ).join();
 	}
 
 	protected static class IndexMapping {
