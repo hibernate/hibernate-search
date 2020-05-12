@@ -12,15 +12,15 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 
 /**
@@ -56,29 +55,68 @@ public class IndexIndexerIT {
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 		IndexWorkspace workspace = index.createWorkspace();
 
+		// Add
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
-			final String id = i + "";
+			final String id = String.valueOf( i );
 			tasks[i] = indexer.add( referenceProvider( id ), document -> {
-				document.addValue( index.binding().title, "The Lord of the Rings cap. " + id );
+				document.addValue( index.binding().title, "The Lord of the Rings chap. " + id );
 			} );
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
 		Awaitility.await().until( future::isDone );
-
 		// The operations should succeed.
 		FutureAssert.assertThat( future ).isSuccessful();
 
+		int expectedMatchingBooks = NUMBER_OF_BOOKS;
 		workspace.refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query()
+				.where( f -> f.match().field( "title" ).matching( "lord" ) )
+				.toQuery() )
+				.hasTotalHitCount( expectedMatchingBooks );
 
-		SearchQuery<DocumentReference> query = index.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
+		// Update
+		int booksToUpdate = NUMBER_OF_BOOKS / 4;
+		tasks = new CompletableFuture<?>[booksToUpdate];
+		for ( int i = 0; i < booksToUpdate; i++ ) {
+			final String id = String.valueOf( i );
+			tasks[i] = indexer.update( referenceProvider( id ), document -> {
+				document.addValue( index.binding().title, "The Boss of the Rings chap. " + id );
+			} );
+		}
+		future = CompletableFuture.allOf( tasks );
+		Awaitility.await().until( future::isDone );
+		// The operations should succeed.
+		FutureAssert.assertThat( future ).isSuccessful();
 
-		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( NUMBER_OF_BOOKS );
+		expectedMatchingBooks -= booksToUpdate;
+		workspace.refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query()
+				.where( f -> f.match().field( "title" ).matching( "lord" ) )
+				.toQuery() )
+				.hasTotalHitCount( expectedMatchingBooks );
+
+		// Delete
+		int booksToDelete = NUMBER_OF_BOOKS / 4;
+		tasks = new CompletableFuture<?>[booksToDelete];
+		for ( int i = 0; i < booksToDelete; i++ ) {
+			final String id = String.valueOf( i + booksToUpdate );
+			tasks[i] = indexer.delete( referenceProvider( id ) );
+		}
+		future = CompletableFuture.allOf( tasks );
+		Awaitility.await().until( future::isDone );
+		// The operations should succeed.
+		FutureAssert.assertThat( future ).isSuccessful();
+
+		expectedMatchingBooks -= booksToDelete;
+		workspace.refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query()
+				.where( f -> f.match().field( "title" ).matching( "lord" ) )
+				.toQuery() )
+				.hasTotalHitCount( expectedMatchingBooks );
 	}
 
 	@Test
-	public void failure() {
+	public void add_failure() {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
@@ -101,11 +139,61 @@ public class IndexIndexerIT {
 		}
 	}
 
+	@Test
+	public void update_failure() {
+		IndexIndexer indexer = index.createIndexer();
+
+		// Trigger failures in the next operations
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+
+		CompletableFuture<?> future = indexer.update( referenceProvider( "1" ), document -> {
+			document.addValue( index.binding().title, "Document #1" );
+		} );
+		Awaitility.await().until( future::isDone );
+
+		// The operation should fail.
+		// Just check the failure is reported through the completable future.
+		FutureAssert.assertThat( future ).isFailed();
+
+		try {
+			setupHelper.cleanUp();
+		}
+		catch (RuntimeException | IOException e) {
+			log.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+		}
+	}
+
+	@Test
+	public void delete_failure() {
+		IndexIndexer indexer = index.createIndexer();
+
+		// Trigger failures in the next operations
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+
+		CompletableFuture<?> future = indexer.delete( referenceProvider( "1" ) );
+		Awaitility.await().until( future::isDone );
+
+		// The operation should fail.
+		// Just check the failure is reported through the completable future.
+		FutureAssert.assertThat( future ).isFailed();
+
+		try {
+			setupHelper.cleanUp();
+		}
+		catch (RuntimeException | IOException e) {
+			log.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+		}
+	}
+
 	private static class IndexBinding {
 		final IndexFieldReference<String> title;
 
 		IndexBinding(IndexSchemaElement root) {
-			title = root.field( "title", f -> f.asString() ).toReference();
+			title = root.field(
+					"title",
+					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+			)
+					.toReference();
 		}
 	}
 }

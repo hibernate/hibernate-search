@@ -14,12 +14,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
-import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -84,20 +83,44 @@ public class IndexIndexingPlanIT {
 	@Test
 	public void success() {
 		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
-		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
-		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
+		// Add
+		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 1" ) );
+		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 2" ) );
+		plan.add( referenceProvider( "3" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 3" ) );
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		FutureAssert.assertThat( future ).isSuccessful();
 
-		SearchQuery<DocumentReference> query = index.createScope().query( sessionContext )
-				.where( f -> f.matchAll() )
-				.toQuery();
+		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( index.name(), "1", "2", "3" );
 
-		SearchResultAssert.assertThat( query )
-				.hasDocRefHitsAnyOrder( index.name(), "1", "2" );
+		// Update
+		plan.update( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
+		future = plan.execute();
+		Awaitility.await().until( future::isDone );
+		// The operations should succeed.
+		FutureAssert.assertThat( future ).isSuccessful();
+
+		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( index.name(), "1", "3" );
+
+		// Delete
+		plan.delete( referenceProvider( "1" ) );
+		future = plan.execute();
+		Awaitility.await().until( future::isDone );
+		// The operations should succeed.
+		FutureAssert.assertThat( future ).isSuccessful();
+
+		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( index.name(), "3" );
 	}
 
 	@Test
@@ -113,19 +136,69 @@ public class IndexIndexingPlanIT {
 		// The operations should succeed.
 		FutureAssert.assertThat( future ).isSuccessful();
 
-		SearchQuery<DocumentReference> query = index.createScope().query( sessionContext )
+		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
-				.toQuery();
-
-		SearchResultAssert.assertThat( query )
+				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.name(), "2" );
 	}
 
 	@Test
-	public void failure() {
+	public void add_failure() {
 		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
+
+		// Trigger failures in the next operations
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+
+		CompletableFuture<?> future = plan.execute();
+		Awaitility.await().until( future::isDone );
+
+		// The operation should fail.
+		// Just check the failure is reported through the completable future.
+		FutureAssert.assertThat( future ).isFailed();
+
+		try {
+			setupHelper.cleanUp();
+		}
+		catch (RuntimeException | IOException e) {
+			log.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+		}
+	}
+
+	@Test
+	public void update_failure() {
+		setup();
+
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		plan.update( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
+		plan.update( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
+
+		// Trigger failures in the next operations
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+
+		CompletableFuture<?> future = plan.execute();
+		Awaitility.await().until( future::isDone );
+
+		// The operation should fail.
+		// Just check the failure is reported through the completable future.
+		FutureAssert.assertThat( future ).isFailed();
+
+		try {
+			setupHelper.cleanUp();
+		}
+		catch (RuntimeException | IOException e) {
+			log.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+		}
+	}
+
+	@Test
+	public void delete_failure() {
+		setup();
+
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		plan.delete( referenceProvider( "1" ) );
+		plan.delete( referenceProvider( "2" ) );
 
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
@@ -185,7 +258,11 @@ public class IndexIndexingPlanIT {
 		final IndexFieldReference<String> title;
 
 		IndexBinding(IndexSchemaElement root) {
-			title = root.field( "name", f -> f.asString() ).toReference();
+			title = root.field(
+					"title",
+					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+			)
+					.toReference();
 		}
 	}
 }
