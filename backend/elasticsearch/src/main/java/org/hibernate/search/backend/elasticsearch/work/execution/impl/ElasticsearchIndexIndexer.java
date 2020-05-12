@@ -38,6 +38,32 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
+		return index( referenceProvider, documentContributor );
+	}
+
+	@Override
+	public CompletableFuture<?> update(DocumentReferenceProvider referenceProvider,
+			DocumentContributor documentContributor) {
+		return index( referenceProvider, documentContributor );
+	}
+
+	@Override
+	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider) {
+		String id = referenceProvider.getIdentifier();
+		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
+		String routingKey = referenceProvider.getRoutingKey();
+
+		SingleDocumentIndexingWork work = factory.delete(
+				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+				indexManagerContext.getElasticsearchIndexWriteName(),
+				elasticsearchId, routingKey
+		)
+				.build();
+		return orchestrator.submit( work );
+	}
+
+	private CompletableFuture<?> index(DocumentReferenceProvider referenceProvider,
+			DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
