@@ -27,12 +27,13 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityReference;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.FutureAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +46,6 @@ import org.awaitility.Awaitility;
 public class IndexIndexingPlanIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final String TYPE_NAME = "typeName";
-	private static final String INDEX_NAME = "indexName";
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] parameters() {
@@ -66,12 +64,11 @@ public class IndexIndexingPlanIT {
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper;
+	public final SearchSetupHelper setupHelper;
 
 	private final StubBackendSessionContext sessionContext;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
 
 	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction,
 			StubBackendSessionContext sessionContext) {
@@ -79,60 +76,59 @@ public class IndexIndexingPlanIT {
 		this.sessionContext = sessionContext;
 	}
 
+	@Before
+	public void setup() {
+		setupHelper.start().withIndex( index ).setup();
+	}
+
 	@Test
 	public void success() {
-		setup();
-
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
-		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.title, "Title of Book 1" ) );
-		plan.add( referenceProvider( "2" ), document -> document.addValue( indexMapping.title, "Title of Book 2" ) );
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
+		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		FutureAssert.assertThat( future ).isSuccessful();
 
-		SearchQuery<DocumentReference> query = indexManager.createScope().query( sessionContext )
+		SearchQuery<DocumentReference> query = index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		SearchResultAssert.assertThat( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( index.name(), "1", "2" );
 	}
 
 	@Test
 	public void discard() {
-		setup();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
-
-		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.title, "Title of Book 1" ) );
+		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.discard();
-		plan.add( referenceProvider( "2" ), document -> document.addValue( indexMapping.title, "Title of Book 2" ) );
+		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
 		FutureAssert.assertThat( future ).isSuccessful();
 
-		SearchQuery<DocumentReference> query = indexManager.createScope().query( sessionContext )
+		SearchQuery<DocumentReference> query = index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		SearchResultAssert.assertThat( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, "2" );
+				.hasDocRefHitsAnyOrder( index.name(), "2" );
 	}
 
 	@Test
 	public void failure() {
-		setup();
-
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
-		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.title, "Title of Book 1" ) );
-		plan.add( referenceProvider( "2" ), document -> document.addValue( indexMapping.title, "Title of Book 2" ) );
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
+		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( INDEX_NAME );
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
 
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
@@ -154,12 +150,12 @@ public class IndexIndexingPlanIT {
 	public void failure_report() {
 		setup();
 
-		IndexIndexingPlan<StubEntityReference> plan = indexManager.createIndexingPlan( sessionContext );
-		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.title, "Title of Book 1" ) );
-		plan.add( referenceProvider( "2" ), document -> document.addValue( indexMapping.title, "Title of Book 2" ) );
+		IndexIndexingPlan<StubEntityReference> plan = index.createIndexingPlan( sessionContext );
+		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
+		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( INDEX_NAME );
+		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
 
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> future = plan.executeAndReport();
 		Awaitility.await().until( future::isDone );
@@ -171,8 +167,8 @@ public class IndexIndexingPlanIT {
 				softly.assertThat( report.getThrowable() ).containsInstanceOf( SearchException.class );
 				softly.assertThat( report.getFailingEntityReferences() )
 						.containsExactly(
-								new StubEntityReference( TYPE_NAME, "1" ),
-								new StubEntityReference( TYPE_NAME, "2" )
+								new StubEntityReference( index.typeName(), "1" ),
+								new StubEntityReference( index.typeName(), "2" )
 						);
 			} );
 		} );
@@ -185,21 +181,10 @@ public class IndexIndexingPlanIT {
 		}
 	}
 
-	private void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						options -> options.mappedType( TYPE_NAME ),
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-	}
-
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> title;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			title = root.field( "name", f -> f.asString() ).toReference();
 		}
 	}
