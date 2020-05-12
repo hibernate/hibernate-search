@@ -32,16 +32,47 @@ public class StubIndexIndexer implements IndexIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider,
+	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
 		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.ADD )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
-				.identifier( documentReferenceProvider.getIdentifier() )
-				.routingKey( documentReferenceProvider.getRoutingKey() )
+				.identifier( referenceProvider.getIdentifier() )
+				.routingKey( referenceProvider.getRoutingKey() )
 				.document( documentBuilder.build() )
+				.commit( DocumentCommitStrategy.NONE )
+				.refresh( DocumentRefreshStrategy.NONE )
+				.build();
+
+		return behavior.processAndExecuteDocumentWork( indexName, work );
+	}
+
+	@Override
+	public CompletableFuture<?> update(DocumentReferenceProvider referenceProvider,
+			DocumentContributor documentContributor) {
+		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
+		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
+
+		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.UPDATE )
+				.tenantIdentifier( sessionContext.getTenantIdentifier() )
+				.identifier( referenceProvider.getIdentifier() )
+				.routingKey( referenceProvider.getRoutingKey() )
+				.document( documentBuilder.build() )
+				.commit( DocumentCommitStrategy.NONE )
+				.refresh( DocumentRefreshStrategy.NONE )
+				.build();
+
+		return behavior.processAndExecuteDocumentWork( indexName, work );
+	}
+
+	@Override
+	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider) {
+		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.DELETE )
+				.tenantIdentifier( sessionContext.getTenantIdentifier() )
+				.identifier( referenceProvider.getIdentifier() )
+				.routingKey( referenceProvider.getRoutingKey() )
 				.commit( DocumentCommitStrategy.NONE )
 				.refresh( DocumentRefreshStrategy.NONE )
 				.build();

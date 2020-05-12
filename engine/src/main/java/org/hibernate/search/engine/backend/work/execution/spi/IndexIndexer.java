@@ -13,6 +13,30 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IndexIndexer {
 
-	CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
+	/**
+	 * Add a document to the index, assuming that the document is absent from the index.
+	 *
+	 * @param referenceProvider A source of information about the identity of the document to add.
+	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
+	 * @return A {@link CompletableFuture} that completes once the document is added.
+	 */
+	CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor);
+
+	/**
+	 * Update a document in the index, or add it if it's absent from the index.
+	 *
+	 * @param referenceProvider A source of information about the identity of the document to update.
+	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
+	 * @return A {@link CompletableFuture} that completes once the document is updated.
+	 */
+	CompletableFuture<?> update(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor);
+
+	/**
+	 * Delete a document from the index.
+	 *
+	 * @param referenceProvider A source of information about the identity of the document to delete.
+	 * @return A {@link CompletableFuture} that completes once the document is deleted.
+	 */
+	CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider);
 
 }
