@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -14,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -119,16 +118,13 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 		beforeInitData( indexManager );
 
-		IndexIndexer indexer =
-				indexManager.createIndexer();
-		CompletableFuture<?>[] tasks = new CompletableFuture<?>[DOCUMENT_COUNT];
-		for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
-			final String id = String.valueOf( i );
-			tasks[i] = indexer.add( referenceProvider( id ), document -> {
-				document.addValue( indexMapping.text, "Text #" + id );
-			} );
-		}
-		CompletableFuture.allOf( tasks ).join();
+		indexManager.initAsync(
+				DOCUMENT_COUNT, i -> documentProvider(
+						String.valueOf( i ),
+						document -> document.addValue( indexMapping.text, "Text #" + i )
+				),
+				false // No commit/refresh
+		).join();
 
 		afterInitData( indexManager );
 	}

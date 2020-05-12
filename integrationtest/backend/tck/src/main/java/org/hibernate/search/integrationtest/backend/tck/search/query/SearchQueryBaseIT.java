@@ -7,30 +7,26 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
-import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -136,18 +132,12 @@ public class SearchQueryBaseIT {
 	}
 
 	private void initData(int documentCount) {
-		IndexIndexer executor =
-				indexManager.createIndexer();
-		List<CompletableFuture<?>> futures = new ArrayList<>();
-		for ( int i = 0; i < documentCount; i++ ) {
-			int intValue = i;
-			futures.add( executor.add( referenceProvider( String.valueOf( intValue ) ), document -> {
-				document.addValue( indexMapping.string, "value" + intValue );
-			} ) );
-		}
-
-		CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) ).join();
-		indexManager.createWorkspace().refresh().join();
+		indexManager.initAsync(
+				documentCount, i -> documentProvider(
+						String.valueOf( i ),
+						document -> document.addValue( indexMapping.string, "value" + i )
+				)
+		).join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

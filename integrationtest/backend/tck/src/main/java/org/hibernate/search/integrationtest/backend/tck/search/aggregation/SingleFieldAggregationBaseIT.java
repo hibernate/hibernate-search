@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +27,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -43,6 +42,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubDocumentProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -59,8 +59,6 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class SingleFieldAggregationBaseIT<F> {
-
-	private static final int INIT_BATCH_SIZE = 500;
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
@@ -103,22 +101,15 @@ public class SingleFieldAggregationBaseIT<F> {
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, emptyIndex, nullOnlyIndex ).setup();
 
-		List<CompletableFuture<?>> futures = new ArrayList<>();
+		List<StubDocumentProvider> mainIndexDocuments = new ArrayList<>();
+		List<StubDocumentProvider> nullOnlyIndexDocuments = new ArrayList<>();
 		for ( DataSet<?> dataSet : dataSets ) {
-			dataSet.init( futures::add );
-			if ( futures.size() >= INIT_BATCH_SIZE ) {
-				CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
-				futures.clear();
-			}
+			dataSet.contribute( mainIndexDocuments::add, nullOnlyIndexDocuments::add );
 		}
 
-		CompletableFuture.allOf( futures.toArray( new CompletableFuture[0] ) ).join();
-
 		CompletableFuture.allOf(
-				mainIndex.createWorkspace().flush(),
-				mainIndex.createWorkspace().refresh(),
-				nullOnlyIndex.createWorkspace().flush(),
-				nullOnlyIndex.createWorkspace().refresh()
+				mainIndex.initAsync( mainIndexDocuments ),
+				nullOnlyIndex.initAsync( nullOnlyIndexDocuments )
 		).join();
 	}
 
@@ -350,15 +341,15 @@ public class SingleFieldAggregationBaseIT<F> {
 			this.fieldStructure = fieldStructure;
 		}
 
-		private void init(Consumer<CompletableFuture<?>> futureCollector) {
-			IndexIndexer indexer = mainIndex.createIndexer();
+		private void contribute(Consumer<StubDocumentProvider> mainIndexDocuments,
+				Consumer<StubDocumentProvider> nullOnlyIndexDocuments) {
 			if ( fieldStructure.isSingleValued() ) {
 				List<F> values = expectations.getMainIndexDocumentFieldValues();
 				for ( int i = 0; i < values.size(); i++ ) {
 					F valueForDocument = values.get( i );
 					F garbageValueForDocument = values.get( i == 0 ? 1 : i - 1 );
-					futureCollector.accept(
-							indexer.add( referenceProvider( name + "_document_" + i, name ), document -> {
+					mainIndexDocuments.accept(
+							documentProvider( name + "_document_" + i, name, document -> {
 								initSingleValued( mainIndex.binding(), document,
 										valueForDocument, garbageValueForDocument );
 							} )
@@ -370,28 +361,27 @@ public class SingleFieldAggregationBaseIT<F> {
 				for ( int i = 0; i < values.size(); i++ ) {
 					List<F> valuesForDocument = values.get( i );
 					List<F> garbageValuesForDocument = values.get( i == 0 ? 1 : i - 1 );
-					futureCollector.accept(
-							indexer.add( referenceProvider( name + "_document_" + i, name ), document -> {
+					mainIndexDocuments.accept(
+							documentProvider( name + "_document_" + i, name, document -> {
 								initMultiValued( mainIndex.binding(), document,
 										valuesForDocument, garbageValuesForDocument );
 							} )
 					);
 				}
 			}
-			futureCollector.accept(
-					indexer.add( referenceProvider( name + "_document_empty", name ), document -> { } )
+			mainIndexDocuments.accept(
+					documentProvider( name + "_document_empty", name, document -> { } )
 			);
 
-			indexer = nullOnlyIndex.createIndexer();
-			futureCollector.accept(
-				indexer.add( referenceProvider( name + "_nullOnlyIndex_document_0", name ), document -> {
-					if ( fieldStructure.isSingleValued() ) {
-						initSingleValued( nullOnlyIndex.binding(), document, null, null );
-					}
-					else {
-						initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ), Arrays.asList( null, null ) );
-					}
-				} )
+			nullOnlyIndexDocuments.accept(
+					documentProvider( name + "_nullOnlyIndex_document_0", name, document -> {
+						if ( fieldStructure.isSingleValued() ) {
+							initSingleValued( nullOnlyIndex.binding(), document, null, null );
+						}
+						else {
+							initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ), Arrays.asList( null, null ) );
+						}
+					} )
 			);
 		}
 

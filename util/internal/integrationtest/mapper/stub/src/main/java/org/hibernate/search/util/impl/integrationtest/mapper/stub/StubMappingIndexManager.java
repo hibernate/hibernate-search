@@ -6,22 +6,31 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 
 /**
  * A wrapper around {@link MappedIndexManager} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
 public abstract class StubMappingIndexManager {
+
+	private static final int INIT_BATCH_SIZE = 500;
 
 	public abstract String name();
 
@@ -33,6 +42,70 @@ public abstract class StubMappingIndexManager {
 
 	public IndexSchemaManager getSchemaManager() {
 		return delegate().getSchemaManager();
+	}
+
+	public CompletableFuture<?> initAsync(StubDocumentProvider ... documentProviders) {
+		return initAsync( Arrays.asList( documentProviders ) );
+	}
+
+	public CompletableFuture<?> initAsync(int documentCount,
+			IntFunction<StubDocumentProvider> documentProviderGenerator) {
+		return initAsync( documentCount, documentProviderGenerator, true );
+	}
+
+	public CompletableFuture<?> initAsync(int documentCount,
+			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean commitAndRefresh) {
+		return initAsync( new StubBackendSessionContext(), documentCount, documentProviderGenerator, commitAndRefresh );
+	}
+
+	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext, int documentCount,
+			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean commitAndRefresh) {
+		return initAsync(
+				sessionContext,
+				IntStream.range( 0, documentCount )
+						.mapToObj( documentProviderGenerator )
+						.collect( Collectors.toList() ),
+				commitAndRefresh
+		);
+	}
+
+	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders) {
+		return initAsync( documentProviders, true );
+	}
+
+	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders, boolean commitAndRefresh) {
+		return initAsync( new StubBackendSessionContext(), documentProviders, commitAndRefresh );
+	}
+
+	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext,
+			List<StubDocumentProvider> documentProviders, boolean commitAndRefresh) {
+		if ( documentProviders.isEmpty() ) {
+			return CompletableFuture.completedFuture( null );
+		}
+		IndexIndexer indexer = createIndexer( sessionContext );
+		CompletableFuture<?> future = CompletableFuture.completedFuture( null );
+		for ( int i = 0; i < documentProviders.size(); i += INIT_BATCH_SIZE ) {
+			int batchStart = i;
+			int batchSize = Math.min( batchStart + INIT_BATCH_SIZE, documentProviders.size() ) - batchStart;
+			future = future.thenCompose( ignored -> {
+				CompletableFuture<?>[] batchFutures = new CompletableFuture[batchSize];
+				for ( int j = 0; j < batchSize; j++ ) {
+					StubDocumentProvider documentProvider = documentProviders.get( batchStart + j );
+					batchFutures[j] = indexer.add(
+							documentProvider.getReferenceProvider(), documentProvider.getContributor()
+					);
+				}
+				return CompletableFuture.allOf( batchFutures );
+			} );
+		}
+		if ( commitAndRefresh ) {
+			IndexWorkspace workspace = createWorkspace( sessionContext );
+			return future.thenCompose( ignored -> workspace.flush() )
+					.thenCompose( ignored -> workspace.refresh() );
+		}
+		else {
+			return future;
+		}
 	}
 
 	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {

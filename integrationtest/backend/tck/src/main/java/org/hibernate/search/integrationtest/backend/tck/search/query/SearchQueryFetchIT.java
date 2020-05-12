@@ -9,17 +9,13 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -284,18 +280,12 @@ public class SearchQueryFetchIT {
 	}
 
 	private void initData() {
-		IndexIndexer executor =
-				indexManager.createIndexer();
-		List<CompletableFuture<?>> futures = new ArrayList<>();
-		for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
-			int intValue = i;
-			futures.add( executor.add( referenceProvider( docId( i ) ), document -> {
-				document.addValue( indexMapping.integer, intValue );
-			} ) );
-		}
-
-		CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) ).join();
-		indexManager.createWorkspace().refresh().join();
+		indexManager.initAsync(
+				DOCUMENT_COUNT, i -> documentProvider(
+						docId( i ),
+						document -> document.addValue( indexMapping.integer, i )
+				)
+		).join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
