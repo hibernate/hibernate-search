@@ -12,6 +12,7 @@ import java.util.Collections;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
+import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 
 public interface SearchSession extends AutoCloseable {
@@ -82,5 +83,10 @@ public interface SearchSession extends AutoCloseable {
 	 * @return The indexing plan for this session. It will be executed upon closing this session.
 	 */
 	SearchIndexingPlan indexingPlan();
+
+	/**
+	 * @return The indexer for this session.
+	 */
+	SearchIndexer indexer();
 
 }
