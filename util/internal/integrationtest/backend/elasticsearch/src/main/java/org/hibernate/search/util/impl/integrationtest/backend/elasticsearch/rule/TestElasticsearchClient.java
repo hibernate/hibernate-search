@@ -125,6 +125,11 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			return this;
 		}
 
+		public IndexClient close() {
+			TestElasticsearchClient.this.closeIndex( primaryIndexName );
+			return this;
+		}
+
 		public IndexClient ensureDoesNotExist() {
 			TestElasticsearchClient.this.ensureIndexDoesNotExist( primaryIndexName );
 			return this;
@@ -392,6 +397,21 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private void deleteIndex(URLEncodedString indexName) {
 		// We're okay with deletion failing if it's just because the index doesn't exist yet
 		tryDeleteESIndex( indexName );
+	}
+
+	private void closeIndex(URLEncodedString indexName) {
+		try {
+			performRequest( ElasticsearchRequest.post()
+					.pathComponent( indexName )
+					.pathComponent( Paths._CLOSE )
+					.build() );
+		}
+		catch (RuntimeException e) {
+			throw new AssertionFailure(
+					String.format( Locale.ROOT, "Error while trying to close index '%s' in the test client", indexName ),
+					e
+			);
+		}
 	}
 
 	private void createTemplate(String templateName, String templateString, int templateOrder, JsonObject settings) {

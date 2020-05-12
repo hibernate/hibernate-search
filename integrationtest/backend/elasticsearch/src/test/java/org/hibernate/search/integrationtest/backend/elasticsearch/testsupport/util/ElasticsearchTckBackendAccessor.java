@@ -25,13 +25,7 @@ public class ElasticsearchTckBackendAccessor implements TckBackendAccessor {
 
 	@Override
 	public void ensureIndexOperationsFail(String indexName) {
-		client.index( indexName ).delete();
-		/*
-		 * Automatic index creation might get in the way and make operation succeed
-		 * even though the index doesn't exist, so we disable it.
-		 * We never rely on automatic index creation,
-		 * so leaving this setting in place afterwards is not a problem.
-		 */
-		client.clusterSettings( "action.auto_create_index" ).put( "false" );
+		// Close the index so that every operation will fail
+		client.index( indexName ).close();
 	}
 }
