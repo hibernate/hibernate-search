@@ -15,6 +15,8 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.stream.LongStream;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
@@ -75,7 +77,8 @@ public class IndexInitializer {
 		idStream.forEach( id -> {
 			CompletableFuture<?> future = indexer.add(
 					StubMapperUtils.referenceProvider( String.valueOf( id ) ),
-					document -> dataset.populate( index, document, id, 0L )
+					document -> dataset.populate( index, document, id, 0L ),
+					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			);
 			futures.add( future );
 		} );

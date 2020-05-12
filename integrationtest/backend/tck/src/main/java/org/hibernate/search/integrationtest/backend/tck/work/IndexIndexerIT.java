@@ -10,10 +10,14 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -27,13 +31,27 @@ import org.hibernate.search.util.impl.test.FutureAssert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.awaitility.Awaitility;
 
 /**
  * Verify that the {@link IndexIndexer}, provided by a backend, is working properly, storing correctly the indexes.
  */
+@RunWith(Parameterized.class)
 public class IndexIndexerIT {
+
+	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}")
+	public static List<Object[]> parameters() {
+		List<Object[]> params = new ArrayList<>();
+		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
+			for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
+				params.add( new Object[] { commitStrategy, refreshStrategy } );
+			}
+		}
+		return params;
+	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -44,6 +62,15 @@ public class IndexIndexerIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
 
+	private final DocumentCommitStrategy commitStrategy;
+	private final DocumentRefreshStrategy refreshStrategy;
+
+	public IndexIndexerIT(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
+		this.commitStrategy = commitStrategy;
+		this.refreshStrategy = refreshStrategy;
+	}
+
 	@Before
 	public void setup() {
 		setupHelper.start().withIndex( index ).setup();
@@ -53,14 +80,15 @@ public class IndexIndexerIT {
 	public void success() {
 		IndexIndexer indexer = index.createIndexer();
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
-		IndexWorkspace workspace = index.createWorkspace();
 
 		// Add
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = String.valueOf( i );
-			tasks[i] = indexer.add( referenceProvider( id ), document -> {
-				document.addValue( index.binding().title, "The Lord of the Rings chap. " + id );
-			} );
+			tasks[i] = indexer.add(
+					referenceProvider( id ),
+					document -> document.addValue( index.binding().title, "The Lord of the Rings chap. " + id ),
+					commitStrategy, refreshStrategy
+			);
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
 		Awaitility.await().until( future::isDone );
@@ -68,7 +96,7 @@ public class IndexIndexerIT {
 		FutureAssert.assertThat( future ).isSuccessful();
 
 		int expectedMatchingBooks = NUMBER_OF_BOOKS;
-		workspace.refresh().join();
+		refreshIfNecessary();
 		SearchResultAssert.assertThat( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
@@ -79,9 +107,11 @@ public class IndexIndexerIT {
 		tasks = new CompletableFuture<?>[booksToUpdate];
 		for ( int i = 0; i < booksToUpdate; i++ ) {
 			final String id = String.valueOf( i );
-			tasks[i] = indexer.update( referenceProvider( id ), document -> {
-				document.addValue( index.binding().title, "The Boss of the Rings chap. " + id );
-			} );
+			tasks[i] = indexer.update(
+					referenceProvider( id ),
+					document -> document.addValue( index.binding().title, "The Boss of the Rings chap. " + id ),
+					commitStrategy, refreshStrategy
+			);
 		}
 		future = CompletableFuture.allOf( tasks );
 		Awaitility.await().until( future::isDone );
@@ -89,7 +119,7 @@ public class IndexIndexerIT {
 		FutureAssert.assertThat( future ).isSuccessful();
 
 		expectedMatchingBooks -= booksToUpdate;
-		workspace.refresh().join();
+		refreshIfNecessary();
 		SearchResultAssert.assertThat( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
@@ -100,7 +130,10 @@ public class IndexIndexerIT {
 		tasks = new CompletableFuture<?>[booksToDelete];
 		for ( int i = 0; i < booksToDelete; i++ ) {
 			final String id = String.valueOf( i + booksToUpdate );
-			tasks[i] = indexer.delete( referenceProvider( id ) );
+			tasks[i] = indexer.delete(
+					referenceProvider( id ),
+					commitStrategy, refreshStrategy
+			);
 		}
 		future = CompletableFuture.allOf( tasks );
 		Awaitility.await().until( future::isDone );
@@ -108,7 +141,7 @@ public class IndexIndexerIT {
 		FutureAssert.assertThat( future ).isSuccessful();
 
 		expectedMatchingBooks -= booksToDelete;
-		workspace.refresh().join();
+		refreshIfNecessary();
 		SearchResultAssert.assertThat( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
@@ -122,9 +155,11 @@ public class IndexIndexerIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
 
-		CompletableFuture<?> future = indexer.add( referenceProvider( "1" ), document -> {
-			document.addValue( index.binding().title, "Document #1" );
-		} );
+		CompletableFuture<?> future = indexer.add(
+				referenceProvider( "1" ),
+				document -> document.addValue( index.binding().title, "Document #1" ),
+				commitStrategy, refreshStrategy
+		);
 		Awaitility.await().until( future::isDone );
 
 		// The operation should fail.
@@ -146,9 +181,11 @@ public class IndexIndexerIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
 
-		CompletableFuture<?> future = indexer.update( referenceProvider( "1" ), document -> {
-			document.addValue( index.binding().title, "Document #1" );
-		} );
+		CompletableFuture<?> future = indexer.update(
+				referenceProvider( "1" ),
+				document -> document.addValue( index.binding().title, "Document #1" ),
+				commitStrategy, refreshStrategy
+		);
 		Awaitility.await().until( future::isDone );
 
 		// The operation should fail.
@@ -170,7 +207,9 @@ public class IndexIndexerIT {
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
 
-		CompletableFuture<?> future = indexer.delete( referenceProvider( "1" ) );
+		CompletableFuture<?> future = indexer.delete(
+				referenceProvider( "1" ), commitStrategy, refreshStrategy
+		);
 		Awaitility.await().until( future::isDone );
 
 		// The operation should fail.
@@ -182,6 +221,13 @@ public class IndexIndexerIT {
 		}
 		catch (RuntimeException | IOException e) {
 			log.debug( "Expected error while shutting down Hibernate Search, caused by the deletion of an index", e );
+		}
+	}
+
+	private void refreshIfNecessary() {
+		if ( DocumentRefreshStrategy.NONE.equals( refreshStrategy ) ) {
+			IndexWorkspace workspace = index.createWorkspace();
+			workspace.refresh().join();
 		}
 	}
 

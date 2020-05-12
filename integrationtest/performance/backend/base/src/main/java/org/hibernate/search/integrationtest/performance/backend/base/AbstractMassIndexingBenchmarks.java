@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.performance.backend.base;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.DatasetHolder;
@@ -70,7 +71,8 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 			long documentId = getIndexPartition().toDocumentId( currentDocumentIdInThread++ );
 			futures[i] = indexer.add(
 					StubMapperUtils.referenceProvider( String.valueOf( documentId ) ),
-					document -> dataset.populate( index, document, documentId, 0L )
+					document -> dataset.populate( index, document, documentId, 0L ),
+					commitStrategy, DocumentRefreshStrategy.NONE
 			);
 		}
 

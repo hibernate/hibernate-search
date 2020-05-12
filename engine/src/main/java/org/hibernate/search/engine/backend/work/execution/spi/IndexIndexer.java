@@ -8,6 +8,9 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+
 /**
  * An indexer scoped to a single index.
  */
@@ -18,25 +21,34 @@ public interface IndexIndexer {
 	 *
 	 * @param referenceProvider A source of information about the identity of the document to add.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
+	 * @param commitStrategy How to handle the commit.
+	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} that completes once the document is added.
 	 */
-	CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor);
+	CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**
 	 * Update a document in the index, or add it if it's absent from the index.
 	 *
 	 * @param referenceProvider A source of information about the identity of the document to update.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
+	 * @param commitStrategy How to handle the commit.
+	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} that completes once the document is updated.
 	 */
-	CompletableFuture<?> update(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor);
+	CompletableFuture<?> update(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**
 	 * Delete a document from the index.
 	 *
 	 * @param referenceProvider A source of information about the identity of the document to delete.
+	 * @param commitStrategy How to handle the commit.
+	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} that completes once the document is deleted.
 	 */
-	CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider);
+	CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 }

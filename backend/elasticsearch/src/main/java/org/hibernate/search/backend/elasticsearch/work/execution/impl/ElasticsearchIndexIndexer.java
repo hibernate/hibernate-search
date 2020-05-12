@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -37,18 +39,21 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
-		return index( referenceProvider, documentContributor );
+			DocumentContributor documentContributor,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return index( referenceProvider, documentContributor, refreshStrategy );
 	}
 
 	@Override
 	public CompletableFuture<?> update(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
-		return index( referenceProvider, documentContributor );
+			DocumentContributor documentContributor,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return index( referenceProvider, documentContributor, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider) {
+	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		String id = referenceProvider.getIdentifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
@@ -58,12 +63,15 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				elasticsearchId, routingKey
 		)
+				// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
+				.refresh( refreshStrategy )
 				.build();
 		return orchestrator.submit( work );
 	}
 
 	private CompletableFuture<?> index(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
+			DocumentContributor documentContributor,
+			DocumentRefreshStrategy refreshStrategy) {
 		String id = referenceProvider.getIdentifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
@@ -75,6 +83,8 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				elasticsearchId, routingKey, document
 		)
+				// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
+				.refresh( refreshStrategy )
 				.build();
 		return orchestrator.submit( work );
 	}

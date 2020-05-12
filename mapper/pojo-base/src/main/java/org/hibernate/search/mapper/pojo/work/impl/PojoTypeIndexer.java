@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.pojo.work.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -33,7 +35,9 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, entitySupplier
 		);
-		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
+		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
+		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 	}
 
 	CompletableFuture<?> addOrUpdate(Object providedId, Object entity) {
@@ -42,7 +46,9 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, entitySupplier
 		);
-		return delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
+		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
+		return delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 	}
 
 	CompletableFuture<?> delete(Object providedId, Object entity) {
@@ -51,7 +57,8 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, entitySupplier
 		);
-		return delegate.delete( referenceProvider );
+		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
+		return delegate.delete( referenceProvider, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 	}
 
 	CompletableFuture<?> purge(Object providedId, String providedRoutingKey) {
@@ -59,6 +66,7 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, providedRoutingKey
 		);
-		return delegate.delete( referenceProvider );
+		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
+		return delegate.delete( referenceProvider, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 	}
 }

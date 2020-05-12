@@ -18,6 +18,8 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -65,9 +67,12 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		IndexWorkspace workspace = indexManager.createWorkspace();
 		IndexIndexer indexer = indexManager.createIndexer();
 
-		indexer.add( referenceProvider( "1" ), document -> {
-			document.addValue( indexMapping.text, "text1" );
-		} ).join();
+		indexer.add(
+				referenceProvider( "1" ),
+				document -> document.addValue( indexMapping.text, "text1" ),
+				DocumentCommitStrategy.NONE,
+				DocumentRefreshStrategy.NONE
+		).join();
 		workspace.refresh().join();
 
 		SearchQuery<DocumentReference> text1Query = indexManager
@@ -98,9 +103,12 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 
 		// Reindex the document: text == "text2"
 		// In a real-world scenario, we would reindex thousands of documents
-		indexer.add( referenceProvider( "1" ), document -> {
-			document.addValue( indexMapping.text, "text2" );
-		} ).join();
+		indexer.add(
+				referenceProvider( "1" ),
+				document -> document.addValue( indexMapping.text, "text2" ),
+				DocumentCommitStrategy.NONE,
+				DocumentRefreshStrategy.NONE
+		).join();
 		workspace.refresh().join();
 
 		// Search queries are unaffected: text == "text1"
