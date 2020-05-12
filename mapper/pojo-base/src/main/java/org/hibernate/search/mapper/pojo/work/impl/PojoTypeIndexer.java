@@ -31,9 +31,34 @@ public class PojoTypeIndexer<I, E> {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
-				sessionContext,
-				identifier, entitySupplier
+				sessionContext, identifier, entitySupplier
 		);
 		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
+	}
+
+	CompletableFuture<?> addOrUpdate(Object providedId, Object entity) {
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
+				sessionContext, identifier, entitySupplier
+		);
+		return delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
+	}
+
+	CompletableFuture<?> delete(Object providedId, Object entity) {
+		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
+				sessionContext, identifier, entitySupplier
+		);
+		return delegate.delete( referenceProvider );
+	}
+
+	CompletableFuture<?> purge(Object providedId, String providedRoutingKey) {
+		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
+		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
+				sessionContext, identifier, providedRoutingKey
+		);
+		return delegate.delete( referenceProvider );
 	}
 }

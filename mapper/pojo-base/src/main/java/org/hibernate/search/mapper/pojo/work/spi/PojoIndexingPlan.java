@@ -87,7 +87,7 @@ public interface PojoIndexingPlan<R> {
 	/**
 	 * Purge an entity from the index.
 	 * <p>
-	 * Entities to reindex as a result from this operation will not be resolved.
+	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
 	 * No effect on the index if the entity is not in the index.
 	 * @param typeIdentifier The identifier of the entity type.
