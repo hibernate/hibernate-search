@@ -33,7 +33,8 @@ public class StubIndexIndexer implements IndexIndexer {
 
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
+			DocumentContributor documentContributor,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
@@ -42,8 +43,8 @@ public class StubIndexIndexer implements IndexIndexer {
 				.identifier( referenceProvider.getIdentifier() )
 				.routingKey( referenceProvider.getRoutingKey() )
 				.document( documentBuilder.build() )
-				.commit( DocumentCommitStrategy.NONE )
-				.refresh( DocumentRefreshStrategy.NONE )
+				.commit( commitStrategy )
+				.refresh( refreshStrategy )
 				.build();
 
 		return behavior.processAndExecuteDocumentWork( indexName, work );
@@ -51,7 +52,8 @@ public class StubIndexIndexer implements IndexIndexer {
 
 	@Override
 	public CompletableFuture<?> update(DocumentReferenceProvider referenceProvider,
-			DocumentContributor documentContributor) {
+			DocumentContributor documentContributor,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
@@ -60,21 +62,22 @@ public class StubIndexIndexer implements IndexIndexer {
 				.identifier( referenceProvider.getIdentifier() )
 				.routingKey( referenceProvider.getRoutingKey() )
 				.document( documentBuilder.build() )
-				.commit( DocumentCommitStrategy.NONE )
-				.refresh( DocumentRefreshStrategy.NONE )
+				.commit( commitStrategy )
+				.refresh( refreshStrategy )
 				.build();
 
 		return behavior.processAndExecuteDocumentWork( indexName, work );
 	}
 
 	@Override
-	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider) {
+	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.DELETE )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
 				.identifier( referenceProvider.getIdentifier() )
 				.routingKey( referenceProvider.getRoutingKey() )
-				.commit( DocumentCommitStrategy.NONE )
-				.refresh( DocumentRefreshStrategy.NONE )
+				.commit( commitStrategy )
+				.refresh( refreshStrategy )
 				.build();
 
 		return behavior.processAndExecuteDocumentWork( indexName, work );

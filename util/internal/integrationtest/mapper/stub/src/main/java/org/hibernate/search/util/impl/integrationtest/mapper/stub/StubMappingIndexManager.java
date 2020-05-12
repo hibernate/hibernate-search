@@ -92,7 +92,8 @@ public abstract class StubMappingIndexManager {
 				for ( int j = 0; j < batchSize; j++ ) {
 					StubDocumentProvider documentProvider = documentProviders.get( batchStart + j );
 					batchFutures[j] = indexer.add(
-							documentProvider.getReferenceProvider(), documentProvider.getContributor()
+							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
+							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					);
 				}
 				return CompletableFuture.allOf( batchFutures );
