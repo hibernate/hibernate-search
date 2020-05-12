@@ -19,7 +19,9 @@ import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
+import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -40,6 +42,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 	private SearchIndexingPlanImpl indexingPlan;
+	private SearchIndexer indexer;
 
 	private JavaBeanSearchSession(Builder builder) {
 		super( builder.mappingContext );
@@ -92,6 +95,17 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 			);
 		}
 		return indexingPlan;
+	}
+
+	@Override
+	public SearchIndexer indexer() {
+		if ( indexer == null ) {
+			indexer = new SearchIndexerImpl(
+					getRuntimeIntrospector(),
+					createIndexer()
+			);
+		}
+		return indexer;
 	}
 
 	@Override
