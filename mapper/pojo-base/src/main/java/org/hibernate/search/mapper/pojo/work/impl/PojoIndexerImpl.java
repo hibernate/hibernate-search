@@ -35,13 +35,32 @@ public class PojoIndexerImpl implements PojoIndexer {
 
 	@Override
 	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
-		PojoTypeIndexer<?, ?> typeExecutor = this.typeExecutors.get( typeIdentifier );
-		if ( typeExecutor == null ) {
-			typeExecutor = createTypeIndexer( typeIdentifier );
-			typeExecutors.put( typeIdentifier, typeExecutor );
-		}
+		return getDelegate( typeIdentifier ).add( providedId, entity );
+	}
 
-		return typeExecutor.add( providedId, entity );
+	@Override
+	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
+		return getDelegate( typeIdentifier ).addOrUpdate( providedId, entity );
+	}
+
+	@Override
+	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
+		return getDelegate( typeIdentifier ).delete( providedId, entity );
+	}
+
+	@Override
+	public CompletableFuture<?> purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			String providedRoutingKey) {
+		return getDelegate( typeIdentifier ).purge( providedId, providedRoutingKey );
+	}
+
+	private PojoTypeIndexer<?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		PojoTypeIndexer<?, ?> delegate = this.typeExecutors.get( typeIdentifier );
+		if ( delegate == null ) {
+			delegate = createTypeIndexer( typeIdentifier );
+			typeExecutors.put( typeIdentifier, delegate );
+		}
+		return delegate;
 	}
 
 	private PojoTypeIndexer<?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
