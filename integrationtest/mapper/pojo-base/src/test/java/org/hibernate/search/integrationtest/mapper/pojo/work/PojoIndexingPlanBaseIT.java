@@ -31,7 +31,7 @@ import org.junit.Test;
  * see {@code org.hibernate.search.integrationtest.mapper.orm.session.SearchIndexingPlanBaseIT}
  * in particular.
  */
-public class PojoIndexingPlanIT {
+public class PojoIndexingPlanBaseIT {
 
 	@Rule
 	public final BackendMock backendMock = new BackendMock( "stubBackend" );
