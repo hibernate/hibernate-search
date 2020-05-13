@@ -378,7 +378,7 @@ See <<backend-lucene-field-types-extension>>.
 |java.time.Year|<<backend-lucene-field-types-date-time>>
 |java.time.YearMonth|<<backend-lucene-field-types-date-time>>
 |java.time.MonthDay|-
-|org.hibernate.search.engine.spatial.GeoPoint|-
+|org.hibernate.search.engine.spatial.GeoPoint|<<backend-lucene-field-types-geopoint>>
 |====
 
 [[backend-lucene-field-types-date-time,Lower range/resolution]]
@@ -398,6 +398,20 @@ Resolution for time types is also lower:
 * The Lucene backend supports millisecond-resolution.
 
 Precision beyond the millisecond will be lost when indexing.
+====
+
+[[backend-lucene-field-types-geopoint,Lower resolution]]
+[NOTE]
+.Range and resolution of `GeoPoint` fields
+====
+``GeoPoint``s are indexed as ``LatLonPoint``s in the Lucene backend.
+According to ``LatLonPoint``'s javadoc, there is a loss of precision when the values are encoded:
+
+> Values are indexed with some loss of precision from the
+> original `double` values (`4.190951585769653E-8` for the latitude component
+> and `8.381903171539307E-8` for longitude).
+
+This effectively means indexed points can be off by about 13 centimeters (5.2 inches) in the worst case.
 ====
 
 [[backend-lucene-field-types-extension]]
