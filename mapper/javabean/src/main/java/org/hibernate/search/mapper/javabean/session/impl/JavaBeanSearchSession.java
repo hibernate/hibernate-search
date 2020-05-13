@@ -102,7 +102,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 		if ( indexer == null ) {
 			indexer = new SearchIndexerImpl(
 					getRuntimeIntrospector(),
-					createIndexer()
+					createIndexer(),
+					commitStrategy, refreshStrategy
 			);
 		}
 		return indexer;

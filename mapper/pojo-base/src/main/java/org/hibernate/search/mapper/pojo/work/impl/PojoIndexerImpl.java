@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -34,24 +36,29 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
-		return getDelegate( typeIdentifier ).add( providedId, entity );
+	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity,
+			DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate( typeIdentifier ).add( providedId, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
-		return getDelegate( typeIdentifier ).addOrUpdate( providedId, entity );
+	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate( typeIdentifier ).addOrUpdate( providedId, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
-		return getDelegate( typeIdentifier ).delete( providedId, entity );
+	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate( typeIdentifier ).delete( providedId, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
 	public CompletableFuture<?> purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			String providedRoutingKey) {
-		return getDelegate( typeIdentifier ).purge( providedId, providedRoutingKey );
+			String providedRoutingKey,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate( typeIdentifier ).purge( providedId, providedRoutingKey, commitStrategy, refreshStrategy );
 	}
 
 	private PojoTypeIndexer<?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
