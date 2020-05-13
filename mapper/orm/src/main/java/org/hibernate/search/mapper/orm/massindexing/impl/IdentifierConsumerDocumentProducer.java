@@ -24,6 +24,8 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
@@ -236,7 +238,9 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		CompletableFuture<?> future;
 		try {
-			future = indexer.add( type.getTypeIdentifier(), null, entity );
+			future = indexer.add( type.getTypeIdentifier(), null, entity,
+					// Commit and refresh are handled globally after all documents are indexed.
+					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 		}
 		catch (RuntimeException e) {
 			future = new CompletableFuture<>();

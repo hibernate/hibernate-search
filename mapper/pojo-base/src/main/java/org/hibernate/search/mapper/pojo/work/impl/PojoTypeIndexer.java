@@ -29,44 +29,44 @@ public class PojoTypeIndexer<I, E> {
 		this.delegate = delegate;
 	}
 
-	CompletableFuture<?> add(Object providedId, Object entity) {
+	CompletableFuture<?> add(Object providedId, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, entitySupplier
 		);
-		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
 		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+				commitStrategy, refreshStrategy );
 	}
 
-	CompletableFuture<?> addOrUpdate(Object providedId, Object entity) {
+	CompletableFuture<?> addOrUpdate(Object providedId, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, entitySupplier
 		);
-		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
 		return delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+				commitStrategy, refreshStrategy );
 	}
 
-	CompletableFuture<?> delete(Object providedId, Object entity) {
+	CompletableFuture<?> delete(Object providedId, Object entity,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, entitySupplier
 		);
-		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
-		return delegate.delete( referenceProvider, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+		return delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
 	}
 
-	CompletableFuture<?> purge(Object providedId, String providedRoutingKey) {
+	CompletableFuture<?> purge(Object providedId, String providedRoutingKey,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, providedRoutingKey
 		);
-		// FIXME HSEARCH-3902 allow configuring the commit/refresh strategy
-		return delegate.delete( referenceProvider, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+		return delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
 	}
 }
