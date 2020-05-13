@@ -165,7 +165,7 @@ public class PojoIndexedTypeManager<I, E>
 		return new PojoTypeIndexer<>(
 				this, sessionContext,
 				indexManager.createIndexer(
-						sessionContext, sessionContext.getEntityReferenceFactory()
+						sessionContext
 				)
 		);
 	}

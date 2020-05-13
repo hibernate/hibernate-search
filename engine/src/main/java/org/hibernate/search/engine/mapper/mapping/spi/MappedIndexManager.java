@@ -34,8 +34,7 @@ public interface MappedIndexManager {
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexIndexer createIndexer(BackendSessionContext sessionContext,
-			EntityReferenceFactory<?> entityReferenceFactory);
+	IndexIndexer createIndexer(BackendSessionContext sessionContext);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 
