@@ -15,13 +15,13 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -67,14 +67,12 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	@Test
 	public void failure() {
-		Assume.assumeTrue( operationWillFailIfAppliedToDeletedIndex() );
-
 		setup();
 
 		IndexWorkspace workspace = indexManager.createWorkspace();
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( INDEX_NAME );
+		ensureOperationsFail( setupHelper.getBackendAccessor(), INDEX_NAME );
 
 		CompletableFuture<?> future = executeAsync( workspace );
 		Awaitility.await().until( future::isDone );
@@ -91,7 +89,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 		}
 	}
 
-	protected abstract boolean operationWillFailIfAppliedToDeletedIndex();
+	protected abstract void ensureOperationsFail(TckBackendAccessor accessor, String indexName);
 
 	protected void beforeInitData(StubMappingIndexManager indexManager) {
 		// Nothing to do by default.

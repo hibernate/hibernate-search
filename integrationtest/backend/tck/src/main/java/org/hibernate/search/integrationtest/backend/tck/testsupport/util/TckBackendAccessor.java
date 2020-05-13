@@ -10,6 +10,8 @@ import java.io.Closeable;
 
 public interface TckBackendAccessor extends Closeable {
 
-	void ensureIndexOperationsFail(String indexName);
+	void ensureIndexingOperationsFail(String indexName);
+
+	void ensureFlushMergeRefreshOperationsFail(String indexName);
 
 }

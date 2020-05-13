@@ -149,7 +149,7 @@ public class IndexIndexingPlanIT {
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
@@ -175,7 +175,7 @@ public class IndexIndexingPlanIT {
 		plan.update( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
@@ -201,7 +201,7 @@ public class IndexIndexingPlanIT {
 		plan.delete( referenceProvider( "2" ) );
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
@@ -228,7 +228,7 @@ public class IndexIndexingPlanIT {
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> future = plan.executeAndReport();
 		Awaitility.await().until( future::isDone );

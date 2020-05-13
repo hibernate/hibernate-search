@@ -38,14 +38,6 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean flushWillFailIfAppliedToDeletedIndex() {
-		return true;
-	}
-
-	public boolean mergeSegmentsWillFailIfAppliedToDeletedIndex() {
-		return true;
-	}
-
 	public boolean lenientOnMultiIndexesCompatibilityChecks() {
 		// we decide to allow ALL the model incompatibilities Elasticsearch allows.
 		return false;

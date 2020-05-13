@@ -153,7 +153,7 @@ public class IndexIndexerIT {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = indexer.add(
 				referenceProvider( "1" ),
@@ -179,7 +179,7 @@ public class IndexIndexerIT {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = indexer.update(
 				referenceProvider( "1" ),
@@ -205,7 +205,7 @@ public class IndexIndexerIT {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
-		setupHelper.getBackendAccessor().ensureIndexOperationsFail( index.name() );
+		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
 		CompletableFuture<?> future = indexer.delete(
 				referenceProvider( "1" ), commitStrategy, refreshStrategy

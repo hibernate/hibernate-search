@@ -17,28 +17,6 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean flushWillFailIfAppliedToDeletedIndex() {
-		/*
-		 * Lucene has optimizations in place to not apply flushes when there are no pending change in the writer.
-		 * Thus, even if we ruthlessly delete the index from the filesystem,
-		 * executing a flush will work most of the time,
-		 * because most of the time changes are already committed when the flush executes.
-		 */
-		return false;
-	}
-
-	@Override
-	public boolean mergeSegmentsWillFailIfAppliedToDeletedIndex() {
-		/*
-		 * Lucene has optimizations in place to not apply mergeSegments() when there is only one segment.
-		 * Thus, even if we ruthlessly delete the index from the filesystem,
-		 * executing mergeSegments() will work most of the time,
-		 * because most of the time we will only have one segment.
-		 */
-		return false;
-	}
-
-	@Override
 	public boolean supportsDynamicChildFieldsInExistsPredicate() {
 		// See https://hibernate.atlassian.net/browse/HSEARCH-3905
 		return false;

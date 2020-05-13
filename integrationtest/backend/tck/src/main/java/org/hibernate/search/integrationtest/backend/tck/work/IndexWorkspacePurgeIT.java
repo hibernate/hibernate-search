@@ -12,12 +12,14 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 
 public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperationIT {
+
 	@Override
-	protected boolean operationWillFailIfAppliedToDeletedIndex() {
-		return true;
+	protected void ensureOperationsFail(TckBackendAccessor accessor, String indexName) {
+		accessor.ensureIndexingOperationsFail( indexName );
 	}
 
 	@Override

@@ -9,13 +9,14 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 
 public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleOperationIT {
+
 	@Override
-	protected boolean operationWillFailIfAppliedToDeletedIndex() {
-		return TckConfiguration.get().getBackendFeatures().mergeSegmentsWillFailIfAppliedToDeletedIndex();
+	protected void ensureOperationsFail(TckBackendAccessor accessor, String indexName) {
+		accessor.ensureFlushMergeRefreshOperationsFail( indexName );
 	}
 
 	@Override

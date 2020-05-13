@@ -145,7 +145,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public IndexSettingsClient settings() {
-			return settings( "" );
+			return settings( null );
 		}
 
 		public IndexSettingsClient settings(String settingsPath) {
@@ -625,12 +625,14 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private JsonObject buildStructuredSettings(String settingsPath, String settings) {
 		JsonElement settingsJsonElement = toJsonElement( settings );
 
-		List<String> components = Arrays.asList( settingsPath.split( "\\." ) );
-		Collections.reverse( components );
-		for ( String property : components ) {
-			JsonObject parent = new JsonObject();
-			parent.add( property, settingsJsonElement );
-			settingsJsonElement = parent;
+		if ( settingsPath != null ) {
+			List<String> components = Arrays.asList( settingsPath.split( "\\." ) );
+			Collections.reverse( components );
+			for ( String property : components ) {
+				JsonObject parent = new JsonObject();
+				parent.add( property, settingsJsonElement );
+				settingsJsonElement = parent;
+			}
 		}
 
 		return settingsJsonElement.getAsJsonObject();
@@ -646,11 +648,13 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			return new JsonObject().toString();
 		}
 		JsonElement settings = index.getAsJsonObject().get( "settings" );
-		for ( String property : path.split( "\\." ) ) {
-			if ( settings == null ) {
-				break;
+		if ( path != null ) {
+			for ( String property : path.split( "\\." ) ) {
+				if ( settings == null ) {
+					break;
+				}
+				settings = settings.getAsJsonObject().get( property );
 			}
-			settings = settings.getAsJsonObject().get( property );
 		}
 		if ( settings == null ) {
 			return new JsonObject().toString();

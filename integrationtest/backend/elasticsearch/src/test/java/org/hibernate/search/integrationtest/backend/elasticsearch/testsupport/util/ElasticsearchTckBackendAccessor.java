@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 import java.io.IOException;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexSettingsTestUtils;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 
 public class ElasticsearchTckBackendAccessor implements TckBackendAccessor {
@@ -24,8 +25,19 @@ public class ElasticsearchTckBackendAccessor implements TckBackendAccessor {
 	}
 
 	@Override
-	public void ensureIndexOperationsFail(String indexName) {
-		// Close the index so that every operation will fail
-		client.index( indexName ).close();
+	public void ensureIndexingOperationsFail(String indexName) {
+		// There are many ways we could implement this method,
+		// but the one below is the only one that:
+		// 1. Will make even deletion operations fail (unlike deleting the index).
+		// 2. Will work on AWS Elasticsearch Service (unlike _close).
+
+		// Block read and write operations
+		client.index( indexName )
+				.settings().putDynamic( ElasticsearchIndexSettingsTestUtils.settingsEnableReadWrite( false ) );
+	}
+
+	@Override
+	public void ensureFlushMergeRefreshOperationsFail(String indexName) {
+		client.index( indexName ).delete();
 	}
 }

@@ -20,6 +20,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneTestIndexesPathConfiguration;
 
+import org.junit.AssumptionViolatedException;
+
 import org.jboss.logging.Logger;
 
 import org.apache.lucene.store.Directory;
@@ -41,7 +43,7 @@ public class LuceneTckBackendAccessor implements TckBackendAccessor {
 	}
 
 	@Override
-	public void ensureIndexOperationsFail(String indexName) {
+	public void ensureIndexingOperationsFail(String indexName) {
 		Path indexPath = indexesPath.resolve( indexName );
 		try {
 			// Try to corrupt the content of the index
@@ -58,6 +60,28 @@ public class LuceneTckBackendAccessor implements TckBackendAccessor {
 							+ " to trigger failures in tests.", e
 			);
 		}
+	}
+
+	@Override
+	public void ensureFlushMergeRefreshOperationsFail(String indexName) {
+		/*
+		 * Flush:
+		 * Lucene has optimizations in place to not apply flushes when there are no pending change in the writer.
+		 * Thus, even if we ruthlessly delete the index from the filesystem,
+		 * executing a flush will work most of the time,
+		 * because most of the time changes are already committed when the flush executes.
+		 *
+		 * Merge:
+		 * Lucene has optimizations in place to not apply mergeSegments() when there is only one segment.
+		 * Thus, even if we ruthlessly delete the index from the filesystem,
+		 * executing mergeSegments() will work most of the time,
+		 * because most of the time we will only have one segment.
+		 *
+		 * Refresh:
+		 * The refresh in the Lucene backend actually doesn't touch the index at all,
+		 * so we don't have any way to trigger failures.
+		 */
+		throw new AssumptionViolatedException( "Cannot simulate flush/merge/refresh failures for the Lucene backend" );
 	}
 
 	public Directory openDirectory(String indexName) throws IOException {
