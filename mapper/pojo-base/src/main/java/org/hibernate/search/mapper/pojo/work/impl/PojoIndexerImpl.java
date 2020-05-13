@@ -7,10 +7,10 @@
 package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -27,7 +27,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoWorkSessionContext<?> sessionContext;
 
-	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?>> typeExecutors = new HashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?>> delegates = new ConcurrentHashMap<>();
 
 	public PojoIndexerImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkSessionContext<?> sessionContext) {
@@ -62,10 +62,11 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	private PojoTypeIndexer<?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
-		PojoTypeIndexer<?, ?> delegate = this.typeExecutors.get( typeIdentifier );
+		// Call get() before resorting to computeIfAbsent,
+		// because it's faster and will be enough in the vast majority of cases.
+		PojoTypeIndexer<?, ?> delegate = this.delegates.get( typeIdentifier );
 		if ( delegate == null ) {
-			delegate = createTypeIndexer( typeIdentifier );
-			typeExecutors.put( typeIdentifier, delegate );
+			delegate = this.delegates.computeIfAbsent( typeIdentifier, this::createTypeIndexer );
 		}
 		return delegate;
 	}

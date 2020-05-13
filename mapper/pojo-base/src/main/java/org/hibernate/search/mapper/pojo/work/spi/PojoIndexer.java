@@ -16,6 +16,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
  * An interface for indexing entities in the context of a session in a POJO mapper,
  * immediately, asynchronously and without any sort of {@link PojoIndexingPlan planning}
  * or handling of containing entities.
+ * <p>
+ * Implementations must be thread-safe if the underlying session is thread-safe.
  */
 public interface PojoIndexer {
 

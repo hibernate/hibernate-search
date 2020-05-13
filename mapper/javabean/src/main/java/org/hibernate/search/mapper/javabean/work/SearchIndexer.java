@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * This class is stateless: operations start executing as soon as they are submitted.
  * <p>
- * This contract is not thread-safe.
+ * This contract is thread-safe.
  */
 public interface SearchIndexer {
 
