@@ -133,7 +133,7 @@ public abstract class StubMappingIndexManager {
 	}
 
 	public IndexIndexer createIndexer(StubBackendSessionContext sessionContext) {
-		return delegate().createIndexer( sessionContext, StubEntityReference.FACTORY );
+		return delegate().createIndexer( sessionContext );
 	}
 
 	public IndexWorkspace createWorkspace() {
