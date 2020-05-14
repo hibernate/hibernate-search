@@ -98,6 +98,21 @@ public class SearchSortIT {
 	}
 
 	@Test
+	public void byDefault_score() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		assertThat( scope.query()
+				.where( f -> f.match().field( "string_analyzed_forScore" ).matching( "hooray" ) )
+				.toQuery() )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID );
+
+		assertThat( scope.query()
+				.where( f -> f.match().field( "string_analyzed_forScore_reversed" ).matching( "hooray" ) )
+				.toQuery() )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID );
+	}
+
+	@Test
 	public void byScore() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
@@ -352,16 +367,19 @@ public class SearchSortIT {
 				.add( SECOND_ID, document -> {
 					document.addValue( mainIndex.binding().string, "george" );
 					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray" );
+					document.addValue( mainIndex.binding().string_analyzed_forScore_reversed, "Hooray Hooray" );
 					document.addValue( mainIndex.binding().unsortable, "george" );
 				} )
 				.add( FIRST_ID, document -> {
 					document.addValue( mainIndex.binding().string, "aaron" );
 					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray Hooray" );
+					document.addValue( mainIndex.binding().string_analyzed_forScore_reversed, "Hooray" );
 					document.addValue( mainIndex.binding().unsortable, "aaron" );
 				} )
 				.add( THIRD_ID, document -> {
 					document.addValue( mainIndex.binding().string, "zach" );
 					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray" );
+					document.addValue( mainIndex.binding().string_analyzed_forScore_reversed, "Hooray Hooray Hooray" );
 					document.addValue( mainIndex.binding().unsortable, "zach" );
 				} )
 				.add( EMPTY_ID, document -> { } )
@@ -371,6 +389,7 @@ public class SearchSortIT {
 	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> string_analyzed_forScore;
+		final IndexFieldReference<String> string_analyzed_forScore_reversed;
 		final IndexFieldReference<String> unsortable;
 
 		IndexBinding(IndexSchemaElement root) {
@@ -378,6 +397,12 @@ public class SearchSortIT {
 					.toReference();
 			string_analyzed_forScore = root.field(
 					"string_analyzed_forScore" ,
+					f -> f.asString()
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+			)
+					.toReference();
+			string_analyzed_forScore_reversed = root.field(
+					"string_analyzed_forScore_reversed" ,
 					f -> f.asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
