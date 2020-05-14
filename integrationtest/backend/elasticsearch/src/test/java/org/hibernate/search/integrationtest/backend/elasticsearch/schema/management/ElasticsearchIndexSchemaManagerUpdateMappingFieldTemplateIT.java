@@ -634,7 +634,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	}
 
 	private void setupAndUpdate(Consumer<? super IndexSchemaElement> binder) {
-		StubMappedIndex index = StubMappedIndex.withoutRetrievableBinding( INDEX_NAME, binder );
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( binder ).name( INDEX_NAME );
 
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

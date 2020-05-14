@@ -55,8 +55,7 @@ public class DocumentElementFieldReferenceIT<F> {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> index =
-			SimpleMappedIndex.ofAdvanced( "MainIndex", IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.ofAdvanced( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {

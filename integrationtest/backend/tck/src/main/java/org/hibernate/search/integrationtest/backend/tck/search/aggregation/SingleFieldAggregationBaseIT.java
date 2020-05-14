@@ -90,12 +90,12 @@ public class SingleFieldAggregationBaseIT<F> {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> mainIndex =
-			SimpleMappedIndex.of( "Main", IndexBinding::new );
-	private static final SimpleMappedIndex<IndexBinding> emptyIndex =
-			SimpleMappedIndex.of( "Empty", IndexBinding::new );
-	private static final SimpleMappedIndex<IndexBinding> nullOnlyIndex =
-			SimpleMappedIndex.of( "NullOnly", IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new )
+			.name( "Main" );
+	private static final SimpleMappedIndex<IndexBinding> emptyIndex = SimpleMappedIndex.of( IndexBinding::new )
+			.name( "Empty" );
+	private static final SimpleMappedIndex<IndexBinding> nullOnlyIndex = SimpleMappedIndex.of( IndexBinding::new )
+			.name( "NullOnly" );
 
 	@BeforeClass
 	public static void setup() {

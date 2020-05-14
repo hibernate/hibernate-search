@@ -17,24 +17,31 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 // TODO This extends StubMappingIndexManager for backward compatibility; ideally we'll move everything to this class, eventually.
 public abstract class StubMappedIndex extends StubMappingIndexManager {
 
-	public static StubMappedIndex withoutFields(String indexName) {
-		return withoutRetrievableBinding( indexName, ignored -> { } );
+	public static StubMappedIndex withoutFields() {
+		return ofAdvancedNonRetrievable( ignored -> { } );
 	}
 
-	public static StubMappedIndex withoutRetrievableBinding(String indexName, Consumer<? super IndexSchemaElement> binder) {
-		return new StubMappedIndex( indexName ) {
+	public static StubMappedIndex ofNonRetrievable(Consumer<? super IndexSchemaElement> binder) {
+		return ofAdvancedNonRetrievable( ctx -> binder.accept( ctx.getSchemaElement() ) );
+	}
+
+	public static StubMappedIndex ofAdvancedNonRetrievable(Consumer<? super IndexedEntityBindingContext> binder) {
+		return new StubMappedIndex() {
 			@Override
 			protected void bind(IndexedEntityBindingContext context) {
-				binder.accept( context.getSchemaElement() );
+				binder.accept( context );
 			}
 		};
 	}
 
-	private final String indexName;
+	private String indexName;
+	private String typeName;
+	private String backendName;
 	private MappedIndexManager manager;
 
-	public StubMappedIndex(String indexName) {
-		this.indexName = indexName;
+	public StubMappedIndex() {
+		this.indexName = "indexName";
+		this.typeName = null;
 	}
 
 	@Override
@@ -42,14 +49,27 @@ public abstract class StubMappedIndex extends StubMappingIndexManager {
 		return indexName;
 	}
 
-	public String typeName() {
-		// Use the index name for the type name by default.
-		// Tests are easier to write if we can just have one constant for the index name.
-		return name();
+	public StubMappedIndex name(String name) {
+		this.indexName = name;
+		return this;
 	}
 
-	public Optional<String> backendName() {
-		return Optional.empty();
+	public final String typeName() {
+		return typeName != null ? typeName : indexName + "Type";
+	}
+
+	public StubMappedIndex typeName(String name) {
+		this.typeName = name;
+		return this;
+	}
+
+	public final Optional<String> backendName() {
+		return Optional.ofNullable( backendName );
+	}
+
+	public StubMappedIndex backendName(String name) {
+		this.backendName = name;
+		return this;
 	}
 
 	public IndexManager toApi() {

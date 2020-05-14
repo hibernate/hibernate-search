@@ -67,8 +67,7 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> mainIndex =
-			SimpleMappedIndex.of( "Main", IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {

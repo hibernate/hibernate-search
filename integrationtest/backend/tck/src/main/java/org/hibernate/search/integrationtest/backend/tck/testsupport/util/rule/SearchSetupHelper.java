@@ -21,6 +21,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
@@ -30,18 +32,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
-import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -205,29 +205,25 @@ public class SearchSetupHelper implements TestRule {
 			StubTypeMappingConfigurationContext configurationContext = new StubTypeMappingConfigurationContext();
 			optionsContributor.accept( configurationContext );
 
-			return withIndex( new StubMappedIndex( rawIndexName ) {
-				@Override
-				public String typeName() {
-					return configurationContext.typeName == null
-							? super.typeName() : configurationContext.typeName;
-				}
+			return withIndex(
+					new StubMappedIndex() {
+						@Override
+						protected void bind(IndexedEntityBindingContext context) {
+							mappingContributor.accept( context );
+						}
 
-				@Override
-				public Optional<String> backendName() {
-					return Optional.ofNullable( configurationContext.backendName );
-				}
-
-				@Override
-				protected void bind(IndexedEntityBindingContext context) {
-					mappingContributor.accept( context );
-				}
-
-				@Override
-				protected void onIndexManagerCreated(MappedIndexManager manager) {
-					super.onIndexManagerCreated( manager );
-					listener.onSetup( this );
-				}
-			} );
+						@Override
+						protected void onIndexManagerCreated(MappedIndexManager manager) {
+							super.onIndexManagerCreated( manager );
+							listener.onSetup( this );
+						}
+					}
+							.name( rawIndexName )
+							// Use the index name for the type name by default.
+							// Tests are easier to write if we can just have one constant for the index name.
+							.typeName( configurationContext.typeName != null ? configurationContext.typeName : rawIndexName )
+							.backendName( configurationContext.backendName )
+				);
 		}
 
 		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {

@@ -67,7 +67,7 @@ public class IndexIndexingPlanIT {
 
 	private final StubBackendSessionContext sessionContext;
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction,
 			StubBackendSessionContext sessionContext) {
@@ -96,7 +96,7 @@ public class IndexIndexingPlanIT {
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
 				.toQuery() )
-				.hasDocRefHitsAnyOrder( index.name(), "1", "2", "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3" );
 
 		// Update
 		plan.update( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
@@ -108,7 +108,7 @@ public class IndexIndexingPlanIT {
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
 				.toQuery() )
-				.hasDocRefHitsAnyOrder( index.name(), "1", "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "3" );
 
 		// Delete
 		plan.delete( referenceProvider( "1" ) );
@@ -120,7 +120,7 @@ public class IndexIndexingPlanIT {
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
 				.toQuery() )
-				.hasDocRefHitsAnyOrder( index.name(), "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 	}
 
 	@Test
@@ -139,7 +139,7 @@ public class IndexIndexingPlanIT {
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery() )
-				.hasDocRefHitsAnyOrder( index.name(), "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "2" );
 	}
 
 	@Test

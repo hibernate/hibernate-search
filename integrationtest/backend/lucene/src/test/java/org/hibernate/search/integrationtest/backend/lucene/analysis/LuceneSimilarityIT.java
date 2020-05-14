@@ -35,7 +35,7 @@ public class LuceneSimilarityIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final StubMappedIndex index = StubMappedIndex.withoutFields( "MainIndex" );
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3777")

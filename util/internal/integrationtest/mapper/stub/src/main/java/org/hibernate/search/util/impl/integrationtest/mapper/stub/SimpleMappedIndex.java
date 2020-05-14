@@ -20,12 +20,12 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
  */
 public abstract class SimpleMappedIndex<B> extends StubMappedIndex {
 
-	public static <B> SimpleMappedIndex<B> of(String indexName, Function<IndexSchemaElement, B> binder) {
-		return ofAdvanced( indexName, context -> binder.apply( context.getSchemaElement() ) );
+	public static <B> SimpleMappedIndex<B> of(Function<IndexSchemaElement, B> binder) {
+		return ofAdvanced( ctx -> binder.apply( ctx.getSchemaElement() ) );
 	}
 
-	public static <B> SimpleMappedIndex<B> ofAdvanced(String indexName, Function<IndexedEntityBindingContext, B> binder) {
-		return new SimpleMappedIndex<B>( indexName ) {
+	public static <B> SimpleMappedIndex<B> ofAdvanced(Function<IndexedEntityBindingContext, B> binder) {
+		return new SimpleMappedIndex<B>() {
 			@Override
 			protected B doBind(IndexedEntityBindingContext context) {
 				return binder.apply( context );
@@ -35,8 +35,25 @@ public abstract class SimpleMappedIndex<B> extends StubMappedIndex {
 
 	private B binding;
 
-	protected SimpleMappedIndex(String indexName) {
-		super( indexName );
+	protected SimpleMappedIndex() {
+	}
+
+	@Override
+	public SimpleMappedIndex<B> name(String name) {
+		super.name( name );
+		return this;
+	}
+
+	@Override
+	public StubMappedIndex typeName(String name) {
+		super.typeName( name );
+		return this;
+	}
+
+	@Override
+	public SimpleMappedIndex<B> backendName(String name) {
+		super.backendName( name );
+		return this;
 	}
 
 	public final B binding() {

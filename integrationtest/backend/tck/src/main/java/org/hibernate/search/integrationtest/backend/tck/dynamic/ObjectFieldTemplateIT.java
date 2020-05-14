@@ -416,7 +416,7 @@ public class ObjectFieldTemplateIT {
 
 		// Check that documents are indexed and the dynamic object field can be detected through an exists() predicate
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "staticObject" ) ) )
-				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		integration.close();
@@ -424,7 +424,7 @@ public class ObjectFieldTemplateIT {
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "staticObject" ) ) )
-				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 	}
 
 	/**
@@ -476,18 +476,18 @@ public class ObjectFieldTemplateIT {
 
 		// Check that documents are indexed and the dynamic object field can be detected through an exists() predicate
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_nested" ) ) )
-				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_flattened" ) ) )
-				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		integration.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_nested" ) ) )
-				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_flattened" ) ) )
-				.hasDocRefHitsAnyOrder( index.name(), documentWhereObjectFieldExistsId );
+				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 	}
 
 	private void assumeBackendSupportsDynamicChildFieldsInExistsPredicate() {
@@ -514,7 +514,7 @@ public class ObjectFieldTemplateIT {
 										.matching( LASTNAME_1 ) )
 						)
 		) )
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_MATCHING_FOR_NESTED );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED );
 	}
 
 	private void checkFlattened(String objectFieldPath) {
@@ -535,7 +535,7 @@ public class ObjectFieldTemplateIT {
 						.must( f.match().field( objectFieldPath + "." + LASTNAME_FIELD )
 								.matching( LASTNAME_1 ) )
 		) )
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_MATCHING_FOR_NESTED, DOCUMENT_MATCHING_FOR_ALL );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_MATCHING_FOR_NESTED, DOCUMENT_MATCHING_FOR_ALL );
 	}
 
 	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
@@ -546,7 +546,7 @@ public class ObjectFieldTemplateIT {
 	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> rootTemplatesBinder,
 			Consumer<IndexSchemaElement> staticObjectTemplatesBinder) {
-		this.index = SimpleMappedIndex.of( "MainIndex",
+		this.index = SimpleMappedIndex.of(
 				root -> new IndexBinding( root, rootTemplatesBinder, staticObjectTemplatesBinder ) );
 
 		return setupHelper.start().withIndex( index )
