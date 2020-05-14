@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
@@ -25,6 +26,14 @@ public interface PropertyMappingNonFullTextFieldOptionsStep<S extends PropertyMa
 	 * @see Sortable
 	 */
 	S sortable(Sortable sortable);
+
+	/**
+	 * @param aggregable Whether aggregations are enabled for this field.
+	 * @return {@code this}, for method chaining.
+	 * @see GenericField#aggregable()
+	 * @see Aggregable
+	 */
+	S aggregable(Aggregable aggregable);
 
 	/**
 	 * @param indexNullAs A value used instead of null values when indexing.

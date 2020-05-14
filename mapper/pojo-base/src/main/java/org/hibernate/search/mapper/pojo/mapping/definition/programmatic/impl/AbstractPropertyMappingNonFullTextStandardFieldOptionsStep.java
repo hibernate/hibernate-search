@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
@@ -26,6 +27,12 @@ abstract class AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<
 	@Override
 	public S sortable(Sortable sortable) {
 		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().sortable( sortable ) );
+		return thisAsS();
+	}
+
+	@Override
+	public S aggregable(Aggregable aggregable) {
+		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().aggregable( aggregable ) );
 		return thisAsS();
 	}
 
