@@ -27,7 +27,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3618")
 	public void distanceProjection_unsortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Double> query = scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
@@ -47,7 +47,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_sortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Double> query = scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
@@ -67,7 +67,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_unit() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Double> query = scope.query()
 				.select( f ->
@@ -87,7 +87,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_several() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.select( f ->
@@ -121,7 +121,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_distanceSort() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
@@ -145,7 +145,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_longCalculatedField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Double> query = scope.query()
 				.select( f ->
@@ -167,7 +167,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_invalidType() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.distance( "string", GeoPoint.of( 43.749828, 1.854172 ) )
@@ -182,7 +182,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_nullCenter() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.distance( "geoPoint", null )
@@ -197,7 +197,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_nullUnit() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).unit( null )
@@ -212,7 +212,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_nonProjectable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy( () -> {
 			scope.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
@@ -231,7 +231,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceSort_unsortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy( () -> {
 			scope.sort().distance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );

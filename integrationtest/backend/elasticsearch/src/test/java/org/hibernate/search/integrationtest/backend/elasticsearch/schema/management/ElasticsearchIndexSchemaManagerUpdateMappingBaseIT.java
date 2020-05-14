@@ -11,24 +11,22 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.function.Consumer;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Tests related to the mapping when updating indexes.
@@ -40,19 +38,20 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
 	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private StubMappingIndexManager indexManager;
-
 	@Test
 	public void nothingToDo_1() {
-		elasticSearchClient.index( INDEX_NAME )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field( "myField", f -> f.asLocalDate() )
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -70,11 +69,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 						)
 				);
 
-		setupAndUpdateIndex( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asLocalDate() )
-					.toReference();
-		} );
+		setupAndUpdateIndex( index );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -88,13 +83,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "'type': 'date'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void nothingToDo_2() {
-		elasticSearchClient.index( INDEX_NAME )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field( "myField", f -> f.asBoolean() )
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -110,11 +110,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 						)
 				);
 
-		setupAndUpdateIndex( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asBoolean() )
-					.toReference();
-		} );
+		setupAndUpdateIndex( index );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -126,34 +122,13 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "'type': 'boolean'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void nothingToDo_3() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
-				"index.analysis", generateAnalysisSettings()
-				);
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-						simpleMappingForInitialization(
-								"'defaultAnalyzer': {"
-										+ "'type': 'text'"
-								+ "},"
-								+ "'nonDefaultAnalyzer': {"
-										+ "'type': 'text',"
-										+ "'analyzer': 'customAnalyzer'"
-								+ "},"
-								+ "'normalizer': {"
-										+ "'type': 'keyword',"
-										+ "'doc_values': false,"
-										+ "'normalizer': 'customNormalizer'"
-								+ "}"
-						)
-				);
-
-		setupAndUpdateIndex( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.field(
 					"defaultAnalyzer",
 					f -> f.asString().analyzer( "default" )
@@ -171,6 +146,28 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 					.toReference();
 		} );
 
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
+				"index.analysis", generateAnalysisSettings()
+				);
+		elasticSearchClient.index( index.name() ).type().putMapping(
+						simpleMappingForInitialization(
+								"'defaultAnalyzer': {"
+										+ "'type': 'text'"
+								+ "},"
+								+ "'nonDefaultAnalyzer': {"
+										+ "'type': 'text',"
+										+ "'analyzer': 'customAnalyzer'"
+								+ "},"
+								+ "'normalizer': {"
+										+ "'type': 'keyword',"
+										+ "'doc_values': false,"
+										+ "'normalizer': 'customNormalizer'"
+								+ "}"
+						)
+				);
+
+		setupAndUpdateIndex( index );
+
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'defaultAnalyzer': {"
@@ -186,20 +183,20 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "'normalizer': 'customNormalizer'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void mapping_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-
-		setupAndUpdateIndex( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField", f -> f.asBoolean() )
-							.toReference();
-				}
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field( "myField", f -> f.asBoolean() )
+						.toReference()
 		);
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+
+		setupAndUpdateIndex( index );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -208,13 +205,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 									+ "'doc_values': false"
 							+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void rootMapping_attribute_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field( "myField", f -> f.asBoolean() )
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping(
 						"{"
@@ -234,11 +236,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 						+ "}"
 				);
 
-		setupAndUpdateIndex( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asBoolean() )
-					.toReference();
-		} );
+		setupAndUpdateIndex( index );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -250,13 +248,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "'type': 'boolean'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void property_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field( "myField", f -> f.asLocalDate() )
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -267,11 +270,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 						)
 				);
 
-		setupAndUpdateIndex( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asLocalDate() )
-					.toReference();
-		} );
+		setupAndUpdateIndex( index );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -284,13 +283,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 								+ "'type': 'date'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void property_attribute_invalid() {
-		elasticSearchClient.index( INDEX_NAME )
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field( "myField", f -> f.asLocalDate() )
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -303,11 +307,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				);
 
 		setupAndUpdateIndexIndexExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField", f -> f.asLocalDate() )
-							.toReference();
-				},
+				index,
 				UPDATE_FAILED_MESSAGE_ID,
 				MAPPING_CREATION_FAILED_MESSAGE_ID,
 				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
@@ -318,10 +318,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 
 	@Test
 	public void property_attribute_invalid_conflictingAnalyzer() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field(
+						"analyzer",
+						f -> f.asString().analyzer( "customAnalyzer" )
+				)
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis", generateAnalysisSettings()
 				);
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'analyzer': {"
 							+ "'type': 'text',"
@@ -331,14 +339,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		);
 
 		setupAndUpdateIndexIndexExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field(
-							"analyzer",
-							f -> f.asString().analyzer( "customAnalyzer" )
-					)
-							.toReference();
-				},
+				index,
 				UPDATE_FAILED_MESSAGE_ID,
 				MAPPING_CREATION_FAILED_MESSAGE_ID,
 				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
@@ -349,10 +350,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 
 	@Test
 	public void property_attribute_invalid_conflictingNormalizer() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+				root.field(
+						"normalizer",
+						f -> f.asString().normalizer( "customNormalizer" )
+				)
+						.toReference()
+		);
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis", generateAnalysisSettings()
 				);
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'normalizer': {"
 								+ "'type': 'keyword',"
@@ -362,14 +371,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 		);
 
 		setupAndUpdateIndexIndexExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field(
-							"normalizer",
-							f -> f.asString().normalizer( "customNormalizer" )
-					)
-							.toReference();
-				},
+				index,
 				UPDATE_FAILED_MESSAGE_ID,
 				MAPPING_CREATION_FAILED_MESSAGE_ID,
 				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
@@ -379,13 +381,13 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 	}
 
 	private void setupAndUpdateIndexIndexExpectingFailure(
-			Consumer<? super IndexedEntityBindingContext> mappingContributor, String ... messageContent) {
-		Assertions.assertThatThrownBy( () -> setupAndUpdateIndex( mappingContributor ) )
+			StubMappedIndex index, String ... messageContent) {
+		Assertions.assertThatThrownBy( () -> setupAndUpdateIndex( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( messageContent );
 	}
 
-	private void setupAndUpdateIndex(Consumer<? super IndexedEntityBindingContext> mappingContributor) {
+	private void setupAndUpdateIndex(StubMappedIndex index) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
@@ -395,10 +397,10 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 							// No-op
 						}
 				)
-				.withIndex( INDEX_NAME, mappingContributor, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( indexManager.getSchemaManager().createOrUpdate() );
+		Futures.unwrappedExceptionJoin( index.getSchemaManager().createOrUpdate() );
 	}
 
 	private String generateAnalysisSettings() {

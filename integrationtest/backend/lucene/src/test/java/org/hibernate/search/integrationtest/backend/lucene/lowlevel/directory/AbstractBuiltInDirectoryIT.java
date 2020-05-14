@@ -122,7 +122,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
 		checkIndexingAndQuerying();
 
-		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
+		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::getIndexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
@@ -144,7 +144,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
+						.indexContext( index.name() )
 						.failure(
 								"Unable to initialize index directory",
 								"can only be used with FSDirectory subclasses"

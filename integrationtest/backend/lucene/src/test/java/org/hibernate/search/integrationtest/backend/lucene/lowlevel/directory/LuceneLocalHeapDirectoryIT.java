@@ -33,7 +33,7 @@ public class LuceneLocalHeapDirectoryIT extends AbstractBuiltInDirectoryIT {
 
 		checkIndexingAndQuerying();
 
-		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
+		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::getIndexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )

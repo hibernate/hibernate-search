@@ -45,7 +45,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -61,45 +61,31 @@ import org.easymock.EasyMockSupport;
  */
 public class SearchProjectionIT extends EasyMockSupport {
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY = "empty";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private StubMappingIndexManager anotherIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> otherIndex =
+			// Using the same mapping here. But a different mapping would work the same.
+			// What matters here is that is a different index.
+			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						ANOTHER_INDEX_NAME,
-						// Using the same mapping here. But a different mapping would work the same.
-						// What matters here is that is a different index.
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.anotherIndexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void noProjections() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.select()
@@ -111,13 +97,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 	@Test
 	public void references() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
-		DocumentReference document1Reference = reference( INDEX_NAME, DOCUMENT_1 );
-		DocumentReference document2Reference = reference( INDEX_NAME, DOCUMENT_2 );
-		DocumentReference document3Reference = reference( INDEX_NAME, DOCUMENT_3 );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY );
+		DocumentReference document1Reference = reference( mainIndex.typeName(), DOCUMENT_1 );
+		DocumentReference document2Reference = reference( mainIndex.typeName(), DOCUMENT_2 );
+		DocumentReference document3Reference = reference( mainIndex.typeName(), DOCUMENT_3 );
+		DocumentReference emptyReference = reference( mainIndex.typeName(), EMPTY );
 
 		/*
 		 * Note to test writers: make sure to assign these projections to variables,
@@ -153,10 +139,10 @@ public class SearchProjectionIT extends EasyMockSupport {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3395")
 	public void references_transformed() {
-		DocumentReference document1Reference = reference( INDEX_NAME, DOCUMENT_1 );
-		DocumentReference document2Reference = reference( INDEX_NAME, DOCUMENT_2 );
-		DocumentReference document3Reference = reference( INDEX_NAME, DOCUMENT_3 );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY );
+		DocumentReference document1Reference = reference( mainIndex.typeName(), DOCUMENT_1 );
+		DocumentReference document2Reference = reference( mainIndex.typeName(), DOCUMENT_2 );
+		DocumentReference document3Reference = reference( mainIndex.typeName(), DOCUMENT_3 );
+		DocumentReference emptyReference = reference( mainIndex.typeName(), EMPTY );
 		StubTransformedReference document1TransformedReference = new StubTransformedReference( document1Reference );
 		StubTransformedReference document2TransformedReference = new StubTransformedReference( document2Reference );
 		StubTransformedReference document3TransformedReference = new StubTransformedReference( document3Reference );
@@ -177,7 +163,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// No call expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				mainIndex.createGenericScope();
 		SearchQuery<List<?>> query;
 		/*
 		 * Note to test writers: make sure to assign these projections to variables,
@@ -228,11 +214,11 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 	@Test
 	public void score() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Float> query = scope.query()
 				.select( f -> f.score() )
-				.where( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
+				.where( f -> f.match().field( mainIndex.binding().scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( f -> f.score().desc() )
 				.toQuery();
 
@@ -253,11 +239,11 @@ public class SearchProjectionIT extends EasyMockSupport {
 	 */
 	@Test
 	public void score_noScoreSort() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Float> query = scope.query()
 				.select( f -> f.score() )
-				.where( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
+				.where( f -> f.match().field( mainIndex.binding().scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( f -> f.indexOrder() )
 				.toQuery();
 
@@ -277,39 +263,39 @@ public class SearchProjectionIT extends EasyMockSupport {
 	 */
 	@Test
 	public void mixed() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
 
 		query = scope.query()
 				.select( f ->
 						f.composite(
-								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
+								f.field( mainIndex.binding().string1Field.relativeFieldName, String.class ),
 								f.documentReference(),
-								f.field( indexMapping.string2Field.relativeFieldName, String.class )
+								f.field( mainIndex.binding().string2Field.relativeFieldName, String.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list(
-					indexMapping.string1Field.document1Value.indexedValue,
-					reference( INDEX_NAME, DOCUMENT_1 ),
-					indexMapping.string2Field.document1Value.indexedValue
+					mainIndex.binding().string1Field.document1Value.indexedValue,
+					reference( mainIndex.typeName(), DOCUMENT_1 ),
+					mainIndex.binding().string2Field.document1Value.indexedValue
 			);
 			b.list(
-					indexMapping.string1Field.document2Value.indexedValue,
-					reference( INDEX_NAME, DOCUMENT_2 ),
-					indexMapping.string2Field.document2Value.indexedValue
+					mainIndex.binding().string1Field.document2Value.indexedValue,
+					reference( mainIndex.typeName(), DOCUMENT_2 ),
+					mainIndex.binding().string2Field.document2Value.indexedValue
 			);
 			b.list(
-					indexMapping.string1Field.document3Value.indexedValue,
-					reference( INDEX_NAME, DOCUMENT_3 ),
-					indexMapping.string2Field.document3Value.indexedValue
+					mainIndex.binding().string1Field.document3Value.indexedValue,
+					reference( mainIndex.typeName(), DOCUMENT_3 ),
+					mainIndex.binding().string2Field.document3Value.indexedValue
 			);
 			b.list(
 					null,
-					reference( INDEX_NAME, EMPTY ),
+					reference( mainIndex.typeName(), EMPTY ),
 					null
 			);
 		} );
@@ -321,47 +307,47 @@ public class SearchProjectionIT extends EasyMockSupport {
 	 */
 	@Test
 	public void mixed_withNestedFields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query;
 
 		query = scope.query()
 				.select( f ->
 						f.composite(
-								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
+								f.field( mainIndex.binding().string1Field.relativeFieldName, String.class ),
 								f.documentReference(),
-								f.field( "nested." + indexMapping.nestedField.relativeFieldName, String.class ),
-								f.field( "nested.nested." + indexMapping.nestedNestedField.relativeFieldName, String.class ),
-								f.field( "nested.flattened." + indexMapping.flattenedField.relativeFieldName, String.class )
+								f.field( "nested." + mainIndex.binding().nestedField.relativeFieldName, String.class ),
+								f.field( "nested.nested." + mainIndex.binding().nestedNestedField.relativeFieldName, String.class ),
+								f.field( "nested.flattened." + mainIndex.binding().flattenedField.relativeFieldName, String.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list(
-					indexMapping.string1Field.document1Value.indexedValue,
-					reference( INDEX_NAME, DOCUMENT_1 ),
-					indexMapping.nestedField.document1Value.indexedValue,
-					indexMapping.nestedNestedField.document1Value.indexedValue,
-					indexMapping.flattenedField.document1Value.indexedValue
+					mainIndex.binding().string1Field.document1Value.indexedValue,
+					reference( mainIndex.typeName(), DOCUMENT_1 ),
+					mainIndex.binding().nestedField.document1Value.indexedValue,
+					mainIndex.binding().nestedNestedField.document1Value.indexedValue,
+					mainIndex.binding().flattenedField.document1Value.indexedValue
 			);
 			b.list(
-					indexMapping.string1Field.document2Value.indexedValue,
-					reference( INDEX_NAME, DOCUMENT_2 ),
-					indexMapping.nestedField.document2Value.indexedValue,
-					indexMapping.nestedNestedField.document2Value.indexedValue,
-					indexMapping.flattenedField.document2Value.indexedValue
+					mainIndex.binding().string1Field.document2Value.indexedValue,
+					reference( mainIndex.typeName(), DOCUMENT_2 ),
+					mainIndex.binding().nestedField.document2Value.indexedValue,
+					mainIndex.binding().nestedNestedField.document2Value.indexedValue,
+					mainIndex.binding().flattenedField.document2Value.indexedValue
 			);
 			b.list(
-					indexMapping.string1Field.document3Value.indexedValue,
-					reference( INDEX_NAME, DOCUMENT_3 ),
-					indexMapping.nestedField.document3Value.indexedValue,
-					indexMapping.nestedNestedField.document3Value.indexedValue,
-					indexMapping.flattenedField.document3Value.indexedValue
+					mainIndex.binding().string1Field.document3Value.indexedValue,
+					reference( mainIndex.typeName(), DOCUMENT_3 ),
+					mainIndex.binding().nestedField.document3Value.indexedValue,
+					mainIndex.binding().nestedNestedField.document3Value.indexedValue,
+					mainIndex.binding().flattenedField.document3Value.indexedValue
 			);
 			b.list(
 					null,
-					reference( INDEX_NAME, EMPTY ),
+					reference( mainIndex.typeName(), EMPTY ),
 					null,
 					null,
 					null
@@ -371,13 +357,13 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 	@Test
 	public void reuseProjectionInstance_onScopeTargetingSameIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchProjection<String> projection = scope.projection()
-				.field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection();
+				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
 
-		String value1 = indexMapping.string1Field.document1Value.indexedValue;
-		String value2 = indexMapping.string1Field.document2Value.indexedValue;
-		String value3 = indexMapping.string1Field.document3Value.indexedValue;
+		String value1 = mainIndex.binding().string1Field.document1Value.indexedValue;
+		String value2 = mainIndex.binding().string1Field.document2Value.indexedValue;
+		String value3 = mainIndex.binding().string1Field.document3Value.indexedValue;
 
 		SearchQuery<String> query = scope.query()
 				.select( projection )
@@ -396,19 +382,19 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// reuse the same projection instance on a different scope,
 		// targeting the same index
-		query = indexManager.createScope().query()
+		query = mainIndex.createScope().query()
 				.select( projection )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
 
-		projection = indexManager.createScope( anotherIndexManager ).projection()
-				.field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection();
+		projection = mainIndex.createScope( otherIndex ).projection()
+				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
 
 		// reuse the same projection instance on a different scope,
 		// targeting same indexes
-		query = anotherIndexManager.createScope( indexManager ).query()
+		query = otherIndex.createScope( mainIndex ).query()
 				.select( projection )
 				.where( f -> f.matchAll() )
 				.toQuery();
@@ -418,38 +404,38 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 	@Test
 	public void reuseProjectionInstance_onScopeTargetingDifferentIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchProjection<String> projection = scope.projection()
-				.field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection();
+				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
 
 		// reuse the same projection instance on a different scope,
 		// targeting a different index
 		Assertions.assertThatThrownBy( () ->
-				anotherIndexManager.createScope().query()
+				otherIndex.createScope().query()
 						.select( projection )
 						.where( f -> f.matchAll() )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 
 		// reuse the same projection instance on a different scope,
 		// targeting different indexes
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope( anotherIndexManager ).query()
+				mainIndex.createScope( otherIndex ).query()
 						.select( projection )
 						.where( f -> f.matchAll() )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 	}
 
 	@Test
 	public void extension() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<String> query;
 
 		// Mandatory extension, supported
@@ -460,7 +446,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
-				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Mandatory extension, unsupported
 		Assertions.assertThatThrownBy(
@@ -484,7 +470,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
-				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, second supported
 		query = scope.query()
@@ -504,7 +490,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
-				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = scope.query()
@@ -524,67 +510,67 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
-				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.string1Field.document1Value.write( document );
-			indexMapping.string2Field.document1Value.write( document );
+			mainIndex.binding().string1Field.document1Value.write( document );
+			mainIndex.binding().string2Field.document1Value.write( document );
 
-			indexMapping.scoreField.document1Value.write( document );
+			mainIndex.binding().scoreField.document1Value.write( document );
 
-			DocumentElement nestedDocument = document.addObject( indexMapping.nestedObject );
-			indexMapping.nestedField.document1Value.write( nestedDocument );
+			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
+			mainIndex.binding().nestedField.document1Value.write( nestedDocument );
 
-			DocumentElement nestedNestedDocument = nestedDocument.addObject( indexMapping.nestedNestedObject );
-			indexMapping.nestedNestedField.document1Value.write( nestedNestedDocument );
+			DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
+			mainIndex.binding().nestedNestedField.document1Value.write( nestedNestedDocument );
 
-			DocumentElement flattedDocument = nestedDocument.addObject( indexMapping.flattenedObject );
-			indexMapping.flattenedField.document1Value.write( flattedDocument );
+			DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
+			mainIndex.binding().flattenedField.document1Value.write( flattedDocument );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.string1Field.document2Value.write( document );
-			indexMapping.string2Field.document2Value.write( document );
+			mainIndex.binding().string1Field.document2Value.write( document );
+			mainIndex.binding().string2Field.document2Value.write( document );
 
-			indexMapping.scoreField.document2Value.write( document );
+			mainIndex.binding().scoreField.document2Value.write( document );
 
-			DocumentElement nestedDocument = document.addObject( indexMapping.nestedObject );
-			indexMapping.nestedField.document2Value.write( nestedDocument );
+			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
+			mainIndex.binding().nestedField.document2Value.write( nestedDocument );
 
-			DocumentElement nestedNestedDocument = nestedDocument.addObject( indexMapping.nestedNestedObject );
-			indexMapping.nestedNestedField.document2Value.write( nestedNestedDocument );
+			DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
+			mainIndex.binding().nestedNestedField.document2Value.write( nestedNestedDocument );
 
-			DocumentElement flattedDocument = nestedDocument.addObject( indexMapping.flattenedObject );
-			indexMapping.flattenedField.document2Value.write( flattedDocument );
+			DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
+			mainIndex.binding().flattenedField.document2Value.write( flattedDocument );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.string1Field.document3Value.write( document );
-			indexMapping.string2Field.document3Value.write( document );
+			mainIndex.binding().string1Field.document3Value.write( document );
+			mainIndex.binding().string2Field.document3Value.write( document );
 
-			indexMapping.scoreField.document3Value.write( document );
+			mainIndex.binding().scoreField.document3Value.write( document );
 
-			DocumentElement nestedDocument = document.addObject( indexMapping.nestedObject );
-			indexMapping.nestedField.document3Value.write( nestedDocument );
+			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
+			mainIndex.binding().nestedField.document3Value.write( nestedDocument );
 
-			DocumentElement nestedNestedDocument = nestedDocument.addObject( indexMapping.nestedNestedObject );
-			indexMapping.nestedNestedField.document3Value.write( nestedNestedDocument );
+			DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
+			mainIndex.binding().nestedNestedField.document3Value.write( nestedNestedDocument );
 
-			DocumentElement flattedDocument = nestedDocument.addObject( indexMapping.flattenedObject );
-			indexMapping.flattenedField.document3Value.write( flattedDocument );
+			DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
+			mainIndex.binding().flattenedField.document3Value.write( flattedDocument );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
 	private static <T, R> Function<T, R> shouldNotBeCalled() {
@@ -593,7 +579,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		};
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final FieldModel<String> string1Field;
 		final FieldModel<String> string2Field;
 		final FieldModel<String> scoreField;
@@ -607,7 +593,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		final IndexObjectFieldReference flattenedObject;
 		final FieldModel<String> flattenedField;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string1Field = FieldModel.mapper( String.class, "ccc", "mmm", "xxx" )
 					.map( root, "string1" );
 			string2Field = FieldModel.mapper( String.class, "ddd", "nnn", "yyy" )

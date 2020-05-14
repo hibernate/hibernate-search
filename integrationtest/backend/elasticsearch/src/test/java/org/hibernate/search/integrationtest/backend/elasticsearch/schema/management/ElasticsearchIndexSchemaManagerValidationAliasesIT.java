@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -44,22 +44,20 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
 		return ElasticsearchIndexSchemaManagerValidationOperation.all();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private StubMappingIndexManager indexManager;
+	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
 
 	public ElasticsearchIndexSchemaManagerValidationAliasesIT(
 			ElasticsearchIndexSchemaManagerValidationOperation operation) {
@@ -68,10 +66,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@Test
 	public void success_simple() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
 		setupAndValidate();
@@ -81,10 +79,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@Test
 	public void writeAlias_missing() {
-		elasticsearchClient.index( defaultPrimaryName( INDEX_NAME ), null, defaultReadAlias( INDEX_NAME ) )
+		elasticsearchClient.index( defaultPrimaryName( index.name() ), null, defaultReadAlias( index.name() ) )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
 		Assertions.assertThatThrownBy( this::setupAndValidate )
@@ -92,7 +90,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-								.aliasContext( defaultWriteAlias( INDEX_NAME ).original )
+								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.failure( "Missing alias" )
 								.build()
 				);
@@ -100,14 +98,14 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@Test
 	public void writeAlias_invalid_filter() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put(
-						defaultWriteAlias( INDEX_NAME ).original,
+						defaultWriteAlias( index.name() ).original,
 						simpleAliasDefinition( true, "'filter': {'term': {'user_id': 12}}" )
 				);
 
@@ -116,7 +114,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-								.aliasContext( defaultWriteAlias( INDEX_NAME ).original )
+								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.aliasAttributeContext( "filter" )
 								.failure( "Invalid value. Expected 'null', actual is '{\"term\":{\"user_id\":12}}'" )
 								.build()
@@ -126,20 +124,20 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 	@Test
 	@Category(RequiresIndexAliasIsWriteIndex.class)
 	public void writeAlias_invalid_isWriteIndex() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.put( defaultWriteAlias( INDEX_NAME ).original, simpleAliasDefinition( false, "" ) );
+		elasticsearchClient.index( index.name() ).aliases()
+				.put( defaultWriteAlias( index.name() ).original, simpleAliasDefinition( false, "" ) );
 
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-								.aliasContext( defaultWriteAlias( INDEX_NAME ).original )
+								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.aliasAttributeContext( "is_write_index" )
 								.failure( "Invalid value. Expected 'true', actual is 'false'" )
 								.build()
@@ -148,10 +146,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@Test
 	public void readAlias_missing() {
-		elasticsearchClient.index( defaultPrimaryName( INDEX_NAME ), defaultWriteAlias( INDEX_NAME ), null )
+		elasticsearchClient.index( defaultPrimaryName( index.name() ), defaultWriteAlias( index.name() ), null )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
 		Assertions.assertThatThrownBy( this::setupAndValidate )
@@ -159,7 +157,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-								.aliasContext( defaultReadAlias( INDEX_NAME ).original )
+								.aliasContext( defaultReadAlias( index.name() ).original )
 								.failure( "Missing alias" )
 								.build()
 				);
@@ -167,20 +165,20 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 
 	@Test
 	public void readAlias_invalid_filter() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.put( defaultReadAlias( INDEX_NAME ).original, "{'filter': {'term': {'user_id': 12}}}" );
+		elasticsearchClient.index( index.name() ).aliases()
+				.put( defaultReadAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-								.aliasContext( defaultReadAlias( INDEX_NAME ).original )
+								.aliasContext( defaultReadAlias( index.name() ).original )
 								.aliasAttributeContext( "filter" )
 								.failure( "Invalid value. Expected 'null', actual is '{\"term\":{\"user_id\":12}}'" )
 								.build()
@@ -197,10 +195,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 							// No-op
 						}
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 
 }

@@ -25,12 +25,12 @@ public class IndexWorkspaceFlushIT extends AbstractIndexWorkspaceSimpleOperation
 	}
 
 	@Override
-	protected void assertPreconditions(StubMappingIndexManager indexManager) {
+	protected void assertPreconditions(StubMappingIndexManager index) {
 		// No measurable effect: don't assert anything.
 	}
 
 	@Override
-	protected void assertSuccess(StubMappingIndexManager indexManager) {
+	protected void assertSuccess(StubMappingIndexManager index) {
 		// No measurable effect: don't assert anything.
 	}
 }

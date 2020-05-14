@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortBaseIT;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -42,7 +42,6 @@ import org.junit.Test;
  */
 public class BooleanSortAndRangePredicateIT {
 
-	public static final String INDEX_NAME = "myIndexName";
 	public static final String FIELD_PATH = "boolean";
 
 	public static final String DOCUMENT_1 = "1";
@@ -52,27 +51,20 @@ public class BooleanSortAndRangePredicateIT {
 	public static final String DOCUMENT_5 = "5";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
-	public void before() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+	public void setup() {
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	private SearchQuery<DocumentReference> sortQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -80,7 +72,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactory, PredicateFinalStep> rangePredicate) {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( rangePredicate )
 				.toQuery();
@@ -126,7 +118,7 @@ public class BooleanSortAndRangePredicateIT {
 
 	@Test
 	public void rangeBetweenAndSortByField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.range().field( FIELD_PATH ).between( Boolean.FALSE, Boolean.TRUE ) )
 				.sort( f -> f.field( FIELD_PATH ).missing().last() )
@@ -170,21 +162,21 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.bool, true );
+			document.addValue( index.binding().bool, true );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.bool, Boolean.FALSE );
+			document.addValue( index.binding().bool, Boolean.FALSE );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( indexMapping.bool, Boolean.TRUE );
+			document.addValue( index.binding().bool, Boolean.TRUE );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			document.addValue( indexMapping.bool, null );
+			document.addValue( index.binding().bool, null );
 		} );
 		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			document.addValue( indexMapping.bool, false );
+			document.addValue( index.binding().bool, false );
 		} );
 
 		plan.execute().join();
@@ -192,18 +184,18 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void checkAllDocumentsAreSearchable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<Boolean> bool;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			bool = root.field( FIELD_PATH, f -> f.asBoolean().sortable( Sortable.YES ) )
 					.toReference();
 		}

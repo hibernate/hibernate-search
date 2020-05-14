@@ -12,12 +12,11 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -25,12 +24,13 @@ import org.junit.Test;
 
 public class LuceneIndexSchemaManagerDropIfExistingIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private StubMappingIndexManager indexManager;
+	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
+			root -> root.field( "field", f -> f.asString() )
+					.toReference()
+	);
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
@@ -41,13 +41,13 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 		// The setup currently creates the index: work around that.
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( indexManager.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.getSchemaManager() )
 		);
 
 		assertThat( indexExists() ).isFalse();
 
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( indexManager.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.getSchemaManager() )
 		);
 
 		// No exception was thrown and the index still doesn't exist.
@@ -61,12 +61,12 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 
 		setup();
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.CREATE_IF_MISSING.apply( indexManager.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.CREATE_IF_MISSING.apply( index.getSchemaManager() )
 		);
 
 		assertThat( indexExists() ).isTrue();
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 		} );
 		plan.execute().join();
@@ -74,34 +74,26 @@ public class LuceneIndexSchemaManagerDropIfExistingIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 1 );
 
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( indexManager.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.getSchemaManager() )
 		);
 
 		assertThat( indexExists() ).isFalse();
 	}
 
 	private boolean indexExists() throws IOException {
-		return LuceneIndexContentUtils.indexExists( setupHelper, INDEX_NAME );
+		return LuceneIndexContentUtils.indexExists( setupHelper, index.name() );
 	}
 
 	private int countDocsOnDisk() throws IOException {
 		return LuceneIndexContentUtils.readIndex(
-				setupHelper, INDEX_NAME,
+				setupHelper, index.name(),
 				reader -> reader.getDocCount( MetadataFields.idFieldName() )
 		);
 	}
 
 	private void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "field", f -> f.asString() )
-									.toReference();
-						},
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.setup();
 	}
 }

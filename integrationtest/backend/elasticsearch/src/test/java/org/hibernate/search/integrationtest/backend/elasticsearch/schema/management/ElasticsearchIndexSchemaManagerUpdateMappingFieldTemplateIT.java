@@ -10,12 +10,9 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
@@ -31,18 +28,26 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
 	@Test
 	public void nothingToDo() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
+					.matchingPathGlob( "*_t1" );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) )
+					.matchingPathGlob( "*_t2" );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() )
+					.matchingPathGlob( "*_t3" );
+			root.objectFieldTemplate( "myTemplate4", ObjectFieldStorage.NESTED );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -69,15 +74,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
-					.matchingPathGlob( "*_t1" );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) )
-					.matchingPathGlob( "*_t2" );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() )
-					.matchingPathGlob( "*_t3" );
-			root.objectFieldTemplate( "myTemplate4", ObjectFieldStorage.NESTED );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -105,14 +102,20 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void missing() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -130,11 +133,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -157,14 +156,20 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -190,11 +195,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -217,14 +218,20 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void wrongOrder() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate2': {"
@@ -246,11 +253,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -273,14 +276,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void duplicate() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -298,9 +305,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -315,14 +320,19 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_pathMatch_missing() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
+					.matchingPathGlob( "*_suffix" );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -336,10 +346,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
-					.matchingPathGlob( "*_suffix" );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -355,14 +362,19 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_pathMatch_invalid() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
+					.matchingPathGlob( "*_suffix" );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -377,10 +389,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
-					.matchingPathGlob( "*_suffix" );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -396,14 +405,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_pathMatch_extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -417,9 +430,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -434,14 +445,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_matchMappingType_missing() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -455,9 +470,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -473,14 +486,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_matchMappingType_invalid() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -495,9 +512,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -513,14 +528,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_matchMappingType_extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -535,9 +554,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -552,14 +569,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void attribute_extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -574,9 +595,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -591,14 +610,18 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void mapping_invalid() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -612,9 +635,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndUpdate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} );
+		setupAndUpdate( index );
 
 		assertJsonEquals(
 				"{"
@@ -629,13 +650,11 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
-	private void setupAndUpdate(Consumer<? super IndexSchemaElement> binder) {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( binder ).name( INDEX_NAME );
-
+	private void setupAndUpdate(StubMappedIndex index) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

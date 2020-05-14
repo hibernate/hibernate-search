@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -30,28 +30,19 @@ import org.junit.Test;
  */
 public class FieldSearchSortTypeIndependentIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	public void unknownField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		String absoluteFieldPath = "unknownField";
 
@@ -64,15 +55,15 @@ public class FieldSearchSortTypeIndependentIT {
 				.hasMessageContainingAll(
 						"Unknown field",
 						absoluteFieldPath,
-						INDEX_NAME
+						index.name()
 				);
 	}
 
 	@Test
 	public void objectField_nested() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
-		String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName;
+		String absoluteFieldPath = index.binding().nestedObject.relativeFieldName;
 
 		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.matchAll() )
@@ -83,15 +74,15 @@ public class FieldSearchSortTypeIndependentIT {
 				.hasMessageContainingAll(
 						"Unknown field",
 						absoluteFieldPath,
-						INDEX_NAME
+						index.name()
 				);
 	}
 
 	@Test
 	public void objectField_flattened() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
-		String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName;
+		String absoluteFieldPath = index.binding().flattenedObject.relativeFieldName;
 
 		assertThatThrownBy( () -> scope.query()
 				.where( f -> f.matchAll() )
@@ -102,15 +93,15 @@ public class FieldSearchSortTypeIndependentIT {
 				.hasMessageContainingAll(
 						"Unknown field",
 						absoluteFieldPath,
-						INDEX_NAME
+						index.name()
 				);
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
 		}

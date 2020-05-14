@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -32,24 +32,18 @@ import org.assertj.core.api.Assertions;
 
 public class LuceneFieldTypesIT {
 
-	private static final String INDEX_NAME = "IndexName";
 	private static final String TEXT_1 = "This is a text containing things. Red house with a blue carpet on the road...";
 	private static final String TEXT_2 = "This is a text containing other things. Such as move the line on the right margin...";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.setup();
 
 		initData();
@@ -58,7 +52,7 @@ public class LuceneFieldTypesIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1640")
 	public void verifyProjectionsOnDifferentTypes() {
-		SearchQuery<Document> query = indexManager.createScope().query()
+		SearchQuery<Document> query = index.createScope().query()
 				.select(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
@@ -87,27 +81,27 @@ public class LuceneFieldTypesIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 
 		plan.add( referenceProvider( "ID:1" ), document -> {
-			document.addValue( indexMapping.string, "keyword" );
-			document.addValue( indexMapping.text, TEXT_1 );
-			document.addValue( indexMapping.integer, 739 );
-			document.addValue( indexMapping.longNumber, 739L );
-			document.addValue( indexMapping.bool, true );
+			document.addValue( index.binding().string, "keyword" );
+			document.addValue( index.binding().text, TEXT_1 );
+			document.addValue( index.binding().integer, 739 );
+			document.addValue( index.binding().longNumber, 739L );
+			document.addValue( index.binding().bool, true );
 		} );
 		plan.add( referenceProvider( "ID:2" ), document -> {
-			document.addValue( indexMapping.string, "anotherKeyword" );
-			document.addValue( indexMapping.text, TEXT_2 );
-			document.addValue( indexMapping.integer, 123 );
-			document.addValue( indexMapping.longNumber, 123L );
-			document.addValue( indexMapping.bool, false );
+			document.addValue( index.binding().string, "anotherKeyword" );
+			document.addValue( index.binding().text, TEXT_2 );
+			document.addValue( index.binding().integer, 123 );
+			document.addValue( index.binding().longNumber, 123L );
+			document.addValue( index.binding().bool, false );
 		} );
 
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> text;
@@ -115,7 +109,7 @@ public class LuceneFieldTypesIT {
 		final IndexFieldReference<Long> longNumber;
 		final IndexFieldReference<Boolean> bool;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).projectable( Projectable.YES ) ).toReference();
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();

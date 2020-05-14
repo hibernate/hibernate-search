@@ -12,6 +12,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.assertj.core.api.Assertions;
+
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -22,7 +24,7 @@ public class ElasticsearchBootstrapFailureIT {
 	private static final String BACKEND_NAME = "BackendName";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
@@ -40,10 +42,7 @@ public class ElasticsearchBootstrapFailureIT {
 								// We just need a closed port, hopefully this one will generally be closed
 								"localhost:9199"
 						)
-						.withIndex(
-								"EmptyIndexName",
-								ctx -> { }
-						)
+						.withIndex( StubMappedIndex.withoutFields() )
 						.setup(),
 				"Closed port"
 		)

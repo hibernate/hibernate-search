@@ -10,20 +10,17 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
 import java.util.EnumSet;
-import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -44,22 +41,18 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
 		return ElasticsearchIndexSchemaManagerValidationOperation.all();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
 	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
-
-	private StubMappingIndexManager indexManager;
 
 	public ElasticsearchIndexSchemaManagerValidationMappingBaseIT(
 			ElasticsearchIndexSchemaManagerValidationOperation operation) {
@@ -68,8 +61,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 	@Test
 	public void success_1() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "myField", f -> f.asLocalDate() )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
 								+ "'type': 'date',"
@@ -84,19 +82,20 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asLocalDate() )
-					.toReference();
-		} );
+		setupAndValidate( index );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
 	@Test
 	public void success_2() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "myField", f -> f.asBoolean() )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
 								+ "'type': 'boolean',"
@@ -109,19 +108,23 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asBoolean() )
-					.toReference();
-		} );
+		setupAndValidate( index );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
 
 	@Test
 	public void success_3() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field(
+					"myField",
+					f -> f.asString().analyzer( "default" )
+			)
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
 								+ "'type': 'text',"
@@ -135,30 +138,25 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field(
-					"myField",
-					f -> f.asString().analyzer( "default" )
-			)
-					.toReference();
-		} );
+		setupAndValidate( index );
 	}
 
 	@Test
-	public void mapping_missing() throws Exception {
+	public void mapping_missing() {
 		Assume.assumeTrue(
 				"Skipping this test as there is always a mapping (be it empty) in " + elasticSearchClient.getDialect(),
 				elasticSearchClient.getDialect().isEmptyMappingPossible()
 		);
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "myField", f -> f.asLocalDate() )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
 
 		setupAndValidateExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField", f -> f.asLocalDate() )
-							.toReference();
-				},
+				index,
 				FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.failure( "Missing type mapping" )
@@ -168,8 +166,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 	@Test
 	public void attribute_field_notPresent() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
+			root -> root.field( "myField", f -> f.asInteger() ).toReference()
+		);
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 					"'notMyField': {"
 									+ "'type': 'integer',"
@@ -179,10 +181,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidateExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField", f -> f.asInteger() ).toReference();
-				},
+				index,
 				FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
@@ -195,9 +194,16 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 	 * Tests that mappings that are more powerful than requested will pass validation.
 	 */
 	@Test
-	public void property_attribute_leniency() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+	public void property_attribute_leniency() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "myField", f -> f.asLong() )
+					.toReference();
+			root.field( "myTextField", f -> f.asString().analyzer( "default" ) )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myField': {"
 								+ "'type': 'long',"
@@ -212,22 +218,24 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				)
 		);
 
-		setupAndValidate( ctx -> {
-			IndexSchemaElement root = ctx.getSchemaElement();
-			root.field( "myField", f -> f.asLong() )
-					.toReference();
-			root.field( "myTextField", f -> f.asString().analyzer( "default" ) )
-					.toReference();
-		} );
+		setupAndValidate( index );
 	}
 
 	/**
 	 * Tests that properties within properties are correctly represented in the failure report.
 	 */
 	@Test
-	public void nestedProperty_attribute_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+	public void nestedProperty_attribute_invalid() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			IndexSchemaObjectField objectField =
+					root.objectField( "myObjectField" );
+			objectField.field( "myField", f -> f.asLocalDate() )
+					.toReference();
+			objectField.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'myObjectField': {"
 								+ "'type': 'object',"
@@ -244,14 +252,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidateExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					IndexSchemaObjectField objectField =
-							root.objectField( "myObjectField" );
-					objectField.field( "myField", f -> f.asLocalDate() )
-							.toReference();
-					objectField.toReference();
-				},
+				index,
 				FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myObjectField.myField" )
@@ -263,8 +264,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 	@Test
 	public void multipleErrors() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "myField", f -> f.asString() )
+					.toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 						+ "'dynamic': false,"
 						+ "'properties': {"
@@ -277,11 +283,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidateExpectingFailure(
-				ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField", f -> f.asString() )
-							.toReference();
-				},
+				index,
 				FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.mappingAttributeContext( "dynamic" )
@@ -297,14 +299,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 	}
 
-	private void setupAndValidateExpectingFailure(Consumer<? super IndexedEntityBindingContext> mappingContributor,
-			String failureReportRegex) {
-		Assertions.assertThatThrownBy( () -> setupAndValidate( mappingContributor ) )
+	private void setupAndValidateExpectingFailure(StubMappedIndex index, String failureReportRegex) {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( failureReportRegex );
 	}
 
-	private void setupAndValidate(Consumer<? super IndexedEntityBindingContext> mappingContributor) {
+	private void setupAndValidate(StubMappedIndex index) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
@@ -314,9 +315,9 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 							// No-op
 						}
 				)
-				.withIndex( INDEX_NAME, mappingContributor, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 }

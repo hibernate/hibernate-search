@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -35,8 +35,6 @@ import org.junit.Test;
  */
 @TestForIssue(jiraKey = "HSEARCH-3612")
 public class LuceneNormalizeWildcardExpressionsIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -55,44 +53,36 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	private static final String TEXT_MATCHING_PATTERN_2_AND_3 = "I had some interaction with that lad.";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-
+		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	public void wildcard_normalizeMatchingExpression() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.where( f -> f.wildcard().field( "analyzed" ).matching( queryString ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		assertThat( createQuery.apply( PATTERN_2 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_4 );
 
 		assertThat( createQuery.apply( PATTERN_3 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void wildcard_tokenizeMatchingExpression() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.wildcard().field( "analyzed" ).matching( PATTERN_1_AND_2 ) )
 				.toQuery();
@@ -102,26 +92,26 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.analyzed, TEXT_MATCHING_PATTERN_1 );
+			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.analyzed, TEXT_MATCHING_PATTERN_2 );
+			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_2 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( indexMapping.analyzed, TEXT_MATCHING_PATTERN_3 );
+			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_3 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			document.addValue( indexMapping.analyzed, TEXT_MATCHING_PATTERN_2_AND_3 );
+			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_2_AND_3 );
 		} );
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> analyzed;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			analyzed = root.field( "analyzed", c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 					.toReference();
 		}

@@ -17,8 +17,8 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,11 +35,10 @@ public class IndexWorkspaceIT {
 	private static final String TENANT_1 = "tenant1";
 	private static final String TENANT_2 = "tenant2";
 
-	private static final String INDEX_NAME = "lordOfTheRingsChapters";
 	private static final int NUMBER_OF_BOOKS = 200;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public SearchSetupHelper multiTenancySetupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
@@ -48,21 +47,14 @@ public class IndexWorkspaceIT {
 	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
 	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
 	public void runMergeSegmentsPurgeAndFlushAndRefreshInSequence() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		// Do not provide a tenant
-		IndexWorkspace workspace = indexManager.createWorkspace();
+		IndexWorkspace workspace = index.createWorkspace();
 		createBookIndexes( noTenantSessionContext );
 
 		workspace.refresh().join();
@@ -81,17 +73,10 @@ public class IndexWorkspaceIT {
 
 	@Test
 	public void runMergeSegmentsPurgeAndFlushAndRefreshWithMultiTenancy() {
-		multiTenancySetupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withMultiTenancy()
-				.setup();
+		multiTenancySetupHelper.start().withIndex( index ).withMultiTenancy().setup();
 
 		// Do provide a tenant ID
-		IndexWorkspace workspace = indexManager.createWorkspace( tenant1SessionContext );
+		IndexWorkspace workspace = index.createWorkspace( tenant1SessionContext );
 
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
@@ -114,28 +99,28 @@ public class IndexWorkspaceIT {
 	}
 
 	private void createBookIndexes(StubBackendSessionContext sessionContext) {
-		indexManager.initAsync(
+		index.initAsync(
 				sessionContext,
 				NUMBER_OF_BOOKS, i -> documentProvider(
 						String.valueOf( i ),
-						document -> document.addValue( indexMapping.title, "The Lord of the Rings cap. " + i )
+						document -> document.addValue( index.binding().title, "The Lord of the Rings cap. " + i )
 				),
 				false // No refresh
 		).join();
 	}
 
 	private void assertBookNumberIsEqualsTo(long bookNumber, StubBackendSessionContext sessionContext) {
-		SearchQuery<DocumentReference> query = indexManager.createScope().query( sessionContext )
+		SearchQuery<DocumentReference> query = index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( bookNumber );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> title;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			title = root.field( "title", f -> f.asString() )
 					.toReference();
 		}

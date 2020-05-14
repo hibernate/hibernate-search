@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -37,36 +37,27 @@ public class LuceneSearchMultiIndexIT {
 	private static final String STRING_1 = "string_1";
 	private static final String STRING_2 = "string_2";
 
-	// Backend 1 / Index 1
+	// Index 1
 
-	private static final String INDEX_NAME_1_1 = "IndexName_1_1";
+	private static final String DOCUMENT_1_1 = "1_1";
+	private static final String ADDITIONAL_FIELD_1_1 = "additional_field_1_1";
 
-	private static final String DOCUMENT_1_1_1 = "1_1_1";
-	private static final String ADDITIONAL_FIELD_1_1_1 = "additional_field_1_1_1";
+	private static final String DOCUMENT_1_2 = "1_2";
+	private static final String ADDITIONAL_FIELD_1_2 = "additional_field_1_2";
 
-	private static final String DOCUMENT_1_1_2 = "1_1_2";
-	private static final String ADDITIONAL_FIELD_1_1_2 = "additional_field_1_1_2";
+	// Index 2
 
-	// Backend 1 / Index 2
-
-	private static final String INDEX_NAME_1_2 = "IndexName_1_2";
-
-	private static final String DOCUMENT_1_2_1 = "1_2_1";
+	private static final String DOCUMENT_2_1 = "2_1";
 
 	private final String directoryType;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	// Backend 1 / Index 1
-
-	private IndexMapping_1_1 indexMapping_1_1;
-	private StubMappingIndexManager indexManager_1_1;
-
-	// Backend 1 / Index 2
-
-	private IndexMapping_1_2 indexMapping_1_2;
-	private StubMappingIndexManager indexManager_1_2;
+	private final SimpleMappedIndex<IndexBinding1> index1 =
+			SimpleMappedIndex.of( IndexBinding1::new ).name( "index1" );
+	private final SimpleMappedIndex<IndexBinding2> index2 =
+			SimpleMappedIndex.of( IndexBinding2::new ).name( "index2" );;
 
 	@Parameters(name = "Lucene directory type {0}")
 	public static Object[] data() {
@@ -81,16 +72,7 @@ public class LuceneSearchMultiIndexIT {
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty( "directory.type", directoryType )
-				.withIndex(
-						INDEX_NAME_1_1,
-						ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_1_1 = indexMapping
-				)
-				.withIndex(
-						INDEX_NAME_1_2,
-						ctx -> this.indexMapping_1_2 = new IndexMapping_1_2( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_1_2 = indexMapping
-				)
+				.withIndexes( index1, index2 )
 				.setup();
 
 		initData();
@@ -98,7 +80,7 @@ public class LuceneSearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported_for_sorting() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index1.createScope( index2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -106,8 +88,8 @@ public class LuceneSearchMultiIndexIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
-			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+			c.doc( index1.typeName(), DOCUMENT_1_1, DOCUMENT_1_2 );
+			c.doc( index2.typeName(), DOCUMENT_2_1 );
 		} );
 
 		query = scope.query()
@@ -116,55 +98,55 @@ public class LuceneSearchMultiIndexIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+			c.doc( index1.typeName(), DOCUMENT_1_2, DOCUMENT_1_1 );
+			c.doc( index2.typeName(), DOCUMENT_2_1 );
 		} );
 	}
 
 	private void initData() {
-		// Backend 1 / Index 1
+		// Index 1
 
-		IndexIndexingPlan<?> plan = indexManager_1_1.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index1.createIndexingPlan();
 
-		plan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
-			document.addValue( indexMapping_1_1.string, STRING_1 );
-			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_1 );
+		plan.add( referenceProvider( DOCUMENT_1_1 ), document -> {
+			document.addValue( index1.binding().string, STRING_1 );
+			document.addValue( index1.binding().additionalField, ADDITIONAL_FIELD_1_1 );
 		} );
-		plan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
-			document.addValue( indexMapping_1_1.string, STRING_2 );
-			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_2 );
+		plan.add( referenceProvider( DOCUMENT_1_2 ), document -> {
+			document.addValue( index1.binding().string, STRING_2 );
+			document.addValue( index1.binding().additionalField, ADDITIONAL_FIELD_1_2 );
 		} );
 
 		plan.execute().join();
 
-		StubMappingScope scope = indexManager_1_1.createScope();
+		StubMappingScope scope = index1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index1.typeName(), DOCUMENT_1_1, DOCUMENT_1_2 );
 
-		// Backend 1 / Index 2
+		// Index 2
 
-		plan = indexManager_1_2.createIndexingPlan();
+		plan = index2.createIndexingPlan();
 
-		plan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
-			document.addValue( indexMapping_1_2.string, STRING_1 );
+		plan.add( referenceProvider( DOCUMENT_2_1 ), document -> {
+			document.addValue( index2.binding().string, STRING_1 );
 		} );
 
 		plan.execute().join();
 
-		scope = indexManager_1_2.createScope();
+		scope = index2.createScope();
 		query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index2.typeName(), DOCUMENT_2_1 );
 	}
 
-	private static class IndexMapping_1_1 {
+	private static class IndexBinding1 {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> additionalField;
 
-		IndexMapping_1_1(IndexSchemaElement root) {
+		IndexBinding1(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 			additionalField = root.field(
 					"additionalField",
@@ -174,10 +156,10 @@ public class LuceneSearchMultiIndexIT {
 		}
 	}
 
-	private static class IndexMapping_1_2 {
+	private static class IndexBinding2 {
 		final IndexFieldReference<String> string;
 
-		IndexMapping_1_2(IndexSchemaElement root) {
+		IndexBinding2(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() )
 					.toReference();
 		}

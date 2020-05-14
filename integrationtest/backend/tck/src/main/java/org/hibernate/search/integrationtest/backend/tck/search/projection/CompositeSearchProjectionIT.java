@@ -26,15 +26,13 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class CompositeSearchProjectionIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -53,251 +51,244 @@ public class CompositeSearchProjectionIT {
 	private static final LocalDate RELEASE_DATE_AVENUE_OF_MYSTERIES = LocalDate.of( 2015, 4, 7 );
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void compositeList_fromSearchProjectionObjects() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.select( f ->
 						f.composite(
-								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+								f.field( index.binding().author.relativeFieldName, String.class ).toProjection(),
+								f.field( index.binding().title.relativeFieldName, String.class ).toProjection()
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				Arrays.asList( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
-				Arrays.asList( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
-				Arrays.asList( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+				Arrays.asList( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
+				Arrays.asList( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
+				Arrays.asList( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeList_fromTerminalContexts() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.select( f ->
 						f.composite(
-								f.field( indexMapping.author.relativeFieldName, String.class ),
-								f.field( indexMapping.title.relativeFieldName, String.class )
+								f.field( index.binding().author.relativeFieldName, String.class ),
+								f.field( index.binding().title.relativeFieldName, String.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				Arrays.asList( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
-				Arrays.asList( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
-				Arrays.asList( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+				Arrays.asList( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
+				Arrays.asList( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
+				Arrays.asList( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeList_transformer_fromSearchProjectionObjects() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
 				.select( f ->
 						f.composite(
 								this::listToBook_Bi,
-								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+								f.field( index.binding().author.relativeFieldName, String.class ).toProjection(),
+								f.field( index.binding().title.relativeFieldName, String.class ).toProjection()
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
+				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
+				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeList_transformer_fromTerminalContext() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
 				.select( f ->
 						f.composite(
 								this::listToBook_Bi,
-								f.field( indexMapping.author.relativeFieldName, String.class ),
-								f.field( indexMapping.title.relativeFieldName, String.class )
+								f.field( index.binding().author.relativeFieldName, String.class ),
+								f.field( index.binding().title.relativeFieldName, String.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
+				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
+				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeFunction_fromSearchProjectionObjects() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book> query = scope.query()
 				.select( f ->
 						f.composite(
 								Book::new,
-								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+								f.field( index.binding().title.relativeFieldName, String.class ).toProjection()
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book( indexMapping.title.document1Value.indexedValue ),
-				new Book( indexMapping.title.document2Value.indexedValue ),
-				new Book( indexMapping.title.document3Value.indexedValue )
+				new Book( index.binding().title.document1Value.indexedValue ),
+				new Book( index.binding().title.document2Value.indexedValue ),
+				new Book( index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeFunction_fromTerminalContext() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book> query = scope.query()
 				.select( f ->
 						f.composite(
 								Book::new,
-								f.field( indexMapping.title.relativeFieldName, String.class )
+								f.field( index.binding().title.relativeFieldName, String.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book( indexMapping.title.document1Value.indexedValue ),
-				new Book( indexMapping.title.document2Value.indexedValue ),
-				new Book( indexMapping.title.document3Value.indexedValue )
+				new Book( index.binding().title.document1Value.indexedValue ),
+				new Book( index.binding().title.document2Value.indexedValue ),
+				new Book( index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeBiFunction_fromSearchProjectionObjects() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
 				.select( f ->
 						f.composite(
 								Book_Bi::new,
-								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+								f.field( index.binding().author.relativeFieldName, String.class ).toProjection(),
+								f.field( index.binding().title.relativeFieldName, String.class ).toProjection()
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
+				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
+				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeBiFunction_fromTerminalContexts() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
 				.select( f ->
 						f.composite(
 								Book_Bi::new,
-								f.field( indexMapping.author.relativeFieldName, String.class ),
-								f.field( indexMapping.title.relativeFieldName, String.class )
+								f.field( index.binding().author.relativeFieldName, String.class ),
+								f.field( index.binding().title.relativeFieldName, String.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
-				new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
+				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
+				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeTriFunction_fromSearchProjectionObjects() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Tri> query = scope.query()
 				.select( f ->
 						f.composite(
 								Book_Tri::new,
-								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection(),
-								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class ).toProjection()
+								f.field( index.binding().author.relativeFieldName, String.class ).toProjection(),
+								f.field( index.binding().title.relativeFieldName, String.class ).toProjection(),
+								f.field( index.binding().releaseDate.relativeFieldName, LocalDate.class ).toProjection()
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Tri( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue,
-						indexMapping.releaseDate.document1Value.indexedValue ),
-				new Book_Tri( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue,
-						indexMapping.releaseDate.document2Value.indexedValue ),
-				new Book_Tri( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue,
-						indexMapping.releaseDate.document3Value.indexedValue )
+				new Book_Tri( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue,
+						index.binding().releaseDate.document1Value.indexedValue ),
+				new Book_Tri( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue,
+						index.binding().releaseDate.document2Value.indexedValue ),
+				new Book_Tri( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue,
+						index.binding().releaseDate.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void compositeTriFunction_fromTerminalContexts() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Tri> query = scope.query()
 				.select( f ->
 						f.composite(
 								Book_Tri::new,
-								f.field( indexMapping.author.relativeFieldName, String.class ),
-								f.field( indexMapping.title.relativeFieldName, String.class ),
-								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class )
+								f.field( index.binding().author.relativeFieldName, String.class ),
+								f.field( index.binding().title.relativeFieldName, String.class ),
+								f.field( index.binding().releaseDate.relativeFieldName, LocalDate.class )
 						)
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Tri( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue,
-						indexMapping.releaseDate.document1Value.indexedValue ),
-				new Book_Tri( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue,
-						indexMapping.releaseDate.document2Value.indexedValue ),
-				new Book_Tri( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue,
-						indexMapping.releaseDate.document3Value.indexedValue )
+				new Book_Tri( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue,
+						index.binding().releaseDate.document1Value.indexedValue ),
+				new Book_Tri( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue,
+						index.binding().releaseDate.document2Value.indexedValue ),
+				new Book_Tri( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue,
+						index.binding().releaseDate.document3Value.indexedValue )
 		);
 	}
 
 	@Test
 	public void nestedComposite() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Book_Bi_Score> query = scope.query()
 				.select( f ->
@@ -305,8 +296,8 @@ public class CompositeSearchProjectionIT {
 								Book_Bi_Score::new,
 								f.composite(
 										Book_Bi::new,
-										f.field( indexMapping.author.relativeFieldName, String.class ),
-										f.field( indexMapping.title.relativeFieldName, String.class )
+										f.field( index.binding().author.relativeFieldName, String.class ),
+										f.field( index.binding().title.relativeFieldName, String.class )
 								),
 								f.score()
 						)
@@ -315,47 +306,47 @@ public class CompositeSearchProjectionIT {
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				new Book_Bi_Score( new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ), 1.0F ),
-				new Book_Bi_Score( new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ), 1.0F ),
-				new Book_Bi_Score( new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue ), 1.0F )
+				new Book_Bi_Score( new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ), 1.0F ),
+				new Book_Bi_Score( new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ), 1.0F ),
+				new Book_Bi_Score( new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue ), 1.0F )
 		);
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.author.document1Value.write( document );
-			indexMapping.title.document1Value.write( document );
-			indexMapping.releaseDate.document1Value.write( document );
+			index.binding().author.document1Value.write( document );
+			index.binding().title.document1Value.write( document );
+			index.binding().releaseDate.document1Value.write( document );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.author.document2Value.write( document );
-			indexMapping.title.document2Value.write( document );
-			indexMapping.releaseDate.document2Value.write( document );
+			index.binding().author.document2Value.write( document );
+			index.binding().title.document2Value.write( document );
+			index.binding().releaseDate.document2Value.write( document );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.author.document3Value.write( document );
-			indexMapping.title.document3Value.write( document );
-			indexMapping.releaseDate.document3Value.write( document );
+			index.binding().author.document3Value.write( document );
+			index.binding().title.document3Value.write( document );
+			index.binding().releaseDate.document3Value.write( document );
 		} );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final FieldModel<String> author;
 		final FieldModel<String> title;
 		final FieldModel<LocalDate> releaseDate;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			author = FieldModel.mapper( String.class, AUTHOR_4_3_2_1, AUTHOR_CIDER_HOUSE, AUTHOR_AVENUE_OF_MYSTERIES )
 					.map( root, "author" );
 			title = FieldModel.mapper( String.class, TITLE_4_3_2_1, TITLE_CIDER_HOUSE, TITLE_AVENUE_OF_MYSTERIES )

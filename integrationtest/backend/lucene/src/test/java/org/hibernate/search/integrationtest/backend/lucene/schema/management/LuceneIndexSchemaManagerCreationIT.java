@@ -11,11 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -26,19 +25,20 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class LuceneIndexSchemaManagerCreationIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<LuceneIndexSchemaManagerOperation> operations() {
 		return LuceneIndexSchemaManagerOperation.creating();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
+			root -> root.field( "field", f -> f.asString() )
+					.toReference()
+	);
 
 	private final LuceneIndexSchemaManagerOperation operation;
-
-	private StubMappingIndexManager indexManager;
 
 	public LuceneIndexSchemaManagerCreationIT(LuceneIndexSchemaManagerOperation operation) {
 		this.operation = operation;
@@ -56,24 +56,16 @@ public class LuceneIndexSchemaManagerCreationIT {
 	}
 
 	private boolean indexExists() throws IOException {
-		return LuceneIndexContentUtils.indexExists( setupHelper, INDEX_NAME );
+		return LuceneIndexContentUtils.indexExists( setupHelper, index.name() );
 	}
 
 	private void create() {
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 
 	private void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "field", f -> f.asString() )
-									.toReference();
-						},
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.setup();
 	}
 }

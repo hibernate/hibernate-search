@@ -28,24 +28,24 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	}
 
 	@Override
-	protected void afterInitData(StubMappingIndexManager indexManager) {
+	protected void afterInitData(StubMappingIndexManager index) {
 		// Make sure to flush the index, otherwise the test won't fail as expected with Lucene,
 		// probably because the index writer optimizes purges when changes are not committed yet.
-		indexManager.createWorkspace().flush();
+		index.createWorkspace().flush();
 	}
 
 	@Override
-	protected void assertPreconditions(StubMappingIndexManager indexManager) {
-		indexManager.createWorkspace().refresh().join();
-		long count = indexManager.createScope().query().where( f -> f.matchAll() )
+	protected void assertPreconditions(StubMappingIndexManager index) {
+		index.createWorkspace().refresh().join();
+		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isGreaterThan( 0 );
 	}
 
 	@Override
-	protected void assertSuccess(StubMappingIndexManager indexManager) {
-		indexManager.createWorkspace().refresh().join();
-		long count = indexManager.createScope().query().where( f -> f.matchAll() )
+	protected void assertSuccess(StubMappingIndexManager index) {
+		index.createWorkspace().refresh().join();
+		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isEqualTo( 0 );
 	}

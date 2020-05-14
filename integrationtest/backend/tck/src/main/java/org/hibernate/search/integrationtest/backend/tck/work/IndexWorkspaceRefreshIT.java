@@ -34,23 +34,23 @@ public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperati
 	}
 
 	@Override
-	protected void beforeInitData(StubMappingIndexManager indexManager) {
+	protected void beforeInitData(StubMappingIndexManager index) {
 		// Make sure index readers are initialized before writing,
 		// otherwise the preconditions won't be met.
-		indexManager.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
+		index.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
 	}
 
 	@Override
-	protected void assertPreconditions(StubMappingIndexManager indexManager) {
-		long count = indexManager.createScope().query().where( f -> f.matchAll() )
+	protected void assertPreconditions(StubMappingIndexManager index) {
+		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		// Indexes haven't been refreshed yet, so documents added so far are missing.
 		assertThat( count ).isEqualTo( 0 );
 	}
 
 	@Override
-	protected void assertSuccess(StubMappingIndexManager indexManager) {
-		long count = indexManager.createScope().query().where( f -> f.matchAll() )
+	protected void assertSuccess(StubMappingIndexManager index) {
+		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		// After a refresh, documents are visible
 		assertThat( count ).isGreaterThan( 0 );

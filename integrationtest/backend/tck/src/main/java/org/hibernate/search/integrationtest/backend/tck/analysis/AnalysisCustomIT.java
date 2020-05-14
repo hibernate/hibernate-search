@@ -16,13 +16,14 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -83,13 +84,10 @@ public class AnalysisCustomIT {
 		}
 	}
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisCustomBackendSetupStrategy );
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private SimpleMappedIndex<IndexBinding> index;
 
 	@Test
 	public void normalizer_keyword() {
@@ -105,13 +103,13 @@ public class AnalysisCustomIT {
 
 		// We only expect exact matches
 		assertMatchQuery( "word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" );
 		assertMatchQuery( "WORD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "2" );
 		assertMatchQuery( "wôrd" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 		assertMatchQuery( "word word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "4" );
 	}
 
 	@Test
@@ -128,15 +126,15 @@ public class AnalysisCustomIT {
 
 		// We expect case-insensitive matches
 		assertMatchQuery( "word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" );
 		assertMatchQuery( "WORD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" );
 		assertMatchQuery( "Word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" );
 		assertMatchQuery( "WÔRD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 		assertMatchQuery( "WorD Word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "4" );
 	}
 
 	@Test
@@ -153,13 +151,13 @@ public class AnalysisCustomIT {
 
 		// We expect any ',' will be treated as a space character
 		assertMatchQuery( "word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" );
 		assertMatchQuery( "WORD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "2" );
 		assertMatchQuery( "wôrd" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 		assertMatchQuery( "word word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "4", "5" );
 	}
 
 	@Test
@@ -176,13 +174,13 @@ public class AnalysisCustomIT {
 
 		// We only expect exact matches
 		assertMatchQuery( "word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" );
 		assertMatchQuery( "WORD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "2" );
 		assertMatchQuery( "wôrd" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 		assertMatchQuery( "word word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "4" );
 	}
 
 	@Test
@@ -199,17 +197,17 @@ public class AnalysisCustomIT {
 
 		// We expect case-insensitive, word-sensitive matches
 		assertMatchQuery( "word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "4", "5" );
 		assertMatchQuery( "WORD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "4", "5" );
 		assertMatchQuery( "Word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "4", "5" );
 		assertMatchQuery( "WÔRD" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
 		assertMatchQuery( "WorD Word" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "4", "5" );
 		assertMatchQuery( "word wôrd" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3", "4", "5" );
 	}
 
 	@Test
@@ -225,24 +223,24 @@ public class AnalysisCustomIT {
 		} );
 
 		assertMatchQuery( "word1" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "4" );
 		assertMatchQuery( "word2" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "3", "5" );
 		assertMatchQuery( "word3" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "3" );
 		assertMatchQuery( "stopword" )
 				.hasNoHits();
 		assertMatchQuery( "word1 stopword" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "4" );
 		assertMatchQuery( "word1,word2" )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "4", "5" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3", "4", "5" );
 	}
 
 	private SearchResultAssert<DocumentReference> assertMatchQuery(String valueToMatch) {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.match().field( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
+				.where( f -> f.match().field( index.binding().field.relativeFieldName ).matching( valueToMatch ) )
 				.toQuery();
 
 		return assertThat( query );
@@ -258,32 +256,19 @@ public class AnalysisCustomIT {
 
 	private void setup(String fieldName,
 			Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> {
-							IndexFieldReference<String> reference = ctx.getSchemaElement().field(
-									fieldName,
-									f -> typeContributor.apply( f.asString() )
-							)
-									.toReference();
-							MainFieldModel fieldModel = new MainFieldModel( reference, fieldName );
-							this.indexMapping = new IndexMapping( fieldModel );
-						},
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		index = SimpleMappedIndex.of( ctx -> new IndexBinding( ctx, fieldName, typeContributor ) );
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	private void initData(Consumer<AnalysisITDocumentBuilder> valueContributor) {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		List<String> documentIds = new ArrayList<>();
 		valueContributor.accept(
 				(String documentId, String ... fieldValues) -> {
 					documentIds.add( documentId );
 					plan.add( referenceProvider( documentId ), document -> {
 						for ( String fieldValue : fieldValues ) {
-							indexMapping.field.write( document, fieldValue );
+							index.binding().field.write( document, fieldValue );
 						}
 					} );
 				}
@@ -291,14 +276,14 @@ public class AnalysisCustomIT {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( c -> {
 					for ( String documentId : documentIds ) {
-						c.doc( INDEX_NAME, documentId );
+						c.doc( index.typeName(), documentId );
 					}
 				} );
 	}
@@ -307,11 +292,17 @@ public class AnalysisCustomIT {
 		void document(String documentId, String ... fieldValues);
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final MainFieldModel field;
 
-		IndexMapping(MainFieldModel field) {
-			this.field = field;
+		IndexBinding(IndexSchemaElement root, String fieldName,
+				Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
+			IndexFieldReference<String> reference = root.field(
+					fieldName,
+					f -> typeContributor.apply( f.asString() )
+			)
+					.toReference();
+			this.field = new MainFieldModel( reference, fieldName );
 		}
 	}
 

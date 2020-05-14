@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,37 +24,28 @@ import org.junit.Test;
 
 public class LuceneMatchSearchPredicateIT {
 
-	private static final String INDEX_NAME = "IndexName";
 	private static final String TEST_TERM = "ThisWillBeLowercasedByTheNormalizer";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-
+		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	public void match_skipAnalysis_normalizedStringField() {
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 
-		query = indexManager.createScope().query()
+		query = index.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery();
 
@@ -62,15 +53,15 @@ public class LuceneMatchSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.normalizedStringField, TEST_TERM ) );
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().normalizedStringField, TEST_TERM ) );
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> normalizedStringField;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			normalizedStringField = root.field(
 					"normalizedStringField",
 					c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )

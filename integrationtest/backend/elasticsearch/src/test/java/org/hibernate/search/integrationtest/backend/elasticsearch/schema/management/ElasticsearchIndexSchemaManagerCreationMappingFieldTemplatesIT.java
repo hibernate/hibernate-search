@@ -11,12 +11,10 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
-import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -37,15 +35,13 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
 		return ElasticsearchIndexSchemaManagerOperation.creating();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
@@ -58,15 +54,17 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 
 	@Test
 	public void rootFieldTemplates() {
-		elasticSearchClient.index( INDEX_NAME )
-				.ensureDoesNotExist().registerForCleanup();
-
-		setupAndCreateIndex( root -> {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			root.objectFieldTemplate( "myTemplate1", ObjectFieldStorage.NESTED )
 					.matchingPathGlob( "*_obj" );
 			root.fieldTemplate( "myTemplate2", f -> f.asString() )
 					.matchingPathGlob( "*_kw" );
 		} );
+
+		elasticSearchClient.index( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		setupAndCreateIndex( index );
 
 		assertJsonEquals(
 				"{"
@@ -95,16 +93,13 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 							+ defaultMetadataMappingForExpectations()
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void nonRootFieldTemplates() {
-		elasticSearchClient.index( INDEX_NAME )
-				.ensureDoesNotExist().registerForCleanup();
-
-		setupAndCreateIndex( root -> {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			IndexSchemaObjectField objectField = root.objectField( "staticObject" );
 			objectField.toReference();
 			objectField.objectFieldTemplate( "myTemplate1", ObjectFieldStorage.NESTED )
@@ -112,6 +107,11 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 			objectField.fieldTemplate( "myTemplate2", f -> f.asString() )
 					.matchingPathGlob( "*_kw" );
 		} );
+
+		elasticSearchClient.index( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		setupAndCreateIndex( index );
 
 		assertJsonEquals(
 				"{"
@@ -144,13 +144,11 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
-	private void setupAndCreateIndex(Consumer<IndexSchemaElement> binder) {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( binder ).name( INDEX_NAME );
-
+	private void setupAndCreateIndex(StubMappedIndex index) {
 		setupHelper.start()
 				.withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )

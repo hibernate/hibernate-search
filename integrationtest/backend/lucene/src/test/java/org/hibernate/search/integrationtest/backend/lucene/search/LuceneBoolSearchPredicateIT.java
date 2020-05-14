@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -21,28 +21,20 @@ import org.junit.Test;
 
 public class LuceneBoolSearchPredicateIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3535")
 	public void minimumShouldMatch_outOfBounds() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.query()
@@ -58,10 +50,10 @@ public class LuceneBoolSearchPredicateIT {
 				.hasMessageContaining( "expected a number between '1' and '1', got '3'" );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> field;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			field = root.field( "fieldName", c -> c.asString() ).toReference();
 		}
 	}

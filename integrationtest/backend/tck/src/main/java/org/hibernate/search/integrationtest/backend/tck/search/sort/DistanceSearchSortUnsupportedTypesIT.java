@@ -16,7 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 
@@ -47,23 +47,14 @@ public class DistanceSearchSortUnsupportedTypesIT<F> {
 		return parameters.toArray( new Object[0][] );
 	}
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static IndexMapping indexMapping;
-	private static StubMappingIndexManager indexManager;
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> DistanceSearchSortUnsupportedTypesIT.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
@@ -74,7 +65,7 @@ public class DistanceSearchSortUnsupportedTypesIT<F> {
 
 	@Test
 	public void error_notSupported() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath();
 
 		Assertions.assertThatThrownBy(
@@ -85,13 +76,13 @@ public class DistanceSearchSortUnsupportedTypesIT<F> {
 	}
 
 	private String getFieldPath() {
-		return indexMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return index.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final SimpleFieldModelsByType fieldModels;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			fieldModels = SimpleFieldModelsByType.mapAll( unsupportedTypeDescriptors(), root, "", c -> { } );
 		}
 	}

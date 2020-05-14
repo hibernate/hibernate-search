@@ -18,8 +18,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubDocumentProvider;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 /**
@@ -28,26 +28,27 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 @PortedFromSearch5(original = "org.hibernate.search.test.shards.ShardsTest")
 public abstract class AbstractShardingIT {
 
-	protected static final String INDEX_NAME = "IndexName";
+	protected final SimpleMappedIndex<IndexBinding> index;
 
-	protected IndexMapping indexMapping;
-	protected StubMappingIndexManager indexManager;
+	protected AbstractShardingIT(RoutingMode routingMode) {
+		this.index = SimpleMappedIndex.ofAdvanced( ctx -> new IndexBinding( ctx, routingMode ) );
+	}
 
-	protected static DocumentReference[] allDocRefs(Map<String, List<String>> docIdByRoutingKey) {
+	protected final DocumentReference[] allDocRefs(Map<String, List<String>> docIdByRoutingKey) {
 		return docRefs( docIdByRoutingKey.values().stream().flatMap( List::stream ) );
 	}
 
-	protected static DocumentReference[] docRefsForRoutingKey(String routingKey, Map<String, List<String>> docIdByRoutingKey) {
+	protected final DocumentReference[] docRefsForRoutingKey(String routingKey, Map<String, List<String>> docIdByRoutingKey) {
 		return docRefs( docIdByRoutingKey.get( routingKey ).stream() );
 	}
 
-	protected static DocumentReference[] docRefsForRoutingKeys(Collection<String> routingKeys, Map<String, List<String>> docIdByRoutingKey) {
+	protected final DocumentReference[] docRefsForRoutingKeys(Collection<String> routingKeys, Map<String, List<String>> docIdByRoutingKey) {
 		return docRefs( routingKeys.stream().flatMap( routingKey -> docIdByRoutingKey.get( routingKey ).stream() ) );
 	}
 
-	protected static DocumentReference[] docRefs(Stream<String> docIds) {
+	protected final DocumentReference[] docRefs(Stream<String> docIds) {
 		return NormalizedDocRefHit.of( b -> {
-			docIds.forEach( docId -> b.doc( INDEX_NAME, docId ) );
+			docIds.forEach( docId -> b.doc( index.typeName(), docId ) );
 		} );
 	}
 
@@ -58,17 +59,17 @@ public abstract class AbstractShardingIT {
 			for ( String documentId : entry.getValue() ) {
 				documentProviders.add( documentProvider(
 						documentId, routingKey,
-						document -> document.addValue( indexMapping.indexedRoutingKey, routingKey )
+						document -> document.addValue( index.binding().indexedRoutingKey, routingKey )
 				) );
 			}
 		}
-		indexManager.initAsync( documentProviders ).join();
+		index.initAsync( documentProviders ).join();
 	}
 
-	protected static class IndexMapping {
+	protected static class IndexBinding {
 		final IndexFieldReference<String> indexedRoutingKey;
 
-		public IndexMapping(IndexedEntityBindingContext ctx, RoutingMode routingMode) {
+		public IndexBinding(IndexedEntityBindingContext ctx, RoutingMode routingMode) {
 			switch ( routingMode ) {
 				case EXPLICIT_ROUTING_KEYS:
 					ctx.explicitRouting();

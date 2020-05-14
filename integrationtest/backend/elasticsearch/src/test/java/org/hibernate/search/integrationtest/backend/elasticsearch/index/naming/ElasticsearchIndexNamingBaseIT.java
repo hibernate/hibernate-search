@@ -13,6 +13,8 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.assertj.core.api.Assertions;
+
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -24,14 +26,14 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexNamingBaseIT {
 
-	private static final String INDEX1_NAME = "index1_name";
-	private static final String INDEX2_NAME = "index2_name";
+	@Rule
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	@Rule
-	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+	private final StubMappedIndex index1 = StubMappedIndex.withoutFields().name( "index1" );
+	private final StubMappedIndex index2 = StubMappedIndex.withoutFields().name( "index2" );
 
 	@Test
 	public void nameConflict_aliasesOfSingleIndex() {
@@ -42,7 +44,7 @@ public class ElasticsearchIndexNamingBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
-								.indexContext( INDEX1_NAME )
+								.indexContext( index1.name() )
 								.failure(
 										"Write alias and read alias must be different,"
 												+ " but were set to the same value: 'alias-conflicting'."
@@ -81,18 +83,18 @@ public class ElasticsearchIndexNamingBaseIT {
 	@Test
 	public void crossIndexNameConflict_hibernateSearchNameAndWriteAlias() {
 		setupExpectingCrossIndexNameConflict(
-				INDEX2_NAME, "index1-read", // Index 1 aliases
+				index2.name(), "index1-read", // Index 1 aliases
 				"index2-write", "index2-read", // Index 2 aliases
-				INDEX2_NAME // This name is used by both indexes
+				index2.name() // This name is used by both indexes
 		);
 	}
 
 	@Test
 	public void crossIndexNameConflict_hibernateSearchNameAndReadAlias() {
 		setupExpectingCrossIndexNameConflict(
-				"index1-write", INDEX2_NAME, // Index 1 aliases
+				"index1-write", index2.name(), // Index 1 aliases
 				"index2-write", "index2-read", // Index 2 aliases
-				INDEX2_NAME // This name is used by both indexes
+				index2.name() // This name is used by both indexes
 		);
 	}
 
@@ -106,8 +108,8 @@ public class ElasticsearchIndexNamingBaseIT {
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.failure(
-										"Conflicting index names: Hibernate Search indexes '" + INDEX1_NAME
-												+ "' and '" + INDEX2_NAME + "' both target the name or alias '"
+										"Conflicting index names: Hibernate Search indexes '" + index1.name()
+												+ "' and '" + index2.name() + "' both target the name or alias '"
 												+ conflictingName + "'"
 								)
 								.build()
@@ -120,12 +122,11 @@ public class ElasticsearchIndexNamingBaseIT {
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY,
 						strategy
 				)
-				.withIndex( INDEX1_NAME, ctx -> { } )
-				.withIndex( INDEX2_NAME, ctx -> { } )
+				.withIndexes( index1, index2 )
 				.setup();
 	}
 
-	private static IndexLayoutStrategy hardcodedStrategy(String index1WriteAlias, String index1ReadAlias,
+	private IndexLayoutStrategy hardcodedStrategy(String index1WriteAlias, String index1ReadAlias,
 			String index2WriteAlias, String index2ReadAlias) {
 		return new IndexLayoutStrategy() {
 			@Override
@@ -135,25 +136,27 @@ public class ElasticsearchIndexNamingBaseIT {
 
 			@Override
 			public String createWriteAlias(String hibernateSearchIndexName) {
-				switch ( hibernateSearchIndexName ) {
-					case INDEX1_NAME:
-						return index1WriteAlias;
-					case INDEX2_NAME:
-						return index2WriteAlias;
-					default:
-						throw unexpectedIndex( hibernateSearchIndexName );
+				if ( index1.name().equals( hibernateSearchIndexName ) ) {
+					return index1WriteAlias;
+				}
+				else if ( index2.name().equals( hibernateSearchIndexName ) ) {
+					return index2WriteAlias;
+				}
+				else {
+					throw unexpectedIndex( hibernateSearchIndexName );
 				}
 			}
 
 			@Override
 			public String createReadAlias(String hibernateSearchIndexName) {
-				switch ( hibernateSearchIndexName ) {
-					case INDEX1_NAME:
-						return index1ReadAlias;
-					case INDEX2_NAME:
-						return index2ReadAlias;
-					default:
-						throw unexpectedIndex( hibernateSearchIndexName );
+				if ( index1.name().equals( hibernateSearchIndexName ) ) {
+					return index1ReadAlias;
+				}
+				else if ( index2.name().equals( hibernateSearchIndexName ) ) {
+					return index2ReadAlias;
+				}
+				else {
+					throw unexpectedIndex( hibernateSearchIndexName );
 				}
 			}
 

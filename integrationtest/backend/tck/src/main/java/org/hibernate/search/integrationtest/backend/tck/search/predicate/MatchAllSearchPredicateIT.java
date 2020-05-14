@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -25,8 +25,6 @@ import org.junit.Test;
 
 public class MatchAllSearchPredicateIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String STRING_1 = "aaa";
 
@@ -37,58 +35,51 @@ public class MatchAllSearchPredicateIT {
 	private static final String STRING_3 = "ccc";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void matchAll() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
 	public void matchAll_except() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
 		SearchPredicate searchPredicate = scope.predicate().match().field( "string" ).matching( STRING_2 ).toPredicate();
 		query = scope.query()
 				.where( f -> f.matchAll().except( searchPredicate ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
 	public void matchAll_multipleExcepts() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll()
@@ -98,7 +89,7 @@ public class MatchAllSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
 		SearchPredicate searchPredicate1 = scope.predicate().match().field( "string" ).matching( STRING_3 ).toPredicate();
 		SearchPredicate searchPredicate2 = scope.predicate().match().field( "string" ).matching( STRING_2 ).toPredicate();
@@ -108,35 +99,35 @@ public class MatchAllSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.string, STRING_1 );
+			document.addValue( index.binding().string, STRING_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.string, STRING_2 );
+			document.addValue( index.binding().string, STRING_2 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( indexMapping.string, STRING_3 );
+			document.addValue( index.binding().string, STRING_3 );
 		} );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 		}
 	}

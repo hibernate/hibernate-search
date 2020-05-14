@@ -14,47 +14,33 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class FieldSearchSortScaledSpecificsIT {
+import org.assertj.core.api.Assertions;
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME = "IndexWithIncompatibleDecimalScale";
+public class FieldSearchSortScaledSpecificsIT {
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private IndexMapping incompatibleDecimalScaleIndexMapping;
-	private StubMappingIndexManager incompatibleDecimalScaleIndexManager;
+	private static final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( root -> new IndexBinding( root, 2 ) ).name( "main" );
+	private static final SimpleMappedIndex<IndexBinding> incompatibleDecimalScaleIndex =
+			SimpleMappedIndex.of( root -> new IndexBinding( root, 5 ) ).name( "incompatibleDecimalScale" );
 
 	@Before
 	public void initData() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement(), 2 ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME,
-						ctx -> incompatibleDecimalScaleIndexMapping = new IndexMapping( ctx.getSchemaElement(), 5 ),
-						indexManager -> this.incompatibleDecimalScaleIndexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( mainIndex, incompatibleDecimalScaleIndex ).setup();
 	}
 
 	@Test
 	public void incompatibleDecimalScale() {
-		StubMappingScope scope = indexManager.createScope( incompatibleDecimalScaleIndexManager );
+		StubMappingScope scope = mainIndex.createScope( incompatibleDecimalScaleIndex );
 
 		Assertions.assertThatThrownBy(
 				() -> scope.query().where( f -> f.matchAll() )
@@ -64,14 +50,14 @@ public class FieldSearchSortScaledSpecificsIT {
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )
 				) );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<BigDecimal> scaledBigDecimal;
 
-		IndexMapping(IndexSchemaElement root, int scale) {
+		IndexBinding(IndexSchemaElement root, int scale) {
 			scaledBigDecimal = root.field(
 					"scaledBigDecimal",
 					f -> f.asBigDecimal().decimalScale( scale )

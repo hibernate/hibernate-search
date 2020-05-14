@@ -37,22 +37,16 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RangeSearchPredicateIT {
+import org.assertj.core.api.Assertions;
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
-	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME = "IndexWithIncompatibleDecimalScale";
-	private static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
+public class RangeSearchPredicateIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -64,56 +58,27 @@ public class RangeSearchPredicateIT {
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 = "incompatible_decimal_scale_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private IndexMapping compatibleIndexMapping;
-	private StubMappingIndexManager compatibleIndexManager;
-
-	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-
-	private StubMappingIndexManager incompatibleIndexManager;
-
-	private IncompatibleDecimalScaleIndexMapping incompatibleDecimalScaleIndexMapping;
-	private StubMappingIndexManager incompatibleDecimalScaleIndexManager;
-
-	private StubMappingIndexManager unsearchableFieldsIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
+			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
+	private final SimpleMappedIndex<IncompatibleDecimalScaleIndexBinding> incompatibleDecimalScaleIndex =
+			SimpleMappedIndex.of( IncompatibleDecimalScaleIndexBinding::new ).name( "incompatibleDecimalScale" );
+	private final SimpleMappedIndex<UnsearchableFieldsIndexBinding> unsearchableFieldsIndex =
+			SimpleMappedIndex.of( UnsearchableFieldsIndexBinding::new ).name( "unsearchableFields" );
 
 	@Before
 	public void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_INDEX_NAME,
-						ctx -> new NotCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.incompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME,
-						ctx -> this.incompatibleDecimalScaleIndexMapping = new IncompatibleDecimalScaleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.incompatibleDecimalScaleIndexManager = indexManager
-				)
-				.withIndex(
-						UNSEARCHABLE_FIELDS_INDEX_NAME,
-						ctx -> new UnsearchableFieldsIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.unsearchableFieldsIndexManager = indexManager
+				.withIndexes(
+						mainIndex, compatibleIndex, rawFieldCompatibleIndex,
+						incompatibleIndex, incompatibleDecimalScaleIndex, unsearchableFieldsIndex
 				)
 				.setup();
 
@@ -122,9 +87,9 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void unsearchable() {
-		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
+		StubMappingScope scope = unsearchableFieldsIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy( () ->
@@ -139,9 +104,9 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void atLeast() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 
@@ -150,15 +115,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
 	@Test
 	public void atLeast_withDslConverter_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 
@@ -167,15 +132,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
 	@Test
 	public void atLeast_withDslConverter_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
@@ -184,15 +149,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
 	@Test
 	public void greaterThan() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.document2Value.indexedValue;
 
@@ -206,15 +171,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 		}
 	}
 
 	@Test
 	public void atMost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
@@ -223,15 +188,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void atMost_withDslConverter_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
@@ -240,15 +205,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void atMost_withDslConverter_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
@@ -257,15 +222,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void lessThan() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.document2Value.indexedValue;
 
@@ -274,15 +239,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 		}
 	}
 
 	@Test
 	public void between() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
@@ -292,15 +257,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void between_withDslConverter_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
@@ -310,15 +275,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void between_withDslConverter_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
@@ -331,15 +296,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void between_boundInclusion() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object value1ToMatch = fieldModel.document1Value.indexedValue;
 			Object value2ToMatch = fieldModel.document2Value.indexedValue;
@@ -352,7 +317,7 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit exclusion for the lower bound
 
@@ -366,7 +331,7 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 
 			// explicit exclusion for the upper bound
 
@@ -380,7 +345,7 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 			// explicit inclusion for both bounds
 
@@ -394,7 +359,7 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit exclusion for both bounds
 
@@ -408,15 +373,15 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void between_nullBounds() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
@@ -428,22 +393,22 @@ public class RangeSearchPredicateIT {
 							.between( lowerValueToMatch, null ) )
 					.toQuery();
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
 			query = scope.query()
 					.where( f -> f.range().field( absoluteFieldPath )
 							.between( null, upperValueToMatch ) )
 					.toQuery();
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void unsupported_field_types() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsupportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -461,50 +426,50 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 						)
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 42 )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName ).boost( 42 )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 						)
 				)
 				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
 				.where( f -> f.bool()
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 42 )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName ).boost( 42 )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 						)
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 						)
 				)
 				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_1 );
 	}
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 						)
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 								.boost( 7 )
 						)
 				)
@@ -512,39 +477,39 @@ public class RangeSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
 				.where( f -> f.bool()
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 								.boost( 39 )
 						)
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 						)
 				)
 				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_1 );
 	}
 
 	@Test
 	public void predicateLevelBoost_andFieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
 						// 2 * 3 => boost x6
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 3 )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName ).boost( 3 )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 								.boost( 2 )
 						)
 						// 7 * 1 => boost x7
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 								.boost( 7 )
 						)
 				)
@@ -552,18 +517,18 @@ public class RangeSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
 				.where( f -> f.bool()
 						// 39 * 0.5 => boost x19.5
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 0.5f )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName ).boost( 0.5f )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 								.boost( 39 )
 						)
 						// 3 * 3 => boost x9
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 3 )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName ).boost( 3 )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 								.boost( 3 )
 						)
 				)
@@ -571,23 +536,23 @@ public class RangeSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_1 );
 	}
 
 	@Test
 	public void predicateLevelBoost_multiFields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.field( indexMapping.string2Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.field( mainIndex.binding().string2Field.relativeFieldName )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 								.boost( 2 )
 						)
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.field( indexMapping.string2Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.field( mainIndex.binding().string2Field.relativeFieldName )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 								.boost( 7 )
 						)
 				)
@@ -595,18 +560,18 @@ public class RangeSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
 				.where( f -> f.bool()
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.field( indexMapping.string2Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.field( mainIndex.binding().string2Field.relativeFieldName )
+								.atLeast( mainIndex.binding().string1Field.document3Value.indexedValue )
 								.boost( 39 )
 						)
-						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.field( indexMapping.string2Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.should( f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+								.field( mainIndex.binding().string2Field.relativeFieldName )
+								.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 								.boost( 3 )
 						)
 				)
@@ -614,117 +579,117 @@ public class RangeSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_1 );
 	}
 
 	@Test
 	public void multi_fields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		// field(...).field(...)
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
-						.field( indexMapping.string2Field.relativeFieldName )
-						.atMost( indexMapping.string1Field.document1Value.indexedValue )
+				.where( f -> f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+						.field( mainIndex.binding().string2Field.relativeFieldName )
+						.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		query = scope.query()
-				.where( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
-						.field( indexMapping.string2Field.relativeFieldName )
-						.atLeast( indexMapping.string2Field.document3Value.indexedValue )
+				.where( f -> f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+						.field( mainIndex.binding().string2Field.relativeFieldName )
+						.atLeast( mainIndex.binding().string2Field.document3Value.indexedValue )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 
 		// field().fields(...)
 
 		query = scope.query()
-				.where( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
-						.fields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.atMost( indexMapping.string1Field.document1Value.indexedValue )
+				.where( f -> f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+						.fields( mainIndex.binding().string2Field.relativeFieldName, mainIndex.binding().string3Field.relativeFieldName )
+						.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		query = scope.query()
-				.where( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
-						.fields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+				.where( f -> f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+						.fields( mainIndex.binding().string2Field.relativeFieldName, mainIndex.binding().string3Field.relativeFieldName )
 						.between( "d", "e" )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		query = scope.query()
-				.where( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
-						.fields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.atLeast( indexMapping.string3Field.document3Value.indexedValue )
+				.where( f -> f.range().field( mainIndex.binding().string1Field.relativeFieldName )
+						.fields( mainIndex.binding().string2Field.relativeFieldName, mainIndex.binding().string3Field.relativeFieldName )
+						.atLeast( mainIndex.binding().string3Field.document3Value.indexedValue )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 
 		// fields(...)
 
 		query = scope.query()
-				.where( f -> f.range().fields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
-						.atMost( indexMapping.string1Field.document1Value.indexedValue )
+				.where( f -> f.range().fields( mainIndex.binding().string1Field.relativeFieldName, mainIndex.binding().string2Field.relativeFieldName )
+						.atMost( mainIndex.binding().string1Field.document1Value.indexedValue )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		query = scope.query()
-				.where( f -> f.range().fields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
-						.atLeast( indexMapping.string2Field.document3Value.indexedValue )
+				.where( f -> f.range().fields( mainIndex.binding().string1Field.relativeFieldName, mainIndex.binding().string2Field.relativeFieldName )
+						.atLeast( mainIndex.binding().string2Field.document3Value.indexedValue )
 				)
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
 	public void multiField_withDslConverter_dslConverterEnabled() {
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.where( f -> f.range().field( indexMapping.string1FieldWithDslConverter.relativeFieldName )
-						.field( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.atMost( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue ) )
+		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
+				.where( f -> f.range().field( mainIndex.binding().string1FieldWithDslConverter.relativeFieldName )
+						.field( mainIndex.binding().string2FieldWithDslConverter.relativeFieldName )
+						.atMost( new ValueWrapper<>( mainIndex.binding().string1FieldWithDslConverter.document1Value.indexedValue ) )
 				)
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void multiFields_withDslConverter_dslConverterDisabled() {
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.where( f -> f.range().field( indexMapping.string1FieldWithDslConverter.relativeFieldName )
-						.field( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.atMost( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, ValueConvert.NO )
+		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
+				.where( f -> f.range().field( mainIndex.binding().string1FieldWithDslConverter.relativeFieldName )
+						.field( mainIndex.binding().string2FieldWithDslConverter.relativeFieldName )
+						.atMost( mainIndex.binding().string1FieldWithDslConverter.document1Value.indexedValue, ValueConvert.NO )
 				)
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void range_error_null() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( fieldPath )
@@ -767,7 +732,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void unknown_field() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().range().field( "unknown_field" ),
@@ -778,7 +743,7 @@ public class RangeSearchPredicateIT {
 				.hasMessageContaining( "'unknown_field'" );
 
 		Assertions.assertThatThrownBy(
-				() -> scope.predicate().range().fields( indexMapping.string1Field.relativeFieldName, "unknown_field" ),
+				() -> scope.predicate().range().fields( mainIndex.binding().string1Field.relativeFieldName, "unknown_field" ),
 				"range() predicate with unknown field"
 		)
 				.isInstanceOf( SearchException.class )
@@ -786,7 +751,7 @@ public class RangeSearchPredicateIT {
 				.hasMessageContaining( "'unknown_field'" );
 
 		Assertions.assertThatThrownBy(
-				() -> scope.predicate().range().field( indexMapping.string1Field.relativeFieldName ).field( "unknown_field" ),
+				() -> scope.predicate().range().field( mainIndex.binding().string1Field.relativeFieldName ).field( "unknown_field" ),
 				"range() predicate with unknown field"
 		)
 				.isInstanceOf( SearchException.class )
@@ -794,7 +759,7 @@ public class RangeSearchPredicateIT {
 				.hasMessageContaining( "'unknown_field'" );
 
 		Assertions.assertThatThrownBy(
-				() -> scope.predicate().range().field( indexMapping.string1Field.relativeFieldName ).fields( "unknown_field" ),
+				() -> scope.predicate().range().field( mainIndex.binding().string1Field.relativeFieldName ).fields( "unknown_field" ),
 				"range() predicate with unknown field"
 		)
 				.isInstanceOf( SearchException.class )
@@ -804,11 +769,11 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void error_invalidType() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
-		fieldModels.addAll( indexMapping.supportedFieldModels );
-		fieldModels.addAll( indexMapping.supportedFieldWithDslConverterModels );
+		fieldModels.addAll( mainIndex.binding().supportedFieldModels );
+		fieldModels.addAll( mainIndex.binding().supportedFieldWithDslConverterModels );
 
 		for ( ByTypeFieldModel<?> fieldModel : fieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -867,10 +832,10 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_usingField() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+	public void multiIndex_withCompatibleIndex_usingField() {
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
@@ -879,22 +844,22 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-				b.doc( INDEX_NAME, DOCUMENT_1 );
-				b.doc( INDEX_NAME, DOCUMENT_2 );
-				b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+				b.doc( mainIndex.typeName(), DOCUMENT_1 );
+				b.doc( mainIndex.typeName(), DOCUMENT_2 );
+				b.doc( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 			} );
 		}
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterEnabled() {
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+	public void multiIndex_withRawFieldCompatibleIndex_dslConverterEnabled() {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			Assertions.assertThatThrownBy(
 					() -> {
-						indexManager.createScope( rawFieldCompatibleIndexManager )
+						mainIndex.createScope( rawFieldCompatibleIndex )
 								.predicate().range().field( absoluteFieldPath ).atMost( upperValueToMatch );
 					}
 			)
@@ -902,16 +867,16 @@ public class RangeSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldModel.relativeFieldName + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )
 					) );
 		}
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_dslConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
@@ -920,18 +885,18 @@ public class RangeSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-				b.doc( INDEX_NAME, DOCUMENT_1 );
-				b.doc( INDEX_NAME, DOCUMENT_2 );
-				b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+				b.doc( mainIndex.typeName(), DOCUMENT_1 );
+				b.doc( mainIndex.typeName(), DOCUMENT_2 );
+				b.doc( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 			} );
 		}
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withNoCompatibleIndex_dslConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -941,16 +906,16 @@ public class RangeSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 					) );
 		}
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withNoCompatibleIndex_dslConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -960,15 +925,15 @@ public class RangeSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 					) );
 		}
 	}
 
 	@Test
 	public void multiIndex_incompatibleDecimalScale() {
-		StubMappingScope scope = indexManager.createScope( incompatibleDecimalScaleIndexManager );
-		String absoluteFieldPath = indexMapping.scaledBigDecimal.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope( incompatibleDecimalScaleIndex );
+		String absoluteFieldPath = mainIndex.binding().scaledBigDecimal.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
 				() -> {
@@ -981,15 +946,15 @@ public class RangeSearchPredicateIT {
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )
 				) );
 	}
 
 	@Test
 	public void multiIndex_incompatibleSearchable() {
-		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
+		StubMappingScope scope = mainIndex.createScope( unsearchableFieldsIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -999,86 +964,86 @@ public class RangeSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+							EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )
 					) );
 		}
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.string1Field.document1Value.write( document );
-			indexMapping.string2Field.document1Value.write( document );
-			indexMapping.string3Field.document1Value.write( document );
-			indexMapping.string1FieldWithDslConverter.document1Value.write( document );
-			indexMapping.string2FieldWithDslConverter.document1Value.write( document );
-			indexMapping.scaledBigDecimal.document1Value.write( document );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().string1Field.document1Value.write( document );
+			mainIndex.binding().string2Field.document1Value.write( document );
+			mainIndex.binding().string3Field.document1Value.write( document );
+			mainIndex.binding().string1FieldWithDslConverter.document1Value.write( document );
+			mainIndex.binding().string2FieldWithDslConverter.document1Value.write( document );
+			mainIndex.binding().scaledBigDecimal.document1Value.write( document );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
-			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			indexMapping.string1Field.document2Value.write( document );
-			indexMapping.string2Field.document2Value.write( document );
-			indexMapping.string3Field.document2Value.write( document );
-			indexMapping.string1FieldWithDslConverter.document2Value.write( document );
-			indexMapping.string2FieldWithDslConverter.document2Value.write( document );
-			indexMapping.scaledBigDecimal.document2Value.write( document );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().string1Field.document2Value.write( document );
+			mainIndex.binding().string2Field.document2Value.write( document );
+			mainIndex.binding().string3Field.document2Value.write( document );
+			mainIndex.binding().string1FieldWithDslConverter.document2Value.write( document );
+			mainIndex.binding().string2FieldWithDslConverter.document2Value.write( document );
+			mainIndex.binding().scaledBigDecimal.document2Value.write( document );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
-			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
-			indexMapping.unsupportedFieldModels.forEach( f -> f.document3Value.write( document ) );
-			indexMapping.string1Field.document3Value.write( document );
-			indexMapping.string2Field.document3Value.write( document );
-			indexMapping.string3Field.document3Value.write( document );
-			indexMapping.string1FieldWithDslConverter.document3Value.write( document );
-			indexMapping.string2FieldWithDslConverter.document3Value.write( document );
-			indexMapping.scaledBigDecimal.document3Value.write( document );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+			mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
+			mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+			mainIndex.binding().string1Field.document3Value.write( document );
+			mainIndex.binding().string2Field.document3Value.write( document );
+			mainIndex.binding().string3Field.document3Value.write( document );
+			mainIndex.binding().string1FieldWithDslConverter.document3Value.write( document );
+			mainIndex.binding().string2FieldWithDslConverter.document3Value.write( document );
+			mainIndex.binding().scaledBigDecimal.document3Value.write( document );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 		plan.execute().join();
 
-		plan = compatibleIndexManager.createIndexingPlan();
+		plan = compatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			compatibleIndexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
-		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan = rawFieldCompatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			rawFieldCompatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
-		plan = incompatibleDecimalScaleIndexManager.createIndexingPlan();
+		plan = incompatibleDecimalScaleIndex.createIndexingPlan();
 		plan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
-			incompatibleDecimalScaleIndexMapping.scaledBigDecimal.document1Value.write( document );
+			incompatibleDecimalScaleIndex.binding().scaledBigDecimal.document1Value.write( document );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
-		query = compatibleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+		query = compatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = rawFieldCompatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = incompatibleDecimalScaleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = incompatibleDecimalScaleIndex.createScope().query()
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( incompatibleDecimalScaleIndex.typeName(), INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -1099,7 +1064,7 @@ public class RangeSearchPredicateIT {
 		} );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
@@ -1113,7 +1078,7 @@ public class RangeSearchPredicateIT {
 
 		final MainFieldModel<BigDecimal> scaledBigDecimal;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_", ignored -> { },
 					(typeDescriptor, expectations, model) -> {
@@ -1157,12 +1122,12 @@ public class RangeSearchPredicateIT {
 		}
 	}
 
-	private static class RawFieldCompatibleIndexMapping {
+	private static class RawFieldCompatibleIndexBinding {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 
-		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
 			 * but with an incompatible DSL converter.
 			 */
 			mapByTypeFields(
@@ -1176,10 +1141,10 @@ public class RangeSearchPredicateIT {
 		}
 	}
 
-	private static class NotCompatibleIndexMapping {
-		NotCompatibleIndexMapping(IndexSchemaElement root) {
+	private static class IncompatibleIndexBinding {
+		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
 			 * but with an incompatible type.
 			 */
 			forEachTypeDescriptor( typeDescriptor -> {
@@ -1195,14 +1160,14 @@ public class RangeSearchPredicateIT {
 		}
 	}
 
-	private static class IncompatibleDecimalScaleIndexMapping {
+	private static class IncompatibleDecimalScaleIndexBinding {
 		final MainFieldModel<BigDecimal> scaledBigDecimal;
 
 		/*
-		 * Unlike IndexMapping#scaledBigDecimal,
+		 * Unlike IndexBinding#scaledBigDecimal,
 		 * we're using here a different decimal scale for the field.
 		 */
-		IncompatibleDecimalScaleIndexMapping(IndexSchemaElement root) {
+		IncompatibleDecimalScaleIndexBinding(IndexSchemaElement root) {
 			scaledBigDecimal = MainFieldModel.mapper(
 					c -> c.asBigDecimal().decimalScale( 7 ),
 					new BigDecimal( "739.739" ), BigDecimal.ONE, BigDecimal.TEN
@@ -1211,11 +1176,11 @@ public class RangeSearchPredicateIT {
 		}
 	}
 
-	private static class UnsearchableFieldsIndexMapping {
+	private static class UnsearchableFieldsIndexBinding {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 
 		@SuppressWarnings("unchecked")
-		UnsearchableFieldsIndexMapping(IndexSchemaElement root) {
+		UnsearchableFieldsIndexBinding(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_",
 					// make the field not searchable

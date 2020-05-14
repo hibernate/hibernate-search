@@ -34,7 +34,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -64,8 +64,6 @@ public class DistanceSearchSortBaseIT {
 		return parameters.toArray( new Object[0][] );
 	}
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
@@ -85,18 +83,11 @@ public class DistanceSearchSortBaseIT {
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static IndexMapping indexMapping;
-	private static StubMappingIndexManager indexManager;
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> DistanceSearchSortBaseIT.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
@@ -120,33 +111,33 @@ public class DistanceSearchSortBaseIT {
 				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT )
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 
 		query = simpleQuery(
 				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 
 		query = simpleQuery(
 				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
 						.asc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 
 		query = simpleQuery(
 				b -> b.distance( fieldPathForDescendingOrderTests, CENTER_POINT ).desc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( index.typeName(), EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery(
 				b -> b.distance( fieldPathForDescendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
 						.desc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( index.typeName(), EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
 
 	@Test
@@ -203,7 +194,7 @@ public class DistanceSearchSortBaseIT {
 
 	private SearchQuery<DocumentReference> simpleQuery(
 			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?, ?>> sortContributor) {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor.andThen( this::applySortMode ).andThen( this::applyFilter ) )
@@ -237,17 +228,17 @@ public class DistanceSearchSortBaseIT {
 	private String getFieldPath(Function<AbstractObjectMapping, String> relativeFieldNameFunction) {
 		switch ( fieldStructure.location ) {
 			case ROOT:
-				return relativeFieldNameFunction.apply( indexMapping );
+				return relativeFieldNameFunction.apply( index.binding() );
 			case IN_FLATTENED:
-				return indexMapping.flattenedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( indexMapping.flattenedObject );
+				return index.binding().flattenedObject.relativeFieldName
+						+ "." + relativeFieldNameFunction.apply( index.binding().flattenedObject );
 			case IN_NESTED:
-				return indexMapping.nestedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( indexMapping.nestedObject );
+				return index.binding().nestedObject.relativeFieldName
+						+ "." + relativeFieldNameFunction.apply( index.binding().nestedObject );
 			case IN_NESTED_TWICE:
-				return indexMapping.nestedObject.relativeFieldName
-						+ "." + indexMapping.nestedObject.nestedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( indexMapping.nestedObject.nestedObject );
+				return index.binding().nestedObject.relativeFieldName
+						+ "." + index.binding().nestedObject.nestedObject.relativeFieldName
+						+ "." + relativeFieldNameFunction.apply( index.binding().nestedObject.nestedObject );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
 		}
@@ -289,49 +280,49 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private static void initDocument(DocumentElement document, Integer ordinal) {
-		initAllFields( indexMapping, document, ordinal );
+		initAllFields( index.binding(), document, ordinal );
 
-		DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-		initAllFields( indexMapping.flattenedObject, flattenedObject, ordinal );
+		DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+		initAllFields( index.binding().flattenedObject, flattenedObject, ordinal );
 
 		// The nested object is split into four objects:
 		// the first two are included by the filter and each hold part of the values that will be sorted on,
 		// and the last two are excluded by the filter and hold garbage values that, if they were taken into account,
 		// would mess with the sort order and eventually fail at least *some* tests.
 
-		DocumentElement nestedObject0 = document.addObject( indexMapping.nestedObject.self );
-		nestedObject0.addValue( indexMapping.nestedObject.discriminator, "included" );
-		initAllFields( indexMapping.nestedObject, nestedObject0, ordinal, ValueSelection.FIRST_PARTITION );
+		DocumentElement nestedObject0 = document.addObject( index.binding().nestedObject.self );
+		nestedObject0.addValue( index.binding().nestedObject.discriminator, "included" );
+		initAllFields( index.binding().nestedObject, nestedObject0, ordinal, ValueSelection.FIRST_PARTITION );
 
-		DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-		nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
-		initAllFields( indexMapping.nestedObject, nestedObject1, ordinal, ValueSelection.SECOND_PARTITION );
+		DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+		nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+		initAllFields( index.binding().nestedObject, nestedObject1, ordinal, ValueSelection.SECOND_PARTITION );
 
-		DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-		nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-		initAllFields( indexMapping.nestedObject, nestedObject2, ordinal == null ? null : ordinal - 1 );
+		DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+		nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+		initAllFields( index.binding().nestedObject, nestedObject2, ordinal == null ? null : ordinal - 1 );
 
-		DocumentElement nestedObject3 = document.addObject( indexMapping.nestedObject.self );
-		nestedObject3.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-		initAllFields( indexMapping.nestedObject, nestedObject3, ordinal == null ? null : ordinal + 1 );
+		DocumentElement nestedObject3 = document.addObject( index.binding().nestedObject.self );
+		nestedObject3.addValue( index.binding().nestedObject.discriminator, "excluded" );
+		initAllFields( index.binding().nestedObject, nestedObject3, ordinal == null ? null : ordinal + 1 );
 
 		// Same for the second level of nesting
 
-		DocumentElement nestedNestedObject0 = nestedObject0.addObject( indexMapping.nestedObject.nestedObject.self );
-		nestedNestedObject0.addValue( indexMapping.nestedObject.nestedObject.discriminator, "included" );
-		initAllFields( indexMapping.nestedObject.nestedObject, nestedNestedObject0, ordinal, ValueSelection.FIRST_PARTITION );
+		DocumentElement nestedNestedObject0 = nestedObject0.addObject( index.binding().nestedObject.nestedObject.self );
+		nestedNestedObject0.addValue( index.binding().nestedObject.nestedObject.discriminator, "included" );
+		initAllFields( index.binding().nestedObject.nestedObject, nestedNestedObject0, ordinal, ValueSelection.FIRST_PARTITION );
 
-		DocumentElement nestedNestedObject1 = nestedObject0.addObject( indexMapping.nestedObject.nestedObject.self );
-		nestedNestedObject1.addValue( indexMapping.nestedObject.nestedObject.discriminator, "included" );
-		initAllFields( indexMapping.nestedObject.nestedObject, nestedNestedObject1, ordinal, ValueSelection.SECOND_PARTITION );
+		DocumentElement nestedNestedObject1 = nestedObject0.addObject( index.binding().nestedObject.nestedObject.self );
+		nestedNestedObject1.addValue( index.binding().nestedObject.nestedObject.discriminator, "included" );
+		initAllFields( index.binding().nestedObject.nestedObject, nestedNestedObject1, ordinal, ValueSelection.SECOND_PARTITION );
 
-		DocumentElement nestedNestedObject2 = nestedObject0.addObject( indexMapping.nestedObject.nestedObject.self );
-		nestedNestedObject2.addValue( indexMapping.nestedObject.nestedObject.discriminator, "excluded" );
-		initAllFields( indexMapping.nestedObject.nestedObject, nestedNestedObject2, ordinal == null ? null : ordinal - 1 );
+		DocumentElement nestedNestedObject2 = nestedObject0.addObject( index.binding().nestedObject.nestedObject.self );
+		nestedNestedObject2.addValue( index.binding().nestedObject.nestedObject.discriminator, "excluded" );
+		initAllFields( index.binding().nestedObject.nestedObject, nestedNestedObject2, ordinal == null ? null : ordinal - 1 );
 
-		DocumentElement nestedNestedObject3 = nestedObject0.addObject( indexMapping.nestedObject.nestedObject.self );
-		nestedNestedObject3.addValue( indexMapping.nestedObject.nestedObject.discriminator, "excluded" );
-		initAllFields( indexMapping.nestedObject.nestedObject, nestedNestedObject3, ordinal == null ? null : ordinal + 1 );
+		DocumentElement nestedNestedObject3 = nestedObject0.addObject( index.binding().nestedObject.nestedObject.self );
+		nestedNestedObject3.addValue( index.binding().nestedObject.nestedObject.discriminator, "excluded" );
+		initAllFields( index.binding().nestedObject.nestedObject, nestedNestedObject3, ordinal == null ? null : ordinal + 1 );
 	}
 
 	private static void initAllFields(AbstractObjectMapping mapping, DocumentElement document, Integer ordinal) {
@@ -404,7 +395,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> initDocument( document, DOCUMENT_3_ORDINAL ) );
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> initDocument( document, DOCUMENT_1_ORDINAL ) );
@@ -414,11 +405,11 @@ public class DistanceSearchSortBaseIT {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 	}
 
 	private static class AbstractObjectMapping {
@@ -455,11 +446,11 @@ public class DistanceSearchSortBaseIT {
 		}
 	}
 
-	private static class IndexMapping extends AbstractObjectMapping {
+	private static class IndexBinding extends AbstractObjectMapping {
 		final FirstLevelObjectMapping flattenedObject;
 		final FirstLevelObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			super( root );
 			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
 					ObjectFieldStorage.FLATTENED, false );

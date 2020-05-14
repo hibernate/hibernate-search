@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 
@@ -28,8 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class DistanceSearchSearchableSortableIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	private static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687, 4.835233 );
@@ -43,38 +41,30 @@ public class DistanceSearchSearchableSortableIT {
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	protected IndexMapping indexMapping;
-	protected StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-
+		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	public void searchableSortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "searchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.sort( f -> f.distance( "searchableSortable", METRO_GARIBALDI ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void searchableNotSortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortable";
 
 		Assertions.assertThatThrownBy( () ->
@@ -93,12 +83,12 @@ public class DistanceSearchSearchableSortableIT {
 				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void searchableDefaultSortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableDefaultSortable";
 
 		Assertions.assertThatThrownBy( () ->
@@ -117,12 +107,12 @@ public class DistanceSearchSearchableSortableIT {
 				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void notSearchableSortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		String fieldPath = "notSearchableSortable";
 
 		Assertions.assertThatThrownBy( () ->
@@ -142,61 +132,61 @@ public class DistanceSearchSearchableSortableIT {
 				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID, OURSON_QUI_BOIT_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void defaultSearchableSortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "defaultSearchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.sort( f -> f.distance( "defaultSearchableSortable", METRO_GARIBALDI ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			document.addValue( indexMapping.searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( indexMapping.searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( indexMapping.searchableDefaultSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( indexMapping.notSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( indexMapping.defaultSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( index.binding().searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( index.binding().searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( index.binding().searchableDefaultSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( index.binding().notSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( index.binding().defaultSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		plan.add( referenceProvider( IMOUTO_ID ), document -> {
-			document.addValue( indexMapping.searchableSortable, IMOUTO_GEO_POINT );
-			document.addValue( indexMapping.searchableNotSortable, IMOUTO_GEO_POINT );
-			document.addValue( indexMapping.searchableDefaultSortable, IMOUTO_GEO_POINT );
-			document.addValue( indexMapping.notSearchableSortable, IMOUTO_GEO_POINT );
-			document.addValue( indexMapping.defaultSearchableSortable, IMOUTO_GEO_POINT );
+			document.addValue( index.binding().searchableSortable, IMOUTO_GEO_POINT );
+			document.addValue( index.binding().searchableNotSortable, IMOUTO_GEO_POINT );
+			document.addValue( index.binding().searchableDefaultSortable, IMOUTO_GEO_POINT );
+			document.addValue( index.binding().notSearchableSortable, IMOUTO_GEO_POINT );
+			document.addValue( index.binding().defaultSearchableSortable, IMOUTO_GEO_POINT );
 		} );
 		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			document.addValue( indexMapping.searchableSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( indexMapping.searchableNotSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( indexMapping.searchableDefaultSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( indexMapping.notSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( indexMapping.defaultSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( index.binding().searchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( index.binding().searchableNotSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( index.binding().searchableDefaultSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( index.binding().notSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( index.binding().defaultSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 	}
 
-	protected static class IndexMapping {
+	protected static class IndexBinding {
 		final IndexFieldReference<GeoPoint> searchableSortable;
 		final IndexFieldReference<GeoPoint> searchableNotSortable;
 		final IndexFieldReference<GeoPoint> searchableDefaultSortable;
 		final IndexFieldReference<GeoPoint> notSearchableSortable;
 		final IndexFieldReference<GeoPoint> defaultSearchableSortable;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			searchableSortable = root.field( "searchableSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.YES ) ).toReference();
 			searchableNotSortable = root.field( "searchableNotSortable", f -> f.asGeoPoint().searchable( Searchable.YES ).sortable( Sortable.NO ) ).toReference();
 			searchableDefaultSortable = root.field( "searchableDefaultSortable", f -> f.asGeoPoint().searchable( Searchable.YES ) ).toReference();

@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -50,10 +51,8 @@ public class ElasticsearchGsonConcurrencyIT {
 	// This must be at least 2, but you don't need more than the number of CPU cores.
 	private static final int INDEX_COUNT_PER_ATTEMPT = 4;
 
-	private static final String INDEX_NAME_PREFIX = "IndexName_";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Test
 	public void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {
@@ -68,29 +67,28 @@ public class ElasticsearchGsonConcurrencyIT {
 
 		for ( int i = 0; i < INDEX_COUNT_PER_ATTEMPT; i++ ) {
 			setupCtx = setupCtx.withIndex(
-					INDEX_NAME_PREFIX + i,
-					ctx -> new IndexMapping( ctx.getSchemaElement() )
+					StubMappedIndex.ofNonRetrievable( IndexBinding::new ).name( "IndexName_" + i )
 			);
 		}
 
 		setupCtx.setup();
 	}
 
-	private static class IndexMapping {
-		final ObjectMapping child;
+	private static class IndexBinding {
+		final ObjectBinding child;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			// Two levels of nested properties are necessary to reproduce the Gson bug causing HSEARCH-3725
-			child = new ObjectMapping( root, "child", 3 );
+			child = new ObjectBinding( root, "child", 3 );
 		}
 	}
 
-	private static class ObjectMapping {
+	private static class ObjectBinding {
 		final IndexObjectFieldReference self;
 		final IndexFieldReference<String> text;
-		final ObjectMapping child;
+		final ObjectBinding child;
 
-		ObjectMapping(IndexSchemaElement parent, String name, int depth) {
+		ObjectBinding(IndexSchemaElement parent, String name, int depth) {
 			IndexSchemaObjectField objectField = parent.objectField( name );
 			self = objectField.toReference();
 			text = objectField.field(
@@ -99,7 +97,7 @@ public class ElasticsearchGsonConcurrencyIT {
 			)
 					.toReference();
 			if ( depth > 1 ) {
-				child = new ObjectMapping( objectField, name, depth - 1 );
+				child = new ObjectBinding( objectField, name, depth - 1 );
 			}
 			else {
 				child = null;

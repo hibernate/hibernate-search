@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.index.lifecyc
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.assertj.core.api.Assertions;
+
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -19,29 +21,25 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexLifecycleStrategyIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3540")
 	public void noCall() {
+		StubMappedIndex index = StubMappedIndex.withoutFields();
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withIndexDefaultsProperty(
 								"lifecycle.strategy",
 								"update"
 						)
-						.withIndex(
-								INDEX_NAME,
-								ctx -> { }
-						)
+						.withIndex( index )
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unable to convert configuration property 'hibernate.search.backends.testedBackend.indexes." + INDEX_NAME
+						"Unable to convert configuration property 'hibernate.search.backends.testedBackend.indexes." + index.name()
 								+ ".lifecycle.strategy' with value 'update'",
 						"The lifecycle strategy cannot be set at the index level anymore",
 						"Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead"

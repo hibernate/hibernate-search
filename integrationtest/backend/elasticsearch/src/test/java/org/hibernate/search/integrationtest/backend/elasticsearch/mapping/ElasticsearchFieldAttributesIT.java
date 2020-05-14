@@ -21,6 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,12 +30,10 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchFieldAttributesIT {
 
-	private static final String INDEX_NAME = "my-index";
-
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
@@ -91,19 +90,20 @@ public class ElasticsearchFieldAttributesIT {
 	}
 
 	private void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( mapping );
 		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(),
 				ElasticsearchRequestAssertionMode.STRICT
 		);
 		clientSpy.expectNext(
 				ElasticsearchRequest.get()
-						.multiValuedPathComponent( defaultAliases( INDEX_NAME ) )
+						.multiValuedPathComponent( defaultAliases( index.name() ) )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
-						.pathComponent( defaultPrimaryName( INDEX_NAME ) )
+						.pathComponent( defaultPrimaryName( index.name() ) )
 						.body( createIndex( properties ) )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
@@ -111,7 +111,7 @@ public class ElasticsearchFieldAttributesIT {
 
 		setupHelper.start()
 				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )
-				.withIndex( INDEX_NAME, ctx -> mapping.accept( ctx.getSchemaElement() ) )
+				.withIndex( index )
 				.setup();
 
 		clientSpy.verifyExpectationsMet();

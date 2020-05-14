@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -35,8 +35,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class MultiTenancyBaseIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String TENANT_1 = "tenant_1";
 	private static final String TENANT_2 = "tenant_2";
@@ -57,31 +55,23 @@ public class MultiTenancyBaseIT {
 	private static final Integer INTEGER_VALUE_5 = 5;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
 
 	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
 	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withMultiTenancy()
-				.setup();
+		setupHelper.start().withIndex( index ).withMultiTenancy().setup();
 
 		initData();
 	}
 
 	@Test
 	public void search_only_returns_elements_of_the_selected_tenant() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -110,7 +100,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3421")
 	public void id_predicate_takes_tenantId_into_account() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -137,7 +127,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void search_on_nested_object_only_returns_elements_of_the_tenant() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -172,14 +162,14 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void delete_only_deletes_elements_of_the_tenant() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant2SessionContext );
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant2SessionContext );
 
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -200,7 +190,7 @@ public class MultiTenancyBaseIT {
 		plan.execute().join();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_2 );
 		projectionQuery = scope.query( tenant2SessionContext )
 				.select( f ->
 						f.composite(
@@ -218,27 +208,27 @@ public class MultiTenancyBaseIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
 	public void update_only_updates_elements_of_the_tenant() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant2SessionContext );
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant2SessionContext );
 
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( checkQuery )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			document.addValue( indexMapping.string, UPDATED_STRING );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
+			document.addValue( index.binding().string, UPDATED_STRING );
+			document.addValue( index.binding().integer, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, UPDATED_STRING );
+			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
 		plan.execute().join();
@@ -328,7 +318,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.query( new StubBackendSessionContext() )
 				.where( f -> f.matchAll() )
@@ -343,15 +333,15 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
 
 			plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
-				document.addValue( indexMapping.string, STRING_VALUE_3 );
-				document.addValue( indexMapping.integer, INTEGER_VALUE_5 );
+				document.addValue( index.binding().string, STRING_VALUE_3 );
+				document.addValue( index.binding().integer, INTEGER_VALUE_5 );
 
-				DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-				nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_3 );
-				nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_5 );
+				DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+				nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_3 );
+				nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_5 );
 			} );
 
 			plan.execute().join();
@@ -365,15 +355,15 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
 
 			plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-				document.addValue( indexMapping.string, UPDATED_STRING );
-				document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
+				document.addValue( index.binding().string, UPDATED_STRING );
+				document.addValue( index.binding().integer, INTEGER_VALUE_4 );
 
-				DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-				nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
-				nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
+				DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+				nestedObject.addValue( index.binding().nestedObject.string, UPDATED_STRING );
+				nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
 			} );
 
 			plan.execute().join();
@@ -387,7 +377,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
 			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 			plan.execute().join();
 		} )
@@ -398,55 +388,55 @@ public class MultiTenancyBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
-			document.addValue( indexMapping.string, STRING_VALUE_1 );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_1 );
+			document.addValue( index.binding().string, STRING_VALUE_1 );
+			document.addValue( index.binding().integer, INTEGER_VALUE_1 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_1 );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_1 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_1 );
+			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_1 );
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			document.addValue( indexMapping.string, STRING_VALUE_2 );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_2 );
+			document.addValue( index.binding().string, STRING_VALUE_2 );
+			document.addValue( index.binding().integer, INTEGER_VALUE_2 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_2 );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_2 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_2 );
+			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_2 );
 		} );
 
 		plan.execute().join();
 
-		plan = indexManager.createIndexingPlan( tenant2SessionContext );
+		plan = index.createIndexingPlan( tenant2SessionContext );
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
-			document.addValue( indexMapping.string, STRING_VALUE_1 );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_3 );
+			document.addValue( index.binding().string, STRING_VALUE_1 );
+			document.addValue( index.binding().integer, INTEGER_VALUE_3 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_1 );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_3 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_1 );
+			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_3 );
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			document.addValue( indexMapping.string, STRING_VALUE_2 );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
+			document.addValue( index.binding().string, STRING_VALUE_2 );
+			document.addValue( index.binding().integer, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_2 );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, STRING_VALUE_2 );
+			nestedObject.addValue( index.binding().nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -466,7 +456,7 @@ public class MultiTenancyBaseIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		projectionQuery = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -483,12 +473,12 @@ public class MultiTenancyBaseIT {
 		} );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<Integer> integer;
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) )
 					.toReference();
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )

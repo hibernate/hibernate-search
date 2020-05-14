@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -31,155 +31,153 @@ import org.junit.experimental.categories.Category;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private StubMappingIndexManager indexManager;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
 	public void nothingToDo() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
 		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {"
 						+ "}"
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
 	@Test
 	public void writeAlias_missing() {
-		elasticsearchClient.index( defaultPrimaryName( INDEX_NAME ), null, defaultReadAlias( INDEX_NAME ) )
+		elasticsearchClient.index( defaultPrimaryName( index.name() ), null, defaultReadAlias( index.name() ) )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
 		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {"
 						+ "}"
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
 	@Test
 	public void writeAlias_invalid_filter() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.put( defaultWriteAlias( INDEX_NAME ).original, "{'filter': {'term': {'user_id': 12}}}" );
+		elasticsearchClient.index( index.name() ).aliases()
+				.put( defaultWriteAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
 		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 						+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
 	@Test
 	@Category(RequiresIndexAliasIsWriteIndex.class)
 	public void writeAlias_invalid_isWriteIndex() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.put( defaultWriteAlias( INDEX_NAME ).original, ElasticsearchIndexSchemaManagerTestUtils
+		elasticsearchClient.index( index.name() ).aliases()
+				.put( defaultWriteAlias( index.name() ).original, ElasticsearchIndexSchemaManagerTestUtils
 						.simpleAliasDefinition( false, "" ) );
 
 		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
 	@Test
 	public void readAlias_missing() {
-		elasticsearchClient.index( defaultPrimaryName( INDEX_NAME ), defaultWriteAlias( INDEX_NAME ), null )
+		elasticsearchClient.index( defaultPrimaryName( index.name() ), defaultWriteAlias( index.name() ), null )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
 
 		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
 	@Test
 	public void readAlias_invalid_filter() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
+		elasticsearchClient.index( index.name() ).aliases()
 				.put( "somePreExistingAlias" );
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.put( defaultReadAlias( INDEX_NAME ).original, "{'filter': {'term': {'user_id': 12}}}" );
+		elasticsearchClient.index( index.name() ).aliases()
+				.put( defaultReadAlias( index.name() ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
 		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						+ "'" + defaultReadAlias( index.name() ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
 						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
@@ -193,10 +191,10 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 							// No-op
 						}
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		indexManager.getSchemaManager().createOrUpdate().join();
+		index.getSchemaManager().createOrUpdate().join();
 	}
 
 }

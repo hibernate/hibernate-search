@@ -40,7 +40,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 
@@ -74,11 +74,6 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		return parameters.toArray( new Object[0][] );
 	}
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
@@ -99,40 +94,19 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static IndexMapping indexMapping;
-	private static StubMappingIndexManager indexManager;
-
-	private static IndexMapping compatibleIndexMapping;
-	private static StubMappingIndexManager compatibleIndexManager;
-
-	private static RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-	private static StubMappingIndexManager rawFieldCompatibleIndexManager;
-
-	private static StubMappingIndexManager incompatibleIndexManager;
+	private static final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
+			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> FieldSearchSortTypeCheckingAndConversionIT.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> rawFieldCompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_INDEX_NAME,
-						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> incompatibleIndexManager = indexManager
-				)
+				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex )
 				.setup();
 
 		initData();
@@ -152,19 +126,19 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
 	@Test
@@ -175,24 +149,24 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
 	@Test
 	public void unsortable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath();
 
 		Assertions.assertThatThrownBy( () -> {
@@ -205,7 +179,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	@Test
 	public void invalidType_noDslConverter() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		String absoluteFieldPath = getFieldPath();
 		Object invalidValueToMatch = new InvalidType();
@@ -226,7 +200,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	@Test
 	public void invalidType_withDslConverter() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		String absoluteFieldPath = getFieldWithDslConverterPath();
 		Object invalidValueToMatch = new InvalidType();
@@ -246,8 +220,8 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_usingField() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+	public void multiIndex_withCompatibleIndex_usingField() {
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldPath();
@@ -261,17 +235,17 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		 * detected as compatible and that no exception is thrown.
 		 */
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, EMPTY );
-			b.doc( INDEX_NAME, DOCUMENT_1 );
-			b.doc( INDEX_NAME, DOCUMENT_2 );
-			b.doc( INDEX_NAME, DOCUMENT_3 );
-			b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), EMPTY );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_2 );
+			b.doc( mainIndex.typeName(), DOCUMENT_3 );
+			b.doc( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_dslConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		String fieldPath = getFieldPath();
 
@@ -285,13 +259,13 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )
 				) );
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_dslConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldPath();
@@ -305,17 +279,17 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		 * detected as compatible and that no exception is thrown.
 		 */
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, EMPTY );
-			b.doc( INDEX_NAME, DOCUMENT_1 );
-			b.doc( INDEX_NAME, DOCUMENT_2 );
-			b.doc( INDEX_NAME, DOCUMENT_3 );
-			b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), EMPTY );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_2 );
+			b.doc( mainIndex.typeName(), DOCUMENT_3 );
+			b.doc( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withNoCompatibleIndex_dslConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
 
@@ -328,13 +302,13 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 				) );
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withNoCompatibleIndex_dslConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
 
@@ -347,13 +321,13 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 				) );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
-		return matchAllQuery( sortContributor, indexManager.createScope() );
+		return matchAllQuery( sortContributor, mainIndex.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
@@ -365,20 +339,20 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	private String getFieldPath() {
-		return indexMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return mainIndex.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
 	private String getFieldWithDslConverterPath() {
-		return indexMapping.fieldWithDslConverterModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return mainIndex.binding().fieldWithDslConverterModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
 	private String getNonSortableFieldPath() {
-		return indexMapping.nonSortableFieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return mainIndex.binding().nonSortableFieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private static void initDocument(IndexMapping indexMapping, DocumentElement document, Integer ordinal) {
-		indexMapping.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
-		indexMapping.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
+	private static void initDocument(IndexBinding indexBinding, DocumentElement document, Integer ordinal) {
+		indexBinding.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
+		indexBinding.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -406,54 +380,54 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
 		plan.add( referenceProvider( DOCUMENT_2 ),
-				document -> initDocument( indexMapping, document, DOCUMENT_2_ORDINAL ) );
+				document -> initDocument( mainIndex.binding(), document, DOCUMENT_2_ORDINAL ) );
 		plan.add( referenceProvider( EMPTY ),
-				document -> initDocument( indexMapping, document, null ) );
+				document -> initDocument( mainIndex.binding(), document, null ) );
 		plan.add( referenceProvider( DOCUMENT_1 ),
-				document -> initDocument( indexMapping, document, DOCUMENT_1_ORDINAL ) );
+				document -> initDocument( mainIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
 		plan.add( referenceProvider( DOCUMENT_3 ),
-				document -> initDocument( indexMapping, document, DOCUMENT_3_ORDINAL ) );
+				document -> initDocument( mainIndex.binding(), document, DOCUMENT_3_ORDINAL ) );
 		plan.execute().join();
 
-		plan = compatibleIndexManager.createIndexingPlan();
+		plan = compatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ),
-				document -> initDocument( compatibleIndexMapping, document, DOCUMENT_1_ORDINAL ) );
+				document -> initDocument( compatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
 		plan.execute().join();
 
-		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan = rawFieldCompatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ),
-				document -> initDocument( rawFieldCompatibleIndexMapping, document, DOCUMENT_1_ORDINAL ) );
+				document -> initDocument( rawFieldCompatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndexManager.createScope().query()
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		query = compatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = rawFieldCompatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithDslConverterModels;
 		final SimpleFieldModelsByType nonSortableFieldModels;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			this( root, ignored -> { } );
 		}
 
-		IndexMapping(IndexSchemaElement root,
+		IndexBinding(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
 			fieldModels = SimpleFieldModelsByType.mapAll(
 					supportedTypeDescriptors(),
@@ -474,20 +448,20 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		}
 	}
 
-	private static class RawFieldCompatibleIndexMapping extends IndexMapping {
-		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+	private static class RawFieldCompatibleIndexBinding extends IndexBinding {
+		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the fieldModels from IndexMapping,
+			 * Add fields with the same name as the fieldModels from IndexBinding,
 			 * but with an incompatible DSL converter.
 			 */
 			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
 		}
 	}
 
-	private static class IncompatibleIndexMapping {
-		IncompatibleIndexMapping(IndexSchemaElement root) {
+	private static class IncompatibleIndexBinding {
+		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
 			 * but with an incompatible type.
 			 */
 			mapFieldsWithIncompatibleType( root );

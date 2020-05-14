@@ -36,22 +36,20 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 	private static final int TOTAL_DOCUMENT_COUNT = SHARD_COUNT * ESTIMATED_DOCUMENT_COUNT_PER_SHARD;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper(
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper(
 			tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT )
 	);
 
 	private final Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
 	private final List<String> docIds = new ArrayList<>();
 
+	public ShardingHashDocumentIdIT() {
+		super( RoutingMode.DOCUMENT_IDS );
+	}
+
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx, RoutingMode.DOCUMENT_IDS ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		// Do not provide explicit routing keys when indexing; the backend should fall back to using IDs
 		for ( int documentIdAsInteger = 0; documentIdAsInteger < TOTAL_DOCUMENT_COUNT;
@@ -69,7 +67,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 	@TestForIssue(jiraKey = "HSEARCH-3314")
 	public void search() {
 		// No routing key => all documents should be returned
-		SearchResultAssert.assertThat( indexManager.createScope().query()
+		SearchResultAssert.assertThat( index.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
@@ -83,7 +81,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 		// One or more explicit routing key => no document should be returned, since no documents was indexed with that routing key.
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( someDocumentId )
 						.toQuery()
@@ -96,7 +94,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 		// Multiple explicit routing keys => no result: documents were indexed without a routing key.
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( Arrays.asList( someDocumentId, someOtherDocumentId ) )
 						.toQuery()
@@ -110,11 +108,11 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 		Iterator<String> iterator = docIds.iterator();
 		String someDocumentId = iterator.next();
 
-		indexManager.createWorkspace().purge( Collections.singleton( someDocumentId ) ).join();
+		index.createWorkspace().purge( Collections.singleton( someDocumentId ) ).join();
 
 		// One or more explicit routing key => no document should be purged, since no documents was indexed with that routing key.
-		indexManager.createWorkspace().refresh().join();
-		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );

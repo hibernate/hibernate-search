@@ -24,7 +24,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -42,22 +42,20 @@ import org.junit.runners.Parameterized.Parameters;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
 		return ElasticsearchIndexSchemaManagerOperation.creating();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private StubMappingIndexManager indexManager;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
 	public ElasticsearchIndexSchemaManagerCreationAliasesIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
@@ -65,23 +63,23 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 
 	@Test
 	public void success_defaultLayoutStrategy() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		setupAndCreateIndex( null );
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition()
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
 	@Test
 	public void success_customLayoutStrategy() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		setupAndCreateIndex( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ) );
@@ -91,7 +89,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 						+ "'custom-write': " + simpleWriteAliasDefinition() + ", "
 						+ "'custom-read': " + simpleReadAliasDefinition()
 				+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 	}
 
@@ -103,7 +101,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	public void migrationFrom6Beta4OrEarlier() {
 		// Index layout of 6.0.0.Beta4 and before: aliases are missing,
 		// and the primary Elasticsearch index name is just the Hibernate Search index name.
-		URLEncodedString oldIndexName = encodeName( INDEX_NAME );
+		URLEncodedString oldIndexName = encodeName( index.name() );
 		elasticsearchClient.index( oldIndexName, null, null )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -113,10 +111,10 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 		// New indexes are created
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition()
+						+ "'" + defaultWriteAlias( index.name() ) + "': " + simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( index.name() ) + "': " + simpleReadAliasDefinition()
 						+ "}",
-				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+				elasticsearchClient.index( index.name() ).aliases().get()
 		);
 		// Old indexes are still there: we expect users to reindex and delete old indexes.
 		assertJsonEquals(
@@ -136,10 +134,10 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 						}
 				)
 				.withBackendProperty( ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy )
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		operation.apply( indexManager.getSchemaManager() ).join();
+		operation.apply( index.getSchemaManager() ).join();
 	}
 
 }

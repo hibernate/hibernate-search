@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -37,22 +37,20 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
 		return ElasticsearchIndexSchemaManagerValidationOperation.all();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private StubMappingIndexManager indexManager;
+	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
 
 	public ElasticsearchIndexSchemaManagerValidationAnalyzerIT(
 			ElasticsearchIndexSchemaManagerValidationOperation operation) {
@@ -61,7 +59,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void success_simple() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -118,7 +116,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void analyzer_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'char_filter': {"
@@ -162,7 +160,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void analyzer_charFilters_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -216,7 +214,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void analyzer_tokenizer_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -270,7 +268,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void analyzer_tokenFilters_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -324,7 +322,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void charFilter_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'tokenizer': {"
@@ -362,7 +360,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void tokenizer_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'char_filter': {"
@@ -401,7 +399,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void tokenFilter_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'char_filter': {"
@@ -437,7 +435,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void charFilter_type_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -490,7 +488,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void charFilter_parameter_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -544,7 +542,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void charFilter_parameter_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -597,7 +595,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	@Test
 	public void tokenFilter_parameter_unexpected() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -663,14 +661,14 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer()
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 
 	protected void putMapping() {
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization( "" )
 		);
 	}

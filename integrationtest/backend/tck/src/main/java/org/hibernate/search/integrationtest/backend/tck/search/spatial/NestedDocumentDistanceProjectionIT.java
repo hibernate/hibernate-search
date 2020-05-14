@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -40,8 +40,6 @@ import org.assertj.core.data.Offset;
  */
 public class NestedDocumentDistanceProjectionIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	private static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687, 4.835233 );
 
@@ -54,27 +52,19 @@ public class NestedDocumentDistanceProjectionIT {
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	protected IndexMapping indexMapping;
-	protected StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-
+		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	public void distance_flattenedDocument() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		List<Double> hits = scope.query()
 				.select( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
 				.where( f -> f.matchAll() )
@@ -89,7 +79,7 @@ public class NestedDocumentDistanceProjectionIT {
 
 	@Test
 	public void distance_nestedDocument() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		List<Double> hits = scope.query()
 				.select( f -> f.distance( "nested.geoPoint", METRO_GARIBALDI ) )
 				.where( f -> f.matchAll() )
@@ -103,42 +93,42 @@ public class NestedDocumentDistanceProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			document.addValue( indexMapping.ordinalField, 1 );
+			document.addValue( index.binding().ordinalField, 1 );
 
-			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
-			nestedDocument.addValue( indexMapping.nestedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+			DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
+			nestedDocument.addValue( index.binding().nestedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 
-			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
-			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+			DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
+			flattenedDocument.addValue( index.binding().flattenedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		plan.add( referenceProvider( IMOUTO_ID ), document -> {
-			document.addValue( indexMapping.ordinalField, 2 );
+			document.addValue( index.binding().ordinalField, 2 );
 
-			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
-			nestedDocument.addValue( indexMapping.nestedGeoPoint, IMOUTO_GEO_POINT );
+			DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
+			nestedDocument.addValue( index.binding().nestedGeoPoint, IMOUTO_GEO_POINT );
 
-			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
-			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, IMOUTO_GEO_POINT );
+			DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
+			flattenedDocument.addValue( index.binding().flattenedGeoPoint, IMOUTO_GEO_POINT );
 		} );
 		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			document.addValue( indexMapping.ordinalField, 3 );
+			document.addValue( index.binding().ordinalField, 3 );
 
-			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
-			nestedDocument.addValue( indexMapping.nestedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+			DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
+			nestedDocument.addValue( index.binding().nestedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 
-			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
-			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+			DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
+			flattenedDocument.addValue( index.binding().flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 	}
 
 	private void checkResult(Double actual, Double expected, Offset<Double> offset) {
@@ -150,7 +140,7 @@ public class NestedDocumentDistanceProjectionIT {
 		}
 	}
 
-	protected static class IndexMapping {
+	protected static class IndexBinding {
 		final IndexFieldReference<Integer> ordinalField;
 
 		final IndexObjectFieldReference nestedDocument;
@@ -159,7 +149,7 @@ public class NestedDocumentDistanceProjectionIT {
 		final IndexObjectFieldReference flattenedDocument;
 		final IndexFieldReference<GeoPoint> flattenedGeoPoint;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			ordinalField = root.field( "ordinal", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
 
 			IndexSchemaObjectField nested = root.objectField( "nested", ObjectFieldStorage.NESTED );

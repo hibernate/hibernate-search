@@ -19,6 +19,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,11 +33,10 @@ import org.junit.Test;
  */
 public class IndexSchemaElementFieldIT {
 
-	private static final String TYPE_NAME = "TypeName";
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private StubMappedIndex index;
 
 	@Test
 	public void nullFieldName() {
@@ -49,8 +49,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -65,8 +65,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -80,8 +80,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -96,8 +96,8 @@ public class IndexSchemaElementFieldIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -114,8 +114,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -129,8 +129,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -144,8 +144,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -159,8 +159,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
@@ -177,8 +177,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
 								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
@@ -197,8 +197,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
 								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
@@ -217,8 +217,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
 								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
@@ -237,8 +237,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
 								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
@@ -261,8 +261,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
@@ -279,8 +279,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
@@ -298,8 +298,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
@@ -316,8 +316,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
@@ -335,8 +335,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
@@ -353,8 +353,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
@@ -371,8 +371,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
 						.failure( "Incomplete field definition" )
 						.build() );
@@ -385,8 +385,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
 						.failure( "Incomplete field definition" )
 						.build() );
@@ -408,8 +408,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
 						.failure( "Multiple calls to toReference() for the same field definition" )
 						.build() );
@@ -424,8 +424,8 @@ public class IndexSchemaElementFieldIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "myField" )
 						.failure( "Multiple calls to toReference() for the same field definition" )
 						.build() );
@@ -436,14 +436,8 @@ public class IndexSchemaElementFieldIT {
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						b -> b.mappedType( TYPE_NAME ),
-						mappingContributor,
-						ignored -> { }
-				)
-				.setup();
+		index = StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor );
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 }

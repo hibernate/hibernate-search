@@ -38,7 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -50,11 +50,6 @@ import org.junit.Test;
 
 public class FieldSearchProjectionIT {
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
@@ -64,42 +59,21 @@ public class FieldSearchProjectionIT {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private IndexMapping compatibleIndexMapping;
-	private StubMappingIndexManager compatibleIndexManager;
-
-	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-
-	private StubMappingIndexManager incompatibleIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
+			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
 	@Before
 	public void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_INDEX_NAME,
-						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.incompatibleIndexManager = indexManager
-				)
+				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex )
 				.setup();
 
 		initData();
@@ -107,9 +81,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void simple() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -130,9 +104,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void noClass() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			SearchQuery<Object> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
@@ -151,29 +125,29 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void validSuperClass() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<CharSequence> query = scope.query()
 				.select( f ->
-						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class )
+						f.field( mainIndex.binding().string1Field.relativeFieldName, CharSequence.class )
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
-				indexMapping.string1Field.document1Value.indexedValue,
-				indexMapping.string1Field.document2Value.indexedValue,
-				indexMapping.string1Field.document3Value.indexedValue,
+				mainIndex.binding().string1Field.document1Value.indexedValue,
+				mainIndex.binding().string1Field.document2Value.indexedValue,
+				mainIndex.binding().string1Field.document3Value.indexedValue,
 				null // Empty document
 		);
 	}
 
 	@Test
 	public void error_nullClass() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
-				.field( indexMapping.string1Field.relativeFieldName, (Class<? extends Object>) null )
+				.field( mainIndex.binding().string1Field.relativeFieldName, (Class<? extends Object>) null )
 				.toProjection()
 		)
 				.isInstanceOf( IllegalArgumentException.class )
@@ -185,9 +159,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_invalidProjectionType_projectionConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Class<?> rightType = fieldModel.type;
@@ -205,9 +179,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_invalidProjectionType_projectionConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Class<?> rightType = fieldModel.type;
@@ -225,7 +199,7 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_unknownField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( "unknownField", Object.class )
@@ -234,13 +208,13 @@ public class FieldSearchProjectionIT {
 				.hasMessageContainingAll(
 						"Unknown field",
 						"unknownField",
-						INDEX_NAME
+						mainIndex.name()
 				);
 	}
 
 	@Test
 	public void error_objectField_nested() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( "nestedObject", Object.class )
@@ -249,13 +223,13 @@ public class FieldSearchProjectionIT {
 				.hasMessageContainingAll(
 						"Unknown field",
 						"nestedObject",
-						INDEX_NAME
+						mainIndex.name()
 				);
 	}
 
 	@Test
 	public void error_objectField_flattened() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( "flattenedObject", Object.class )
@@ -264,15 +238,15 @@ public class FieldSearchProjectionIT {
 				.hasMessageContainingAll(
 						"Unknown field",
 						"flattenedObject",
-						INDEX_NAME
+						mainIndex.name()
 				);
 	}
 
 	@Test
 	public void error_nonProjectable() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedNonProjectableFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedNonProjectableFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 			Class<?> fieldType = fieldModel.type;
 
@@ -287,9 +261,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void withProjectionConverters_projectionConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithProjectionConverterModels ) {
 			@SuppressWarnings("rawtypes") // The projection DSL only allows to work with raw types, not with parameterized types
 					SearchQuery<ValueWrapper> query;
 			String fieldPath = fieldModel.relativeFieldName;
@@ -309,9 +283,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void withProjectionConverters_projectionConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -332,9 +306,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void withProjectionConverters_projectionConverterDisabled_withoutType() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -355,9 +329,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_invalidProjectionType_withProjectionConverter() {
-		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
+		FieldModel<?> fieldModel = mainIndex.binding().supportedFieldWithProjectionConverterModels.get( 0 );
 
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldModel.relativeFieldName, String.class )
@@ -376,9 +350,9 @@ public class FieldSearchProjectionIT {
 	 */
 	@Test
 	public void duplicated() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -404,11 +378,11 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void inFlattenedObject() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().flattenedObject.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + model.relativeFieldName;
+				String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "." + model.relativeFieldName;
 
 				assertThat(
 						scope.query()
@@ -429,11 +403,11 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void inNestedObject() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + model.relativeFieldName;
+				String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + model.relativeFieldName;
 
 				assertThat(
 						scope.query()
@@ -460,10 +434,10 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_noProjectionConverter() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+	public void multiIndex_withCompatibleIndex_noProjectionConverter() {
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -484,10 +458,10 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_projectionConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+	public void multiIndex_withCompatibleIndex_projectionConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -508,10 +482,10 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_projectionConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_projectionConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithProjectionConverterModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -525,10 +499,10 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_projectionConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_projectionConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
@@ -549,10 +523,10 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_projectionConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndex_projectionConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -566,10 +540,10 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_projectionConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndex_projectionConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -583,12 +557,12 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_inNestedObject() {
-		StubMappingScope scope = incompatibleIndexManager.createScope( indexManager );
+	public void multiIndex_withIncompatibleIndex_inNestedObject() {
+		StubMappingScope scope = incompatibleIndex.createScope( mainIndex );
 
-		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + model.relativeFieldName;
+				String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + model.relativeFieldName;
 
 				Assertions.assertThatThrownBy(
 						() -> scope.projection().field( fieldPath, ValueConvert.NO ),
@@ -602,74 +576,74 @@ public class FieldSearchProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 
-			indexMapping.string1Field.document1Value.write( document );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
+			mainIndex.binding().string1Field.document1Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
+			DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
 
-			indexMapping.string1Field.document2Value.write( document );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
+			mainIndex.binding().string1Field.document2Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
+			DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
-			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+			mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
 
-			indexMapping.string1Field.document3Value.write( document );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
+			mainIndex.binding().string1Field.document3Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
+			DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
 		plan.execute().join();
 
-		plan = compatibleIndexManager.createIndexingPlan();
+		plan = compatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			compatibleIndexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
-		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan = rawFieldCompatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+			rawFieldCompatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		query = compatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -690,7 +664,7 @@ public class FieldSearchProjectionIT {
 		} );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final List<FieldModel<?>> supportedFieldModels = new ArrayList<>();
 		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels = new ArrayList<>();
 		final List<FieldModel<?>> supportedNonProjectableFieldModels = new ArrayList<>();
@@ -700,7 +674,7 @@ public class FieldSearchProjectionIT {
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_", ignored -> { },
 					(typeDescriptor, expectations, model) -> {
@@ -746,12 +720,12 @@ public class FieldSearchProjectionIT {
 		}
 	}
 
-	private static class RawFieldCompatibleIndexMapping {
+	private static class RawFieldCompatibleIndexBinding {
 		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels = new ArrayList<>();
 
-		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldWithProjectionConverterModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldWithProjectionConverterModels from IndexBinding,
 			 * but with an incompatible projection converter.
 			 */
 			mapByTypeFields(
@@ -771,12 +745,12 @@ public class FieldSearchProjectionIT {
 		}
 	}
 
-	private static class IncompatibleIndexMapping {
+	private static class IncompatibleIndexBinding {
 		final ObjectMapping flattenedObject;
 
-		IncompatibleIndexMapping(IndexSchemaElement root) {
+		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
 			 * but with an incompatible type.
 			 */
 			forEachTypeDescriptor( typeDescriptor -> {
@@ -791,7 +765,7 @@ public class FieldSearchProjectionIT {
 			} );
 
 			/*
-			 * Add object with the same name of nestedObject of IndexMapping,
+			 * Add object with the same name of nestedObject of IndexBinding,
 			 * but we're using here a ObjectFieldStorage.FLATTENED for it.
 			 * If we try to project a field within this object,
 			 * this will have to lead to an inconsistency exception.

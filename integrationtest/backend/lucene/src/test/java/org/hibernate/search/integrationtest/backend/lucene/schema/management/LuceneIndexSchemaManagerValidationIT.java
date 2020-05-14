@@ -14,7 +14,7 @@ import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.Luce
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -23,12 +23,10 @@ import org.junit.Test;
 
 public class LuceneIndexSchemaManagerValidationIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private StubMappingIndexManager indexManager;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
@@ -39,7 +37,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 		// The setup currently creates the index: work around that.
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( indexManager.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.getSchemaManager() )
 		);
 
 		assertThat( indexExists() ).isFalse();
@@ -48,7 +46,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Index does not exist for directory",
-						INDEX_NAME
+						index.name()
 				);
 	}
 
@@ -67,18 +65,18 @@ public class LuceneIndexSchemaManagerValidationIT {
 	}
 
 	private boolean indexExists() throws IOException {
-		return LuceneIndexContentUtils.indexExists( setupHelper, INDEX_NAME );
+		return LuceneIndexContentUtils.indexExists( setupHelper, index.name() );
 	}
 
 	private void validate() {
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.VALIDATE.apply( indexManager.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.VALIDATE.apply( index.getSchemaManager() )
 		);
 	}
 
 	private void setup() {
 		setupHelper.start()
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 	}
 }

@@ -26,7 +26,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 
@@ -36,25 +37,21 @@ import org.junit.Test;
 
 public class IndexNullAsValueIT {
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
-
 	private static final String DOCUMENT_WITH_INDEX_NULL_AS_VALUES = "documentWithIndexNullAsValues";
 	private static final String DOCUMENT_WITH_DIFFERENT_VALUES = "documentWithDifferentValues";
 	private static final String DOCUMENT_WITH_NULL_VALUES = "documentWithNullValues";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
 	public void indexNullAsValue_match() {
 		setUp();
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.matchFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : index.binding().matchFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.indexNullAsValue.indexedValue;
 
@@ -63,7 +60,7 @@ public class IndexNullAsValueIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
+					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
 		}
 	}
 
@@ -75,22 +72,25 @@ public class IndexNullAsValueIT {
 		);
 
 		setUp();
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.spatial().within().field( "geoPointField" ).circle( GeoPoint.of( 0.0, 0.0 ), 1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
 	}
 
 	@Test
 	public void indexNullAsValue_fullText() {
 		Assertions.assertThatThrownBy( () -> setupHelper.start()
-				.withIndex( ANOTHER_INDEX_NAME, ctx -> ctx.getSchemaElement()
-								.field( "fullTextField", c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).indexNullAs( "bla bla bla" ) )
-								.toReference()
-						, ignored -> {
-						} )
+				.withIndex( StubMappedIndex.ofNonRetrievable(
+						root -> root.field(
+								"fullTextField",
+								c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name
+								)
+										.indexNullAs( "bla bla bla" ) )
+										.toReference()
+				) )
 				.setup()
 		)
 				.isInstanceOf( SearchException.class )
@@ -100,54 +100,48 @@ public class IndexNullAsValueIT {
 	}
 
 	private void setUp() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( index ).setup();
 
 		initData();
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add(
 				referenceProvider( DOCUMENT_WITH_INDEX_NULL_AS_VALUES ),
 				document -> {
-					indexMapping.matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
-					if ( indexMapping.geoPointField != null ) {
-						document.addValue( indexMapping.geoPointField, GeoPoint.of( 0.0, 0.0 ) );
+					index.binding().matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
+					if ( index.binding().geoPointField != null ) {
+						document.addValue( index.binding().geoPointField, GeoPoint.of( 0.0, 0.0 ) );
 					}
 				}
 		);
 		plan.add(
 				referenceProvider( DOCUMENT_WITH_DIFFERENT_VALUES ),
 				document -> {
-					indexMapping.matchFieldModels.forEach( f -> f.differentValue.write( document ) );
-					if ( indexMapping.geoPointField != null ) {
-						document.addValue( indexMapping.geoPointField, GeoPoint.of( 40, 70 ) );
+					index.binding().matchFieldModels.forEach( f -> f.differentValue.write( document ) );
+					if ( index.binding().geoPointField != null ) {
+						document.addValue( index.binding().geoPointField, GeoPoint.of( 40, 70 ) );
 					}
 				}
 		);
 		plan.add(
 				referenceProvider( DOCUMENT_WITH_NULL_VALUES ),
 				document -> {
-					indexMapping.matchFieldModels.forEach( f -> f.nullValue.write( document ) );
-					if ( indexMapping.geoPointField != null ) {
-						document.addValue( indexMapping.geoPointField, null );
+					index.binding().matchFieldModels.forEach( f -> f.nullValue.write( document ) );
+					if ( index.binding().geoPointField != null ) {
+						document.addValue( index.binding().geoPointField, null );
 					}
 				}
 		);
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final List<ByTypeFieldModel<?>> matchFieldModels;
 		final IndexFieldReference<GeoPoint> geoPointField;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			matchFieldModels = FieldTypeDescriptor.getAll().stream()
 					.filter( typeDescriptor -> typeDescriptor.getIndexNullAsMatchPredicateExpectations().isPresent() )
 					.map( typeDescriptor -> ByTypeFieldModel.mapper( root, typeDescriptor ) )

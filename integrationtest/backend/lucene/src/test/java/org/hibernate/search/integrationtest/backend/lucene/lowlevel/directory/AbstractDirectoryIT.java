@@ -19,7 +19,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Rule;
@@ -28,7 +28,6 @@ import org.junit.rules.TemporaryFolder;
 public abstract class AbstractDirectoryIT {
 
 	protected static final String BACKEND_NAME = "BackendName";
-	protected static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -40,30 +39,30 @@ public abstract class AbstractDirectoryIT {
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	protected static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+
 	protected SearchIntegration searchIntegration;
-	protected IndexMapping indexMapping;
-	protected StubMappingIndexManager indexManager;
 
 	protected final void checkIndexingAndQuerying() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.string, "text 1" );
+			document.addValue( index.binding().string, "text 1" );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.string, "text 2" );
+			document.addValue( index.binding().string, "text 2" );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( indexMapping.string, "text 3" );
+			document.addValue( index.binding().string, "text 3" );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(
-				INDEX_NAME,
+				index.typeName(),
 				DOCUMENT_1, DOCUMENT_2, DOCUMENT_3
 		);
 	}
@@ -72,11 +71,7 @@ public abstract class AbstractDirectoryIT {
 			Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
 		searchIntegration = additionalConfiguration.apply(
 				setupHelper.start( BACKEND_NAME )
-						.withIndex(
-								INDEX_NAME,
-								ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-								indexManager -> this.indexManager = indexManager
-						)
+						.withIndex( index )
 						.withBackendProperty(
 								LuceneBackendSettings.DIRECTORY_TYPE, directoryType
 						)
@@ -84,10 +79,10 @@ public abstract class AbstractDirectoryIT {
 				.setup();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field(
 					"string",
 					f -> f.asString()

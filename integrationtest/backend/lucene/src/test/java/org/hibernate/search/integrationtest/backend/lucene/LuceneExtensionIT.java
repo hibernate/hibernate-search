@@ -61,8 +61,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -83,12 +83,6 @@ public class LuceneExtensionIT {
 
 	private static final String BACKEND_NAME = "myLuceneBackend";
 
-	private static final String INDEX_NAME = "indexName";
-	private static final String TYPE_NAME = "typeName";
-
-	private static final String OTHER_INDEX_NAME = "otherIndexName";
-	private static final String OTHER_TYPE_NAME = "otherTypeName";
-
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
 	private static final String THIRD_ID = "3";
@@ -96,32 +90,16 @@ public class LuceneExtensionIT {
 	private static final String FIFTH_ID = "5";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> otherIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
 	private SearchIntegration integration;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private IndexMapping otherIndexMapping;
-	private StubMappingIndexManager otherIndexManager;
-
 	@Before
 	public void setup() {
-		this.integration = setupHelper.start( BACKEND_NAME )
-				.withIndex(
-						INDEX_NAME,
-						options -> options.mappedType( TYPE_NAME ),
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						OTHER_INDEX_NAME,
-						options -> options.mappedType( OTHER_TYPE_NAME ),
-						ctx -> this.otherIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.otherIndexManager = indexManager
-				)
-				.setup();
+		this.integration = setupHelper.start( BACKEND_NAME ).withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
@@ -129,7 +107,7 @@ public class LuceneExtensionIT {
 	@Test
 	@SuppressWarnings("unused")
 	public void queryContext() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
 		LuceneSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
@@ -153,7 +131,7 @@ public class LuceneExtensionIT {
 		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 
 		assertThat( result ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
@@ -173,7 +151,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
 				.where( f -> f.matchAll() )
@@ -183,7 +161,7 @@ public class LuceneExtensionIT {
 		LuceneSearchQuery<DocumentReference> query = genericQuery.extension( LuceneExtension.get() );
 		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 		assertThat( result ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
 
 		// Unsupported extension
@@ -195,7 +173,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_topDocs() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		LuceneSearchResult<DocumentReference> result = scope.query().extension( LuceneExtension.get() )
 				.where( f -> f.matchAll() )
@@ -206,7 +184,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_singleIndex() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.where( f -> f.id().matching( FIRST_ID ) )
@@ -225,7 +203,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void query_explain_singleIndex_invalidId() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.where( f -> f.id().matching( FIRST_ID ) )
@@ -237,32 +215,32 @@ public class LuceneExtensionIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Document with id 'InvalidId' does not exist for the mapped type '" + TYPE_NAME + "'"
+						"Document with id 'InvalidId' does not exist for the mapped type '" + mainIndex.typeName() + "'"
 				);
 	}
 
 	@Test
 	public void query_explain_multipleIndexes() {
-		StubMappingScope scope = indexManager.createScope( otherIndexManager );
+		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( TYPE_NAME, FIRST_ID ) )
+		Assertions.assertThat( query.explain( mainIndex.typeName(), FIRST_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( TYPE_NAME, FIFTH_ID ) )
+		Assertions.assertThat( query.explain( mainIndex.typeName(), FIFTH_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 	}
 
 	@Test
 	public void query_explain_multipleIndexes_missingIndexName() {
-		StubMappingScope scope = indexManager.createScope( otherIndexManager );
+		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.where( f -> f.id().matching( FIRST_ID ) )
@@ -274,13 +252,13 @@ public class LuceneExtensionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple mapped types" )
 				.hasMessageContaining(
-						"pass one of [" + TYPE_NAME + ", " + OTHER_TYPE_NAME + "]"
+						"pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
 				);
 	}
 
 	@Test
 	public void query_explain_multipleIndexes_invalidIndexName() {
-		StubMappingScope scope = indexManager.createScope( otherIndexManager );
+		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
 				.where( f -> f.id().matching( FIRST_ID ) )
@@ -292,13 +270,13 @@ public class LuceneExtensionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"mapped type name 'NotAnIndexName' is not among the mapped types targeted by this query: ["
-								+ TYPE_NAME + ", " + OTHER_TYPE_NAME + "]"
+								+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
 				);
 	}
 
 	@Test
 	public void predicate_fromLuceneQuery() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -314,13 +292,13 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
 	@Test
 	public void predicate_fromLuceneQuery_separatePredicate() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ).toPredicate();
@@ -338,13 +316,13 @@ public class LuceneExtensionIT {
 				.where( booleanPredicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
 
 	@Test
 	public void sort_fromLuceneSortField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -358,7 +336,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				TYPE_NAME,
+				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 
@@ -378,14 +356,14 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				TYPE_NAME,
+				mainIndex.typeName(),
 				THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID
 		);
 	}
 
 	@Test
 	public void sort_fromLuceneSortField_separateSort() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchSort sort1 = scope.sort().extension()
 						.ifSupported(
@@ -410,7 +388,7 @@ public class LuceneExtensionIT {
 				.sort( f -> f.composite().add( sort1 ).add( sort2 ).add( sort3 ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( TYPE_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
 		SearchSort sort = scope.sort()
 				.extension( LuceneExtension.get() ).fromLuceneSort( new Sort(
@@ -426,26 +404,26 @@ public class LuceneExtensionIT {
 				.sort( sort )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( TYPE_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
 
 	@Test
 	public void sort_filter_fromLuceneQuery() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.extension( LuceneExtension.get() )
 				.where( f -> f.matchAll() )
-				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+				.sort( f -> f.field( mainIndex.binding().nestedObject.relativeFieldName + ".sort1" )
 						// The provided predicate factory should already be extended and offer Lucene-specific extensions
 						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
-								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								mainIndex.binding().nestedObject.relativeFieldName + ".discriminator",
 								"included"
 						) ) ) )
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				TYPE_NAME,
+				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 
@@ -453,23 +431,23 @@ public class LuceneExtensionIT {
 		query = scope.query()
 				.extension( LuceneExtension.get() )
 				.where( f -> f.matchAll() )
-				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+				.sort( f -> f.field( mainIndex.binding().nestedObject.relativeFieldName + ".sort1" )
 						.desc()
 						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
-								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								mainIndex.binding().nestedObject.relativeFieldName + ".discriminator",
 								"included"
 						) ) ) )
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
-				TYPE_NAME,
+				mainIndex.typeName(),
 				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID
 		);
 	}
 
 	@Test
 	public void predicate_nativeField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.query()
@@ -486,7 +464,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void predicate_nativeField_fromLuceneQuery() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.extension( LuceneExtension.get() )
@@ -495,12 +473,12 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID );
 	}
 
 	@Test
 	public void predicate_nativeField_exists() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "nativeField" ),
@@ -515,7 +493,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void sort_nativeField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.query()
@@ -533,7 +511,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void sort_nativeField_fromLuceneSortField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -541,12 +519,12 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( TYPE_NAME, FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
 	public void projection_nativeField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Integer> query = scope.query()
 				.select( f -> f.field( "nativeField", Integer.class ) )
@@ -558,7 +536,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_nativeField_withProjectionConverters_enabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<ValueWrapper> query = scope.query()
 				.select( f -> f.field( "nativeField_converted", ValueWrapper.class ) )
@@ -570,7 +548,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_nativeField_withProjectionConverters_disabled() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Integer> query = scope.query()
 				.select( f -> f.field( "nativeField_converted", Integer.class, ValueConvert.NO ) )
@@ -582,7 +560,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_nativeField_unsupportedProjection() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		// let's check that it's possible to query the field beforehand
 		SearchQuery<DocumentReference> query = scope.query()
@@ -592,7 +570,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( TYPE_NAME, FIRST_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
 		Assertions.assertThatThrownBy(
@@ -608,7 +586,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_document() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Document> query = scope.query()
 				.select(
@@ -665,7 +643,7 @@ public class LuceneExtensionIT {
 	 */
 	@Test
 	public void projection_documentAndField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
 				.select( f ->
@@ -693,7 +671,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void projection_explanation() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<Explanation> query = scope.query()
 				.select( f -> f.extension( LuceneExtension.get() ).explanation() )
@@ -710,7 +688,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void aggregation_filter_fromLuceneQuery() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "agg" );
 
@@ -718,10 +696,10 @@ public class LuceneExtensionIT {
 				.extension( LuceneExtension.get() )
 				.where( f -> f.matchAll() )
 				.aggregation( aggregationKey, f -> f.terms()
-						.field( indexMapping.nestedObject.relativeFieldName + ".aggregation1", String.class )
+						.field( mainIndex.binding().nestedObject.relativeFieldName + ".aggregation1", String.class )
 						// The provided predicate factory should already be extended and offer Lucene-specific extensions
 						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
-								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								mainIndex.binding().nestedObject.relativeFieldName + ".discriminator",
 								"included"
 						) ) ) )
 				)
@@ -737,11 +715,11 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 
 		assertThatThrownBy(
 				() -> plan.add( referenceProvider( FIRST_ID ), document -> {
-					document.addValue( indexMapping.nativeField_invalidFieldPath, 45 );
+					document.addValue( mainIndex.binding().nativeField_invalidFieldPath, 45 );
 				} ),
 				"native field contributing field with invalid field path"
 		)
@@ -769,17 +747,17 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void indexManager_unwrap() {
-		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
-		Assertions.assertThat( indexManager.unwrap( LuceneIndexManager.class ) )
+	public void mainIndex_unwrap() {
+		IndexManager mainIndexFromIntegration = integration.getIndexManager( mainIndex.name() );
+		Assertions.assertThat( mainIndexFromIntegration.unwrap( LuceneIndexManager.class ) )
 				.isNotNull();
 	}
 
 	@Test
-	public void indexManager_unwrap_error_unknownType() {
-		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
+	public void mainIndex_unwrap_error_unknownType() {
+		IndexManager mainIndexFromIntegration = integration.getIndexManager( mainIndex.name() );
 
-		assertThatThrownBy( () -> indexManager.unwrap( String.class ) )
+		assertThatThrownBy( () -> mainIndexFromIntegration.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'",
@@ -788,128 +766,128 @@ public class LuceneExtensionIT {
 	}
 
 	private void initData() {
-		indexDataSet( indexMapping, indexManager );
+		indexDataSet( mainIndex );
 
-		// Use the same IDs and dataset for otherIndexMapping to trigger
+		// Use the same IDs and dataset for otherIndex.binding() to trigger
 		// a failure in explain() tests if index selection doesn't work correctly.
-		indexDataSet( otherIndexMapping, otherIndexManager );
+		indexDataSet( otherIndex );
 
 		// Check that all documents are searchable
-		assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThat( mainIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasDocRefHitsAnyOrder(
-						TYPE_NAME,
+						mainIndex.typeName(),
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 				);
-		assertThat( otherIndexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThat( otherIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasDocRefHitsAnyOrder(
-						OTHER_TYPE_NAME,
+						otherIndex.typeName(),
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 				);
 	}
 
-	private static void indexDataSet(IndexMapping indexMapping, StubMappingIndexManager indexManager) {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+	private static void indexDataSet(SimpleMappedIndex<IndexBinding> index) {
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( indexMapping.string, "text 1" );
+			document.addValue( index.binding().string, "text 1" );
 
-			document.addValue( indexMapping.nativeField, 37 );
-			document.addValue( indexMapping.nativeField_converted, 37 );
-			document.addValue( indexMapping.nativeField_unsupportedProjection, 37 );
+			document.addValue( index.binding().nativeField, 37 );
+			document.addValue( index.binding().nativeField_converted, 37 );
+			document.addValue( index.binding().nativeField_unsupportedProjection, 37 );
 
-			document.addValue( indexMapping.sort1, "a" );
-			document.addValue( indexMapping.sort2, "z" );
-			document.addValue( indexMapping.sort3, "z" );
+			document.addValue( index.binding().sort1, "a" );
+			document.addValue( index.binding().sort2, "z" );
+			document.addValue( index.binding().sort3, "z" );
 
-			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
-			nestedObject1.addValue( indexMapping.nestedObject.sort1, "a" );
-			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "one" );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
-			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-one" );
+			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+			nestedObject1.addValue( index.binding().nestedObject.sort1, "a" );
+			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "one" );
+			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
+			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-one" );
 		} );
 		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( indexMapping.integer, 2 );
+			document.addValue( index.binding().integer, 2 );
 
-			document.addValue( indexMapping.nativeField, 78 );
-			document.addValue( indexMapping.nativeField_converted, 78 );
-			document.addValue( indexMapping.nativeField_unsupportedProjection, 78 );
+			document.addValue( index.binding().nativeField, 78 );
+			document.addValue( index.binding().nativeField_converted, 78 );
+			document.addValue( index.binding().nativeField_unsupportedProjection, 78 );
 
-			document.addValue( indexMapping.sort1, "z" );
-			document.addValue( indexMapping.sort2, "a" );
-			document.addValue( indexMapping.sort3, "z" );
+			document.addValue( index.binding().sort1, "z" );
+			document.addValue( index.binding().sort2, "a" );
+			document.addValue( index.binding().sort3, "z" );
 
-			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
-			nestedObject1.addValue( indexMapping.nestedObject.sort1, "b" );
-			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "two" );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
-			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-two" );
+			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+			nestedObject1.addValue( index.binding().nestedObject.sort1, "b" );
+			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "two" );
+			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
+			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-two" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
+			document.addValue( index.binding().geoPoint, GeoPoint.of( 40.12, -71.34 ) );
 
-			document.addValue( indexMapping.nativeField, 13 );
-			document.addValue( indexMapping.nativeField_converted, 13 );
-			document.addValue( indexMapping.nativeField_unsupportedProjection, 13 );
+			document.addValue( index.binding().nativeField, 13 );
+			document.addValue( index.binding().nativeField_converted, 13 );
+			document.addValue( index.binding().nativeField_unsupportedProjection, 13 );
 
-			document.addValue( indexMapping.sort1, "z" );
-			document.addValue( indexMapping.sort2, "z" );
-			document.addValue( indexMapping.sort3, "a" );
+			document.addValue( index.binding().sort1, "z" );
+			document.addValue( index.binding().sort2, "z" );
+			document.addValue( index.binding().sort3, "a" );
 
-			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
-			nestedObject1.addValue( indexMapping.nestedObject.sort1, "c" );
-			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "three" );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
-			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-three" );
+			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+			nestedObject1.addValue( index.binding().nestedObject.sort1, "c" );
+			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "three" );
+			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
+			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-three" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
-			document.addValue( indexMapping.nativeField, 89 );
-			document.addValue( indexMapping.nativeField_converted, 89 );
-			document.addValue( indexMapping.nativeField_unsupportedProjection, 89 );
+			document.addValue( index.binding().nativeField, 89 );
+			document.addValue( index.binding().nativeField_converted, 89 );
+			document.addValue( index.binding().nativeField_unsupportedProjection, 89 );
 
-			document.addValue( indexMapping.sort1, "z" );
-			document.addValue( indexMapping.sort2, "z" );
-			document.addValue( indexMapping.sort3, "z" );
+			document.addValue( index.binding().sort1, "z" );
+			document.addValue( index.binding().sort2, "z" );
+			document.addValue( index.binding().sort3, "z" );
 
-			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
-			nestedObject1.addValue( indexMapping.nestedObject.sort1, "d" );
-			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "four" );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( indexMapping.nestedObject.sort1, "c" );
-			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-four" );
+			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+			nestedObject1.addValue( index.binding().nestedObject.sort1, "d" );
+			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "four" );
+			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( index.binding().nestedObject.sort1, "c" );
+			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-four" );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			document.addValue( indexMapping.string, "text 2" );
-			document.addValue( indexMapping.integer, 1 );
-			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.12, -75.34 ) );
+			document.addValue( index.binding().string, "text 2" );
+			document.addValue( index.binding().integer, 1 );
+			document.addValue( index.binding().geoPoint, GeoPoint.of( 45.12, -75.34 ) );
 
-			document.addValue( indexMapping.sort1, "zz" );
-			document.addValue( indexMapping.sort2, "zz" );
-			document.addValue( indexMapping.sort3, "zz" );
+			document.addValue( index.binding().sort1, "zz" );
+			document.addValue( index.binding().sort2, "zz" );
+			document.addValue( index.binding().sort3, "zz" );
 
-			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
-			nestedObject1.addValue( indexMapping.nestedObject.sort1, "e" );
-			nestedObject1.addValue( indexMapping.nestedObject.aggregation1, "five" );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
-			nestedObject2.addValue( indexMapping.nestedObject.aggregation1, "fifty-five" );
+			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+			nestedObject1.addValue( index.binding().nestedObject.sort1, "e" );
+			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "five" );
+			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
+			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-five" );
 		} );
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<GeoPoint> geoPoint;
@@ -924,7 +902,7 @@ public class LuceneExtensionIT {
 
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )

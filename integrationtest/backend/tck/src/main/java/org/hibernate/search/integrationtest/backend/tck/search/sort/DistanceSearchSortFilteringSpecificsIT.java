@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.BeforeClass;
@@ -37,28 +37,19 @@ import org.junit.Test;
  */
 public class DistanceSearchSortFilteringSpecificsIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static IndexMapping indexMapping;
-	private static StubMappingIndexManager indexManager;
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> DistanceSearchSortFilteringSpecificsIT.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	public void nonNested() {
-		String fieldPath = indexMapping.flattenedObject.relativeFieldName + ".geoPoint";
+		String fieldPath = index.binding().flattenedObject.relativeFieldName + ".geoPoint";
 
 		assertThatThrownBy(
 				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
@@ -73,7 +64,7 @@ public class DistanceSearchSortFilteringSpecificsIT {
 
 	@Test
 	public void invalidNestedPath_parent() {
-		String fieldPath = indexMapping.nestedObject1.relativeFieldName + ".geoPoint";
+		String fieldPath = index.binding().nestedObject1.relativeFieldName + ".geoPoint";
 		String fieldInParentPath = "geoPoint";
 
 		assertThatThrownBy(
@@ -83,15 +74,15 @@ public class DistanceSearchSortFilteringSpecificsIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
-						"Only fields that are contained in the nested object with path '" + indexMapping.nestedObject1.relativeFieldName + "'"
+						"Only fields that are contained in the nested object with path '" + index.binding().nestedObject1.relativeFieldName + "'"
 								+ " are allowed here."
 				);
 	}
 
 	@Test
 	public void invalidNestedPath_sibling() {
-		String fieldPath = indexMapping.nestedObject1.relativeFieldName + ".geoPoint";
-		String fieldInSiblingPath = indexMapping.nestedObject2.relativeFieldName + ".geoPoint";
+		String fieldPath = index.binding().nestedObject1.relativeFieldName + ".geoPoint";
+		String fieldInSiblingPath = index.binding().nestedObject2.relativeFieldName + ".geoPoint";
 
 		assertThatThrownBy(
 				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
@@ -100,14 +91,14 @@ public class DistanceSearchSortFilteringSpecificsIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
-						"Only fields that are contained in the nested object with path '" + indexMapping.nestedObject1.relativeFieldName + "'"
+						"Only fields that are contained in the nested object with path '" + index.binding().nestedObject1.relativeFieldName + "'"
 								+ " are allowed here."
 				);
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
-		return matchAllQuery( sortContributor, indexManager.createScope() );
+		return matchAllQuery( sortContributor, index.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
@@ -127,12 +118,12 @@ public class DistanceSearchSortFilteringSpecificsIT {
 		}
 	}
 
-	private static class IndexMapping extends AbstractObjectMapping {
+	private static class IndexBinding extends AbstractObjectMapping {
 		final FirstLevelObjectMapping flattenedObject;
 		final FirstLevelObjectMapping nestedObject1;
 		final FirstLevelObjectMapping nestedObject2;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			super( root );
 
 			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",

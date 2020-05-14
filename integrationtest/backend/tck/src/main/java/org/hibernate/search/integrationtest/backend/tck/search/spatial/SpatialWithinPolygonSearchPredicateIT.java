@@ -56,26 +56,26 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void within_polygon() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).polygon( POLYGON_2 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).polygon( POLYGON_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void within_unsearchable_polygon() {
-		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
+		StubMappingScope scope = unsearchableFieldsIndex.createScope();
 
 		Assertions.assertThatThrownBy( () ->
 				scope.predicate().spatial().within().field( "geoPoint" ).polygon( POLYGON_2 )
@@ -88,7 +88,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void unsupported_field_types() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "string" ).polygon( POLYGON_1 ),
@@ -103,7 +103,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -119,7 +119,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -135,12 +135,12 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -159,7 +159,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -178,12 +178,12 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void predicateLevelBoost_andFieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -202,7 +202,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -221,12 +221,12 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void predicateLevelBoost_multiFields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -246,7 +246,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -266,12 +266,12 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void multi_fields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		// field(...).field(...)
 
@@ -280,14 +280,14 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).field( "geoPoint_1" ).polygon( POLYGON_2_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// field().fields(...)
 
@@ -298,7 +298,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
@@ -307,7 +307,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
@@ -316,7 +316,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// fields(...)
 
@@ -325,19 +325,19 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().fields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_1_2 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void polygon_error_null() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "geoPoint" ).polygon( null ),
@@ -349,7 +349,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void unknown_field() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "unknown_field" )
@@ -363,25 +363,25 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).polygon( POLYGON_2 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void multiIndex_incompatibleSearchable() {
-		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
+		StubMappingScope scope = mainIndex.createScope( unsearchableFieldsIndex );
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().spatial().within().field( "geoPoint" ).polygon( POLYGON_2 ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "geoPoint" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )
 				) );
 	}
 

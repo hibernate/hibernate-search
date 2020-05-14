@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -29,8 +29,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class NestedSearchPredicateIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
 	private static final String DOCUMENT_2 = "nonNestedQueryShouldMatchId";
@@ -48,27 +46,20 @@ public class NestedSearchPredicateIT {
 	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 = "secondNonMatchingWord";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
@@ -103,13 +94,13 @@ public class NestedSearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -142,13 +133,13 @@ public class NestedSearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 )
 				.hasTotalHitCount( 2 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
@@ -174,13 +165,13 @@ public class NestedSearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_separatePredicates() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().nested().objectField( "nestedObject.nestedObject" )
 				.nest( f -> f.bool()
@@ -217,13 +208,13 @@ public class NestedSearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void invalidNestedPath_parent() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		String objectFieldPath = "nestedObject";
 		String fieldInParentPath = "string";
@@ -252,7 +243,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void invalidNestedPath_sibling() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		String objectFieldPath = "nestedObject";
 		String fieldInSiblingPath = "nestedObject2.string";
@@ -280,14 +271,14 @@ public class NestedSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			ObjectMapping level1;
 			SecondLevelObjectMapping level2;
 			DocumentElement object;
 			DocumentElement secondLevelObject;
 
-			level1 = indexMapping.nestedObject;
+			level1 = index.binding().nestedObject;
 			level2 = level1.nestedObject;
 
 			object = document.addObject( level1.self );
@@ -319,7 +310,7 @@ public class NestedSearchPredicateIT {
 		} );
 
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			ObjectMapping level1 = indexMapping.nestedObject;
+			ObjectMapping level1 = index.binding().nestedObject;
 			DocumentElement object = document.addObject( level1.self );
 			SecondLevelObjectMapping level2 = level1.nestedObject;
 			DocumentElement secondLevelObject = object.addObject( level2.self );
@@ -351,7 +342,7 @@ public class NestedSearchPredicateIT {
 		} );
 
 		plan.add( referenceProvider( "neverMatching" ), document -> {
-			ObjectMapping level1 = indexMapping.nestedObject;
+			ObjectMapping level1 = index.binding().nestedObject;
 			SecondLevelObjectMapping level2 = level1.nestedObject;
 
 			DocumentElement object = document.addObject( level1.self );
@@ -396,23 +387,23 @@ public class NestedSearchPredicateIT {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(
-						INDEX_NAME,
+						index.typeName(),
 						DOCUMENT_1, DOCUMENT_2, "neverMatching", "empty"
 				);
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final ObjectMapping nestedObject;
 		final ObjectMapping nestedObject2;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 
 			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
