@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -28,19 +28,17 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<LuceneIndexSchemaManagerOperation> operations() {
 		return LuceneIndexSchemaManagerOperation.creatingOrPreserving();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	private final LuceneIndexSchemaManagerOperation operation;
-
-	private StubMappingIndexManager indexManager;
 
 	public LuceneIndexSchemaManagerCreationOrPreservationIT(LuceneIndexSchemaManagerOperation operation) {
 		this.operation = operation;
@@ -67,7 +65,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 
 		assertThat( indexExists() ).isTrue();
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 		} );
 		plan.execute().join();
@@ -81,24 +79,23 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 	}
 
 	private boolean indexExists() throws IOException {
-		return LuceneIndexContentUtils.indexExists( setupHelper, INDEX_NAME );
+		return LuceneIndexContentUtils.indexExists( setupHelper, index.name() );
 	}
 
 	private int countDocsOnDisk() throws IOException {
 		return LuceneIndexContentUtils.readIndex(
-				setupHelper, INDEX_NAME,
+				setupHelper, index.name(),
 				reader -> reader.getDocCount( MetadataFields.idFieldName() )
 		);
 	}
 
 	private void createOrPreserve() {
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 
 	private void setup() {
 		setupHelper.start()
-				.withIndex( INDEX_NAME, ctx -> {
-				}, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 	}
 }

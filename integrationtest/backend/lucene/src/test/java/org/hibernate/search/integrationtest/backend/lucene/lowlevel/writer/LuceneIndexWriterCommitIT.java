@@ -21,7 +21,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
 import org.junit.Rule;
@@ -34,7 +34,6 @@ import org.awaitility.Awaitility;
 @RunWith(Parameterized.class)
 public class LuceneIndexWriterCommitIT {
 
-	private static final String INDEX_NAME = "IndexName";
 	/*
 	 * Pick a value that is:
 	 * - large enough that background indexing threads actually wait before committing
@@ -57,12 +56,12 @@ public class LuceneIndexWriterCommitIT {
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private final String ioStrategyName;
 	private final Integer commitInterval;
 
-	private StubMappingIndexManager indexManager;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	public LuceneIndexWriterCommitIT(String ioStrategyName, Integer commitInterval) {
 		this.ioStrategyName = ioStrategyName;
@@ -77,7 +76,7 @@ public class LuceneIndexWriterCommitIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit will happen at some point, but the indexing plan will be considered completed before that
 				DocumentRefreshStrategy.NONE // This is irrelevant
@@ -105,7 +104,7 @@ public class LuceneIndexWriterCommitIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.FORCE, // The commit will happen before the indexing plan is considered completed
 				DocumentRefreshStrategy.NONE // This is irrelevant
@@ -128,7 +127,7 @@ public class LuceneIndexWriterCommitIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter
@@ -151,7 +150,7 @@ public class LuceneIndexWriterCommitIT {
 	 */
 	private int countDocsOnDisk() throws IOException {
 		return LuceneIndexContentUtils.readIndex(
-				setupHelper, INDEX_NAME,
+				setupHelper, index.name(),
 				reader -> reader.getDocCount( MetadataFields.idFieldName() )
 		);
 	}
@@ -159,11 +158,7 @@ public class LuceneIndexWriterCommitIT {
 	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		return setupHelper.start()
 				.withSchemaManagement( schemaManagementStrategy )
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { },
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.withIndexDefaultsProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )
 				.withIndexDefaultsProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )
 				.setup();

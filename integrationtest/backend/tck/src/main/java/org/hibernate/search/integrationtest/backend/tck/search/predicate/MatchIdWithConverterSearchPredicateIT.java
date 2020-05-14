@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,16 +32,9 @@ import org.junit.Test;
  */
 public class MatchIdWithConverterSearchPredicateIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
 	private static final String DOCUMENT_3 = "document3";
-
-	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private StubMappingIndexManager indexManager;
 
 	private static final ToDocumentIdentifierValueConverter<Integer> ID_CONVERTER = new ToDocumentIdentifierValueConverter<Integer>() {
 		@Override
@@ -55,37 +48,33 @@ public class MatchIdWithConverterSearchPredicateIT {
 		}
 	};
 
+	@Rule
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( ID_CONVERTER ) );
+
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						(ctx) -> {
-							ctx.idDslConverter( ID_CONVERTER );
-							// Nothing else to do, we don't need any field in the mapping
-						},
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void match_id() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id().matching( 1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void match_multiple_ids() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -95,12 +84,12 @@ public class MatchIdWithConverterSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
 	public void match_any_and_match_single_id() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -110,12 +99,12 @@ public class MatchIdWithConverterSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void match_any_single_id() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -124,12 +113,12 @@ public class MatchIdWithConverterSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void match_any_ids() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -138,21 +127,21 @@ public class MatchIdWithConverterSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> { } );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 }

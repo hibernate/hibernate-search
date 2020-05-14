@@ -28,7 +28,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -38,27 +38,18 @@ import org.junit.Test;
 
 public class CompositeSearchSortIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
@@ -68,78 +59,78 @@ public class CompositeSearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f.composite( c -> {
-			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() );
-			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() );
+			c.add( f.field( index.binding().identicalForFirstTwo.relativeFieldName ).asc() );
+			c.add( f.field( index.binding().identicalForLastTwo.relativeFieldName ).asc() );
 		} ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f.composite( c -> {
-			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() );
-			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() );
+			c.add( f.field( index.binding().identicalForFirstTwo.relativeFieldName ).desc() );
+			c.add( f.field( index.binding().identicalForLastTwo.relativeFieldName ).desc() );
 		} ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery( f -> f.composite( c -> {
-			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() );
-			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() );
+			c.add( f.field( index.binding().identicalForFirstTwo.relativeFieldName ).asc() );
+			c.add( f.field( index.binding().identicalForLastTwo.relativeFieldName ).desc() );
 		} ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f.composite( c -> {
-			c.add( f.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() );
-			c.add( f.field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() );
+			c.add( f.field( index.binding().identicalForFirstTwo.relativeFieldName ).desc() );
+			c.add( f.field( index.binding().identicalForLastTwo.relativeFieldName ).asc() );
 		} ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void byComposite_separateSort() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery(
 				scope,
 				scope.sort().composite()
-						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
-						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
+						.add( scope.sort().field( index.binding().identicalForFirstTwo.relativeFieldName ).asc() )
+						.add( scope.sort().field( index.binding().identicalForLastTwo.relativeFieldName ).asc() )
 						.toSort()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = simpleQuery(
 				scope,
 				scope.sort().composite()
-						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
-						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
+						.add( scope.sort().field( index.binding().identicalForFirstTwo.relativeFieldName ).desc() )
+						.add( scope.sort().field( index.binding().identicalForLastTwo.relativeFieldName ).desc() )
 						.toSort()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery(
 				scope,
 				scope.sort().composite()
-						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc() )
-						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc() )
+						.add( scope.sort().field( index.binding().identicalForFirstTwo.relativeFieldName ).asc() )
+						.add( scope.sort().field( index.binding().identicalForLastTwo.relativeFieldName ).desc() )
 						.toSort()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 
 		query = simpleQuery(
 				scope,
 				scope.sort().composite()
-						.add( scope.sort().field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc() )
-						.add( scope.sort().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc() )
+						.add( scope.sort().field( index.binding().identicalForFirstTwo.relativeFieldName ).desc() )
+						.add( scope.sort().field( index.binding().identicalForLastTwo.relativeFieldName ).asc() )
 						.toSort()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -150,7 +141,7 @@ public class CompositeSearchSortIT {
 
 		// Just check that the query is executed (the empty sort is ignored and nothing fails)
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -158,53 +149,53 @@ public class CompositeSearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( f -> f
-				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
-				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
+				.field( index.binding().identicalForFirstTwo.relativeFieldName ).asc()
+				.then().field( index.binding().identicalForLastTwo.relativeFieldName ).asc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f
-				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc()
-				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
+				.field( index.binding().identicalForFirstTwo.relativeFieldName ).desc()
+				.then().field( index.binding().identicalForLastTwo.relativeFieldName ).desc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery( f -> f
-				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).asc()
-				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
+				.field( index.binding().identicalForFirstTwo.relativeFieldName ).asc()
+				.then().field( index.binding().identicalForLastTwo.relativeFieldName ).desc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f
-				.field( indexMapping.identicalForFirstTwo.relativeFieldName ).desc()
-				.then().field( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
+				.field( index.binding().identicalForFirstTwo.relativeFieldName ).desc()
+				.then().field( index.binding().identicalForLastTwo.relativeFieldName ).asc()
 		);
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void then_flattened_nested() {
 		SearchQuery<DocumentReference> query;
 
-		String normalField = indexMapping.identicalForFirstTwo.relativeFieldName;
-		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
-		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
+		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
+		String flattenedField = "flattened." + index.binding().flattenedField.relativeFieldName;
+		String nestedField = "nested." + index.binding().flattenedField.relativeFieldName;
 
 		query = simpleQuery( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() );
 		// [a b a][a a b] => {1 3 2}
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3, DOCUMENT_2 );
+		assertThat( query ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3, DOCUMENT_2 );
 
 		query = simpleQuery( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() );
 		// [b a a][a b a] => {3 2 1}
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery( f -> f.field( normalField ).asc().then().field( nestedField ).asc() );
 		// [a a b][b a a] => {2 1 3}
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+		assertThat( query ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
@@ -212,8 +203,8 @@ public class CompositeSearchSortIT {
 	public void then_nested_normal_limit1() {
 		SearchQuery<DocumentReference> query;
 
-		String normalField = indexMapping.identicalForLastTwo.relativeFieldName;
-		String nestedField = "nested." + indexMapping.nestedField.relativeFieldName;
+		String normalField = index.binding().identicalForLastTwo.relativeFieldName;
+		String nestedField = "nested." + index.binding().nestedField.relativeFieldName;
 
 		/*
 		 * This used to trigger a bug caused by the fact we were doing a two-pass sort,
@@ -227,65 +218,65 @@ public class CompositeSearchSortIT {
 				.then().field( normalField ).asc() );
 		// [b a a][a b b] => {[2 or 3] (3 or 2) 1}
 		assertThat( query.fetch( 1 ) ).hits().ordinal( 0 )
-				.isDocRefHit( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+				.isDocRefHit( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
 	public void then_flattened_nested_limit2() {
 		SearchQuery<DocumentReference> query;
 
-		String normalField = indexMapping.identicalForFirstTwo.relativeFieldName;
-		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
-		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
+		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
+		String flattenedField = "flattened." + index.binding().flattenedField.relativeFieldName;
+		String nestedField = "nested." + index.binding().flattenedField.relativeFieldName;
 
 		query = simpleQuery( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() );
 		// [a b a][a a b] => {[1 3] 2}
-		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
 		query = simpleQuery( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() );
 		// [b a a][a b a] => {[3 2] 1}
-		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2 );
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_3, DOCUMENT_2 );
 
 		query = simpleQuery( f -> f.field( normalField ).asc().then().field( nestedField ).asc() );
 		// [a a b][b a a] => {[2 1] 3}
-		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
 	}
 
 	@Test
 	public void then_flattened_nested_filterByPredicate() {
 		SearchQuery<DocumentReference> query;
 
-		String normalField = indexMapping.identicalForFirstTwo.relativeFieldName;
-		String flattenedField = "flattened." + indexMapping.flattenedField.relativeFieldName;
-		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
+		String normalField = index.binding().identicalForFirstTwo.relativeFieldName;
+		String flattenedField = "flattened." + index.binding().flattenedField.relativeFieldName;
+		String nestedField = "nested." + index.binding().flattenedField.relativeFieldName;
 
-		query = indexManager.createScope().query()
+		query = index.createScope().query()
 				.where( b -> b.match().field( normalField ).matching( "aaa" ) )
 				.sort( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() )
 				.toQuery();
 
 		// [a b a][a a b] => {1+ 3 2+}
-		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
-		query = indexManager.createScope().query()
+		query = index.createScope().query()
 				.where( b -> b.match().field( normalField ).matching( "aaa" ) )
 				.sort( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() )
 				.toQuery();
 
 		// [b a a][a b a] => {3 2+ 1+}
-		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
 
-		query = indexManager.createScope().query()
+		query = index.createScope().query()
 				.where( b -> b.match().field( normalField ).matching( "aaa" ) )
 				.sort( f -> f.field( normalField ).asc().then().field( nestedField ).asc() )
 				.toQuery();
 		// [a a b][b a a] => {2+ 1+ 3}
-		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
+		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
-		return simpleQuery( indexManager.createScope(), sortContributor );
+		return simpleQuery( index.createScope(), sortContributor );
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope,
@@ -304,44 +295,44 @@ public class CompositeSearchSortIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.identicalForFirstTwo.write( document, "aaa" );
-			indexMapping.identicalForLastTwo.write( document, "aaa" );
+			index.binding().identicalForFirstTwo.write( document, "aaa" );
+			index.binding().identicalForLastTwo.write( document, "aaa" );
 
-			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
-			indexMapping.flattenedField.write( flattened, "aaa" );
-			DocumentElement nested = document.addObject( indexMapping.nestedObject );
-			indexMapping.nestedField.write( nested, "bbb" );
+			DocumentElement flattened = document.addObject( index.binding().flattenedObject );
+			index.binding().flattenedField.write( flattened, "aaa" );
+			DocumentElement nested = document.addObject( index.binding().nestedObject );
+			index.binding().nestedField.write( nested, "bbb" );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.identicalForFirstTwo.write( document, "aaa" );
-			indexMapping.identicalForLastTwo.write( document, "bbb" );
+			index.binding().identicalForFirstTwo.write( document, "aaa" );
+			index.binding().identicalForLastTwo.write( document, "bbb" );
 
-			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
-			indexMapping.flattenedField.write( flattened, "bbb" );
-			DocumentElement nested = document.addObject( indexMapping.nestedObject );
-			indexMapping.nestedField.write( nested, "aaa" );
+			DocumentElement flattened = document.addObject( index.binding().flattenedObject );
+			index.binding().flattenedField.write( flattened, "bbb" );
+			DocumentElement nested = document.addObject( index.binding().nestedObject );
+			index.binding().nestedField.write( nested, "aaa" );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.identicalForFirstTwo.write( document, "bbb" );
-			indexMapping.identicalForLastTwo.write( document, "bbb" );
+			index.binding().identicalForFirstTwo.write( document, "bbb" );
+			index.binding().identicalForLastTwo.write( document, "bbb" );
 
-			DocumentElement flattened = document.addObject( indexMapping.flattenedObject );
-			indexMapping.flattenedField.write( flattened, "aaa" );
-			DocumentElement nested = document.addObject( indexMapping.nestedObject );
-			indexMapping.nestedField.write( nested, "aaa" );
+			DocumentElement flattened = document.addObject( index.binding().flattenedObject );
+			index.binding().flattenedField.write( flattened, "aaa" );
+			DocumentElement nested = document.addObject( index.binding().nestedObject );
+			index.binding().nestedField.write( nested, "aaa" );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = index.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final MainFieldModel<String> identicalForFirstTwo;
 		final MainFieldModel<String> identicalForLastTwo;
 		final MainFieldModel<String> string3;
@@ -351,7 +342,7 @@ public class CompositeSearchSortIT {
 		final IndexObjectFieldReference nestedObject;
 		final MainFieldModel<String> nestedField;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			identicalForFirstTwo = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
 					.map( root, "identicalForFirstTwo" );
 			identicalForLastTwo = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )

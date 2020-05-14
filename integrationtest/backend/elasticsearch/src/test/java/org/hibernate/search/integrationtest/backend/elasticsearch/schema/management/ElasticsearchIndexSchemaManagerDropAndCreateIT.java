@@ -14,11 +14,10 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -30,21 +29,22 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private StubMappingIndexManager indexManager;
+	private final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root ->
+		root.field( "field", f -> f.asString() )
+				.toReference()
+	);
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
 	public void alreadyExists() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				simpleMappingForInitialization(
 						"'field': {"
 								+ "'type': 'text'"
@@ -64,7 +64,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 								+ "'type': 'date'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 
 		setupAndDropAndCreateIndex();
@@ -78,16 +78,16 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 								+ "'doc_values': false"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3759")
 	public void doesNotExist() {
-		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
+		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
-		assertThat( elasticSearchClient.index( INDEX_NAME ).exists() ).isFalse();
+		assertThat( elasticSearchClient.index( index.name() ).exists() ).isFalse();
 
 		setupAndDropAndCreateIndex();
 
@@ -99,21 +99,13 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 								+ "'doc_values': false"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+				elasticSearchClient.index( index.name() ).type().getMapping()
 		);
 	}
 
 	private void setupAndDropAndCreateIndex() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "field", f -> f.asString() )
-									.toReference();
-						},
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
@@ -125,7 +117,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 				.setup();
 
 		Futures.unwrappedExceptionJoin(
-				indexManager.getSchemaManager().dropAndCreate()
+				index.getSchemaManager().dropAndCreate()
 		);
 	}
 

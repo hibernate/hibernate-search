@@ -53,21 +53,21 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 	@Test
 	public void within_boundingBox() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" )
@@ -77,7 +77,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" )
@@ -87,12 +87,12 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void within_unsearchable_boundingBox() {
-		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
+		StubMappingScope scope = unsearchableFieldsIndex.createScope();
 
 		Assertions.assertThatThrownBy( () ->
 				scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 )
@@ -105,7 +105,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 	@Test
 	public void boundingBox_consistency() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" )
@@ -114,12 +114,12 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, ADDITIONAL_POINT_1_ID, ADDITIONAL_POINT_2_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), ADDITIONAL_POINT_1_ID, ADDITIONAL_POINT_2_ID );
 	}
 
 	@Test
 	public void unsupported_field_types() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "string" ).boundingBox( BOUNDING_BOX_1 ),
@@ -134,7 +134,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -152,7 +152,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -170,12 +170,12 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -193,7 +193,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -212,12 +212,12 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void predicateLevelBoost_andFieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -236,7 +236,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -255,12 +255,12 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void predicateLevelBoost_multiFields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -280,7 +280,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -300,12 +300,12 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
 	public void multi_fields() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		// field(...).field(...)
 
@@ -314,14 +314,14 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).field( "geoPoint_1" ).boundingBox( BOUNDING_BOX_2_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// field().fields(...)
 
@@ -332,7 +332,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
@@ -341,7 +341,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).fields( "geoPoint_1" ).fields( "geoPoint_2" )
@@ -350,7 +350,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// fields(...)
 
@@ -359,19 +359,19 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = scope.query()
 				.where( f -> f.spatial().within().fields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_1_2 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void boundingBox_error_null() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( null ),
@@ -383,7 +383,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 	@Test
 	public void unknown_field() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "unknown_field" )
@@ -397,25 +397,25 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
 	public void multiIndex_incompatibleSearchable() {
-		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
+		StubMappingScope scope = mainIndex.createScope( unsearchableFieldsIndex );
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "geoPoint" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )
 				) );
 	}
 
@@ -423,22 +423,22 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	protected void initData() {
 		super.initData();
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
-			document.addValue( indexMapping.geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
 		} );
 		plan.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
-			document.addValue( indexMapping.geoPoint, ADDITIONAL_POINT_2_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_2_GEO_POINT );
 		} );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
 				ADDITIONAL_POINT_2_ID );
 	}
 

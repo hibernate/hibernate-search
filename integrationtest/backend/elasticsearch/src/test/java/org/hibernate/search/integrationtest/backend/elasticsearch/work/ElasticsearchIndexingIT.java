@@ -24,7 +24,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,12 +41,12 @@ import com.google.gson.JsonObject;
 @RunWith(Parameterized.class)
 public class ElasticsearchIndexingIT {
 
-	private static final String INDEX_NAME = "indexname";
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Parameterized.Parameters(name = "IndexLayoutStrategy = {0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
-				{ null, defaultWriteAlias( INDEX_NAME ) },
+				{ null, defaultWriteAlias( index.name() ) },
 				{ new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-write" ) }
 		};
 	}
@@ -54,16 +54,13 @@ public class ElasticsearchIndexingIT {
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
 	private final IndexLayoutStrategy layoutStrategy;
 	private final URLEncodedString writeAlias;
-
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
 
 	public ElasticsearchIndexingIT(IndexLayoutStrategy layoutStrategy, URLEncodedString writeAlias) {
 		this.layoutStrategy = layoutStrategy;
@@ -79,11 +76,7 @@ public class ElasticsearchIndexingIT {
 				.withBackendProperty(
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy
 				)
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.setup();
 	}
 
@@ -92,10 +85,10 @@ public class ElasticsearchIndexingIT {
 		Gson gson = new Gson();
 
 		String routingKey = "someRoutingKey";
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 
 		plan.add( referenceProvider( "1", routingKey ), document -> {
-			document.addValue( indexMapping.string, "text1" );
+			document.addValue( index.binding().string, "text1" );
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
@@ -112,7 +105,7 @@ public class ElasticsearchIndexingIT {
 		clientSpy.verifyExpectationsMet();
 
 		plan.update( referenceProvider( "1", routingKey ), document -> {
-			document.addValue( indexMapping.string, "text2" );
+			document.addValue( index.binding().string, "text2" );
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
@@ -143,10 +136,10 @@ public class ElasticsearchIndexingIT {
 		clientSpy.verifyExpectationsMet();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() )
 					.toReference();
 		}

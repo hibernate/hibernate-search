@@ -32,7 +32,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -42,13 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class PhraseSearchPredicateIT {
-
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String INCOMPATIBLE_ANALYZER_INDEX_NAME = "IndexWithIncompatibleAnalyzer";
-	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME = "IndexWithCompatibleSearchAnalyzer";
-	private static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -76,61 +69,27 @@ public class PhraseSearchPredicateIT {
 	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 = "compatible_search_analyzer_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private OtherIndexMapping compatibleIndexMapping;
-	private StubMappingIndexManager compatibleIndexManager;
-
-	private OtherIndexMapping rawFieldCompatibleIndexMapping;
-	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-
-	private OtherIndexMapping incompatibleAnalyzerIndexMapping;
-	private StubMappingIndexManager incompatibleAnalyzerIndexManager;
-
-	private OtherIndexMapping compatibleSearchAnalyzerIndexMapping;
-	private StubMappingIndexManager compatibleSearchAnalyzerIndexManager;
-
-	private StubMappingIndexManager unsearchableFieldsIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<OtherIndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( OtherIndexBinding::createCompatible ).name( "compatible" );
+	private final SimpleMappedIndex<OtherIndexBinding> rawFieldCompatibleIndex =
+			SimpleMappedIndex.of( OtherIndexBinding::createRawFieldCompatible ).name( "rawFieldCompatible" );
+	private final SimpleMappedIndex<OtherIndexBinding> compatibleSearchAnalyzerIndex =
+			SimpleMappedIndex.of( OtherIndexBinding::createCompatibleSearchAnalyzer ).name( "compatibleSearchAnalyzer" );
+	private final SimpleMappedIndex<OtherIndexBinding> incompatibleAnalyzerIndex =
+			SimpleMappedIndex.of( OtherIndexBinding::createIncompatibleAnalyzer ).name( "incompatibleAnalyzer" );
+	private final SimpleMappedIndex<OtherIndexBinding> unsearchableFieldsIndex =
+			SimpleMappedIndex.of( OtherIndexBinding::createUnsearchableFieldsIndexBinding ).name( "unsearchableFields" );
 
 	@Before
 	public void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping =
-								OtherIndexMapping.createCompatible( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> this.rawFieldCompatibleIndexMapping =
-								OtherIndexMapping.createRawFieldCompatible( ctx.getSchemaElement() ),
-						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_ANALYZER_INDEX_NAME,
-						ctx -> this.incompatibleAnalyzerIndexMapping =
-								OtherIndexMapping.createIncompatibleAnalyzer( ctx.getSchemaElement() ),
-						indexManager -> this.incompatibleAnalyzerIndexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME,
-						ctx -> this.compatibleSearchAnalyzerIndexMapping =
-								OtherIndexMapping.createCompatibleSearchAnalyzer( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleSearchAnalyzerIndexManager = indexManager
-				)
-				.withIndex(
-						UNSEARCHABLE_FIELDS_INDEX_NAME,
-						ctx -> OtherIndexMapping.createUnsearchableFieldsIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.unsearchableFieldsIndexManager = indexManager
+				.withIndexes(
+						mainIndex, compatibleIndex, rawFieldCompatibleIndex, compatibleSearchAnalyzerIndex,
+						incompatibleAnalyzerIndex, unsearchableFieldsIndex
 				)
 				.setup();
 
@@ -140,21 +99,21 @@ public class PhraseSearchPredicateIT {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
 	public void phrase() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void phrase_nonAnalyzedField() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().nonAnalyzedField.relativeFieldName;
 
 		assertThat( scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
@@ -164,13 +123,13 @@ public class PhraseSearchPredicateIT {
 		assertThat( scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_TEXT_EXACT_MATCH ) )
 				.toQuery() )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void phrase_unsearchable() {
-		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = unsearchableFieldsIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
 				scope.predicate().phrase().field( absoluteFieldPath )
@@ -188,35 +147,35 @@ public class PhraseSearchPredicateIT {
 	 */
 	@Test
 	public void withDslConverter() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringFieldWithDslConverter.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
 	public void singleTerm() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void emptyStringBeforeAnalysis() {
-		StubMappingScope scope = indexManager.createScope();
-		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
+		StubMappingScope scope = mainIndex.createScope();
+		MainFieldModel fieldModel = mainIndex.binding().analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( fieldModel.relativeFieldName ).matching( "" ) )
@@ -228,8 +187,8 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void noTokenAfterAnalysis() {
-		StubMappingScope scope = indexManager.createScope();
-		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
+		StubMappingScope scope = mainIndex.createScope();
+		MainFieldModel fieldModel = mainIndex.binding().analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				// Use stopwords, which should be removed by the analysis
@@ -242,25 +201,25 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void analyzerOverride() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
-		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
-		String whitespaceLowercaseSearchAnalyzedField = indexMapping.whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
+		String whitespaceAnalyzedField = mainIndex.binding().whitespaceAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseAnalyzedField = mainIndex.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseSearchAnalyzedField = mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
 
 		// Terms are never lower-cased, neither at write nor at query time.
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 
 		// Terms are always lower-cased, both at write and at query time.
 		query = scope.query()
 				.where( f -> f.phrase().field( whitespaceLowercaseAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
@@ -268,14 +227,14 @@ public class PhraseSearchPredicateIT {
 						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Same here. Terms are lower-cased only at query time. Because we've defined a search analyzer.
 		query = scope.query()
 				.where( f -> f.phrase().field( whitespaceLowercaseSearchAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// As for the first query, terms are never lower-cased, neither at write nor at query time.
 		// Because even if we've defined a search analyzer, we are overriding it with an analyzer in the predicate,
@@ -285,13 +244,13 @@ public class PhraseSearchPredicateIT {
 						.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 );
 	}
 
 	@Test
 	public void analyzerOverride_notExistingName() {
-		StubMappingScope scope = indexManager.createScope();
-		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String whitespaceAnalyzedField = mainIndex.binding().whitespaceAnalyzedField.relativeFieldName;
 
 		Assertions.assertThatThrownBy( () -> scope.query()
 				.where( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
@@ -305,15 +264,15 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void skipAnalysis() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( "quick fox" ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
 		// so it will not match any token
@@ -330,14 +289,14 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
 	public void error_unsupportedFieldType() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel fieldModel : indexMapping.unsupportedFieldModels ) {
+		for ( ByTypeFieldModel fieldModel : mainIndex.binding().unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -356,8 +315,8 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void error_null() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( absoluteFieldPath ).matching( null ),
@@ -372,32 +331,32 @@ public class PhraseSearchPredicateIT {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testPhraseQuery")
 	public void slop() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ).slop( slop ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( 0 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		assertThat( createQuery.apply( 1 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
 		assertThat( createQuery.apply( 2 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		assertThat( createQuery.apply( 3 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
 
 		assertThat( createQuery.apply( 50 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void perFieldBoostWithConstantScore_error() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase()
@@ -412,9 +371,9 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
-		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath1 = mainIndex.binding().analyzedStringField1.relativeFieldName;
+		String absoluteFieldPath2 = mainIndex.binding().analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase()
@@ -426,7 +385,7 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_5 );
 
 		query = scope.query()
 				.where( f -> f.phrase()
@@ -438,14 +397,14 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_5, DOCUMENT_1 );
 	}
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
-		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath1 = mainIndex.binding().analyzedStringField1.relativeFieldName;
+		String absoluteFieldPath2 = mainIndex.binding().analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -461,7 +420,7 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_5, DOCUMENT_1 );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -477,14 +436,14 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_5 );
 	}
 
 	@Test
 	public void predicateLevelBoost_withConstantScore() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
-		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath1 = mainIndex.binding().analyzedStringField1.relativeFieldName;
+		String absoluteFieldPath2 = mainIndex.binding().analyzedStringField2.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -501,7 +460,7 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_5, DOCUMENT_1 );
 
 		query = scope.query()
 				.where( f -> f.bool()
@@ -518,15 +477,15 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_5 );
 	}
 
 	@Test
 	public void multiFields() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
-		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
-		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath1 = mainIndex.binding().analyzedStringField1.relativeFieldName;
+		String absoluteFieldPath2 = mainIndex.binding().analyzedStringField2.relativeFieldName;
+		String absoluteFieldPath3 = mainIndex.binding().analyzedStringField3.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery;
 
 		// field(...)
@@ -538,9 +497,9 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 		assertThat( createQuery.apply( PHRASE_2 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_3 ) )
 				.hasNoHits();
 
@@ -554,11 +513,11 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_2 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_3 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 
 		// field().fields(...)
 
@@ -570,11 +529,11 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3, DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_2 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_4, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_4, DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_3 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 
 		// fields(...)
 
@@ -586,17 +545,17 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_2 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_5 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_5 );
 		assertThat( createQuery.apply( PHRASE_3 ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
 	public void error_unknownField() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( "unknown_field" ),
@@ -636,8 +595,8 @@ public class PhraseSearchPredicateIT {
 
 	@Test
 	public void error_invalidSlop() {
-		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( absoluteFieldPath )
@@ -659,42 +618,42 @@ public class PhraseSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope(
-				compatibleIndexManager
+	public void multiIndex_withCompatibleIndex() {
+		StubMappingScope scope = mainIndex.createScope(
+				compatibleIndex
 		);
 
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1 );
-			b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+	public void multiIndex_withRawFieldCompatibleIndex() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1 );
-			b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer() {
-		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope( incompatibleAnalyzerIndex );
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
 				() -> {
@@ -707,15 +666,15 @@ public class PhraseSearchPredicateIT {
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), incompatibleAnalyzerIndex.name() )
 				) )
 		;
 	}
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer_overrideAnalyzer() {
-		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope( incompatibleAnalyzerIndex );
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
@@ -723,30 +682,30 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
-			b.doc( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+			b.doc( incompatibleAnalyzerIndex.typeName(), INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
-		StubMappingScope scope = indexManager.createScope( compatibleSearchAnalyzerIndexManager );
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope( compatibleSearchAnalyzerIndex );
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
-			b.doc( COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME, COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+			b.doc( compatibleSearchAnalyzerIndex.typeName(), COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
 	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
-		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope( incompatibleAnalyzerIndex );
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM )
@@ -754,116 +713,116 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
-			b.doc( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+			b.doc( incompatibleAnalyzerIndex.typeName(), INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
 	public void multiIndex_incompatibleSearchable() {
-		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
-		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope( unsearchableFieldsIndex );
+		String absoluteFieldPath = mainIndex.binding().analyzedStringField1.relativeFieldName;
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().phrase().field( absoluteFieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )
 				) )
 		;
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
-			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
-			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
-			document.addValue( indexMapping.nonAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+			document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+			document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+			document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
-			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
-			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
-			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
-			document.addValue( indexMapping.nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+			document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+			document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+			document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
-			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_3_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_3_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
-			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_2_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField3.reference, PHRASE_2_TEXT_EXACT_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_2_TEXT_EXACT_MATCH );
-			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_2_TEXT_EXACT_MATCH );
+			document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> {
 		} );
 		plan.execute().join();
 
-		plan = compatibleIndexManager.createIndexingPlan();
+		plan = compatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( compatibleIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( compatibleIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.execute().join();
 
-		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan = rawFieldCompatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( rawFieldCompatibleIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( rawFieldCompatibleIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.execute().join();
 
-		plan = incompatibleAnalyzerIndexManager.createIndexingPlan();
+		plan = incompatibleAnalyzerIndex.createIndexingPlan();
 		plan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( incompatibleAnalyzerIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( incompatibleAnalyzerIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.execute().join();
 
-		plan = compatibleSearchAnalyzerIndexManager.createIndexingPlan();
+		plan = compatibleSearchAnalyzerIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( compatibleSearchAnalyzerIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( compatibleSearchAnalyzerIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
 
-		query = compatibleIndexManager.createScope().query()
+		query = compatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 
-		query = rawFieldCompatibleIndexManager.createScope().query()
+		query = rawFieldCompatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 
-		query = incompatibleAnalyzerIndexManager.createScope().query()
+		query = incompatibleAnalyzerIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( incompatibleAnalyzerIndex.typeName(), INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
 
-		query = compatibleSearchAnalyzerIndexManager.createScope().query()
+		query = compatibleSearchAnalyzerIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME, COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( compatibleSearchAnalyzerIndex.typeName(), COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -881,7 +840,7 @@ public class PhraseSearchPredicateIT {
 		} );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final List<ByTypeFieldModel> unsupportedFieldModels = new ArrayList<>();
 
 		final MainFieldModel analyzedStringField1;
@@ -893,7 +852,7 @@ public class PhraseSearchPredicateIT {
 		final MainFieldModel whitespaceLowercaseSearchAnalyzedField;
 		final MainFieldModel nonAnalyzedField;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_",
 					(typeDescriptor, ignored, model) -> {
@@ -937,9 +896,9 @@ public class PhraseSearchPredicateIT {
 		}
 	}
 
-	private static class OtherIndexMapping {
-		static OtherIndexMapping createCompatible(IndexSchemaElement root) {
-			return new OtherIndexMapping(
+	private static class OtherIndexBinding {
+		static OtherIndexBinding createCompatible(IndexSchemaElement root) {
+			return new OtherIndexBinding(
 					MainFieldModel.mapper(
 							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
@@ -947,8 +906,8 @@ public class PhraseSearchPredicateIT {
 			);
 		}
 
-		static OtherIndexMapping createRawFieldCompatible(IndexSchemaElement root) {
-			return new OtherIndexMapping(
+		static OtherIndexBinding createRawFieldCompatible(IndexSchemaElement root) {
+			return new OtherIndexBinding(
 					MainFieldModel.mapper(
 							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 									// Using a different DSL converter
@@ -958,8 +917,8 @@ public class PhraseSearchPredicateIT {
 			);
 		}
 
-		static OtherIndexMapping createIncompatibleAnalyzer(IndexSchemaElement root) {
-			return new OtherIndexMapping(
+		static OtherIndexBinding createIncompatibleAnalyzer(IndexSchemaElement root) {
+			return new OtherIndexBinding(
 					MainFieldModel.mapper(
 							// Using a different analyzer
 							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
@@ -968,8 +927,8 @@ public class PhraseSearchPredicateIT {
 			);
 		}
 
-		static OtherIndexMapping createCompatibleSearchAnalyzer(IndexSchemaElement root) {
-			return new OtherIndexMapping(
+		static OtherIndexBinding createCompatibleSearchAnalyzer(IndexSchemaElement root) {
+			return new OtherIndexBinding(
 					MainFieldModel.mapper(
 							// Using a different analyzer
 							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
@@ -980,8 +939,8 @@ public class PhraseSearchPredicateIT {
 			);
 		}
 
-		static OtherIndexMapping createUnsearchableFieldsIndexMapping(IndexSchemaElement root) {
-			return new OtherIndexMapping(
+		static OtherIndexBinding createUnsearchableFieldsIndexBinding(IndexSchemaElement root) {
+			return new OtherIndexBinding(
 					MainFieldModel.mapper(
 							// make the field not searchable
 							c -> c.asString().searchable( Searchable.NO )
@@ -992,7 +951,7 @@ public class PhraseSearchPredicateIT {
 
 		final MainFieldModel analyzedStringField1;
 
-		private OtherIndexMapping(MainFieldModel analyzedStringField1) {
+		private OtherIndexBinding(MainFieldModel analyzedStringField1) {
 			this.analyzedStringField1 = analyzedStringField1;
 		}
 	}

@@ -36,21 +36,17 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ExistsSearchPredicateIT {
+import org.assertj.core.api.Assertions;
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
+public class ExistsSearchPredicateIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -61,42 +57,21 @@ public class ExistsSearchPredicateIT {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private IndexMapping compatibleIndexMapping;
-	private StubMappingIndexManager compatibleIndexManager;
-
-	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-
-	private StubMappingIndexManager incompatibleIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
+			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
 	@Before
 	public void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_INDEX_NAME,
-						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.incompatibleIndexManager = indexManager
-				)
+				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex )
 				.setup();
 
 		initData();
@@ -104,9 +79,9 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void exists() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
@@ -114,7 +89,7 @@ public class ExistsSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -124,9 +99,9 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void exists_withDocValues() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDocValuesModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldWithDocValuesModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
@@ -134,7 +109,7 @@ public class ExistsSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -144,9 +119,9 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void missing() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
@@ -154,50 +129,50 @@ public class ExistsSearchPredicateIT {
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, EMPTY );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, EMPTY );
 		}
 	}
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
-						.should( f.exists().field( indexMapping.string1Field.relativeFieldName ) )
-						.should( f.exists().field( indexMapping.string2Field.relativeFieldName ).boost( 7 ) )
+						.should( f.exists().field( mainIndex.binding().string1Field.relativeFieldName ) )
+						.should( f.exists().field( mainIndex.binding().string2Field.relativeFieldName ).boost( 7 ) )
 				)
 				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_1 );
 
 		query = scope.query()
 				.where( f -> f.bool()
-						.should( f.exists().field( indexMapping.string1Field.relativeFieldName ).boost( 39 ) )
-						.should( f.exists().field( indexMapping.string2Field.relativeFieldName ) )
+						.should( f.exists().field( mainIndex.binding().string1Field.relativeFieldName ).boost( 39 ) )
+						.should( f.exists().field( mainIndex.binding().string2Field.relativeFieldName ) )
 				)
 				.sort( f -> f.score() )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void inFlattenedObject() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
-			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().flattenedObject.supportedFieldModels ) {
+			String absoluteFieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
 					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -207,50 +182,50 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inFlattenedObject_withDocValues() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldWithDocValuesModels ) {
-			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels ) {
+			String absoluteFieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
 					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void inNestedPredicate_implicit() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
-			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldModels ) {
+			String absoluteFieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
 					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
 	public void inNestedPredicate_explicit() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
-			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldModels ) {
+			String absoluteFieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.where( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+					.where( f -> f.nested().objectField( mainIndex.binding().nestedObject.relativeFieldName )
 							.nest( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -260,18 +235,18 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inNestedPredicate_withDocValues() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldWithDocValuesModels ) {
-			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels ) {
+			String absoluteFieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.where( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+					.where( f -> f.nested().objectField( mainIndex.binding().nestedObject.relativeFieldName )
 							.nest( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
 			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -281,25 +256,25 @@ public class ExistsSearchPredicateIT {
 	 */
 	@Test
 	public void inNestedPredicate_missing() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
-			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldModels ) {
+			String absoluteFieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.where( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+					.where( f -> f.nested().objectField( mainIndex.binding().nestedObject.relativeFieldName )
 							.nest( f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) ) )
 					.toQuery();
 
 			assertThat( query )
 					// No match for document 1, since all of its nested objects have this field
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
 	@Test
 	public void unknownField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "unknown_field" ),
@@ -312,9 +287,9 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String absoluteFieldPath = model.relativeFieldName;
 
@@ -323,9 +298,9 @@ public class ExistsSearchPredicateIT {
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-					b.doc( INDEX_NAME, DOCUMENT_1 );
-					b.doc( INDEX_NAME, DOCUMENT_2 );
-					b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+					b.doc( mainIndex.typeName(), DOCUMENT_1 );
+					b.doc( mainIndex.typeName(), DOCUMENT_2 );
+					b.doc( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 				} );
 			} );
 		}
@@ -333,9 +308,9 @@ public class ExistsSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withRawFieldCompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String absoluteFieldPath = model.relativeFieldName;
 
@@ -344,9 +319,9 @@ public class ExistsSearchPredicateIT {
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-					b.doc( INDEX_NAME, DOCUMENT_1 );
-					b.doc( INDEX_NAME, DOCUMENT_2 );
-					b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+					b.doc( mainIndex.typeName(), DOCUMENT_1 );
+					b.doc( mainIndex.typeName(), DOCUMENT_2 );
+					b.doc( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 				} );
 			} );
 		}
@@ -360,10 +335,10 @@ public class ExistsSearchPredicateIT {
 	 * and the usefulness of this work is dubious.
 	 */
 	@Test
-	public void multiIndex_withIncompatibleIndexManager() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndex() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			Assertions.assertThatThrownBy(
@@ -373,91 +348,91 @@ public class ExistsSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 					) );
 		}
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.string1Field.document1Value.write( document );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
+			mainIndex.binding().string1Field.document1Value.write( document );
 
 			// Add one object with the values of document 1, and another with the values of document 2
-			DocumentElement flattenedObject1 = document.addObject( indexMapping.flattenedObject.self );
-			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
-			indexMapping.flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
-			DocumentElement flattenedObject2 = document.addObject( indexMapping.flattenedObject.self );
-			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+			DocumentElement flattenedObject1 = document.addObject( mainIndex.binding().flattenedObject.self );
+			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
+			mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
+			DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
+			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 			// Can't add two values to a sortable field
-			//indexMapping.flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+			//index.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 
 			// Same for the nested object
-			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
-			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
-			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
+			mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
+			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+			mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
-			indexMapping.string2Field.document2Value.write( document );
+			mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
+			mainIndex.binding().string2Field.document2Value.write( document );
 
 			// Add one empty object, and and another with the values of document 2
-			document.addObject( indexMapping.flattenedObject.self );
-			DocumentElement flattenedObject2 = document.addObject( indexMapping.flattenedObject.self );
-			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-			indexMapping.flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+			document.addObject( mainIndex.binding().flattenedObject.self );
+			DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
+			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+			mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 
 			// Same for the nested object
-			document.addObject( indexMapping.nestedObject.self );
-			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
-			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+			document.addObject( mainIndex.binding().nestedObject.self );
+			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+			mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.string1Field.document3Value.write( document );
+			mainIndex.binding().string1Field.document3Value.write( document );
 
 			// Add two empty objects
-			document.addObject( indexMapping.flattenedObject.self );
-			document.addObject( indexMapping.flattenedObject.self );
+			document.addObject( mainIndex.binding().flattenedObject.self );
+			document.addObject( mainIndex.binding().flattenedObject.self );
 
 			// Same for the nested object
-			document.addObject( indexMapping.nestedObject.self );
-			document.addObject( indexMapping.nestedObject.self );
+			document.addObject( mainIndex.binding().nestedObject.self );
+			document.addObject( mainIndex.binding().nestedObject.self );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
 		plan.execute().join();
 
-		plan = compatibleIndexManager.createIndexingPlan();
+		plan = compatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
-		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan = rawFieldCompatibleIndex.createIndexingPlan();
 		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			rawFieldCompatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = indexManager.createScope().query()
+		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		query = compatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createScope().query()
+		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = rawFieldCompatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -493,7 +468,7 @@ public class ExistsSearchPredicateIT {
 		} );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> supportedFieldWithDocValuesModels = new ArrayList<>();
 
@@ -503,7 +478,7 @@ public class ExistsSearchPredicateIT {
 		final MainFieldModel string1Field;
 		final MainFieldModel string2Field;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_", ignored -> { },
 					(typeDescriptor, expectations, model) -> {
@@ -559,12 +534,12 @@ public class ExistsSearchPredicateIT {
 		}
 	}
 
-	private static class RawFieldCompatibleIndexMapping {
+	private static class RawFieldCompatibleIndexBinding {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 
-		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
 			 * but with an incompatible DSL converter.
 			 */
 			mapByTypeFields(
@@ -577,10 +552,10 @@ public class ExistsSearchPredicateIT {
 		}
 	}
 
-	private static class IncompatibleIndexMapping {
-		IncompatibleIndexMapping(IndexSchemaElement root) {
+	private static class IncompatibleIndexBinding {
+		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
 			 * but with an incompatible type.
 			 */
 			forEachTypeDescriptor( typeDescriptor -> {

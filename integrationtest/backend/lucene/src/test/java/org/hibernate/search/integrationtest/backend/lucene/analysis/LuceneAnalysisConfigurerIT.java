@@ -15,6 +15,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+
 import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
@@ -26,12 +28,11 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 public class LuceneAnalysisConfigurerIT {
 
 	private static final String BACKEND_NAME = "BackendName";
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Test
 	public void error_invalidReference() {
@@ -168,16 +169,14 @@ public class LuceneAnalysisConfigurerIT {
 		setup( analysisConfigurer, c -> { } );
 	}
 
-	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
+	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> binder) {
+		StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( binder );
 		setupHelper.start( BACKEND_NAME )
 				.withPropertyRadical(
 						"backends." + BACKEND_NAME + "." + LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						analysisConfigurer
 				)
-				.withIndex(
-						INDEX_NAME,
-						mappingContributor
-				)
+				.withIndex( index )
 				.setup();
 	}
 }

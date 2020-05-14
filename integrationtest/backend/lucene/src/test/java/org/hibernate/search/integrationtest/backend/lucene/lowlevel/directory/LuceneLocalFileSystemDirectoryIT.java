@@ -39,7 +39,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	public void root() throws IOException {
 		Path rootDirectory = temporaryFolder.getRoot().toPath();
-		Path indexDirectory = rootDirectory.resolve( INDEX_NAME );
+		Path indexDirectory = rootDirectory.resolve( index.name() );
 
 		assertThat( indexDirectory )
 				.doesNotExist();
@@ -141,7 +141,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 
 		checkIndexingAndQuerying();
 
-		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
+		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::getIndexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )

@@ -21,6 +21,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,9 +36,6 @@ import com.google.gson.JsonObject;
 @RunWith(Parameterized.class)
 public class ElasticsearchTypeNameMappingSchemaIT {
 
-	private static final String TYPE_NAME = "typename";
-	private static final String INDEX_NAME = "indexname";
-
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
@@ -48,10 +46,12 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
+
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	private final String strategyName;
 	private final JsonObject expectedMappingContent;
@@ -69,7 +69,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 		);
 		clientSpy.expectNext(
 				ElasticsearchRequest.get()
-						.multiValuedPathComponent( defaultAliases( INDEX_NAME ) )
+						.multiValuedPathComponent( defaultAliases( index.name() ) )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
@@ -92,19 +92,14 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 				.withBackendProperty(
 						ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
 				)
-				.withIndex(
-						INDEX_NAME,
-						options -> options.mappedType( TYPE_NAME ),
-						ignored -> { },
-						ignored -> { }
-				)
+				.withIndex( index )
 				.setup();
 		clientSpy.verifyExpectationsMet();
 	}
 
 	private ElasticsearchRequest indexCreationRequest() {
 		ElasticsearchRequest.Builder schemaRequestBuilder = ElasticsearchRequest.put()
-				.pathComponent( defaultPrimaryName( INDEX_NAME ) )
+				.pathComponent( defaultPrimaryName( index.name() ) )
 				.body( indexCreationPayload() );
 		Boolean includeTypeName = ElasticsearchTestDialect.get().getIncludeTypeNameParameterForMappingApi();
 		if ( includeTypeName != null ) {
@@ -116,7 +111,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 	private JsonObject indexCreationPayload() {
 		JsonObject payload = new JsonObject();
 
-		payload.add( "aliases", defaultAliasDefinitions( INDEX_NAME ) );
+		payload.add( "aliases", defaultAliasDefinitions( index.name() ) );
 
 		JsonObject mappings = ElasticsearchTestDialect.get().getTypeNameForMappingAndBulkApi()
 				// ES6 and below: the mapping has its own object node, child of "mappings"

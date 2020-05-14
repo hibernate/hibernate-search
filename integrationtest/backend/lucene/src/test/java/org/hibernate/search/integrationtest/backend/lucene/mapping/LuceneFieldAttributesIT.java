@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,16 +36,14 @@ import org.assertj.core.api.Assertions;
 
 public class LuceneFieldAttributesIT {
 
-	private static final String INDEX_NAME = "my-index";
 	private static final String ANALYZER_NAME = "my-analyzer";
 
 	private static final String TEXT = "This is a text containing things. Red house with a blue carpet on the road...";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
@@ -58,11 +56,7 @@ public class LuceneFieldAttributesIT {
 								.param( "maxGramSize", "6" )
 								.tokenFilter( TokenOffsetPayloadTokenFilterFactory.class )
 				)
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.setup();
 
 		initData();
@@ -107,7 +101,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	private Document loadDocument() {
-		SearchQuery<Document> query = indexManager.createScope().query()
+		SearchQuery<Document> query = index.createScope().query()
 				.select(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
@@ -121,20 +115,20 @@ public class LuceneFieldAttributesIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "ID:1" ), document -> {
-			document.addValue( indexMapping.string, "keyword" );
-			document.addValue( indexMapping.text, TEXT );
-			document.addValue( indexMapping.norms, TEXT );
-			document.addValue( indexMapping.noNorms, TEXT );
-			document.addValue( indexMapping.termVector, TEXT );
-			document.addValue( indexMapping.moreOptions, "Search 6 groundwork - Add the missing common field type options compared to Search 5" );
+			document.addValue( index.binding().string, "keyword" );
+			document.addValue( index.binding().text, TEXT );
+			document.addValue( index.binding().norms, TEXT );
+			document.addValue( index.binding().noNorms, TEXT );
+			document.addValue( index.binding().termVector, TEXT );
+			document.addValue( index.binding().moreOptions, "Search 6 groundwork - Add the missing common field type options compared to Search 5" );
 		} );
 
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> text;
 		final IndexFieldReference<String> norms;
@@ -142,7 +136,7 @@ public class LuceneFieldAttributesIT {
 		final IndexFieldReference<String> termVector;
 		final IndexFieldReference<String> moreOptions;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "keyword", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 			text = root.field( "text", f -> f.asString().analyzer( ANALYZER_NAME ).projectable( Projectable.YES ) ).toReference();
 

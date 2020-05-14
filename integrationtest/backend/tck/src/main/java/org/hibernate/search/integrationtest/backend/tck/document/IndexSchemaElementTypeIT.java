@@ -18,6 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,11 +32,10 @@ import org.junit.Test;
  */
 public class IndexSchemaElementTypeIT {
 
-	private static final String TYPE_NAME = "TypeName";
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private StubMappedIndex index;
 
 	@Test
 	public void analyzerOnSortableField() {
@@ -54,8 +54,8 @@ public class IndexSchemaElementTypeIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure(
 								"Cannot apply an analyzer on a sortable field",
 								"Use a normalizer instead",
@@ -81,8 +81,8 @@ public class IndexSchemaElementTypeIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure(
 								"Cannot apply an analyzer on an aggregable field",
 								"Use a normalizer instead",
@@ -108,8 +108,8 @@ public class IndexSchemaElementTypeIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure(
 								"Cannot apply both an analyzer and a normalizer",
 								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'",
@@ -134,8 +134,8 @@ public class IndexSchemaElementTypeIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure(
 								"Cannot apply a search analyzer if an analyzer has not been defined on the same field",
 								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
@@ -144,14 +144,8 @@ public class IndexSchemaElementTypeIT {
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						b -> b.mappedType( TYPE_NAME ),
-						mappingContributor,
-						ignored -> { }
-				)
-				.setup();
+		index = StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor );
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 }

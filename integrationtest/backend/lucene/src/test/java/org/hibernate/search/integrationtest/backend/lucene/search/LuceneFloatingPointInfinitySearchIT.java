@@ -27,7 +27,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -36,33 +36,23 @@ import org.junit.Test;
 
 public class LuceneFloatingPointInfinitySearchIT<F> {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final String AGGREGATION_NAME = "aggregationName";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
-
+		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
 	public void float_infinityIncluded() {
-		String fieldPath = indexMapping.floatFieldModel.relativeFieldName;
+		String fieldPath = index.binding().floatFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -88,7 +78,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
 	public void float_infinityExcluded() {
-		String fieldPath = indexMapping.floatFieldModel.relativeFieldName;
+		String fieldPath = index.binding().floatFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -122,7 +112,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
 	public void double_infinityIncluded() {
-		String fieldPath = indexMapping.doubleFieldModel.relativeFieldName;
+		String fieldPath = index.binding().doubleFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -148,7 +138,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3685")
 	public void double_infinityExcluded() {
-		String fieldPath = indexMapping.doubleFieldModel.relativeFieldName;
+		String fieldPath = index.binding().doubleFieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -180,39 +170,39 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
-		return indexManager.createScope().query().where( f -> f.matchAll() );
+		return index.createScope().query().where( f -> f.matchAll() );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "negative-infinity" ), document -> {
-			document.addValue( indexMapping.floatFieldModel.reference, Float.NEGATIVE_INFINITY );
-			document.addValue( indexMapping.doubleFieldModel.reference, Double.NEGATIVE_INFINITY );
+			document.addValue( index.binding().floatFieldModel.reference, Float.NEGATIVE_INFINITY );
+			document.addValue( index.binding().doubleFieldModel.reference, Double.NEGATIVE_INFINITY );
 		} );
 		plan.add( referenceProvider( "zero" ), document -> {
-			document.addValue( indexMapping.floatFieldModel.reference, 0f );
-			document.addValue( indexMapping.doubleFieldModel.reference, 0d );
+			document.addValue( index.binding().floatFieldModel.reference, 0f );
+			document.addValue( index.binding().doubleFieldModel.reference, 0d );
 		} );
 		plan.add( referenceProvider( "positive-infinity" ), document -> {
-			document.addValue( indexMapping.floatFieldModel.reference, Float.POSITIVE_INFINITY );
-			document.addValue( indexMapping.doubleFieldModel.reference, Double.POSITIVE_INFINITY );
+			document.addValue( index.binding().floatFieldModel.reference, Float.POSITIVE_INFINITY );
+			document.addValue( index.binding().doubleFieldModel.reference, Double.POSITIVE_INFINITY );
 		} );
 		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasTotalHitCount( 3 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final FieldModel<Float> floatFieldModel;
 		final FieldModel<Double> doubleFieldModel;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			floatFieldModel = FieldModel.mapper( f -> f.asFloat().aggregable( Aggregable.YES ) )
 					.map( root, "float" );
 			doubleFieldModel = FieldModel.mapper( f -> f.asDouble().aggregable( Aggregable.YES ) )

@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Rule;
@@ -29,24 +29,17 @@ import org.junit.Test;
  */
 public class MultiTenancyMismatchIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( "tenant_1" );
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
 	public void backend_multi_tenancy_disabled_but_indexes_requiring_multi_tenancy_throws_exception() {
 		assertThatThrownBy( () -> setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.withMultiTenancy()
 				.setup()
 		)
@@ -59,15 +52,9 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_query_while_disabled_throws_exception() {
-		setupHelper.start()
-				.withIndex(
-						"IndexName-using_multi_tenancy_for_query_while_disabled_throws_exception",
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.query( tenant1SessionContext )
 				.where( f -> f.matchAll() )
@@ -82,16 +69,10 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_add_while_disabled_throws_exception() {
-		setupHelper.start()
-				.withIndex(
-						"IndexName-using_multi_tenancy_for_add_while_disabled_throws_exception",
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
 			plan.update( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
@@ -104,16 +85,10 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_update_while_disabled_throws_exception() {
-		setupHelper.start()
-				.withIndex(
-						"IndexName-using_multi_tenancy_for_update_while_disabled_throws_exception",
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
 			plan.update( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
@@ -126,16 +101,10 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void using_multi_tenancy_for_delete_while_disabled_throws_exception() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
 			plan.delete( referenceProvider( "1" ) );
 			plan.execute().join();
 		} )
@@ -146,10 +115,10 @@ public class MultiTenancyMismatchIT {
 				);
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) )
 					.toReference();
 		}

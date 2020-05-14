@@ -654,7 +654,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add a field with the same name as the fieldWithConverterModel from IndexMapping,
+			 * Add a field with the same name as the fieldWithConverterModel from IndexBinding,
 			 * but with an incompatible projection converter.
 			 */
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
@@ -676,7 +676,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	private static class IncompatibleIndexBinding {
 		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the fieldsModels from IndexMapping,
+			 * Add fields with the same name as the fieldsModels from IndexBinding,
 			 * but with an incompatible type.
 			 */
 			mapFieldsWithIncompatibleType( root );

@@ -17,6 +17,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -29,7 +30,7 @@ public class ElasticsearchBootstrapIT {
 	private static final String BACKEND_NAME = "BackendName";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
@@ -50,11 +51,7 @@ public class ElasticsearchBootstrapIT {
 						elasticsearchClientSpy.getFactory()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndex(
-						"EmptyIndexName",
-						ctx -> {
-						}
-				)
+				.withIndex( StubMappedIndex.withoutFields() )
 				.setupFirstPhaseOnly();
 
 		// We do not expect the client to be created in the first phase
@@ -85,11 +82,7 @@ public class ElasticsearchBootstrapIT {
 								elasticsearchClientSpy.getFactory()
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-						.withIndex(
-								"EmptyIndexName",
-								ctx -> {
-								}
-						)
+						.withIndex( StubMappedIndex.withoutFields() )
 						.setupFirstPhaseOnly(),
 				"NO version check without explicit version number"
 		)
@@ -124,11 +117,7 @@ public class ElasticsearchBootstrapIT {
 								elasticsearchClientSpy.getFactory()
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-						.withIndex(
-								"EmptyIndexName",
-								ctx -> {
-								}
-						)
+						.withIndex( StubMappedIndex.withoutFields() )
 						.setupFirstPhaseOnly(),
 				"NO version check with partial version number"
 		)
@@ -162,11 +151,7 @@ public class ElasticsearchBootstrapIT {
 						elasticsearchClientSpy.getFactory()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndex(
-						"EmptyIndexName",
-						ctx -> {
-						}
-				)
+				.withIndex( StubMappedIndex.withoutFields() )
 				.setupFirstPhaseOnly();
 		// We do not expect the client to be created in the first phase
 		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isEqualTo( 0 );

@@ -35,20 +35,20 @@ public class LuceneIndexManagerIT {
 
 	private static final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( IndexBinding::new );
 
-	private static LuceneIndexManager indexManager;
+	private static LuceneIndexManager indexApi;
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
-		indexManager = index.toApi().unwrap( LuceneIndexManager.class );
+		indexApi = index.toApi().unwrap( LuceneIndexManager.class );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void indexingAnalyzer() throws IOException {
-		Analyzer analyzer = indexManager.indexingAnalyzer();
+		Analyzer analyzer = indexApi.indexingAnalyzer();
 		assertThat( analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
 		// Overridden with a search analyzer, which should be ignored here
@@ -65,7 +65,7 @@ public class LuceneIndexManagerIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void searchAnalyzer() throws IOException {
-		Analyzer analyzer = indexManager.searchAnalyzer();
+		Analyzer analyzer = indexApi.searchAnalyzer();
 		assertThat( analyze( analyzer, "whitespace_lowercase", "Foo Bar" ) )
 				.containsExactly( "foo", "bar" );
 		// Overridden with a search analyzer

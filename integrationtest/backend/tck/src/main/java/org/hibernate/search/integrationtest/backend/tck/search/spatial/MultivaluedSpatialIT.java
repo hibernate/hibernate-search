@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -27,8 +27,6 @@ import org.junit.Test;
 
 @TestForIssue(jiraKey = "HSEARCH-2859")
 public class MultivaluedSpatialIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	// latitude increases from south to north
 	// longitude increases from west to east
@@ -41,50 +39,43 @@ public class MultivaluedSpatialIT {
 			GeoBoundingBox.of( GeoPoint.of( 8.0, 2.0 ), GeoPoint.of( 6.0, 4.0 ) );
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	protected IndexMapping indexMapping;
-	protected StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				).setup();
-
+		setupHelper.start().withIndex( index ).setup();
 		initData();
 	}
 
 	@Test
 	public void boundingBox() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( AROUND_NORTH_WEST_BOX ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), f -> {
-			f.addValue( indexMapping.geoPoint, NORTH_WEST );
-			f.addValue( indexMapping.geoPoint, SOUTH_EAST );
+			f.addValue( index.binding().geoPoint, NORTH_WEST );
+			f.addValue( index.binding().geoPoint, SOUTH_EAST );
 		} );
 		plan.add( referenceProvider( "2" ), f -> {
-			f.addValue( indexMapping.geoPoint, NORTH_EAST );
-			f.addValue( indexMapping.geoPoint, SOUTH_WEST );
+			f.addValue( index.binding().geoPoint, NORTH_EAST );
+			f.addValue( index.binding().geoPoint, SOUTH_WEST );
 		} );
 		plan.execute().join();
 	}
 
-	protected static class IndexMapping {
+	protected static class IndexBinding {
 		final IndexFieldReference<GeoPoint> geoPoint;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint() )
 					.multiValued().toReference();
 		}

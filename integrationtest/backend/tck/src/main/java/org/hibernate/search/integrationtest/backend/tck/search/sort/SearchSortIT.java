@@ -31,7 +31,7 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -46,9 +46,6 @@ import org.assertj.core.api.Assertions;
  */
 public class SearchSortIT {
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
-
 	private static final int INDEX_ORDER_CHECKS = 10;
 
 	private static final String FIRST_ID = "1";
@@ -57,36 +54,25 @@ public class SearchSortIT {
 	private static final String EMPTY_ID = "empty";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private StubMappingIndexManager anotherIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> otherIndex =
+			// Using the same mapping here. But a different mapping would work the same.
+			// What matters here is that is a different index.
+			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						ANOTHER_INDEX_NAME,
-						// Using the same mapping here. But a different mapping would work the same.
-						// What matters here is that is a different index.
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.anotherIndexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -103,7 +89,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.indexOrder() );
 		SearchResult<DocumentReference> firstCallResult = query.fetchAll();
 		assertThat( firstCallResult ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		List<DocumentReference> firstCallHits = firstCallResult.getHits();
 
 		for ( int i = 0; i < INDEX_ORDER_CHECKS; ++i ) {
@@ -115,7 +101,7 @@ public class SearchSortIT {
 
 	@Test
 	public void byScore() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = scope.predicate()
@@ -126,26 +112,26 @@ public class SearchSortIT {
 				.sort( f -> f.score() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
 				.where( predicate )
 				.sort( f -> f.score().desc() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
 				.where( predicate )
 				.sort( f -> f.score().asc() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
 	public void separateSort() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
 		SearchSort sortAsc = scope.sort()
@@ -157,7 +143,7 @@ public class SearchSortIT {
 				.sort( sortAsc )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		SearchSort sortDesc = scope.sort()
 				.field( "string" ).desc().missing().last()
@@ -168,12 +154,12 @@ public class SearchSortIT {
 				.sort( sortDesc )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasDocRefHitsExactOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void reuseSortInstance_onScopeTargetingSameIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchSort sort = scope
 				.sort().field( "string" ).asc().missing().last().toSort();
 
@@ -182,7 +168,7 @@ public class SearchSortIT {
 				.sort( sort )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		// reuse the same sort instance on the same scope
 		query = scope.query()
@@ -190,59 +176,59 @@ public class SearchSortIT {
 				.sort( sort )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		// reuse the same sort instance on a different scope,
 		// targeting the same index
-		query = indexManager.createScope().query()
+		query = mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		sort = indexManager.createScope( anotherIndexManager )
+		sort = mainIndex.createScope( otherIndex )
 				.sort().field( "string" ).asc().missing().last().toSort();
 
 		// reuse the same sort instance on a different scope,
 		// targeting same indexes
-		query = anotherIndexManager.createScope( indexManager ).query()
+		query = otherIndex.createScope( mainIndex ).query()
 				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void reuseSortInstance_onScopeTargetingDifferentIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchSort sort = scope
 				.sort().field( "string" ).asc().missing().last().toSort();
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
 		Assertions.assertThatThrownBy( () ->
-				anotherIndexManager.createScope().query()
+				otherIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 
 		// reuse the same sort instance on a different scope,
 		// targeting different indexes
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope( anotherIndexManager ).query()
+				mainIndex.createScope( otherIndex ).query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 	}
 
 	@Test
@@ -254,16 +240,16 @@ public class SearchSortIT {
 				.extension( new SupportedExtension() ).field( "string" ).missing().last()
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension( new SupportedExtension() ).field( "string" ).desc().missing().last()
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Mandatory extension, unsupported
 		Assertions.assertThatThrownBy(
-				() -> indexManager.createScope().sort().extension( new UnSupportedExtension() )
+				() -> mainIndex.createScope().sort().extension( new UnSupportedExtension() )
 		)
 				.isInstanceOf( SearchException.class );
 
@@ -281,7 +267,7 @@ public class SearchSortIT {
 						.orElseFail()
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
@@ -295,7 +281,7 @@ public class SearchSortIT {
 						.orElseFail()
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Conditional extensions with orElse - two, second supported
 		query = simpleQuery( b -> b
@@ -311,7 +297,7 @@ public class SearchSortIT {
 						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
@@ -325,7 +311,7 @@ public class SearchSortIT {
 						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = simpleQuery( b -> b
@@ -343,7 +329,7 @@ public class SearchSortIT {
 						)
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
@@ -359,45 +345,45 @@ public class SearchSortIT {
 						)
 		);
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts
 		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( indexMapping.string, "george" );
-			document.addValue( indexMapping.string_analyzed_forScore, "Hooray Hooray" );
-			document.addValue( indexMapping.unsortable, "george" );
+			document.addValue( mainIndex.binding().string, "george" );
+			document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray" );
+			document.addValue( mainIndex.binding().unsortable, "george" );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( indexMapping.string, "aaron" );
-			document.addValue( indexMapping.string_analyzed_forScore, "Hooray Hooray Hooray" );
-			document.addValue( indexMapping.unsortable, "aaron" );
+			document.addValue( mainIndex.binding().string, "aaron" );
+			document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray Hooray" );
+			document.addValue( mainIndex.binding().unsortable, "aaron" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( indexMapping.string, "zach" );
-			document.addValue( indexMapping.string_analyzed_forScore, "Hooray" );
-			document.addValue( indexMapping.unsortable, "zach" );
+			document.addValue( mainIndex.binding().string, "zach" );
+			document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray" );
+			document.addValue( mainIndex.binding().unsortable, "zach" );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> string_analyzed_forScore;
 		final IndexFieldReference<String> unsortable;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 			string_analyzed_forScore = root.field(

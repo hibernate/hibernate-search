@@ -15,6 +15,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+
 import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
@@ -23,12 +25,11 @@ import org.junit.Test;
 public class ElasticsearchAnalysisConfigurerIT {
 
 	private static final String BACKEND_NAME = "BackendName";
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Test
 	public void error_invalidReference() {
@@ -317,10 +318,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 						"backends." + BACKEND_NAME + "." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						analysisConfigurer
 				)
-				.withIndex(
-						INDEX_NAME,
-						mappingContributor
-				)
+				.withIndex( StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor ) )
 				.setup();
 	}
 }

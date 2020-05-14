@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
@@ -26,8 +25,6 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -188,42 +185,6 @@ public class SearchSetupHelper implements TestRule {
 							+ "." + BackendSettings.INDEX_DEFAULTS + "." + keyRadical,
 					value
 			);
-		}
-
-		public SetupContext withIndex(String rawIndexName,
-				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			return withIndex( rawIndexName, ignored -> { }, mappingContributor, listener );
-		}
-
-		public SetupContext withIndex(String rawIndexName, Consumer<? super IndexedEntityBindingContext> mappingContributor) {
-			return withIndex( rawIndexName, mappingContributor, ignored -> { } );
-		}
-
-		public SetupContext withIndex(String rawIndexName,
-				Consumer<? super StubTypeMappingConfigurationContext> optionsContributor,
-				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			StubTypeMappingConfigurationContext configurationContext = new StubTypeMappingConfigurationContext();
-			optionsContributor.accept( configurationContext );
-
-			return withIndex(
-					new StubMappedIndex() {
-						@Override
-						protected void bind(IndexedEntityBindingContext context) {
-							mappingContributor.accept( context );
-						}
-
-						@Override
-						protected void onIndexManagerCreated(MappedIndexManager manager) {
-							super.onIndexManagerCreated( manager );
-							listener.onSetup( this );
-						}
-					}
-							.name( rawIndexName )
-							// Use the index name for the type name by default.
-							// Tests are easier to write if we can just have one constant for the index name.
-							.typeName( configurationContext.typeName != null ? configurationContext.typeName : rawIndexName )
-							.backendName( configurationContext.backendName )
-				);
 		}
 
 		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {

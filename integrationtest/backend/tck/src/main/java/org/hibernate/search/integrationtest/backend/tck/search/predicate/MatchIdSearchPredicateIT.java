@@ -11,29 +11,26 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.util.Arrays;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MatchIdSearchPredicateIT {
+import org.assertj.core.api.Assertions;
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_ID_CONVERTER_INDEX_NAME = "IndexWithCompatibleIdConverter";
-	private static final String INCOMPATIBLE_ID_CONVERTER_INDEX_NAME = "IndexWithIncompatibleIdConverter";
+public class MatchIdSearchPredicateIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -42,50 +39,38 @@ public class MatchIdSearchPredicateIT {
 	private static final String INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 = "incompatibleIdConverter_document1";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private StubMappingIndexManager indexManager;
-	private StubMappingIndexManager compatibleIdConverterIndexManager;
-	private StubMappingIndexManager incompatibleIdConverterIndexManager;
+	private final StubMappedIndex mainIndex =
+			StubMappedIndex.withoutFields().name( "main" );
+	private final StubMappedIndex compatibleIdConverterIndex =
+			StubMappedIndex.withoutFields().name( "compatibleIdConverter" );
+	private final StubMappedIndex incompatibleIdConverterIndex =
+			StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( new IncompatibleIdConverter() ) )
+					.name( "incompatibleIdConverter" );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { }, // Nothing to do, we don't need any field in the mapping
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_ID_CONVERTER_INDEX_NAME,
-						ctx -> { }, // Nothing to do, we don't need any field in the mapping
-						indexManager -> this.compatibleIdConverterIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_ID_CONVERTER_INDEX_NAME,
-						ctx -> ctx.idDslConverter( new IncompatibleIdConverter() ),
-						indexManager -> this.incompatibleIdConverterIndexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( mainIndex, compatibleIdConverterIndex, incompatibleIdConverterIndex ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void matching() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void matching_then_matching() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -95,12 +80,12 @@ public class MatchIdSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
 	public void matching_then_matchingAny() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -110,12 +95,12 @@ public class MatchIdSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void matchingAny_singleElement() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -124,12 +109,12 @@ public class MatchIdSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void matchingAny_multipleElements() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id()
@@ -138,26 +123,26 @@ public class MatchIdSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
 	public void multiIndex_withCompatibleIdConverterIndexManager_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( compatibleIdConverterIndexManager );
+		StubMappingScope scope = mainIndex.createScope( compatibleIdConverterIndex );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id().matching( DOCUMENT_1 ).matching( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1 );
-			b.doc( COMPATIBLE_ID_CONVERTER_INDEX_NAME, COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( compatibleIdConverterIndex.typeName(), COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
 		} );
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIdConverterIndexManager_dslConverterEnabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIdConverterIndexManager );
+	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().id().matching( new Object() /* Value does not matter */ )
@@ -165,13 +150,13 @@ public class MatchIdSearchPredicateIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types for identifier" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_ID_CONVERTER_INDEX_NAME )
+						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIdConverterIndex.name() )
 				) );
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIdConverterIndexManager_dslConverterDisabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIdConverterIndexManager );
+	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.NO )
@@ -179,45 +164,45 @@ public class MatchIdSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, DOCUMENT_1 );
-			b.doc( INCOMPATIBLE_ID_CONVERTER_INDEX_NAME, INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( incompatibleIdConverterIndex.typeName(), INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
 		} );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> { } );
 		plan.execute().join();
 
-		plan = compatibleIdConverterIndexManager.createIndexingPlan();
+		plan = compatibleIdConverterIndex.createIndexingPlan();
 		plan.add( referenceProvider( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ), document -> { } );
 		plan.execute().join();
 
-		plan = incompatibleIdConverterIndexManager.createIndexingPlan();
+		plan = incompatibleIdConverterIndex.createIndexingPlan();
 		plan.add( referenceProvider( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 ), document -> { } );
 		plan.execute().join();
 
 		// Check that all documents are searchable
 		assertThat(
-				indexManager.createScope().query()
+				mainIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.toQuery()
 		)
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		assertThat(
-				compatibleIdConverterIndexManager.createScope().query()
+				compatibleIdConverterIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.toQuery()
 		)
-				.hasDocRefHitsAnyOrder( COMPATIBLE_ID_CONVERTER_INDEX_NAME, COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( compatibleIdConverterIndex.typeName(), COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
 		assertThat(
-				incompatibleIdConverterIndexManager.createScope().query()
+				incompatibleIdConverterIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.toQuery()
 		)
-				.hasDocRefHitsAnyOrder( INCOMPATIBLE_ID_CONVERTER_INDEX_NAME, INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( incompatibleIdConverterIndex.typeName(), INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
 	}
 
 	private static class IncompatibleIdConverter implements ToDocumentIdentifierValueConverter<String> {

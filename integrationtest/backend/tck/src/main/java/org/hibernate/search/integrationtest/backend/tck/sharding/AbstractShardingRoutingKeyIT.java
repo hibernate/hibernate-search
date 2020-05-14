@@ -36,7 +36,7 @@ import org.junit.Test;
 public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	@Rule
-	public SearchSetupHelper setupHelper;
+	public final SearchSetupHelper setupHelper;
 
 	private final Set<String> routingKeys;
 	private final int documentCountPerRoutingKey;
@@ -46,6 +46,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	public AbstractShardingRoutingKeyIT(Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction,
 			Set<String> routingKeys) {
+		super( RoutingMode.EXPLICIT_ROUTING_KEYS );
 		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
 		this.routingKeys = routingKeys;
 		documentCountPerRoutingKey = 100;
@@ -56,12 +57,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	public void setup() {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start();
 		configure( setupContext );
-		setupContext.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx, RoutingMode.EXPLICIT_ROUTING_KEYS ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupContext.withIndex( index ).setup();
 
 		// Provide explicit routing keys when indexing
 		for ( String routingKey : routingKeys ) {
@@ -82,7 +78,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@TestForIssue(jiraKey = "HSEARCH-3314")
 	public void search() {
 		// No routing key => all documents should be returned
-		SearchResultAssert.assertThat( indexManager.createScope().query()
+		SearchResultAssert.assertThat( index.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
@@ -100,7 +96,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		 * and only those documents.
 		 */
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( someRoutingKey )
 						.toQuery()
@@ -119,7 +115,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		 */
 		List<String> twoRoutingKeys = Arrays.asList( someRoutingKey, someOtherRoutingKey );
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( twoRoutingKeys )
 						.toQuery()
@@ -129,7 +125,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( twoRoutingKeys, docIdByRoutingKey ) );
 
 		// All routing keys => all documents should be returned
-		SearchResultAssert.assertThat( indexManager.createScope().query()
+		SearchResultAssert.assertThat( index.createScope().query()
 				.where( f -> f.matchAll() )
 				.routing( docIdByRoutingKey.keySet() )
 				.toQuery()
@@ -142,11 +138,11 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_noRoutingKey() {
-		indexManager.createWorkspace().purge( Collections.emptySet() ).join();
+		index.createWorkspace().purge( Collections.emptySet() ).join();
 
 		// No routing key => all documents should be purged
-		indexManager.createWorkspace().refresh().join();
-		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasNoHits();
 	}
 
@@ -159,14 +155,14 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
 		otherRoutingKeys.remove( someRoutingKey );
 
-		indexManager.createWorkspace().purge( Collections.singleton( someRoutingKey ) ).join();
+		index.createWorkspace().purge( Collections.singleton( someRoutingKey ) ).join();
 
 		/*
 		 * One routing key => all documents indexed with that routing key should be purged,
 		 * and only those documents.
 		 */
-		indexManager.createWorkspace().refresh().join();
-		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
 	}
@@ -185,14 +181,14 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
 		otherRoutingKeys.removeAll( twoRoutingKeys );
 
-		indexManager.createWorkspace().purge( twoRoutingKeys ).join();
+		index.createWorkspace().purge( twoRoutingKeys ).join();
 
 		/*
 		 * Two routing keys => all documents indexed with these routing keys should be returned,
 		 * and only those documents.
 		 */
-		indexManager.createWorkspace().refresh().join();
-		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
 	}
@@ -205,11 +201,11 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 				TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys()
 		);
 
-		indexManager.createWorkspace().purge( routingKeys ).join();
+		index.createWorkspace().purge( routingKeys ).join();
 
 		// All routing keys => all documents should be purged
-		indexManager.createWorkspace().refresh().join();
-		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		index.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasNoHits();
 	}
 

@@ -22,7 +22,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 
@@ -38,11 +38,6 @@ import com.google.gson.JsonObject;
  */
 @RunWith(Parameterized.class)
 public class ElasticsearchTypeNameMappingBaseIT {
-
-	private static final String TYPE1_NAME = "type1_name";
-	private static final String INDEX1_NAME = "index1_name";
-	private static final String TYPE2_NAME = "type2_name";
-	private static final String INDEX2_NAME = "index2_name";
 
 	private static final String ID_1 = "id_1";
 	private static final String ID_2 = "id_2";
@@ -62,17 +57,17 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
+	private final StubMappedIndex index1 = StubMappedIndex.withoutFields().name( "index1" );
+	private final StubMappedIndex index2 = StubMappedIndex.withoutFields().name( "index2" );
+
 	private final String strategyName;
 	private final JsonObject expectedMappingContent;
 	private final IrregularIndexNameSupport irregularIndexNameSupport;
-
-	private StubMappingIndexManager index1Manager;
-	private StubMappingIndexManager index2Manager;
 
 	public ElasticsearchTypeNameMappingBaseIT(String strategyName, JsonObject expectedMappingContent,
 			IrregularIndexNameSupport irregularIndexNameSupport) {
@@ -85,11 +80,11 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	public void singleIndexScope() {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 		SearchResultAssert.assertThat(
-				index1Manager.createScope().query().where( f -> f.matchAll() ).toQuery()
+				index1.createScope().query().where( f -> f.matchAll() ).toQuery()
 		)
 				.hasDocRefHitsAnyOrder( c -> c
-						.doc( TYPE1_NAME, ID_1 )
-						.doc( TYPE1_NAME, ID_2 )
+						.doc( index1.typeName(), ID_1 )
+						.doc( index1.typeName(), ID_2 )
 				);
 	}
 
@@ -98,13 +93,13 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
 		SearchResultAssert.assertThat(
-				index1Manager.createScope( index2Manager ).query().where( f -> f.matchAll() ).toQuery()
+				index1.createScope( index2 ).query().where( f -> f.matchAll() ).toQuery()
 		)
 				.hasDocRefHitsAnyOrder( c -> c
-						.doc( TYPE1_NAME, ID_1 )
-						.doc( TYPE1_NAME, ID_2 )
-						.doc( TYPE2_NAME, ID_1 )
-						.doc( TYPE2_NAME, ID_2 )
+						.doc( index1.typeName(), ID_1 )
+						.doc( index1.typeName(), ID_2 )
+						.doc( index2.typeName(), ID_1 )
+						.doc( index2.typeName(), ID_2 )
 				);
 	}
 
@@ -113,15 +108,15 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
-		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
+		SearchQuery<DocumentReference> query = index1.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		// Should work even if the index has an irregular name: the selected type-name mapping strategy is not actually used.
 		SearchResultAssert.assertThat( query )
 				.hasDocRefHitsAnyOrder( c -> c
-						.doc( TYPE1_NAME, ID_1 )
-						.doc( TYPE1_NAME, ID_2 )
+						.doc( index1.typeName(), ID_1 )
+						.doc( index1.typeName(), ID_2 )
 				);
 	}
 
@@ -130,17 +125,17 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
-		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
+		SearchQuery<DocumentReference> query = index1.createScope( index2 ).query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		if ( IrregularIndexNameSupport.YES.equals( irregularIndexNameSupport ) ) {
 			SearchResultAssert.assertThat( query )
 					.hasDocRefHitsAnyOrder( c -> c
-							.doc( TYPE1_NAME, ID_1 )
-							.doc( TYPE1_NAME, ID_2 )
-							.doc( TYPE2_NAME, ID_1 )
-							.doc( TYPE2_NAME, ID_2 )
+							.doc( index1.typeName(), ID_1 )
+							.doc( index1.typeName(), ID_2 )
+							.doc( index2.typeName(), ID_1 )
+							.doc( index2.typeName(), ID_2 )
 					);
 		}
 		else {
@@ -154,15 +149,15 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
-		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
+		SearchQuery<DocumentReference> query = index1.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		// Should work even if the index has an irregular name: the selected type-name mapping strategy is not actually used.
 		SearchResultAssert.assertThat( query )
 				.hasDocRefHitsAnyOrder( c -> c
-						.doc( TYPE1_NAME, ID_1 )
-						.doc( TYPE1_NAME, ID_2 )
+						.doc( index1.typeName(), ID_1 )
+						.doc( index1.typeName(), ID_2 )
 				);
 	}
 
@@ -171,17 +166,17 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
-		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
+		SearchQuery<DocumentReference> query = index1.createScope( index2 ).query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		if ( IrregularIndexNameSupport.YES.equals( irregularIndexNameSupport ) ) {
 			SearchResultAssert.assertThat( query )
 					.hasDocRefHitsAnyOrder( c -> c
-							.doc( TYPE1_NAME, ID_1 )
-							.doc( TYPE1_NAME, ID_2 )
-							.doc( TYPE2_NAME, ID_1 )
-							.doc( TYPE2_NAME, ID_2 )
+							.doc( index1.typeName(), ID_1 )
+							.doc( index1.typeName(), ID_2 )
+							.doc( index2.typeName(), ID_1 )
+							.doc( index2.typeName(), ID_2 )
 					);
 		}
 		else {
@@ -191,30 +186,30 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	private void createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases() {
-		URLEncodedString index1PrimaryName = IndexNames.encodeName( INDEX1_NAME + "-000001-somesuffix-000001" );
-		URLEncodedString index1WriteAlias = defaultWriteAlias( INDEX1_NAME );
-		URLEncodedString index1ReadAlias = defaultReadAlias( INDEX1_NAME );
+		URLEncodedString index1PrimaryName = IndexNames.encodeName( index1.name() + "-000001-somesuffix-000001" );
+		URLEncodedString index1WriteAlias = defaultWriteAlias( index1.name() );
+		URLEncodedString index1ReadAlias = defaultReadAlias( index1.name() );
 		elasticsearchClient.index( index1PrimaryName, index1WriteAlias, index1ReadAlias )
 				.deleteAndCreate()
 				.type().putMapping( expectedMappingContent );
-		URLEncodedString index2PrimaryName = IndexNames.encodeName( INDEX2_NAME + "-000001-somesuffix-000001" );
-		URLEncodedString index2WriteAlias = defaultWriteAlias( INDEX2_NAME );
-		URLEncodedString index2ReadAlias = defaultReadAlias( INDEX2_NAME );
+		URLEncodedString index2PrimaryName = IndexNames.encodeName( index2.name() + "-000001-somesuffix-000001" );
+		URLEncodedString index2WriteAlias = defaultWriteAlias( index2.name() );
+		URLEncodedString index2ReadAlias = defaultReadAlias( index2.name() );
 		elasticsearchClient.index( index2PrimaryName, index2WriteAlias, index2ReadAlias )
 				.deleteAndCreate()
 				.type().putMapping( expectedMappingContent );
 	}
 
 	private void createIndexesWithIncorrectNamingSchemeAndCorrectAliases() {
-		URLEncodedString index1PrimaryName = IndexNames.encodeName( INDEX1_NAME + "-somesuffix" );
-		URLEncodedString index1WriteAlias = defaultWriteAlias( INDEX1_NAME );
-		URLEncodedString index1ReadAlias = defaultReadAlias( INDEX1_NAME );
+		URLEncodedString index1PrimaryName = IndexNames.encodeName( index1.name() + "-somesuffix" );
+		URLEncodedString index1WriteAlias = defaultWriteAlias( index1.name() );
+		URLEncodedString index1ReadAlias = defaultReadAlias( index1.name() );
 		elasticsearchClient.index( index1PrimaryName, index1WriteAlias, index1ReadAlias )
 				.deleteAndCreate()
 				.type().putMapping( expectedMappingContent );
-		URLEncodedString index2PrimaryName = IndexNames.encodeName( INDEX2_NAME + "-somesuffix" );
-		URLEncodedString index2WriteAlias = defaultWriteAlias( INDEX2_NAME );
-		URLEncodedString index2ReadAlias = defaultReadAlias( INDEX2_NAME );
+		URLEncodedString index2PrimaryName = IndexNames.encodeName( index2.name() + "-somesuffix" );
+		URLEncodedString index2WriteAlias = defaultWriteAlias( index2.name() );
+		URLEncodedString index2ReadAlias = defaultReadAlias( index2.name() );
 		elasticsearchClient.index( index2PrimaryName, index2WriteAlias, index2ReadAlias )
 				.deleteAndCreate()
 				.type().putMapping( expectedMappingContent );
@@ -226,30 +221,19 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.withBackendProperty(
 						ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
 				)
-				.withIndex(
-						INDEX1_NAME,
-						options -> options.mappedType( TYPE1_NAME ),
-						ignored -> { },
-						indexManager -> this.index1Manager = indexManager
-				)
-				.withIndex(
-						INDEX2_NAME,
-						options -> options.mappedType( TYPE2_NAME ),
-						ignored -> { },
-						indexManager -> this.index2Manager = indexManager
-				)
+				.withIndexes( index1, index2 )
 				.setup();
 
 		initData();
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index1Manager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index1.createIndexingPlan();
 		plan.add( referenceProvider( ID_1 ), document -> { } );
 		plan.add( referenceProvider( ID_2 ), document -> { } );
 		plan.execute().join();
 
-		plan = index2Manager.createIndexingPlan();
+		plan = index2.createIndexingPlan();
 		plan.add( referenceProvider( ID_1 ), document -> { } );
 		plan.add( referenceProvider( ID_2 ), document -> { } );
 		plan.execute().join();

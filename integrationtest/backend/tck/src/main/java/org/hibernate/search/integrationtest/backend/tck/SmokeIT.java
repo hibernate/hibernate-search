@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -33,90 +33,81 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 public class SmokeIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void where_match() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "string_analyzed" ).matching( "text" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3" )
 				.hasTotalHitCount( 3 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "integer" ).matching( 1 ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "flattenedObject.string" ).matching( "text 1_1" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void where_range() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.range().field( "string" ).between( "text 2", "text 42" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.where( f -> f.range().field( "string_analyzed" ).between( "2", "42" ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.where( f -> f.range().field( "integer" ).between( 2, 42 ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
@@ -126,20 +117,20 @@ public class SmokeIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "2" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.range().field( "flattenedObject.integer" ).between( 201, 242 ) )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "2" )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void where_boolean() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -148,7 +139,7 @@ public class SmokeIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
@@ -158,7 +149,7 @@ public class SmokeIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
@@ -168,13 +159,13 @@ public class SmokeIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "3" )
 				.hasTotalHitCount( 2 );
 	}
 
 	@Test
 	public void where_nested() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		// Without nested storage, we expect predicates to be able to match on different objects
 		SearchQuery<DocumentReference> query = scope.query()
@@ -184,7 +175,7 @@ public class SmokeIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 //		TODO HSEARCH-3752 with implicit nested predicates, this is not true anymore:
@@ -219,20 +210,20 @@ public class SmokeIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void where_searchPredicate() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( "text 1" ).toPredicate();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( predicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		predicate = scope.predicate().range().field( "integer" ).between( 1, 2 ).toPredicate();
@@ -240,7 +231,7 @@ public class SmokeIT {
 				.where( predicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" )
 				.hasTotalHitCount( 2 );
 
 		predicate = scope.predicate().bool()
@@ -251,66 +242,66 @@ public class SmokeIT {
 				.where( predicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" )
 				.hasTotalHitCount( 2 );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
-			document.addValue( indexMapping.string, "text 1" );
-			document.addValue( indexMapping.string_analyzed, "text 1" );
-			document.addValue( indexMapping.integer, 1 );
-			document.addValue( indexMapping.localDate, LocalDate.of( 2018, 1, 1 ) );
-			document.addValue( indexMapping.geoPoint, GeoPoint.of( 0, 1 ) );
+			document.addValue( index.binding().string, "text 1" );
+			document.addValue( index.binding().string_analyzed, "text 1" );
+			document.addValue( index.binding().integer, 1 );
+			document.addValue( index.binding().localDate, LocalDate.of( 2018, 1, 1 ) );
+			document.addValue( index.binding().geoPoint, GeoPoint.of( 0, 1 ) );
 
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 1_1" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 101 );
-			flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 1_2" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 102 );
+			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+			flattenedObject.addValue( index.binding().flattenedObject.string, "text 1_1" );
+			flattenedObject.addValue( index.binding().flattenedObject.integer, 101 );
+			flattenedObject = document.addObject( index.binding().flattenedObject.self );
+			flattenedObject.addValue( index.binding().flattenedObject.string, "text 1_2" );
+			flattenedObject.addValue( index.binding().flattenedObject.integer, 102 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "text 1_1" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 101 );
-			nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "text 1_2" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 102 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, "text 1_1" );
+			nestedObject.addValue( index.binding().nestedObject.integer, 101 );
+			nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, "text 1_2" );
+			nestedObject.addValue( index.binding().nestedObject.integer, 102 );
 		} );
 
 		plan.add( referenceProvider( "2" ), document -> {
-			document.addValue( indexMapping.string, "text 2" );
-			document.addValue( indexMapping.string_analyzed, "text 2" );
-			document.addValue( indexMapping.integer, 2 );
-			document.addValue( indexMapping.localDate, LocalDate.of( 2018, 1, 2 ) );
-			document.addValue( indexMapping.geoPoint, GeoPoint.of( 0, 2 ) );
+			document.addValue( index.binding().string, "text 2" );
+			document.addValue( index.binding().string_analyzed, "text 2" );
+			document.addValue( index.binding().integer, 2 );
+			document.addValue( index.binding().localDate, LocalDate.of( 2018, 1, 2 ) );
+			document.addValue( index.binding().geoPoint, GeoPoint.of( 0, 2 ) );
 
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 2_1" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 201 );
-			flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 2_2" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 202 );
+			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+			flattenedObject.addValue( index.binding().flattenedObject.string, "text 2_1" );
+			flattenedObject.addValue( index.binding().flattenedObject.integer, 201 );
+			flattenedObject = document.addObject( index.binding().flattenedObject.self );
+			flattenedObject.addValue( index.binding().flattenedObject.string, "text 2_2" );
+			flattenedObject.addValue( index.binding().flattenedObject.integer, 202 );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "text 2_1" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 201 );
-			nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "text 2_2" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 202 );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, "text 2_1" );
+			nestedObject.addValue( index.binding().nestedObject.integer, 201 );
+			nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, "text 2_2" );
+			nestedObject.addValue( index.binding().nestedObject.integer, 202 );
 		} );
 
 		plan.add( referenceProvider( "3" ), document -> {
-			document.addValue( indexMapping.string, "text 3" );
-			document.addValue( indexMapping.string_analyzed, "text 3" );
-			document.addValue( indexMapping.integer, 3 );
+			document.addValue( index.binding().string, "text 3" );
+			document.addValue( index.binding().string_analyzed, "text 3" );
+			document.addValue( index.binding().integer, 3 );
 		} );
 
 		plan.add( referenceProvider( "neverMatching" ), document -> {
-			document.addValue( indexMapping.string, "never matching" );
-			document.addValue( indexMapping.string_analyzed, "never matching" );
-			document.addValue( indexMapping.integer, 9484 );
+			document.addValue( index.binding().string, "never matching" );
+			document.addValue( index.binding().string_analyzed, "never matching" );
+			document.addValue( index.binding().integer, 9484 );
 		} );
 
 		plan.add( referenceProvider( "empty" ), document -> { } );
@@ -318,15 +309,15 @@ public class SmokeIT {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3", "neverMatching", "empty" );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> string_analyzed;
 		final IndexFieldReference<Integer> integer;
@@ -335,7 +326,7 @@ public class SmokeIT {
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 			string_analyzed = root.field(
 					"string_analyzed",

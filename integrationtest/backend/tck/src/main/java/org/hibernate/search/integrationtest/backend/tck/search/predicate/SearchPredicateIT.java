@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -35,9 +35,6 @@ import org.assertj.core.api.Assertions;
 
 public class SearchPredicateIT {
 
-	private static final String INDEX_NAME = "IndexName";
-	private static final String ANOTHER_INDEX_NAME = "AnotherIndexName";
-
 	private static final String DOCUMENT_1 = "doc1";
 	private static final String DOCUMENT_2 = "doc2";
 	private static final String EMPTY = "empty";
@@ -46,36 +43,25 @@ public class SearchPredicateIT {
 	private static final String STRING_2 = "Auster";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private StubMappingIndexManager anotherIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> otherIndex =
+			// Using the same mapping here. But a different mapping would work the same.
+			// What matters here is that is a different index.
+			SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						ANOTHER_INDEX_NAME,
-						// Using the same mapping here. But a different mapping would work the same.
-						// What matters here is that is a different index.
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.anotherIndexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void where_searchPredicate() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
@@ -84,24 +70,24 @@ public class SearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void where_lambda() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void predicate_searchPredicate() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
@@ -110,24 +96,24 @@ public class SearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void predicate_lambda() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
@@ -135,67 +121,67 @@ public class SearchPredicateIT {
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
-		query = indexManager.createScope().query()
+		query = mainIndex.createScope().query()
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
-		predicate = indexManager.createScope( anotherIndexManager )
+		predicate = mainIndex.createScope( otherIndex )
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting same indexes
-		query = anotherIndexManager.createScope( indexManager ).query()
+		query = otherIndex.createScope( mainIndex ).query()
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void reuseRootPredicateInstance_onScopeTargetingDifferentIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
 		Assertions.assertThatThrownBy( () ->
-				anotherIndexManager.createScope().query()
+				otherIndex.createScope().query()
 						.where( predicate )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope( anotherIndexManager ).query()
+				mainIndex.createScope( otherIndex ).query()
 						.where( predicate )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 	}
 
 	@Test
 	public void reuseNonRootPredicateInstance_onScopeTargetingSameIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		final SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
@@ -203,76 +189,76 @@ public class SearchPredicateIT {
 				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
 				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
-		query = indexManager.createScope().query()
+		query = mainIndex.createScope().query()
 				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
-		final SearchPredicate multiIndexScopedPredicate = indexManager.createScope( anotherIndexManager )
+		final SearchPredicate multiIndexScopedPredicate = mainIndex.createScope( otherIndex )
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting same indexes
-		query = anotherIndexManager.createScope( indexManager ).query()
+		query = otherIndex.createScope( mainIndex ).query()
 				.where( f -> f.bool().must( multiIndexScopedPredicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
-		query = anotherIndexManager.createScope( indexManager ).query()
+		query = otherIndex.createScope( mainIndex ).query()
 				.where( f -> f.bool()
 						.should( multiIndexScopedPredicate )
 						.should( f.match().field( "string" ).matching( STRING_2 ) )
 				)
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void reuseNonRootPredicateInstance_onScopeTargetingDifferentIndexes() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
 		Assertions.assertThatThrownBy( () ->
-				anotherIndexManager.createScope().query()
+				otherIndex.createScope().query()
 						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope( anotherIndexManager ).query()
+				mainIndex.createScope( otherIndex ).query()
 						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( ANOTHER_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( otherIndex.name() );
 	}
 
 	@Test
 	public void extension() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
@@ -282,7 +268,7 @@ public class SearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Mandatory extension, unsupported
 		Assertions.assertThatThrownBy(
@@ -305,7 +291,7 @@ public class SearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, second supported
 		query = scope.query()
@@ -324,7 +310,7 @@ public class SearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = scope.query()
@@ -343,27 +329,27 @@ public class SearchPredicateIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.string, STRING_1 );
+			document.addValue( mainIndex.binding().string, STRING_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.string, STRING_2 );
+			document.addValue( mainIndex.binding().string, STRING_2 );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}
 
 	private static <T, R> Function<T, R> shouldNotBeCalled() {
@@ -372,10 +358,10 @@ public class SearchPredicateIT {
 		};
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 		}
 	}

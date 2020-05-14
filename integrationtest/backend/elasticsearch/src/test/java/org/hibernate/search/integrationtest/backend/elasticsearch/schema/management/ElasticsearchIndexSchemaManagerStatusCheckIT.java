@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -39,22 +39,20 @@ import org.junit.runners.Parameterized.Parameters;
 @TestForIssue(jiraKey = "HSEARCH-2456")
 public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
 		return ElasticsearchIndexSchemaManagerOperation.statusChecking();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private StubMappingIndexManager indexManager;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
 	public ElasticsearchIndexSchemaManagerStatusCheckIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
@@ -66,7 +64,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
-		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
+		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
 		setupAndInspectIndexExpectingFailure( "HSEARCH400050" );
 	}
@@ -88,7 +86,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 						"{'number_of_replicas': 5}"
 				);
 
-		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
+		elasticSearchClient.index( index.name() ).ensureDoesNotExist();
 
 		setupAndInspectIndexExpectingFailure( "HSEARCH400024", "100ms" );
 	}
@@ -110,7 +108,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 						"{'number_of_replicas': 5}"
 				);
 
-		elasticSearchClient.index( INDEX_NAME )
+		elasticSearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization( "" )
@@ -143,10 +141,10 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 
 }

@@ -19,17 +19,13 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class AbstractSpatialWithinSearchPredicateIT {
-
-	protected static final String INDEX_NAME = "IndexName";
-	protected static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	protected static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
 	protected static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
 	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687,4.835233 );
@@ -46,84 +42,68 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	protected static final String EMPTY_ID = "empty";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	protected IndexMapping indexMapping;
-	protected StubMappingIndexManager indexManager;
-
-	protected StubMappingIndexManager compatibleIndexManager;
-
-	// TODO HSEARCH-3593 test other incompatibilities ( projection, sort and so on and so forth )
-	protected StubMappingIndexManager unsearchableFieldsIndexManager;
+	protected final SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	protected final SimpleMappedIndex<IndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	// TODO HSEARCH-3593 test incompatibilities ( projection, sort and so on and so forth )
+	protected final SimpleMappedIndex<UnsearchableFieldsIndexBinding> unsearchableFieldsIndex =
+			SimpleMappedIndex.of( UnsearchableFieldsIndexBinding::new ).name( "unsearchableFields" );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						UNSEARCHABLE_FIELDS_INDEX_NAME,
-						ctx -> new UnsearchableFieldsIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.unsearchableFieldsIndexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndexes( mainIndex, compatibleIndex, unsearchableFieldsIndex ).setup();
 
 		initData();
 	}
 
 	protected void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			document.addValue( indexMapping.string, OURSON_QUI_BOIT_STRING );
-			document.addValue( indexMapping.geoPoint, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
+			document.addValue( mainIndex.binding().string, OURSON_QUI_BOIT_STRING );
+			document.addValue( mainIndex.binding().geoPoint, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
-			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
+			document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
-			document.addValue( indexMapping.geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( indexMapping.projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		plan.add( referenceProvider( IMOUTO_ID ), document -> {
-			document.addValue( indexMapping.string, IMOUTO_STRING );
-			document.addValue( indexMapping.geoPoint, IMOUTO_GEO_POINT );
-			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
+			document.addValue( mainIndex.binding().string, IMOUTO_STRING );
+			document.addValue( mainIndex.binding().geoPoint, IMOUTO_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
 					IMOUTO_GEO_POINT.getLongitude() - 1 ) );
-			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
+			document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
-			document.addValue( indexMapping.geoPoint_with_longName, IMOUTO_GEO_POINT );
-			document.addValue( indexMapping.projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint_with_longName, IMOUTO_GEO_POINT );
+			document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
 		} );
 		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			document.addValue( indexMapping.string, CHEZ_MARGOTTE_STRING );
-			document.addValue( indexMapping.geoPoint, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
+			document.addValue( mainIndex.binding().string, CHEZ_MARGOTTE_STRING );
+			document.addValue( mainIndex.binding().geoPoint, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
-			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
+			document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
-			document.addValue( indexMapping.geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( indexMapping.projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( mainIndex.binding().geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
 	}
 
-	protected static class IndexMapping {
+	protected static class IndexBinding {
 		final IndexFieldReference<GeoPoint> geoPoint;
 		final IndexFieldReference<GeoPoint> geoPoint_1;
 		final IndexFieldReference<GeoPoint> geoPoint_2;
@@ -133,7 +113,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		final IndexFieldReference<GeoPoint> projectableUnsortableGeoPoint;
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			geoPoint = root.field(
 					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
@@ -174,10 +154,10 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		}
 	}
 
-	protected static class UnsearchableFieldsIndexMapping {
+	protected static class UnsearchableFieldsIndexBinding {
 		final IndexFieldReference<GeoPoint> geoPoint;
 
-		UnsearchableFieldsIndexMapping(IndexSchemaElement root) {
+		UnsearchableFieldsIndexBinding(IndexSchemaElement root) {
 			geoPoint = root.field(
 					// make the field not searchable
 					"geoPoint", f -> f.asGeoPoint().searchable( Searchable.NO )

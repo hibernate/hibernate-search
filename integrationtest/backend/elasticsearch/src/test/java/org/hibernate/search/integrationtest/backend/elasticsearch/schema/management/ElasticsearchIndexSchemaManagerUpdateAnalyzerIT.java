@@ -13,7 +13,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ca
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
@@ -28,19 +28,17 @@ import org.junit.experimental.categories.Category;
 @Category(RequiresIndexOpenClose.class)
 public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private StubMappingIndexManager indexManager;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
 	public void nothingToDo() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -131,13 +129,13 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'char_filter': {"
@@ -216,13 +214,13 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_componentDefinition_missing() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					/*
@@ -298,13 +296,13 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_componentReference_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -390,13 +388,13 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_componentDefinition_invalid() throws Exception {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
+		elasticSearchClient.index( index.name() ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
@@ -479,7 +477,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
 				);
 	}
 
@@ -490,10 +488,10 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer()
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		indexManager.getSchemaManager().createOrUpdate().join();
+		index.getSchemaManager().createOrUpdate().join();
 	}
 
 }

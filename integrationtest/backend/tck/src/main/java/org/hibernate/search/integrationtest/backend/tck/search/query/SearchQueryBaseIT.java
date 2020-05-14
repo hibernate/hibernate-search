@@ -30,8 +30,8 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingContext;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -42,28 +42,19 @@ import org.assertj.core.api.Assertions;
 
 public class SearchQueryBaseIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private StubMappingIndexManager indexManager;
-	private IndexMapping indexMapping;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	public void getQueryString() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "string" ).matching( "platypus" ) )
@@ -74,7 +65,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void tookAndTimedOut() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -91,7 +82,7 @@ public class SearchQueryBaseIT {
 	public void extension() {
 		initData( 2 );
 
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -100,7 +91,7 @@ public class SearchQueryBaseIT {
 		// Mandatory extension, supported
 		QueryWrapper<DocumentReference> extendedQuery = query.extension( new SupportedQueryExtension<>() );
 		SearchResultAssert.assertThat( extendedQuery.extendedFetch() ).fromQuery( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, "0", "1" );
+				.hasDocRefHitsAnyOrder( index.typeName(), "0", "1" );
 
 		// Mandatory extension, unsupported
 		Assertions.assertThatThrownBy(
@@ -113,7 +104,7 @@ public class SearchQueryBaseIT {
 	public void context_extension() {
 		initData( 5 );
 
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension, supported
@@ -121,7 +112,7 @@ public class SearchQueryBaseIT {
 				.extension( new SupportedQueryDslExtension<>() )
 				.extendedFeature( "string", "value1", "value2" );
 		SearchResultAssert.assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, "1","2" );
+				.hasDocRefHitsExactOrder( index.typeName(), "1","2" );
 
 		// Mandatory extension, unsupported
 		Assertions.assertThatThrownBy(
@@ -132,25 +123,25 @@ public class SearchQueryBaseIT {
 	}
 
 	private void initData(int documentCount) {
-		indexManager.initAsync(
+		index.initAsync(
 				documentCount, i -> documentProvider(
 						String.valueOf( i ),
-						document -> document.addValue( indexMapping.string, "value" + i )
+						document -> document.addValue( index.binding().string, "value" + i )
 				)
 		).join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		SearchResultAssert.assertThat( query ).hasTotalHitCount( documentCount );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 		}

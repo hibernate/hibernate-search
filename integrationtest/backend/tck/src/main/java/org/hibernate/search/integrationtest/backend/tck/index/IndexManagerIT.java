@@ -29,23 +29,23 @@ public class IndexManagerIT {
 
 	private static final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private static Backend backend;
-	private static IndexManager indexManager;
+	private static Backend backendApi;
+	private static IndexManager indexApi;
 
 	@BeforeClass
 	public static void setup() {
 		SearchIntegration integration = setupHelper.start( BACKEND_NAME ).withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
-		backend = integration.getBackend( BACKEND_NAME );
-		indexManager = index.toApi();
+		backendApi = integration.getBackend( BACKEND_NAME );
+		indexApi = index.toApi();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void backend() {
-		assertThat( indexManager.backend() )
+		assertThat( indexApi.backend() )
 				.isNotNull()
-				.isSameAs( backend );
+				.isSameAs( backendApi );
 	}
 }

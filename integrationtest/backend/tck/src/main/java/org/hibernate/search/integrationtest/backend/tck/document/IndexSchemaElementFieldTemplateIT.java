@@ -18,6 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,11 +32,10 @@ import org.junit.Test;
  */
 public class IndexSchemaElementFieldTemplateIT {
 
-	private static final String TYPE_NAME = "TypeName";
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private StubMappedIndex index;
 
 	@Test
 	public void nullName() {
@@ -47,8 +47,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -62,8 +62,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -76,8 +76,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -90,8 +90,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -107,8 +107,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -121,8 +121,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -135,8 +135,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -149,8 +149,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
 						.build() );
@@ -166,8 +166,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
 								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
@@ -182,8 +182,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
 								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
@@ -198,8 +198,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
 								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
@@ -214,8 +214,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
 								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
@@ -234,8 +234,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "field template 'field1' was added twice" )
 						.build() );
@@ -251,8 +251,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
 						.failure( "field template 'field1' was added twice" )
 						.build() );
@@ -269,8 +269,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "field template 'field1' was added twice" )
 						.build() );
@@ -286,8 +286,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
 						.failure( "field template 'field1' was added twice" )
 						.build() );
@@ -304,8 +304,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure( "field template 'field1' was added twice" )
 						.build() );
@@ -321,8 +321,8 @@ public class IndexSchemaElementFieldTemplateIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
 						.failure( "field template 'field1' was added twice" )
 						.build() );
@@ -333,14 +333,8 @@ public class IndexSchemaElementFieldTemplateIT {
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						b -> b.mappedType( TYPE_NAME ),
-						mappingContributor,
-						ignored -> { }
-				)
-				.setup();
+		index = StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor ).typeName( "typeName" );
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 }

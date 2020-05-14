@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
@@ -32,22 +32,20 @@ import org.junit.runners.Parameterized.Parameters;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionCreationIT")
 public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
 		return ElasticsearchIndexSchemaManagerOperation.creating();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private StubMappingIndexManager indexManager;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
 	public ElasticsearchIndexSchemaManagerCreationAnalyzerIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
@@ -55,7 +53,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 
 	@Test
 	public void success_simple() throws Exception {
-		elasticSearchClient.index( INDEX_NAME )
+		elasticSearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
 
 		setupAndCreateIndex();
@@ -106,7 +104,7 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( index.name() ).settings( "index.analysis" ).get()
 				);
 	}
 
@@ -117,10 +115,10 @@ public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer()
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		operation.apply( indexManager.getSchemaManager() ).join();
+		operation.apply( index.getSchemaManager() ).join();
 	}
 
 }

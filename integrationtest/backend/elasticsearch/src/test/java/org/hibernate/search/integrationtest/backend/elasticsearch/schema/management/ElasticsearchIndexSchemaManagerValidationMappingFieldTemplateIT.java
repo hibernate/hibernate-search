@@ -10,12 +10,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForInitialization;
 
 import java.util.EnumSet;
-import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -40,7 +38,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
-	private static final String INDEX_NAME = "IndexName";
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	@Parameterized.Parameters(name = "With operation {0}")
@@ -49,7 +46,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
@@ -63,8 +60,18 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void success() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
+					.matchingPathGlob( "*_t1" );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) )
+					.matchingPathGlob( "*_t2" );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() )
+					.matchingPathGlob( "*_t3" );
+			root.objectFieldTemplate( "myTemplate4", ObjectFieldStorage.NESTED );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -91,21 +98,19 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() )
-					.matchingPathGlob( "*_t1" );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) )
-					.matchingPathGlob( "*_t2" );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() )
-					.matchingPathGlob( "*_t3" );
-			root.objectFieldTemplate( "myTemplate4", ObjectFieldStorage.NESTED );
-		} );
+		setupAndValidate( index );
 	}
 
 	@Test
 	public void missing() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -123,11 +128,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -138,8 +139,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -165,11 +172,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -180,8 +183,14 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void wrongOrder() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
+			root.fieldTemplate( "myTemplate3", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate2': {"
@@ -203,11 +212,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-			root.fieldTemplate( "myTemplate2", f -> f.asString().analyzer( "default" ) );
-			root.fieldTemplate( "myTemplate3", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -221,8 +226,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void duplicate() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
@@ -240,9 +249,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate1", f -> f.asInteger() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -256,8 +263,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_pathMatch_missing() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
+					.matchingPathGlob( "*_suffix" );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -271,10 +283,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
-					.matchingPathGlob( "*_suffix" );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -286,8 +295,13 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_pathMatch_invalid() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
+					.matchingPathGlob( "*_suffix" );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -302,10 +316,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
-					.matchingPathGlob( "*_suffix" );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -317,8 +328,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_pathMatch_extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -332,9 +347,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -346,8 +359,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_matchMappingType_missing() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -361,9 +378,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -375,8 +390,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_matchMappingType_invalid() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -391,9 +410,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -405,8 +422,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_matchMappingType_extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -421,9 +442,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -435,8 +454,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void attribute_extra() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -451,9 +474,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -465,8 +486,12 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 	@Test
 	public void mapping_invalid() {
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.fieldTemplate( "myTemplate", f -> f.asString() );
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
 				"{"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate': {"
@@ -480,9 +505,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 				+ "}"
 		);
 
-		assertThatThrownBy( () -> setupAndValidate( root -> {
-			root.fieldTemplate( "myTemplate", f -> f.asString() );
-		} ) )
+		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -493,9 +516,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 						.build() );
 	}
 
-	private void setupAndValidate(Consumer<? super IndexSchemaElement> binder) {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( binder ).name( INDEX_NAME );
-
+	private void setupAndValidate(StubMappedIndex index) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

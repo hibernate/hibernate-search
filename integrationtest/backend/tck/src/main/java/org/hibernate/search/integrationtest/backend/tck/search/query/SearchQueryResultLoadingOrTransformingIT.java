@@ -42,7 +42,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -53,8 +53,6 @@ import org.junit.Test;
 import org.easymock.EasyMockSupport;
 
 public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String MAIN_ID = "main";
 	private static final String EMPTY_ID = "empty";
@@ -70,20 +68,13 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	private static final String FLATTENED_OBJECT_STRING_VALUE = "flattened object string";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
@@ -91,8 +82,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3578")
 	public void defaultResultType() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
@@ -109,7 +100,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// No calls expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
 				.toQuery();
@@ -134,32 +125,32 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void selectEntityReference_noReferenceTransformer() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void selectEntity_noEntityLoading() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void selectEntityReference_referenceTransformer() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 
@@ -174,7 +165,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// No calls expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				index.createGenericScope();
 		SearchQuery<StubTransformedReference> referencesQuery = scope.query( loadingContextMock )
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
@@ -200,8 +191,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void selectEntity_referencesTransformer_entityLoading() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
@@ -218,7 +209,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// No calls expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.selectEntity()
 				.where( f -> f.matchAll() )
@@ -244,8 +235,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void select_referencesTransformer_entityLoading() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
@@ -262,7 +253,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// No calls expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				index.createGenericScope();
 		SearchQuery<List<?>> projectionsQuery = scope.query( loadingContextMock )
 				.select( f ->
 						f.composite(
@@ -304,8 +295,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void select_hitTransformer() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
@@ -314,7 +305,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
 				.select( f ->
 						f.composite(
@@ -351,8 +342,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void select_hitTransformer_referencesTransformer_entityLoading() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -372,7 +363,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// No calls expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				index.createGenericScope();
 		SearchQuery<StubTransformedHit> query = scope.query( loadingContextMock )
 				.select( f ->
 						f.composite(
@@ -420,32 +411,32 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void asEntityReference_noReferenceTransformer() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void asEntity_noEntityLoading() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void asProjection_hitTransformer() {
-		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
@@ -454,7 +445,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
 				.asProjection( f ->
 						f.composite(
@@ -491,7 +482,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void countQuery() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -521,7 +512,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 	@Test
 	public void countQueryWithProjection() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<String> query = scope.query()
 				.select( f -> f.field( "string", String.class ) )
@@ -546,7 +537,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		resetAll();
 		// No calls expected on the mocks
 		replayAll();
-		GenericStubMappingScope<DocumentReference, DocumentReference> scope = indexManager.createGenericScope();
+		GenericStubMappingScope<DocumentReference, DocumentReference> scope = index.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
 				.selectEntity()
 				.where( f -> f.matchAll() )
@@ -577,8 +568,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void failedEntityLoading_skipHit() {
-		DocumentReference mainDocumentReference = reference( INDEX_NAME, MAIN_ID );
-		DocumentReference emptyDocumentReference = reference( INDEX_NAME, EMPTY_ID );
+		DocumentReference mainDocumentReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyDocumentReference = reference( index.typeName(), EMPTY_ID );
 		StubTransformedReference mainEntityReference = new StubTransformedReference( mainDocumentReference );
 		StubTransformedReference emptyEntityReference = new StubTransformedReference( emptyDocumentReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyDocumentReference );
@@ -594,7 +585,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// No calls expected on the mocks
 		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
-				indexManager.createGenericScope();
+				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
 				.toQuery();
@@ -615,23 +606,23 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( MAIN_ID ), document -> {
-			document.addValue( indexMapping.string, STRING_VALUE );
-			document.addValue( indexMapping.string_analyzed, STRING_ANALYZED_VALUE );
-			document.addValue( indexMapping.integer, INTEGER_VALUE );
-			document.addValue( indexMapping.localDate, LOCAL_DATE_VALUE );
-			document.addValue( indexMapping.geoPoint, GEO_POINT_VALUE );
+			document.addValue( index.binding().string, STRING_VALUE );
+			document.addValue( index.binding().string_analyzed, STRING_ANALYZED_VALUE );
+			document.addValue( index.binding().integer, INTEGER_VALUE );
+			document.addValue( index.binding().localDate, LOCAL_DATE_VALUE );
+			document.addValue( index.binding().geoPoint, GEO_POINT_VALUE );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, FLATTENED_OBJECT_STRING_VALUE );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, FLATTENED_OBJECT_INTEGER_VALUE );
+			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+			flattenedObject.addValue( index.binding().flattenedObject.string, FLATTENED_OBJECT_STRING_VALUE );
+			flattenedObject.addValue( index.binding().flattenedObject.integer, FLATTENED_OBJECT_INTEGER_VALUE );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, NESTED_OBJECT_STRING_VALUE );
-			nestedObject.addValue( indexMapping.nestedObject.integer, NESTED_OBJECT_INTEGER_VALUE );
+			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+			nestedObject.addValue( index.binding().nestedObject.string, NESTED_OBJECT_STRING_VALUE );
+			nestedObject.addValue( index.binding().nestedObject.integer, NESTED_OBJECT_INTEGER_VALUE );
 		} );
 
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
@@ -639,15 +630,15 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> string_analyzed;
 		final IndexFieldReference<Integer> integer;
@@ -656,7 +647,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES )

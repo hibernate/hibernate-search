@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -39,47 +39,37 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchZeroDowntimeReindexingIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
-	private static final String INDEX_NAME = "indexname";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start( BACKEND_NAME )
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	public void test() {
-		IndexWorkspace workspace = indexManager.createWorkspace();
-		IndexIndexer indexer = indexManager.createIndexer();
+		IndexWorkspace workspace = index.createWorkspace();
+		IndexIndexer indexer = index.createIndexer();
 
 		indexer.add(
 				referenceProvider( "1" ),
-				document -> document.addValue( indexMapping.text, "text1" ),
+				document -> document.addValue( index.binding().text, "text1" ),
 				DocumentCommitStrategy.NONE,
 				DocumentRefreshStrategy.NONE
 		).join();
 		workspace.refresh().join();
 
-		SearchQuery<DocumentReference> text1Query = indexManager
+		SearchQuery<DocumentReference> text1Query = index
 				.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
 				.toQuery();
-		SearchQuery<DocumentReference> text2Query = indexManager
+		SearchQuery<DocumentReference> text2Query = index
 				.createScope().query()
 				.where( f -> f.match().field( "text" ).matching( "text2" ) )
 				.toQuery();
@@ -90,12 +80,12 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		assertThat( text2Query ).hasNoHits();
 
 		// Create a new index without aliases
-		URLEncodedString newIndexPrimaryName = encodeName( INDEX_NAME + "-000002" );
+		URLEncodedString newIndexPrimaryName = encodeName( index.name() + "-000002" );
 		elasticsearchClient.index( newIndexPrimaryName, null, null ).deleteAndCreate();
 
 		// Switch the write alias from the old to the new index
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.move( defaultWriteAlias( INDEX_NAME ).original, newIndexPrimaryName.original, writeAliasDefinition() );
+		elasticsearchClient.index( index.name() ).aliases()
+				.move( defaultWriteAlias( index.name() ).original, newIndexPrimaryName.original, writeAliasDefinition() );
 
 		// Search queries are unaffected: text == "text1"
 		assertThat( text1Query ).hasTotalHitCount( 1 );
@@ -105,7 +95,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		// In a real-world scenario, we would reindex thousands of documents
 		indexer.add(
 				referenceProvider( "1" ),
-				document -> document.addValue( indexMapping.text, "text2" ),
+				document -> document.addValue( index.binding().text, "text2" ),
 				DocumentCommitStrategy.NONE,
 				DocumentRefreshStrategy.NONE
 		).join();
@@ -116,25 +106,25 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		assertThat( text2Query ).hasNoHits();
 
 		// Switch the read alias from the old to the new index
-		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.move( defaultReadAlias( INDEX_NAME ).original, newIndexPrimaryName.original, readAliasDefinition() );
+		elasticsearchClient.index( index.name() ).aliases()
+				.move( defaultReadAlias( index.name() ).original, newIndexPrimaryName.original, readAliasDefinition() );
 
 		// Search queries immediately show the new content: text == "text2"
 		assertThat( text1Query ).hasNoHits();
 		assertThat( text2Query ).hasTotalHitCount( 1 );
 
 		// Remove the old index
-		elasticsearchClient.index( INDEX_NAME ).ensureDoesNotExist();
+		elasticsearchClient.index( index.name() ).ensureDoesNotExist();
 
 		// Search queries still work and target the new index: text == "text2"
 		assertThat( text1Query ).hasNoHits();
 		assertThat( text2Query ).hasTotalHitCount( 1 );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> text;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			text = root.field( "text", f -> f.asString() )
 					.toReference();
 		}

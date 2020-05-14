@@ -119,7 +119,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
 			StaticCounters.get().increment( CREATE_DIRECTORY_COUNTER_KEY );
 			assertThat( context ).isNotNull();
-			assertThat( context.getIndexName() ).isEqualTo( INDEX_NAME );
+			assertThat( context.getIndexName() ).isEqualTo( index.name() );
 			return new DirectoryHolder() {
 				Directory directory;
 				@Override

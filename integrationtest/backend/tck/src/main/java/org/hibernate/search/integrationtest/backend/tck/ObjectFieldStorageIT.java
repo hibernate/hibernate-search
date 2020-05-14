@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -33,8 +33,6 @@ import org.junit.Test;
 
 
 public class ObjectFieldStorageIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String EXPECTED_NESTED_MATCH_ID = "nestedQueryShouldMatchId";
 	private static final String EXPECTED_NON_NESTED_MATCH_ID = "nonNestedQueryShouldMatchId";
@@ -50,32 +48,25 @@ public class ObjectFieldStorageIT {
 	private static final LocalDate NON_MATCHING_LOCAL_DATE = LocalDate.of( 2018, 2, 15 );
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_root() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 
 		assertThatThrownBy( () -> {
 			plan.add( referenceProvider( "willNotWork" ), document -> {
-				DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-				flattenedObject.addValue( indexMapping.string, "willNotWork" );
+				DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+				flattenedObject.addValue( index.binding().string, "willNotWork" );
 			} );
 
 			plan.execute().join();
@@ -90,11 +81,11 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_flattened() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 
 		assertThatThrownBy( () -> {
 			plan.add( referenceProvider( "willNotWork" ), document -> {
-				document.addValue( indexMapping.flattenedObject.string, "willNotWork" );
+				document.addValue( index.binding().flattenedObject.string, "willNotWork" );
 			} );
 
 			plan.execute().join();
@@ -108,11 +99,11 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_nested() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 
 		assertThatThrownBy( () -> {
 			plan.add( referenceProvider( "willNotWork" ), document -> {
-				document.addValue( indexMapping.nestedObject.string, "willNotWork" );
+				document.addValue( index.binding().nestedObject.string, "willNotWork" );
 			} );
 
 			plan.execute().join();
@@ -126,7 +117,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_match() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -137,7 +128,7 @@ public class ObjectFieldStorageIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NON_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
@@ -151,13 +142,13 @@ public class ObjectFieldStorageIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_range() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
@@ -173,7 +164,7 @@ public class ObjectFieldStorageIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NON_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
@@ -192,13 +183,13 @@ public class ObjectFieldStorageIT {
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_error_nonNestedField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () ->
 			scope.predicate().nested().objectField( "flattenedObject" )
@@ -209,7 +200,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_nonObjectField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () ->
 				scope.predicate().nested().objectField( "flattenedObject.string" )
@@ -220,7 +211,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_missingField() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () ->
 				scope.predicate().nested().objectField( "doesNotExist" )
@@ -230,7 +221,7 @@ public class ObjectFieldStorageIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
 			ObjectMapping objectMapping;
 			DocumentElement object;
@@ -238,13 +229,13 @@ public class ObjectFieldStorageIT {
 			// ----------------
 			// Flattened object
 			// Leave it empty.
-			objectMapping = indexMapping.flattenedObject;
+			objectMapping = index.binding().flattenedObject;
 			document.addNullObject( objectMapping.self );
 
 			// -------------
 			// Nested object
 			// Content specially crafted to match in nested queries.
-			objectMapping = indexMapping.nestedObject;
+			objectMapping = index.binding().nestedObject;
 
 			object = document.addObject( objectMapping.self );
 			object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
@@ -272,7 +263,7 @@ public class ObjectFieldStorageIT {
 			 * if flattened storage is used.
 			 */
 			for ( ObjectMapping objectMapping :
-					Arrays.asList( indexMapping.flattenedObject, indexMapping.nestedObject ) ) {
+					Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
 				DocumentElement object = document.addObject( objectMapping.self );
 				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
@@ -300,7 +291,7 @@ public class ObjectFieldStorageIT {
 			 * For second-level nesting tests, it's because there is no nested object matching condition 1.
 			 */
 			for ( ObjectMapping objectMapping :
-					Arrays.asList( indexMapping.flattenedObject, indexMapping.nestedObject ) ) {
+					Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
 				DocumentElement object = document.addObject( objectMapping.self );
 				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
@@ -325,23 +316,23 @@ public class ObjectFieldStorageIT {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(
-						INDEX_NAME,
+						index.typeName(),
 						EXPECTED_NESTED_MATCH_ID, EXPECTED_NON_NESTED_MATCH_ID, "neverMatching", "empty"
 				);
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
 					.multiValued();

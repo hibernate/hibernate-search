@@ -9,24 +9,25 @@ package org.hibernate.search.integrationtest.backend.tck.search;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 public class SearchMultiIndexIT {
 
@@ -37,8 +38,6 @@ public class SearchMultiIndexIT {
 	private static final String STRING_2 = "string_2";
 
 	// Backend 1 / Index 1
-
-	private static final String INDEX_NAME_1_1 = "IndexName_1_1";
 
 	private static final String DOCUMENT_1_1_1 = "1_1_1";
 	private static final String ADDITIONAL_FIELD_1_1_1 = "additional_field_1_1_1";
@@ -52,81 +51,51 @@ public class SearchMultiIndexIT {
 
 	// Backend 1 / Index 2
 
-	private static final String INDEX_NAME_1_2 = "IndexName_1_2";
-
 	private static final String DOCUMENT_1_2_1 = "1_2_1";
 	private static final String SORT_FIELD_1_2_1 = "1_2_1";
 	private static final Integer DIFFERENT_TYPES_FIELD_1_2_1 = 37;
 
 	// Backend 2 / Index 1
 
-	private static final String INDEX_NAME_2_1 = "IndexName_2_1";
-
 	private static final String DOCUMENT_2_1_1 = "2_1_1";
 
 	private static final String DOCUMENT_2_1_2 = "2_1_2";
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	// Backend 1 / Index 1
-
-	private IndexMapping_1_1 indexMapping_1_1;
-	private StubMappingIndexManager indexManager_1_1;
-
-	// Backend 1 / Index 2
-
-	private IndexMapping_1_2 indexMapping_1_2;
-	private StubMappingIndexManager indexManager_1_2;
-
-	// Backend 2 / Index 1
-
-	private IndexMapping_2_1 indexMapping_2_1;
-	private StubMappingIndexManager indexManager_2_1;
+	private final SimpleMappedIndex<IndexBinding_1_1> index_1_1 =
+			SimpleMappedIndex.of( IndexBinding_1_1::new ).name( "index_1_1" );
+	private final SimpleMappedIndex<IndexBinding_1_2> index_1_2 =
+			SimpleMappedIndex.of( IndexBinding_1_2::new ).name( "index_1_2" );;
+	private final SimpleMappedIndex<IndexBinding_2_1> index_2_1 =
+			SimpleMappedIndex.of( IndexBinding_2_1::new ).name( "index_2_1" );;
 
 	@Before
 	public void setup() {
-		setupHelper.start( BACKEND_1 )
-				.withIndex(
-						INDEX_NAME_1_1,
-						ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_1_1 = indexMapping
-				)
-				.withIndex(
-						INDEX_NAME_1_2,
-						ctx -> this.indexMapping_1_2 = new IndexMapping_1_2( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_1_2 = indexMapping
-				)
-				.setup();
-
-		setupHelper.start( BACKEND_2 )
-				.withIndex(
-						INDEX_NAME_2_1,
-						ctx -> this.indexMapping_2_1 = new IndexMapping_2_1( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_2_1 = indexMapping
-				)
-				.setup();
+		setupHelper.start( BACKEND_1 ).withIndexes( index_1_1, index_1_2 ).setup();
+		setupHelper.start( BACKEND_2 ).withIndexes( index_2_1 ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void search_across_multiple_indexes() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
-			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
+			c.doc( index_1_2.typeName(), DOCUMENT_1_2_1 );
 		} );
 	}
 
 	@Test
 	public void sort_across_multiple_indexes() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -134,9 +103,9 @@ public class SearchMultiIndexIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2 );
-			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
+			c.doc( index_1_1.typeName(), DOCUMENT_1_1_2 );
+			c.doc( index_1_2.typeName(), DOCUMENT_1_2_1 );
 		} );
 
 		query = scope.query()
@@ -145,15 +114,15 @@ public class SearchMultiIndexIT {
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2 );
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
+			c.doc( index_1_2.typeName(), DOCUMENT_1_2_1 );
+			c.doc( index_1_1.typeName(), DOCUMENT_1_1_2 );
+			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
 		} );
 	}
 
 	@Test
 	public void projection_across_multiple_indexes() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		SearchQuery<String> query = scope.query()
 				.select( f -> f.field( "sortField", String.class ) )
@@ -169,14 +138,14 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1 );
 
 		// Sort
 
@@ -200,7 +169,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void unknown_field_throws_exception() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
 		Assertions.assertThatThrownBy(
@@ -211,8 +180,8 @@ public class SearchMultiIndexIT {
 				.hasMessageContaining( "Unknown field 'unknownField'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames(
-								INDEX_NAME_1_1,
-								INDEX_NAME_1_2
+								index_1_1.name(),
+								index_1_2.name()
 						)
 				) );
 
@@ -226,8 +195,8 @@ public class SearchMultiIndexIT {
 				.hasMessageContaining( "Unknown field 'unknownField'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames(
-								INDEX_NAME_1_1,
-								INDEX_NAME_1_2
+								index_1_1.name(),
+								index_1_2.name()
 						)
 				) );
 
@@ -242,15 +211,15 @@ public class SearchMultiIndexIT {
 				.hasMessageContaining( "unknownField" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames(
-								INDEX_NAME_1_1,
-								INDEX_NAME_1_2
+								index_1_1.name(),
+								index_1_2.name()
 						)
 				) );
 	}
 
 	@Test
 	public void search_with_incompatible_types_throws_exception() {
-		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
+		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		Assertions.assertThatThrownBy(
 				() -> scope.predicate().match().field( "differentTypesField" )
@@ -278,7 +247,7 @@ public class SearchMultiIndexIT {
 	@Test
 	public void search_across_backends_throws_exception() {
 		Assertions.assertThatThrownBy(
-				() -> indexManager_1_1.createScope( indexManager_2_1 ),
+				() -> index_1_1.createScope( index_2_1 ),
 				"search across multiple backends"
 		)
 				.isInstanceOf( SearchException.class )
@@ -289,74 +258,74 @@ public class SearchMultiIndexIT {
 	private void initData() {
 		// Backend 1 / Index 1
 
-		IndexIndexingPlan<?> plan = indexManager_1_1.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index_1_1.createIndexingPlan();
 
 		plan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
-			document.addValue( indexMapping_1_1.string, STRING_1 );
-			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_1 );
-			document.addValue( indexMapping_1_1.differentTypesField, DIFFERENT_TYPES_FIELD_1_1_1 );
-			document.addValue( indexMapping_1_1.sortField, SORT_FIELD_1_1_1 );
+			document.addValue( index_1_1.binding().string, STRING_1 );
+			document.addValue( index_1_1.binding().additionalField, ADDITIONAL_FIELD_1_1_1 );
+			document.addValue( index_1_1.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_1_1 );
+			document.addValue( index_1_1.binding().sortField, SORT_FIELD_1_1_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
-			document.addValue( indexMapping_1_1.string, STRING_2 );
-			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_2 );
-			document.addValue( indexMapping_1_1.differentTypesField, DIFFERENT_TYPES_FIELD_1_1_2 );
-			document.addValue( indexMapping_1_1.sortField, SORT_FIELD_1_1_2 );
+			document.addValue( index_1_1.binding().string, STRING_2 );
+			document.addValue( index_1_1.binding().additionalField, ADDITIONAL_FIELD_1_1_2 );
+			document.addValue( index_1_1.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_1_2 );
+			document.addValue( index_1_1.binding().sortField, SORT_FIELD_1_1_2 );
 		} );
 
 		plan.execute().join();
 
-		StubMappingScope scope = indexManager_1_1.createScope();
+		StubMappingScope scope = index_1_1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
 
-		plan = indexManager_1_2.createIndexingPlan();
+		plan = index_1_2.createIndexingPlan();
 
 		plan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
-			document.addValue( indexMapping_1_2.string, STRING_1 );
-			document.addValue( indexMapping_1_2.differentTypesField, DIFFERENT_TYPES_FIELD_1_2_1 );
-			document.addValue( indexMapping_1_2.sortField, SORT_FIELD_1_2_1 );
+			document.addValue( index_1_2.binding().string, STRING_1 );
+			document.addValue( index_1_2.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_2_1 );
+			document.addValue( index_1_2.binding().sortField, SORT_FIELD_1_2_1 );
 		} );
 
 		plan.execute().join();
 
-		scope = indexManager_1_2.createScope();
+		scope = index_1_2.createScope();
 		query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index_1_2.typeName(), DOCUMENT_1_2_1 );
 
 		// Backend 2 / Index 1
 
-		plan = indexManager_2_1.createIndexingPlan();
+		plan = index_2_1.createIndexingPlan();
 
 		plan.add( referenceProvider( DOCUMENT_2_1_1 ), document -> {
-			document.addValue( indexMapping_2_1.string, STRING_1 );
+			document.addValue( index_2_1.binding().string, STRING_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2_1_2 ), document -> {
-			document.addValue( indexMapping_2_1.string, STRING_2 );
+			document.addValue( index_2_1.binding().string, STRING_2 );
 		} );
 
 		plan.execute().join();
 
-		scope = indexManager_2_1.createScope();
+		scope = index_2_1.createScope();
 		query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( index_2_1.typeName(), DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}
 
-	private static class IndexMapping_1_1 {
+	private static class IndexBinding_1_1 {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> additionalField;
 		final IndexFieldReference<String> differentTypesField;
 		final IndexFieldReference<String> sortField;
 
-		IndexMapping_1_1(IndexSchemaElement root) {
+		IndexBinding_1_1(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 			additionalField = root.field(
 					"additionalField",
@@ -376,12 +345,12 @@ public class SearchMultiIndexIT {
 		}
 	}
 
-	private static class IndexMapping_1_2 {
+	private static class IndexBinding_1_2 {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<Integer> differentTypesField;
 		final IndexFieldReference<String> sortField;
 
-		IndexMapping_1_2(IndexSchemaElement root) {
+		IndexBinding_1_2(IndexSchemaElement root) {
 			string = root.field(
 					"string",
 					f -> f.asString()
@@ -400,10 +369,10 @@ public class SearchMultiIndexIT {
 		}
 	}
 
-	private static class IndexMapping_2_1 {
+	private static class IndexBinding_2_1 {
 		final IndexFieldReference<String> string;
 
-		IndexMapping_2_1(IndexSchemaElement root) {
+		IndexBinding_2_1(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 		}
 	}

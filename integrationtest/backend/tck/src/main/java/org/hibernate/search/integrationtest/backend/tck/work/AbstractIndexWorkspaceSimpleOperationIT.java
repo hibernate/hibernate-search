@@ -19,6 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
@@ -31,15 +32,12 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String INDEX_NAME = "IndexName";
-
 	private static final Integer DOCUMENT_COUNT = 50;
 
 	@Rule
-	public SearchSetupHelper setupHelper;
+	public final SearchSetupHelper setupHelper;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	protected AbstractIndexWorkspaceSimpleOperationIT() {
 		this( new SearchSetupHelper() );
@@ -53,26 +51,26 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 	public void success() {
 		setup();
 
-		IndexWorkspace workspace = indexManager.createWorkspace();
+		IndexWorkspace workspace = index.createWorkspace();
 
-		assertPreconditions( indexManager );
+		assertPreconditions( index );
 
 		CompletableFuture<?> future = executeAsync( workspace );
 		Awaitility.await().until( future::isDone );
 
 		FutureAssert.assertThat( future ).isSuccessful();
 
-		assertSuccess( indexManager );
+		assertSuccess( index );
 	}
 
 	@Test
 	public void failure() {
 		setup();
 
-		IndexWorkspace workspace = indexManager.createWorkspace();
+		IndexWorkspace workspace = index.createWorkspace();
 
 		// Trigger failures in the next operations
-		ensureOperationsFail( setupHelper.getBackendAccessor(), INDEX_NAME );
+		ensureOperationsFail( setupHelper.getBackendAccessor(), index.name() );
 
 		CompletableFuture<?> future = executeAsync( workspace );
 		Awaitility.await().until( future::isDone );
@@ -91,46 +89,40 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	protected abstract void ensureOperationsFail(TckBackendAccessor accessor, String indexName);
 
-	protected void beforeInitData(StubMappingIndexManager indexManager) {
+	protected void beforeInitData(StubMappingIndexManager index) {
 		// Nothing to do by default.
 	}
 
-	protected void afterInitData(StubMappingIndexManager indexManager) {
+	protected void afterInitData(StubMappingIndexManager index) {
 		// Nothing to do by default.
 	}
 
-	protected abstract void assertPreconditions(StubMappingIndexManager indexManager);
+	protected abstract void assertPreconditions(StubMappingIndexManager index);
 
 	protected abstract CompletableFuture<?> executeAsync(IndexWorkspace workspace);
 
-	protected abstract void assertSuccess(StubMappingIndexManager indexManager);
+	protected abstract void assertSuccess(StubMappingIndexManager index);
 
 	private void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
-		beforeInitData( indexManager );
+		beforeInitData( index );
 
-		indexManager.initAsync(
+		index.initAsync(
 				DOCUMENT_COUNT, i -> documentProvider(
 						String.valueOf( i ),
-						document -> document.addValue( indexMapping.text, "Text #" + i )
+						document -> document.addValue( index.binding().text, "Text #" + i )
 				),
 				false // No refresh
 		).join();
 
-		afterInitData( indexManager );
+		afterInitData( index );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> text;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			text = root.field( "text", f -> f.asString() )
 					.toReference();
 		}

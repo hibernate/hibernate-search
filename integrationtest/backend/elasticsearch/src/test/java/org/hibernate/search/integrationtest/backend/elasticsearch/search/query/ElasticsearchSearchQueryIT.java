@@ -23,7 +23,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.co
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -41,26 +41,24 @@ import com.google.gson.JsonObject;
 @RunWith(Parameterized.class)
 public class ElasticsearchSearchQueryIT {
 
-	private static final String INDEX_NAME = "indexname";
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Parameterized.Parameters(name = "IndexLayoutStrategy = {0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
-				{ null, defaultReadAlias( INDEX_NAME ) },
+				{ null, defaultReadAlias( index.name() ) },
 				{ new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) }
 		};
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
 	private final IndexLayoutStrategy layoutStrategy;
 	private final URLEncodedString readAlias;
-
-	private StubMappingIndexManager indexManager;
 
 	public ElasticsearchSearchQueryIT(IndexLayoutStrategy layoutStrategy, URLEncodedString readAlias) {
 		this.layoutStrategy = layoutStrategy;
@@ -76,17 +74,13 @@ public class ElasticsearchSearchQueryIT {
 				.withBackendProperty(
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy
 				)
-				.withIndex(
-						INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
+				.withIndex( index )
 				.setup();
 	}
 
 	@Test
 	public void defaultSourceFiltering() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<?> query = scope.query()
 				.where( f -> f.matchAll() )
@@ -106,7 +100,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void projection_sourceFiltering() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		SearchQuery<Object> query = scope.query()
 				.select( f -> f.field( "string" ) )
@@ -127,7 +121,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void routing() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 
 		String routingKey = "someRoutingKey";
 
@@ -150,11 +144,11 @@ public class ElasticsearchSearchQueryIT {
 	}
 
 	@SuppressWarnings("unused")
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )

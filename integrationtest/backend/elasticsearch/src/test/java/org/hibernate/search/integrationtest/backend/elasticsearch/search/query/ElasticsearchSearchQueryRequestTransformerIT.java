@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -43,17 +43,14 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchSearchQueryRequestTransformerIT {
 
-	private static final String INDEX_NAME = "indexname";
-	private static final String SECOND_INDEX_NAME = "secondindexname";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
-	private StubMappingIndexManager indexManager;
-	private StubMappingIndexManager secondIndexManager;
+	private final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
+	private final SimpleMappedIndex<IndexBinding> otherIndex = SimpleMappedIndex.of( IndexBinding::new ).name( "other" );
 
 	@Before
 	public void setup() {
@@ -61,28 +58,19 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 				.withBackendProperty(
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
-				.withIndex(
-						INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						SECOND_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.secondIndexManager = indexManager
-				)
+				.withIndexes( mainIndex, otherIndex )
 				.setup();
 	}
 
 	@Test
 	public void path() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
-					assertThat( context.getPath() ).isEqualTo( "/" + defaultReadAlias( INDEX_NAME ).original + "/_search" );
-					String newPath = "/" + defaultReadAlias( SECOND_INDEX_NAME ).original + "/_search";
+					assertThat( context.getPath() ).isEqualTo( "/" + defaultReadAlias( mainIndex.name() ).original + "/_search" );
+					String newPath = "/" + defaultReadAlias( otherIndex.name() ).original + "/_search";
 					context.setPath( newPath );
 					// Changes should be visible immediately
 					assertThat( context.getPath() ).isEqualTo( newPath );
@@ -91,7 +79,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( defaultReadAlias( SECOND_INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( otherIndex.name() ) )
 						.pathComponent( URLEncodedString.fromString( "_search" ) )
 						.body( new Gson().fromJson( "{}", JsonObject.class ) )
 						.build(),
@@ -103,7 +91,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 	@Test
 	public void queryParameters() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
@@ -119,7 +107,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( defaultReadAlias( INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( mainIndex.name() ) )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{}", JsonObject.class ) )
 						.param( "search_type", "dfs_query_then_fetch" )
@@ -132,7 +120,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 	@Test
 	public void body() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
@@ -151,7 +139,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( defaultReadAlias( INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( mainIndex.name() ) )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{'min_score':0.5}", JsonObject.class ) )
 						.build(),
@@ -162,11 +150,11 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	}
 
 	@SuppressWarnings("unused")
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<Integer> integer;
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )

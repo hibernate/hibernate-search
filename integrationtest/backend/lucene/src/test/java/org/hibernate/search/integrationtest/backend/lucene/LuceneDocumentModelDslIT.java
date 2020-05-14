@@ -15,17 +15,17 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class LuceneDocumentModelDslIT {
 
-	private static final String TYPE_NAME = "TypeName";
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private StubMappedIndex index;
 
 	@Test
 	public void unknownAnalyzer() {
@@ -38,8 +38,8 @@ public class LuceneDocumentModelDslIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure( "Unknown analyzer" )
 						.build() );
 	}
@@ -55,8 +55,8 @@ public class LuceneDocumentModelDslIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure( "Unknown normalizer" )
 						.build() );
 	}
@@ -73,20 +73,14 @@ public class LuceneDocumentModelDslIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
+						.typeContext( index.typeName() )
+						.indexContext( index.name() )
 						.failure( "Unknown analyzer" )
 						.build() );
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						b -> b.mappedType( TYPE_NAME ),
-						mappingContributor,
-						ignored -> { }
-				)
-				.setup();
+		index = StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor );
+		setupHelper.start().withIndex( index ).setup();
 	}
 }

@@ -29,7 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
@@ -39,8 +39,6 @@ import org.junit.Test;
 
 public class SearchQueryTimeoutIT {
 
-	private static final String BACKEND_NAME = "backendName";
-	private static final String INDEX_NAME = "indexName";
 	private static final int FIELD_COUNT = 20;
 	private static final List<String> FIELD_NAMES = Collections.unmodifiableList(
 			IntStream.range( 0 , FIELD_COUNT )
@@ -69,18 +67,11 @@ public class SearchQueryTimeoutIT {
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static StubMappingIndexManager indexManager;
-	private static IndexMapping indexMapping;
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start( BACKEND_NAME )
-				.withIndex(
-						INDEX_NAME,
-						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> SearchQueryTimeoutIT.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
@@ -145,7 +136,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
-		return indexManager.createScope().query()
+		return index.createScope().query()
 				.where( f -> f.bool( b -> {
 					for ( String fieldName : FIELD_NAMES ) {
 						b.must( f.match().field( fieldName ).matching( BUZZ_WORDS ) );
@@ -154,12 +145,12 @@ public class SearchQueryTimeoutIT {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startFastQuery() {
-		return indexManager.createScope().query()
+		return index.createScope().query()
 				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		for ( int i = 0; i < INIT_DATA_ROUNDS; i++ ) {
 			if ( i % INIT_DATA_BATCH_SIZE == 0 ) {
 				plan.execute().join();
@@ -167,7 +158,7 @@ public class SearchQueryTimeoutIT {
 			plan.add(
 					referenceProvider( i + "a" ),
 					document -> {
-						for ( IndexFieldReference<String> field : indexMapping.fields ) {
+						for ( IndexFieldReference<String> field : index.binding().fields ) {
 							document.addValue( field, TEXT_1 );
 						}
 					}
@@ -175,7 +166,7 @@ public class SearchQueryTimeoutIT {
 			plan.add(
 					referenceProvider( i + "b" ),
 					document -> {
-						for ( IndexFieldReference<String> field : indexMapping.fields ) {
+						for ( IndexFieldReference<String> field : index.binding().fields ) {
 							document.addValue( field, TEXT_2 );
 						}
 					}
@@ -183,7 +174,7 @@ public class SearchQueryTimeoutIT {
 			plan.add(
 					referenceProvider( i + "c" ),
 					document -> {
-						for ( IndexFieldReference<String> field : indexMapping.fields ) {
+						for ( IndexFieldReference<String> field : index.binding().fields ) {
 							document.addValue( field, TEXT_3 );
 						}
 					}
@@ -192,10 +183,10 @@ public class SearchQueryTimeoutIT {
 		plan.execute().join();
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		private final List<IndexFieldReference<String>> fields = new ArrayList<>();
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			for ( String fieldName : FIELD_NAMES ) {
 				fields.add(
 						root.field(

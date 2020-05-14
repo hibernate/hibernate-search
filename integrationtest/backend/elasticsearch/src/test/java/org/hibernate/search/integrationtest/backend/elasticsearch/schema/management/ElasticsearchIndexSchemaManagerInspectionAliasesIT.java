@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -38,22 +38,20 @@ import org.junit.runners.Parameterized.Parameters;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> strategies() {
 		return ElasticsearchIndexSchemaManagerOperation.aliasInspecting();
 	}
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexSchemaManagerOperation operation;
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
-	private StubMappingIndexManager indexManager;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
 	public ElasticsearchIndexSchemaManagerInspectionAliasesIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
@@ -61,44 +59,44 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 
 	@Test
 	public void writeAliasTargetsMultipleIndexes() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate();
 		// The write alias for index 1 also targets a second index
 		elasticsearchClient.index( "otherIndex" )
 				.deleteAndCreate()
-				.aliases().put( defaultWriteAlias( INDEX_NAME ).original );
+				.aliases().put( defaultWriteAlias( index.name() ).original );
 
 		Assertions.assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
+						"Index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
 								+ "] are assigned to a single Hibernate Search index, "
 								+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
-								+ "[" + defaultPrimaryName( INDEX_NAME ) + ", "
+								+ "[" + defaultPrimaryName( index.name() ) + ", "
 								+ defaultPrimaryName( "otherIndex" ) + "]"
 				);
 	}
 
 	@Test
 	public void readAliasTargetsMultipleIndexes() {
-		elasticsearchClient.index( INDEX_NAME )
+		elasticsearchClient.index( index.name() )
 				.deleteAndCreate();
 		// The read alias for index 1 also targets a second index
 		elasticsearchClient.index( "otherIndex" )
 				.deleteAndCreate()
-				.aliases().put( defaultReadAlias( INDEX_NAME ).original );
+				.aliases().put( defaultReadAlias( index.name() ).original );
 
 		Assertions.assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-							"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
+							"Index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
 									+ "] are assigned to a single Hibernate Search index, "
 									+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
-									+ "[" + defaultPrimaryName( INDEX_NAME ) + ", "
+									+ "[" + defaultPrimaryName( index.name() ) + ", "
 									+ defaultPrimaryName( "otherIndex" ) + "]"
 				);
 	}
@@ -113,10 +111,10 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 							// No-op
 						}
 				)
-				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
 	}
 
 }
