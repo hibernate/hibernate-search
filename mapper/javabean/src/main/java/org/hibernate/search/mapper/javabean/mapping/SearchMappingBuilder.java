@@ -23,6 +23,7 @@ import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
@@ -104,6 +105,10 @@ public final class SearchMappingBuilder {
 	public SearchMappingBuilder setMultiTenancyEnabled(boolean multiTenancyEnabled) {
 		mappingInitiator.setMultiTenancyEnabled( multiTenancyEnabled );
 		return this;
+	}
+
+	public void setDefaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
+		mappingInitiator.setDefaultReindexOnUpdate( defaultReindexOnUpdate );
 	}
 
 	public SearchMappingBuilder setProvidedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
