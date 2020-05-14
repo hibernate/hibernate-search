@@ -149,7 +149,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 	}
 
 	private void setupAndCreateIndex(Consumer<IndexSchemaElement> binder) {
-		StubMappedIndex index = StubMappedIndex.withoutRetrievableBinding( INDEX_NAME, binder );
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( binder ).name( INDEX_NAME );
 
 		setupHelper.start()
 				.withIndex( index )

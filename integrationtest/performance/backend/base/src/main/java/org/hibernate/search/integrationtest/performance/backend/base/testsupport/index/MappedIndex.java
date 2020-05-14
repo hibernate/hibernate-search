@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.performance.backend.base.testsupport.index;
 
-import java.util.Optional;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -25,27 +23,14 @@ public class MappedIndex extends StubMappedIndex {
 	public static final String LONG_TEXT_FIELD_NAME = "longText";
 	public static final String NUMERIC_FIELD_NAME = "numeric";
 
-	private final String backendName;
-	private final int indexId;
-
 	private IndexFieldReference<String> shortTextField;
 	private IndexFieldReference<String> longTextField;
 	private IndexFieldReference<Long> numericField;
 
 	public MappedIndex(String backendName, int indexId) {
-		super( "index_" + indexId );
-		this.backendName = backendName;
-		this.indexId = indexId;
-	}
-
-	@Override
-	public String typeName() {
-		return "type_" + indexId;
-	}
-
-	@Override
-	public Optional<String> backendName() {
-		return Optional.of( backendName );
+		backendName( backendName );
+		name( "index_" + indexId );
+		typeName( "type_" + indexId );
 	}
 
 	@Override

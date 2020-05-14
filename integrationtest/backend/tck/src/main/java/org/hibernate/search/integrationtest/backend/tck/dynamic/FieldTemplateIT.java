@@ -109,7 +109,7 @@ public class FieldTemplateIT {
 		SearchResultAssert.assertThat( query(
 				f -> f.match().field( getFieldPath( "foo" ) ).matching( "matchedValue" ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		integration.close();
@@ -118,7 +118,7 @@ public class FieldTemplateIT {
 		SearchResultAssert.assertThat( query(
 				f -> f.match().field( getFieldPath( "foo" ) ).matching( "matchedValue" ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -155,11 +155,11 @@ public class FieldTemplateIT {
 		SearchResultAssert.assertThat( query(
 				f -> f.match().field( getFieldPath( "foo_str" ) ).matching( "matchedValue" ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		SearchResultAssert.assertThat( query(
 				f -> f.match().field( getFieldPath( "foo_int" ) ).matching( 42 ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		integration.close();
@@ -168,11 +168,11 @@ public class FieldTemplateIT {
 		SearchResultAssert.assertThat( query(
 				f -> f.match().field( getFieldPath( "foo_str" ) ).matching( "matchedValue" ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		SearchResultAssert.assertThat( query(
 				f -> f.match().field( getFieldPath( "foo_int" ) ).matching( 42 ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
 	@Test
@@ -215,12 +215,12 @@ public class FieldTemplateIT {
 				f -> f.range().field( getFieldPath( "foo_str_int" ) )
 						.between( "3000", "5000" ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		SearchResultAssert.assertThat( query(
 				f -> f.range().field( getFieldPath( "foo_int" ) )
 						.between( 41, 43 ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		integration.close();
@@ -230,12 +230,12 @@ public class FieldTemplateIT {
 				f -> f.range().field( getFieldPath( "foo_str_int" ) )
 						.between( "3000", "5000" ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		SearchResultAssert.assertThat( query(
 				f -> f.range().field( getFieldPath( "foo_int" ) )
 						.between( 41, 43 ) )
 		)
-				.hasDocRefHitsAnyOrder( index.name(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
 	private SearchQuery<DocumentReference> query(
@@ -286,7 +286,7 @@ public class FieldTemplateIT {
 
 	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy,
 			Consumer<IndexSchemaElement> templatesBinder) {
-		this.index = SimpleMappedIndex.of( "MainIndex", root -> new IndexBinding( root, templatesBinder ) );
+		this.index = SimpleMappedIndex.of( root -> new IndexBinding( root, templatesBinder ) );
 
 		return setupHelper.start().withIndex( index )
 				.withSchemaManagement( schemaManagementStrategy )

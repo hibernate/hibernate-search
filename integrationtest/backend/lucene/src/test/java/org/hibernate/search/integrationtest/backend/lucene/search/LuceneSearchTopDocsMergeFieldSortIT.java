@@ -106,8 +106,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> index =
-			SimpleMappedIndex.of( "MainIndex", IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
@@ -138,9 +137,9 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		LuceneSearchResult segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult segment1Result = segment1Query.fetch( 10 );
 		assertThat( segment0Result )
-				.hasDocRefHitsExactOrder( index.name(), SEGMENT_0_DOC_1, SEGMENT_0_DOC_0 );
+				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_0_DOC_1, SEGMENT_0_DOC_0 );
 		assertThat( segment1Result )
-				.hasDocRefHitsExactOrder( index.name(), SEGMENT_1_DOC_0 );
+				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_0 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
 		Assertions.assertThat( TopDocs.merge( segment0Query.getLuceneSort(), 10, allTopDocs ).scoreDocs )
@@ -161,9 +160,9 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		LuceneSearchResult segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult segment1Result = segment1Query.fetch( 10 );
 		assertThat( segment0Result )
-				.hasDocRefHitsExactOrder( index.name(), SEGMENT_0_DOC_0, SEGMENT_0_DOC_1 );
+				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_0_DOC_0, SEGMENT_0_DOC_1 );
 		assertThat( segment1Result )
-				.hasDocRefHitsExactOrder( index.name(), SEGMENT_1_DOC_0 );
+				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_0 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
 		Assertions.assertThat( TopDocs.merge( segment0Query.getLuceneSort(), 10, allTopDocs ).scoreDocs )
@@ -454,7 +453,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(
-				index.name(),
+				index.typeName(),
 				SEGMENT_1_DOC_0, SEGMENT_0_DOC_1, SEGMENT_0_DOC_0,
 				SEGMENT_0_DOC_EMPTY, SEGMENT_1_DOC_EMPTY
 		);

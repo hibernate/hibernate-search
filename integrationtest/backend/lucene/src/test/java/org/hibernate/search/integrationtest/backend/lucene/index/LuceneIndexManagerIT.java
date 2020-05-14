@@ -33,8 +33,7 @@ public class LuceneIndexManagerIT {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final StubMappedIndex index =
-			StubMappedIndex.withoutRetrievableBinding( "MainIndex", IndexBinding::new );
+	private static final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( IndexBinding::new );
 
 	private static LuceneIndexManager indexManager;
 

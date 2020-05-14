@@ -96,13 +96,13 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
-			SimpleMappedIndex.of( "Main", IndexBinding::new );
+			SimpleMappedIndex.of( IndexBinding::new ).name( "Main" );
 	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-			SimpleMappedIndex.of( "Compatible", IndexBinding::new );
+			SimpleMappedIndex.of( IndexBinding::new ).name( "Compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
-			SimpleMappedIndex.of( "RawFieldCompatible", RawFieldCompatibleIndexBinding::new );
+			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "RawFieldCompatible" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
-			SimpleMappedIndex.of( "Incompatible", IncompatibleIndexBinding::new );
+			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "Incompatible" );
 
 	@BeforeClass
 	public static void setup() {

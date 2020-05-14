@@ -31,7 +31,7 @@ public class LuceneBackendIT {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final StubMappedIndex index = StubMappedIndex.withoutFields( "MainIndex" );
+	private static final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	private static LuceneBackend backend;
 
