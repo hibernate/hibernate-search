@@ -16,6 +16,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
@@ -35,6 +36,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	private BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private boolean multiTenancyEnabled;
+	private ReindexOnUpdate defaultReindexOnUpdate = ReindexOnUpdate.DEFAULT;
 
 	private final AnnotationMappingConfigurationContextImpl annotationMappingConfiguration;
 
@@ -80,6 +82,10 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
+	public void setDefaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
+		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
+	}
+
 	public void setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
 		annotationMappingConfiguration.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 	}
@@ -101,6 +107,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 				containerExtractorRegistryBuilder.build(),
 				providedIdentifierBridge,
 				multiTenancyEnabled,
+				defaultReindexOnUpdate,
 				createMapperDelegate()
 		);
 	}

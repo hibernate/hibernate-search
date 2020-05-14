@@ -31,6 +31,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoAssociationPathInverter;
@@ -72,6 +73,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private final BeanResolver beanResolver;
 	private final boolean multiTenancyEnabled;
+	private final ReindexOnUpdate defaultReindexOnUpdate;
 
 	private final FailureHandler failureHandler;
 	private final ThreadPoolProvider threadPoolProvider;
@@ -97,11 +99,12 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			PojoBootstrapIntrospector introspector,
 			ContainerExtractorRegistry containerExtractorRegistry,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
-			boolean multiTenancyEnabled,
+			boolean multiTenancyEnabled, ReindexOnUpdate defaultReindexOnUpdate,
 			PojoMapperDelegate<MPBS> delegate) {
 		this.failureCollector = buildContext.getFailureCollector();
 		this.contributorProvider = contributorProvider;
 		this.multiTenancyEnabled = multiTenancyEnabled;
+		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 
 		this.failureHandler = buildContext.getFailureHandler();
 		this.threadPoolProvider = buildContext.getThreadPoolProvider();
@@ -241,7 +244,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		);
 		PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper =
 				new PojoImplicitReindexingResolverBuildingHelper(
-						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
+						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes,
+						defaultReindexOnUpdate
 				);
 
 		PojoMappingDelegate mappingDelegate;

@@ -34,6 +34,8 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final PojoAssociationPathInverter pathInverter;
 	private final Set<PojoRawTypeModel<?>> entityTypes;
+	private final ReindexOnUpdate defaultReindexOnUpdate;
+
 	private final Map<PojoRawTypeModel<?>, Set<PojoRawTypeModel<?>>> concreteEntitySubTypesByEntitySuperType =
 			new HashMap<>();
 	private final Map<PojoRawTypeModel<?>, PojoImplicitReindexingResolverBuilder<?>> builderByType =
@@ -43,11 +45,13 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			ContainerExtractorBinder extractorBinder,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
 			PojoAssociationPathInverter pathInverter,
-			Set<PojoRawTypeModel<?>> entityTypes) {
+			Set<PojoRawTypeModel<?>> entityTypes,
+			ReindexOnUpdate defaultReindexOnUpdate) {
 		this.extractorBinder = extractorBinder;
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 		this.pathInverter = pathInverter;
 		this.entityTypes = entityTypes;
+		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 
 		for ( PojoRawTypeModel<?> entityType : entityTypes ) {
 			if ( !entityType.isAbstract() ) {
@@ -161,7 +165,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 				}
 			}
 
-			return reindexOnUpdateOptional.orElse( ReindexOnUpdate.DEFAULT );
+			return reindexOnUpdateOptional.orElse( defaultReindexOnUpdate );
 		}
 	}
 
