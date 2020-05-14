@@ -13,7 +13,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -34,7 +33,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *     <li>The field value (the value of your annotated property, or at least the value produced by your custom
  *     {@link #valueBridge() value bridge} must be of type String</li>
  *     <li>You must assign an analyzer when using this annotation</li>
- *     <li>This annotation does not allow to make the field sortable (analyzed fields cannot be sorted on)</li>
+ *     <li>This annotation does not allow making the field sortable (analyzed fields cannot be sorted on)</li>
+ *     <li>This annotation does not allow making the field aggregable (analyzed fields cannot be aggregated on)</li>
  * </ul>
  * <p>
  * If you want to index a non-String value, use the {@link GenericField} annotation instead.
@@ -93,13 +93,6 @@ public @interface FullTextField {
 	 * @see Searchable
 	 */
 	Searchable searchable() default Searchable.DEFAULT;
-
-	/**
-	 * @return Whether aggregations are enabled for this field.
-	 * @see GenericField#aggregable()
-	 * @see Aggregable
-	 */
-	Aggregable aggregable() default Aggregable.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.

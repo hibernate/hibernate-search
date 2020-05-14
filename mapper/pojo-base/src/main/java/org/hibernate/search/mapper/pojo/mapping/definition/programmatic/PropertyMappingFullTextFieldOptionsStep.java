@@ -13,6 +13,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 /**
  * The step in a property-to-index-field mapping where optional parameters can be set,
  * when the index field is a full-text field.
+ *
+ * @see FullTextField
  */
 public interface PropertyMappingFullTextFieldOptionsStep
 		extends PropertyMappingStandardFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep> {
