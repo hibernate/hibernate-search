@@ -28,11 +28,11 @@ public class SearchHitAssert<H> {
 		return this;
 	}
 
-	public void isDocRefHit(String indexName, String id, String... orIds) {
+	public void isDocRefHit(String typeName, String id, String... orIds) {
 		Set<DocumentReference> references = new HashSet<>();
-		references.add( NormalizationUtils.reference( indexName, id ) );
+		references.add( NormalizationUtils.reference( typeName, id ) );
 		for ( String orId : orIds ) {
-			references.add( NormalizationUtils.reference( indexName, orId ) );
+			references.add( NormalizationUtils.reference( typeName, orId ) );
 		}
 
 		DocumentReference actualReference = NormalizationUtils.normalize( (DocumentReference) actual );

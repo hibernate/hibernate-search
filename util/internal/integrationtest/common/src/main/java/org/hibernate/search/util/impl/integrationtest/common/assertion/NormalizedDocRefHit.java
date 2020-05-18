@@ -21,8 +21,8 @@ public class NormalizedDocRefHit {
 		return builder.build();
 	}
 
-	public static DocumentReference[] of(String indexName, String firstId, String... otherIds) {
-		return of( b -> b.doc( indexName, firstId, otherIds ) );
+	public static DocumentReference[] of(String typeName, String firstId, String... otherIds) {
+		return of( b -> b.doc( typeName, firstId, otherIds ) );
 	}
 
 	private NormalizedDocRefHit() {
@@ -35,10 +35,10 @@ public class NormalizedDocRefHit {
 		private Builder() {
 		}
 
-		public Builder doc(String indexName, String firstId, String... otherIds) {
-			expectedHits.add( NormalizationUtils.reference( indexName, firstId ) );
+		public Builder doc(String typeName, String firstId, String... otherIds) {
+			expectedHits.add( NormalizationUtils.reference( typeName, firstId ) );
 			for ( String id : otherIds ) {
-				expectedHits.add( NormalizationUtils.reference( indexName, id ) );
+				expectedHits.add( NormalizationUtils.reference( typeName, id ) );
 			}
 			return this;
 		}

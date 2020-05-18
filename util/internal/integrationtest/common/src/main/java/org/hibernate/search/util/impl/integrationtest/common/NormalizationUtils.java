@@ -33,8 +33,8 @@ public final class NormalizationUtils {
 	private NormalizationUtils() {
 	}
 
-	public static DocumentReference reference(String indexName, String id) {
-		return new NormalizedDocumentReference( indexName, id );
+	public static DocumentReference reference(String typeName, String id) {
+		return new NormalizedDocumentReference( typeName, id );
 	}
 
 	// The casts will work fine as long as we don't reference subclasses of the normalized classes in our tests
