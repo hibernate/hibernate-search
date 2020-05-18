@@ -360,7 +360,7 @@ For example, the implementation below will lead to the following layout for an i
 * Read operations (searching, explaining, ...) will target the alias `myindex` (no suffix).
 * If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>
 at exactly 19:19:00 on November 6th, 2017,
-it will name the index `myindex-20201106-191900-000000000`.
+it will name the index `myindex-20171106-191900-000000000`.
 
 .Implementing a custom index layout strategy with the Elasticsearch backend
 ====
