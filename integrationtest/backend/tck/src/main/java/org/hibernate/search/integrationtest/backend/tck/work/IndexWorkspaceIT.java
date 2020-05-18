@@ -99,14 +99,12 @@ public class IndexWorkspaceIT {
 	}
 
 	private void createBookIndexes(StubBackendSessionContext sessionContext) {
-		index.initAsync(
-				sessionContext,
-				NUMBER_OF_BOOKS, i -> documentProvider(
+		index.bulkIndexer( sessionContext, false ) // No refresh
+				.add( NUMBER_OF_BOOKS, i -> documentProvider(
 						String.valueOf( i ),
 						document -> document.addValue( index.binding().title, "The Lord of the Rings cap. " + i )
-				),
-				false // No refresh
-		).join();
+				) )
+				.join();
 	}
 
 	private void assertBookNumberIsEqualsTo(long bookNumber, StubBackendSessionContext sessionContext) {

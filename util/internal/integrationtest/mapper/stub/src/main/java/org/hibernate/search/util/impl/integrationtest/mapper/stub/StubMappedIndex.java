@@ -6,14 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -34,8 +28,6 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
  * such as methods that do not force to provide a session context.
  */
 public abstract class StubMappedIndex {
-
-	private static final int INIT_BATCH_SIZE = 500;
 
 	public static StubMappedIndex withoutFields() {
 		return ofAdvancedNonRetrievable( ignored -> { } );
@@ -103,68 +95,16 @@ public abstract class StubMappedIndex {
 		return delegate().getSchemaManager();
 	}
 
-	public CompletableFuture<?> initAsync(StubDocumentProvider ... documentProviders) {
-		return initAsync( Arrays.asList( documentProviders ) );
+	public BulkIndexer bulkIndexer() {
+		return bulkIndexer( new StubBackendSessionContext(), true );
 	}
 
-	public CompletableFuture<?> initAsync(int documentCount,
-			IntFunction<StubDocumentProvider> documentProviderGenerator) {
-		return initAsync( documentCount, documentProviderGenerator, true );
+	public BulkIndexer bulkIndexer(boolean refresh) {
+		return bulkIndexer( new StubBackendSessionContext(), refresh );
 	}
 
-	public CompletableFuture<?> initAsync(int documentCount,
-			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean refresh) {
-		return initAsync( new StubBackendSessionContext(), documentCount, documentProviderGenerator, refresh );
-	}
-
-	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext, int documentCount,
-			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean refresh) {
-		return initAsync(
-				sessionContext,
-				IntStream.range( 0, documentCount )
-						.mapToObj( documentProviderGenerator )
-						.collect( Collectors.toList() ),
-				refresh
-		);
-	}
-
-	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders) {
-		return initAsync( documentProviders, true );
-	}
-
-	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders, boolean refresh) {
-		return initAsync( new StubBackendSessionContext(), documentProviders, refresh );
-	}
-
-	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext,
-			List<StubDocumentProvider> documentProviders, boolean refresh) {
-		if ( documentProviders.isEmpty() ) {
-			return CompletableFuture.completedFuture( null );
-		}
-		IndexIndexer indexer = createIndexer( sessionContext );
-		CompletableFuture<?> future = CompletableFuture.completedFuture( null );
-		for ( int i = 0; i < documentProviders.size(); i += INIT_BATCH_SIZE ) {
-			int batchStart = i;
-			int batchSize = Math.min( batchStart + INIT_BATCH_SIZE, documentProviders.size() ) - batchStart;
-			future = future.thenCompose( ignored -> {
-				CompletableFuture<?>[] batchFutures = new CompletableFuture[batchSize];
-				for ( int j = 0; j < batchSize; j++ ) {
-					StubDocumentProvider documentProvider = documentProviders.get( batchStart + j );
-					batchFutures[j] = indexer.add(
-							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
-							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-					);
-				}
-				return CompletableFuture.allOf( batchFutures );
-			} );
-		}
-		if ( refresh ) {
-			IndexWorkspace workspace = createWorkspace( sessionContext );
-			return future.thenCompose( ignored -> workspace.refresh() );
-		}
-		else {
-			return future;
-		}
+	public BulkIndexer bulkIndexer(StubBackendSessionContext sessionContext, boolean refresh) {
+		return new BulkIndexer( delegate(), sessionContext, refresh );
 	}
 
 	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {

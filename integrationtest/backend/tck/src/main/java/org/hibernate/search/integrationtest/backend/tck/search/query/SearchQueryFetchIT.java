@@ -272,12 +272,12 @@ public class SearchQueryFetchIT {
 	}
 
 	private void initData() {
-		index.initAsync(
-				DOCUMENT_COUNT, i -> documentProvider(
+		index.bulkIndexer()
+				.add( DOCUMENT_COUNT, i -> documentProvider(
 						docId( i ),
 						document -> document.addValue( index.binding().integer, i )
-				)
-		).join();
+				) )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

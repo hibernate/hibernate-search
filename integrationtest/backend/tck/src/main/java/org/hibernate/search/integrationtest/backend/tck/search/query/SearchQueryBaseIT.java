@@ -123,12 +123,12 @@ public class SearchQueryBaseIT {
 	}
 
 	private void initData(int documentCount) {
-		index.initAsync(
-				documentCount, i -> documentProvider(
+		index.bulkIndexer()
+				.add( documentCount, i -> documentProvider(
 						String.valueOf( i ),
 						document -> document.addValue( index.binding().string, "value" + i )
-				)
-		).join();
+				) )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

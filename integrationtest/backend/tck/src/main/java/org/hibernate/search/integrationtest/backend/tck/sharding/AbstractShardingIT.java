@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +17,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubDocumentProvider;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 /**
@@ -53,17 +52,17 @@ public abstract class AbstractShardingIT {
 	}
 
 	protected final void initData(Map<String, List<String>> docIdByRoutingKey) {
-		List<StubDocumentProvider> documentProviders = new ArrayList<>();
+		BulkIndexer indexer = index.bulkIndexer();
 		for ( Map.Entry<String, List<String>> entry : docIdByRoutingKey.entrySet() ) {
 			String routingKey = entry.getKey();
 			for ( String documentId : entry.getValue() ) {
-				documentProviders.add( documentProvider(
+				indexer.add( documentProvider(
 						documentId, routingKey,
 						document -> document.addValue( index.binding().indexedRoutingKey, routingKey )
 				) );
 			}
 		}
-		index.initAsync( documentProviders ).join();
+		indexer.join();
 	}
 
 	protected static class IndexBinding {

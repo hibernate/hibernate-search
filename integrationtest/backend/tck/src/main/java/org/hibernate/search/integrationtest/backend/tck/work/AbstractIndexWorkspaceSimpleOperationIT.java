@@ -108,13 +108,12 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 		beforeInitData( index );
 
-		index.initAsync(
-				DOCUMENT_COUNT, i -> documentProvider(
+		index.bulkIndexer( false ) // No refresh
+				.add( DOCUMENT_COUNT, i -> documentProvider(
 						String.valueOf( i ),
 						document -> document.addValue( index.binding().text, "Text #" + i )
-				),
-				false // No refresh
-		).join();
+				) )
+				.join();
 
 		afterInitData( index );
 	}
