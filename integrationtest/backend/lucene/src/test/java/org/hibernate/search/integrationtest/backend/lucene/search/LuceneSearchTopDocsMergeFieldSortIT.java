@@ -402,10 +402,6 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		);
 	}
 
-	private F getSingleValueForMissingUse(int ordinal) {
-		return fieldTypeDescriptor.getAscendingUniqueTermValues().getSingle().get( ordinal );
-	}
-
 	private static <F> void addSingleValue(SimpleFieldModel<F> fieldModel, DocumentElement documentElement, Integer ordinal) {
 		if ( ordinal == null ) {
 			return;
