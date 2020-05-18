@@ -121,7 +121,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 						String.valueOf( i ),
 						document -> document.addValue( indexMapping.text, "Text #" + i )
 				),
-				false // No commit/refresh
+				false // No refresh
 		).join();
 
 		afterInitData( indexManager );

@@ -120,7 +120,7 @@ public class IndexWorkspaceIT {
 						String.valueOf( i ),
 						document -> document.addValue( indexMapping.title, "The Lord of the Rings cap. " + i )
 				),
-				false // Do not commit and refresh
+				false // No refresh
 		).join();
 	}
 

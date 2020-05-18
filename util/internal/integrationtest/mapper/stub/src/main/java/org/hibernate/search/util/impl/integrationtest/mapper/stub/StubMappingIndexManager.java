@@ -54,18 +54,18 @@ public abstract class StubMappingIndexManager {
 	}
 
 	public CompletableFuture<?> initAsync(int documentCount,
-			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean commitAndRefresh) {
-		return initAsync( new StubBackendSessionContext(), documentCount, documentProviderGenerator, commitAndRefresh );
+			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean refresh) {
+		return initAsync( new StubBackendSessionContext(), documentCount, documentProviderGenerator, refresh );
 	}
 
 	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext, int documentCount,
-			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean commitAndRefresh) {
+			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean refresh) {
 		return initAsync(
 				sessionContext,
 				IntStream.range( 0, documentCount )
 						.mapToObj( documentProviderGenerator )
 						.collect( Collectors.toList() ),
-				commitAndRefresh
+				refresh
 		);
 	}
 
@@ -73,12 +73,12 @@ public abstract class StubMappingIndexManager {
 		return initAsync( documentProviders, true );
 	}
 
-	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders, boolean commitAndRefresh) {
-		return initAsync( new StubBackendSessionContext(), documentProviders, commitAndRefresh );
+	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders, boolean refresh) {
+		return initAsync( new StubBackendSessionContext(), documentProviders, refresh );
 	}
 
 	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext,
-			List<StubDocumentProvider> documentProviders, boolean commitAndRefresh) {
+			List<StubDocumentProvider> documentProviders, boolean refresh) {
 		if ( documentProviders.isEmpty() ) {
 			return CompletableFuture.completedFuture( null );
 		}
@@ -99,10 +99,9 @@ public abstract class StubMappingIndexManager {
 				return CompletableFuture.allOf( batchFutures );
 			} );
 		}
-		if ( commitAndRefresh ) {
+		if ( refresh ) {
 			IndexWorkspace workspace = createWorkspace( sessionContext );
-			return future.thenCompose( ignored -> workspace.flush() )
-					.thenCompose( ignored -> workspace.refresh() );
+			return future.thenCompose( ignored -> workspace.refresh() );
 		}
 		else {
 			return future;
