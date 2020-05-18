@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.document;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -237,9 +235,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( id ), documentContributor::accept );
-		plan.execute().join();
+		index.index( id, documentContributor::accept );
 	}
 
 	private String getRelativeFieldName() {

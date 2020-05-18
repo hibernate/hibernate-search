@@ -715,14 +715,9 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-
-		assertThatThrownBy(
-				() -> plan.add( referenceProvider( FIRST_ID ), document -> {
-					document.addValue( mainIndex.binding().nativeField_invalidFieldPath, 45 );
-				} ),
-				"native field contributing field with invalid field path"
-		)
+		assertThatThrownBy( () -> mainIndex.index( FIRST_ID, document ->
+			document.addValue( mainIndex.binding().nativeField_invalidFieldPath, 45 )
+		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
 	}

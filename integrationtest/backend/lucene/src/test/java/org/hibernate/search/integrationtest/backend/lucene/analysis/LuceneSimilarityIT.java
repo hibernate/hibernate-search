@@ -7,14 +7,12 @@
 package org.hibernate.search.integrationtest.backend.lucene.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -53,9 +51,7 @@ public class LuceneSimilarityIT {
 				} );
 
 		// Add a document to the index
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute().join();
+		index.index( "1", document -> { } );
 
 		// Check that writing succeeded
 		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
@@ -79,9 +75,7 @@ public class LuceneSimilarityIT {
 				} );
 
 		// Add a document to the index
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> { } );
-		plan.execute().join();
+		index.index( "1", document -> { } );
 
 		// Check that writing succeeded
 		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
