@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaMana
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -93,6 +94,15 @@ public abstract class StubMappedIndex {
 
 	public IndexSchemaManager getSchemaManager() {
 		return delegate().getSchemaManager();
+	}
+
+	/**
+	 * Execute indexing for the given document, without waiting for the change to be committed.
+	 * <p>
+	 * Used to test indexing of specific data in tests that are not specifically about indexing.
+	 */
+	public void index(String id, DocumentContributor documentContributor) {
+		bulkIndexer().add( id, documentContributor ).join();
 	}
 
 	public BulkIndexer bulkIndexer() {
