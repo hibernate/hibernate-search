@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperationIT {
 
@@ -34,14 +34,14 @@ public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperati
 	}
 
 	@Override
-	protected void beforeInitData(StubMappingIndexManager index) {
+	protected void beforeInitData(StubMappedIndex index) {
 		// Make sure index readers are initialized before writing,
 		// otherwise the preconditions won't be met.
 		index.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
 	}
 
 	@Override
-	protected void assertPreconditions(StubMappingIndexManager index) {
+	protected void assertPreconditions(StubMappedIndex index) {
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		// Indexes haven't been refreshed yet, so documents added so far are missing.
@@ -49,7 +49,7 @@ public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperati
 	}
 
 	@Override
-	protected void assertSuccess(StubMappingIndexManager index) {
+	protected void assertSuccess(StubMappedIndex index) {
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		// After a refresh, documents are visible

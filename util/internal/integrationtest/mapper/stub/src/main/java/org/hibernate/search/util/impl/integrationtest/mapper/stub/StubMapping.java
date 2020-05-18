@@ -74,10 +74,6 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 		// Nothing to do
 	}
 
-	public StubMappingIndexManager getIndexMappingByTypeIdentifier(String typeId) {
-		return mappedIndexesByTypeIdentifier.get( typeId );
-	}
-
 	private CompletableFuture<?> doSchemaManagementOperation(
 			Function<IndexSchemaManager, CompletableFuture<?>> operation,
 			ContextualFailureCollector failureCollector) {
