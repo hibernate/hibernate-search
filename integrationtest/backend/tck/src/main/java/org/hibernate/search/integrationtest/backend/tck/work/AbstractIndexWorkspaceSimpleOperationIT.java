@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.Rule;
@@ -89,19 +89,19 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	protected abstract void ensureOperationsFail(TckBackendAccessor accessor, String indexName);
 
-	protected void beforeInitData(StubMappingIndexManager index) {
+	protected void beforeInitData(StubMappedIndex index) {
 		// Nothing to do by default.
 	}
 
-	protected void afterInitData(StubMappingIndexManager index) {
+	protected void afterInitData(StubMappedIndex index) {
 		// Nothing to do by default.
 	}
 
-	protected abstract void assertPreconditions(StubMappingIndexManager index);
+	protected abstract void assertPreconditions(StubMappedIndex index);
 
 	protected abstract CompletableFuture<?> executeAsync(IndexWorkspace workspace);
 
-	protected abstract void assertSuccess(StubMappingIndexManager index);
+	protected abstract void assertSuccess(StubMappedIndex index);
 
 	private void setup() {
 		setupHelper.start().withIndex( index ).setup();

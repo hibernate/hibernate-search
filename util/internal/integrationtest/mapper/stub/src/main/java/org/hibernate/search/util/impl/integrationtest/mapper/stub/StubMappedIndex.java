@@ -6,16 +6,36 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 
-// TODO This extends StubMappingIndexManager for backward compatibility; ideally we'll move everything to this class, eventually.
-public abstract class StubMappedIndex extends StubMappingIndexManager {
+/**
+ * A wrapper around {@link MappedIndexManager} providing some syntactic sugar,
+ * such as methods that do not force to provide a session context.
+ */
+public abstract class StubMappedIndex {
+
+	private static final int INIT_BATCH_SIZE = 500;
 
 	public static StubMappedIndex withoutFields() {
 		return ofAdvancedNonRetrievable( ignored -> { } );
@@ -44,7 +64,6 @@ public abstract class StubMappedIndex extends StubMappingIndexManager {
 		this.typeName = null;
 	}
 
-	@Override
 	public final String name() {
 		return indexName;
 	}
@@ -76,13 +95,156 @@ public abstract class StubMappedIndex extends StubMappingIndexManager {
 		return manager.toAPI();
 	}
 
+	public <T> T unwrapForTests(Class<T> clazz) {
+		return clazz.cast( delegate().toAPI() );
+	}
+
+	public IndexSchemaManager getSchemaManager() {
+		return delegate().getSchemaManager();
+	}
+
+	public CompletableFuture<?> initAsync(StubDocumentProvider ... documentProviders) {
+		return initAsync( Arrays.asList( documentProviders ) );
+	}
+
+	public CompletableFuture<?> initAsync(int documentCount,
+			IntFunction<StubDocumentProvider> documentProviderGenerator) {
+		return initAsync( documentCount, documentProviderGenerator, true );
+	}
+
+	public CompletableFuture<?> initAsync(int documentCount,
+			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean refresh) {
+		return initAsync( new StubBackendSessionContext(), documentCount, documentProviderGenerator, refresh );
+	}
+
+	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext, int documentCount,
+			IntFunction<StubDocumentProvider> documentProviderGenerator, boolean refresh) {
+		return initAsync(
+				sessionContext,
+				IntStream.range( 0, documentCount )
+						.mapToObj( documentProviderGenerator )
+						.collect( Collectors.toList() ),
+				refresh
+		);
+	}
+
+	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders) {
+		return initAsync( documentProviders, true );
+	}
+
+	public CompletableFuture<?> initAsync(List<StubDocumentProvider> documentProviders, boolean refresh) {
+		return initAsync( new StubBackendSessionContext(), documentProviders, refresh );
+	}
+
+	public CompletableFuture<?> initAsync(StubBackendSessionContext sessionContext,
+			List<StubDocumentProvider> documentProviders, boolean refresh) {
+		if ( documentProviders.isEmpty() ) {
+			return CompletableFuture.completedFuture( null );
+		}
+		IndexIndexer indexer = createIndexer( sessionContext );
+		CompletableFuture<?> future = CompletableFuture.completedFuture( null );
+		for ( int i = 0; i < documentProviders.size(); i += INIT_BATCH_SIZE ) {
+			int batchStart = i;
+			int batchSize = Math.min( batchStart + INIT_BATCH_SIZE, documentProviders.size() ) - batchStart;
+			future = future.thenCompose( ignored -> {
+				CompletableFuture<?>[] batchFutures = new CompletableFuture[batchSize];
+				for ( int j = 0; j < batchSize; j++ ) {
+					StubDocumentProvider documentProvider = documentProviders.get( batchStart + j );
+					batchFutures[j] = indexer.add(
+							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
+							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					);
+				}
+				return CompletableFuture.allOf( batchFutures );
+			} );
+		}
+		if ( refresh ) {
+			IndexWorkspace workspace = createWorkspace( sessionContext );
+			return future.thenCompose( ignored -> workspace.refresh() );
+		}
+		else {
+			return future;
+		}
+	}
+
+	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {
+		return createIndexingPlan( new StubBackendSessionContext() );
+	}
+
+	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext) {
+		/*
+		 * Use the same defaults as in the ORM mapper for the commit strategy,
+		 * but force refreshes because it's more convenient for tests.
+		 */
+		return delegate().createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
+	}
+
+	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return delegate().createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+				commitStrategy, refreshStrategy );
+	}
+
+	public IndexIndexer createIndexer() {
+		return createIndexer( new StubBackendSessionContext() );
+	}
+
+	public IndexIndexer createIndexer(StubBackendSessionContext sessionContext) {
+		return delegate().createIndexer( sessionContext );
+	}
+
+	public IndexWorkspace createWorkspace() {
+		return createWorkspace( new StubBackendSessionContext() );
+	}
+
+	public IndexWorkspace createWorkspace(StubBackendSessionContext sessionContext) {
+		return createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
+	}
+
+	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+		return delegate().createWorkspace( sessionContext );
+	}
+
+	/**
+	 * @return A scope containing this index only.
+	 */
+	public StubMappingScope createScope() {
+		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
+				delegate().createScopeBuilder( new StubBackendMappingContext() );
+		return new StubMappingScope( builder.build() );
+	}
+
+	/**
+	 * @return A scope containing this index and the given other indexes.
+	 */
+	public StubMappingScope createScope(StubMappedIndex... others) {
+		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
+				delegate().createScopeBuilder( new StubBackendMappingContext() );
+		for ( StubMappedIndex other : others ) {
+			other.delegate().addTo( builder );
+		}
+		return new StubMappingScope( builder.build() );
+	}
+
+	/**
+	 * @return A scope containing this index and the given other indexes.
+	 */
+	public <R, E> GenericStubMappingScope<R, E> createGenericScope(StubMappedIndex... others) {
+		MappedIndexScopeBuilder<R, E> builder =
+				delegate().createScopeBuilder( new StubBackendMappingContext() );
+		for ( StubMappedIndex other : others ) {
+			other.delegate().addTo( builder );
+		}
+		return new GenericStubMappingScope<>( builder.build() );
+	}
+
 	protected abstract void bind(IndexedEntityBindingContext context);
 
 	protected void onIndexManagerCreated(MappedIndexManager manager) {
 		this.manager = manager;
 	}
 
-	@Override
 	protected MappedIndexManager delegate() {
 		return manager;
 	}

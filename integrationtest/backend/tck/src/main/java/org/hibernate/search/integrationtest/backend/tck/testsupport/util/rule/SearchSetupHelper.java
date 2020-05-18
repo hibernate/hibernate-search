@@ -35,7 +35,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -242,32 +241,6 @@ public class SearchSetupHelper implements TestRule {
 		public SearchIntegration setup() {
 			return setupFirstPhaseOnly().doSecondPhase();
 		}
-
-	}
-
-	public static class StubTypeMappingConfigurationContext {
-
-		private String typeName;
-		private String backendName;
-
-		public StubTypeMappingConfigurationContext() {
-		}
-
-		public StubTypeMappingConfigurationContext mappedType(String typeName) {
-			this.typeName = typeName;
-			return this;
-		}
-
-		public StubTypeMappingConfigurationContext backend(String backendName) {
-			this.backendName = backendName;
-			return this;
-		}
-
-	}
-
-	public interface IndexSetupListener {
-
-		void onSetup(StubMappingIndexManager indexMapping);
 
 	}
 

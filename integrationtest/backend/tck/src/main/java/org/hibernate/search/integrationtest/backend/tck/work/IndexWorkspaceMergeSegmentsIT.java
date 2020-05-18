@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleOperationIT {
 
@@ -25,12 +25,12 @@ public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleO
 	}
 
 	@Override
-	protected void assertPreconditions(StubMappingIndexManager index) {
+	protected void assertPreconditions(StubMappedIndex index) {
 		// No measurable effect: don't assert anything.
 	}
 
 	@Override
-	protected void assertSuccess(StubMappingIndexManager index) {
+	protected void assertSuccess(StubMappedIndex index) {
 		// No measurable effect: don't assert anything.
 	}
 }

@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperationIT {
 
@@ -28,14 +28,14 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	}
 
 	@Override
-	protected void afterInitData(StubMappingIndexManager index) {
+	protected void afterInitData(StubMappedIndex index) {
 		// Make sure to flush the index, otherwise the test won't fail as expected with Lucene,
 		// probably because the index writer optimizes purges when changes are not committed yet.
 		index.createWorkspace().flush();
 	}
 
 	@Override
-	protected void assertPreconditions(StubMappingIndexManager index) {
+	protected void assertPreconditions(StubMappedIndex index) {
 		index.createWorkspace().refresh().join();
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
@@ -43,7 +43,7 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	}
 
 	@Override
-	protected void assertSuccess(StubMappingIndexManager index) {
+	protected void assertSuccess(StubMappedIndex index) {
 		index.createWorkspace().refresh().join();
 		long count = index.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
