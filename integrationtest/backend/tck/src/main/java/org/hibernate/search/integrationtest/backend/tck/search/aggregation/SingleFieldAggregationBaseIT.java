@@ -15,9 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -41,8 +39,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubDocumentProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -101,16 +99,13 @@ public class SingleFieldAggregationBaseIT<F> {
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, emptyIndex, nullOnlyIndex ).setup();
 
-		List<StubDocumentProvider> mainIndexDocuments = new ArrayList<>();
-		List<StubDocumentProvider> nullOnlyIndexDocuments = new ArrayList<>();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer();
+		BulkIndexer nullOnlyIndexer = nullOnlyIndex.bulkIndexer();
 		for ( DataSet<?> dataSet : dataSets ) {
-			dataSet.contribute( mainIndexDocuments::add, nullOnlyIndexDocuments::add );
+			dataSet.contribute( mainIndexer, nullOnlyIndexer );
 		}
 
-		CompletableFuture.allOf(
-				mainIndex.initAsync( mainIndexDocuments ),
-				nullOnlyIndex.initAsync( nullOnlyIndexDocuments )
-		).join();
+		mainIndexer.join( nullOnlyIndexer );
 	}
 
 	private final SupportedSingleFieldAggregationExpectations<F> expectations;
@@ -341,14 +336,13 @@ public class SingleFieldAggregationBaseIT<F> {
 			this.fieldStructure = fieldStructure;
 		}
 
-		private void contribute(Consumer<StubDocumentProvider> mainIndexDocuments,
-				Consumer<StubDocumentProvider> nullOnlyIndexDocuments) {
+		private void contribute(BulkIndexer mainIndexer, BulkIndexer nullOnlyIndexer) {
 			if ( fieldStructure.isSingleValued() ) {
 				List<F> values = expectations.getMainIndexDocumentFieldValues();
 				for ( int i = 0; i < values.size(); i++ ) {
 					F valueForDocument = values.get( i );
 					F garbageValueForDocument = values.get( i == 0 ? 1 : i - 1 );
-					mainIndexDocuments.accept(
+					mainIndexer.add(
 							documentProvider( name + "_document_" + i, name, document -> {
 								initSingleValued( mainIndex.binding(), document,
 										valueForDocument, garbageValueForDocument );
@@ -361,7 +355,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				for ( int i = 0; i < values.size(); i++ ) {
 					List<F> valuesForDocument = values.get( i );
 					List<F> garbageValuesForDocument = values.get( i == 0 ? 1 : i - 1 );
-					mainIndexDocuments.accept(
+					mainIndexer.add(
 							documentProvider( name + "_document_" + i, name, document -> {
 								initMultiValued( mainIndex.binding(), document,
 										valuesForDocument, garbageValuesForDocument );
@@ -369,11 +363,11 @@ public class SingleFieldAggregationBaseIT<F> {
 					);
 				}
 			}
-			mainIndexDocuments.accept(
+			mainIndexer.add(
 					documentProvider( name + "_document_empty", name, document -> { } )
 			);
 
-			nullOnlyIndexDocuments.accept(
+			nullOnlyIndexer.add(
 					documentProvider( name + "_nullOnlyIndex_document_0", name, document -> {
 						if ( fieldStructure.isSingleValued() ) {
 							initSingleValued( nullOnlyIndex.binding(), document, null, null );
