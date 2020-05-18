@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -19,7 +18,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -174,20 +172,20 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "negative-infinity" ), document -> {
-			document.addValue( index.binding().floatFieldModel.reference, Float.NEGATIVE_INFINITY );
-			document.addValue( index.binding().doubleFieldModel.reference, Double.NEGATIVE_INFINITY );
-		} );
-		plan.add( referenceProvider( "zero" ), document -> {
-			document.addValue( index.binding().floatFieldModel.reference, 0f );
-			document.addValue( index.binding().doubleFieldModel.reference, 0d );
-		} );
-		plan.add( referenceProvider( "positive-infinity" ), document -> {
-			document.addValue( index.binding().floatFieldModel.reference, Float.POSITIVE_INFINITY );
-			document.addValue( index.binding().doubleFieldModel.reference, Double.POSITIVE_INFINITY );
-		} );
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( "negative-infinity", document -> {
+					document.addValue( index.binding().floatFieldModel.reference, Float.NEGATIVE_INFINITY );
+					document.addValue( index.binding().doubleFieldModel.reference, Double.NEGATIVE_INFINITY );
+				} )
+				.add( "zero", document -> {
+					document.addValue( index.binding().floatFieldModel.reference, 0f );
+					document.addValue( index.binding().doubleFieldModel.reference, 0d );
+				} )
+				.add( "positive-infinity", document -> {
+					document.addValue( index.binding().floatFieldModel.reference, Float.POSITIVE_INFINITY );
+					document.addValue( index.binding().doubleFieldModel.reference, Double.POSITIVE_INFINITY );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(

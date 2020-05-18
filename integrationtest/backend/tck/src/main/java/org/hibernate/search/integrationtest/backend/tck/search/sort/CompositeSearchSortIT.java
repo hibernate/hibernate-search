@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Function;
 
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -295,35 +293,35 @@ public class CompositeSearchSortIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			index.binding().identicalForFirstTwo.write( document, "aaa" );
-			index.binding().identicalForLastTwo.write( document, "aaa" );
+		index.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					index.binding().identicalForFirstTwo.write( document, "aaa" );
+					index.binding().identicalForLastTwo.write( document, "aaa" );
 
-			DocumentElement flattened = document.addObject( index.binding().flattenedObject );
-			index.binding().flattenedField.write( flattened, "aaa" );
-			DocumentElement nested = document.addObject( index.binding().nestedObject );
-			index.binding().nestedField.write( nested, "bbb" );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			index.binding().identicalForFirstTwo.write( document, "aaa" );
-			index.binding().identicalForLastTwo.write( document, "bbb" );
+					DocumentElement flattened = document.addObject( index.binding().flattenedObject );
+					index.binding().flattenedField.write( flattened, "aaa" );
+					DocumentElement nested = document.addObject( index.binding().nestedObject );
+					index.binding().nestedField.write( nested, "bbb" );
+				} )
+				.add( DOCUMENT_2, document -> {
+					index.binding().identicalForFirstTwo.write( document, "aaa" );
+					index.binding().identicalForLastTwo.write( document, "bbb" );
 
-			DocumentElement flattened = document.addObject( index.binding().flattenedObject );
-			index.binding().flattenedField.write( flattened, "bbb" );
-			DocumentElement nested = document.addObject( index.binding().nestedObject );
-			index.binding().nestedField.write( nested, "aaa" );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			index.binding().identicalForFirstTwo.write( document, "bbb" );
-			index.binding().identicalForLastTwo.write( document, "bbb" );
+					DocumentElement flattened = document.addObject( index.binding().flattenedObject );
+					index.binding().flattenedField.write( flattened, "bbb" );
+					DocumentElement nested = document.addObject( index.binding().nestedObject );
+					index.binding().nestedField.write( nested, "aaa" );
+				} )
+				.add( DOCUMENT_3, document -> {
+					index.binding().identicalForFirstTwo.write( document, "bbb" );
+					index.binding().identicalForLastTwo.write( document, "bbb" );
 
-			DocumentElement flattened = document.addObject( index.binding().flattenedObject );
-			index.binding().flattenedField.write( flattened, "aaa" );
-			DocumentElement nested = document.addObject( index.binding().nestedObject );
-			index.binding().nestedField.write( nested, "aaa" );
-		} );
-		plan.execute().join();
+					DocumentElement flattened = document.addObject( index.binding().flattenedObject );
+					index.binding().flattenedField.write( flattened, "aaa" );
+					DocumentElement nested = document.addObject( index.binding().nestedObject );
+					index.binding().nestedField.write( nested, "aaa" );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = index.createScope().query()

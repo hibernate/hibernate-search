@@ -7,14 +7,12 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -333,16 +331,15 @@ public class SearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( mainIndex.binding().string, STRING_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( mainIndex.binding().string, STRING_2 );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
-
-		plan.execute().join();
+		mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					document.addValue( mainIndex.binding().string, STRING_1 );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( mainIndex.binding().string, STRING_2 );
+				} )
+				.add( EMPTY, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

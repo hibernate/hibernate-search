@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Function;
 
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -31,6 +29,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
@@ -304,44 +303,44 @@ public class ImplicitNestedSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			DocumentElement nestedDocument = document.addObject( index.binding().nested );
-			nestedDocument.addValue( index.binding().nestedString, SOME_STRING );
-			nestedDocument.addValue( index.binding().nestedNumeric, SOME_INTEGER );
-			nestedDocument.addValue( index.binding().nestedText, SOME_PHRASE_TEXT );
-			nestedDocument.addValue( index.binding().nestedGeo, G11 );
+		index.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					DocumentElement nestedDocument = document.addObject( index.binding().nested );
+					nestedDocument.addValue( index.binding().nestedString, SOME_STRING );
+					nestedDocument.addValue( index.binding().nestedNumeric, SOME_INTEGER );
+					nestedDocument.addValue( index.binding().nestedText, SOME_PHRASE_TEXT );
+					nestedDocument.addValue( index.binding().nestedGeo, G11 );
 
-			DocumentElement nestedDocumentX2 = nestedDocument.addObject( index.binding().nestedX2 );
-			nestedDocumentX2.addValue( index.binding().nestedX2Numeric, SOME_INTEGER );
+					DocumentElement nestedDocumentX2 = nestedDocument.addObject( index.binding().nestedX2 );
+					nestedDocumentX2.addValue( index.binding().nestedX2Numeric, SOME_INTEGER );
 
-			DocumentElement nestedDocumentX3 = nestedDocumentX2.addObject( index.binding().nestedX3 );
-			nestedDocumentX3.addValue( index.binding().nestedX3String, SOME_STRING );
-			nestedDocumentX3.addValue( index.binding().nestedX3Text, SOME_PHRASE_TEXT );
+					DocumentElement nestedDocumentX3 = nestedDocumentX2.addObject( index.binding().nestedX3 );
+					nestedDocumentX3.addValue( index.binding().nestedX3String, SOME_STRING );
+					nestedDocumentX3.addValue( index.binding().nestedX3Text, SOME_PHRASE_TEXT );
 
-			DocumentElement nestFlatNestDocument = nestedDocument.addObject( index.binding().nestFlat ).addObject( index.binding().nestFlatNest );
-			nestFlatNestDocument.addValue( index.binding().nestFlatNestNumeric, SOME_INTEGER );
-			nestFlatNestDocument.addValue( index.binding().nestFlatNestText, SOME_PHRASE_KEY );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			DocumentElement nestedDocument = document.addObject( index.binding().nested );
-			nestedDocument.addValue( index.binding().nestedString, OTHER_STRING );
-			nestedDocument.addValue( index.binding().nestedNumeric, OTHER_INTEGER );
-			nestedDocument.addValue( index.binding().nestedText, OTHER_PHRASE_TEXT );
-			nestedDocument.addValue( index.binding().nestedGeo, G33 );
+					DocumentElement nestFlatNestDocument = nestedDocument.addObject( index.binding().nestFlat ).addObject( index.binding().nestFlatNest );
+					nestFlatNestDocument.addValue( index.binding().nestFlatNestNumeric, SOME_INTEGER );
+					nestFlatNestDocument.addValue( index.binding().nestFlatNestText, SOME_PHRASE_KEY );
+				} )
+				.add( DOCUMENT_2, document -> {
+					DocumentElement nestedDocument = document.addObject( index.binding().nested );
+					nestedDocument.addValue( index.binding().nestedString, OTHER_STRING );
+					nestedDocument.addValue( index.binding().nestedNumeric, OTHER_INTEGER );
+					nestedDocument.addValue( index.binding().nestedText, OTHER_PHRASE_TEXT );
+					nestedDocument.addValue( index.binding().nestedGeo, G33 );
 
-			DocumentElement nestedDocumentX2 = nestedDocument.addObject( index.binding().nestedX2 );
-			nestedDocumentX2.addValue( index.binding().nestedX2Numeric, OTHER_INTEGER );
+					DocumentElement nestedDocumentX2 = nestedDocument.addObject( index.binding().nestedX2 );
+					nestedDocumentX2.addValue( index.binding().nestedX2Numeric, OTHER_INTEGER );
 
-			DocumentElement nestedDocumentX3 = nestedDocumentX2.addObject( index.binding().nestedX3 );
-			nestedDocumentX3.addValue( index.binding().nestedX3String, OTHER_STRING );
-			nestedDocumentX3.addValue( index.binding().nestedX3Text, OTHER_PHRASE_TEXT );
+					DocumentElement nestedDocumentX3 = nestedDocumentX2.addObject( index.binding().nestedX3 );
+					nestedDocumentX3.addValue( index.binding().nestedX3String, OTHER_STRING );
+					nestedDocumentX3.addValue( index.binding().nestedX3Text, OTHER_PHRASE_TEXT );
 
-			DocumentElement nestFlatNestDocument = nestedDocument.addObject( index.binding().nestFlat ).addObject( index.binding().nestFlatNest );
-			nestFlatNestDocument.addValue( index.binding().nestFlatNestNumeric, OTHER_INTEGER );
-			nestFlatNestDocument.addValue( index.binding().nestFlatNestText, OTHER_STRING );
-		} );
-		plan.execute().join();
+					DocumentElement nestFlatNestDocument = nestedDocument.addObject( index.binding().nestFlat ).addObject( index.binding().nestFlatNest );
+					nestFlatNestDocument.addValue( index.binding().nestFlatNestNumeric, OTHER_INTEGER );
+					nestFlatNestDocument.addValue( index.binding().nestFlatNestText, OTHER_STRING );
+				} )
+				.join();
 	}
 
 	private static class IndexBinding {

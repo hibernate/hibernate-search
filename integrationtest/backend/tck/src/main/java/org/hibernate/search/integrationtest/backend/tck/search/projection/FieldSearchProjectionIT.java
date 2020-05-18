@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +26,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -38,6 +36,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
@@ -576,64 +575,60 @@ public class FieldSearchProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+					mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 
-			mainIndex.binding().string1Field.document1Value.write( document );
+					mainIndex.binding().string1Field.document1Value.write( document );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
-			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
+					// Note: this object must be single-valued for these tests
+					DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+					mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
-			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
+					// Note: this object must be single-valued for these tests
+					DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+					mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
+				} )
+				.add( DOCUMENT_2, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+					mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
 
-			mainIndex.binding().string1Field.document2Value.write( document );
+					mainIndex.binding().string1Field.document2Value.write( document );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
-			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
+					// Note: this object must be single-valued for these tests
+					DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+					mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
-			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
-			mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
+					// Note: this object must be single-valued for these tests
+					DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+					mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
+				} )
+				.add( DOCUMENT_3, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
+					mainIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
 
-			mainIndex.binding().string1Field.document3Value.write( document );
+					mainIndex.binding().string1Field.document3Value.write( document );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
-			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
+					// Note: this object must be single-valued for these tests
+					DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+					mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
-			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
-		plan.execute().join();
-
-		plan = compatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			compatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		plan.execute().join();
-
-		plan = rawFieldCompatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		plan.execute().join();
+					// Note: this object must be single-valued for these tests
+					DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+					mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
+				} )
+				.add( EMPTY, document -> { } );
+		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+					compatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+				} );
+		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
+				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					rawFieldCompatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+				} );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = mainIndex.createScope().query()

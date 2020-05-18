@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
@@ -36,6 +34,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -354,71 +353,67 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			mainIndex.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
-			mainIndex.binding().string1Field.document1Value.write( document );
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+					mainIndex.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
+					mainIndex.binding().string1Field.document1Value.write( document );
 
-			// Add one object with the values of document 1, and another with the values of document 2
-			DocumentElement flattenedObject1 = document.addObject( mainIndex.binding().flattenedObject.self );
-			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
-			mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
-			DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
-			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-			// Can't add two values to a sortable field
-			//index.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+					// Add one object with the values of document 1, and another with the values of document 2
+					DocumentElement flattenedObject1 = document.addObject( mainIndex.binding().flattenedObject.self );
+					mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
+					mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
+					DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
+					mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+					// Can't add two values to a sortable field
+					//index.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 
-			// Same for the nested object
-			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
-			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
-			mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-			mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			mainIndex.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
-			mainIndex.binding().string2Field.document2Value.write( document );
+					// Same for the nested object
+					DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+					mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
+					mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+					mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+				} )
+				.add( DOCUMENT_2, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+					mainIndex.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
+					mainIndex.binding().string2Field.document2Value.write( document );
 
-			// Add one empty object, and and another with the values of document 2
-			document.addObject( mainIndex.binding().flattenedObject.self );
-			DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
-			mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-			mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+					// Add one empty object, and and another with the values of document 2
+					document.addObject( mainIndex.binding().flattenedObject.self );
+					DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
+					mainIndex.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
+					mainIndex.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
 
-			// Same for the nested object
-			document.addObject( mainIndex.binding().nestedObject.self );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-			mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			mainIndex.binding().string1Field.document3Value.write( document );
+					// Same for the nested object
+					document.addObject( mainIndex.binding().nestedObject.self );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					mainIndex.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+					mainIndex.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
+				} )
+				.add( DOCUMENT_3, document -> {
+					mainIndex.binding().string1Field.document3Value.write( document );
 
-			// Add two empty objects
-			document.addObject( mainIndex.binding().flattenedObject.self );
-			document.addObject( mainIndex.binding().flattenedObject.self );
+					// Add two empty objects
+					document.addObject( mainIndex.binding().flattenedObject.self );
+					document.addObject( mainIndex.binding().flattenedObject.self );
 
-			// Same for the nested object
-			document.addObject( mainIndex.binding().nestedObject.self );
-			document.addObject( mainIndex.binding().nestedObject.self );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
-		plan.execute().join();
-
-		plan = compatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		plan.execute().join();
-
-		plan = rawFieldCompatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		plan.execute().join();
+					// Same for the nested object
+					document.addObject( mainIndex.binding().nestedObject.self );
+					document.addObject( mainIndex.binding().nestedObject.self );
+				} )
+				.add( EMPTY, document -> { } );
+		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+				} );
+		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
+				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					rawFieldCompatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+				} );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = mainIndex.createScope().query()

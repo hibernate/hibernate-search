@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -27,7 +26,6 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -46,6 +44,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -566,35 +565,31 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			List<F> mainIndexDocumentFieldValues = expectations.getMainIndexDocumentFieldValues();
 			List<F> otherIndexDocumentFieldValues = expectations.getOtherIndexDocumentFieldValues();
 
-			IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
+			BulkIndexer mainIndexer = mainIndex.bulkIndexer();
 			for ( int i = 0; i < mainIndexDocumentFieldValues.size(); i++ ) {
 				F value = mainIndexDocumentFieldValues.get( i );
-				plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
+				mainIndexer.add( name + "_document_" + i, name, document -> {
 					document.addValue( mainIndex.binding().fieldModels.get( fieldType ).reference, value );
 					document.addValue( mainIndex.binding().fieldWithConverterModels.get( fieldType ).reference, value );
 				} );
 			}
-			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
-			plan.execute().join();
-
-			plan = compatibleIndex.createIndexingPlan();
+			mainIndexer.add( name + "_document_empty", name, document -> { } );
+			BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer();
 			for ( int i = 0; i < otherIndexDocumentFieldValues.size(); i++ ) {
 				F value = otherIndexDocumentFieldValues.get( i );
-				plan.add( referenceProvider( name + "_compatibleindex_document_" + i, name ), document -> {
+				compatibleIndexer.add( name + "_compatibleindex_document_" + i, name, document -> {
 					document.addValue( compatibleIndex.binding().fieldModels.get( fieldType ).reference, value );
 					document.addValue( compatibleIndex.binding().fieldWithConverterModels.get( fieldType ).reference, value );
 				} );
 			}
-			plan.execute().join();
-
-			plan = rawFieldCompatibleIndex.createIndexingPlan();
+			BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer();
 			for ( int i = 0; i < otherIndexDocumentFieldValues.size(); i++ ) {
 				F value = otherIndexDocumentFieldValues.get( i );
-				plan.add( referenceProvider( name + "_rawcompatibleindex_document_" + i, name ), document -> {
+				rawFieldCompatibleIndexer.add( name + "_rawcompatibleindex_document_" + i, name, document -> {
 					document.addValue( rawFieldCompatibleIndex.binding().fieldWithConverterModels.get( fieldType ).reference, value );
 				} );
 			}
-			plan.execute().join();
+			mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
 
 			// Check that all documents are searchable
 			SearchResultAssert.assertThat( mainIndex.createScope().query()

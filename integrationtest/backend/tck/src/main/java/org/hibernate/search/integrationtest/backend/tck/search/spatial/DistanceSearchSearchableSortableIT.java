@@ -7,13 +7,11 @@
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -147,29 +145,29 @@ public class DistanceSearchSearchableSortableIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			document.addValue( index.binding().searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( index.binding().searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( index.binding().searchableDefaultSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( index.binding().notSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( index.binding().defaultSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
-		} );
-		plan.add( referenceProvider( IMOUTO_ID ), document -> {
-			document.addValue( index.binding().searchableSortable, IMOUTO_GEO_POINT );
-			document.addValue( index.binding().searchableNotSortable, IMOUTO_GEO_POINT );
-			document.addValue( index.binding().searchableDefaultSortable, IMOUTO_GEO_POINT );
-			document.addValue( index.binding().notSearchableSortable, IMOUTO_GEO_POINT );
-			document.addValue( index.binding().defaultSearchableSortable, IMOUTO_GEO_POINT );
-		} );
-		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			document.addValue( index.binding().searchableSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( index.binding().searchableNotSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( index.binding().searchableDefaultSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( index.binding().notSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( index.binding().defaultSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
-		} );
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( OURSON_QUI_BOIT_ID, document -> {
+					document.addValue( index.binding().searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+					document.addValue( index.binding().searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );
+					document.addValue( index.binding().searchableDefaultSortable, OURSON_QUI_BOIT_GEO_POINT );
+					document.addValue( index.binding().notSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+					document.addValue( index.binding().defaultSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
+				} )
+				.add( IMOUTO_ID, document -> {
+					document.addValue( index.binding().searchableSortable, IMOUTO_GEO_POINT );
+					document.addValue( index.binding().searchableNotSortable, IMOUTO_GEO_POINT );
+					document.addValue( index.binding().searchableDefaultSortable, IMOUTO_GEO_POINT );
+					document.addValue( index.binding().notSearchableSortable, IMOUTO_GEO_POINT );
+					document.addValue( index.binding().defaultSearchableSortable, IMOUTO_GEO_POINT );
+				} )
+				.add( CHEZ_MARGOTTE_ID, document -> {
+					document.addValue( index.binding().searchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+					document.addValue( index.binding().searchableNotSortable, CHEZ_MARGOTTE_GEO_POINT );
+					document.addValue( index.binding().searchableDefaultSortable, CHEZ_MARGOTTE_GEO_POINT );
+					document.addValue( index.binding().notSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+					document.addValue( index.binding().defaultSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

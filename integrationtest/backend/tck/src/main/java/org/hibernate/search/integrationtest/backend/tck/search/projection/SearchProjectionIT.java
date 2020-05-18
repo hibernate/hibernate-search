@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -514,55 +512,54 @@ public class SearchProjectionIT extends EasyMockSupport {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			mainIndex.binding().string1Field.document1Value.write( document );
-			mainIndex.binding().string2Field.document1Value.write( document );
+		mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					mainIndex.binding().string1Field.document1Value.write( document );
+					mainIndex.binding().string2Field.document1Value.write( document );
 
-			mainIndex.binding().scoreField.document1Value.write( document );
+					mainIndex.binding().scoreField.document1Value.write( document );
 
-			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
-			mainIndex.binding().nestedField.document1Value.write( nestedDocument );
+					DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
+					mainIndex.binding().nestedField.document1Value.write( nestedDocument );
 
-			DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
-			mainIndex.binding().nestedNestedField.document1Value.write( nestedNestedDocument );
+					DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
+					mainIndex.binding().nestedNestedField.document1Value.write( nestedNestedDocument );
 
-			DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
-			mainIndex.binding().flattenedField.document1Value.write( flattedDocument );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			mainIndex.binding().string1Field.document2Value.write( document );
-			mainIndex.binding().string2Field.document2Value.write( document );
+					DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
+					mainIndex.binding().flattenedField.document1Value.write( flattedDocument );
+				} )
+				.add( DOCUMENT_2, document -> {
+					mainIndex.binding().string1Field.document2Value.write( document );
+					mainIndex.binding().string2Field.document2Value.write( document );
 
-			mainIndex.binding().scoreField.document2Value.write( document );
+					mainIndex.binding().scoreField.document2Value.write( document );
 
-			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
-			mainIndex.binding().nestedField.document2Value.write( nestedDocument );
+					DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
+					mainIndex.binding().nestedField.document2Value.write( nestedDocument );
 
-			DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
-			mainIndex.binding().nestedNestedField.document2Value.write( nestedNestedDocument );
+					DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
+					mainIndex.binding().nestedNestedField.document2Value.write( nestedNestedDocument );
 
-			DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
-			mainIndex.binding().flattenedField.document2Value.write( flattedDocument );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			mainIndex.binding().string1Field.document3Value.write( document );
-			mainIndex.binding().string2Field.document3Value.write( document );
+					DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
+					mainIndex.binding().flattenedField.document2Value.write( flattedDocument );
+				} )
+				.add( DOCUMENT_3, document -> {
+					mainIndex.binding().string1Field.document3Value.write( document );
+					mainIndex.binding().string2Field.document3Value.write( document );
 
-			mainIndex.binding().scoreField.document3Value.write( document );
+					mainIndex.binding().scoreField.document3Value.write( document );
 
-			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
-			mainIndex.binding().nestedField.document3Value.write( nestedDocument );
+					DocumentElement nestedDocument = document.addObject( mainIndex.binding().nestedObject );
+					mainIndex.binding().nestedField.document3Value.write( nestedDocument );
 
-			DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
-			mainIndex.binding().nestedNestedField.document3Value.write( nestedNestedDocument );
+					DocumentElement nestedNestedDocument = nestedDocument.addObject( mainIndex.binding().nestedNestedObject );
+					mainIndex.binding().nestedNestedField.document3Value.write( nestedNestedDocument );
 
-			DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
-			mainIndex.binding().flattenedField.document3Value.write( flattedDocument );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
-
-		plan.execute().join();
+					DocumentElement flattedDocument = nestedDocument.addObject( mainIndex.binding().flattenedObject );
+					mainIndex.binding().flattenedField.document3Value.write( flattedDocument );
+				} )
+				.add( EMPTY, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

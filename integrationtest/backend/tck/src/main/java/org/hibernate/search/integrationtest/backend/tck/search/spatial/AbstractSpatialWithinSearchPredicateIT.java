@@ -7,14 +7,12 @@
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -60,40 +58,39 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	}
 
 	protected void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			document.addValue( mainIndex.binding().string, OURSON_QUI_BOIT_STRING );
-			document.addValue( mainIndex.binding().geoPoint, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
-					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
-			document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
-					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
-			document.addValue( mainIndex.binding().geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
-			document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
-		} );
-		plan.add( referenceProvider( IMOUTO_ID ), document -> {
-			document.addValue( mainIndex.binding().string, IMOUTO_STRING );
-			document.addValue( mainIndex.binding().geoPoint, IMOUTO_GEO_POINT );
-			document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
-					IMOUTO_GEO_POINT.getLongitude() - 1 ) );
-			document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
-					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
-			document.addValue( mainIndex.binding().geoPoint_with_longName, IMOUTO_GEO_POINT );
-			document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
-		} );
-		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			document.addValue( mainIndex.binding().string, CHEZ_MARGOTTE_STRING );
-			document.addValue( mainIndex.binding().geoPoint, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
-					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
-			document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
-					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
-			document.addValue( mainIndex.binding().geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
-			document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
-		} );
-		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
-
-		plan.execute().join();
+		mainIndex.bulkIndexer()
+				.add( OURSON_QUI_BOIT_ID, document -> {
+					document.addValue( mainIndex.binding().string, OURSON_QUI_BOIT_STRING );
+					document.addValue( mainIndex.binding().geoPoint, OURSON_QUI_BOIT_GEO_POINT );
+					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
+							OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
+					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
+							OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
+					document.addValue( mainIndex.binding().geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
+					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+				} )
+				.add( IMOUTO_ID, document -> {
+					document.addValue( mainIndex.binding().string, IMOUTO_STRING );
+					document.addValue( mainIndex.binding().geoPoint, IMOUTO_GEO_POINT );
+					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
+							IMOUTO_GEO_POINT.getLongitude() - 1 ) );
+					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
+							IMOUTO_GEO_POINT.getLongitude() - 2 ) );
+					document.addValue( mainIndex.binding().geoPoint_with_longName, IMOUTO_GEO_POINT );
+					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
+				} )
+				.add( CHEZ_MARGOTTE_ID, document -> {
+					document.addValue( mainIndex.binding().string, CHEZ_MARGOTTE_STRING );
+					document.addValue( mainIndex.binding().geoPoint, CHEZ_MARGOTTE_GEO_POINT );
+					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
+							CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
+					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
+							CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
+					document.addValue( mainIndex.binding().geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
+					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+				} )
+				.add( EMPTY_ID, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

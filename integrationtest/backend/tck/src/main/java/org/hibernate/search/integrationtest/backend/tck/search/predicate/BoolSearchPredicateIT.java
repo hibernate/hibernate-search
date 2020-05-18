@@ -7,14 +7,13 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -1016,30 +1015,29 @@ public class BoolSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		BulkIndexer indexer = index.bulkIndexer();
+		indexer.add( DOCUMENT_1, document -> {
 			document.addValue( index.binding().field1, FIELD1_VALUE1 );
 			document.addValue( index.binding().field2, FIELD2_VALUE1 );
 			document.addValue( index.binding().field3, FIELD3_VALUE1 );
 			document.addValue( index.binding().field4, FIELD4_VALUE1AND2 );
 			document.addValue( index.binding().field5, FIELD5_VALUE1AND2 );
 		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		indexer.add( DOCUMENT_2, document -> {
 			document.addValue( index.binding().field1, FIELD1_VALUE2 );
 			document.addValue( index.binding().field2, FIELD2_VALUE2 );
 			document.addValue( index.binding().field3, FIELD3_VALUE2 );
 			document.addValue( index.binding().field4, FIELD4_VALUE1AND2 );
 			document.addValue( index.binding().field5, FIELD5_VALUE1AND2 );
 		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		indexer.add( DOCUMENT_3, document -> {
 			document.addValue( index.binding().field1, FIELD1_VALUE3 );
 			document.addValue( index.binding().field2, FIELD2_VALUE3 );
 			document.addValue( index.binding().field3, FIELD3_VALUE3 );
 			document.addValue( index.binding().field4, FIELD4_VALUE3 );
 			document.addValue( index.binding().field5, FIELD5_VALUE3 );
 		} );
-
-		plan.execute().join();
+		indexer.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

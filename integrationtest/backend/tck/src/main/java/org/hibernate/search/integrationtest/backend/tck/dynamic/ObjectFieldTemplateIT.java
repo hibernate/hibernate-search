@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -18,7 +17,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -27,7 +25,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -74,25 +71,25 @@ public class ObjectFieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_NESTED ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			nestedObject = document.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-		} );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_ALL ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			nestedObject = document.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.execute().join();
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
+					DocumentElement nestedObject = document.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					nestedObject = document.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+				} )
+				.add( DOCUMENT_MATCHING_FOR_ALL, document -> {
+					DocumentElement nestedObject = document.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					nestedObject = document.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
 		checkNested( "foo" );
@@ -122,29 +119,29 @@ public class ObjectFieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_NESTED ), document -> {
-			DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
+					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
-			DocumentElement nestedObject = staticObject.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			nestedObject = staticObject.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-		} );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_ALL ), document -> {
-			DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
+					DocumentElement nestedObject = staticObject.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					nestedObject = staticObject.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+				} )
+				.add( DOCUMENT_MATCHING_FOR_ALL, document -> {
+					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
-			DocumentElement nestedObject = staticObject.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			nestedObject = staticObject.addObject( "foo" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.execute().join();
+					DocumentElement nestedObject = staticObject.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					nestedObject = staticObject.addObject( "foo" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
 		checkNested( "staticObject.foo" );
@@ -175,39 +172,39 @@ public class ObjectFieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_NESTED ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			nestedObject = document.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
+					DocumentElement nestedObject = document.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					nestedObject = document.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
 
-			DocumentElement flattenedObject = document.addObject( "bar_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			flattenedObject = document.addObject( "bar_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-		} );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_ALL ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			nestedObject = document.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					DocumentElement flattenedObject = document.addObject( "bar_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					flattenedObject = document.addObject( "bar_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+				} )
+				.add( DOCUMENT_MATCHING_FOR_ALL, document -> {
+					DocumentElement nestedObject = document.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					nestedObject = document.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
 
-			DocumentElement flattenedObject = document.addObject( "bar_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			flattenedObject = document.addObject( "bar_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.execute().join();
+					DocumentElement flattenedObject = document.addObject( "bar_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					flattenedObject = document.addObject( "bar_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
 		checkNested( "foo_nested" );
@@ -244,39 +241,39 @@ public class ObjectFieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_NESTED ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			nestedObject = document.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
+					DocumentElement nestedObject = document.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					nestedObject = document.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
 
-			DocumentElement flattenedObject = document.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			flattenedObject = document.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-		} );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_ALL ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			nestedObject = document.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					DocumentElement flattenedObject = document.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					flattenedObject = document.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+				} )
+				.add( DOCUMENT_MATCHING_FOR_ALL, document -> {
+					DocumentElement nestedObject = document.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					nestedObject = document.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
 
-			DocumentElement flattenedObject = document.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			flattenedObject = document.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.execute().join();
+					DocumentElement flattenedObject = document.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					flattenedObject = document.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.join();
 
 		// Check that dynamic fields have the correct storage type
 		checkNested( "foo_nested_object" );
@@ -311,43 +308,43 @@ public class ObjectFieldTemplateIT {
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_NESTED ), document -> {
-			DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_MATCHING_FOR_NESTED, document -> {
+					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
-			DocumentElement nestedObject = staticObject.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			nestedObject = staticObject.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					DocumentElement nestedObject = staticObject.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					nestedObject = staticObject.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
 
-			DocumentElement flattenedObject = staticObject.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			flattenedObject = staticObject.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-		} );
-		indexingPlan.add( referenceProvider( DOCUMENT_MATCHING_FOR_ALL ), document -> {
-			DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
+					DocumentElement flattenedObject = staticObject.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					flattenedObject = staticObject.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+				} )
+				.add( DOCUMENT_MATCHING_FOR_ALL, document -> {
+					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
-			DocumentElement nestedObject = staticObject.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			nestedObject = staticObject.addObject( "foo_nested_object" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					DocumentElement nestedObject = staticObject.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					nestedObject = staticObject.addObject( "foo_nested_object" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
 
-			DocumentElement flattenedObject = staticObject.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
-			flattenedObject = staticObject.addObject( "flattened_object" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.execute().join();
+					DocumentElement flattenedObject = staticObject.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_2 );
+					flattenedObject = staticObject.addObject( "flattened_object" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_2 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.join();
 
 		// Check that dynamic fields have the correct storage type
 		checkNested( "staticObject.foo_nested_object" );
@@ -390,29 +387,29 @@ public class ObjectFieldTemplateIT {
 		String documentWhereObjectFieldDoesNotExistId = "not-existing";
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( documentWhereObjectFieldExistsId ), document -> {
-			DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( documentWhereObjectFieldExistsId, document -> {
+					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
-			DocumentElement nestedObject = staticObject.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			DocumentElement flattenedObject = staticObject.addObject( "foo_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.add( referenceProvider( documentWhereObjectFieldDoesNotExistId ), document -> {
-			DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
+					DocumentElement nestedObject = staticObject.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					DocumentElement flattenedObject = staticObject.addObject( "foo_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.add( documentWhereObjectFieldDoesNotExistId, document -> {
+					DocumentElement staticObject = document.addObject( index.binding().staticObject.self );
 
-			DocumentElement nestedObject = staticObject.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, null );
-			nestedObject.addValue( LASTNAME_FIELD, null );
-			DocumentElement flattenedObject = staticObject.addObject( "foo_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, null );
-			flattenedObject.addValue( LASTNAME_FIELD, null );
-		} );
-		indexingPlan.execute().join();
+					DocumentElement nestedObject = staticObject.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, null );
+					nestedObject.addValue( LASTNAME_FIELD, null );
+					DocumentElement flattenedObject = staticObject.addObject( "foo_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, null );
+					flattenedObject.addValue( LASTNAME_FIELD, null );
+				} )
+				.join();
 
 		// Check that documents are indexed and the dynamic object field can be detected through an exists() predicate
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "staticObject" ) ) )
@@ -454,25 +451,25 @@ public class ObjectFieldTemplateIT {
 		String documentWhereObjectFieldDoesNotExistId = "not-existing";
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( documentWhereObjectFieldExistsId ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-			DocumentElement flattenedObject = document.addObject( "foo_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
-			flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
-		} );
-		indexingPlan.add( referenceProvider( documentWhereObjectFieldDoesNotExistId ), document -> {
-			DocumentElement nestedObject = document.addObject( "foo_nested" );
-			nestedObject.addValue( FIRSTNAME_FIELD, null );
-			nestedObject.addValue( LASTNAME_FIELD, null );
-			DocumentElement flattenedObject = document.addObject( "foo_flattened" );
-			flattenedObject.addValue( FIRSTNAME_FIELD, null );
-			flattenedObject.addValue( LASTNAME_FIELD, null );
-		} );
-		indexingPlan.execute().join();
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( documentWhereObjectFieldExistsId, document -> {
+					DocumentElement nestedObject = document.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					nestedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+					DocumentElement flattenedObject = document.addObject( "foo_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, FIRSTNAME_1 );
+					flattenedObject.addValue( LASTNAME_FIELD, LASTNAME_1 );
+				} )
+				.add( documentWhereObjectFieldDoesNotExistId, document -> {
+					DocumentElement nestedObject = document.addObject( "foo_nested" );
+					nestedObject.addValue( FIRSTNAME_FIELD, null );
+					nestedObject.addValue( LASTNAME_FIELD, null );
+					DocumentElement flattenedObject = document.addObject( "foo_flattened" );
+					flattenedObject.addValue( FIRSTNAME_FIELD, null );
+					flattenedObject.addValue( LASTNAME_FIELD, null );
+				} )
+				.join();
 
 		// Check that documents are indexed and the dynamic object field can be detected through an exists() predicate
 		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_nested" ) ) )

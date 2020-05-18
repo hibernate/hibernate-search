@@ -7,20 +7,19 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -170,19 +169,15 @@ public class MatchIdSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> { } );
-		plan.execute().join();
-
-		plan = compatibleIdConverterIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ), document -> { } );
-		plan.execute().join();
-
-		plan = incompatibleIdConverterIndex.createIndexingPlan();
-		plan.add( referenceProvider( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 ), document -> { } );
-		plan.execute().join();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> { } )
+				.add( DOCUMENT_2, document -> { } )
+				.add( DOCUMENT_3, document -> { } );
+		BulkIndexer compatibleIdConverterIndexer = compatibleIdConverterIndex.bulkIndexer()
+				.add( COMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> { } );
+		BulkIndexer incompatibleIdConverterIndexer = incompatibleIdConverterIndex.bulkIndexer()
+				.add( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> { } );
+		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer );
 
 		// Check that all documents are searchable
 		assertThat(

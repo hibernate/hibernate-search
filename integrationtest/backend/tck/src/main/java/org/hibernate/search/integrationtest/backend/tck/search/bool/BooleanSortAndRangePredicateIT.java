@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.bool;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -17,7 +16,6 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
@@ -27,6 +25,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortBaseIT;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -162,24 +161,23 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		BulkIndexer indexer = index.bulkIndexer();
+		indexer.add( DOCUMENT_1, document -> {
 			document.addValue( index.binding().bool, true );
 		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		indexer.add( DOCUMENT_2, document -> {
 			document.addValue( index.binding().bool, Boolean.FALSE );
 		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		indexer.add( DOCUMENT_3, document -> {
 			document.addValue( index.binding().bool, Boolean.TRUE );
 		} );
-		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
+		indexer.add( DOCUMENT_4, document -> {
 			document.addValue( index.binding().bool, null );
 		} );
-		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
+		indexer.add( DOCUMENT_5, document -> {
 			document.addValue( index.binding().bool, false );
 		} );
-
-		plan.execute().join();
+		indexer.join();
 		checkAllDocumentsAreSearchable();
 	}
 

@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.time.MonthDay;
 import java.time.temporal.Temporal;
@@ -29,7 +28,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -665,23 +663,16 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
-		plan.add( referenceProvider( EMPTY_4 ),
-				document -> initDocument( index.binding(), document, null ) );
-		plan.add( referenceProvider( DOCUMENT_2 ),
-				document -> initDocument( index.binding(), document, DOCUMENT_2_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_1 ),
-				document -> initDocument( index.binding(), document, null ) );
-		plan.add( referenceProvider( DOCUMENT_1 ),
-				document -> initDocument( index.binding(), document, DOCUMENT_1_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_2 ),
-				document -> initDocument( index.binding(), document, null ) );
-		plan.add( referenceProvider( DOCUMENT_3 ),
-				document -> initDocument( index.binding(), document, DOCUMENT_3_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_3 ),
-				document -> initDocument( index.binding(), document, null ) );
-		plan.execute().join();
+		index.bulkIndexer()
+				// Important: do not index the documents in the expected order after sorts (1, 2, 3)
+				.add( EMPTY_4, document -> initDocument( index.binding(), document, null ) )
+				.add( DOCUMENT_2, document -> initDocument( index.binding(), document, DOCUMENT_2_ORDINAL ) )
+				.add( EMPTY_1, document -> initDocument( index.binding(), document, null ) )
+				.add( DOCUMENT_1, document -> initDocument( index.binding(), document, DOCUMENT_1_ORDINAL ) )
+				.add( EMPTY_2, document -> initDocument( index.binding(), document, null ) )
+				.add( DOCUMENT_3, document -> initDocument( index.binding(), document, DOCUMENT_3_ORDINAL ) )
+				.add( EMPTY_3, document -> initDocument( index.binding(), document, null ) )
+				.join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = index.createScope().query()

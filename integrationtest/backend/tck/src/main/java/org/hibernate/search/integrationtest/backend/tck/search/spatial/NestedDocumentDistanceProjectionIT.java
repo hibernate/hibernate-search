@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -93,35 +91,35 @@ public class NestedDocumentDistanceProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			document.addValue( index.binding().ordinalField, 1 );
+		index.bulkIndexer()
+				.add( OURSON_QUI_BOIT_ID, document -> {
+					document.addValue( index.binding().ordinalField, 1 );
 
-			DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
-			nestedDocument.addValue( index.binding().nestedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+					DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
+					nestedDocument.addValue( index.binding().nestedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 
-			DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
-			flattenedDocument.addValue( index.binding().flattenedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
-		} );
-		plan.add( referenceProvider( IMOUTO_ID ), document -> {
-			document.addValue( index.binding().ordinalField, 2 );
+					DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
+					flattenedDocument.addValue( index.binding().flattenedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
+				} )
+				.add( IMOUTO_ID, document -> {
+					document.addValue( index.binding().ordinalField, 2 );
 
-			DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
-			nestedDocument.addValue( index.binding().nestedGeoPoint, IMOUTO_GEO_POINT );
+					DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
+					nestedDocument.addValue( index.binding().nestedGeoPoint, IMOUTO_GEO_POINT );
 
-			DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
-			flattenedDocument.addValue( index.binding().flattenedGeoPoint, IMOUTO_GEO_POINT );
-		} );
-		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			document.addValue( index.binding().ordinalField, 3 );
+					DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
+					flattenedDocument.addValue( index.binding().flattenedGeoPoint, IMOUTO_GEO_POINT );
+				} )
+				.add( CHEZ_MARGOTTE_ID, document -> {
+					document.addValue( index.binding().ordinalField, 3 );
 
-			DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
-			nestedDocument.addValue( index.binding().nestedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+					DocumentElement nestedDocument = document.addObject( index.binding().nestedDocument );
+					nestedDocument.addValue( index.binding().nestedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 
-			DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
-			flattenedDocument.addValue( index.binding().flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
-		} );
-		plan.execute().join();
+					DocumentElement flattenedDocument = document.addObject( index.binding().flattenedDocument );
+					flattenedDocument.addValue( index.binding().flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

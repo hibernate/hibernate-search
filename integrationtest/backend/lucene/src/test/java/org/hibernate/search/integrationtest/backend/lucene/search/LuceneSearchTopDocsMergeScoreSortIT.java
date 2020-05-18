@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
@@ -15,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -127,28 +125,27 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		// Important: do not index the documents in the expected order after sorts
-		plan.add( referenceProvider( SEGMENT_0_DOC_1, SEGMENT_0 ), document -> {
-			document.addValue( index.binding().text, "Hooray" );
-		} );
-		plan.add( referenceProvider( SEGMENT_0_DOC_0, SEGMENT_0 ), document -> {
-			document.addValue( index.binding().text, "Hooray Hooray Hooray" );
-		} );
-		plan.add( referenceProvider( SEGMENT_0_DOC_NON_MATCHING, SEGMENT_0 ), document -> {
-			document.addValue( index.binding().text, "No match" );
-		} );
-		plan.add( referenceProvider( SEGMENT_1_DOC_0, SEGMENT_1 ), document -> {
-			document.addValue( index.binding().text, "Hooray Hooray Hooray Hooray" );
-		} );
-		plan.add( referenceProvider( SEGMENT_1_DOC_1, SEGMENT_1 ), document -> {
-			document.addValue( index.binding().text, "Hooray Hooray" );
-		} );
-		plan.add( referenceProvider( SEGMENT_1_DOC_NON_MATCHING, SEGMENT_1 ), document -> {
-			document.addValue( index.binding().text, "No match" );
-		} );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				// Important: do not index the documents in the expected order after sorts
+				.add( SEGMENT_0_DOC_1, SEGMENT_0, document -> {
+					document.addValue( index.binding().text, "Hooray" );
+				} )
+				.add( SEGMENT_0_DOC_0, SEGMENT_0, document -> {
+					document.addValue( index.binding().text, "Hooray Hooray Hooray" );
+				} )
+				.add( SEGMENT_0_DOC_NON_MATCHING, SEGMENT_0, document -> {
+					document.addValue( index.binding().text, "No match" );
+				} )
+				.add( SEGMENT_1_DOC_0, SEGMENT_1, document -> {
+					document.addValue( index.binding().text, "Hooray Hooray Hooray Hooray" );
+				} )
+				.add( SEGMENT_1_DOC_1, SEGMENT_1, document -> {
+					document.addValue( index.binding().text, "Hooray Hooray" );
+				} )
+				.add( SEGMENT_1_DOC_NON_MATCHING, SEGMENT_1, document -> {
+					document.addValue( index.binding().text, "No match" );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

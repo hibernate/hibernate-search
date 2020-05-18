@@ -7,17 +7,16 @@
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -104,36 +103,26 @@ public class LuceneSearchMultiIndexIT {
 	}
 
 	private void initData() {
-		// Index 1
-
-		IndexIndexingPlan<?> plan = index1.createIndexingPlan();
-
-		plan.add( referenceProvider( DOCUMENT_1_1 ), document -> {
-			document.addValue( index1.binding().string, STRING_1 );
-			document.addValue( index1.binding().additionalField, ADDITIONAL_FIELD_1_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_1_2 ), document -> {
-			document.addValue( index1.binding().string, STRING_2 );
-			document.addValue( index1.binding().additionalField, ADDITIONAL_FIELD_1_2 );
-		} );
-
-		plan.execute().join();
+		BulkIndexer indexer1 = index1.bulkIndexer()
+				.add( DOCUMENT_1_1, document -> {
+					document.addValue( index1.binding().string, STRING_1 );
+					document.addValue( index1.binding().additionalField, ADDITIONAL_FIELD_1_1 );
+				} )
+				.add( DOCUMENT_1_2, document -> {
+					document.addValue( index1.binding().string, STRING_2 );
+					document.addValue( index1.binding().additionalField, ADDITIONAL_FIELD_1_2 );
+				} );
+		BulkIndexer indexer2 = index2.bulkIndexer()
+				.add( DOCUMENT_2_1, document -> {
+					document.addValue( index2.binding().string, STRING_1 );
+				} );
+		indexer1.join( indexer2 );
 
 		StubMappingScope scope = index1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( index1.typeName(), DOCUMENT_1_1, DOCUMENT_1_2 );
-
-		// Index 2
-
-		plan = index2.createIndexingPlan();
-
-		plan.add( referenceProvider( DOCUMENT_2_1 ), document -> {
-			document.addValue( index2.binding().string, STRING_1 );
-		} );
-
-		plan.execute().join();
 
 		scope = index2.createScope();
 		query = scope.query()

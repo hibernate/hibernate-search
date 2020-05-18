@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.stream.IntStream;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -29,6 +27,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.assertj.core.api.Assertions;
 
@@ -62,7 +61,6 @@ public class SearchQueryTimeoutIT {
 
 	private static final int INIT_DATA_ROUNDS = 1000;
 	private static final int TOTAL_DOCUMENT_COUNT = 3 * INIT_DATA_ROUNDS;
-	private static final int INIT_DATA_BATCH_SIZE = 200;
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -150,29 +148,26 @@ public class SearchQueryTimeoutIT {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		BulkIndexer indexer = index.bulkIndexer();
 		for ( int i = 0; i < INIT_DATA_ROUNDS; i++ ) {
-			if ( i % INIT_DATA_BATCH_SIZE == 0 ) {
-				plan.execute().join();
-			}
-			plan.add(
-					referenceProvider( i + "a" ),
+			indexer.add(
+					i + "a",
 					document -> {
 						for ( IndexFieldReference<String> field : index.binding().fields ) {
 							document.addValue( field, TEXT_1 );
 						}
 					}
 			);
-			plan.add(
-					referenceProvider( i + "b" ),
+			indexer.add(
+					i + "b",
 					document -> {
 						for ( IndexFieldReference<String> field : index.binding().fields ) {
 							document.addValue( field, TEXT_2 );
 						}
 					}
 			);
-			plan.add(
-					referenceProvider( i + "c" ),
+			indexer.add(
+					i + "c",
 					document -> {
 						for ( IndexFieldReference<String> field : index.binding().fields ) {
 							document.addValue( field, TEXT_3 );
@@ -180,7 +175,7 @@ public class SearchQueryTimeoutIT {
 					}
 			);
 		}
-		plan.execute().join();
+		indexer.join();
 	}
 
 	private static class IndexBinding {

@@ -10,7 +10,6 @@ import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
@@ -24,7 +23,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
@@ -606,28 +604,26 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( MAIN_ID ), document -> {
-			document.addValue( index.binding().string, STRING_VALUE );
-			document.addValue( index.binding().string_analyzed, STRING_ANALYZED_VALUE );
-			document.addValue( index.binding().integer, INTEGER_VALUE );
-			document.addValue( index.binding().localDate, LOCAL_DATE_VALUE );
-			document.addValue( index.binding().geoPoint, GEO_POINT_VALUE );
+		index.bulkIndexer()
+				.add( MAIN_ID, document -> {
+					document.addValue( index.binding().string, STRING_VALUE );
+					document.addValue( index.binding().string_analyzed, STRING_ANALYZED_VALUE );
+					document.addValue( index.binding().integer, INTEGER_VALUE );
+					document.addValue( index.binding().localDate, LOCAL_DATE_VALUE );
+					document.addValue( index.binding().geoPoint, GEO_POINT_VALUE );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			flattenedObject.addValue( index.binding().flattenedObject.string, FLATTENED_OBJECT_STRING_VALUE );
-			flattenedObject.addValue( index.binding().flattenedObject.integer, FLATTENED_OBJECT_INTEGER_VALUE );
+					// Note: this object must be single-valued for these tests
+					DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject.addValue( index.binding().flattenedObject.string, FLATTENED_OBJECT_STRING_VALUE );
+					flattenedObject.addValue( index.binding().flattenedObject.integer, FLATTENED_OBJECT_INTEGER_VALUE );
 
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-			nestedObject.addValue( index.binding().nestedObject.string, NESTED_OBJECT_STRING_VALUE );
-			nestedObject.addValue( index.binding().nestedObject.integer, NESTED_OBJECT_INTEGER_VALUE );
-		} );
-
-		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
-
-		plan.execute().join();
+					// Note: this object must be single-valued for these tests
+					DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+					nestedObject.addValue( index.binding().nestedObject.string, NESTED_OBJECT_STRING_VALUE );
+					nestedObject.addValue( index.binding().nestedObject.integer, NESTED_OBJECT_INTEGER_VALUE );
+				} )
+				.add( EMPTY_ID, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

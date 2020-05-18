@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -40,6 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
@@ -380,27 +379,19 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
-		plan.add( referenceProvider( DOCUMENT_2 ),
-				document -> initDocument( mainIndex.binding(), document, DOCUMENT_2_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY ),
-				document -> initDocument( mainIndex.binding(), document, null ) );
-		plan.add( referenceProvider( DOCUMENT_1 ),
-				document -> initDocument( mainIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
-		plan.add( referenceProvider( DOCUMENT_3 ),
-				document -> initDocument( mainIndex.binding(), document, DOCUMENT_3_ORDINAL ) );
-		plan.execute().join();
-
-		plan = compatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ),
-				document -> initDocument( compatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
-		plan.execute().join();
-
-		plan = rawFieldCompatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ),
-				document -> initDocument( rawFieldCompatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
-		plan.execute().join();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				// Important: do not index the documents in the expected order after sorts (1, 2, 3)
+				.add( DOCUMENT_2, document -> initDocument( mainIndex.binding(), document, DOCUMENT_2_ORDINAL ) )
+				.add( EMPTY, document -> initDocument( mainIndex.binding(), document, null ) )
+				.add( DOCUMENT_1, document -> initDocument( mainIndex.binding(), document, DOCUMENT_1_ORDINAL ) )
+				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, DOCUMENT_3_ORDINAL ) );
+		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
+				.add( COMPATIBLE_INDEX_DOCUMENT_1,
+						document -> initDocument( compatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
+		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
+				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
+						document -> initDocument( rawFieldCompatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = mainIndex.createScope().query()

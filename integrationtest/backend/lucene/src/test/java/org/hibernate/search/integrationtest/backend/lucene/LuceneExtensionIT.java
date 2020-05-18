@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,6 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -781,105 +779,105 @@ public class LuceneExtensionIT {
 	}
 
 	private static void indexDataSet(SimpleMappedIndex<IndexBinding> index) {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( index.binding().string, "text 1" );
+		index.bulkIndexer()
+				.add( FIRST_ID, document -> {
+					document.addValue( index.binding().string, "text 1" );
 
-			document.addValue( index.binding().nativeField, 37 );
-			document.addValue( index.binding().nativeField_converted, 37 );
-			document.addValue( index.binding().nativeField_unsupportedProjection, 37 );
+					document.addValue( index.binding().nativeField, 37 );
+					document.addValue( index.binding().nativeField_converted, 37 );
+					document.addValue( index.binding().nativeField_unsupportedProjection, 37 );
 
-			document.addValue( index.binding().sort1, "a" );
-			document.addValue( index.binding().sort2, "z" );
-			document.addValue( index.binding().sort3, "z" );
+					document.addValue( index.binding().sort1, "a" );
+					document.addValue( index.binding().sort2, "z" );
+					document.addValue( index.binding().sort3, "z" );
 
-			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
-			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( index.binding().nestedObject.sort1, "a" );
-			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "one" );
-			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
-			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-one" );
-		} );
-		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( index.binding().integer, 2 );
+					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+					nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( index.binding().nestedObject.sort1, "a" );
+					nestedObject1.addValue( index.binding().nestedObject.aggregation1, "one" );
+					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
+					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-one" );
+				} )
+				.add( SECOND_ID, document -> {
+					document.addValue( index.binding().integer, 2 );
 
-			document.addValue( index.binding().nativeField, 78 );
-			document.addValue( index.binding().nativeField_converted, 78 );
-			document.addValue( index.binding().nativeField_unsupportedProjection, 78 );
+					document.addValue( index.binding().nativeField, 78 );
+					document.addValue( index.binding().nativeField_converted, 78 );
+					document.addValue( index.binding().nativeField_unsupportedProjection, 78 );
 
-			document.addValue( index.binding().sort1, "z" );
-			document.addValue( index.binding().sort2, "a" );
-			document.addValue( index.binding().sort3, "z" );
+					document.addValue( index.binding().sort1, "z" );
+					document.addValue( index.binding().sort2, "a" );
+					document.addValue( index.binding().sort3, "z" );
 
-			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
-			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( index.binding().nestedObject.sort1, "b" );
-			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "two" );
-			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
-			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-two" );
-		} );
-		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( index.binding().geoPoint, GeoPoint.of( 40.12, -71.34 ) );
+					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+					nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( index.binding().nestedObject.sort1, "b" );
+					nestedObject1.addValue( index.binding().nestedObject.aggregation1, "two" );
+					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
+					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-two" );
+				} )
+				.add( THIRD_ID, document -> {
+					document.addValue( index.binding().geoPoint, GeoPoint.of( 40.12, -71.34 ) );
 
-			document.addValue( index.binding().nativeField, 13 );
-			document.addValue( index.binding().nativeField_converted, 13 );
-			document.addValue( index.binding().nativeField_unsupportedProjection, 13 );
+					document.addValue( index.binding().nativeField, 13 );
+					document.addValue( index.binding().nativeField_converted, 13 );
+					document.addValue( index.binding().nativeField_unsupportedProjection, 13 );
 
-			document.addValue( index.binding().sort1, "z" );
-			document.addValue( index.binding().sort2, "z" );
-			document.addValue( index.binding().sort3, "a" );
+					document.addValue( index.binding().sort1, "z" );
+					document.addValue( index.binding().sort2, "z" );
+					document.addValue( index.binding().sort3, "a" );
 
-			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
-			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( index.binding().nestedObject.sort1, "c" );
-			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "three" );
-			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
-			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-three" );
-		} );
-		plan.add( referenceProvider( FOURTH_ID ), document -> {
-			document.addValue( index.binding().nativeField, 89 );
-			document.addValue( index.binding().nativeField_converted, 89 );
-			document.addValue( index.binding().nativeField_unsupportedProjection, 89 );
+					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+					nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( index.binding().nestedObject.sort1, "c" );
+					nestedObject1.addValue( index.binding().nestedObject.aggregation1, "three" );
+					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
+					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-three" );
+				} )
+				.add( FOURTH_ID, document -> {
+					document.addValue( index.binding().nativeField, 89 );
+					document.addValue( index.binding().nativeField_converted, 89 );
+					document.addValue( index.binding().nativeField_unsupportedProjection, 89 );
 
-			document.addValue( index.binding().sort1, "z" );
-			document.addValue( index.binding().sort2, "z" );
-			document.addValue( index.binding().sort3, "z" );
+					document.addValue( index.binding().sort1, "z" );
+					document.addValue( index.binding().sort2, "z" );
+					document.addValue( index.binding().sort3, "z" );
 
-			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
-			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( index.binding().nestedObject.sort1, "d" );
-			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "four" );
-			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( index.binding().nestedObject.sort1, "c" );
-			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-four" );
-		} );
-		plan.add( referenceProvider( FIFTH_ID ), document -> {
-			// This document should not match any query
-			document.addValue( index.binding().string, "text 2" );
-			document.addValue( index.binding().integer, 1 );
-			document.addValue( index.binding().geoPoint, GeoPoint.of( 45.12, -75.34 ) );
+					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+					nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( index.binding().nestedObject.sort1, "d" );
+					nestedObject1.addValue( index.binding().nestedObject.aggregation1, "four" );
+					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( index.binding().nestedObject.sort1, "c" );
+					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-four" );
+				} )
+				.add( FIFTH_ID, document -> {
+					// This document should not match any query
+					document.addValue( index.binding().string, "text 2" );
+					document.addValue( index.binding().integer, 1 );
+					document.addValue( index.binding().geoPoint, GeoPoint.of( 45.12, -75.34 ) );
 
-			document.addValue( index.binding().sort1, "zz" );
-			document.addValue( index.binding().sort2, "zz" );
-			document.addValue( index.binding().sort3, "zz" );
+					document.addValue( index.binding().sort1, "zz" );
+					document.addValue( index.binding().sort2, "zz" );
+					document.addValue( index.binding().sort3, "zz" );
 
-			DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
-			nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( index.binding().nestedObject.sort1, "e" );
-			nestedObject1.addValue( index.binding().nestedObject.aggregation1, "five" );
-			DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-			nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
-			nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-five" );
-		} );
-		plan.execute().join();
+					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
+					nestedObject1.addValue( index.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( index.binding().nestedObject.sort1, "e" );
+					nestedObject1.addValue( index.binding().nestedObject.aggregation1, "five" );
+					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
+					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
+					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-five" );
+				} )
+				.join();
 	}
 
 	private static class IndexBinding {

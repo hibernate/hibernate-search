@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.mapping;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
-
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -16,7 +14,6 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -115,17 +112,16 @@ public class LuceneFieldAttributesIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "ID:1" ), document -> {
-			document.addValue( index.binding().string, "keyword" );
-			document.addValue( index.binding().text, TEXT );
-			document.addValue( index.binding().norms, TEXT );
-			document.addValue( index.binding().noNorms, TEXT );
-			document.addValue( index.binding().termVector, TEXT );
-			document.addValue( index.binding().moreOptions, "Search 6 groundwork - Add the missing common field type options compared to Search 5" );
-		} );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( "ID:1", document -> {
+					document.addValue( index.binding().string, "keyword" );
+					document.addValue( index.binding().text, TEXT );
+					document.addValue( index.binding().norms, TEXT );
+					document.addValue( index.binding().noNorms, TEXT );
+					document.addValue( index.binding().termVector, TEXT );
+					document.addValue( index.binding().moreOptions, "Search 6 groundwork - Add the missing common field type options compared to Search 5" );
+				} )
+				.join();
 	}
 
 	private static class IndexBinding {

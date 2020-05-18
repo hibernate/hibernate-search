@@ -7,13 +7,11 @@
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -92,20 +90,20 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_2 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_3 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_2_AND_3 );
-		} );
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_1 );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_2 );
+				} )
+				.add( DOCUMENT_3, document -> {
+					document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_3 );
+				} )
+				.add( DOCUMENT_4, document -> {
+					document.addValue( index.binding().analyzed, TEXT_MATCHING_PATTERN_2_AND_3 );
+				} )
+				.join();
 	}
 
 	private static class IndexBinding {
