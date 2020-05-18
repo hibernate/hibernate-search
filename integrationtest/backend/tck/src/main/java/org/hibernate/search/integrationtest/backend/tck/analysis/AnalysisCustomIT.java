@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.analysis;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +20,9 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -261,19 +260,19 @@ public class AnalysisCustomIT {
 	}
 
 	private void initData(Consumer<AnalysisITDocumentBuilder> valueContributor) {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		BulkIndexer indexer = index.bulkIndexer();
 		List<String> documentIds = new ArrayList<>();
 		valueContributor.accept(
 				(String documentId, String ... fieldValues) -> {
 					documentIds.add( documentId );
-					plan.add( referenceProvider( documentId ), document -> {
+					indexer.add( documentId, document -> {
 						for ( String fieldValue : fieldValues ) {
 							index.binding().field.write( document, fieldValue );
 						}
 					} );
 				}
 		);
-		plan.execute().join();
+		indexer.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

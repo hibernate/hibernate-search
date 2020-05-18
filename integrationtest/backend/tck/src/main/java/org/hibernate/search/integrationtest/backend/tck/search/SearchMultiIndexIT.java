@@ -7,19 +7,18 @@
 package org.hibernate.search.integrationtest.backend.tck.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -256,24 +255,33 @@ public class SearchMultiIndexIT {
 	}
 
 	private void initData() {
-		// Backend 1 / Index 1
-
-		IndexIndexingPlan<?> plan = index_1_1.createIndexingPlan();
-
-		plan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
-			document.addValue( index_1_1.binding().string, STRING_1 );
-			document.addValue( index_1_1.binding().additionalField, ADDITIONAL_FIELD_1_1_1 );
-			document.addValue( index_1_1.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_1_1 );
-			document.addValue( index_1_1.binding().sortField, SORT_FIELD_1_1_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
-			document.addValue( index_1_1.binding().string, STRING_2 );
-			document.addValue( index_1_1.binding().additionalField, ADDITIONAL_FIELD_1_1_2 );
-			document.addValue( index_1_1.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_1_2 );
-			document.addValue( index_1_1.binding().sortField, SORT_FIELD_1_1_2 );
-		} );
-
-		plan.execute().join();
+		BulkIndexer indexer_1_1 = index_1_1.bulkIndexer()
+				.add( DOCUMENT_1_1_1, document -> {
+					document.addValue( index_1_1.binding().string, STRING_1 );
+					document.addValue( index_1_1.binding().additionalField, ADDITIONAL_FIELD_1_1_1 );
+					document.addValue( index_1_1.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_1_1 );
+					document.addValue( index_1_1.binding().sortField, SORT_FIELD_1_1_1 );
+				} )
+				.add( DOCUMENT_1_1_2, document -> {
+					document.addValue( index_1_1.binding().string, STRING_2 );
+					document.addValue( index_1_1.binding().additionalField, ADDITIONAL_FIELD_1_1_2 );
+					document.addValue( index_1_1.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_1_2 );
+					document.addValue( index_1_1.binding().sortField, SORT_FIELD_1_1_2 );
+				} );
+		BulkIndexer indexer_1_2 = index_1_2.bulkIndexer()
+				.add( DOCUMENT_1_2_1, document -> {
+					document.addValue( index_1_2.binding().string, STRING_1 );
+					document.addValue( index_1_2.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_2_1 );
+					document.addValue( index_1_2.binding().sortField, SORT_FIELD_1_2_1 );
+				} );
+		BulkIndexer indexer_2_1 = index_2_1.bulkIndexer()
+				.add( DOCUMENT_2_1_1, document -> {
+					document.addValue( index_2_1.binding().string, STRING_1 );
+				} )
+				.add( DOCUMENT_2_1_2, document -> {
+					document.addValue( index_2_1.binding().string, STRING_2 );
+				} );
+		indexer_1_1.join( indexer_1_2, indexer_2_1 );
 
 		StubMappingScope scope = index_1_1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
@@ -281,36 +289,11 @@ public class SearchMultiIndexIT {
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
-		// Backend 1 / Index 2
-
-		plan = index_1_2.createIndexingPlan();
-
-		plan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
-			document.addValue( index_1_2.binding().string, STRING_1 );
-			document.addValue( index_1_2.binding().differentTypesField, DIFFERENT_TYPES_FIELD_1_2_1 );
-			document.addValue( index_1_2.binding().sortField, SORT_FIELD_1_2_1 );
-		} );
-
-		plan.execute().join();
-
 		scope = index_1_2.createScope();
 		query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( index_1_2.typeName(), DOCUMENT_1_2_1 );
-
-		// Backend 2 / Index 1
-
-		plan = index_2_1.createIndexingPlan();
-
-		plan.add( referenceProvider( DOCUMENT_2_1_1 ), document -> {
-			document.addValue( index_2_1.binding().string, STRING_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2_1_2 ), document -> {
-			document.addValue( index_2_1.binding().string, STRING_2 );
-		} );
-
-		plan.execute().join();
 
 		scope = index_2_1.createScope();
 		query = scope.query()

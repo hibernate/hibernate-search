@@ -10,18 +10,17 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithDiscriminatorProperty;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithoutAnyProperty;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
@@ -228,15 +227,13 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index1.createIndexingPlan();
-		plan.add( referenceProvider( ID_1 ), document -> { } );
-		plan.add( referenceProvider( ID_2 ), document -> { } );
-		plan.execute().join();
-
-		plan = index2.createIndexingPlan();
-		plan.add( referenceProvider( ID_1 ), document -> { } );
-		plan.add( referenceProvider( ID_2 ), document -> { } );
-		plan.execute().join();
+		BulkIndexer indexer1 = index1.bulkIndexer()
+				.add( ID_1, document -> { } )
+				.add( ID_2, document -> { } );
+		BulkIndexer indexer2 = index2.bulkIndexer()
+				.add( ID_1, document -> { } )
+				.add( ID_2, document -> { } );
+		indexer1.join( indexer2 );
 	}
 
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -31,6 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
@@ -491,45 +490,40 @@ public class WildcardSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
-			document.addValue( mainIndex.binding().analyzedStringFieldWithDslConverter.reference, TEXT_MATCHING_PATTERN_1 );
-			document.addValue( mainIndex.binding().normalizedField.reference, TERM_MATCHING_PATTERN_1 );
-			document.addValue( mainIndex.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2 );
-			document.addValue( mainIndex.binding().normalizedField.reference, TERM_MATCHING_PATTERN_2 );
-			document.addValue( mainIndex.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_2 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_3 );
-			document.addValue( mainIndex.binding().normalizedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
-			document.addValue( mainIndex.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2_AND_3 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField2.reference, TEXT_MATCHING_PATTERN_1 );
-			document.addValue( mainIndex.binding().analyzedStringField3.reference, TEXT_MATCHING_PATTERN_3 );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> {
-		} );
-		plan.execute().join();
-
-		plan = compatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( compatibleIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
-		} );
-		plan.execute().join();
-
-		plan = rawFieldCompatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( rawFieldCompatibleIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
-		} );
-		plan.execute().join();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
+					document.addValue( mainIndex.binding().analyzedStringFieldWithDslConverter.reference, TEXT_MATCHING_PATTERN_1 );
+					document.addValue( mainIndex.binding().normalizedField.reference, TERM_MATCHING_PATTERN_1 );
+					document.addValue( mainIndex.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_1 );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2 );
+					document.addValue( mainIndex.binding().normalizedField.reference, TERM_MATCHING_PATTERN_2 );
+					document.addValue( mainIndex.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_2 );
+				} )
+				.add( DOCUMENT_3, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_3 );
+					document.addValue( mainIndex.binding().normalizedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
+					document.addValue( mainIndex.binding().nonAnalyzedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
+				} )
+				.add( DOCUMENT_4, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2_AND_3 );
+				} )
+				.add( DOCUMENT_5, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField2.reference, TEXT_MATCHING_PATTERN_1 );
+					document.addValue( mainIndex.binding().analyzedStringField3.reference, TEXT_MATCHING_PATTERN_3 );
+				} )
+				.add( EMPTY, document -> { } );
+		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					document.addValue( compatibleIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
+				} );
+		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
+				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					document.addValue( rawFieldCompatibleIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
+				} );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

@@ -8,14 +8,12 @@ package org.hibernate.search.integrationtest.backend.lucene.mapping;
 
 
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -81,24 +79,22 @@ public class LuceneFieldTypesIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-
-		plan.add( referenceProvider( "ID:1" ), document -> {
-			document.addValue( index.binding().string, "keyword" );
-			document.addValue( index.binding().text, TEXT_1 );
-			document.addValue( index.binding().integer, 739 );
-			document.addValue( index.binding().longNumber, 739L );
-			document.addValue( index.binding().bool, true );
-		} );
-		plan.add( referenceProvider( "ID:2" ), document -> {
-			document.addValue( index.binding().string, "anotherKeyword" );
-			document.addValue( index.binding().text, TEXT_2 );
-			document.addValue( index.binding().integer, 123 );
-			document.addValue( index.binding().longNumber, 123L );
-			document.addValue( index.binding().bool, false );
-		} );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( "ID:1", document -> {
+					document.addValue( index.binding().string, "keyword" );
+					document.addValue( index.binding().text, TEXT_1 );
+					document.addValue( index.binding().integer, 739 );
+					document.addValue( index.binding().longNumber, 739L );
+					document.addValue( index.binding().bool, true );
+				} )
+				.add( "ID:2", document -> {
+					document.addValue( index.binding().string, "anotherKeyword" );
+					document.addValue( index.binding().text, TEXT_2 );
+					document.addValue( index.binding().integer, 123 );
+					document.addValue( index.binding().longNumber, 123L );
+					document.addValue( index.binding().bool, false );
+				} )
+				.join();
 	}
 
 	private static class IndexBinding {

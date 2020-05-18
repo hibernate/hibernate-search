@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -37,6 +35,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.assertj.core.api.Assertions;
@@ -641,21 +640,21 @@ public class TermsAggregationSpecificsIT<F> {
 		}
 
 		private void init() {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan();
+			BulkIndexer indexer = index.bulkIndexer();
 			int documentCount = 0;
 			for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
 				F value = entry.getKey();
 				for ( String documentId : entry.getValue() ) {
-					plan.add( referenceProvider( documentId, name ), document -> {
+					indexer.add( documentId, name, document -> {
 						document.addValue( index.binding().fieldModels.get( fieldType ).reference, value );
 						document.addValue( index.binding().fieldWithConverterModels.get( fieldType ).reference, value );
 					} );
 					++documentCount;
 				}
 			}
-			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
+			indexer.add( name + "_document_empty", name, document -> { } );
 			++documentCount;
-			plan.execute().join();
+			indexer.join();
 
 			// Check that all documents are searchable
 			SearchResultAssert.assertThat(

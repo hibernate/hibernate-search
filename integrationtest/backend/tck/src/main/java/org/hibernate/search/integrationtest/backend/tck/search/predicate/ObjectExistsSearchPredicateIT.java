@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assume.assumeFalse;
 
 import java.util.List;
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -320,47 +318,46 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_0 ), document -> { } );
+		mainIndex.bulkIndexer()
+				.add( DOCUMENT_0, document -> { } )
+				.add( DOCUMENT_1, document -> {
+					document.addValue( mainIndex.binding().string, ANY_STRING );
+					document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( mainIndex.binding().string, ANY_STRING );
+					document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
 
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( mainIndex.binding().string, ANY_STRING );
-			document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( mainIndex.binding().string, ANY_STRING );
-			document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
+					document.addObject( mainIndex.binding().nested );
+					document.addObject( mainIndex.binding().flattened );
+				} )
+				.add( DOCUMENT_3, document -> {
+					document.addValue( mainIndex.binding().string, ANY_STRING );
+					document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
 
-			document.addObject( mainIndex.binding().nested );
-			document.addObject( mainIndex.binding().flattened );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( mainIndex.binding().string, ANY_STRING );
-			document.addValue( mainIndex.binding().numeric, ANY_INTEGER );
+					DocumentElement nestedDocument = document.addObject( mainIndex.binding().nested );
+					nestedDocument.addValue( mainIndex.binding().nestedString, ANY_STRING );
+					nestedDocument.addValue( mainIndex.binding().nestedNumeric, ANY_INTEGER );
 
-			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nested );
-			nestedDocument.addValue( mainIndex.binding().nestedString, ANY_STRING );
-			nestedDocument.addValue( mainIndex.binding().nestedNumeric, ANY_INTEGER );
+					DocumentElement flattedDocument = document.addObject( mainIndex.binding().flattened );
+					flattedDocument.addValue( mainIndex.binding().flattenedString, ANY_STRING );
+					flattedDocument.addValue( mainIndex.binding().flattenedNumeric, ANY_INTEGER );
+				} )
+				.add( DOCUMENT_4, document -> {
+					DocumentElement nestedDocument = document.addObject( mainIndex.binding().nested );
+					DocumentElement nestedX2Document = nestedDocument.addObject( mainIndex.binding().nestedX2 );
+					nestedX2Document.addValue( mainIndex.binding().nestedX2String, ANY_STRING );
 
-			DocumentElement flattedDocument = document.addObject( mainIndex.binding().flattened );
-			flattedDocument.addValue( mainIndex.binding().flattenedString, ANY_STRING );
-			flattedDocument.addValue( mainIndex.binding().flattenedNumeric, ANY_INTEGER );
-		} );
-		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			DocumentElement nestedDocument = document.addObject( mainIndex.binding().nested );
-			DocumentElement nestedX2Document = nestedDocument.addObject( mainIndex.binding().nestedX2 );
-			nestedX2Document.addValue( mainIndex.binding().nestedX2String, ANY_STRING );
+					DocumentElement flattedDocument = document.addObject( mainIndex.binding().flattened );
+					DocumentElement flattedX2Document = flattedDocument.addObject( mainIndex.binding().flattenedX2 );
+					flattedX2Document.addValue( mainIndex.binding().flattenedX2String, ANY_STRING );
+				} )
+				.add( DOCUMENT_5, document -> {
+					document.addObject( mainIndex.binding().nestedNoChild );
+					document.addObject( mainIndex.binding().flattenedNoChild );
+				} )
+				.join();
 
-			DocumentElement flattedDocument = document.addObject( mainIndex.binding().flattened );
-			DocumentElement flattedX2Document = flattedDocument.addObject( mainIndex.binding().flattenedX2 );
-			flattedX2Document.addValue( mainIndex.binding().flattenedX2String, ANY_STRING );
-		} );
-		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			document.addObject( mainIndex.binding().nestedNoChild );
-			document.addObject( mainIndex.binding().flattenedNoChild );
-		} );
-
-		plan.execute().join();
 		checkDocumentsCreation();
 	}
 

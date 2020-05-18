@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -21,7 +20,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -313,24 +311,23 @@ public class CompositeSearchProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			index.binding().author.document1Value.write( document );
-			index.binding().title.document1Value.write( document );
-			index.binding().releaseDate.document1Value.write( document );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			index.binding().author.document2Value.write( document );
-			index.binding().title.document2Value.write( document );
-			index.binding().releaseDate.document2Value.write( document );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			index.binding().author.document3Value.write( document );
-			index.binding().title.document3Value.write( document );
-			index.binding().releaseDate.document3Value.write( document );
-		} );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					index.binding().author.document1Value.write( document );
+					index.binding().title.document1Value.write( document );
+					index.binding().releaseDate.document1Value.write( document );
+				} )
+				.add( DOCUMENT_2, document -> {
+					index.binding().author.document2Value.write( document );
+					index.binding().title.document2Value.write( document );
+					index.binding().releaseDate.document2Value.write( document );
+				} )
+				.add( DOCUMENT_3, document -> {
+					index.binding().author.document3Value.write( document );
+					index.binding().title.document3Value.write( document );
+					index.binding().releaseDate.document3Value.write( document );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

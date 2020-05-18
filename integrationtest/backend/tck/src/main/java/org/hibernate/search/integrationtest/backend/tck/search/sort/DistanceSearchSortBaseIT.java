@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static java.util.Arrays.asList;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -23,7 +22,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
@@ -395,14 +393,13 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		// Important: do not index the documents in the expected order after sorts
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> initDocument( document, DOCUMENT_3_ORDINAL ) );
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> initDocument( document, DOCUMENT_1_ORDINAL ) );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> initDocument( document, DOCUMENT_2_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_ID ), document -> initDocument( document, null ) );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				// Important: do not index the documents in the expected order after sort.
+				.add( DOCUMENT_3, document -> initDocument( document, DOCUMENT_3_ORDINAL ) )
+				.add( DOCUMENT_1, document -> initDocument( document, DOCUMENT_1_ORDINAL ) )
+				.add( DOCUMENT_2, document -> initDocument( document, DOCUMENT_2_ORDINAL ) )
+				.add( EMPTY_ID, document -> initDocument( document, null ) )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

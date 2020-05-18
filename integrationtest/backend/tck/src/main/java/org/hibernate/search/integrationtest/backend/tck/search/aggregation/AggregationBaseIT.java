@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +14,6 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -84,19 +82,18 @@ public class AggregationBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( index.binding().string, STRING_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( index.binding().string, STRING_2 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( index.binding().string, STRING_1 );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					document.addValue( index.binding().string, STRING_1 );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( index.binding().string, STRING_2 );
+				} )
+				.add( DOCUMENT_3, document -> {
+					document.addValue( index.binding().string, STRING_1 );
+				} )
+				.add( EMPTY, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

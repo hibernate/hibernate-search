@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -32,6 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
@@ -734,67 +733,61 @@ public class PhraseSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
-			document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
-			document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
-			document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
-			document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
-			document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
-			document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
-			document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
-			document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_3_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
-		} );
-		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
-			document.addValue( mainIndex.binding().analyzedStringField3.reference, PHRASE_2_TEXT_EXACT_MATCH );
-		} );
-		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_2_TEXT_EXACT_MATCH );
-			document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_1_TEXT_EXACT_MATCH );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> {
-		} );
-		plan.execute().join();
-
-		plan = compatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( compatibleIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
-		} );
-		plan.execute().join();
-
-		plan = rawFieldCompatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( rawFieldCompatibleIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
-		} );
-		plan.execute().join();
-
-		plan = incompatibleAnalyzerIndex.createIndexingPlan();
-		plan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( incompatibleAnalyzerIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
-		} );
-		plan.execute().join();
-
-		plan = compatibleSearchAnalyzerIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
-			document.addValue( compatibleSearchAnalyzerIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
-		} );
-		plan.execute().join();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+					document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+					document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+					document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
+					document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+					document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+					document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+					document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
+				} )
+				.add( DOCUMENT_3, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
+					document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_3_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
+				} )
+				.add( DOCUMENT_4, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
+					document.addValue( mainIndex.binding().analyzedStringField3.reference, PHRASE_2_TEXT_EXACT_MATCH );
+				} )
+				.add( DOCUMENT_5, document -> {
+					document.addValue( mainIndex.binding().analyzedStringField1.reference, PHRASE_2_TEXT_EXACT_MATCH );
+					document.addValue( mainIndex.binding().analyzedStringField2.reference, PHRASE_1_TEXT_EXACT_MATCH );
+				} )
+				.add( EMPTY, document -> { } );
+		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					document.addValue( compatibleIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+				} );
+		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
+				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					document.addValue( rawFieldCompatibleIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+				} );
+		BulkIndexer incompatibleAnalyzerIndexer = incompatibleAnalyzerIndex.bulkIndexer()
+				.add( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1, document -> {
+					document.addValue( incompatibleAnalyzerIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+				} );
+		BulkIndexer compatibleSearchAnalyzerIndexer = compatibleSearchAnalyzerIndex.bulkIndexer()
+				.add( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1, document -> {
+					document.addValue( compatibleSearchAnalyzerIndex.binding().analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+				} );
+		mainIndexer.join(
+				compatibleIndexer, rawFieldCompatibleIndexer, compatibleSearchAnalyzerIndexer,
+				incompatibleAnalyzerIndexer
+		);
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

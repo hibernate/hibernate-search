@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.time.MonthDay;
 import java.time.temporal.Temporal;
@@ -31,7 +30,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
@@ -434,19 +432,19 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	}
 
 	private static void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
-		plan.add( referenceProvider( SEGMENT_1_DOC_0, SEGMENT_1 ),
-				document -> initDocument( index.binding(), document, DOCUMENT_2_ORDINAL ) );
-		plan.add( referenceProvider( SEGMENT_1_DOC_EMPTY, SEGMENT_1 ),
-				document -> initDocument( index.binding(), document, null ) );
-		plan.add( referenceProvider( SEGMENT_0_DOC_1, SEGMENT_0 ),
-				document -> initDocument( index.binding(), document, DOCUMENT_1_ORDINAL ) );
-		plan.add( referenceProvider( SEGMENT_0_DOC_0, SEGMENT_0 ),
-				document -> initDocument( index.binding(), document, DOCUMENT_3_ORDINAL ) );
-		plan.add( referenceProvider( SEGMENT_0_DOC_EMPTY, SEGMENT_0 ),
-				document -> initDocument( index.binding(), document, null ) );
-		plan.execute().join();
+		index.bulkIndexer()
+				// Important: do not index the documents in the expected order after sorts (1, 2, 3)
+				.add( SEGMENT_1_DOC_0, SEGMENT_1,
+						document -> initDocument( index.binding(), document, DOCUMENT_2_ORDINAL ) )
+				.add( SEGMENT_1_DOC_EMPTY, SEGMENT_1,
+						document -> initDocument( index.binding(), document, null ) )
+				.add( SEGMENT_0_DOC_1, SEGMENT_0,
+						document -> initDocument( index.binding(), document, DOCUMENT_1_ORDINAL ) )
+				.add( SEGMENT_0_DOC_0, SEGMENT_0,
+						document -> initDocument( index.binding(), document, DOCUMENT_3_ORDINAL ) )
+				.add( SEGMENT_0_DOC_EMPTY, SEGMENT_0,
+						document -> initDocument( index.binding(), document, null ) )
+				.join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = index.createScope().query()

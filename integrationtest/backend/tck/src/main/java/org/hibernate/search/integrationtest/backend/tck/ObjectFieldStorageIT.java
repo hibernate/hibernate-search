@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -201,99 +199,95 @@ public class ObjectFieldStorageIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
-			ObjectMapping objectMapping;
-			DocumentElement object;
+		index.bulkIndexer()
+				.add( EXPECTED_NESTED_MATCH_ID, document -> {
+					ObjectMapping objectMapping;
+					DocumentElement object;
 
-			// ----------------
-			// Flattened object
-			// Leave it empty.
-			objectMapping = index.binding().flattenedObject;
-			document.addNullObject( objectMapping.self );
+					// ----------------
+					// Flattened object
+					// Leave it empty.
+					objectMapping = index.binding().flattenedObject;
+					document.addNullObject( objectMapping.self );
 
-			// -------------
-			// Nested object
-			// Content specially crafted to match in nested queries.
-			objectMapping = index.binding().nestedObject;
+					// -------------
+					// Nested object
+					// Content specially crafted to match in nested queries.
+					objectMapping = index.binding().nestedObject;
 
-			object = document.addObject( objectMapping.self );
-			object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
+					object = document.addObject( objectMapping.self );
+					object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-			// This object will trigger the match; others should not
-			object = document.addObject( objectMapping.self );
-			object.addValue( objectMapping.string, MATCHING_STRING );
-			object.addValue( objectMapping.string, NON_MATCHING_STRING );
-			object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
-			object.addValue( objectMapping.integer, MATCHING_INTEGER );
-			object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
+					// This object will trigger the match; others should not
+					object = document.addObject( objectMapping.self );
+					object.addValue( objectMapping.string, MATCHING_STRING );
+					object.addValue( objectMapping.string, NON_MATCHING_STRING );
+					object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
+					object.addValue( objectMapping.integer, MATCHING_INTEGER );
+					object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
 
-			object = document.addObject( objectMapping.self );
-			object.addValue( objectMapping.localDate, NON_MATCHING_LOCAL_DATE );
-		} );
+					object = document.addObject( objectMapping.self );
+					object.addValue( objectMapping.localDate, NON_MATCHING_LOCAL_DATE );
+				} )
+				.add( EXPECTED_NON_NESTED_MATCH_ID, document -> {
+					/*
+					 * Below, we use the same content for both the flattened object and the nested object.
+					 * This is to demonstrate the practical difference of object storage:
+					 * with the same content and similar conditions, the queries on the flattened object should match,
+					 * but the queries on the nested object should not.
+					 * In short, there is content that matches each and every condition used in tests,
+					 * but this content is spread over several objects, meaning it will only match
+					 * if flattened storage is used.
+					 */
+					for ( ObjectMapping objectMapping :
+							Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
+						DocumentElement object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-		plan.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
-			/*
-			 * Below, we use the same content for both the flattened object and the nested object.
-			 * This is to demonstrate the practical difference of object storage:
-			 * with the same content and similar conditions, the queries on the flattened object should match,
-			 * but the queries on the nested object should not.
-			 * In short, there is content that matches each and every condition used in tests,
-			 * but this content is spread over several objects, meaning it will only match
-			 * if flattened storage is used.
-			 */
-			for ( ObjectMapping objectMapping :
-					Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
-				DocumentElement object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string, NON_MATCHING_STRING );
+						object.addValue( objectMapping.integer, MATCHING_INTEGER );
+						object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string, NON_MATCHING_STRING );
-				object.addValue( objectMapping.integer, MATCHING_INTEGER );
-				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string, MATCHING_STRING );
 
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string, MATCHING_STRING );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
 
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
+						object.addValue( objectMapping.string_analyzed, NON_MATCHING_STRING_ANALYZED );
+					}
+				} )
+				.add( "neverMatching", document -> {
+					/*
+					 * This should not match, be it on the nested or the flattened object.
+					 * For first-level nesting tests, it's because of the integer field.
+					 * For second-level nesting tests, it's because there is no nested object matching condition 1.
+					 */
+					for ( ObjectMapping objectMapping :
+							Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
+						DocumentElement object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
-				object.addValue( objectMapping.string_analyzed, NON_MATCHING_STRING_ANALYZED );
-			}
-		} );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string, NON_MATCHING_STRING );
+						object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-		plan.add( referenceProvider( "neverMatching" ), document -> {
-			/*
-			 * This should not match, be it on the nested or the flattened object.
-			 * For first-level nesting tests, it's because of the integer field.
-			 * For second-level nesting tests, it's because there is no nested object matching condition 1.
-			 */
-			for ( ObjectMapping objectMapping :
-					Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
-				DocumentElement object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string, MATCHING_STRING );
 
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string, NON_MATCHING_STRING );
-				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
 
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string, MATCHING_STRING );
-
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
-
-				object = document.addObject( objectMapping.self );
-				object.addValue( objectMapping.string_analyzed, NON_MATCHING_STRING_ANALYZED );
-				object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
-			}
-		} );
-
-		plan.add( referenceProvider( "empty" ), document -> { } );
-
-		plan.execute().join();
+						object = document.addObject( objectMapping.self );
+						object.addValue( objectMapping.string_analyzed, NON_MATCHING_STRING_ANALYZED );
+						object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
+					}
+				} )
+				.add( "empty", document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

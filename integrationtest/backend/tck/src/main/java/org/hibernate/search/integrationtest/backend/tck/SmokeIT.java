@@ -14,7 +14,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -28,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 
 public class SmokeIT {
@@ -247,66 +245,61 @@ public class SmokeIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), document -> {
-			document.addValue( index.binding().string, "text 1" );
-			document.addValue( index.binding().string_analyzed, "text 1" );
-			document.addValue( index.binding().integer, 1 );
-			document.addValue( index.binding().localDate, LocalDate.of( 2018, 1, 1 ) );
-			document.addValue( index.binding().geoPoint, GeoPoint.of( 0, 1 ) );
+		index.bulkIndexer()
+				.add( "1", document -> {
+					document.addValue( index.binding().string, "text 1" );
+					document.addValue( index.binding().string_analyzed, "text 1" );
+					document.addValue( index.binding().integer, 1 );
+					document.addValue( index.binding().localDate, LocalDate.of( 2018, 1, 1 ) );
+					document.addValue( index.binding().geoPoint, GeoPoint.of( 0, 1 ) );
 
-			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			flattenedObject.addValue( index.binding().flattenedObject.string, "text 1_1" );
-			flattenedObject.addValue( index.binding().flattenedObject.integer, 101 );
-			flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			flattenedObject.addValue( index.binding().flattenedObject.string, "text 1_2" );
-			flattenedObject.addValue( index.binding().flattenedObject.integer, 102 );
+					DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject.addValue( index.binding().flattenedObject.string, "text 1_1" );
+					flattenedObject.addValue( index.binding().flattenedObject.integer, 101 );
+					flattenedObject = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject.addValue( index.binding().flattenedObject.string, "text 1_2" );
+					flattenedObject.addValue( index.binding().flattenedObject.integer, 102 );
 
-			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-			nestedObject.addValue( index.binding().nestedObject.string, "text 1_1" );
-			nestedObject.addValue( index.binding().nestedObject.integer, 101 );
-			nestedObject = document.addObject( index.binding().nestedObject.self );
-			nestedObject.addValue( index.binding().nestedObject.string, "text 1_2" );
-			nestedObject.addValue( index.binding().nestedObject.integer, 102 );
-		} );
+					DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+					nestedObject.addValue( index.binding().nestedObject.string, "text 1_1" );
+					nestedObject.addValue( index.binding().nestedObject.integer, 101 );
+					nestedObject = document.addObject( index.binding().nestedObject.self );
+					nestedObject.addValue( index.binding().nestedObject.string, "text 1_2" );
+					nestedObject.addValue( index.binding().nestedObject.integer, 102 );
+				} )
+				.add( "2", document -> {
+					document.addValue( index.binding().string, "text 2" );
+					document.addValue( index.binding().string_analyzed, "text 2" );
+					document.addValue( index.binding().integer, 2 );
+					document.addValue( index.binding().localDate, LocalDate.of( 2018, 1, 2 ) );
+					document.addValue( index.binding().geoPoint, GeoPoint.of( 0, 2 ) );
 
-		plan.add( referenceProvider( "2" ), document -> {
-			document.addValue( index.binding().string, "text 2" );
-			document.addValue( index.binding().string_analyzed, "text 2" );
-			document.addValue( index.binding().integer, 2 );
-			document.addValue( index.binding().localDate, LocalDate.of( 2018, 1, 2 ) );
-			document.addValue( index.binding().geoPoint, GeoPoint.of( 0, 2 ) );
+					DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject.addValue( index.binding().flattenedObject.string, "text 2_1" );
+					flattenedObject.addValue( index.binding().flattenedObject.integer, 201 );
+					flattenedObject = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject.addValue( index.binding().flattenedObject.string, "text 2_2" );
+					flattenedObject.addValue( index.binding().flattenedObject.integer, 202 );
 
-			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			flattenedObject.addValue( index.binding().flattenedObject.string, "text 2_1" );
-			flattenedObject.addValue( index.binding().flattenedObject.integer, 201 );
-			flattenedObject = document.addObject( index.binding().flattenedObject.self );
-			flattenedObject.addValue( index.binding().flattenedObject.string, "text 2_2" );
-			flattenedObject.addValue( index.binding().flattenedObject.integer, 202 );
-
-			DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-			nestedObject.addValue( index.binding().nestedObject.string, "text 2_1" );
-			nestedObject.addValue( index.binding().nestedObject.integer, 201 );
-			nestedObject = document.addObject( index.binding().nestedObject.self );
-			nestedObject.addValue( index.binding().nestedObject.string, "text 2_2" );
-			nestedObject.addValue( index.binding().nestedObject.integer, 202 );
-		} );
-
-		plan.add( referenceProvider( "3" ), document -> {
-			document.addValue( index.binding().string, "text 3" );
-			document.addValue( index.binding().string_analyzed, "text 3" );
-			document.addValue( index.binding().integer, 3 );
-		} );
-
-		plan.add( referenceProvider( "neverMatching" ), document -> {
-			document.addValue( index.binding().string, "never matching" );
-			document.addValue( index.binding().string_analyzed, "never matching" );
-			document.addValue( index.binding().integer, 9484 );
-		} );
-
-		plan.add( referenceProvider( "empty" ), document -> { } );
-
-		plan.execute().join();
+					DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
+					nestedObject.addValue( index.binding().nestedObject.string, "text 2_1" );
+					nestedObject.addValue( index.binding().nestedObject.integer, 201 );
+					nestedObject = document.addObject( index.binding().nestedObject.self );
+					nestedObject.addValue( index.binding().nestedObject.string, "text 2_2" );
+					nestedObject.addValue( index.binding().nestedObject.integer, 202 );
+				} )
+				.add( "3", document -> {
+					document.addValue( index.binding().string, "text 3" );
+					document.addValue( index.binding().string_analyzed, "text 3" );
+					document.addValue( index.binding().integer, 3 );
+				} )
+				.add( "neverMatching", document -> {
+					document.addValue( index.binding().string, "never matching" );
+					document.addValue( index.binding().string_analyzed, "never matching" );
+					document.addValue( index.binding().integer, 9484 );
+				} )
+				.add( "empty", document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

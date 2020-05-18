@@ -7,9 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -423,15 +421,14 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	protected void initData() {
 		super.initData();
 
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
-			document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
-		} );
-		plan.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
-			document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_2_GEO_POINT );
-		} );
-
-		plan.execute().join();
+		mainIndex.bulkIndexer()
+				.add( ADDITIONAL_POINT_1_ID, document -> {
+					document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
+				} )
+				.add( ADDITIONAL_POINT_2_ID, document -> {
+					document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_2_GEO_POINT );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

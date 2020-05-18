@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.indexnull;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -106,35 +104,35 @@ public class IndexNullAsValueIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add(
-				referenceProvider( DOCUMENT_WITH_INDEX_NULL_AS_VALUES ),
-				document -> {
-					index.binding().matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
-					if ( index.binding().geoPointField != null ) {
-						document.addValue( index.binding().geoPointField, GeoPoint.of( 0.0, 0.0 ) );
-					}
-				}
-		);
-		plan.add(
-				referenceProvider( DOCUMENT_WITH_DIFFERENT_VALUES ),
-				document -> {
-					index.binding().matchFieldModels.forEach( f -> f.differentValue.write( document ) );
-					if ( index.binding().geoPointField != null ) {
-						document.addValue( index.binding().geoPointField, GeoPoint.of( 40, 70 ) );
-					}
-				}
-		);
-		plan.add(
-				referenceProvider( DOCUMENT_WITH_NULL_VALUES ),
-				document -> {
-					index.binding().matchFieldModels.forEach( f -> f.nullValue.write( document ) );
-					if ( index.binding().geoPointField != null ) {
-						document.addValue( index.binding().geoPointField, null );
-					}
-				}
-		);
-		plan.execute().join();
+		index.bulkIndexer()
+				.add(
+						DOCUMENT_WITH_INDEX_NULL_AS_VALUES,
+						document -> {
+							index.binding().matchFieldModels.forEach( f -> f.indexNullAsValue.write( document ) );
+							if ( index.binding().geoPointField != null ) {
+								document.addValue( index.binding().geoPointField, GeoPoint.of( 0.0, 0.0 ) );
+							}
+						}
+				)
+				.add(
+						DOCUMENT_WITH_DIFFERENT_VALUES,
+						document -> {
+							index.binding().matchFieldModels.forEach( f -> f.differentValue.write( document ) );
+							if ( index.binding().geoPointField != null ) {
+								document.addValue( index.binding().geoPointField, GeoPoint.of( 40, 70 ) );
+							}
+						}
+				)
+				.add(
+						DOCUMENT_WITH_NULL_VALUES,
+						document -> {
+							index.binding().matchFieldModels.forEach( f -> f.nullValue.write( document ) );
+							if ( index.binding().geoPointField != null ) {
+								document.addValue( index.binding().geoPointField, null );
+							}
+						}
+				)
+				.join();
 	}
 
 	private static class IndexBinding {

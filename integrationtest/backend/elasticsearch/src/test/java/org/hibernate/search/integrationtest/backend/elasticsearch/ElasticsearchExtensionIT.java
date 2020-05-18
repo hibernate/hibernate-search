@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.List;
@@ -37,7 +36,6 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -1070,119 +1068,118 @@ public class ElasticsearchExtensionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "text 2" );
+		mainIndex.bulkIndexer()
+				.add( SECOND_ID, document -> {
+					document.addValue( mainIndex.binding().string, "text 2" );
 
-			document.addValue( mainIndex.binding().nativeField_integer, new JsonPrimitive( 2 ) );
-			document.addValue( mainIndex.binding().nativeField_integer_converted, new JsonPrimitive( 2 ) );
-			document.addValue( mainIndex.binding().nativeField_unsupportedType, new JsonPrimitive( "42" ) );
+					document.addValue( mainIndex.binding().nativeField_integer, new JsonPrimitive( 2 ) );
+					document.addValue( mainIndex.binding().nativeField_integer_converted, new JsonPrimitive( 2 ) );
+					document.addValue( mainIndex.binding().nativeField_unsupportedType, new JsonPrimitive( "42" ) );
 
-			document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "a" ) );
-			document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			document.addValue( mainIndex.binding().nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
+					document.addValue( mainIndex.binding().nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
 
-			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "b" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "one" );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "a" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-one" );
-		} );
-		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "text 1" );
+					DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "b" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "one" );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "a" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-one" );
+				} )
+				.add( FIRST_ID, document -> {
+					document.addValue( mainIndex.binding().string, "text 1" );
 
-			document.addValue( mainIndex.binding().nativeField_string, new JsonPrimitive( "text 1" ) );
+					document.addValue( mainIndex.binding().nativeField_string, new JsonPrimitive( "text 1" ) );
 
-			document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "a" ) );
-			document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			document.addValue( mainIndex.binding().nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
+					document.addValue( mainIndex.binding().nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
 
-			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "a" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "two" );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "b" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-two" );
-		} );
-		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "text 3" );
+					DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "a" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "two" );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "b" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-two" );
+				} )
+				.add( THIRD_ID, document -> {
+					document.addValue( mainIndex.binding().string, "text 3" );
 
-			document.addValue( mainIndex.binding().nativeField_geoPoint, gson.fromJson( "{'lat': 40.12, 'lon': -71.34}", JsonObject.class ) );
+					document.addValue( mainIndex.binding().nativeField_geoPoint, gson.fromJson( "{'lat': 40.12, 'lon': -71.34}", JsonObject.class ) );
 
-			document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "a" ) );
-			document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			document.addValue( mainIndex.binding().nativeField_aggregation, new JsonPrimitive( "value-for-doc-3" ) );
+					document.addValue( mainIndex.binding().nativeField_aggregation, new JsonPrimitive( "value-for-doc-3" ) );
 
-			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "c" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "three" );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "b" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-three" );
-		} );
-		plan.add( referenceProvider( FOURTH_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "text 4" );
+					DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "c" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "three" );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "b" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-three" );
+				} )
+				.add( FOURTH_ID, document -> {
+					document.addValue( mainIndex.binding().string, "text 4" );
 
-			document.addValue( mainIndex.binding().nativeField_dateWithColons, new JsonPrimitive( "2018:01:12" ) );
+					document.addValue( mainIndex.binding().nativeField_dateWithColons, new JsonPrimitive( "2018:01:12" ) );
 
-			document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "z" ) );
-			document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "a" ) );
-			document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort1, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort2, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort3, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort4, new JsonPrimitive( "a" ) );
+					document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "d" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "four" );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "c" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-four" );
-		} );
-		plan.add( referenceProvider( FIFTH_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "text 5" );
+					DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "d" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "four" );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "c" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-four" );
+				} )
+				.add( FIFTH_ID, document -> {
+					document.addValue( mainIndex.binding().string, "text 5" );
 
-			// This document should not match any query
-			document.addValue( mainIndex.binding().nativeField_string, new JsonPrimitive( "text 2" ) );
-			document.addValue( mainIndex.binding().nativeField_integer, new JsonPrimitive( 1 ) );
-			document.addValue( mainIndex.binding().nativeField_geoPoint, gson.fromJson( "{'lat': 45.12, 'lon': -75.34}", JsonObject.class ) );
-			document.addValue( mainIndex.binding().nativeField_dateWithColons, new JsonPrimitive( "2018:01:25" ) );
-			document.addValue( mainIndex.binding().nativeField_unsupportedType, new JsonPrimitive( "foobar" ) ); // ignore_malformed is enabled, this should be ignored
+					// This document should not match any query
+					document.addValue( mainIndex.binding().nativeField_string, new JsonPrimitive( "text 2" ) );
+					document.addValue( mainIndex.binding().nativeField_integer, new JsonPrimitive( 1 ) );
+					document.addValue( mainIndex.binding().nativeField_geoPoint, gson.fromJson( "{'lat': 45.12, 'lon': -75.34}", JsonObject.class ) );
+					document.addValue( mainIndex.binding().nativeField_dateWithColons, new JsonPrimitive( "2018:01:25" ) );
+					document.addValue( mainIndex.binding().nativeField_unsupportedType, new JsonPrimitive( "foobar" ) ); // ignore_malformed is enabled, this should be ignored
 
-			document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "z" ) );
+					document.addValue( mainIndex.binding().nativeField_sort5, new JsonPrimitive( "z" ) );
 
-			DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "e" );
-			nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "five" );
-			DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "a" );
-			nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-five" );
-		} );
-		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
-
-		plan.execute().join();
+					DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.discriminator, "included" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.sort1, "e" );
+					nestedObject1.addValue( mainIndex.binding().nestedObject.aggregation1, "five" );
+					DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.discriminator, "excluded" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.sort1, "a" );
+					nestedObject2.addValue( mainIndex.binding().nestedObject.aggregation1, "fifty-five" );
+				} )
+				.add( EMPTY_ID, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

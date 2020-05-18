@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,7 +19,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -31,7 +28,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityReference;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -95,15 +91,15 @@ public class FieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_1 ), document ->
-				initDocument( document, "foo",
-						"matchedValue", "notMatchedValue1", "notMatchedValue2" ) );
-		indexingPlan.add( referenceProvider( DOCUMENT_2 ), document ->
-				initDocument( document, "foo",
-						"notMatchedValue1", "notMatchedValue1", "matchedValue" ) );
-		indexingPlan.execute().join();
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_1, document ->
+						initDocument( document, "foo",
+								"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
+				.add( DOCUMENT_2, document ->
+						initDocument( document, "foo",
+								"notMatchedValue1", "notMatchedValue1", "matchedValue" ) )
+				.join();
 
 		// Check that documents are indexed and the dynamic field can be searched
 		SearchResultAssert.assertThat( query(
@@ -141,15 +137,15 @@ public class FieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_1 ), document ->
-				initDocument( document, "foo_str",
-						"matchedValue", "notMatchedValue1", "notMatchedValue2" ) );
-		indexingPlan.add( referenceProvider( DOCUMENT_2 ), document ->
-				initDocument( document, "foo_int",
-						42, 52, 56 ) );
-		indexingPlan.execute().join();
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_1, document ->
+						initDocument( document, "foo_str",
+								"matchedValue", "notMatchedValue1", "notMatchedValue2" ) )
+				.add( DOCUMENT_2, document ->
+						initDocument( document, "foo_int",
+								42, 52, 56 ) )
+				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
 		SearchResultAssert.assertThat( query(
@@ -200,15 +196,15 @@ public class FieldTemplateIT {
 				setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY, templatesBinder );
 
 		// Index a few documents
-		IndexIndexingPlan<StubEntityReference> indexingPlan = index.createIndexingPlan();
-		indexingPlan.add( referenceProvider( EMPTY ), document -> { } );
-		indexingPlan.add( referenceProvider( DOCUMENT_1 ), document ->
-				initDocument( document, "foo_str_int",
-						"42", "notMatchedValue1", "notMatchedValue2" ) );
-		indexingPlan.add( referenceProvider( DOCUMENT_2 ), document ->
-				initDocument( document, "foo_int",
-						42, 52, 56 ) );
-		indexingPlan.execute().join();
+		index.bulkIndexer()
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_1, document ->
+						initDocument( document, "foo_str_int",
+								"42", "notMatchedValue1", "notMatchedValue2" ) )
+				.add( DOCUMENT_2, document ->
+						initDocument( document, "foo_int",
+								42, 52, 56 ) )
+				.join();
 
 		// Check that dynamic fields have the correct type
 		SearchResultAssert.assertThat( query(

@@ -7,12 +7,10 @@
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -60,16 +58,16 @@ public class MultivaluedSpatialIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( "1" ), f -> {
-			f.addValue( index.binding().geoPoint, NORTH_WEST );
-			f.addValue( index.binding().geoPoint, SOUTH_EAST );
-		} );
-		plan.add( referenceProvider( "2" ), f -> {
-			f.addValue( index.binding().geoPoint, NORTH_EAST );
-			f.addValue( index.binding().geoPoint, SOUTH_WEST );
-		} );
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( "1", f -> {
+					f.addValue( index.binding().geoPoint, NORTH_WEST );
+					f.addValue( index.binding().geoPoint, SOUTH_EAST );
+				} )
+				.add( "2", f -> {
+					f.addValue( index.binding().geoPoint, NORTH_EAST );
+					f.addValue( index.binding().geoPoint, SOUTH_WEST );
+				} )
+				.join();
 	}
 
 	protected static class IndexBinding {

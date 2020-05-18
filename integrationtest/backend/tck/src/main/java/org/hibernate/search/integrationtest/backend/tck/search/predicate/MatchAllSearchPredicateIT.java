@@ -7,11 +7,9 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -103,18 +101,17 @@ public class MatchAllSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( index.binding().string, STRING_1 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( index.binding().string, STRING_2 );
-		} );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( index.binding().string, STRING_3 );
-		} );
-
-		plan.execute().join();
+		index.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					document.addValue( index.binding().string, STRING_1 );
+				} )
+				.add( DOCUMENT_2, document -> {
+					document.addValue( index.binding().string, STRING_2 );
+				} )
+				.add( DOCUMENT_3, document -> {
+					document.addValue( index.binding().string, STRING_3 );
+				} )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = index.createScope();

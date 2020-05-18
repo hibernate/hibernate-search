@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -349,26 +347,25 @@ public class SearchSortIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
+		mainIndex.bulkIndexer()
 		// Important: do not index the documents in the expected order after sorts
-		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "george" );
-			document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray" );
-			document.addValue( mainIndex.binding().unsortable, "george" );
-		} );
-		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "aaron" );
-			document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray Hooray" );
-			document.addValue( mainIndex.binding().unsortable, "aaron" );
-		} );
-		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( mainIndex.binding().string, "zach" );
-			document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray" );
-			document.addValue( mainIndex.binding().unsortable, "zach" );
-		} );
-		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
-
-		plan.execute().join();
+				.add( SECOND_ID, document -> {
+					document.addValue( mainIndex.binding().string, "george" );
+					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray" );
+					document.addValue( mainIndex.binding().unsortable, "george" );
+				} )
+				.add( FIRST_ID, document -> {
+					document.addValue( mainIndex.binding().string, "aaron" );
+					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray Hooray Hooray" );
+					document.addValue( mainIndex.binding().unsortable, "aaron" );
+				} )
+				.add( THIRD_ID, document -> {
+					document.addValue( mainIndex.binding().string, "zach" );
+					document.addValue( mainIndex.binding().string_analyzed_forScore, "Hooray" );
+					document.addValue( mainIndex.binding().unsortable, "zach" );
+				} )
+				.add( EMPTY_ID, document -> { } )
+				.join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = mainIndex.createScope();

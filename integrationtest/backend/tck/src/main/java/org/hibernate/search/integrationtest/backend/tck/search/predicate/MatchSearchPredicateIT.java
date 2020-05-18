@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -37,6 +35,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -1334,91 +1333,84 @@ public class MatchSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
-			mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			mainIndex.binding().string1Field.document1Value.write( document );
-			mainIndex.binding().string2Field.document1Value.write( document );
-			mainIndex.binding().string3Field.document1Value.write( document );
-			mainIndex.binding().string1FieldWithDslConverter.document1Value.write( document );
-			mainIndex.binding().string2FieldWithDslConverter.document1Value.write( document );
-			mainIndex.binding().analyzedStringField.document1Value.write( document );
-			mainIndex.binding().analyzedStringField2.document1Value.write( document );
-			mainIndex.binding().normalizedStringField.document1Value.write( document );
-			mainIndex.binding().whitespaceAnalyzedField.document1Value.write( document );
-			mainIndex.binding().whitespaceLowercaseAnalyzedField.document1Value.write( document );
-			mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.document1Value.write( document );
-			mainIndex.binding().ngramSearchAnalyzedField.document1Value.write( document );
-			mainIndex.binding().scaledBigDecimal.document1Value.write( document );
-		} );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
-			mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-			mainIndex.binding().string1Field.document2Value.write( document );
-			mainIndex.binding().string2Field.document2Value.write( document );
-			mainIndex.binding().string3Field.document2Value.write( document );
-			mainIndex.binding().string1FieldWithDslConverter.document2Value.write( document );
-			mainIndex.binding().string2FieldWithDslConverter.document2Value.write( document );
-			mainIndex.binding().analyzedStringField.document2Value.write( document );
-			mainIndex.binding().analyzedStringField2.document2Value.write( document );
-			mainIndex.binding().normalizedStringField.document2Value.write( document );
-			mainIndex.binding().whitespaceAnalyzedField.document2Value.write( document );
-			mainIndex.binding().whitespaceLowercaseAnalyzedField.document2Value.write( document );
-			mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.document2Value.write( document );
-			mainIndex.binding().ngramSearchAnalyzedField.document2Value.write( document );
-			mainIndex.binding().scaledBigDecimal.document2Value.write( document );
-		} );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			mainIndex.binding().string1Field.document3Value.write( document );
-			mainIndex.binding().string2Field.document3Value.write( document );
-			mainIndex.binding().string3Field.document3Value.write( document );
-			mainIndex.binding().string1FieldWithDslConverter.document3Value.write( document );
-			mainIndex.binding().string2FieldWithDslConverter.document3Value.write( document );
-			mainIndex.binding().analyzedStringField.document3Value.write( document );
-			mainIndex.binding().analyzedStringField2.document3Value.write( document );
-			mainIndex.binding().normalizedStringField.document3Value.write( document );
-			mainIndex.binding().whitespaceAnalyzedField.document3Value.write( document );
-			mainIndex.binding().whitespaceLowercaseAnalyzedField.document3Value.write( document );
-			mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.document3Value.write( document );
-			mainIndex.binding().ngramSearchAnalyzedField.document3Value.write( document );
-			mainIndex.binding().scaledBigDecimal.document3Value.write( document );
-		} );
-		plan.execute().join();
-
-		plan = compatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			compatibleIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		plan.execute().join();
-
-		plan = rawFieldCompatibleIndex.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-		} );
-		plan.execute().join();
-
-		plan = incompatibleAnalyzerIndex.createIndexingPlan();
-		plan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
-			incompatibleAnalyzerIndex.binding().analyzedStringField.document1Value.write( document );
-		} );
-		plan.execute().join();
-
-		plan = compatibleSearchAnalyzerIndex.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
-			compatibleSearchAnalyzerIndex.binding().analyzedStringField.document1Value.write( document );
-		} );
-		plan.execute().join();
-
-		plan = incompatibleDecimalScaleIndex.createIndexingPlan();
-		plan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
-			incompatibleDecimalScaleIndex.binding().scaledBigDecimal.document1Value.write( document );
-		} );
-		plan.execute().join();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
+				.add( DOCUMENT_1, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+					mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+					mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+					mainIndex.binding().string1Field.document1Value.write( document );
+					mainIndex.binding().string2Field.document1Value.write( document );
+					mainIndex.binding().string3Field.document1Value.write( document );
+					mainIndex.binding().string1FieldWithDslConverter.document1Value.write( document );
+					mainIndex.binding().string2FieldWithDslConverter.document1Value.write( document );
+					mainIndex.binding().analyzedStringField.document1Value.write( document );
+					mainIndex.binding().analyzedStringField2.document1Value.write( document );
+					mainIndex.binding().normalizedStringField.document1Value.write( document );
+					mainIndex.binding().whitespaceAnalyzedField.document1Value.write( document );
+					mainIndex.binding().whitespaceLowercaseAnalyzedField.document1Value.write( document );
+					mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.document1Value.write( document );
+					mainIndex.binding().ngramSearchAnalyzedField.document1Value.write( document );
+					mainIndex.binding().scaledBigDecimal.document1Value.write( document );
+				} )
+				.add( DOCUMENT_2, document -> {
+					mainIndex.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+					mainIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
+					mainIndex.binding().unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
+					mainIndex.binding().string1Field.document2Value.write( document );
+					mainIndex.binding().string2Field.document2Value.write( document );
+					mainIndex.binding().string3Field.document2Value.write( document );
+					mainIndex.binding().string1FieldWithDslConverter.document2Value.write( document );
+					mainIndex.binding().string2FieldWithDslConverter.document2Value.write( document );
+					mainIndex.binding().analyzedStringField.document2Value.write( document );
+					mainIndex.binding().analyzedStringField2.document2Value.write( document );
+					mainIndex.binding().normalizedStringField.document2Value.write( document );
+					mainIndex.binding().whitespaceAnalyzedField.document2Value.write( document );
+					mainIndex.binding().whitespaceLowercaseAnalyzedField.document2Value.write( document );
+					mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.document2Value.write( document );
+					mainIndex.binding().ngramSearchAnalyzedField.document2Value.write( document );
+					mainIndex.binding().scaledBigDecimal.document2Value.write( document );
+				} )
+				.add( EMPTY, document -> { } )
+				.add( DOCUMENT_3, document -> {
+					mainIndex.binding().string1Field.document3Value.write( document );
+					mainIndex.binding().string2Field.document3Value.write( document );
+					mainIndex.binding().string3Field.document3Value.write( document );
+					mainIndex.binding().string1FieldWithDslConverter.document3Value.write( document );
+					mainIndex.binding().string2FieldWithDslConverter.document3Value.write( document );
+					mainIndex.binding().analyzedStringField.document3Value.write( document );
+					mainIndex.binding().analyzedStringField2.document3Value.write( document );
+					mainIndex.binding().normalizedStringField.document3Value.write( document );
+					mainIndex.binding().whitespaceAnalyzedField.document3Value.write( document );
+					mainIndex.binding().whitespaceLowercaseAnalyzedField.document3Value.write( document );
+					mainIndex.binding().whitespaceLowercaseSearchAnalyzedField.document3Value.write( document );
+					mainIndex.binding().ngramSearchAnalyzedField.document3Value.write( document );
+					mainIndex.binding().scaledBigDecimal.document3Value.write( document );
+				} );
+		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					compatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+					compatibleIndex.binding().supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+				} );
+		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
+				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					rawFieldCompatibleIndex.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+				} );
+		BulkIndexer incompatibleAnalyzerIndexer = incompatibleAnalyzerIndex.bulkIndexer()
+				.add( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1, document -> {
+					incompatibleAnalyzerIndex.binding().analyzedStringField.document1Value.write( document );
+				} );
+		BulkIndexer compatibleSearchAnalyzerIndexer = compatibleSearchAnalyzerIndex.bulkIndexer()
+				.add( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1, document -> {
+					compatibleSearchAnalyzerIndex.binding().analyzedStringField.document1Value.write( document );
+				} );
+		BulkIndexer incompatibleDecimalScaleIndexer = incompatibleDecimalScaleIndex.bulkIndexer()
+				.add( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1, document -> {
+					incompatibleDecimalScaleIndex.binding().scaledBigDecimal.document1Value.write( document );
+				} );
+		mainIndexer.join(
+				compatibleIndexer, rawFieldCompatibleIndexer, compatibleSearchAnalyzerIndexer,
+				incompatibleAnalyzerIndexer, incompatibleDecimalScaleIndexer
+		);
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
