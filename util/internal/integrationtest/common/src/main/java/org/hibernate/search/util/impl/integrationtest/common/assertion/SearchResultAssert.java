@@ -94,13 +94,13 @@ public class SearchResultAssert<H> {
 		return this;
 	}
 
-	public SearchResultAssert<H> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
-		hits().hasDocRefHitsExactOrder( indexName, firstId, otherIds );
+	public SearchResultAssert<H> hasDocRefHitsExactOrder(String typeName, String firstId, String... otherIds) {
+		hits().hasDocRefHitsExactOrder( typeName, firstId, otherIds );
 		return this;
 	}
 
-	public SearchResultAssert<H> hasDocRefHitsAnyOrder(String indexName, String firstId, String... otherIds) {
-		hits().hasDocRefHitsAnyOrder( indexName, firstId, otherIds );
+	public SearchResultAssert<H> hasDocRefHitsAnyOrder(String typeName, String firstId, String... otherIds) {
+		hits().hasDocRefHitsAnyOrder( typeName, firstId, otherIds );
 		return this;
 	}
 

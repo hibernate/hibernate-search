@@ -93,15 +93,15 @@ public class SearchHitsAssert<H> {
 		return hasHitsAnyOrder( (H[]) hits.toArray() );
 	}
 
-	public SearchHitsAssert<H> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
+	public SearchHitsAssert<H> hasDocRefHitsExactOrder(String typeName, String firstId, String... otherIds) {
 		return hasDocRefHitsExactOrder( ctx -> {
-			ctx.doc( indexName, firstId, otherIds );
+			ctx.doc( typeName, firstId, otherIds );
 		} );
 	}
 
-	public SearchHitsAssert<H> hasDocRefHitsAnyOrder(String indexName, String firstId, String... otherIds) {
+	public SearchHitsAssert<H> hasDocRefHitsAnyOrder(String typeName, String firstId, String... otherIds) {
 		return hasDocRefHitsAnyOrder( ctx -> {
-			ctx.doc( indexName, firstId, otherIds );
+			ctx.doc( typeName, firstId, otherIds );
 		} );
 	}
 
