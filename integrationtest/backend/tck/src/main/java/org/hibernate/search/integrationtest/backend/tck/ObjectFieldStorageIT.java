@@ -61,16 +61,10 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_root() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-
-		assertThatThrownBy( () -> {
-			plan.add( referenceProvider( "willNotWork" ), document -> {
-				DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-				flattenedObject.addValue( index.binding().string, "willNotWork" );
-			} );
-
-			plan.execute().join();
-		} )
+		assertThatThrownBy( () -> index.index( "willNotWork", document -> {
+			DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
+			flattenedObject.addValue( index.binding().string, "willNotWork" );
+		} ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid field reference for this document element",
@@ -81,15 +75,8 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_flattened() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-
-		assertThatThrownBy( () -> {
-			plan.add( referenceProvider( "willNotWork" ), document -> {
-				document.addValue( index.binding().flattenedObject.string, "willNotWork" );
-			} );
-
-			plan.execute().join();
-		} )
+		assertThatThrownBy( () -> index.index( "willNotWork", document ->
+				document.addValue( index.binding().flattenedObject.string, "willNotWork" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid field reference for this document element",
@@ -99,15 +86,8 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_nested() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-
-		assertThatThrownBy( () -> {
-			plan.add( referenceProvider( "willNotWork" ), document -> {
-				document.addValue( index.binding().nestedObject.string, "willNotWork" );
-			} );
-
-			plan.execute().join();
-		} )
+		assertThatThrownBy( () -> index.index( "willNotWork", document ->
+				document.addValue( index.binding().nestedObject.string, "willNotWork" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid field reference for this document element",
