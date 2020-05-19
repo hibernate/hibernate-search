@@ -7,15 +7,16 @@
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
@@ -83,18 +84,49 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+		ParameterExpression<Collection> idsParameter = criteriaBuilder.parameter( Collection.class, "ids" );
+		int fetchSize = loadingOptions.fetchSize();
+		Query<? extends E> query = createQuery( criteriaBuilder, idsParameter, fetchSize );
+
+		if ( fetchSize >= documentIdSourceValues.size() ) {
+			query.setParameter( idsParameter, documentIdSourceValues );
+			return query.getResultList();
+		}
+		else {
+			List<E> result = new ArrayList<>( documentIdSourceValues.size() );
+
+			List<Object> ids = new ArrayList<>( fetchSize );
+			for ( Object documentIdSourceValue : documentIdSourceValues ) {
+				ids.add( documentIdSourceValue );
+				if ( ids.size() >= fetchSize ) {
+					query.setParameter( idsParameter, ids );
+					result.addAll( query.getResultList() );
+					ids.clear();
+				}
+			}
+			if ( !ids.isEmpty() ) {
+				query.setParameter( idsParameter, ids );
+				result.addAll( query.getResultList() );
+			}
+
+			return result;
+		}
+	}
+
+	private Query<? extends E> createQuery(CriteriaBuilder criteriaBuilder,
+			ParameterExpression<Collection> idsParameter, int fetchSize) {
 		CriteriaQuery<? extends E> criteriaQuery = criteriaBuilder.createQuery( entityType.getJavaType() );
 
 		Root<? extends E> root = criteriaQuery.from( entityType );
 		Path<?> documentIdSourcePropertyInRoot = root.get( documentIdSourceAttribute );
 
-		criteriaQuery.where( documentIdSourcePropertyInRoot.in( documentIdSourceValues ) );
+		criteriaQuery.where( documentIdSourcePropertyInRoot.in( idsParameter ) );
 
 		Query<? extends E> query = session.createQuery( criteriaQuery );
 
-		query.setFetchSize( loadingOptions.fetchSize() );
+		query.setFetchSize( fetchSize );
 
-		return query.getResultList();
+		return query;
 	}
 
 	private static class Factory<E> implements EntityLoaderFactory {
