@@ -138,7 +138,7 @@ But at the lower levels, indexing in a mapper comes down to using the backend SP
 When indexing, the mapper must build a document that will be passed to the backend.
 This is done using document elements and index field references.
 During bootstrap, whenever the mapper declared a field, the backend returned a reference
-(see `IndexSchemaFieldTerminalContext#getReference`).
+(see `IndexSchemaFieldFinalStep#toReference`).
 In order to build a document, the mapper extracts data from an object to index,
 retrieves a document element from the backend,
 and pass the field reference along with the value to the document element,
