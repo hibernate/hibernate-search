@@ -19,6 +19,19 @@ public interface LuceneSearchResult<H> extends SearchResult<H> {
 	 * It might be used by an advanced user who needs to merge different query result,
 	 * using the merge low level Lucene API, such as {@link TopDocs#merge(int, TopDocs[])}.
 	 */
-	TopDocs getTopDocs();
+	TopDocs topDocs();
+
+	/**
+	 * @return the Lucene topDocs produced by the query.
+	 * <p>
+	 * For the common use cases there is no meaning for using it.
+	 * It might be used by an advanced user who needs to merge different query result,
+	 * using the merge low level Lucene API, such as {@link TopDocs#merge(int, TopDocs[])}.
+	 * @deprecated Use {@link #topDocs()} instead.
+	 */
+	@Deprecated
+	default TopDocs getTopDocs() {
+		return topDocs();
+	}
 
 }

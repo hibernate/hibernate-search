@@ -28,7 +28,7 @@ public enum IOStrategyName {
 	public static IOStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				IOStrategyName.values(),
-				IOStrategyName::getExternalRepresentation,
+				IOStrategyName::externalRepresentation,
 				log::invalidIOStrategyName,
 				value
 		);
@@ -40,7 +40,19 @@ public enum IOStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	private String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation()} instead.
+	 */
+	@Deprecated
+	private String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 }

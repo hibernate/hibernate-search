@@ -557,11 +557,11 @@ public class QueryDslIT {
 					.sort( f -> f.field( "title_sort" ) )
 					.toQuery(); // <2>
 
-			Sort sort = query.getLuceneSort(); // <3>
+			Sort sort = query.luceneSort(); // <3>
 
 			LuceneSearchResult<Book> result = query.fetch( 20 ); // <4>
 
-			TopDocs topDocs = result.getTopDocs(); // <5>
+			TopDocs topDocs = result.topDocs(); // <5>
 			// end::lucene-lowLevel[]
 
 			assertThat( result.hits() ).extracting( Book::getId )

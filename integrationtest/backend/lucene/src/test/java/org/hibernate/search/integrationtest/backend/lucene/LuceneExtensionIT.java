@@ -177,7 +177,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.matchAll() )
 				.fetchAll();
 
-		Assertions.assertThat( result.getTopDocs() ).isNotNull();
+		Assertions.assertThat( result.topDocs() ).isNotNull();
 	}
 
 	@Test

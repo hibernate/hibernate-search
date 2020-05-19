@@ -25,7 +25,7 @@ public enum LockingStrategyName {
 	public static LockingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				LockingStrategyName.values(),
-				LockingStrategyName::getExternalRepresentation,
+				LockingStrategyName::externalRepresentation,
 				log::invalidLockingStrategyName,
 				value
 		);
@@ -37,7 +37,19 @@ public enum LockingStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	private String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation()} instead.
+	 */
+	@Deprecated
+	private String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 }

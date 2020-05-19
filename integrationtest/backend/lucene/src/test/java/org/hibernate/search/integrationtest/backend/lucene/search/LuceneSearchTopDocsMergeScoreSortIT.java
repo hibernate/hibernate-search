@@ -73,7 +73,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_0, SEGMENT_1_DOC_1 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
-		Assertions.assertThat( TopDocs.merge( segment0Query.getLuceneSort(), 10, allTopDocs ).scoreDocs )
+		Assertions.assertThat( TopDocs.merge( segment0Query.luceneSort(), 10, allTopDocs ).scoreDocs )
 				.containsExactly(
 						allTopDocs[1].scoreDocs[0], // SEGMENT_1_DOC_0
 						allTopDocs[0].scoreDocs[0], // SEGMENT_0_DOC_0
@@ -95,7 +95,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_1, SEGMENT_1_DOC_0 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
-		Assertions.assertThat( TopDocs.merge( segment0Query.getLuceneSort(), 10, allTopDocs ).scoreDocs )
+		Assertions.assertThat( TopDocs.merge( segment0Query.luceneSort(), 10, allTopDocs ).scoreDocs )
 				.containsExactly(
 						allTopDocs[0].scoreDocs[0], // SEGMENT_0_DOC_1
 						allTopDocs[1].scoreDocs[0], // SEGMENT_1_DOC_1
@@ -114,10 +114,10 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	}
 
 	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult ... results) {
-		Sort sort = query.getLuceneSort();
+		Sort sort = query.luceneSort();
 		TopFieldDocs[] allTopDocs = new TopFieldDocs[results.length];
 		for ( int i = 0; i < results.length; i++ ) {
-			TopDocs topDocs = results[i].getTopDocs();
+			TopDocs topDocs = results[i].topDocs();
 			allTopDocs[i] = new TopFieldDocs( topDocs.totalHits, topDocs.scoreDocs, sort.getSort() );
 		}
 		return allTopDocs;
