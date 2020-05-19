@@ -124,14 +124,14 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	private void putField(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
 		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaNodeNameConflict( name, getEventContext() );
+			throw log.indexSchemaNodeNameConflict( name, eventContext() );
 		}
 	}
 
 	private void putTemplate(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
 		Object previous = templates.putIfAbsent( name, contributor );
 		if ( previous != null ) {
-			throw log.indexSchemaFieldTemplateNameConflict( name, getEventContext() );
+			throw log.indexSchemaFieldTemplateNameConflict( name, eventContext() );
 		}
 	}
 

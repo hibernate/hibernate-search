@@ -113,7 +113,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		Optional<ElasticsearchVersion> configuredVersion = VERSION.get( propertySource );
 		boolean versionCheckEnabled = getVersionCheckEnabled( propertySource );
 
-		BeanResolver beanResolver = buildContext.getBeanResolver();
+		BeanResolver beanResolver = buildContext.beanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
 		BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder = null;
 		BackendThreads threads = null;
@@ -136,7 +136,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			}
 			else {
 				// We must determine the Elasticsearch version, and thus instantiate the client, right now.
-				threads.onStart( propertySource, buildContext.getThreadPoolProvider() );
+				threads.onStart( propertySource, buildContext.threadPoolProvider() );
 				link.onStart( propertySource );
 
 				version = link.getElasticsearchVersion();
@@ -163,7 +163,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					getMultiTenancyStrategy( name, propertySource ),
 					indexLayoutStrategyHolder,
 					createTypeNameMapping( name, propertySource, indexLayoutStrategyHolder.get() ),
-					buildContext.getFailureHandler()
+					buildContext.failureHandler()
 			);
 		}
 		catch (RuntimeException e) {
@@ -208,7 +208,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 	private BeanHolder<? extends IndexLayoutStrategy> createIndexLayoutStrategy(BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
-		final BeanResolver beanResolver = buildContext.getBeanResolver();
+		final BeanResolver beanResolver = buildContext.beanResolver();
 		return LAYOUT_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
 	}
 
@@ -233,7 +233,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
-			final BeanResolver beanResolver = buildContext.getBeanResolver();
+			final BeanResolver beanResolver = buildContext.beanResolver();
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.map( holder -> {
 						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {

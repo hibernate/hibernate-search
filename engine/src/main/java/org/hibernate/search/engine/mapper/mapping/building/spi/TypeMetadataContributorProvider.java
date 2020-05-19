@@ -25,6 +25,6 @@ public interface TypeMetadataContributorProvider<C> {
 	/**
 	 * @return A set containing all the types that were contributed to so far.
 	 */
-	Set<? extends MappableTypeModel> getTypesContributedTo();
+	Set<? extends MappableTypeModel> typesContributedTo();
 
 }

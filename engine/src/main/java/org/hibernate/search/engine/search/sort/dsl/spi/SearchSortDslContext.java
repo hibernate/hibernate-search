@@ -31,7 +31,7 @@ public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?, B>, 
 	/**
 	 * @return The sort builder factory. Will always return the exact same instance.
 	 */
-	F getBuilderFactory();
+	F builderFactory();
 
 	/**
 	 * Create a new context with a sort builder appended.
@@ -44,7 +44,7 @@ public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?, B>, 
 	/**
 	 * @return The predicate factory. Will always return the exact same instance.
 	 */
-	PDF getPredicateFactory();
+	PDF predicateFactory();
 
 	/**
 	 * @param extension The extension to apply to the predicate factory.

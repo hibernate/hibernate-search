@@ -79,7 +79,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				EasyMock.capture( indexPropertySourceCapture )
 		) )
 				.andReturn( (IndexManagerBuilder) indexManagerBuilderMock );
-		EasyMock.expect( indexManagerBuilderMock.getSchemaRootNodeBuilder() )
+		EasyMock.expect( indexManagerBuilderMock.schemaRootNodeBuilder() )
 				.andStubReturn( indexSchemaRootNodeBuilderMock );
 		replayAll();
 		holder.getIndexManagerBuildingState(

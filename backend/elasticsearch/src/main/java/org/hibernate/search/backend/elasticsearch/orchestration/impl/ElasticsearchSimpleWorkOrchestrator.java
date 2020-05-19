@@ -41,7 +41,7 @@ public class ElasticsearchSimpleWorkOrchestrator
 	}
 
 	@Override
-	protected CompletableFuture<?> getCompletion() {
+	protected CompletableFuture<?> completion() {
 		// We do not wait for these works to finish;
 		// callers were provided with a future and are responsible for waiting
 		// before they close the application.

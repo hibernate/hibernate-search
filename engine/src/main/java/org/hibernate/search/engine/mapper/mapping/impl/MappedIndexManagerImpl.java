@@ -36,8 +36,8 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	}
 
 	@Override
-	public IndexSchemaManager getSchemaManager() {
-		return implementor.getSchemaManager();
+	public IndexSchemaManager schemaManager() {
+		return implementor.schemaManager();
 	}
 
 	@Override

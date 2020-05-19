@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 /**
  * The binding context associated to a specific node in the entity tree.
  * <p>
- * The context includes in particular {@link #getSchemaElement() the corresponding node in the index schema tree}.
+ * The context includes in particular {@link #schemaElement() the corresponding node in the index schema tree}.
  * <p>
  * Provides entry points to add fields to the index schema and to generate new contexts for indexed-embeddeds.
  */
@@ -39,14 +39,14 @@ public interface IndexBindingContext {
 	/**
 	 * @return The element in the index schema that this context points to.
 	 */
-	IndexSchemaElement getSchemaElement();
+	IndexSchemaElement schemaElement();
 
 	/**
 	 * @param listener A listener to notify when operations are executed on the returned schema element.
 	 * @return The element in the index schema that this context points to,
 	 * with a wrapper that ensures the given listener will be called when operations are executed on the schema element.
 	 */
-	IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener);
+	IndexSchemaElement schemaElement(IndexSchemaContributionListener listener);
 
 	/**
 	 * @param definition The indexed-embedded definition.

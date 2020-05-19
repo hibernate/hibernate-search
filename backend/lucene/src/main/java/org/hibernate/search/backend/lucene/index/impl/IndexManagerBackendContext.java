@@ -116,7 +116,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			BackendSessionContext sessionContext,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new LuceneIndexIndexingPlan<>(
 				workFactory,
@@ -133,7 +133,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new LuceneIndexIndexer(
 				workFactory,
@@ -146,7 +146,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	@Override
 	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new LuceneIndexWorkspace( workFactory, indexManagerContext, sessionContext );
 	}
@@ -167,7 +167,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new LuceneSearchQueryBuilder<>(
 				workFactory,

@@ -318,6 +318,6 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager() ) );
 	}
 }

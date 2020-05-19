@@ -29,8 +29,8 @@ public final class DetachedBackendSessionContext {
 
 	public static DetachedBackendSessionContext of(BackendSessionContext sessionContext) {
 		return new DetachedBackendSessionContext(
-				sessionContext.getMappingContext(),
-				sessionContext.getTenantIdentifier()
+				sessionContext.mappingContext(),
+				sessionContext.tenantIdentifier()
 		);
 	}
 
@@ -51,11 +51,11 @@ public final class DetachedBackendSessionContext {
 		this.tenantIdentifier = tenantIdentifier;
 	}
 
-	public BackendMappingContext getMappingContext() {
+	public BackendMappingContext mappingContext() {
 		return mappingContext;
 	}
 
-	public String getTenantIdentifier() {
+	public String tenantIdentifier() {
 		return tenantIdentifier;
 	}
 

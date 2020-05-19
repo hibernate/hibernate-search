@@ -38,7 +38,7 @@ public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProj
 	@Override
 	public E transform(LoadingResult<?> loadingResult, Object extractedData,
 			SearchProjectionTransformContext context) {
-		E loaded = (E) loadingResult.getLoaded( extractedData );
+		E loaded = (E) loadingResult.get( extractedData );
 		if ( loaded == null ) {
 			context.reportFailedLoad();
 		}

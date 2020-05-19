@@ -76,7 +76,7 @@ public abstract class AbstractShardingIT {
 				case DOCUMENT_IDS:
 					break;
 			}
-			this.indexedRoutingKey = ctx.getSchemaElement().field(
+			this.indexedRoutingKey = ctx.schemaElement().field(
 					"indexedRoutingKey", f -> f.asString()
 			).toReference();
 		}

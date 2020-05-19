@@ -103,7 +103,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 					embeddedTypeModelPath, mappingHelper, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
 					Optional.empty(),
-					nestedBindingContext.getParentIndexObjectReferences()
+					nestedBindingContext.parentIndexObjectReferences()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 

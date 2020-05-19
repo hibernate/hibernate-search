@@ -56,8 +56,8 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
-		BeanResolver beanResolver = buildContext.getBeanResolver();
-		FailureCollector failureCollector = buildContext.getFailureCollector();
+		BeanResolver beanResolver = buildContext.beanResolver();
+		FailureCollector failureCollector = buildContext.failureCollector();
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.getAnnotationValueReadHandleFactory() );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
 				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, annotationHelper );
@@ -69,7 +69,7 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 		Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
 		Set<PojoRawTypeModel<?>> typesToInspect = new LinkedHashSet<>();
 		for ( Class<?> annotatedType : annotatedTypes ) {
-			introspector.getTypeModel( annotatedType ).getAscendingSuperTypes()
+			introspector.getTypeModel( annotatedType ).ascendingSuperTypes()
 					.forEach( typesToInspect::add );
 		}
 		for ( PojoRawTypeModel<?> typeModel : typesToInspect ) {

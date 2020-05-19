@@ -50,7 +50,7 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 		}
 
 		@Override
-		public Void getLoaded(Object key) {
+		public Void get(Object key) {
 			throw new AssertionFailure(
 					"Attempt to load an entity with a key that was never issued."
 					+ " There is probably a bug in Hibernate Search, please report it."

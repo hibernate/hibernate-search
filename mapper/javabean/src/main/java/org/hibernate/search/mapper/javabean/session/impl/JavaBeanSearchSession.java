@@ -62,6 +62,12 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	}
 
 	@Override
+	public String tenantIdentifier() {
+		return tenantId;
+	}
+
+	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
+	@Override
 	public String getTenantIdentifier() {
 		return tenantId;
 	}

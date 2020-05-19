@@ -70,7 +70,7 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 		}
 
 		return new SearchScopeImpl(
-				getDelegate().createPojoScope(
+				delegate().createPojoScope(
 						this,
 						typeIdentifiers,
 						// We don't load anything, so we don't need any additional type context

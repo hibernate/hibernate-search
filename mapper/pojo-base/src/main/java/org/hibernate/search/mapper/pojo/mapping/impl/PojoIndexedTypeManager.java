@@ -157,7 +157,7 @@ public class PojoIndexedTypeManager<I, E>
 
 	@Override
 	public IndexSchemaManager getSchemaManager() {
-		return indexManager.getSchemaManager();
+		return indexManager.schemaManager();
 	}
 
 	@Override

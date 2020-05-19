@@ -40,7 +40,7 @@ public interface BeanProvider extends AutoCloseable {
 	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the reference is invalid (null) or the bean does not exist.
 	 */
-	<T> BeanHolder<T> getBean(Class<T> typeReference);
+	<T> BeanHolder<T> forType(Class<T> typeReference);
 
 	/**
 	 * Provide a bean referenced by its type and name.
@@ -50,6 +50,6 @@ public interface BeanProvider extends AutoCloseable {
 	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if a reference is invalid (null or empty) or the bean does not exist.
 	 */
-	<T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference);
+	<T> BeanHolder<T> forTypeAndName(Class<T> typeReference, String nameReference);
 
 }

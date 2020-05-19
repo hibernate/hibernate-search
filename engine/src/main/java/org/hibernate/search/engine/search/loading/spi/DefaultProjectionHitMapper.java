@@ -51,7 +51,7 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 		}
 
 		@Override
-		public E getLoaded(Object key) {
+		public E get(Object key) {
 			return loadedObjects.get( (int) key );
 		}
 	}

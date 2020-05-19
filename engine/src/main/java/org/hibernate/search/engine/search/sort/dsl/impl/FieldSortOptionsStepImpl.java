@@ -30,7 +30,7 @@ public class FieldSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 	public FieldSortOptionsStepImpl(SearchSortDslContext<?, B, ? extends PDF> dslContext, String absoluteFieldPath) {
 		super( dslContext );
 		this.dslContext = dslContext;
-		this.builder = dslContext.getBuilderFactory().field( absoluteFieldPath );
+		this.builder = dslContext.builderFactory().field( absoluteFieldPath );
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class FieldSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 	@Override
 	public FieldSortOptionsStepImpl<B, PDF> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
-		SearchPredicate predicate = clauseContributor.apply( dslContext.getPredicateFactory() ).toPredicate();
+		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
 		return filter( predicate );
 	}

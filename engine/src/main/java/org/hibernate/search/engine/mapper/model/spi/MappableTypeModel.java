@@ -19,7 +19,7 @@ public interface MappableTypeModel {
 	/**
 	 * @return A human-readable name for this type.
 	 */
-	String getName();
+	String name();
 
 	/**
 	 * @return {@code true} if this type is abstract, i.e. it cannot be instantiated as-is (but may be as a subtype).
@@ -30,7 +30,7 @@ public interface MappableTypeModel {
 	/**
 	 * @param superTypeCandidate Another type that should be assessed as a supertype.
 	 * @return {@code true} if this type is a subtype of {@code superTypeCandidate},
-	 * i.e. if {@code superTypeCandidate} is mentioned in {@link #getAscendingSuperTypes()}.
+	 * i.e. if {@code superTypeCandidate} is mentioned in {@link #ascendingSuperTypes()}.
 	 * {@code false} otherwise.
 	 */
 	boolean isSubTypeOf(MappableTypeModel superTypeCandidate);
@@ -39,13 +39,13 @@ public interface MappableTypeModel {
 	 * @return A stream of all supertypes of this type, from the most specific (this type)
 	 * to the least specific ({@code Object}).
 	 */
-	Stream<? extends MappableTypeModel> getAscendingSuperTypes();
+	Stream<? extends MappableTypeModel> ascendingSuperTypes();
 
 	/**
 	 * @return A stream of all supertypes of this type, from the least specific ({@code Object})
 	 * to the most specific (this type).
 	 */
-	Stream<? extends MappableTypeModel> getDescendingSuperTypes();
+	Stream<? extends MappableTypeModel> descendingSuperTypes();
 
 	/**
 	 * @return A human-readable description of this type.

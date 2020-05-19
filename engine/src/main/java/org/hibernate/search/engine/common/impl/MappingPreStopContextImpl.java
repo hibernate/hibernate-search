@@ -17,7 +17,7 @@ class MappingPreStopContextImpl implements MappingPreStopContext {
 	}
 
 	@Override
-	public ContextualFailureCollector getFailureCollector() {
+	public ContextualFailureCollector failureCollector() {
 		return failureCollector;
 	}
 

@@ -791,7 +791,7 @@ public class DecimalScaleIT {
 		IndexFieldReference<BigDecimal> scaled;
 
 		DefaultDecimalScaleIndexBinding(IndexedEntityBindingContext ctx) {
-			scaled = ctx.getSchemaElement()
+			scaled = ctx.schemaElement()
 					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( 2 ) ).asBigDecimal() ).toReference();
 		}
 	}
@@ -800,7 +800,7 @@ public class DecimalScaleIT {
 		IndexFieldReference<BigDecimal> scaled;
 
 		BothDecimalScaleIndexBinding(IndexedEntityBindingContext ctx) {
-			scaled = ctx.getSchemaElement()
+			scaled = ctx.schemaElement()
 					// setting both default decimal scale
 					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( 2 ) )
 							// and the not-default decimal scale
@@ -820,7 +820,7 @@ public class DecimalScaleIT {
 		IndexFieldReference<BigInteger> scaled;
 
 		DefaultIntegerScaleIndexBinding(IndexedEntityBindingContext ctx) {
-			scaled = ctx.getSchemaElement()
+			scaled = ctx.schemaElement()
 					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( -2 ) ).asBigInteger() ).toReference();
 		}
 	}
@@ -829,7 +829,7 @@ public class DecimalScaleIT {
 		IndexFieldReference<BigInteger> scaled;
 
 		BothIntegerScaleIndexBinding(IndexedEntityBindingContext ctx) {
-			scaled = ctx.getSchemaElement()
+			scaled = ctx.schemaElement()
 					// setting both default decimal scale
 					.field( "scaled", ctx.createTypeFactory( new IndexFieldTypeDefaultsProvider( -2 ) )
 							// and the not-default decimal scale

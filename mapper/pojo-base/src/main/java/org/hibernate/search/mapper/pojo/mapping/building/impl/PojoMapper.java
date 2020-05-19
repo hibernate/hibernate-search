@@ -101,18 +101,18 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
 			boolean multiTenancyEnabled, ReindexOnUpdate defaultReindexOnUpdate,
 			PojoMapperDelegate<MPBS> delegate) {
-		this.failureCollector = buildContext.getFailureCollector();
+		this.failureCollector = buildContext.failureCollector();
 		this.contributorProvider = contributorProvider;
 		this.multiTenancyEnabled = multiTenancyEnabled;
 		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 
-		this.failureHandler = buildContext.getFailureHandler();
-		this.threadPoolProvider = buildContext.getThreadPoolProvider();
+		this.failureHandler = buildContext.failureHandler();
+		this.threadPoolProvider = buildContext.threadPoolProvider();
 
 		this.delegate = delegate;
 
 		this.providedIdentifierBridge = providedIdentifierBridge;
-		this.beanResolver = buildContext.getBeanResolver();
+		this.beanResolver = buildContext.beanResolver();
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
 				beanResolver, failureCollector, contributorProvider
@@ -144,7 +144,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 	@Override
 	public void prepareIndexedTypes(Consumer<Optional<String>> backendNameCollector) {
-		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.getTypesContributedTo();
+		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.typesContributedTo();
 		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
 			try {
 				if ( !( mappableTypeModel instanceof PojoRawTypeModel ) ) {
@@ -337,12 +337,12 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private void checkPathTrackers() {
 		for ( Map.Entry<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> entry : pathTrackers.entrySet() ) {
 			IndexedEmbeddedPathTracker pathTracker = entry.getValue();
-			Set<String> uselessIncludePaths = pathTracker.getUselessIncludePaths();
+			Set<String> uselessIncludePaths = pathTracker.uselessIncludePaths();
 			if ( !uselessIncludePaths.isEmpty() ) {
-				Set<String> encounteredFieldPaths = pathTracker.getEncounteredFieldPaths();
+				Set<String> encounteredFieldPaths = pathTracker.encounteredFieldPaths();
 				failureCollector.add( log.uselessIncludePathFilters(
 						uselessIncludePaths, encounteredFieldPaths,
-						EventContexts.fromType( entry.getKey().getDefiningTypeModel() )
+						EventContexts.fromType( entry.getKey().definingTypeModel() )
 				) );
 			}
 		}
@@ -384,7 +384,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				mappingHelper,
 				indexManagerBuilder,
 				delegate.createIndexedTypeExtendedMappingCollector(
-						entityTypeModel, entityTypeMetadata.getEntityName(), indexManagerBuilder.getIndexName()
+						entityTypeModel, entityTypeMetadata.getEntityName(), indexManagerBuilder.indexName()
 				),
 				providedIdentifierBridge, beanResolver
 		);

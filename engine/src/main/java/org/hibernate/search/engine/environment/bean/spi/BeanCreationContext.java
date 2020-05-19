@@ -10,6 +10,6 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface BeanCreationContext {
 
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
 }

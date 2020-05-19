@@ -52,7 +52,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	void start(IndexManagerStartContext startContext) {
-		ConfigurationPropertySource propertySource = startContext.getConfigurationPropertySource();
+		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
 
 		try {
 			IOStrategy ioStrategy = backendContext.createIOStrategy( propertySource );
@@ -66,7 +66,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 					);
 			this.shardingStrategyHolder = initializationContext.create( shards );
 
-			if ( startContext.getFailureCollector().hasFailure() ) {
+			if ( startContext.failureCollector().hasFailure() ) {
 				// At least one shard creation failed; abort and don't even try to start shards.
 				return;
 			}

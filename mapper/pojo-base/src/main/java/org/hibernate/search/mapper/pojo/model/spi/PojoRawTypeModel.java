@@ -36,13 +36,13 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	 * @return The supertypes of the current type, in ascending order.
 	 */
 	@Override
-	Stream<? extends PojoRawTypeModel<? super T>> getAscendingSuperTypes();
+	Stream<? extends PojoRawTypeModel<? super T>> ascendingSuperTypes();
 
 	/**
 	 * @return The supertypes of the current type, in descending order.
 	 */
 	@Override
-	Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes();
+	Stream<? extends PojoRawTypeModel<? super T>> descendingSuperTypes();
 
 	Stream<Annotation> getAnnotations();
 

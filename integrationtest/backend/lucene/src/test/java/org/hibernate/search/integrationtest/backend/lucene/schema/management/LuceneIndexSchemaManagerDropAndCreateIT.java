@@ -68,7 +68,7 @@ public class LuceneIndexSchemaManagerDropAndCreateIT {
 
 	private void dropAndCreate() {
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_AND_CREATE.apply( index.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_AND_CREATE.apply( index.schemaManager() )
 		);
 	}
 

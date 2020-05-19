@@ -183,7 +183,7 @@ class IndexManagerBuildingStateHolder {
 				IndexManagerBuilder builder = backend.createIndexManagerBuilder(
 						indexName, mappedTypeName, multiTenancyEnabled, backendBuildContext, indexPropertySource
 				);
-				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
+				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
 
 				state = new IndexManagerInitialBuildState( backendName, indexName, builder, schemaRootNodeBuilder );
 				indexManagerBuildStateByName.put( indexName, state );

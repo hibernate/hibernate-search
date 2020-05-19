@@ -226,12 +226,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public IndexManager indexManager(String indexName) {
-		return getSearchIntegration().getIndexManager( indexName );
+		return getSearchIntegration().indexManager( indexName );
 	}
 
 	@Override
 	public Backend backend(String backendName) {
-		return getSearchIntegration().getBackend( backendName );
+		return getSearchIntegration().backend( backendName );
 	}
 
 	@Override
@@ -267,12 +267,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public ThreadPoolProvider getThreadPoolProvider() {
-		return getDelegate().getThreadPoolProvider();
+		return delegate().getThreadPoolProvider();
 	}
 
 	@Override
 	public FailureHandler getFailureHandler() {
-		return getDelegate().getFailureHandler();
+		return delegate().getFailureHandler();
 	}
 
 	@Override
@@ -356,7 +356,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private Optional<SearchScopeImpl<Object>> createAllScope() {
-		return getDelegate()
+		return delegate()
 				.<EntityReference, HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
 						this,
 						typeContextContainer::getIndexedByExactType
@@ -366,7 +366,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
 		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
-				getDelegate().createPojoScope(
+				delegate().createPojoScope(
 						this,
 						typeIdentifiers,
 						typeContextContainer::getIndexedByExactType

@@ -45,7 +45,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		this.builderFactory = builderFactory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
-		this.tenantId = sessionContext.getTenantIdentifier();
+		this.tenantId = sessionContext.tenantIdentifier();
 		this.entityReferenceFactory = entityReferenceFactory;
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -64,12 +64,12 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	@Override
 	public void delete(DocumentReferenceProvider referenceProvider) {
-		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, referenceProvider.getIdentifier() );
-		String routingKey = referenceProvider.getRoutingKey();
+		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, referenceProvider.identifier() );
+		String routingKey = referenceProvider.routingKey();
 
 		collect(
 				builderFactory.delete(
-						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+						indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
 						elasticsearchId, routingKey
 				)
@@ -107,15 +107,15 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private void index(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
-		String id = referenceProvider.getIdentifier();
+		String id = referenceProvider.identifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
-		String routingKey = referenceProvider.getRoutingKey();
+		String routingKey = referenceProvider.routingKey();
 
 		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
 		collect(
 				builderFactory.index(
-						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+						indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
 						elasticsearchId, routingKey, document
 				)

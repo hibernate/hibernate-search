@@ -34,15 +34,15 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
-		this.tenantId = sessionContext.getTenantIdentifier();
+		this.tenantId = sessionContext.tenantIdentifier();
 	}
 
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		String id = referenceProvider.getIdentifier();
-		String routingKey = referenceProvider.getRoutingKey();
+		String id = referenceProvider.identifier();
+		String routingKey = referenceProvider.routingKey();
 
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
@@ -50,7 +50,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 				id, routingKey,
 				factory.add(
 						tenantId, indexManagerContext.getMappedTypeName(),
-						referenceProvider.getEntityIdentifier(), id,
+						referenceProvider.entityIdentifier(), id,
 						indexEntry
 				),
 				commitStrategy, refreshStrategy
@@ -62,8 +62,8 @@ public class LuceneIndexIndexer implements IndexIndexer {
 			DocumentContributor documentContributor,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
-		String id = referenceProvider.getIdentifier();
-		String routingKey = referenceProvider.getRoutingKey();
+		String id = referenceProvider.identifier();
+		String routingKey = referenceProvider.routingKey();
 
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
@@ -71,7 +71,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 				id, routingKey,
 				factory.update(
 						tenantId, indexManagerContext.getMappedTypeName(),
-						referenceProvider.getEntityIdentifier(), id,
+						referenceProvider.entityIdentifier(), id,
 						indexEntry
 				),
 				commitStrategy, refreshStrategy
@@ -81,13 +81,13 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	@Override
 	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		String id = referenceProvider.getIdentifier();
-		String routingKey = referenceProvider.getRoutingKey();
+		String id = referenceProvider.identifier();
+		String routingKey = referenceProvider.routingKey();
 		return submit(
 				id, routingKey,
 				factory.delete(
 						tenantId, indexManagerContext.getMappedTypeName(),
-						referenceProvider.getEntityIdentifier(), id
+						referenceProvider.entityIdentifier(), id
 				),
 				commitStrategy, refreshStrategy
 		);

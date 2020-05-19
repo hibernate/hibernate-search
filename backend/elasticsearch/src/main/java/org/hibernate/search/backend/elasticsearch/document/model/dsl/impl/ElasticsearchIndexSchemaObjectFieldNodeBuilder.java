@@ -56,7 +56,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return getRootNodeBuilder().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
@@ -69,7 +69,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	@Override
 	public IndexObjectFieldReference toReference() {
 		if ( reference != null ) {
-			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
+			throw log.cannotCreateReferenceMultipleTimes( eventContext() );
 		}
 		this.reference = new ElasticsearchIndexObjectFieldReference();
 		return reference;
@@ -81,7 +81,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
-			throw log.incompleteFieldDefinition( getEventContext() );
+			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
 		List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren = new ArrayList<>();

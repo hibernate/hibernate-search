@@ -39,9 +39,9 @@ public class StubIndexIndexer implements IndexIndexer {
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
 		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.ADD )
-				.tenantIdentifier( sessionContext.getTenantIdentifier() )
-				.identifier( referenceProvider.getIdentifier() )
-				.routingKey( referenceProvider.getRoutingKey() )
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.identifier( referenceProvider.identifier() )
+				.routingKey( referenceProvider.routingKey() )
 				.document( documentBuilder.build() )
 				.commit( commitStrategy )
 				.refresh( refreshStrategy )
@@ -58,9 +58,9 @@ public class StubIndexIndexer implements IndexIndexer {
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
 		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.UPDATE )
-				.tenantIdentifier( sessionContext.getTenantIdentifier() )
-				.identifier( referenceProvider.getIdentifier() )
-				.routingKey( referenceProvider.getRoutingKey() )
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.identifier( referenceProvider.identifier() )
+				.routingKey( referenceProvider.routingKey() )
 				.document( documentBuilder.build() )
 				.commit( commitStrategy )
 				.refresh( refreshStrategy )
@@ -73,9 +73,9 @@ public class StubIndexIndexer implements IndexIndexer {
 	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.DELETE )
-				.tenantIdentifier( sessionContext.getTenantIdentifier() )
-				.identifier( referenceProvider.getIdentifier() )
-				.routingKey( referenceProvider.getRoutingKey() )
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
+				.identifier( referenceProvider.identifier() )
+				.routingKey( referenceProvider.routingKey() )
 				.commit( commitStrategy )
 				.refresh( refreshStrategy )
 				.build();

@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
  */
 public interface BackendSessionContext {
 
-	BackendMappingContext getMappingContext();
+	BackendMappingContext mappingContext();
 
-	String getTenantIdentifier();
+	String tenantIdentifier();
 
 }

@@ -24,17 +24,17 @@ public final class PojoDocumentReferenceProvider implements DocumentReferencePro
 	}
 
 	@Override
-	public String getIdentifier() {
+	public String identifier() {
 		return documentIdentifier;
 	}
 
 	@Override
-	public String getRoutingKey() {
+	public String routingKey() {
 		return routingKey;
 	}
 
 	@Override
-	public Object getEntityIdentifier() {
+	public Object entityIdentifier() {
 		return entityIdentifier;
 	}
 }

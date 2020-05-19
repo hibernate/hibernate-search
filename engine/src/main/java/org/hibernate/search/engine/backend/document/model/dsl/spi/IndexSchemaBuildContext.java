@@ -15,6 +15,6 @@ public interface IndexSchemaBuildContext {
 	 * @return A list of failure context elements to be passed to the constructor of any
 	 * {@link SearchException} occurring in this context.
 	 */
-	EventContext getEventContext();
+	EventContext eventContext();
 
 }

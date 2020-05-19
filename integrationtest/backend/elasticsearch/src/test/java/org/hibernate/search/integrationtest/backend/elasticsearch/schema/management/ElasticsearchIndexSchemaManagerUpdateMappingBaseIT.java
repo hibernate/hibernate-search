@@ -400,7 +400,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( index.getSchemaManager().createOrUpdate() );
+		Futures.unwrappedExceptionJoin( index.schemaManager().createOrUpdate() );
 	}
 
 	private String generateAnalysisSettings() {

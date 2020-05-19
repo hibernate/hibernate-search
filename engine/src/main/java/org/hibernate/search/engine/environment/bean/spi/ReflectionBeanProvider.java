@@ -31,20 +31,20 @@ public final class ReflectionBeanProvider implements BeanProvider {
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
-		return BeanHolder.of( getBeanNoClosingNecessary( typeReference ) );
+	public <T> BeanHolder<T> forType(Class<T> typeReference) {
+		return BeanHolder.of( forTypeNoClosingNecessary( typeReference ) );
 	}
 
-	public <T> T getBeanNoClosingNecessary(Class<T> typeReference) {
+	public <T> T forTypeNoClosingNecessary(Class<T> typeReference) {
 		return ClassLoaderHelper.untypedInstanceFromClass( typeReference, typeReference.getName() );
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference, String implementationFullyQualifiedClassName) {
-		return BeanHolder.of( getBeanNoClosingNecessary( typeReference, implementationFullyQualifiedClassName ) );
+	public <T> BeanHolder<T> forTypeAndName(Class<T> typeReference, String implementationFullyQualifiedClassName) {
+		return BeanHolder.of( forTypeAndNameNoClosingNecessary( typeReference, implementationFullyQualifiedClassName ) );
 	}
 
-	public <T> T getBeanNoClosingNecessary(Class<T> typeReference, String implementationFullyQualifiedClassName) {
+	public <T> T forTypeAndNameNoClosingNecessary(Class<T> typeReference, String implementationFullyQualifiedClassName) {
 		Class<? extends T> implementationClass = ClassLoaderHelper.classForName(
 				typeReference, implementationFullyQualifiedClassName, typeReference.getName(), classResolver
 		);

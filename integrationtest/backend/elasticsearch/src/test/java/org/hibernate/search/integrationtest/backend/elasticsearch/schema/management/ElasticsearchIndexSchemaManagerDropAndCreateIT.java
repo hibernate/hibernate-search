@@ -117,7 +117,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 				.setup();
 
 		Futures.unwrappedExceptionJoin(
-				index.getSchemaManager().dropAndCreate()
+				index.schemaManager().dropAndCreate()
 		);
 	}
 

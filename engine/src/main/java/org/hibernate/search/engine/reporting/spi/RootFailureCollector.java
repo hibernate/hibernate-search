@@ -123,7 +123,7 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		ContextualFailureCollectorImpl withDefaultContext() {
-			return withContext( EventContexts.getDefault() );
+			return withContext( EventContexts.defaultContext() );
 		}
 
 		void appendContextTo(StringJoiner joiner) {
@@ -146,7 +146,7 @@ public final class RootFailureCollector implements FailureCollector {
 			}
 		}
 
-		final Map<EventContextElement, ContextualFailureCollectorImpl> getChildren() {
+		final Map<EventContextElement, ContextualFailureCollectorImpl> children() {
 			return children;
 		}
 	}
@@ -168,7 +168,7 @@ public final class RootFailureCollector implements FailureCollector {
 			if ( !failureMessages.isEmpty() ) {
 				return true;
 			}
-			for ( ContextualFailureCollectorImpl child : getChildren().values() ) {
+			for ( ContextualFailureCollectorImpl child : children().values() ) {
 				if ( child.hasFailure() ) {
 					return true;
 				}

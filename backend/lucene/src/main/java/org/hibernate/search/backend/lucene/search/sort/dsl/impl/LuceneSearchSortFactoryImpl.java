@@ -34,12 +34,12 @@ public class LuceneSearchSortFactoryImpl
 
 	@Override
 	public SortThenStep fromLuceneSortField(SortField luceneSortField) {
-		return staticThenStep( dslContext.getBuilderFactory().fromLuceneSortField( luceneSortField ) );
+		return staticThenStep( dslContext.builderFactory().fromLuceneSortField( luceneSortField ) );
 	}
 
 	@Override
 	public SortThenStep fromLuceneSort(Sort luceneSort) {
-		return staticThenStep( dslContext.getBuilderFactory().fromLuceneSort( luceneSort ) );
+		return staticThenStep( dslContext.builderFactory().fromLuceneSort( luceneSort ) );
 	}
 
 	private SortThenStep staticThenStep(LuceneSearchSortBuilder builder) {

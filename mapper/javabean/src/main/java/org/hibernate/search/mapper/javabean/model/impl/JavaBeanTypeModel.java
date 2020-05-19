@@ -79,8 +79,14 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return typeIdentifier.toString();
+	}
+
+	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
+	@Override
+	public String getName() {
+		return name();
 	}
 
 	@Override
@@ -101,13 +107,13 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes() {
+	public Stream<JavaBeanTypeModel<? super T>> ascendingSuperTypes() {
 		return (Stream<JavaBeanTypeModel<? super T>>) introspector.getAscendingSuperTypes( xClass );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes() {
+	public Stream<? extends PojoRawTypeModel<? super T>> descendingSuperTypes() {
 		return (Stream<? extends PojoRawTypeModel<? super T>>) introspector.getDescendingSuperTypes( xClass );
 	}
 
@@ -118,7 +124,7 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
-		return getAscendingSuperTypes()
+		return ascendingSuperTypes()
 				.map( model -> model.declaredProperties.get( propertyName ) )
 				.filter( Objects::nonNull )
 				.findFirst().map( this::createProperty )

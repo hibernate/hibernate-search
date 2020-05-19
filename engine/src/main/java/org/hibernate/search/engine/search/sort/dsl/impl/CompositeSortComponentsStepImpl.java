@@ -22,7 +22,7 @@ class CompositeSortComponentsStepImpl<B>
 
 	@Override
 	public CompositeSortComponentsStepImpl<B> add(SearchSort searchSort) {
-		dslContext = dslContext.append( dslContext.getBuilderFactory().toImplementation( searchSort ) );
+		dslContext = dslContext.append( dslContext.builderFactory().toImplementation( searchSort ) );
 		return this;
 	}
 

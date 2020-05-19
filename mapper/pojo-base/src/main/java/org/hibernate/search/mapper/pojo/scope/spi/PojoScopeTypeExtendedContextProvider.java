@@ -10,6 +10,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoScopeTypeExtendedContextProvider<E, C> {
 
-	C getByExactType(PojoRawTypeIdentifier<? extends E> typeIdentifier);
+	C forExactType(PojoRawTypeIdentifier<? extends E> typeIdentifier);
 
 }

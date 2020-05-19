@@ -85,7 +85,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 		return delegate.createIndexer( context );
 	}
 
-	protected final PojoMappingDelegate getDelegate() {
+	protected final PojoMappingDelegate delegate() {
 		return delegate;
 	}
 

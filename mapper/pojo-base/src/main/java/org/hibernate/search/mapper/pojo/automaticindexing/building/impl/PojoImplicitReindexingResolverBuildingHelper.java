@@ -55,7 +55,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 		for ( PojoRawTypeModel<?> entityType : entityTypes ) {
 			if ( !entityType.isAbstract() ) {
-				entityType.getAscendingSuperTypes().forEach(
+				entityType.ascendingSuperTypes().forEach(
 						superType ->
 								concreteEntitySubTypesByEntitySuperType.computeIfAbsent(
 										superType,

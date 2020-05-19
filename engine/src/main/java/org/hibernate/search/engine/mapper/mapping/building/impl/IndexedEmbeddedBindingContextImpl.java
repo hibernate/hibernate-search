@@ -34,7 +34,7 @@ class IndexedEmbeddedBindingContextImpl
 	}
 
 	@Override
-	public Collection<IndexObjectFieldReference> getParentIndexObjectReferences() {
+	public Collection<IndexObjectFieldReference> parentIndexObjectReferences() {
 		return parentIndexObjectReferences;
 	}
 

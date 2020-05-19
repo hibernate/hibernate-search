@@ -58,7 +58,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			PojoBootstrapIntrospector introspector,
 			ContainerExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
-		this.beanResolver = buildContext.getBeanResolver();
+		this.beanResolver = buildContext.beanResolver();
 		this.introspector = introspector;
 		this.extractorBinder = extractorBinder;
 		this.bridgeResolver = bridgeResolver;

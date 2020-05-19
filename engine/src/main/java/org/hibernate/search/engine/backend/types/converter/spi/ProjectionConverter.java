@@ -34,7 +34,7 @@ public final class ProjectionConverter<F, V> {
 		return getClass().getSimpleName() + "[valueType=" + valueType.getName() + ",delegate=" + delegate + "]";
 	}
 
-	public Class<V> getValueType() {
+	public Class<V> valueType() {
 		return valueType;
 	}
 

@@ -245,7 +245,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 
 	private static class IndexBinding {
 		IndexBinding(IndexedEntityBindingContext ctx) {
-			IndexSchemaElement root = ctx.getSchemaElement();
+			IndexSchemaElement root = ctx.schemaElement();
 			supportedTypeDescriptors().forEach( fieldType -> {
 				root.fieldTemplate( fieldType.getUniqueName(), f -> fieldType.configure( f ) )
 						.matchingPathGlob( "*_" + fieldType.getUniqueName() );

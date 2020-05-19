@@ -94,7 +94,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					analysisDefinitionRegistry,
 					multiTenancyStrategy,
 					new DefaultTimingSource(),
-					buildContext.getFailureHandler()
+					buildContext.failureHandler()
 			);
 		}
 		catch (RuntimeException e) {
@@ -131,7 +131,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		DirectoryProviderInitializationContextImpl initializationContext = new DirectoryProviderInitializationContextImpl(
 				backendContext,
-				buildContext.getBeanResolver(),
+				buildContext.beanResolver(),
 				propertySource.withMask( "directory" )
 		);
 		return initializationContext.createDirectoryProvider();
@@ -158,14 +158,14 @@ public class LuceneBackendFactory implements BackendFactory {
 			Version luceneVersion) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
-			final BeanResolver beanResolver = buildContext.getBeanResolver();
+			final BeanResolver beanResolver = buildContext.beanResolver();
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 					.map( holder -> {
 						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
 							LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
 									luceneVersion,
-									buildContext.getClassResolver(),
-									buildContext.getResourceResolver()
+									buildContext.classResolver(),
+									buildContext.resourceResolver()
 							);
 							LuceneAnalysisConfigurationContextImpl collector =
 									new LuceneAnalysisConfigurationContextImpl( analysisComponentFactory );

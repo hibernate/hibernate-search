@@ -30,7 +30,7 @@ public class StubScaledNumberIndexFieldTypeOptionsStep<F extends Number>
 	}
 
 	private void setDefaults(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		Integer decimalScale = defaultsProvider.getDecimalScale();
+		Integer decimalScale = defaultsProvider.decimalScale();
 		if ( decimalScale != null ) {
 			modifiers.add( b -> b.defaultDecimalScale( decimalScale ) );
 		}

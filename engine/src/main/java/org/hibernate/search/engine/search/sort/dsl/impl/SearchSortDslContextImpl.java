@@ -54,7 +54,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	}
 
 	@Override
-	public F getBuilderFactory() {
+	public F builderFactory() {
 		return factory;
 	}
 
@@ -65,7 +65,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	}
 
 	@Override
-	public PDF getPredicateFactory() {
+	public PDF predicateFactory() {
 		return predicateFactory;
 	}
 

@@ -14,8 +14,8 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
  */
 public interface MappingFinalizationContext {
 
-	ConfigurationPropertySource getConfigurationPropertySource();
+	ConfigurationPropertySource configurationPropertySource();
 
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
 }

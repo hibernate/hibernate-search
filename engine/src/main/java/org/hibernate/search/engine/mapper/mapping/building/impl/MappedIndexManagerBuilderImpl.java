@@ -25,12 +25,12 @@ public class MappedIndexManagerBuilderImpl implements MappedIndexManagerBuilder 
 	}
 
 	@Override
-	public String getIndexName() {
+	public String indexName() {
 		return indexManagerBuildingState.getIndexName();
 	}
 
 	@Override
-	public IndexedEntityBindingContext getRootBindingContext() {
+	public IndexedEntityBindingContext rootBindingContext() {
 		return bindingContext;
 	}
 

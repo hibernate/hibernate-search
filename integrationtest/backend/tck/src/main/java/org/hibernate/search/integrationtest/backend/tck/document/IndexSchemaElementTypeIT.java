@@ -41,7 +41,7 @@ public class IndexSchemaElementTypeIT {
 	public void analyzerOnSortableField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field(
 							"myField",
 							f -> f.asString()
@@ -68,7 +68,7 @@ public class IndexSchemaElementTypeIT {
 	public void analyzerOnAggregableField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field(
 							"myField",
 							f -> f.asString()
@@ -95,7 +95,7 @@ public class IndexSchemaElementTypeIT {
 	public void analyzerAndNormalizer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field(
 							"myField",
 							f -> f.asString()
@@ -122,7 +122,7 @@ public class IndexSchemaElementTypeIT {
 	public void searchAnalyzerWithoutAnalyzer() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field(
 							"myField",
 							f -> f.asString()

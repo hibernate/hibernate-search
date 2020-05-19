@@ -99,12 +99,12 @@ public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescri
 
 	@Override
 	public Class<?> dslArgumentClass() {
-		return dslConverter.getValueType();
+		return dslConverter.valueType();
 	}
 
 	@Override
 	public Class<?> projectedValueClass() {
-		return projectionConverter.getValueType();
+		return projectionConverter.valueType();
 	}
 
 	@Override

@@ -85,7 +85,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
-		ConfigurationPropertySource propertySource = buildContext.getConfigurationPropertySource();
+		ConfigurationPropertySource propertySource = buildContext.configurationPropertySource();
 
 		addConfigurationContributor(
 				new HibernateOrmMetatadaContributor( basicTypeMetadataProvider, introspector )
@@ -105,7 +105,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		}
 
 		// Apply the user-provided mapping configurer if necessary
-		final BeanResolver beanResolver = buildContext.getBeanResolver();
+		final BeanResolver beanResolver = buildContext.beanResolver();
 		MAPPING_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 				.ifPresent( holder -> {
 					try ( BeanHolder<? extends HibernateOrmSearchMappingConfigurer> configurerHolder = holder ) {

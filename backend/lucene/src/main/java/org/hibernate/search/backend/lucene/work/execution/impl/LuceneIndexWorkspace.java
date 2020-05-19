@@ -39,7 +39,7 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		return doSubmit(
 				indexManagerContext.getManagementOrchestrators( routingKeys ),
-				factory.deleteAll( sessionContext.getTenantIdentifier(), routingKeys ),
+				factory.deleteAll( sessionContext.tenantIdentifier(), routingKeys ),
 				true
 		);
 	}

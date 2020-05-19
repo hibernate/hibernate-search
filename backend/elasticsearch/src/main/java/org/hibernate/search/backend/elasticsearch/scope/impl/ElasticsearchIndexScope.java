@@ -59,27 +59,27 @@ public class ElasticsearchIndexScope
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateBuilderFactoryImpl getSearchPredicateBuilderFactory() {
+	public ElasticsearchSearchPredicateBuilderFactoryImpl searchPredicateBuilderFactory() {
 		return searchPredicateFactory;
 	}
 
 	@Override
-	public ElasticsearchSearchSortBuilderFactoryImpl getSearchSortBuilderFactory() {
+	public ElasticsearchSearchSortBuilderFactoryImpl searchSortBuilderFactory() {
 		return searchSortFactory;
 	}
 
 	@Override
-	public ElasticsearchSearchQueryBuilderFactory getSearchQueryBuilderFactory() {
+	public ElasticsearchSearchQueryBuilderFactory searchQueryBuilderFactory() {
 		return searchQueryFactory;
 	}
 
 	@Override
-	public ElasticsearchSearchProjectionBuilderFactory getSearchProjectionFactory() {
+	public ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory() {
 		return searchProjectionFactory;
 	}
 
 	@Override
-	public SearchAggregationBuilderFactory<? super ElasticsearchSearchQueryElementCollector> getSearchAggregationFactory() {
+	public SearchAggregationBuilderFactory<? super ElasticsearchSearchQueryElementCollector> searchAggregationFactory() {
 		return searchAggregationFactory;
 	}
 }

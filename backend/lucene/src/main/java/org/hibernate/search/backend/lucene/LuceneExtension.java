@@ -169,7 +169,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchSortBuilderFactory, the cast is safe
 	public Optional<LuceneSearchSortFactory> extendOptional(
 			SearchSortFactory original, SearchSortDslContext<?, ?, ?> dslContext) {
-		if ( dslContext.getBuilderFactory() instanceof LuceneSearchSortBuilderFactory ) {
+		if ( dslContext.builderFactory() instanceof LuceneSearchSortBuilderFactory ) {
 			return Optional.of( new LuceneSearchSortFactoryImpl(
 					original,
 					((SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder, ?>) dslContext)
@@ -204,7 +204,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchAggregationBuilderFactory, the cast is safe
 	public Optional<LuceneSearchAggregationFactory> extendOptional(
 			SearchAggregationFactory original, SearchAggregationDslContext<?, ?> dslContext) {
-		if ( dslContext.getBuilderFactory() instanceof LuceneSearchAggregationBuilderFactory ) {
+		if ( dslContext.builderFactory() instanceof LuceneSearchAggregationBuilderFactory ) {
 			return Optional.of( new LuceneSearchAggregationFactoryImpl(
 					original,
 					((SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory, ?>) dslContext)

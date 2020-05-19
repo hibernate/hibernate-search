@@ -90,7 +90,7 @@ public class LuceneIndexSchemaManagerCreationOrPreservationIT {
 	}
 
 	private void createOrPreserve() {
-		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager() ) );
 	}
 
 	private void setup() {

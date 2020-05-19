@@ -107,7 +107,7 @@ public class DelegatingSearchPredicateFactory implements SearchPredicateFactory 
 		return delegate.extension();
 	}
 
-	protected SearchPredicateFactory getDelegate() {
+	protected SearchPredicateFactory delegate() {
 		return delegate;
 	}
 }

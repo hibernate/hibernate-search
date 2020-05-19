@@ -69,7 +69,7 @@ public class PojoIndexedTypeManagerContainer
 
 		public <E> void add(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E> typeManager) {
 			byExactType.put( typeModel.getTypeIdentifier(), typeManager );
-			typeModel.getAscendingSuperTypes()
+			typeModel.ascendingSuperTypes()
 					.map( PojoRawTypeModel::getTypeIdentifier )
 					.forEach( clazz ->
 							bySuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )

@@ -56,7 +56,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	}
 
 	@Override
-	public Backend getBackend(String backendName) {
+	public Backend backend(String backendName) {
 		BackendImplementor backend = backends.get( backendName );
 		if ( backend == null ) {
 			throw log.noBackendRegistered( backendName );
@@ -65,7 +65,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	}
 
 	@Override
-	public IndexManager getIndexManager(String indexManagerName) {
+	public IndexManager indexManager(String indexManagerName) {
 		IndexManagerImplementor indexManager = indexManagers.get( indexManagerName );
 		if ( indexManager == null ) {
 			throw log.noIndexManagerRegistered( indexManagerName );
@@ -88,7 +88,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}
 		catch (RuntimeException e) {
-			failureCollector.withContext( EventContexts.getDefault() ).add( e );
+			failureCollector.withContext( EventContexts.defaultContext() ).add( e );
 		}
 
 		failureCollector.checkNoFailure();

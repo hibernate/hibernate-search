@@ -46,7 +46,7 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return parent.getRootNodeBuilder().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( parent.getAbsolutePath() ) )
 				.append( EventContexts.fromFieldTemplateAbsolutePath( absolutePath ) );

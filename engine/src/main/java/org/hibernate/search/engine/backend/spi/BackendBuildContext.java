@@ -17,14 +17,14 @@ import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
  */
 public interface BackendBuildContext {
 
-	ClassResolver getClassResolver();
+	ClassResolver classResolver();
 
-	ResourceResolver getResourceResolver();
+	ResourceResolver resourceResolver();
 
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
-	ThreadPoolProvider getThreadPoolProvider();
+	ThreadPoolProvider threadPoolProvider();
 
-	FailureHandler getFailureHandler();
+	FailureHandler failureHandler();
 
 }

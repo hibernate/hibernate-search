@@ -24,15 +24,15 @@ public interface BackendStartContext {
 	 *
 	 * @return A failure collector.
 	 */
-	ContextualFailureCollector getFailureCollector();
+	ContextualFailureCollector failureCollector();
 
 	/**
 	 * @return A {@link BeanResolver}.
 	 */
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
-	ConfigurationPropertySource getConfigurationPropertySource();
+	ConfigurationPropertySource configurationPropertySource();
 
-	ThreadPoolProvider getThreadPoolProvider();
+	ThreadPoolProvider threadPoolProvider();
 
 }

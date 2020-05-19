@@ -33,12 +33,12 @@ public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderF
 	}
 
 	@Override
-	public F getBuilderFactory() {
+	public F builderFactory() {
 		return builderFactory;
 	}
 
 	@Override
-	public PDF getPredicateFactory() {
+	public PDF predicateFactory() {
 		return predicateFactory;
 	}
 
@@ -52,10 +52,5 @@ public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderF
 				),
 				predicateBuilderFactory
 		);
-	}
-
-	@Override
-	public SearchPredicateBuilderFactory getPredicateBuilderFactory() {
-		return predicateBuilderFactory;
 	}
 }

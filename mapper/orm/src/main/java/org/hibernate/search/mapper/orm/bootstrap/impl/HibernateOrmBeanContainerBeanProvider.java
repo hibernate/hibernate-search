@@ -45,12 +45,12 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 
 			@Override
 			public <B> B produceBeanInstance(Class<B> aClass) {
-				return delegate.getBeanNoClosingNecessary( aClass );
+				return delegate.forTypeNoClosingNecessary( aClass );
 			}
 
 			@Override
 			public <B> B produceBeanInstance(String s, Class<B> aClass) {
-				return delegate.getBeanNoClosingNecessary( aClass, s );
+				return delegate.forTypeAndNameNoClosingNecessary( aClass, s );
 			}
 		};
 	}
@@ -61,7 +61,7 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
+	public <T> BeanHolder<T> forType(Class<T> typeReference) {
 		ContainedBean<T> containedBean = beanContainer.getBean(
 				typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer
 		);
@@ -69,7 +69,7 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 	}
 
 	@Override
-	public <T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference) {
+	public <T> BeanHolder<T> forTypeAndName(Class<T> typeReference, String nameReference) {
 		ContainedBean<T> containedBean = beanContainer.getBean(
 				nameReference, typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer
 		);

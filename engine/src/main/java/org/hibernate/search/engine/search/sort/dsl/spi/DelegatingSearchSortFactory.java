@@ -77,7 +77,7 @@ public class DelegatingSearchSortFactory<PDF extends SearchPredicateFactory> imp
 		return delegate.extension();
 	}
 
-	protected SearchSortFactory getDelegate() {
+	protected SearchSortFactory delegate() {
 		return delegate;
 	}
 }

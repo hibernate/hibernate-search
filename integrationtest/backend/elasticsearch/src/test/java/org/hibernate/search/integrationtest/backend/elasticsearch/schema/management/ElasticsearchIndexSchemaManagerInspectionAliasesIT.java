@@ -114,7 +114,7 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager() ) );
 	}
 
 }

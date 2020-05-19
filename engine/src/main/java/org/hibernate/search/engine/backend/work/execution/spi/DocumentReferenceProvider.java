@@ -11,16 +11,16 @@ public interface DocumentReferenceProvider {
 	/**
 	 * @return The document identifier.
 	 */
-	String getIdentifier();
+	String identifier();
 
 	/**
 	 * @return The routing key.
 	 */
-	String getRoutingKey();
+	String routingKey();
 
 	/**
 	 * @return The entity identifier. Used when reporting failures.
 	 */
-	Object getEntityIdentifier();
+	Object entityIdentifier();
 
 }

@@ -17,7 +17,7 @@ final class BeanCreationContextImpl implements BeanCreationContext {
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return beanResolver;
 	}
 }

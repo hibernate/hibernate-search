@@ -37,7 +37,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 		// The setup currently creates the index: work around that.
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.DROP_IF_EXISTING.apply( index.schemaManager() )
 		);
 
 		assertThat( indexExists() ).isFalse();
@@ -70,7 +70,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 	private void validate() {
 		Futures.unwrappedExceptionJoin(
-				LuceneIndexSchemaManagerOperation.VALIDATE.apply( index.getSchemaManager() )
+				LuceneIndexSchemaManagerOperation.VALIDATE.apply( index.schemaManager() )
 		);
 	}
 

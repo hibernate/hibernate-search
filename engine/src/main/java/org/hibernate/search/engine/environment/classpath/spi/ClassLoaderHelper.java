@@ -95,7 +95,7 @@ public class ClassLoaderHelper {
 	 */
 	public static <T> T untypedInstanceFromClass(final Class<T> classToLoad, final String componentDescription) {
 		checkClassType( classToLoad, componentDescription );
-		Constructor<T> constructor = getNoArgConstructor( classToLoad, componentDescription );
+		Constructor<T> constructor = noArgConstructor( classToLoad, componentDescription );
 		try {
 			return constructor.newInstance();
 		}
@@ -155,7 +155,7 @@ public class ClassLoaderHelper {
 	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription,
 			Map<String, String> constructorParameter) {
 		checkClassType( classToLoad, componentDescription );
-		Constructor<?> singleMapConstructor = getSingleMapConstructor( classToLoad, componentDescription );
+		Constructor<?> singleMapConstructor = singleMapConstructor( classToLoad, componentDescription );
 		if ( constructorParameter == null ) {
 			constructorParameter = new HashMap<>( 0 );//can't use the emptyMap singleton as it needs to be mutable
 		}
@@ -184,7 +184,7 @@ public class ClassLoaderHelper {
 	 * @param classToLoad the class type to check
 	 * @param componentDescription adds a meaningful description to the type to describe in the error messsage
 	 */
-	private static <T> Constructor<T> getNoArgConstructor(Class<T> classToLoad, String componentDescription) {
+	private static <T> Constructor<T> noArgConstructor(Class<T> classToLoad, String componentDescription) {
 		try {
 			return classToLoad.getConstructor();
 		}
@@ -196,7 +196,7 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	private static Constructor<?> getSingleMapConstructor(Class<?> classToLoad, String componentDescription) {
+	private static Constructor<?> singleMapConstructor(Class<?> classToLoad, String componentDescription) {
 		try {
 			return classToLoad.getConstructor( Map.class );
 		}

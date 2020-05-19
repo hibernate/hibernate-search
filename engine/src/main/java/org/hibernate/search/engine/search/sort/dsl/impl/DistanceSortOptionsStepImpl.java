@@ -30,7 +30,7 @@ public class DistanceSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 			String absoluteFieldPath, GeoPoint location) {
 		super( dslContext );
 		this.dslContext = dslContext;
-		this.builder = dslContext.getBuilderFactory().distance( absoluteFieldPath, location );
+		this.builder = dslContext.builderFactory().distance( absoluteFieldPath, location );
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class DistanceSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 	@Override
 	public DistanceSortOptionsStepImpl<B, PDF> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
-		SearchPredicate predicate = clauseContributor.apply( dslContext.getPredicateFactory() ).toPredicate();
+		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
 		return filter( predicate );
 	}

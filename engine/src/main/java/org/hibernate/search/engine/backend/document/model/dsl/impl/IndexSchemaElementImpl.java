@@ -130,21 +130,21 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 
 	private void checkRelativeFieldName(String relativeFieldName) {
 		if ( StringHelper.isEmpty( relativeFieldName ) ) {
-			throw log.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName, objectNodeBuilder.getEventContext() );
+			throw log.relativeFieldNameCannotBeNullOrEmpty( relativeFieldName, objectNodeBuilder.eventContext() );
 		}
 		if ( relativeFieldName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
-			throw log.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.getEventContext() );
+			throw log.relativeFieldNameCannotContainDot( relativeFieldName, objectNodeBuilder.eventContext() );
 		}
 	}
 
 	private void checkFieldTemplateName(String templateName) {
 		if ( StringHelper.isEmpty( templateName ) ) {
-			throw log.fieldTemplateNameCannotBeNullOrEmpty( templateName, objectNodeBuilder.getEventContext() );
+			throw log.fieldTemplateNameCannotBeNullOrEmpty( templateName, objectNodeBuilder.eventContext() );
 		}
 		// This is mostly to allow making template names absolute and unique by prepending them
 		// with the path of the schema elements they were declared on.
 		if ( templateName.contains( FieldPaths.PATH_SEPARATOR_STRING ) ) {
-			throw log.fieldTemplateNameCannotContainDot( templateName, objectNodeBuilder.getEventContext() );
+			throw log.fieldTemplateNameCannotContainDot( templateName, objectNodeBuilder.eventContext() );
 		}
 	}
 

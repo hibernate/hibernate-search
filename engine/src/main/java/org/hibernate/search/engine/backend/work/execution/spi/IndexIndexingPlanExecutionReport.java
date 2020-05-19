@@ -59,11 +59,11 @@ public final class IndexIndexingPlanExecutionReport<R> {
 		}
 	}
 
-	public Optional<Throwable> getThrowable() {
+	public Optional<Throwable> throwable() {
 		return Optional.ofNullable( throwable );
 	}
 
-	public List<R> getFailingEntityReferences() {
+	public List<R> failingEntityReferences() {
 		return failingEntityReferences;
 	}
 
@@ -76,8 +76,8 @@ public final class IndexIndexingPlanExecutionReport<R> {
 		}
 
 		public Builder<R> add(IndexIndexingPlanExecutionReport<R> report) {
-			report.getThrowable().ifPresent( this::throwable );
-			for ( R failingEntityReference : report.getFailingEntityReferences() ) {
+			report.throwable().ifPresent( this::throwable );
+			for ( R failingEntityReference : report.failingEntityReferences() ) {
 				failingEntityReference( failingEntityReference );
 			}
 			return this;

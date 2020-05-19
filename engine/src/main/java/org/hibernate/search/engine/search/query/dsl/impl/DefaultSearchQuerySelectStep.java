@@ -47,14 +47,14 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS, C>
 
 	@Override
 	public DefaultSearchQueryOptionsStep<E, LOS, C> selectEntity() {
-		SearchQueryBuilder<E, C> builder = indexScope.getSearchQueryBuilderFactory()
+		SearchQueryBuilder<E, C> builder = indexScope.searchQueryBuilderFactory()
 				.selectEntity( sessionContext, loadingContextBuilder );
 		return new DefaultSearchQueryOptionsStep<E, LOS, C>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<R, LOS, C> selectEntityReference() {
-		SearchQueryBuilder<R, C> builder = indexScope.getSearchQueryBuilderFactory()
+		SearchQueryBuilder<R, C> builder = indexScope.searchQueryBuilderFactory()
 				.selectEntityReference( sessionContext, loadingContextBuilder );
 		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
 	}
@@ -69,14 +69,14 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS, C>
 
 	@Override
 	public <P> DefaultSearchQueryOptionsStep<P, LOS, C> select(SearchProjection<P> projection) {
-		SearchQueryBuilder<P, C> builder = indexScope.getSearchQueryBuilderFactory()
+		SearchQueryBuilder<P, C> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projection );
 		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<List<?>, LOS, C> select(SearchProjection<?>... projections) {
-		SearchQueryBuilder<List<?>, C> builder = indexScope.getSearchQueryBuilderFactory()
+		SearchQueryBuilder<List<?>, C> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projections );
 		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
 	}
@@ -93,17 +93,17 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS, C>
 	}
 
 	@Override
-	protected IndexScope<C> getIndexScope() {
+	protected IndexScope<C> indexScope() {
 		return indexScope;
 	}
 
 	@Override
-	protected BackendSessionContext getSessionContext() {
+	protected BackendSessionContext sessionContext() {
 		return sessionContext;
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 }

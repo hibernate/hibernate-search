@@ -21,27 +21,27 @@ class DelegatingBuildContext {
 		this.delegate = delegate;
 	}
 
-	public ClassResolver getClassResolver() {
+	public ClassResolver classResolver() {
 		return delegate.getClassResolver();
 	}
 
-	public ResourceResolver getResourceResolver() {
+	public ResourceResolver resourceResolver() {
 		return delegate.getResourceResolver();
 	}
 
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return delegate.getBeanResolver();
 	}
 
-	public ConfigurationPropertySource getConfigurationPropertySource() {
+	public ConfigurationPropertySource configurationPropertySource() {
 		return delegate.getConfigurationPropertySource();
 	}
 
-	public ThreadPoolProvider getThreadPoolProvider() {
+	public ThreadPoolProvider threadPoolProvider() {
 		return delegate.getThreadPoolProvider();
 	}
 
-	public FailureHandler getFailureHandler() {
+	public FailureHandler failureHandler() {
 		return delegate.getFailureHandler();
 	}
 }

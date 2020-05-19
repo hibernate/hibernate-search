@@ -111,18 +111,18 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 			 * Useful for compile-time boot.
 			 */
 			schemaManager = backendContext.createSchemaManager(
-					model, createLifecycleExecutionOptions( context.getConfigurationPropertySource() )
+					model, createLifecycleExecutionOptions( context.configurationPropertySource() )
 			);
 
 			// HSEARCH-3759: the lifecycle strategy is now the schema management strategy, at the mapper level
 			OBSOLETE_LIFECYCLE_STRATEGY.getAndMap(
-					context.getConfigurationPropertySource(),
+					context.configurationPropertySource(),
 					ignored -> {
 						throw log.lifecycleStrategyMovedToMapper();
 					}
 			);
 
-			indexingOrchestrator.start( context.getConfigurationPropertySource() );
+			indexingOrchestrator.start( context.configurationPropertySource() );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -181,7 +181,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	@Override
-	public IndexSchemaManager getSchemaManager() {
+	public IndexSchemaManager schemaManager() {
 		return schemaManager;
 	}
 

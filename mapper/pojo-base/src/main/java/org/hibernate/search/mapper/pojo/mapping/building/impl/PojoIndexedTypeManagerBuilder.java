@@ -63,12 +63,12 @@ class PojoIndexedTypeManagerBuilder<E> {
 				typeModel,
 				entityTypeMetadata,
 				mappingHelper,
-				indexManagerBuilder.getRootBindingContext(),
+				indexManagerBuilder.rootBindingContext(),
 				providedIdentifierBridge, beanResolver
 		);
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
-				mappingHelper, indexManagerBuilder.getRootBindingContext(),
+				mappingHelper, indexManagerBuilder.rootBindingContext(),
 				Optional.of( identityMappingCollector ),
 				Collections.emptyList()
 		);

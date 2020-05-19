@@ -63,7 +63,7 @@ public class SearchSchemaManagerImpl implements SearchSchemaManager {
 			Futures.unwrappedExceptionJoin( operation.apply( delegate, failureCollector ) );
 		}
 		catch (RuntimeException e) {
-			failureCollector.withContext( EventContexts.getDefault() )
+			failureCollector.withContext( EventContexts.defaultContext() )
 					.add( e );
 		}
 		failureCollector.checkNoFailure();

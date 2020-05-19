@@ -71,7 +71,7 @@ public class ContainerExtractorBinder {
 	public ContainerExtractorBinder(MappingBuildContext buildContext,
 			ContainerExtractorRegistry containerExtractorRegistry,
 			TypePatternMatcherFactory typePatternMatcherFactory) {
-		this.beanResolver = buildContext.getBeanResolver();
+		this.beanResolver = buildContext.beanResolver();
 		this.containerExtractorRegistry = containerExtractorRegistry;
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
 		for ( String extractorName : containerExtractorRegistry.getDefaults() ) {

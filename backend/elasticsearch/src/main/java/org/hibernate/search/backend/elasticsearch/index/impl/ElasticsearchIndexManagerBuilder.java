@@ -37,7 +37,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder {
 	}
 
 	@Override
-	public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+	public IndexSchemaRootNodeBuilder schemaRootNodeBuilder() {
 		return schemaRootNodeBuilder;
 	}
 

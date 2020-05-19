@@ -219,7 +219,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
 					metadata, reflectionManager, ormConfigurationService,
-					builder.getMaskedPropertySource()
+					builder.maskedPropertySource()
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -227,9 +227,9 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			Optional<ManagedBeanRegistry> managedBeanRegistryService = getOrmServiceOrEmpty( ManagedBeanRegistry.class );
 			HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver classAndResourceAndServiceResolver =
 					new HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver( hibernateOrmClassLoaderService );
-			builder.setClassResolver( classAndResourceAndServiceResolver );
-			builder.setResourceResolver( classAndResourceAndServiceResolver );
-			builder.setServiceResolver( classAndResourceAndServiceResolver );
+			builder.classResolver( classAndResourceAndServiceResolver );
+			builder.resourceResolver( classAndResourceAndServiceResolver );
+			builder.serviceResolver( classAndResourceAndServiceResolver );
 
 			reflectionBeanProvider = ReflectionBeanProvider.create( classAndResourceAndServiceResolver );
 			if ( managedBeanRegistryService.isPresent() ) {
@@ -243,7 +243,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			if ( beanProvider == null ) {
 				beanProvider = reflectionBeanProvider;
 			}
-			builder.setBeanProvider( beanProvider );
+			builder.beanProvider( beanProvider );
 
 			// TODO HSEARCH-3057 namingService (JMX)? Or maybe in second phase?
 

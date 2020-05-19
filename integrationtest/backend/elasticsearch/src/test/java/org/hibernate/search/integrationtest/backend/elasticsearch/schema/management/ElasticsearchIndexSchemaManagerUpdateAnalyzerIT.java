@@ -491,7 +491,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 				.withIndex( index )
 				.setup();
 
-		index.getSchemaManager().createOrUpdate().join();
+		index.schemaManager().createOrUpdate().join();
 	}
 
 }

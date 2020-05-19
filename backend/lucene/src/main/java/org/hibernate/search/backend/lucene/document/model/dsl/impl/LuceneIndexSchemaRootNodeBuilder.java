@@ -48,7 +48,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return getIndexEventContext().append( EventContexts.indexSchemaRoot() );
 	}
 

@@ -237,8 +237,8 @@ public class IndexIndexingPlanIT {
 		FutureAssert.assertThat( future ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsInstanceOf( SearchException.class );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.throwable() ).containsInstanceOf( SearchException.class );
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
 								new StubEntityReference( index.typeName(), "1" ),
 								new StubEntityReference( index.typeName(), "2" )

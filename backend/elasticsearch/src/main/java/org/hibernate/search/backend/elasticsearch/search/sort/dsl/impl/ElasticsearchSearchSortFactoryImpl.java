@@ -33,12 +33,12 @@ public class ElasticsearchSearchSortFactoryImpl
 
 	@Override
 	public SortThenStep fromJson(JsonObject jsonObject) {
-		return staticThenStep( dslContext.getBuilderFactory().fromJson( jsonObject ) );
+		return staticThenStep( dslContext.builderFactory().fromJson( jsonObject ) );
 	}
 
 	@Override
 	public SortThenStep fromJson(String jsonString) {
-		return staticThenStep( dslContext.getBuilderFactory().fromJson( jsonString ) );
+		return staticThenStep( dslContext.builderFactory().fromJson( jsonString ) );
 	}
 
 	private SortThenStep staticThenStep(ElasticsearchSearchSortBuilder builder) {

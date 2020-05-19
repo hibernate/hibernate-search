@@ -35,7 +35,7 @@ public abstract class StubMappedIndex {
 	}
 
 	public static StubMappedIndex ofNonRetrievable(Consumer<? super IndexSchemaElement> binder) {
-		return ofAdvancedNonRetrievable( ctx -> binder.accept( ctx.getSchemaElement() ) );
+		return ofAdvancedNonRetrievable( ctx -> binder.accept( ctx.schemaElement() ) );
 	}
 
 	public static StubMappedIndex ofAdvancedNonRetrievable(Consumer<? super IndexedEntityBindingContext> binder) {
@@ -92,8 +92,8 @@ public abstract class StubMappedIndex {
 		return clazz.cast( delegate().toAPI() );
 	}
 
-	public IndexSchemaManager getSchemaManager() {
-		return delegate().getSchemaManager();
+	public IndexSchemaManager schemaManager() {
+		return delegate().schemaManager();
 	}
 
 	/**

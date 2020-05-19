@@ -59,7 +59,7 @@ public class BackendThreads {
 
 	public ThreadProvider getThreadProvider() {
 		checkStarted();
-		return threadPoolProvider.getThreadProvider();
+		return threadPoolProvider.threadProvider();
 	}
 
 	public ScheduledExecutorService getWorkExecutor() {

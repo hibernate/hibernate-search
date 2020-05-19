@@ -52,27 +52,27 @@ public class LuceneIndexScope
 	}
 
 	@Override
-	public LuceneSearchPredicateBuilderFactoryImpl getSearchPredicateBuilderFactory() {
+	public LuceneSearchPredicateBuilderFactoryImpl searchPredicateBuilderFactory() {
 		return searchPredicateFactory;
 	}
 
 	@Override
-	public LuceneSearchSortBuilderFactoryImpl getSearchSortBuilderFactory() {
+	public LuceneSearchSortBuilderFactoryImpl searchSortBuilderFactory() {
 		return searchSortFactory;
 	}
 
 	@Override
-	public LuceneSearchQueryBuilderFactory getSearchQueryBuilderFactory() {
+	public LuceneSearchQueryBuilderFactory searchQueryBuilderFactory() {
 		return searchQueryFactory;
 	}
 
 	@Override
-	public LuceneSearchProjectionBuilderFactory getSearchProjectionFactory() {
+	public LuceneSearchProjectionBuilderFactory searchProjectionFactory() {
 		return searchProjectionFactory;
 	}
 
 	@Override
-	public SearchAggregationBuilderFactory<? super LuceneSearchQueryElementCollector> getSearchAggregationFactory() {
+	public SearchAggregationBuilderFactory<? super LuceneSearchQueryElementCollector> searchAggregationFactory() {
 		return searchAggregationFactory;
 	}
 }

@@ -105,7 +105,7 @@ public final class SingletonTask {
 	 * @return A future that completes when all works submitted to the executor so far are completely executed.
 	 * Works submitted to the executor after entering this method may delay the wait.
 	 */
-	public CompletableFuture<?> getCompletion() {
+	public CompletableFuture<?> completion() {
 		CompletableFuture<?> future = completionFuture;
 		if ( future == null ) {
 			// No execution in progress or scheduled.

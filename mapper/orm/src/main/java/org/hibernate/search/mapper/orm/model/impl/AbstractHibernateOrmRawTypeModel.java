@@ -74,8 +74,14 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public final String getName() {
+	public final String name() {
 		return typeIdentifier.toString();
+	}
+
+	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
+	@Override
+	public String getName() {
+		return name();
 	}
 
 	@Override
@@ -90,10 +96,10 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes();
+	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> ascendingSuperTypes();
 
 	@Override
-	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> getDescendingSuperTypes();
+	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> descendingSuperTypes();
 
 	@Override
 	public final PojoPropertyModel<?> getProperty(String propertyName) {

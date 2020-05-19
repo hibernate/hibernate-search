@@ -94,30 +94,30 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public ConfigurationPropertySource getMaskedPropertySource() {
+	public ConfigurationPropertySource maskedPropertySource() {
 		return propertySource;
 	}
 
 	@Override
-	public SearchIntegrationBuilder setClassResolver(ClassResolver classResolver) {
+	public SearchIntegrationBuilder classResolver(ClassResolver classResolver) {
 		this.classResolver = classResolver;
 		return this;
 	}
 
 	@Override
-	public SearchIntegrationBuilder setResourceResolver(ResourceResolver resourceResolver) {
+	public SearchIntegrationBuilder resourceResolver(ResourceResolver resourceResolver) {
 		this.resourceResolver = resourceResolver;
 		return this;
 	}
 
 	@Override
-	public SearchIntegrationBuilder setServiceResolver(ServiceResolver serviceResolver) {
+	public SearchIntegrationBuilder serviceResolver(ServiceResolver serviceResolver) {
 		this.serviceResolver = serviceResolver;
 		return this;
 	}
 
 	@Override
-	public SearchIntegrationBuilder setBeanProvider(BeanProvider beanProvider) {
+	public SearchIntegrationBuilder beanProvider(BeanProvider beanProvider) {
 		this.beanProvider = beanProvider;
 		return this;
 	}
@@ -392,7 +392,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 
 		private void handleMappingAborted(MappingAbortedException e) {
-			ContextualFailureCollector failureCollector = buildContext.getFailureCollector();
+			ContextualFailureCollector failureCollector = buildContext.failureCollector();
 
 			if ( !failureCollector.hasFailure() ) {
 				throw new AssertionFailure(
@@ -435,7 +435,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			@Override
 			public Set<C> get(MappableTypeModel typeModel) {
-				return typeModel.getDescendingSuperTypes()
+				return typeModel.descendingSuperTypes()
 						.map( MappingBuildingState.this::getContributionIncludingAutomaticallyDiscovered )
 						.filter( Objects::nonNull )
 						.flatMap( TypeMappingContribution::getContributors )
@@ -447,7 +447,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			@Override
-			public Set<? extends MappableTypeModel> getTypesContributedTo() {
+			public Set<? extends MappableTypeModel> typesContributedTo() {
 				// Use a LinkedHashSet for deterministic iteration
 				return Collections.unmodifiableSet( new LinkedHashSet<>( contributionByType.keySet() ) );
 			}

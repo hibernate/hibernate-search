@@ -26,7 +26,7 @@ public class RangeAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		RangeAggregationBuilder<F> builder =
-				dslContext.getBuilderFactory().createRangeAggregationBuilder( absoluteFieldPath, type, convert );
+				dslContext.builderFactory().createRangeAggregationBuilder( absoluteFieldPath, type, convert );
 		return new RangeAggregationRangeStepImpl<>( builder, dslContext );
 	}
 }

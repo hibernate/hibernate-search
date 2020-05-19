@@ -22,19 +22,19 @@ public abstract class AbstractSortThenStep<B> implements SortThenStep {
 
 	@Override
 	public final SearchSortFactory then() {
-		return new DefaultSearchSortFactory<>( getSelfDslContext() );
+		return new DefaultSearchSortFactory<>( selfDslContext() );
 	}
 
 	@Override
 	public SearchSort toSort() {
-		return getSelfDslContext().toSort();
+		return selfDslContext().toSort();
 	}
 
-	protected SearchSortDslContext<?, ? super B, ?> getDslContext() {
+	protected SearchSortDslContext<?, ? super B, ?> dslContext() {
 		return parentDslContext;
 	}
 
-	private SearchSortDslContext<?, ? super B, ?> getSelfDslContext() {
+	private SearchSortDslContext<?, ? super B, ?> selfDslContext() {
 		/*
 		 * Postpone the call of toImplementation() as long as possible,
 		 * and make sure to only call it once,

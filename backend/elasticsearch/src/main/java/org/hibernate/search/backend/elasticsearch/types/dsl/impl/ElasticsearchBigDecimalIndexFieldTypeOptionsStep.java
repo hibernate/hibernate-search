@@ -58,8 +58,8 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 		if ( decimalScale != null ) {
 			return decimalScale;
 		}
-		if ( defaultsProvider.getDecimalScale() != null ) {
-			return defaultsProvider.getDecimalScale();
+		if ( defaultsProvider.decimalScale() != null ) {
+			return defaultsProvider.decimalScale();
 		}
 
 		throw log.nullDecimalScale( getBuildContext().getEventContext() );

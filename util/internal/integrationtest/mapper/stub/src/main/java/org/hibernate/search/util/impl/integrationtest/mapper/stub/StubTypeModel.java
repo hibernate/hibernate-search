@@ -24,7 +24,7 @@ public class StubTypeModel implements MappableTypeModel {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return typeIdentifier;
 	}
 
@@ -39,12 +39,12 @@ public class StubTypeModel implements MappableTypeModel {
 	}
 
 	@Override
-	public Stream<? extends MappableTypeModel> getAscendingSuperTypes() {
+	public Stream<? extends MappableTypeModel> ascendingSuperTypes() {
 		return Stream.of( this );
 	}
 
 	@Override
-	public Stream<? extends MappableTypeModel> getDescendingSuperTypes() {
+	public Stream<? extends MappableTypeModel> descendingSuperTypes() {
 		return Stream.of( this );
 	}
 
