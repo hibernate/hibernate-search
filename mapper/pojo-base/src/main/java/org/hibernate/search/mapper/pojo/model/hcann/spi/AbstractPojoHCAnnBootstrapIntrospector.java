@@ -53,11 +53,11 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 	}
 
 	protected Stream<Class<?>> getAscendingSuperClasses(XClass xClass) {
-		return typeOrdering.getAscendingSuperTypes( xClass ).map( this::toClass );
+		return typeOrdering.ascendingSuperTypes( xClass ).map( this::toClass );
 	}
 
 	protected Stream<Class<?>> getDescendingSuperClasses(XClass xClass) {
-		return typeOrdering.getDescendingSuperTypes( xClass ).map( this::toClass );
+		return typeOrdering.descendingSuperTypes( xClass ).map( this::toClass );
 	}
 
 	private Class<?> toClass(XClass xClass) {
