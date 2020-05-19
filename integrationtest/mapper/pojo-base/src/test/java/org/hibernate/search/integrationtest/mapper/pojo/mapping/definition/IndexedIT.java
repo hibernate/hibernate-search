@@ -255,7 +255,7 @@ public class IndexedIT {
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withConfiguration( builder -> {
-							builder.setAnnotatedTypeDiscoveryEnabled( false );
+							builder.annotatedTypeDiscoveryEnabled( false );
 							builder.addEntityType( AbstractIndexedEntity.class );
 							builder.programmaticMapping()
 									.type( AbstractIndexedEntity.class )

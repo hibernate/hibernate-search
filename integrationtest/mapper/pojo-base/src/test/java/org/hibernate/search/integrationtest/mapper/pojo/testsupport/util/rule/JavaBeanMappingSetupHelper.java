@@ -65,7 +65,7 @@ public final class JavaBeanMappingSetupHelper
 
 		SetupContext() {
 			// Ensure overridden properties will be applied
-			withConfiguration( builder -> properties.forEach( builder::setProperty ) );
+			withConfiguration( builder -> properties.forEach( builder::property ) );
 		}
 
 		@Override
@@ -106,7 +106,7 @@ public final class JavaBeanMappingSetupHelper
 
 		@Override
 		protected SearchMappingBuilder createBuilder() {
-			return SearchMapping.builder( lookup ).setProperties( properties );
+			return SearchMapping.builder( lookup ).properties( properties );
 		}
 
 		@Override

@@ -115,7 +115,7 @@ public class ProvidedIdIT {
 
 	private JavaBeanMappingSetupHelper.SetupContext withBaseConfiguration() {
 		return setupHelper.start()
-				.withConfiguration( b -> b.setProvidedIdentifierBridge( BeanReference.of( NaiveIdentifierBridge.class ) ) );
+				.withConfiguration( b -> b.providedIdentifierBridge( BeanReference.of( NaiveIdentifierBridge.class ) ) );
 	}
 
 	public static class NaiveIdentifierBridge implements IdentifierBridge<Object> {
