@@ -11,7 +11,6 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 
 /**
@@ -26,17 +25,12 @@ public interface SearchAggregationDslContext<F extends SearchAggregationBuilderF
 	/**
 	 * @return The aggregation builder factory. Will always return the exact same instance.
 	 */
-	F getBuilderFactory();
-
-	/**
-	 * @return The predicate builder factory. Will always return the exact same instance.
-	 */
-	SearchPredicateBuilderFactory<?, ?> getPredicateBuilderFactory();
+	F builderFactory();
 
 	/**
 	 * @return The predicate factory. Will always return the exact same instance.
 	 */
-	PDF getPredicateFactory();
+	PDF predicateFactory();
 
 	/**
 	 * @param extension The extension to apply to the predicate factory.

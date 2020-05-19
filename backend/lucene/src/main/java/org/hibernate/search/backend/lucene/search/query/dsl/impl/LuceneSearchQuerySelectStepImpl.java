@@ -52,14 +52,14 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public LuceneSearchQueryWhereStep<E, LOS> selectEntity() {
-		LuceneSearchQueryBuilder<E> builder = indexScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<E> builder = indexScope.searchQueryBuilderFactory()
 				.selectEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<R, LOS> selectEntityReference() {
-		LuceneSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<R> builder = indexScope.searchQueryBuilderFactory()
 				.selectEntityReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
@@ -75,14 +75,14 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public <P> LuceneSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
-		LuceneSearchQueryBuilder<P> builder = indexScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<P> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projection );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		LuceneSearchQueryBuilder<List<?>> builder = indexScope.getSearchQueryBuilderFactory()
+		LuceneSearchQueryBuilder<List<?>> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
 	}
@@ -99,17 +99,17 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LuceneIndexScope getIndexScope() {
+	protected LuceneIndexScope indexScope() {
 		return indexScope;
 	}
 
 	@Override
-	protected BackendSessionContext getSessionContext() {
+	protected BackendSessionContext sessionContext() {
 		return sessionContext;
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 

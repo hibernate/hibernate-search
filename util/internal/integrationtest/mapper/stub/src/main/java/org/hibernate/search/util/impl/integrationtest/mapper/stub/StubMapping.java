@@ -42,7 +42,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 			case DROP_AND_CREATE_ON_STARTUP_ONLY:
 				return doSchemaManagementOperation(
 						IndexSchemaManager::dropAndCreate,
-						context.getFailureCollector()
+						context.failureCollector()
 				);
 			case DROP_ON_SHUTDOWN_ONLY:
 			case NONE:
@@ -59,7 +59,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 			case DROP_ON_SHUTDOWN_ONLY:
 				return doSchemaManagementOperation(
 						IndexSchemaManager::dropIfExisting,
-						context.getFailureCollector()
+						context.failureCollector()
 				);
 			case DROP_AND_CREATE_ON_STARTUP_ONLY:
 			case NONE:
@@ -81,7 +81,7 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 		int typeCounter = 0;
 
 		for ( Map.Entry<String, StubMappedIndex> entry : mappedIndexesByTypeIdentifier.entrySet() ) {
-			IndexSchemaManager delegate = entry.getValue().getSchemaManager();
+			IndexSchemaManager delegate = entry.getValue().schemaManager();
 			ContextualFailureCollector typeFailureCollector =
 					failureCollector.withContext( EventContexts.fromType( entry.getKey() ) );
 			futures[typeCounter++] = operation.apply( delegate )

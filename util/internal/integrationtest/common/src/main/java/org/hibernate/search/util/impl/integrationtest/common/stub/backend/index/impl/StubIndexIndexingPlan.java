@@ -137,10 +137,10 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	private void populate(StubDocumentWork.Builder builder, DocumentReferenceProvider documentReferenceProvider) {
-		builder.tenantIdentifier( sessionContext.getTenantIdentifier() );
-		builder.identifier( documentReferenceProvider.getIdentifier() );
-		builder.routingKey( documentReferenceProvider.getRoutingKey() );
-		builder.entityIdentifier( documentReferenceProvider.getEntityIdentifier() );
+		builder.tenantIdentifier( sessionContext.tenantIdentifier() );
+		builder.identifier( documentReferenceProvider.identifier() );
+		builder.routingKey( documentReferenceProvider.routingKey() );
+		builder.entityIdentifier( documentReferenceProvider.entityIdentifier() );
 	}
 
 	private void addWork(StubDocumentWork work) {

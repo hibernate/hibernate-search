@@ -20,5 +20,6 @@ public interface LoadingResult<E> {
 	 * @param key The key that was previously returned by {@link ProjectionHitMapper#planLoading(DocumentReference)}.
 	 * @return The loaded entity corresponding to the key, or {@code null} if the entity could not be loaded.
 	 */
-	E getLoaded(Object key);
+	E get(Object key);
+
 }

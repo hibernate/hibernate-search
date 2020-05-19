@@ -161,7 +161,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 				)
 				.setup();
 
-		operation.apply( index.getSchemaManager() ).join();
+		operation.apply( index.schemaManager() ).join();
 	}
 
 }

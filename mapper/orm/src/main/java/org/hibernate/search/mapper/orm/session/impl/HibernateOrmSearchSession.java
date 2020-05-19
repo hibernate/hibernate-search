@@ -121,6 +121,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
+	public String tenantIdentifier() {
+		return session().getTenantIdentifier();
+	}
+
+	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
+	@Override
 	public String getTenantIdentifier() {
 		return session().getTenantIdentifier();
 	}

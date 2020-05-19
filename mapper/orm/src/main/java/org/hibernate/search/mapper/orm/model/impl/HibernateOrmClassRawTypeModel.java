@@ -58,7 +58,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<HibernateOrmClassRawTypeModel<? super T>> getAscendingSuperTypes() {
+	public Stream<HibernateOrmClassRawTypeModel<? super T>> ascendingSuperTypes() {
 		if ( ascendingSuperTypesCache == null ) {
 			ascendingSuperTypesCache =
 					( (Stream<HibernateOrmClassRawTypeModel<? super T>>) introspector.getAscendingSuperTypes( xClass ) )
@@ -69,7 +69,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
-	public Stream<HibernateOrmClassRawTypeModel<? super T>> getDescendingSuperTypes() {
+	public Stream<HibernateOrmClassRawTypeModel<? super T>> descendingSuperTypes() {
 		if ( descendingSuperTypesCache == null ) {
 			descendingSuperTypesCache =
 					( (Stream<HibernateOrmClassRawTypeModel<? super T>>) introspector.getDescendingSuperTypes( xClass ) )
@@ -164,7 +164,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	private HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadataFromParentTypes(String propertyName) {
 		// TODO HSEARCH-3056 remove lambdas if possible
-		return getAscendingSuperTypes()
+		return ascendingSuperTypes()
 				.skip( 1 ) // Ignore self
 				.map( type -> type.getOrmPropertyMetadataFromThisType( propertyName ) )
 				.filter( Objects::nonNull )
@@ -184,7 +184,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	private Member getPropertyMemberFromParentTypes(String propertyName,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) {
 		// TODO HSEARCH-3056 remove lambdas if possible
-		return getAscendingSuperTypes()
+		return ascendingSuperTypes()
 				.skip( 1 ) // Ignore self
 				.map( type -> type.getPropertyMemberFromThisType( propertyName, ormPropertyMetadata ) )
 				.filter( Objects::nonNull )

@@ -131,7 +131,7 @@ class IndexSchemaFilter {
 		if ( parent != null ) {
 			includedByParent = parent.isPathIncludedInternal(
 					relativeDepth + 1,
-					definition.getRelativePrefix() + relativePath,
+					definition.relativePrefix() + relativePath,
 					markAsEncountered, includedByThis
 			);
 		}
@@ -163,7 +163,7 @@ class IndexSchemaFilter {
 		 * First check the explicitly included paths from this.
 		 * They may be excluded by the given filter (which is either this or a descendant).
 		 */
-		for ( String path : definition.getIncludePaths() ) {
+		for ( String path : definition.includePaths() ) {
 			if ( !path.startsWith( prefixToRemove ) ) {
 				continue;
 			}
@@ -183,7 +183,7 @@ class IndexSchemaFilter {
 		 * even though they are not explicitly included by the child
 		 */
 		return parent != null
-				&& parent.isAnyPathExplicitlyIncluded( definition.getRelativePrefix() + prefixToRemove, filter );
+				&& parent.isAnyPathExplicitlyIncluded( definition.relativePrefix() + prefixToRemove, filter );
 	}
 
 	private boolean isEveryPathIncludedAtDepth(int depth) {
@@ -199,11 +199,11 @@ class IndexSchemaFilter {
 		else if ( parent != null ) {
 			if ( this.definition.equals( definition ) ) {
 				// Same IndexedEmbedded as the one passed as a parameter
-				return this.definition.getRelativePrefix();
+				return this.definition.relativePrefix();
 			}
 			else {
 				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( definition );
-				return path == null ? null : path + this.definition.getRelativePrefix();
+				return path == null ? null : path + this.definition.relativePrefix();
 			}
 		}
 		else {
@@ -219,15 +219,15 @@ class IndexSchemaFilter {
 	public IndexSchemaFilter compose(IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker) {
 		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( definition );
 		if ( cyclicRecursionPath != null ) {
-			cyclicRecursionPath += definition.getRelativePrefix();
-			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, definition.getDefiningTypeModel() );
+			cyclicRecursionPath += definition.relativePrefix();
+			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, definition.definingTypeModel() );
 		}
 
 		// The new depth filter according to the new max depth
-		DepthFilter newDepthFilter = DepthFilter.of( definition.getMaxDepth() );
+		DepthFilter newDepthFilter = DepthFilter.of( definition.maxDepth() );
 
 		// The new path filter according to the given includedPaths
-		PathFilter newPathFilter = PathFilter.of( definition.getIncludePaths() );
+		PathFilter newPathFilter = PathFilter.of( definition.includePaths() );
 
 		return new IndexSchemaFilter(
 				this, definition, pathTracker,

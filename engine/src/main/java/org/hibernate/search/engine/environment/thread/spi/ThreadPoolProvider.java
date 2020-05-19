@@ -14,7 +14,7 @@ public interface ThreadPoolProvider {
 	/**
 	 * @return The underlying thread provider.
 	 */
-	ThreadProvider getThreadProvider();
+	ThreadProvider threadProvider();
 
 	/**
 	 * Creates a new fixed size {@link ThreadPoolExecutor}.

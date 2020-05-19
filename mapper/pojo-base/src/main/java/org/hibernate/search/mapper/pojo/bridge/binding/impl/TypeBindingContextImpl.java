@@ -49,7 +49,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		this.dependencyContext = dependencyContext;
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
 		this.listener = new PojoIndexSchemaContributionListener();
-		this.indexSchemaElement = indexBindingContext.getSchemaElement( listener );
+		this.indexSchemaElement = indexBindingContext.schemaElement( listener );
 	}
 
 	@Override

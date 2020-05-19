@@ -18,15 +18,15 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 
 public interface SearchIntegrationBuilder {
 
-	ConfigurationPropertySource getMaskedPropertySource();
+	ConfigurationPropertySource maskedPropertySource();
 
-	SearchIntegrationBuilder setClassResolver(ClassResolver classResolver);
+	SearchIntegrationBuilder classResolver(ClassResolver classResolver);
 
-	SearchIntegrationBuilder setResourceResolver(ResourceResolver resourceResolver);
+	SearchIntegrationBuilder resourceResolver(ResourceResolver resourceResolver);
 
-	SearchIntegrationBuilder setServiceResolver(ServiceResolver serviceResolver);
+	SearchIntegrationBuilder serviceResolver(ServiceResolver serviceResolver);
 
-	SearchIntegrationBuilder setBeanProvider(BeanProvider beanProvider);
+	SearchIntegrationBuilder beanProvider(BeanProvider beanProvider);
 
 	<PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
 			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator);

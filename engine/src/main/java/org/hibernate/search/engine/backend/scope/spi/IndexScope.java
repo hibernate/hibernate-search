@@ -19,14 +19,14 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
  */
 public interface IndexScope<C> {
 
-	SearchPredicateBuilderFactory<? super C, ?> getSearchPredicateBuilderFactory();
+	SearchPredicateBuilderFactory<? super C, ?> searchPredicateBuilderFactory();
 
-	SearchSortBuilderFactory<? super C, ?> getSearchSortBuilderFactory();
+	SearchSortBuilderFactory<? super C, ?> searchSortBuilderFactory();
 
-	SearchQueryBuilderFactory<C> getSearchQueryBuilderFactory();
+	SearchQueryBuilderFactory<C> searchQueryBuilderFactory();
 
-	SearchProjectionBuilderFactory getSearchProjectionFactory();
+	SearchProjectionBuilderFactory searchProjectionFactory();
 
-	SearchAggregationBuilderFactory<? super C> getSearchAggregationFactory();
+	SearchAggregationBuilderFactory<? super C> searchAggregationFactory();
 
 }

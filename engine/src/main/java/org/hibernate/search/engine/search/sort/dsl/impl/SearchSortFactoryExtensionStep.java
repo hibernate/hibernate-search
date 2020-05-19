@@ -43,12 +43,12 @@ final class SearchSortFactoryExtensionStep<B>
 	@Override
 	public SortThenStep orElse(Function<SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		SortFinalStep result = state.orElse( parent, sortContributor );
-		return new StaticSortThenStep<>( dslContext, dslContext.getBuilderFactory().toImplementation( result.toSort() ) );
+		return new StaticSortThenStep<>( dslContext, dslContext.builderFactory().toImplementation( result.toSort() ) );
 	}
 
 	@Override
 	public SortThenStep orElseFail() {
 		SortFinalStep result = state.orElseFail();
-		return new StaticSortThenStep<>( dslContext, dslContext.getBuilderFactory().toImplementation( result.toSort() ) );
+		return new StaticSortThenStep<>( dslContext, dslContext.builderFactory().toImplementation( result.toSort() ) );
 	}
 }

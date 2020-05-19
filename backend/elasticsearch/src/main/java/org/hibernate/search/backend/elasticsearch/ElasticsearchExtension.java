@@ -169,7 +169,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchSortBuilderFactory, the cast is safe
 	public Optional<ElasticsearchSearchSortFactory> extendOptional(
 			SearchSortFactory original, SearchSortDslContext<?, ?, ?> dslContext) {
-		if ( dslContext.getBuilderFactory() instanceof ElasticsearchSearchSortBuilderFactory ) {
+		if ( dslContext.builderFactory() instanceof ElasticsearchSearchSortBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchSortFactoryImpl(
 					original,
 					((SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ?>) dslContext)
@@ -204,7 +204,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchAggregationBuilderFactory, the cast is safe
 	public Optional<ElasticsearchSearchAggregationFactory> extendOptional(
 			SearchAggregationFactory original, SearchAggregationDslContext<?, ?> dslContext) {
-		if ( dslContext.getBuilderFactory() instanceof ElasticsearchSearchAggregationBuilderFactory ) {
+		if ( dslContext.builderFactory() instanceof ElasticsearchSearchAggregationBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchAggregationFactoryImpl(
 					original,
 					((SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory, ?>) dslContext)

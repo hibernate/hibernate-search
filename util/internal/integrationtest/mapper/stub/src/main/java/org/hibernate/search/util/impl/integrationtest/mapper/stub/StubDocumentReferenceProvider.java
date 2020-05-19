@@ -19,17 +19,17 @@ class StubDocumentReferenceProvider implements DocumentReferenceProvider {
 	}
 
 	@Override
-	public String getIdentifier() {
+	public String identifier() {
 		return identifier;
 	}
 
 	@Override
-	public String getRoutingKey() {
+	public String routingKey() {
 		return routingKey;
 	}
 
 	@Override
-	public Object getEntityIdentifier() {
+	public Object entityIdentifier() {
 		return identifier;
 	}
 }

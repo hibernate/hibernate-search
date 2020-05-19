@@ -58,7 +58,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	}
 
 	@Override
-	public IndexSchemaElement getSchemaElement() {
+	public IndexSchemaElement schemaElement() {
 		return new IndexSchemaElementImpl<>(
 				createTypeFactory(),
 				indexSchemaObjectNodeBuilder,
@@ -68,7 +68,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	}
 
 	@Override
-	public IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener) {
+	public IndexSchemaElement schemaElement(IndexSchemaContributionListener listener) {
 		return new IndexSchemaElementImpl<>(
 				createTypeFactory(),
 				indexSchemaObjectNodeBuilder,
@@ -127,7 +127,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
 					currentNodeBuilder.addObjectField( objectName, IndexFieldInclusion.INCLUDED,
-							definition.getStorage()
+							definition.storage()
 					);
 			if ( multiValued ) {
 				// Only mark the first object as multi-valued

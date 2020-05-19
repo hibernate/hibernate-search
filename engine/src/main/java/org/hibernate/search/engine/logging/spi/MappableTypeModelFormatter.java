@@ -18,6 +18,6 @@ public final class MappableTypeModelFormatter {
 
 	@Override
 	public String toString() {
-		return typeModel != null ? typeModel.getName() : "null";
+		return typeModel != null ? typeModel.name() : "null";
 	}
 }

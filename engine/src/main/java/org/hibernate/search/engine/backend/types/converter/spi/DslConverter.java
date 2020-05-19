@@ -33,7 +33,7 @@ public final class DslConverter<V, F> {
 		return getClass().getSimpleName() + "[valueType=" + valueType.getName() + ",delegate=" + delegate + "]";
 	}
 
-	public Class<V> getValueType() {
+	public Class<V> valueType() {
 		return valueType;
 	}
 

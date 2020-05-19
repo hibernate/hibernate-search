@@ -88,7 +88,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public IndexSchemaManager getSchemaManager() {
+	public IndexSchemaManager schemaManager() {
 		checkStarted();
 		return new StubIndexSchemaManager( name, backend.getBehavior() );
 	}

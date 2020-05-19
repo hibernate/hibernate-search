@@ -47,7 +47,7 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		JsonArray filters = new JsonArray();
-		JsonObject filter = multiTenancyStrategy.getFilterOrNull( sessionContext.getTenantIdentifier() );
+		JsonObject filter = multiTenancyStrategy.getFilterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
 			filters.add( filter );
 		}

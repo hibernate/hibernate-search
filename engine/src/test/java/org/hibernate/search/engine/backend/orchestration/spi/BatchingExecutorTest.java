@@ -335,7 +335,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		resetAll();
 		// This should not trigger any call to the mocks
 		replayAll();
-		CompletableFuture<?> completion = executor.getCompletion();
+		CompletableFuture<?> completion = executor.completion();
 		verifyAll();
 		FutureAssert.assertThat( completion ).isSuccessful();
 	}
@@ -346,7 +346,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		resetAll();
 		// This should not trigger any call to the mocks
 		replayAll();
-		CompletableFuture<?> completion = executor.getCompletion()
+		CompletableFuture<?> completion = executor.completion()
 				.whenComplete( (result, throwable) -> {
 					assertThat( result ).isNull();
 					assertThat( throwable ).isNull();
@@ -362,7 +362,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		resetAll();
 		// This should not trigger any call to the mocks
 		replayAll();
-		CompletableFuture<?> completion = executor.getCompletion();
+		CompletableFuture<?> completion = executor.completion();
 		verifyAll();
 		FutureAssert.assertThat( completion ).isSuccessful();
 

@@ -24,10 +24,10 @@ public interface IndexManagerBuilder {
 	 * <p>
 	 * Never called after {@link #build()}.
 	 */
-	IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder();
+	IndexSchemaRootNodeBuilder schemaRootNodeBuilder();
 
 	/**
-	 * Build the mapping based on the {@link #getSchemaRootNodeBuilder()} metadata contributed} so far.
+	 * Build the mapping based on the {@link #schemaRootNodeBuilder()} metadata contributed} so far.
 	 * <p>
 	 * May only be called once on a given object.
 	 *

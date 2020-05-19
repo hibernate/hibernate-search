@@ -80,7 +80,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	@Override
 	public BeanResolver getBeanResolver() {
-		return startContext.getBeanResolver();
+		return startContext.beanResolver();
 	}
 
 	@Override
@@ -121,7 +121,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 			shardCollector.put( shardId.orElse( null ), shard );
 		}
 		catch (RuntimeException e) {
-			ContextualFailureCollector failureCollector = startContext.getFailureCollector();
+			ContextualFailureCollector failureCollector = startContext.failureCollector();
 			if ( shardId.isPresent() ) {
 				failureCollector = failureCollector.withContext( EventContexts.fromShardId( shardId.get() ) );
 			}

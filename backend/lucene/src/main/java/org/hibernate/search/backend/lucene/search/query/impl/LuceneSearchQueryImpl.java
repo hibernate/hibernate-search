@@ -153,7 +153,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private Explanation doExplain(String indexName, String id) {
 		timeoutManager.start();
-		Query filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
+		Query filter = searchContext.getFilterOrNull( sessionContext.tenantIdentifier() );
 		ReadWork<Explanation> work = workFactory.explain(
 				searcher, indexName, id, filter
 		);

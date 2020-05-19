@@ -24,7 +24,7 @@ public class SchemaManagementListener {
 	}
 
 	public CompletableFuture<?> onStart(MappingStartContext context, PojoScopeSchemaManager manager) {
-		ContextualFailureCollector failureCollector = context.getFailureCollector();
+		ContextualFailureCollector failureCollector = context.failureCollector();
 		switch ( strategyName ) {
 			case CREATE:
 				return manager.createIfMissing( failureCollector );
@@ -46,7 +46,7 @@ public class SchemaManagementListener {
 	}
 
 	public CompletableFuture<?> onStop(MappingPreStopContext context, PojoScopeSchemaManager manager) {
-		ContextualFailureCollector failureCollector = context.getFailureCollector();
+		ContextualFailureCollector failureCollector = context.failureCollector();
 		switch ( strategyName ) {
 			case DROP_AND_CREATE_AND_DROP:
 				return manager.dropIfExisting( failureCollector );

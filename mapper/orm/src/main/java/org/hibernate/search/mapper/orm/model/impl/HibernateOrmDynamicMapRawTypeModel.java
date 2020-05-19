@@ -45,13 +45,13 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 	}
 
 	@Override
-	public Stream<AbstractHibernateOrmRawTypeModel<? super Map>> getAscendingSuperTypes() {
-		return Stream.concat( Stream.of( this ), getSuperType().getAscendingSuperTypes() );
+	public Stream<AbstractHibernateOrmRawTypeModel<? super Map>> ascendingSuperTypes() {
+		return Stream.concat( Stream.of( this ), getSuperType().ascendingSuperTypes() );
 	}
 
 	@Override
-	public Stream<AbstractHibernateOrmRawTypeModel<? super Map>> getDescendingSuperTypes() {
-		return Stream.concat( getSuperType().getDescendingSuperTypes(), Stream.of( this ) );
+	public Stream<AbstractHibernateOrmRawTypeModel<? super Map>> descendingSuperTypes() {
+		return Stream.concat( getSuperType().descendingSuperTypes(), Stream.of( this ) );
 	}
 
 	@Override

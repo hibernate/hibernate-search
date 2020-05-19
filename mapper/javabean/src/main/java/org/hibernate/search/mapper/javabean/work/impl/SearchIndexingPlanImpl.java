@@ -72,7 +72,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	public CompletableFuture<?> execute() {
 		return delegate.executeAndReport().thenApply( report -> {
-			report.getThrowable().ifPresent( t -> {
+			report.throwable().ifPresent( t -> {
 				throw Throwables.toRuntimeException( t );
 			} );
 			return null;

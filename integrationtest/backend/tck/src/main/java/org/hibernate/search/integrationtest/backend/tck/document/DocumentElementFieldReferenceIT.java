@@ -240,8 +240,8 @@ public class DocumentElementFieldReferenceIT<F> {
 		final FirstLevelObjectBinding excludingObject;
 
 		IndexBinding(IndexedEntityBindingContext ctx) {
-			super( ctx.getSchemaElement() );
-			IndexSchemaElement root = ctx.getSchemaElement();
+			super( ctx.schemaElement() );
+			IndexSchemaElement root = ctx.schemaElement();
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
 					.multiValued();
 			flattenedObject = new FirstLevelObjectBinding( flattenedObjectField );
@@ -258,8 +258,8 @@ public class DocumentElementFieldReferenceIT<F> {
 			IndexedEmbeddedBindingContext excludingEmbeddedContext =
 					ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();
 			excludingObject = new FirstLevelObjectBinding(
-					excludingEmbeddedContext.getSchemaElement(),
-					excludingEmbeddedContext.getParentIndexObjectReferences().iterator().next()
+					excludingEmbeddedContext.schemaElement(),
+					excludingEmbeddedContext.parentIndexObjectReferences().iterator().next()
 			);
 		}
 	}

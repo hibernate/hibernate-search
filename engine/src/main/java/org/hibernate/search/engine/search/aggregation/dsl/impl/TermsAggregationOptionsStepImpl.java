@@ -69,7 +69,7 @@ class TermsAggregationOptionsStepImpl<PDF extends SearchPredicateFactory, F>
 	@Override
 	public TermsAggregationOptionsStepImpl<PDF, F> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
-		SearchPredicate predicate = clauseContributor.apply( dslContext.getPredicateFactory() ).toPredicate();
+		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
 		return filter( predicate );
 	}

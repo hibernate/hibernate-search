@@ -97,7 +97,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		checkFooBarIncluded( "prefix1_", level1Context );
 
 		resetAll();
-		EasyMock.expect( typeModel1Mock.getName() ).andReturn( "typeModel1Mock" );
+		EasyMock.expect( typeModel1Mock.name() ).andReturn( "typeModel1Mock" );
 		replayAll();
 		assertThatThrownBy( () -> {
 				IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
@@ -133,7 +133,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		);
 
 		resetAll();
-		EasyMock.expect( typeModel1Mock.getName() ).andReturn( "typeModel1Mock" );
+		EasyMock.expect( typeModel1Mock.name() ).andReturn( "typeModel1Mock" );
 		replayAll();
 		assertThatThrownBy( () -> {
 			IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
@@ -298,9 +298,9 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 				level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all includePaths are useless
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.isEmpty();
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"included",
 						"notEncountered",
@@ -315,12 +315,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Encounter "included" and "excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level1Context, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level1Context, "excludedBecauseOfLevel1" );
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
 						"excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
 						"notEncountered",
@@ -335,13 +335,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Check non-IndexedEmbedded nesting
 		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
 				checkCompositeIncluded( "level2NonIndexedEmbedded", level1Context, "level2NonIndexedEmbedded" );
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
 						"level2NonIndexedEmbedded" // Added
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						// "level2NonIndexedEmbedded" removed
@@ -355,7 +355,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Encounter "level2NonIndexedEmbedded.included" and "level2NonIndexedEmbedded.excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level2NonIndexedEmbeddedContext, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level2NonIndexedEmbeddedContext, "excludedBecauseOfLevel1" );
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -363,7 +363,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 						"level2NonIndexedEmbedded.included", // Added
 						"level2NonIndexedEmbedded.excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						// "level2NonIndexedEmbedded.included" removed
@@ -387,9 +387,9 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 				"level2IndexedEmbedded", level1Context,
 				level2Definition, level2PathTracker
 		);
-		assertThat( level2PathTracker.getEncounteredFieldPaths() )
+		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.isEmpty();
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -398,13 +398,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
 						"level2IndexedEmbedded" // Added
 				);
-		assertThat( level2PathTracker.getUselessIncludePaths() )
+		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"included",
 						"notEncountered",
 						"excludedBecauseOfLevel1"
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered",
@@ -417,12 +417,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Encounter "level2IndexedEmbedded.included" and "level2IndexedEmbedded.excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level2IndexedEmbeddedContext, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level2IndexedEmbeddedContext, "excludedBecauseOfLevel1" );
-		assertThat( level2PathTracker.getEncounteredFieldPaths() )
+		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
 						"excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -433,13 +433,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 						"level2IndexedEmbedded.included", // Added
 						"level2IndexedEmbedded.excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level2PathTracker.getUselessIncludePaths() )
+		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
 						"notEncountered"
 						// "excludedBecauseOfLevel1" removed
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						"level2NonIndexedEmbedded.notEncountered",
@@ -450,13 +450,13 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 
 		// Encounter "level2IndexedEmbedded.excludedBecauseOfLevel2"
 		checkLeafExcluded( "excludedBecauseOfLevel2", level2IndexedEmbeddedContext, "excludedBecauseOfLevel2" );
-		assertThat( level2PathTracker.getEncounteredFieldPaths() )
+		assertThat( level2PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
 						"excludedBecauseOfLevel2" // Added
 				);
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -468,12 +468,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 						"level2IndexedEmbedded.excludedBecauseOfLevel1",
 						"level2IndexedEmbedded.excludedBecauseOfLevel2" // Added
 				);
-		assertThat( level2PathTracker.getUselessIncludePaths() )
+		assertThat( level2PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered"
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						"level2NonIndexedEmbedded.notEncountered",
@@ -705,9 +705,9 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 				level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all includePaths are useless
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.isEmpty();
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"included",
 						"notEncountered",
@@ -718,12 +718,12 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Encounter "included" and "excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level1Context, "included" );
 		checkLeafIncluded( "includedBecauseOfDepth", level1Context, "includedBecauseOfDepth" );
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
 						"includedBecauseOfDepth" // Added
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
 						"notEncountered",
@@ -747,18 +747,18 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 				"level3", level2Context, level3Definition, level3PathTracker
 
 		);
-		assertThat( level3PathTracker.getUselessIncludePaths() )
+		assertThat( level3PathTracker.uselessIncludePaths() )
 				.isEmpty();
-		assertThat( level2PathTracker.getUselessIncludePaths() )
+		assertThat( level2PathTracker.uselessIncludePaths() )
 				.isEmpty();
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"includedBecauseOfDepth",
 						"level2", // Added
 						"level2.level3" // Added
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered",
@@ -769,7 +769,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		// Encounter "level2.level3.included" and "level2.level3.excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level3Context, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level3Context, "excludedBecauseOfLevel1" );
-		assertThat( level1PathTracker.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.encounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"includedBecauseOfDepth",
@@ -778,7 +778,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 						"level2.level3.included", // Added
 						"level2.level3.excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1PathTracker.getUselessIncludePaths() )
+		assertThat( level1PathTracker.uselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						// "level2.level3.included" removed

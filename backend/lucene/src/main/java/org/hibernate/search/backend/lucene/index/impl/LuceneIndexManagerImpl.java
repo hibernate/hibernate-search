@@ -101,7 +101,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexSchemaManager getSchemaManager() {
+	public IndexSchemaManager schemaManager() {
 		return schemaManager;
 	}
 

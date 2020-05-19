@@ -122,12 +122,12 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * @return A future that completes when all works submitted to the executor so far are completely executed.
 	 * Works submitted to the executor after entering this method may delay the wait.
 	 */
-	public CompletableFuture<?> getCompletion() {
+	public CompletableFuture<?> completion() {
 		if ( processingTask == null ) {
 			// Not started
 			return CompletableFuture.completedFuture( null );
 		}
-		return processingTask.getCompletion();
+		return processingTask.completion();
 	}
 
 	/**

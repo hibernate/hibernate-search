@@ -21,12 +21,12 @@ class MappingFinalizationContextImpl implements MappingFinalizationContext {
 	}
 
 	@Override
-	public ConfigurationPropertySource getConfigurationPropertySource() {
+	public ConfigurationPropertySource configurationPropertySource() {
 		return propertySource;
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return beanResolver;
 	}
 }

@@ -90,7 +90,7 @@ public class ElasticsearchBatchingWorkOrchestrator
 			// Processors are not thread-safe: create one per executor.
 			ElasticsearchBatchedWorkProcessor processor = createProcessor( executionContext, maxBulkSize );
 			executors[i] = new BatchingExecutor<>(
-					getName() + " - " + i,
+					name() + " - " + i,
 					processor,
 					queueSize,
 					true,
@@ -110,10 +110,10 @@ public class ElasticsearchBatchingWorkOrchestrator
 	}
 
 	@Override
-	protected CompletableFuture<?> getCompletion() {
+	protected CompletableFuture<?> completion() {
 		CompletableFuture<?>[] completions = new CompletableFuture[executors.length];
 		for ( int i = 0; i < executors.length; i++ ) {
-			completions[i] = executors[i].getCompletion();
+			completions[i] = executors[i].completion();
 		}
 		return CompletableFuture.allOf( completions );
 	}

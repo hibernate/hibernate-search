@@ -31,9 +31,9 @@ public final class IndexedEmbeddedPathTracker {
 		this.definition = definition;
 	}
 
-	public Set<String> getUselessIncludePaths() {
+	public Set<String> uselessIncludePaths() {
 		Set<String> uselessIncludePaths = new LinkedHashSet<>();
-		for ( String path : definition.getIncludePaths() ) {
+		for ( String path : definition.includePaths() ) {
 			Boolean included = encounteredFieldPaths.get( path );
 			if ( included == null /* not encountered */ || !included ) {
 				// An "includePaths" filter that does not result in inclusion is useless
@@ -43,7 +43,7 @@ public final class IndexedEmbeddedPathTracker {
 		return uselessIncludePaths;
 	}
 
-	public Set<String> getEncounteredFieldPaths() {
+	public Set<String> encounteredFieldPaths() {
 		return encounteredFieldPaths.keySet();
 	}
 

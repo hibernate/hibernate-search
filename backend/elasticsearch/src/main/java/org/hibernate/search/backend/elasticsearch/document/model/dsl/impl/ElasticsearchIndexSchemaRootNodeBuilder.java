@@ -60,7 +60,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return getIndexEventContext()
 				.append( EventContexts.indexSchemaRoot() );
 	}

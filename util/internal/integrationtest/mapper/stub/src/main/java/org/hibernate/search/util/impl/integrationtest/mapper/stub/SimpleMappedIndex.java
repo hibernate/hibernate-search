@@ -21,7 +21,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 public abstract class SimpleMappedIndex<B> extends StubMappedIndex {
 
 	public static <B> SimpleMappedIndex<B> of(Function<IndexSchemaElement, B> binder) {
-		return ofAdvanced( ctx -> binder.apply( ctx.getSchemaElement() ) );
+		return ofAdvanced( ctx -> binder.apply( ctx.schemaElement() ) );
 	}
 
 	public static <B> SimpleMappedIndex<B> ofAdvanced(Function<IndexedEntityBindingContext, B> binder) {

@@ -34,7 +34,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 		this.name = name;
 	}
 
-	protected final String getName() {
+	protected final String name() {
 		return name;
 	}
 
@@ -79,11 +79,11 @@ public abstract class AbstractWorkOrchestrator<W> {
 			switch ( state ) {
 				case RUNNING:
 					state = State.PRE_STOPPING;
-					return getCompletion();
+					return completion();
 				case PRE_STOPPING:
 				case STOPPED:
 				default:
-					return getCompletion();
+					return completion();
 			}
 		}
 		finally {
@@ -118,7 +118,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 
 	protected abstract void doSubmit(W work) throws InterruptedException;
 
-	protected abstract CompletableFuture<?> getCompletion();
+	protected abstract CompletableFuture<?> completion();
 
 	protected abstract void doStop();
 

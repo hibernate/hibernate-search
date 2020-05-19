@@ -667,7 +667,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( index.getSchemaManager().createOrUpdate() );
+		Futures.unwrappedExceptionJoin( index.schemaManager().createOrUpdate() );
 	}
 
 	private String integerMappingForExpectations() {

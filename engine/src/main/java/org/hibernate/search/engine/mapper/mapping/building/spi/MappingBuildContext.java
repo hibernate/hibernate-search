@@ -20,11 +20,11 @@ import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
  */
 public interface MappingBuildContext {
 
-	ClassResolver getClassResolver();
+	ClassResolver classResolver();
 
-	ResourceResolver getResourceResolver();
+	ResourceResolver resourceResolver();
 
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
 	/**
 	 * A collector of (non-fatal) failures, allowing to notify Hibernate Search
@@ -40,12 +40,12 @@ public interface MappingBuildContext {
 	 *
 	 * @return A failure collector.
 	 */
-	ContextualFailureCollector getFailureCollector();
+	ContextualFailureCollector failureCollector();
 
-	FailureHandler getFailureHandler();
+	FailureHandler failureHandler();
 
-	ThreadPoolProvider getThreadPoolProvider();
+	ThreadPoolProvider threadPoolProvider();
 
-	ConfigurationPropertySource getConfigurationPropertySource();
+	ConfigurationPropertySource configurationPropertySource();
 
 }

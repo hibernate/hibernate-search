@@ -20,7 +20,7 @@ class ScoreSortOptionsStepImpl<B>
 
 	ScoreSortOptionsStepImpl(SearchSortDslContext<?, B, ?> dslContext) {
 		super( dslContext );
-		this.builder = dslContext.getBuilderFactory().score();
+		this.builder = dslContext.builderFactory().score();
 	}
 
 	@Override

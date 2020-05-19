@@ -664,7 +664,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 				.withIndex( index )
 				.setup();
 
-		Futures.unwrappedExceptionJoin( operation.apply( index.getSchemaManager() ) );
+		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager() ) );
 	}
 
 	protected void putMapping() {

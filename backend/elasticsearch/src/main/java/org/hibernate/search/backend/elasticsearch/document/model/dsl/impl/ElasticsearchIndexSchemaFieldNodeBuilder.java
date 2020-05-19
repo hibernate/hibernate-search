@@ -52,7 +52,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return parent.getRootNodeBuilder().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
@@ -66,7 +66,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	@Override
 	public IndexFieldReference<F> toReference() {
 		if ( reference != null ) {
-			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
+			throw log.cannotCreateReferenceMultipleTimes( eventContext() );
 		}
 		this.reference = new ElasticsearchIndexFieldReference<>();
 		return reference;
@@ -78,7 +78,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
-			throw log.incompleteFieldDefinition( getEventContext() );
+			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
 		ElasticsearchIndexSchemaFieldNode<F> fieldNode = new ElasticsearchIndexSchemaFieldNode<>(

@@ -722,14 +722,14 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void backend_unwrap() {
-		Backend backend = integration.getBackend( BACKEND_NAME );
+		Backend backend = integration.backend( BACKEND_NAME );
 		Assertions.assertThat( backend.unwrap( LuceneBackend.class ) )
 				.isNotNull();
 	}
 
 	@Test
 	public void backend_unwrap_error_unknownType() {
-		Backend backend = integration.getBackend( BACKEND_NAME );
+		Backend backend = integration.backend( BACKEND_NAME );
 
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
@@ -741,14 +741,14 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void mainIndex_unwrap() {
-		IndexManager mainIndexFromIntegration = integration.getIndexManager( mainIndex.name() );
+		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
 		Assertions.assertThat( mainIndexFromIntegration.unwrap( LuceneIndexManager.class ) )
 				.isNotNull();
 	}
 
 	@Test
 	public void mainIndex_unwrap_error_unknownType() {
-		IndexManager mainIndexFromIntegration = integration.getIndexManager( mainIndex.name() );
+		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
 
 		assertThatThrownBy( () -> mainIndexFromIntegration.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )

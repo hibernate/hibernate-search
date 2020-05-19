@@ -59,7 +59,7 @@ public interface IndexManagerImplementor {
 	 */
 	IndexManager toAPI();
 
-	IndexSchemaManager getSchemaManager();
+	IndexSchemaManager schemaManager();
 
 	<R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
 			EntityReferenceFactory<R> entityReferenceFactory,

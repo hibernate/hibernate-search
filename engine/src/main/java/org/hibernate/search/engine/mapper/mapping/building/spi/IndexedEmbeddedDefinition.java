@@ -70,23 +70,23 @@ public final class IndexedEmbeddedDefinition {
 		return Objects.hash( definingTypeModel, relativePrefix, maxDepth, includePaths );
 	}
 
-	public MappableTypeModel getDefiningTypeModel() {
+	public MappableTypeModel definingTypeModel() {
 		return definingTypeModel;
 	}
 
-	public String getRelativePrefix() {
+	public String relativePrefix() {
 		return relativePrefix;
 	}
 
-	public ObjectFieldStorage getStorage() {
+	public ObjectFieldStorage storage() {
 		return storage;
 	}
 
-	public Set<String> getIncludePaths() {
+	public Set<String> includePaths() {
 		return includePaths;
 	}
 
-	public Integer getMaxDepth() {
+	public Integer maxDepth() {
 		return maxDepth;
 	}
 

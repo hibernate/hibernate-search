@@ -92,7 +92,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 	public Stream<? extends PojoModelProperty> properties() {
 		if ( !propertiesInitialized ) {
 			// Populate all the known properties
-			getTypeModel().getRawType().getAscendingSuperTypes()
+			getTypeModel().getRawType().ascendingSuperTypes()
 					.flatMap( PojoRawTypeModel::getDeclaredProperties )
 					.map( PojoPropertyModel::getName )
 					.forEach( this::property );

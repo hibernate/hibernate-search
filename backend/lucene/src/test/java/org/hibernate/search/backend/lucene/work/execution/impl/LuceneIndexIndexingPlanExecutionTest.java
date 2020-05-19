@@ -126,8 +126,8 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).isEmpty();
-				softly.assertThat( report.getFailingEntityReferences() ).isEmpty();
+				softly.assertThat( report.throwable() ).isEmpty();
+				softly.assertThat( report.failingEntityReferences() ).isEmpty();
 			} );
 		} );
 	}
@@ -192,8 +192,8 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.throwable() ).containsSame( work1Exception );
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactlyInAnyOrder( entityReference( 0 ) );
 			} );
 		} );
@@ -268,9 +268,9 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
+				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				assertThat( work1Exception ).hasSuppressedException( work3Exception );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactlyInAnyOrder( entityReference( 0 ), entityReference( 2 ) );
 			} );
 		} );
@@ -348,9 +348,9 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
+				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				softly.assertThat( work1Exception ).hasSuppressedException( entityReferenceFactoryException );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
 								// Reference to entity 0 is missing because we could not create it,
 								// but at least the other references are reported.
@@ -418,8 +418,8 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( commitException );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.throwable() ).containsSame( commitException );
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
 								// All entities, even if their work succeeded
 								entityReference( 0 ), entityReference( 1 ), entityReference( 2 )
@@ -488,8 +488,8 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( refreshException );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.throwable() ).containsSame( refreshException );
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
 								// All entities, even if their work succeeded
 								entityReference( 0 ), entityReference( 1 ), entityReference( 2 )
@@ -557,9 +557,9 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
+				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				softly.assertThat( work1Exception ).hasSuppressedException( commitException );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
 								// All entities, even if their work succeeded
 								entityReference( 0 ), entityReference( 1 ), entityReference( 2 )
@@ -628,9 +628,9 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
-				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
+				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				softly.assertThat( work1Exception ).hasSuppressedException( refreshException );
-				softly.assertThat( report.getFailingEntityReferences() )
+				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(
 								// All entities, even if their work succeeded
 								entityReference( 0 ), entityReference( 1 ), entityReference( 2 )

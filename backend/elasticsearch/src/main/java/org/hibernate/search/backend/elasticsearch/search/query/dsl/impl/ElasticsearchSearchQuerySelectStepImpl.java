@@ -52,14 +52,14 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity() {
-		ElasticsearchSearchQueryBuilder<E> builder = indexScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<E> builder = indexScope.searchQueryBuilderFactory()
 				.selectEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<R, LOS> selectEntityReference() {
-		ElasticsearchSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<R> builder = indexScope.searchQueryBuilderFactory()
 				.selectEntityReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
@@ -75,14 +75,14 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
-		ElasticsearchSearchQueryBuilder<P> builder = indexScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<P> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projection );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		ElasticsearchSearchQueryBuilder<List<?>> builder = indexScope.getSearchQueryBuilderFactory()
+		ElasticsearchSearchQueryBuilder<List<?>> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
 	}
@@ -99,17 +99,17 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected ElasticsearchIndexScope getIndexScope() {
+	protected ElasticsearchIndexScope indexScope() {
 		return indexScope;
 	}
 
 	@Override
-	protected BackendSessionContext getSessionContext() {
+	protected BackendSessionContext sessionContext() {
 		return sessionContext;
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 

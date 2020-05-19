@@ -20,6 +20,6 @@ public interface MappingPreStopContext {
 	 *
 	 * @return A failure collector.
 	 */
-	ContextualFailureCollector getFailureCollector();
+	ContextualFailureCollector failureCollector();
 
 }

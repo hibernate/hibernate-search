@@ -83,7 +83,7 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 			NestedContextBuilder<T> contextBuilder) {
 		IndexSchemaFilter composedFilter = filter.compose( definition, pathTracker );
 		if ( !composedFilter.isEveryPathExcluded() ) {
-			String prefixToParse = unconsumedPrefix + definition.getRelativePrefix();
+			String prefixToParse = unconsumedPrefix + definition.relativePrefix();
 			int afterPreviousDotIndex = 0;
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			while ( nextDotIndex >= 0 ) {

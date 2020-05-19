@@ -45,7 +45,7 @@ public final class ThreadPoolProviderImpl implements ThreadPoolProvider {
 	}
 
 	@Override
-	public ThreadProvider getThreadProvider() {
+	public ThreadProvider threadProvider() {
 		return threadProviderHolder.get();
 	}
 

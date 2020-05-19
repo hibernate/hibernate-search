@@ -42,7 +42,7 @@ public class IndexSchemaElementFieldIT {
 	public void nullFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field( null, this::irrelevantTypeContributor );
 				} ),
 				"Null field name on root"
@@ -57,7 +57,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" )
 							.field( null, this::irrelevantTypeContributor );
 				} ),
@@ -73,7 +73,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( null );
 				} ),
 				"Null object field name on root"
@@ -88,7 +88,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).objectField( null );
 				} ),
 				"Null object field name on non-root"
@@ -107,7 +107,7 @@ public class IndexSchemaElementFieldIT {
 	public void emptyFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field( "", this::irrelevantTypeContributor );
 				} ),
 				"empty field name on root"
@@ -122,7 +122,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).field( "", this::irrelevantTypeContributor );
 				} ),
 				"empty field name on non-root"
@@ -137,7 +137,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "" );
 				} ),
 				"empty object field name on root"
@@ -152,7 +152,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).objectField( "" );
 				} ),
 				"empty object field name on non-root"
@@ -170,7 +170,7 @@ public class IndexSchemaElementFieldIT {
 	public void dotInFieldName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field( "foo.bar", this::irrelevantTypeContributor );
 				} ),
 				"field name containing a dot on root"
@@ -190,7 +190,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).field( "foo.bar", this::irrelevantTypeContributor );
 				} ),
 				"field name containing a dot on non-root"
@@ -210,7 +210,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "foo.bar" );
 				} ),
 				"object field name containing a dot on root"
@@ -230,7 +230,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).objectField( "foo.bar" );
 				} ),
 				"object field name containing a dot on non-root"
@@ -253,7 +253,7 @@ public class IndexSchemaElementFieldIT {
 	public void nameCollision_fields() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field( "field1", f -> f.asString() );
 					root.field( "field1", this::irrelevantTypeContributor );
 				} ),
@@ -269,7 +269,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.field( "field1", f -> f.asString() );
@@ -290,7 +290,7 @@ public class IndexSchemaElementFieldIT {
 	public void nameCollision_objectFields() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "field1" );
 					root.objectField( "field1" );
 				} ),
@@ -306,7 +306,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.objectField( "field1" );
@@ -327,7 +327,7 @@ public class IndexSchemaElementFieldIT {
 	public void nameCollision_fieldAndObjectField() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field( "field1", f -> f.asString() );
 					root.objectField( "field1" );
 				} ),
@@ -343,7 +343,7 @@ public class IndexSchemaElementFieldIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.field( "field1", f -> f.asString() );
@@ -364,7 +364,7 @@ public class IndexSchemaElementFieldIT {
 	public void missingToReferenceCall() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.field( "myField", this::irrelevantTypeContributor );
 				} ),
 				"Missing toReference() call after field()"
@@ -378,7 +378,7 @@ public class IndexSchemaElementFieldIT {
 						.build() );
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "myField" );
 				} ),
 				"Missing toReference() call after objectField()"
@@ -396,7 +396,7 @@ public class IndexSchemaElementFieldIT {
 	public void multipleToReferenceCall() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaFieldFinalStep<?> context = root.field(
 							"myField",
 							this::irrelevantTypeContributor
@@ -415,7 +415,7 @@ public class IndexSchemaElementFieldIT {
 						.build() );
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField context = root.objectField( "myField" );
 					context.toReference();
 					context.toReference();

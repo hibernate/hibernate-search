@@ -39,7 +39,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	StubMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider,
 			boolean multiTenancyEnabled) {
-		this.failureCollector = buildContext.getFailureCollector();
+		this.failureCollector = buildContext.failureCollector();
 		this.contributorProvider = contributorProvider;
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
@@ -51,7 +51,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 
 	@Override
 	public void prepareIndexedTypes(Consumer<Optional<String>> backendNameCollector) {
-		contributorProvider.getTypesContributedTo()
+		contributorProvider.typesContributedTo()
 				.forEach( type -> {
 					try {
 						prepareType( type, backendNameCollector );
@@ -70,7 +70,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 
 	@Override
 	public void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
-		contributorProvider.getTypesContributedTo()
+		contributorProvider.typesContributedTo()
 				.forEach( type -> {
 					try {
 						mapTypeIfIndexed( type, indexManagerFactory );
@@ -89,11 +89,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 					this,
 					mappedIndex.backendName(),
 					mappedIndex.name(),
-					type.getName(),
+					type.name(),
 					multiTenancyEnabled
 			);
 			indexManagerBuilders.put( (StubTypeModel) type, indexManagerBuilder );
-			mappedIndex.bind( indexManagerBuilder.getRootBindingContext() );
+			mappedIndex.bind( indexManagerBuilder.rootBindingContext() );
 		} );
 	}
 

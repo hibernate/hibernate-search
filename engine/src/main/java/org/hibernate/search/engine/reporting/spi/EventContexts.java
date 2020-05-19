@@ -66,7 +66,7 @@ public class EventContexts {
 	private EventContexts() {
 	}
 
-	public static EventContext getDefault() {
+	public static EventContext defaultContext() {
 		return DEFAULT;
 	}
 
@@ -82,7 +82,7 @@ public class EventContexts {
 		return EventContext.create( new AbstractSimpleEventContextElement<MappableTypeModel>( typeModel ) {
 			@Override
 			public String render(MappableTypeModel param) {
-				String typeName = param.getName();
+				String typeName = param.name();
 				return MESSAGES.type( typeName );
 			}
 		} );

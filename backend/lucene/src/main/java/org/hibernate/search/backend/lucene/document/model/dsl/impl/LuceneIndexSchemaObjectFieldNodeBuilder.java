@@ -49,7 +49,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return getRootNodeBuilder().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
@@ -62,7 +62,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	@Override
 	public IndexObjectFieldReference toReference() {
 		if ( reference != null ) {
-			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
+			throw log.cannotCreateReferenceMultipleTimes( eventContext() );
 		}
 		this.reference = new LuceneIndexObjectFieldReference();
 		return reference;
@@ -72,7 +72,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
 			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent) {
 		if ( reference == null ) {
-			throw log.incompleteFieldDefinition( getEventContext() );
+			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
 		List<AbstractLuceneIndexSchemaFieldNode> staticChildren = new ArrayList<>();

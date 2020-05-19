@@ -74,7 +74,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 		Set<C> targetedTypeExtendedContexts =
 				targetedTypeContexts.stream()
 						.map( PojoScopeIndexedTypeContext::getTypeIdentifier )
-						.map( indexedTypeExtendedContextProvider::getByExactType )
+						.map( indexedTypeExtendedContextProvider::forExactType )
 						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new PojoScopeDelegateImpl<>(

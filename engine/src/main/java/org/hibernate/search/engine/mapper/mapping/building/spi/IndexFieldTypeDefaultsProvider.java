@@ -18,7 +18,7 @@ public class IndexFieldTypeDefaultsProvider {
 		this.decimalScale = decimalScale;
 	}
 
-	public Integer getDecimalScale() {
+	public Integer decimalScale() {
 		return decimalScale;
 	}
 

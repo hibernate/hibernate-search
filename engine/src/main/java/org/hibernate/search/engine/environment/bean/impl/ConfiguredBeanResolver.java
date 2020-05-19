@@ -64,7 +64,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		try {
-			return beanProvider.getBean( typeReference );
+			return beanProvider.forType( typeReference );
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, null );
@@ -76,7 +76,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
 		try {
-			return beanProvider.getBean( typeReference, nameReference );
+			return beanProvider.forTypeAndName( typeReference, nameReference );
 		}
 		catch (SearchException e) {
 			return fallbackToConfiguredBeans( e, typeReference, nameReference );

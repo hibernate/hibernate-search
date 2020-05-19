@@ -33,18 +33,18 @@ public abstract class AbstractSearchQuerySelectStep<
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional(
-						this, getIndexScope(), getSessionContext(), getLoadingContextBuilder()
+						this, indexScope(), sessionContext(), loadingContextBuilder()
 				)
 		);
 	}
 
 	protected final SearchProjectionFactory<R, E> createDefaultProjectionFactory() {
-		return new DefaultSearchProjectionFactory<>( getIndexScope().getSearchProjectionFactory() );
+		return new DefaultSearchProjectionFactory<>( indexScope().searchProjectionFactory() );
 	}
 
-	protected abstract IndexScope<C> getIndexScope();
+	protected abstract IndexScope<C> indexScope();
 
-	protected abstract BackendSessionContext getSessionContext();
+	protected abstract BackendSessionContext sessionContext();
 
-	protected abstract LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder();
+	protected abstract LoadingContextBuilder<R, E, LOS> loadingContextBuilder();
 }

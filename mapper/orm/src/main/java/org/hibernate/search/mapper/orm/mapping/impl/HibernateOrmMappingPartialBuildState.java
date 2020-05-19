@@ -29,8 +29,8 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 		return HibernateOrmMapping.create(
 				mappingDelegate, typeContextContainerBuilder.build( sessionFactoryImplementor ),
 				sessionFactoryImplementor,
-				context.getConfigurationPropertySource(),
-				context.getBeanResolver()
+				context.configurationPropertySource(),
+				context.beanResolver()
 		);
 	}
 

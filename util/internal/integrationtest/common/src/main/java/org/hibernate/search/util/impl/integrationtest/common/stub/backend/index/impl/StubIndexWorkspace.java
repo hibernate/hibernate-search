@@ -36,7 +36,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.PURGE )
-				.tenantIdentifier( sessionContext.getTenantIdentifier() )
+				.tenantIdentifier( sessionContext.tenantIdentifier() )
 				.routingKeys( routingKeys )
 				.build();
 		return behavior.executeIndexScaleWork( indexName, work );

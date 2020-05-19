@@ -181,7 +181,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 				)
 				.setup();
 
-		operation.apply( index.getSchemaManager() ).join();
+		operation.apply( index.schemaManager() ).join();
 	}
 
 }

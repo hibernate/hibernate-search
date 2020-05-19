@@ -18,8 +18,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 public class SearchIndexingPlanExecutionReportImpl implements SearchIndexingPlanExecutionReport {
 
 	public static SearchIndexingPlanExecutionReport from(IndexIndexingPlanExecutionReport<EntityReference> indexReport) {
-		Throwable throwable = indexReport.getThrowable().orElse( null );
-		List<EntityReference> failingEntities = indexReport.getFailingEntityReferences();
+		Throwable throwable = indexReport.throwable().orElse( null );
+		List<EntityReference> failingEntities = indexReport.failingEntityReferences();
 		if ( throwable == null && !failingEntities.isEmpty() ) {
 			throwable = new AssertionFailure(
 					"Unknown throwable: missing throwable when reporting the failure."

@@ -28,12 +28,12 @@ public class StubBackendSessionContext implements BackendSessionContext {
 	}
 
 	@Override
-	public BackendMappingContext getMappingContext() {
+	public BackendMappingContext mappingContext() {
 		return mappingContext;
 	}
 
 	@Override
-	public String getTenantIdentifier() {
+	public String tenantIdentifier() {
 		return tenantIdentifier;
 	}
 }

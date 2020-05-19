@@ -28,14 +28,14 @@ final class BeanProviderOnlyBeanResolver implements BeanResolver {
 	@Override
 	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
-		return beanProvider.getBean( typeReference );
+		return beanProvider.forType( typeReference );
 	}
 
 	@Override
 	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
-		return beanProvider.getBean( typeReference, nameReference );
+		return beanProvider.forTypeAndName( typeReference, nameReference );
 	}
 
 	@Override

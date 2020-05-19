@@ -85,7 +85,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		@Override
-		public EventContext getEventContext() {
+		public EventContext eventContext() {
 			return EventContexts.fromIndexFieldAbsolutePath( getAbsolutePath() );
 		}
 

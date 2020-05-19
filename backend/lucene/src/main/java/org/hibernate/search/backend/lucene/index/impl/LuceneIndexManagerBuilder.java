@@ -35,7 +35,7 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder {
 	}
 
 	@Override
-	public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+	public IndexSchemaRootNodeBuilder schemaRootNodeBuilder() {
 		return schemaRootNodeBuilder;
 	}
 

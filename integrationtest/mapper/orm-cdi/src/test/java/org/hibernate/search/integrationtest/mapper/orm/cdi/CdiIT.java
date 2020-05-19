@@ -122,9 +122,9 @@ public class CdiIT {
 		List<BeanHolder<T>> retrievedBeans = new ArrayList<>();
 
 		backendMock.onCreate( context -> {
-			BeanHolder<T> retrievedBean1 = context.getBeanResolver().resolve( reference );
+			BeanHolder<T> retrievedBean1 = context.beanResolver().resolve( reference );
 			retrievedBeans.add( retrievedBean1 );
-			BeanHolder<T> retrievedBean2 = context.getBeanResolver().resolve( reference );
+			BeanHolder<T> retrievedBean2 = context.beanResolver().resolve( reference );
 			retrievedBeans.add( retrievedBean2 );
 		} );
 		backendMock.onStop( () -> {

@@ -94,7 +94,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext, EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentRefreshStrategy refreshStrategy) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexIndexingPlan<>(
 				link.getWorkBuilderFactory(), orchestrator,
@@ -110,7 +110,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexIndexer( link.getWorkBuilderFactory(), orchestrator,
 				indexManagerContext, sessionContext
@@ -120,7 +120,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	@Override
 	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkspace(
 				link.getWorkBuilderFactory(), multiTenancyStrategy, generalPurposeOrchestrator,
@@ -150,7 +150,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
-		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
+		multiTenancyStrategy.checkTenantId( sessionContext.tenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
 				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
 				generalPurposeOrchestrator,

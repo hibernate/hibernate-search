@@ -47,7 +47,7 @@ public class DelegatingSearchAggregationFactory<PDF extends SearchPredicateFacto
 		return delegate.extension( extension );
 	}
 
-	protected SearchAggregationFactory getDelegate() {
+	protected SearchAggregationFactory delegate() {
 		return delegate;
 	}
 }

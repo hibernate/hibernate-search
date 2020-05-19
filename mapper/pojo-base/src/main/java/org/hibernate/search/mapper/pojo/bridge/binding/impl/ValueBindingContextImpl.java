@@ -71,7 +71,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory( defaultsProvider );
 		this.listener = new PojoIndexSchemaContributionListener();
-		this.schemaElement = indexBindingContext.getSchemaElement( listener );
+		this.schemaElement = indexBindingContext.schemaElement( listener );
 		this.relativeFieldName = relativeFieldName;
 		this.contributor = contributor;
 	}

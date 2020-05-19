@@ -129,7 +129,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				transactionalContext,
 				getNotifier(),
 				new IdentifierProducer<>(
-						mappingContext.getSessionFactory(), sessionContext.getTenantIdentifier(),
+						mappingContext.getSessionFactory(), sessionContext.tenantIdentifier(),
 						getNotifier(),
 						primaryKeyStream,
 						objectLoadingBatchSize,
@@ -137,7 +137,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 						objectsLimit,
 						idFetchSize
 				),
-				transactionTimeout, sessionContext.getTenantIdentifier()
+				transactionTimeout, sessionContext.tenantIdentifier()
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
@@ -154,7 +154,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	private void startIndexing() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
-				mappingContext, sessionContext.getTenantIdentifier(),
+				mappingContext, sessionContext.tenantIdentifier(),
 				getNotifier(),
 				type, idAttributeOfType,
 				primaryKeyStream,

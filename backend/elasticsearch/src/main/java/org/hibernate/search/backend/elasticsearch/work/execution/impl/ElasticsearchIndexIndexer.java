@@ -34,7 +34,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 		this.factory = factory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
-		this.tenantId = sessionContext.getTenantIdentifier();
+		this.tenantId = sessionContext.tenantIdentifier();
 	}
 
 	@Override
@@ -54,12 +54,12 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 	@Override
 	public CompletableFuture<?> delete(DocumentReferenceProvider referenceProvider,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		String id = referenceProvider.getIdentifier();
+		String id = referenceProvider.identifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
-		String routingKey = referenceProvider.getRoutingKey();
+		String routingKey = referenceProvider.routingKey();
 
 		SingleDocumentIndexingWork work = factory.delete(
-				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+				indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				elasticsearchId, routingKey
 		)
@@ -72,14 +72,14 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 	private CompletableFuture<?> index(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
 			DocumentRefreshStrategy refreshStrategy) {
-		String id = referenceProvider.getIdentifier();
+		String id = referenceProvider.identifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
-		String routingKey = referenceProvider.getRoutingKey();
+		String routingKey = referenceProvider.routingKey();
 
 		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
 		SingleDocumentIndexingWork work = factory.index(
-				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+				indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				elasticsearchId, routingKey, document
 		)

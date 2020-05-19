@@ -30,7 +30,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return getRootNodeBuilder().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( builder.getAbsolutePath() ) );
 	}

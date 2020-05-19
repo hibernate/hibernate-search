@@ -43,27 +43,27 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	}
 
 	@Override
-	public StubSearchPredicateBuilderFactory getSearchPredicateBuilderFactory() {
+	public StubSearchPredicateBuilderFactory searchPredicateBuilderFactory() {
 		return predicateFactory;
 	}
 
 	@Override
-	public StubSearchSortBuilderFactory getSearchSortBuilderFactory() {
+	public StubSearchSortBuilderFactory searchSortBuilderFactory() {
 		return sortFactory;
 	}
 
 	@Override
-	public StubSearchQueryBuilderFactory getSearchQueryBuilderFactory() {
+	public StubSearchQueryBuilderFactory searchQueryBuilderFactory() {
 		return queryFactory;
 	}
 
 	@Override
-	public SearchProjectionBuilderFactory getSearchProjectionFactory() {
+	public SearchProjectionBuilderFactory searchProjectionFactory() {
 		return projectionFactory;
 	}
 
 	@Override
-	public SearchAggregationBuilderFactory<? super StubQueryElementCollector> getSearchAggregationFactory() {
+	public SearchAggregationBuilderFactory<? super StubQueryElementCollector> searchAggregationFactory() {
 		return aggregationFactory;
 	}
 

@@ -81,7 +81,7 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	protected CompletableFuture<?> getCompletion() {
+	protected CompletableFuture<?> completion() {
 		// Works are executed synchronously.
 		return CompletableFuture.completedFuture( null );
 	}

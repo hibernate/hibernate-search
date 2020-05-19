@@ -29,7 +29,7 @@ public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		TermsAggregationBuilder<F> builder =
-				dslContext.getBuilderFactory().createTermsAggregationBuilder( absoluteFieldPath, type, convert );
+				dslContext.builderFactory().createTermsAggregationBuilder( absoluteFieldPath, type, convert );
 		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

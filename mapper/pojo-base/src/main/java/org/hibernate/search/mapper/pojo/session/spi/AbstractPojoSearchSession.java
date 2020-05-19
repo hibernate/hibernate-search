@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.session.spi;
 
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -30,6 +31,12 @@ public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionCon
 		this.sessionBasedBridgeOperationContext = new SessionBasedBridgeOperationContext( this );
 	}
 
+	@Override
+	public BackendMappingContext mappingContext() {
+		return mappingContext;
+	}
+
+	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
 	@Override
 	public PojoSearchSessionMappingContext getMappingContext() {
 		return mappingContext;

@@ -137,7 +137,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 				.withIndex( index )
 				.setup();
 
-		operation.apply( index.getSchemaManager() ).join();
+		operation.apply( index.schemaManager() ).join();
 	}
 
 }

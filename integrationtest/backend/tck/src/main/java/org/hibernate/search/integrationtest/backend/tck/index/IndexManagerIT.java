@@ -37,7 +37,7 @@ public class IndexManagerIT {
 		SearchIntegration integration = setupHelper.start( BACKEND_NAME ).withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
-		backendApi = integration.getBackend( BACKEND_NAME );
+		backendApi = integration.backend( BACKEND_NAME );
 		indexApi = index.toApi();
 	}
 

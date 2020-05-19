@@ -28,7 +28,7 @@ public interface MappedIndexManager {
 
 	IndexManager toAPI();
 
-	IndexSchemaManager getSchemaManager();
+	IndexSchemaManager schemaManager();
 
 	<R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
 			EntityReferenceFactory<R> entityReferenceFactory,

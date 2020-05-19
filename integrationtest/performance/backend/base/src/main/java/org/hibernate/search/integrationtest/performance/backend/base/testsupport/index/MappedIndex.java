@@ -35,7 +35,7 @@ public class MappedIndex extends StubMappedIndex {
 
 	@Override
 	protected void bind(IndexedEntityBindingContext context) {
-		IndexSchemaElement root = context.getSchemaElement();
+		IndexSchemaElement root = context.schemaElement();
 		shortTextField = root.field(
 				SHORT_TEXT_FIELD_NAME,
 				f -> f.asString().normalizer( Analyzers.NORMALIZER_ENGLISH ).sortable( Sortable.YES )

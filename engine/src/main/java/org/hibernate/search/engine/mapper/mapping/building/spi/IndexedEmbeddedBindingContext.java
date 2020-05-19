@@ -20,6 +20,6 @@ public interface IndexedEmbeddedBindingContext extends IndexBindingContext {
 	/**
 	 * @return The list of index object fields between the parent binding context and this context.
 	 */
-	Collection<IndexObjectFieldReference> getParentIndexObjectReferences();
+	Collection<IndexObjectFieldReference> parentIndexObjectReferences();
 
 }

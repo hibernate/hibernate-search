@@ -25,17 +25,17 @@ class MappingStartContextImpl implements MappingStartContext {
 	}
 
 	@Override
-	public ContextualFailureCollector getFailureCollector() {
+	public ContextualFailureCollector failureCollector() {
 		return failureCollector;
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return beanResolver;
 	}
 
 	@Override
-	public ConfigurationPropertySource getConfigurationPropertySource() {
+	public ConfigurationPropertySource configurationPropertySource() {
 		return configurationPropertySource;
 	}
 }

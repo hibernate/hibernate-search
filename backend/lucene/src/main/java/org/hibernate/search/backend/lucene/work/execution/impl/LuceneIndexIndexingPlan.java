@@ -47,7 +47,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
-		this.tenantId = sessionContext.getTenantIdentifier();
+		this.tenantId = sessionContext.tenantIdentifier();
 		this.entityReferenceFactory = entityReferenceFactory;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
@@ -56,13 +56,13 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
-		String id = referenceProvider.getIdentifier();
-		String routingKey = referenceProvider.getRoutingKey();
+		String id = referenceProvider.identifier();
+		String routingKey = referenceProvider.routingKey();
 
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		collect( id, routingKey, factory.add(
-				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				id, indexEntry
 		) );
 	}
@@ -70,24 +70,24 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
-		String id = referenceProvider.getIdentifier();
-		String routingKey = referenceProvider.getRoutingKey();
+		String id = referenceProvider.identifier();
+		String routingKey = referenceProvider.routingKey();
 
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		collect( id, routingKey, factory.update(
-				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				id, indexEntry
 		) );
 	}
 
 	@Override
 	public void delete(DocumentReferenceProvider referenceProvider) {
-		String id = referenceProvider.getIdentifier();
-		String routingKey = referenceProvider.getRoutingKey();
+		String id = referenceProvider.identifier();
+		String routingKey = referenceProvider.routingKey();
 
 		collect( id, routingKey, factory.delete(
-				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
 				id
 		) );
 	}

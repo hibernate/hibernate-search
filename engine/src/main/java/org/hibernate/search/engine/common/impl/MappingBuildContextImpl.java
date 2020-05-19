@@ -20,7 +20,7 @@ class MappingBuildContextImpl extends DelegatingBuildContext implements MappingB
 	}
 
 	@Override
-	public ContextualFailureCollector getFailureCollector() {
+	public ContextualFailureCollector failureCollector() {
 		return failureCollector;
 	}
 }

@@ -41,7 +41,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	public void nullName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.fieldTemplate( null, this::irrelevantTypeContributor );
 				} )
 		)
@@ -55,7 +55,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" )
 							.fieldTemplate( null, this::irrelevantTypeContributor );
 				} )
@@ -70,7 +70,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectFieldTemplate( null );
 				} )
 		)
@@ -84,7 +84,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).objectFieldTemplate( null );
 				} )
 		)
@@ -101,7 +101,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	public void emptyName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.fieldTemplate( "", this::irrelevantTypeContributor );
 				} )
 		)
@@ -115,7 +115,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).fieldTemplate( "", this::irrelevantTypeContributor );
 				} )
 		)
@@ -129,7 +129,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectFieldTemplate( "" );
 				} )
 		)
@@ -143,7 +143,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).objectFieldTemplate( "" );
 				} )
 		)
@@ -160,7 +160,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	public void dotInName() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.fieldTemplate( "foo.bar", this::irrelevantTypeContributor );
 				} )
 		)
@@ -176,7 +176,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).fieldTemplate( "foo.bar", this::irrelevantTypeContributor );
 				} )
 		)
@@ -192,7 +192,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectFieldTemplate( "foo.bar" );
 				} )
 		)
@@ -208,7 +208,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectField( "nonRoot" ).objectFieldTemplate( "foo.bar" );
 				} )
 		)
@@ -227,7 +227,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	public void nameCollision_fieldTemplates() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.fieldTemplate( "field1", this::irrelevantTypeContributor );
 					root.fieldTemplate( "field1", this::irrelevantTypeContributor );
 				} )
@@ -242,7 +242,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.fieldTemplate( "field1", this::irrelevantTypeContributor );
@@ -262,7 +262,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	public void nameCollision_objectFieldTemplates() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.objectFieldTemplate( "field1" );
 					root.objectFieldTemplate( "field1" );
 				} )
@@ -277,7 +277,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.objectFieldTemplate( "field1" );
@@ -297,7 +297,7 @@ public class IndexSchemaElementFieldTemplateIT {
 	public void nameCollision_fieldTemplateAndObjectFieldTemplate() {
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					root.fieldTemplate( "field1", f -> f.asString() );
 					root.objectFieldTemplate( "field1" );
 				} )
@@ -312,7 +312,7 @@ public class IndexSchemaElementFieldTemplateIT {
 
 		assertThatThrownBy(
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
+					IndexSchemaElement root = ctx.schemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.fieldTemplate( "field1", f -> f.asString() );
