@@ -45,20 +45,20 @@ public class SearchResultAssert<H> {
 	}
 
 	public AbstractLongAssert<?> totalHitCount() {
-		return Assertions.assertThat( actual.getTotalHitCount() )
+		return Assertions.assertThat( actual.totalHitCount() )
 				.as( "Total hit count of " + queryDescription );
 	}
 
 	public SearchHitsAssert<H> hits() {
-		return SearchHitsAssert.<H>assertThat( actual.getHits() ).as( "Hits of " + queryDescription );
+		return SearchHitsAssert.<H>assertThat( actual.hits() ).as( "Hits of " + queryDescription );
 	}
 
 	public <A> ObjectAssert<A> aggregation(AggregationKey<A> key) {
-		return Assertions.assertThat( actual.getAggregation( key ) );
+		return Assertions.assertThat( actual.aggregation( key ) );
 	}
 
 	public <A> SearchResultAssert<H> aggregation(AggregationKey<A> key, Consumer<A> assertion) {
-		assertion.accept( actual.getAggregation( key ) );
+		assertion.accept( actual.aggregation( key ) );
 		return this;
 	}
 

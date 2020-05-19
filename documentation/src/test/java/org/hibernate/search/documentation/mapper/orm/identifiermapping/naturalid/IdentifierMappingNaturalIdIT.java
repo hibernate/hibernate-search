@@ -72,7 +72,7 @@ public class IdentifierMappingNaturalIdIT {
 					.fetchHits( 20 );
 
 			assertThat( result )
-					.extracting( DocumentReference::getId )
+					.extracting( DocumentReference::id )
 					.containsExactly( "9780586008355" );
 		} );
 	}

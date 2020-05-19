@@ -73,7 +73,7 @@ public class IdentifierMappingCustomTypeIT {
 					.fetchHits( 20 );
 
 			assertThat( result )
-					.extracting( DocumentReference::getId )
+					.extracting( DocumentReference::id )
 					.containsExactly( "978-0-58-600835-5" );
 		} );
 	}

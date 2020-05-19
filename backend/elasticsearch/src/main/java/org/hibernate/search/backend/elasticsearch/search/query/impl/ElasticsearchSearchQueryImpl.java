@@ -87,13 +87,13 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public String getQueryString() {
+	public String queryString() {
 		return payload.toString();
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + getQueryString() + "]";
+		return getClass().getSimpleName() + "[" + queryString() + "]";
 	}
 
 	@Override

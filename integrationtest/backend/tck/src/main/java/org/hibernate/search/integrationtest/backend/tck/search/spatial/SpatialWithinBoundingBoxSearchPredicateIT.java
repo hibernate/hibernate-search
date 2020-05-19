@@ -69,8 +69,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" )
-						.boundingBox( BOUNDING_BOX_2.getTopLeft().getLatitude(), BOUNDING_BOX_2.getTopLeft().getLongitude(),
-								BOUNDING_BOX_2.getBottomRight().getLatitude(), BOUNDING_BOX_2.getBottomRight().getLongitude() )
+						.boundingBox( BOUNDING_BOX_2.topLeft().latitude(), BOUNDING_BOX_2.topLeft().longitude(),
+								BOUNDING_BOX_2.bottomRight().latitude(), BOUNDING_BOX_2.bottomRight().longitude() )
 				)
 				.toQuery();
 
@@ -79,8 +79,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = scope.query()
 				.where( f -> f.spatial().within().field( "geoPoint" )
-						.boundingBox( BOUNDING_BOX_1.getTopLeft().getLatitude(), BOUNDING_BOX_1.getTopLeft().getLongitude(),
-								BOUNDING_BOX_1.getBottomRight().getLatitude(), BOUNDING_BOX_1.getBottomRight().getLongitude() )
+						.boundingBox( BOUNDING_BOX_1.topLeft().latitude(), BOUNDING_BOX_1.topLeft().longitude(),
+								BOUNDING_BOX_1.bottomRight().latitude(), BOUNDING_BOX_1.bottomRight().longitude() )
 				)
 				.toQuery();
 
@@ -432,7 +432,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	}
 
 	private static GeoBoundingBox moveBoundingBox(GeoBoundingBox originalBoundingBox, double degrees) {
-		return GeoBoundingBox.of( originalBoundingBox.getTopLeft().getLatitude() + degrees, originalBoundingBox.getTopLeft().getLongitude() + degrees,
-				originalBoundingBox.getBottomRight().getLatitude() + degrees, originalBoundingBox.getBottomRight().getLongitude() + degrees );
+		return GeoBoundingBox.of( originalBoundingBox.topLeft().latitude() + degrees, originalBoundingBox.topLeft().longitude() + degrees,
+				originalBoundingBox.bottomRight().latitude() + degrees, originalBoundingBox.bottomRight().longitude() + degrees );
 	}
 }

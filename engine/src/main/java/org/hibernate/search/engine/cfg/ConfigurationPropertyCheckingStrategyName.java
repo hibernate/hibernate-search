@@ -30,7 +30,7 @@ public enum ConfigurationPropertyCheckingStrategyName {
 	public static ConfigurationPropertyCheckingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				ConfigurationPropertyCheckingStrategyName.values(),
-				ConfigurationPropertyCheckingStrategyName::getExternalRepresentation,
+				ConfigurationPropertyCheckingStrategyName::externalRepresentation,
 				log::invalidConfigurationPropertyCheckingStrategyName,
 				value
 		);
@@ -42,8 +42,20 @@ public enum ConfigurationPropertyCheckingStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	public String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	public String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation} instead.
+	 */
+	@Deprecated
+	public String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 
 }

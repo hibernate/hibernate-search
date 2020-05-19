@@ -25,12 +25,12 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	private static final GeoPoint METRO_HOTEL_DE_VILLE = GeoPoint.of( 45.7673396, 4.833743 );
 	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
-	private static final GeoPoint METRO_HOTEL_DE_VILLE_1 = GeoPoint.of( METRO_HOTEL_DE_VILLE.getLatitude() - 1,
-			METRO_HOTEL_DE_VILLE.getLongitude() - 1 );
-	private static final GeoPoint METRO_HOTEL_DE_VILLE_2 = GeoPoint.of( METRO_HOTEL_DE_VILLE.getLatitude() - 2,
-			METRO_HOTEL_DE_VILLE.getLongitude() - 2 );
-	private static final GeoPoint METRO_GARIBALDI_1 = GeoPoint.of( METRO_GARIBALDI.getLatitude() - 1, METRO_GARIBALDI.getLongitude() - 1 );
-	private static final GeoPoint METRO_GARIBALDI_2 = GeoPoint.of( METRO_GARIBALDI.getLatitude() - 2, METRO_GARIBALDI.getLongitude() - 2 );
+	private static final GeoPoint METRO_HOTEL_DE_VILLE_1 = GeoPoint.of( METRO_HOTEL_DE_VILLE.latitude() - 1,
+			METRO_HOTEL_DE_VILLE.longitude() - 1 );
+	private static final GeoPoint METRO_HOTEL_DE_VILLE_2 = GeoPoint.of( METRO_HOTEL_DE_VILLE.latitude() - 2,
+			METRO_HOTEL_DE_VILLE.longitude() - 2 );
+	private static final GeoPoint METRO_GARIBALDI_1 = GeoPoint.of( METRO_GARIBALDI.latitude() - 1, METRO_GARIBALDI.longitude() - 1 );
+	private static final GeoPoint METRO_GARIBALDI_2 = GeoPoint.of( METRO_GARIBALDI.latitude() - 2, METRO_GARIBALDI.longitude() - 2 );
 
 	@Test
 	public void within_circle() {
@@ -59,7 +59,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		query = scope.query()
 				.where( f -> f.spatial().within()
 						.field( "geoPoint" )
-						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1_500 )
+						.circle( METRO_GARIBALDI.latitude(), METRO_GARIBALDI.longitude(), 1_500 )
 				)
 				.toQuery();
 
@@ -69,7 +69,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		query = scope.query()
 				.where( f -> f.spatial().within()
 						.field( "geoPoint" )
-						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1.5, DistanceUnit.KILOMETERS )
+						.circle( METRO_GARIBALDI.latitude(), METRO_GARIBALDI.longitude(), 1.5, DistanceUnit.KILOMETERS )
 				)
 				.toQuery();
 

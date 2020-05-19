@@ -120,7 +120,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 			AggregationKey<?> key = entry.getKey();
 			ElasticsearchSearchAggregation<?> aggregation = entry.getValue();
 
-			Object extracted = aggregation.extract( jsonAggregations.getAsJsonObject( key.getName() ), extractContext );
+			Object extracted = aggregation.extract( jsonAggregations.getAsJsonObject( key.name() ), extractContext );
 			extractedMap.put( key, extracted );
 		}
 

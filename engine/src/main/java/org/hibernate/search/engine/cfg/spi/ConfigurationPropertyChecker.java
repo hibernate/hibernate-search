@@ -101,7 +101,7 @@ public class ConfigurationPropertyChecker {
 			log.configurationPropertyTrackingUnusedProperties(
 					unconsumedPropertyKeys,
 					configurationPropertyCheckingStrategyPropertyName,
-					ConfigurationPropertyCheckingStrategyName.IGNORE.getExternalRepresentation()
+					ConfigurationPropertyCheckingStrategyName.IGNORE.externalRepresentation()
 			);
 		}
 	}

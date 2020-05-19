@@ -34,7 +34,7 @@ final class ImmutableGeoPolygon implements GeoPolygon {
 	}
 
 	@Override
-	public List<GeoPoint> getPoints() {
+	public List<GeoPoint> points() {
 		return points;
 	}
 

@@ -22,6 +22,6 @@ class LuceneGeoPointSpatialWithinCirclePredicateBuilder extends AbstractLuceneSp
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.getLatitude(), center.getLongitude(), radiusInMeters );
+		return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.latitude(), center.longitude(), radiusInMeters );
 	}
 }

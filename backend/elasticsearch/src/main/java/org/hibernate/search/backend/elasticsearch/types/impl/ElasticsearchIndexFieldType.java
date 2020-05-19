@@ -78,22 +78,22 @@ public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescri
 	}
 
 	@Override
-	public boolean isSearchable() {
+	public boolean searchable() {
 		return predicateBuilderFactory.isSearchable();
 	}
 
 	@Override
-	public boolean isSortable() {
+	public boolean sortable() {
 		return sortBuilderFactory.isSortable();
 	}
 
 	@Override
-	public boolean isProjectable() {
+	public boolean projectable() {
 		return projectionBuilderFactory.isProjectable();
 	}
 
 	@Override
-	public boolean isAggregable() {
+	public boolean aggregable() {
 		return aggregationBuilderFactory.isAggregable();
 	}
 

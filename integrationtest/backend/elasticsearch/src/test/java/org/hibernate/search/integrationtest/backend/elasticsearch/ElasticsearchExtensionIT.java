@@ -810,7 +810,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<JsonObject> result = query.fetchAll().getHits();
+		List<JsonObject> result = query.fetchAll().hits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
@@ -845,7 +845,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<JsonObject> result = query.fetchAll().getHits().stream()
+		List<JsonObject> result = query.fetchAll().hits().stream()
 				.map( list -> (JsonObject) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result ).hasSize( 1 );
@@ -873,7 +873,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<JsonObject> result = query.fetchAll().getHits();
+		List<JsonObject> result = query.fetchAll().hits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) )
 				.asString()
@@ -890,7 +890,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<JsonObject> result = query.fetchAll().getHits();
+		List<JsonObject> result = query.fetchAll().hits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
@@ -939,7 +939,7 @@ public class ElasticsearchExtensionIT {
 						JsonObject.class
 				) ) )
 				.toQuery();
-		JsonObject aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
+		JsonObject aggregationResult = query.fetchAll().aggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
 						+ "'value': 3"
@@ -966,7 +966,7 @@ public class ElasticsearchExtensionIT {
 								+ "}"
 				) )
 				.toQuery();
-		JsonObject aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
+		JsonObject aggregationResult = query.fetchAll().aggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
 						+ "'value': 3"

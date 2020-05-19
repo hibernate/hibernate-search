@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.impl.Contracts;
  *
  * @param <A> The type of result for this aggregation.
  *
- * @see SearchResult#getAggregation(AggregationKey)
+ * @see SearchResult#aggregation(AggregationKey)
  */
 public final class AggregationKey<A> {
 
@@ -58,7 +58,19 @@ public final class AggregationKey<A> {
 		return Objects.hash( name );
 	}
 
-	public String getName() {
+	/**
+	 * @return The name passed to {@link #of(String)}.
+	 */
+	public String name() {
 		return name;
+	}
+
+	/**
+	 * @return The name passed to {@link #of(String)}.
+	 * @deprecated Use {@link #name()} instead.
+	 */
+	@Deprecated
+	public String getName() {
+		return name();
 	}
 }

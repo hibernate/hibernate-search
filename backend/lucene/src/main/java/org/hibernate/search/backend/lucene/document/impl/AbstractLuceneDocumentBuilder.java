@@ -159,7 +159,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		LuceneIndexFieldType<F> type = node.type();
 		String absolutePath = node.absolutePath();
 
-		if ( !node.isMultiValued() ) {
+		if ( !node.multiValued() ) {
 			checkNoValueYetForSingleValued( absolutePath );
 		}
 
@@ -172,7 +172,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 
 		String absolutePath = node.absolutePath();
 
-		if ( !node.isMultiValued() ) {
+		if ( !node.multiValued() ) {
 			checkNoValueYetForSingleValued( absolutePath );
 		}
 

@@ -141,7 +141,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 						.where( f -> f.matchAll() )
 						.toQuery();
 
-				assertThat( query.fetchAll().getHits() )
+				assertThat( query.fetchAll().hits() )
 						.containsExactly( EntityReferenceImpl.withName(
 								expectations.getTypeWithIdentifierBridge1(),
 								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,

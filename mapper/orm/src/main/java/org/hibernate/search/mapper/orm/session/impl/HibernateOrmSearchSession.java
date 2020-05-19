@@ -216,14 +216,14 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	@Override
 	public EntityReference fromDocumentReference(DocumentReference reference) {
 		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.getIndexedByJpaEntityName( reference.getTypeName() );
+				typeContextProvider.getIndexedByJpaEntityName( reference.typeName() );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Document reference " + reference + " refers to an unknown type"
 			);
 		}
 		Object id = typeContext.getIdentifierMapping()
-				.fromDocumentIdentifier( reference.getId(), this );
+				.fromDocumentIdentifier( reference.id(), this );
 		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getJpaEntityName(), id );
 	}
 

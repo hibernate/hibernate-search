@@ -126,7 +126,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void assertHasHitsWithBooleanProperties(SearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
-		List<DocumentReference> hits = query.fetchAll().getHits();
+		List<DocumentReference> hits = query.fetchAll().hits();
 		assertEquals( expectedPropertyValues.length, hits.size() );
 
 		for ( int i = 0; i < expectedPropertyValues.length; i++ ) {
@@ -145,17 +145,17 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private boolean isTrueDocument(DocumentReference documentReference) {
-		String id = documentReference.getId();
+		String id = documentReference.id();
 		return DOCUMENT_1.equals( id ) || DOCUMENT_3.equals( id );
 	}
 
 	private boolean isFalseDocument(DocumentReference documentReference) {
-		String id = documentReference.getId();
+		String id = documentReference.id();
 		return DOCUMENT_2.equals( id ) || DOCUMENT_5.equals( id );
 	}
 
 	private boolean isNullDocument(DocumentReference documentReference) {
-		String id = documentReference.getId();
+		String id = documentReference.id();
 		return DOCUMENT_4.equals( id );
 	}
 

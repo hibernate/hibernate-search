@@ -87,7 +87,7 @@ public class GettingStartedWithAnalysisIT {
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
 
-			assertThat( result.getHits() ).extracting( "id" )
+			assertThat( result.hits() ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
@@ -102,7 +102,7 @@ public class GettingStartedWithAnalysisIT {
 								.matching( term )
 						)
 						.fetch( 20 );
-				assertThat( result.getHits() ).as( "Result of searching for '" + term + "'" )
+				assertThat( result.hits() ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
 						.containsExactlyInAnyOrder( bookIdHolder.get() );
 			}

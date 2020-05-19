@@ -96,7 +96,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class ) )
 					.fetch( 20 ); // <5>
 
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey ); // <6>
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey ); // <6>
 			// end::entryPoint-lambdas[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -121,7 +121,7 @@ public class AggregationDslIT {
 							.toAggregation() )
 					.fetch( 20 );
 
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::entryPoint-objects[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -140,7 +140,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class ) ) // <1>
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -157,7 +157,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", String.class, ValueConvert.NO ) )
 					.fetch( 20 );
-			Map<String, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<String, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-noConverter[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -175,7 +175,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class )
 							.maxTermCount( 1 ) )
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-max-term-count[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -192,7 +192,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class )
 							.minDocumentCount( 0 ) )
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-min-doc-count-zero[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -210,7 +210,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class )
 							.minDocumentCount( 2 ) )
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-min-doc-count-high[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -227,7 +227,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class )
 							.orderByTermAscending() )
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-order-term-ascending[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -245,7 +245,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class )
 							.orderByTermDescending() )
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-order-term-descending[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -263,7 +263,7 @@ public class AggregationDslIT {
 							.field( "genre", Genre.class )
 							.orderByCountAscending() )
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.getAggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
 			// end::terms-order-count-ascending[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -287,7 +287,7 @@ public class AggregationDslIT {
 							.range( 20.0, null ) // <3>
 					)
 					.fetch( 20 );
-			Map<Range<Double>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::range[]
 			assertThat( countsByPrice )
 					.containsExactly(
@@ -310,7 +310,7 @@ public class AggregationDslIT {
 							.range( Range.atLeast( 20.0 ) ) // <3>
 					)
 					.fetch( 20 );
-			Map<Range<Double>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::range-objects[]
 			assertThat( countsByPrice )
 					.containsExactly(
@@ -340,7 +340,7 @@ public class AggregationDslIT {
 									null )
 					)
 					.fetch( 20 );
-			Map<Range<Instant>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
+			Map<Range<Instant>, Long> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::range-noConverter[]
 			assertThat( countsByPrice )
 					.containsExactly(
@@ -388,7 +388,7 @@ public class AggregationDslIT {
 							.filter( pf -> pf.match().field( "editions.label" ).matching( "paperback" ) )
 					)
 					.fetch( 20 );
-			Map<Range<Double>, Long> countsByPrice = result.getAggregation( countsByPriceKey );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::filter[]
 			assertThat( countsByPrice )
 					.containsExactly(
@@ -424,7 +424,7 @@ public class AggregationDslIT {
 					.where( f -> f.matchAll() )
 					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( jsonObject ) )
 					.fetch( 20 );
-			JsonObject countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
+			JsonObject countsByPriceHistogram = result.aggregation( countsByPriceHistogramKey ); // <1>
 			// end::elasticsearch-fromJson-jsonObject[]
 			assertJsonEquals(
 					"{"
@@ -460,7 +460,7 @@ public class AggregationDslIT {
 									+ "}"
 							+ "}" ) )
 					.fetch( 20 );
-			JsonObject countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
+			JsonObject countsByPriceHistogram = result.aggregation( countsByPriceHistogramKey ); // <1>
 			// end::elasticsearch-fromJson-string[]
 			assertJsonEquals(
 					"{"

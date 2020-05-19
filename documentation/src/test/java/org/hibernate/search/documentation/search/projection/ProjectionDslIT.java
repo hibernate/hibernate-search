@@ -268,7 +268,7 @@ public class ProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <3>
 			// end::distance[]
-			assertThat( result.getHits() )
+			assertThat( result.hits() )
 					.hasSize( 2 )
 					.allSatisfy(
 							distance -> assertThat( distance ).isBetween( 1_000_000.0, 10_000_000.0 )
@@ -284,7 +284,7 @@ public class ProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <3>
 			// end::distance-unit[]
-			assertThat( result.getHits() )
+			assertThat( result.hits() )
 					.hasSize( 2 )
 					.allSatisfy(
 							distance -> assertThat( distance ).isBetween( 1_000.0, 10_000.0 )

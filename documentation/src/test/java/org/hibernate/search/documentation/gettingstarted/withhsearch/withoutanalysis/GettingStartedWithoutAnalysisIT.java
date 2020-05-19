@@ -112,8 +112,8 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.fetch( 20 ); // <5>
 
-			long totalHitCount = result.getTotalHitCount(); // <6>
-			List<Book> hits = result.getHits(); // <7>
+			long totalHitCount = result.totalHitCount(); // <6>
+			List<Book> hits = result.hits(); // <7>
 
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
@@ -148,8 +148,8 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.fetch( 20 ); // <4>
 
-			long totalHitCount = result.getTotalHitCount(); // <5>
-			List<Book> hits = result.getHits(); // <6>
+			long totalHitCount = result.totalHitCount(); // <5>
+			List<Book> hits = result.hits(); // <6>
 
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */

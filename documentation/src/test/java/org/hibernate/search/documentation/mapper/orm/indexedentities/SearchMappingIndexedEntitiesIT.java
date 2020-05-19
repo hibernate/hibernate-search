@@ -109,7 +109,7 @@ public class SearchMappingIndexedEntitiesIT {
 				IndexValueFieldDescriptor valueField = field.toValueField(); // <7>
 
 				IndexValueFieldTypeDescriptor type = valueField.type(); // <8>
-				boolean projectable = type.isProjectable();
+				boolean projectable = type.projectable();
 				Class<?> dslArgumentClass = type.dslArgumentClass();
 				Class<?> projectedValueClass = type.projectedValueClass();
 				Optional<String> analyzerName = type.analyzerName();
@@ -129,7 +129,7 @@ public class SearchMappingIndexedEntitiesIT {
 				IndexObjectFieldDescriptor objectField = field.toObjectField();
 
 				IndexObjectFieldTypeDescriptor type = objectField.type();
-				boolean nested = type.isNested();
+				boolean nested = type.nested();
 				// Etc.
 			}
 		} );

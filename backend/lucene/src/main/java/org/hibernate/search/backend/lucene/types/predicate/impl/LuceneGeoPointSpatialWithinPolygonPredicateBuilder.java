@@ -24,14 +24,14 @@ class LuceneGeoPointSpatialWithinPolygonPredicateBuilder extends
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		List<GeoPoint> points = polygon.getPoints();
+		List<GeoPoint> points = polygon.points();
 
 		double[] polyLats = new double[points.size()];
 		double[] polyLons = new double[points.size()];
 
 		for ( int i = 0; i < points.size(); i++ ) {
-			polyLats[i] = points.get( i ).getLatitude();
-			polyLons[i] = points.get( i ).getLongitude();
+			polyLats[i] = points.get( i ).latitude();
+			polyLons[i] = points.get( i ).longitude();
 		}
 
 		Polygon lucenePolygon = new Polygon( polyLats, polyLons );

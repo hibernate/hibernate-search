@@ -111,8 +111,8 @@ public class QueryDslIT {
 							.matching( "robot" ) )
 					.fetch( 20 ); // <4>
 
-			long totalHitCount = result.getTotalHitCount(); // <5>
-			List<Book> hits = result.getHits(); // <6>
+			long totalHitCount = result.totalHitCount(); // <5>
+			List<Book> hits = result.hits(); // <6>
 			// Not shown: commit the transaction and close the entity manager
 			// end::entryPoint[]
 
@@ -135,7 +135,7 @@ public class QueryDslIT {
 							.matching( "james" ) )
 					.fetch( 20 ); // <3>
 			// end::targeting-multiple[]
-			List<Person> hits = result.getHits();
+			List<Person> hits = result.hits();
 			assertThat( hits )
 					.containsExactlyInAnyOrder(
 							entityManager.getReference( Manager.class, MANAGER1_ID ),
@@ -160,7 +160,7 @@ public class QueryDslIT {
 							.matching( "james" ) )
 					.fetch( 20 ); // <4>
 			// end::targeting-entityName[]
-			List<Person> hits = result.getHits();
+			List<Person> hits = result.hits();
 			assertThat( hits )
 					.containsExactlyInAnyOrder(
 							entityManager.getReference( Manager.class, MANAGER1_ID ),
@@ -178,8 +178,8 @@ public class QueryDslIT {
 					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <2>
 
-			long totalHitCount = result.getTotalHitCount(); // <3>
-			List<Book> hits = result.getHits(); // <4>
+			long totalHitCount = result.totalHitCount(); // <3>
+			List<Book> hits = result.hits(); // <4>
 			// ... // <5>
 			// end::fetching-searchResult[]
 
@@ -233,8 +233,8 @@ public class QueryDslIT {
 					.where( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
 					.fetchAll();
 
-			long totalHitCount = result.getTotalHitCount();
-			List<Book> hits = result.getHits();
+			long totalHitCount = result.totalHitCount();
+			List<Book> hits = result.hits();
 			// end::fetching-all-searchResult[]
 
 			assertThat( totalHitCount ).isEqualTo( 2 );
@@ -264,8 +264,8 @@ public class QueryDslIT {
 					.where( f -> f.matchAll() )
 					.fetch( 40, 20 ); // <1>
 			// end::fetching-pagination-searchResult[]
-			long totalHitCount = result.getTotalHitCount();
-			List<Book> hits = result.getHits();
+			long totalHitCount = result.totalHitCount();
+			List<Book> hits = result.hits();
 
 			assertThat( totalHitCount ).isEqualTo( 4 );
 			assertThat( hits ).isEmpty();
@@ -383,8 +383,8 @@ public class QueryDslIT {
 
 			SearchResult<Book> result = query.fetch( 20 ); // <1>
 
-			Duration took = result.getTook(); // <2>
-			Boolean timedOut = result.isTimedOut(); // <3>
+			Duration took = result.took(); // <2>
+			Boolean timedOut = result.timedOut(); // <3>
 			// end::took-timedOut[]
 
 			assertThat( took ).isNotNull();
@@ -404,8 +404,8 @@ public class QueryDslIT {
 					.truncateAfter( 500, TimeUnit.MILLISECONDS ) // <2>
 					.fetch( 20 ); // <3>
 
-			Duration took = result.getTook(); // <4>
-			Boolean timedOut = result.isTimedOut(); // <5>
+			Duration took = result.took(); // <4>
+			Boolean timedOut = result.timedOut(); // <5>
 			// end::truncateAfter[]
 
 			assertThat( took ).isNotNull();
@@ -453,7 +453,7 @@ public class QueryDslIT {
 					.fetch( 20 ); // <3>
 			// end::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
 
-			assertThat( result.getHits() ).extracting( Book::getId )
+			assertThat( result.hits() ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 			assertThat( statistics.getSecondLevelCacheHitCount() ).isEqualTo( 2 );
 		} );
@@ -473,7 +473,7 @@ public class QueryDslIT {
 					.fetch( 200 ); // <3>
 			// end::fetchSize[]
 
-			assertThat( result.getHits() ).extracting( Book::getId )
+			assertThat( result.hits() ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 	}
@@ -564,7 +564,7 @@ public class QueryDslIT {
 			TopDocs topDocs = result.getTopDocs(); // <5>
 			// end::lucene-lowLevel[]
 
-			assertThat( result.getHits() ).extracting( Book::getId )
+			assertThat( result.hits() ).extracting( Book::getId )
 					.containsExactly( BOOK1_ID, BOOK3_ID );
 
 			assertThat( sort ).isNotNull();

@@ -27,7 +27,7 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "(" + getQueryString() + ")";
+		return getClass().getSimpleName() + "(" + queryString() + ")";
 	}
 
 	@Override
@@ -55,20 +55,20 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 
 	@Override
 	public List<H> fetchHits(Integer offset, Integer limit) {
-		return fetch( offset, limit ).getHits();
+		return fetch( offset, limit ).hits();
 	}
 
 	@Override
 	public Optional<H> fetchSingleHit() {
 		// We don't need to fetch more than two elements to detect a problem
 		R result = fetch( 2 );
-		List<H> hits = result.getHits();
-		int fetchedHitCount = result.getHits().size();
+		List<H> hits = result.hits();
+		int fetchedHitCount = result.hits().size();
 		if ( fetchedHitCount == 0 ) {
 			return Optional.empty();
 		}
 		else if ( fetchedHitCount > 1 ) {
-			throw log.nonSingleHit( result.getTotalHitCount() );
+			throw log.nonSingleHit( result.totalHitCount() );
 		}
 		else {
 			return Optional.of( hits.get( 0 ) );

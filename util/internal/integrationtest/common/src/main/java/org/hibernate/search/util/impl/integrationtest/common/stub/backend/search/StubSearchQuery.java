@@ -41,7 +41,7 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	}
 
 	@Override
-	public String getQueryString() {
+	public String queryString() {
 		return getClass().getName() + "@" + Integer.toHexString( hashCode() );
 	}
 

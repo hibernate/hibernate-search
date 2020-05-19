@@ -60,7 +60,7 @@ public class SearchQueryBaseIT {
 				.where( f -> f.match().field( "string" ).matching( "platypus" ) )
 				.toQuery();
 
-		assertThat( query.getQueryString() ).contains( "platypus" );
+		assertThat( query.queryString() ).contains( "platypus" );
 	}
 
 	@Test
@@ -73,9 +73,9 @@ public class SearchQueryBaseIT {
 
 		SearchResult<DocumentReference> result = query.fetchAll();
 
-		assertNotNull( result.getTook() );
-		assertNotNull( result.isTimedOut() );
-		assertFalse( result.isTimedOut() );
+		assertNotNull( result.took() );
+		assertNotNull( result.timedOut() );
+		assertFalse( result.timedOut() );
 	}
 
 	@Test

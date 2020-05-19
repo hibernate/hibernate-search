@@ -22,7 +22,17 @@ public interface GeoPolygon {
 	 * @return The points of this polygon.
 	 * The first and last points are always identical.
 	 */
-	List<GeoPoint> getPoints();
+	List<GeoPoint> points();
+
+	/**
+	 * @return The points of this polygon.
+	 * The first and last points are always identical.
+	 * @deprecated Use {@link #points()} instead.
+	 */
+	@Deprecated
+	default List<GeoPoint> getPoints() {
+		return points();
+	}
 
 	/**
 	 * Create a {@link GeoPolygon} from a list of points.

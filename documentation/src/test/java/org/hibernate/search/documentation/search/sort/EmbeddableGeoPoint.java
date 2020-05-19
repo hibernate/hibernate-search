@@ -34,13 +34,13 @@ public class EmbeddableGeoPoint implements GeoPoint {
 
 	@Override
 	@Basic
-	public double getLatitude() {
+	public double latitude() {
 		return latitude;
 	}
 
 	@Override
 	@Basic
-	public double getLongitude() {
+	public double longitude() {
 		return longitude;
 	}
 }

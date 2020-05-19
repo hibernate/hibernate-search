@@ -53,14 +53,14 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		}
 
 		if ( projectable ) {
-			documentBuilder.addField( new StoredField( getLatitudeAbsoluteFieldPath( absoluteFieldPath ), value.getLatitude() ) );
-			documentBuilder.addField( new StoredField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), value.getLongitude() ) );
+			documentBuilder.addField( new StoredField( getLatitudeAbsoluteFieldPath( absoluteFieldPath ), value.latitude() ) );
+			documentBuilder.addField( new StoredField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), value.longitude() ) );
 		}
 
 		if ( sortable || projectable ) {
 			// The projectable term here is present only to support distance projections.
 			// Since distances are derived from a DocValuesField, see DistanceCollector.
-			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.latitude(), value.longitude() ) );
 		}
 		else {
 			// For createExistsQuery()
@@ -68,7 +68,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		}
 
 		if ( searchable ) {
-			documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+			documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.latitude(), value.longitude() ) );
 		}
 	}
 

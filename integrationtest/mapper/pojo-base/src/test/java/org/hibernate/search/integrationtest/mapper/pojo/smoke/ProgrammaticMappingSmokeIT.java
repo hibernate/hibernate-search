@@ -435,12 +435,12 @@ public class ProgrammaticMappingSmokeIT {
 
 
 			SearchResult<EntityReference> result = query.fetch( 3, 2 );
-			assertThat( result.getHits() )
+			assertThat( result.hits() )
 					.containsExactly(
 							EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
 							EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 )
 					);
-			assertThat( result.getTotalHitCount() ).isEqualTo( 6L );
+			assertThat( result.totalHitCount() ).isEqualTo( 6L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -469,12 +469,12 @@ public class ProgrammaticMappingSmokeIT {
 			);
 
 			SearchResult<String> result = query.fetch( 3, 2 );
-			assertThat( result.getHits() )
+			assertThat( result.hits() )
 					.containsExactly(
 							"text1",
 							null
 					);
-			assertThat( result.getTotalHitCount() ).isEqualTo( 2L );
+			assertThat( result.totalHitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -521,7 +521,7 @@ public class ProgrammaticMappingSmokeIT {
 			);
 
 			SearchResult<List<?>> result = query.fetchAll();
-			assertThat( result.getHits() )
+			assertThat( result.hits() )
 					.containsExactly(
 							Arrays.asList(
 									"text1",
@@ -538,7 +538,7 @@ public class ProgrammaticMappingSmokeIT {
 									null
 							)
 					);
-			assertThat( result.getTotalHitCount() ).isEqualTo( 2L );
+			assertThat( result.totalHitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}

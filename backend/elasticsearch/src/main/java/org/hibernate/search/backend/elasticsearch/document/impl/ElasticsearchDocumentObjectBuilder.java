@@ -131,7 +131,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
 		ElasticsearchIndexFieldType<F> type = node.type();
 
-		if ( !node.isMultiValued() && accessor.hasExplicitValue( content ) ) {
+		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
 		accessor.add( content, type.getCodec().encode( value ) );
@@ -160,7 +160,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
 
-		if ( !node.isMultiValued() && accessor.hasExplicitValue( content ) ) {
+		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
 		accessor.add( content, value );

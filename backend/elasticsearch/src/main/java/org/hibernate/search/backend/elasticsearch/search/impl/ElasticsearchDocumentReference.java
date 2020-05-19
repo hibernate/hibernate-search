@@ -24,12 +24,12 @@ public class ElasticsearchDocumentReference implements DocumentReference {
 	}
 
 	@Override
-	public String getTypeName() {
+	public String typeName() {
 		return typeName;
 	}
 
 	@Override
-	public String getId() {
+	public String id() {
 		return id;
 	}
 

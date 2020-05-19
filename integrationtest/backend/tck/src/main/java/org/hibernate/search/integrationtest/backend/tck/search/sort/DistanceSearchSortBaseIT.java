@@ -112,13 +112,13 @@ public class DistanceSearchSortBaseIT {
 				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 
 		query = simpleQuery(
-				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
+				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 
 		query = simpleQuery(
-				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
+				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 						.asc()
 		);
 		assertThat( query )
@@ -131,7 +131,7 @@ public class DistanceSearchSortBaseIT {
 				.hasDocRefHitsExactOrder( index.typeName(), EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery(
-				b -> b.distance( fieldPathForDescendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
+				b -> b.distance( fieldPathForDescendingOrderTests, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 						.desc()
 		);
 		assertThat( query )

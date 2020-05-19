@@ -37,18 +37,18 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	}
 
 	@Override
-	public long getTotalHitCount() {
+	public long totalHitCount() {
 		return hitCount;
 	}
 
 	@Override
-	public List<H> getHits() {
+	public List<H> hits() {
 		return hits;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // The type of aggregation results must be consistent with the type of keys, by contract
-	public <T> T getAggregation(AggregationKey<T> key) {
+	public <T> T aggregation(AggregationKey<T> key) {
 		Object aggregationResult = aggregationResults.get( key );
 		if ( aggregationResult == null && !aggregationResults.containsKey( key ) ) {
 			throw log.unknownAggregationKey( key );
@@ -57,12 +57,12 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	}
 
 	@Override
-	public Duration getTook() {
+	public Duration took() {
 		return took;
 	}
 
 	@Override
-	public boolean isTimedOut() {
+	public boolean timedOut() {
 		return timedOut;
 	}
 
