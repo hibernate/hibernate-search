@@ -255,15 +255,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		return runtimeIntrospector;
 	}
 
-	// FIXME HSEARCH-3922 remove this once the ORM mapper SPIs have been updated.
-	@Override
-	public HibernateOrmRuntimeIntrospector getRuntimeIntrospector() {
-		return runtimeIntrospector;
-	}
-
 	@Override
 	@SuppressWarnings("unchecked")
-	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(boolean createIfDoesNotExist) {
+	public PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist) {
 		checkOrmSessionIsOpen();
 		Transaction transactionIdentifier = null;
 
@@ -310,7 +304,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy() {
+	public ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy() {
 		return configuredAutomaticIndexingSynchronizationStrategy;
 	}
 

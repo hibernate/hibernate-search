@@ -34,7 +34,7 @@ public enum HibernateOrmReflectionStrategyName {
 	public static HibernateOrmReflectionStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				HibernateOrmReflectionStrategyName.values(),
-				HibernateOrmReflectionStrategyName::getExternalRepresentation,
+				HibernateOrmReflectionStrategyName::externalRepresentation,
 				log::invalidReflectionStrategyName,
 				value
 		);
@@ -46,7 +46,7 @@ public enum HibernateOrmReflectionStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	private String externalRepresentation() {
 		return externalRepresentation;
 	}
 

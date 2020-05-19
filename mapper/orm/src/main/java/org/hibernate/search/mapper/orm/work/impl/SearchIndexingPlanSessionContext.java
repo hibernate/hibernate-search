@@ -13,10 +13,10 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface SearchIndexingPlanSessionContext {
 
-	ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy();
+	ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy();
 
-	PojoRuntimeIntrospector getRuntimeIntrospector();
+	PojoRuntimeIntrospector runtimeIntrospector();
 
-	PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(boolean createIfDoesNotExist);
+	PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist);
 
 }
