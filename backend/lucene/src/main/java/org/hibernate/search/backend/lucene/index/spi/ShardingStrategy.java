@@ -28,7 +28,7 @@ public interface ShardingStrategy {
 	 * Initializes the sharding strategy.
 	 *
 	 * @param context The initialization context, giving access to configuration and environment.
-	 * The sharding strategy is expected to call {@link ShardingStrategyInitializationContext#setShardIdentifiers(Set)}.
+	 * The sharding strategy is expected to call {@link ShardingStrategyInitializationContext#shardIdentifiers(Set)}.
 	 */
 	void initialize(ShardingStrategyInitializationContext context);
 

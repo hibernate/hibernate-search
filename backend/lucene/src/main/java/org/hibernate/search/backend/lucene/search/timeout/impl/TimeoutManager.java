@@ -67,7 +67,7 @@ public final class TimeoutManager {
 	 * we start counting from this method call (if needed)
 	 */
 	public void start() {
-		this.start = timingSource.getMonotonicTimeEstimate();
+		this.start = timingSource.monotonicTimeEstimate();
 	}
 
 	public void stop() {
@@ -143,7 +143,7 @@ public final class TimeoutManager {
 	}
 
 	private long getElapsedTimeInMilliseconds() {
-		return timingSource.getMonotonicTimeEstimate() - start;
+		return timingSource.monotonicTimeEstimate() - start;
 	}
 }
 

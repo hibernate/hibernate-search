@@ -63,34 +63,34 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 	}
 
 	@Override
-	public void setShardIdentifiers(Set<String> shardIdentifiers) {
+	public void shardIdentifiers(Set<String> shardIdentifiers) {
 		this.shardIdentifiers.clear();
 		this.shardIdentifiers.addAll( shardIdentifiers );
 	}
 
 	@Override
-	public void setShardingDisabled() {
+	public void disableSharding() {
 		this.shardIdentifiers = null;
 	}
 
 	@Override
-	public String getIndexName() {
+	public String indexName() {
 		return model.hibernateSearchName();
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return startContext.beanResolver();
 	}
 
 	@Override
-	public ConfigurationPropertySource getConfigurationPropertySource() {
+	public ConfigurationPropertySource configurationPropertySource() {
 		return shardingPropertySource;
 	}
 
 	public BeanHolder<? extends ShardingStrategy> create(Map<String, Shard> shardCollector) {
 		BeanHolder<? extends ShardingStrategy> shardingStrategyHolder =
-				SHARDING_STRATEGY.getAndTransform( shardingPropertySource, getBeanResolver()::resolve );
+				SHARDING_STRATEGY.getAndTransform( shardingPropertySource, beanResolver()::resolve );
 
 		shardingStrategyHolder.get().initialize( this );
 

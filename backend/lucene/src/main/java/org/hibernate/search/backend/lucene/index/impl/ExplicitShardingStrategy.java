@@ -35,11 +35,11 @@ public class ExplicitShardingStrategy implements ShardingStrategy {
 	@Override
 	public void initialize(ShardingStrategyInitializationContext context) {
 		List<String> shardIdentifiers = SHARD_IDENTIFIERS.getOrThrow(
-				context.getConfigurationPropertySource(),
+				context.configurationPropertySource(),
 				key -> log.missingPropertyValueForShardingStrategy( NAME, key )
 		);
 		this.shardIdSet = new LinkedHashSet<>( shardIdentifiers );
-		context.setShardIdentifiers( shardIdSet );
+		context.shardIdentifiers( shardIdSet );
 	}
 
 	@Override

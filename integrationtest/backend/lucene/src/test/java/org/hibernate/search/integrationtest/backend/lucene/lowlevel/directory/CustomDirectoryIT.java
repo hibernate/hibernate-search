@@ -104,7 +104,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		public void initialize(DirectoryProviderInitializationContext context) {
 			StaticCounters.get().increment( INITIALIZE_COUNTER_KEY );
 			assertThat( context ).isNotNull();
-			Optional<?> actualConfigurationPropertyValue = context.getConfigurationPropertySource()
+			Optional<?> actualConfigurationPropertyValue = context.configurationPropertySource()
 					.get( CONFIGURATION_PROPERTY_KEY_RADICAL );
 			assertThat( (Optional) actualConfigurationPropertyValue )
 					.contains( CONFIGURATION_PROPERTY_EXPECTED_VALUE );
@@ -119,7 +119,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
 			StaticCounters.get().increment( CREATE_DIRECTORY_COUNTER_KEY );
 			assertThat( context ).isNotNull();
-			assertThat( context.getIndexName() ).isEqualTo( index.name() );
+			assertThat( context.indexName() ).isEqualTo( index.name() );
 			return new DirectoryHolder() {
 				Directory directory;
 				@Override

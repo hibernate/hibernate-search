@@ -15,16 +15,16 @@ public interface DirectoryCreationContext {
 	/**
 	 * @return The event context to use for exceptions.
 	 */
-	EventContext getEventContext();
+	EventContext eventContext();
 
 	/**
 	 * @return The name of the index in Hibernate Search.
 	 */
-	String getIndexName();
+	String indexName();
 
 	/**
 	 * @return The identifier of the index shard, if relevant.
 	 */
-	Optional<String> getShardId();
+	Optional<String> shardId();
 
 }

@@ -55,7 +55,7 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 
 	@Override
 	public void initialize(DirectoryProviderInitializationContext context) {
-		ConfigurationPropertySource propertySource = context.getConfigurationPropertySource();
+		ConfigurationPropertySource propertySource = context.configurationPropertySource();
 		this.directoryRoot = ROOT.get( propertySource ).toAbsolutePath();
 		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
 		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
@@ -71,13 +71,13 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 
 	@Override
 	public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
-		Path directoryPath = directoryRoot.resolve( context.getIndexName() );
-		Optional<String> shardId = context.getShardId();
+		Path directoryPath = directoryRoot.resolve( context.indexName() );
+		Optional<String> shardId = context.shardId();
 		if ( shardId.isPresent() ) {
 			directoryPath = directoryPath.resolve( shardId.get() );
 		}
 		return new LocalFileSystemDirectoryHolder(
-				directoryPath, accessStrategy, lockFactorySupplier, context.getEventContext()
+				directoryPath, accessStrategy, lockFactorySupplier, context.eventContext()
 		);
 	}
 

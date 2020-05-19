@@ -28,7 +28,7 @@ public final class DefaultTimingSource implements TimingSource {
 	private volatile long currentTimeApproximation = INVALID_TIME;
 
 	@Override
-	public long getMonotonicTimeEstimate() {
+	public long monotonicTimeEstimate() {
 		// This method is very performance critical:
 		// it's invoked once for each Lucene match during a query collection.
 		// That's why we read the volatile resorting to a Timer and

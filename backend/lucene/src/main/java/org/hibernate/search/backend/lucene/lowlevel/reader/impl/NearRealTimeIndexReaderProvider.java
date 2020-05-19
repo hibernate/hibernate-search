@@ -126,7 +126,7 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 		private IndexReaderEntry(DirectoryReader reader, TimingSource timingSource, int refreshInterval) {
 			this.reader = reader;
 			this.timingSource = timingSource;
-			this.expiration = refreshInterval == 0 ? 0 : timingSource.getMonotonicTimeEstimate() + refreshInterval;
+			this.expiration = refreshInterval == 0 ? 0 : timingSource.monotonicTimeEstimate() + refreshInterval;
 		}
 
 		public void forceRefresh() {
@@ -144,7 +144,7 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 			if ( refreshForced ) {
 				return false;
 			}
-			if ( expiration == 0 || expiration < timingSource.getMonotonicTimeEstimate() ) {
+			if ( expiration == 0 || expiration < timingSource.monotonicTimeEstimate() ) {
 				// The last refresh was a long time ago. Let's check if the reader is really fresh.
 				return reader.isCurrent();
 			}

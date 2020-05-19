@@ -206,11 +206,11 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			return 0L;
 		}
 
-		return commitExpiration - timingSource.getMonotonicTimeEstimate();
+		return commitExpiration - timingSource.monotonicTimeEstimate();
 	}
 
 	private void updateCommitExpiration() {
-		commitExpiration = commitInterval == 0 ? 0L : timingSource.getMonotonicTimeEstimate() + commitInterval;
+		commitExpiration = commitInterval == 0 ? 0L : timingSource.monotonicTimeEstimate() + commitInterval;
 	}
 
 	private class LuceneDelayedCommitWorker implements SingletonTask.Worker {
