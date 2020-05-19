@@ -24,31 +24,31 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		sessionContext.getCurrentIndexingPlan( true )
+		sessionContext.currentIndexingPlan( true )
 				.addOrUpdate( getTypeIdentifier( entity ), null, entity );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		sessionContext.getCurrentIndexingPlan( true )
+		sessionContext.currentIndexingPlan( true )
 				.delete( getTypeIdentifier( entity ), null, entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		sessionContext.getCurrentIndexingPlan( true )
+		sessionContext.currentIndexingPlan( true )
 				.purge( getTypeIdentifier( entityClass ), providedId, providedRoutingKey );
 	}
 
 	@Override
 	public void purge(String entityName, Object providedId, String providedRoutingKey) {
-		sessionContext.getCurrentIndexingPlan( true )
+		sessionContext.currentIndexingPlan( true )
 				.purge( getTypeIdentifier( entityName ), providedId, providedRoutingKey );
 	}
 
 	@Override
 	public void process() {
-		PojoIndexingPlan<?> plan = sessionContext.getCurrentIndexingPlan( false );
+		PojoIndexingPlan<?> plan = sessionContext.currentIndexingPlan( false );
 		if ( plan == null ) {
 			return;
 		}
@@ -57,16 +57,16 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void execute() {
-		PojoIndexingPlan<EntityReference> plan = sessionContext.getCurrentIndexingPlan( false );
+		PojoIndexingPlan<EntityReference> plan = sessionContext.currentIndexingPlan( false );
 		if ( plan == null ) {
 			return;
 		}
-		sessionContext.getConfiguredAutomaticIndexingSynchronizationStrategy()
+		sessionContext.configuredAutomaticIndexingSynchronizationStrategy()
 				.executeAndSynchronize( plan );
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
-		return sessionContext.getRuntimeIntrospector().detectEntityType( entity );
+		return sessionContext.runtimeIntrospector().detectEntityType( entity );
 	}
 
 	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {

@@ -288,14 +288,14 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(SessionImplementor session,
 			boolean createIfDoesNotExist) {
-		return HibernateOrmSearchSession.get( this, session ).getCurrentIndexingPlan( createIfDoesNotExist );
+		return HibernateOrmSearchSession.get( this, session ).currentIndexingPlan( createIfDoesNotExist );
 	}
 
 	@Override
 	public ConfiguredAutomaticIndexingSynchronizationStrategy getCurrentAutomaticIndexingSynchronizationStrategy(
 			SessionImplementor session) {
 		return HibernateOrmSearchSession.get( this, session )
-				.getConfiguredAutomaticIndexingSynchronizationStrategy();
+				.configuredAutomaticIndexingSynchronizationStrategy();
 	}
 
 	@Override
