@@ -357,16 +357,6 @@ public class ObjectExistsSearchPredicateIT {
 					document.addObject( mainIndex.binding().flattenedNoChild );
 				} )
 				.join();
-
-		checkDocumentsCreation();
-	}
-
-	private void checkDocumentsCreation() {
-		List<DocumentReference> docs = mainIndex.createScope().query().selectEntityReference()
-				.where( p -> p.matchAll() )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
 	}
 
 	private void assumeFullMultiIndexCompatibilityCheck() {

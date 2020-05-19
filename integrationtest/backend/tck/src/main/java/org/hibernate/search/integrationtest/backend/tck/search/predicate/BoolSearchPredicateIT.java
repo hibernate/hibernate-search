@@ -1038,13 +1038,6 @@ public class BoolSearchPredicateIT {
 			document.addValue( index.binding().field5, FIELD5_VALUE3 );
 		} );
 		indexer.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexBinding {

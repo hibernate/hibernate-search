@@ -366,13 +366,6 @@ public class SearchSortIT {
 				} )
 				.add( EMPTY_ID, document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = mainIndex.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	private static class IndexBinding {

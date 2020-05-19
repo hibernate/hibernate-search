@@ -129,13 +129,6 @@ public class SearchQueryBaseIT {
 						document -> document.addValue( index.binding().string, "value" + i )
 				) )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		SearchResultAssert.assertThat( query ).hasTotalHitCount( documentCount );
 	}
 
 	private static class IndexBinding {

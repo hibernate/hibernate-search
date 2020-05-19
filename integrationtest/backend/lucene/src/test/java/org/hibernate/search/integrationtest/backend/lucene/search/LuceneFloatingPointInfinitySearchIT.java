@@ -186,14 +186,6 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 					document.addValue( index.binding().doubleFieldModel.reference, Double.POSITIVE_INFINITY );
 				} )
 				.join();
-
-		// Check that all documents are searchable
-		SearchResultAssert.assertThat(
-				index.createScope().query()
-						.where( f -> f.matchAll() )
-						.toQuery()
-		)
-				.hasTotalHitCount( 3 );
 	}
 
 	private static class IndexBinding {

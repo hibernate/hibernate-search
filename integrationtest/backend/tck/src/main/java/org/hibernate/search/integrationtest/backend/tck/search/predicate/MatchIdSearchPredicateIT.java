@@ -178,26 +178,6 @@ public class MatchIdSearchPredicateIT {
 		BulkIndexer incompatibleIdConverterIndexer = incompatibleIdConverterIndex.bulkIndexer()
 				.add( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, document -> { } );
 		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer );
-
-		// Check that all documents are searchable
-		assertThat(
-				mainIndex.createScope().query()
-						.where( f -> f.matchAll() )
-						.toQuery()
-		)
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		assertThat(
-				compatibleIdConverterIndex.createScope().query()
-						.where( f -> f.matchAll() )
-						.toQuery()
-		)
-				.hasDocRefHitsAnyOrder( compatibleIdConverterIndex.typeName(), COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
-		assertThat(
-				incompatibleIdConverterIndex.createScope().query()
-						.where( f -> f.matchAll() )
-						.toQuery()
-		)
-				.hasDocRefHitsAnyOrder( incompatibleIdConverterIndex.typeName(), INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
 	}
 
 	private static class IncompatibleIdConverter implements ToDocumentIdentifierValueConverter<String> {

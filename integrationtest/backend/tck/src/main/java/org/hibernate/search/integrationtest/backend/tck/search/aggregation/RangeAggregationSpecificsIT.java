@@ -536,15 +536,6 @@ public class RangeAggregationSpecificsIT<F> {
 			}
 			indexer.add( name + "_document_empty", name, document -> { } );
 			indexer.join();
-
-			// Check that all documents are searchable
-			SearchResultAssert.assertThat(
-					index.createScope().query()
-							.where( f -> f.matchAll() )
-							.routing( name )
-							.toQuery()
-			)
-					.hasTotalHitCount( documentFieldValues.size() + 1 /* +1 for the empty document */ );
 		}
 	}
 

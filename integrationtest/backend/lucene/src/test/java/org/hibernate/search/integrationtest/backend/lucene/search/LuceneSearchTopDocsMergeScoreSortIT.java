@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -146,17 +145,6 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 					document.addValue( index.binding().text, "No match" );
 				} )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder(
-				index.typeName(),
-				SEGMENT_0_DOC_0, SEGMENT_0_DOC_1, SEGMENT_0_DOC_NON_MATCHING,
-				SEGMENT_1_DOC_0, SEGMENT_1_DOC_1, SEGMENT_1_DOC_NON_MATCHING
-		);
 	}
 
 	private static class IndexBinding {

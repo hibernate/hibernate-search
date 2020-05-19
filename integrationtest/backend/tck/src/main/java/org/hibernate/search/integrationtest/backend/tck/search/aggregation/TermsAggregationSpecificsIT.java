@@ -655,15 +655,6 @@ public class TermsAggregationSpecificsIT<F> {
 			indexer.add( name + "_document_empty", name, document -> { } );
 			++documentCount;
 			indexer.join();
-
-			// Check that all documents are searchable
-			SearchResultAssert.assertThat(
-					index.createScope().query()
-							.where( f -> f.matchAll() )
-							.routing( name )
-							.toQuery()
-			)
-					.hasTotalHitCount( documentCount );
 		}
 
 	}

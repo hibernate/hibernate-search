@@ -429,14 +429,6 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 					document.addValue( mainIndex.binding().geoPoint, ADDITIONAL_POINT_2_GEO_POINT );
 				} )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = mainIndex.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
-				ADDITIONAL_POINT_2_ID );
 	}
 
 	private static GeoBoundingBox moveBoundingBox(GeoBoundingBox originalBoundingBox, double degrees) {

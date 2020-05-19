@@ -288,17 +288,6 @@ public class ObjectFieldStorageIT {
 				} )
 				.add( "empty", document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder(
-						index.typeName(),
-						EXPECTED_NESTED_MATCH_ID, EXPECTED_NON_NESTED_MATCH_ID, "neverMatching", "empty"
-				);
 	}
 
 	private static class IndexBinding {

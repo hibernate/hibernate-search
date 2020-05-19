@@ -400,13 +400,6 @@ public class DistanceSearchSortBaseIT {
 				.add( DOCUMENT_2, document -> initDocument( document, DOCUMENT_2_ORDINAL ) )
 				.add( EMPTY_ID, document -> initDocument( document, null ) )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 	}
 
 	private static class AbstractObjectMapping {

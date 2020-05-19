@@ -673,13 +673,6 @@ public class FieldSearchSortBaseIT<F> {
 				.add( DOCUMENT_3, document -> initDocument( index.binding(), document, DOCUMENT_3_ORDINAL ) )
 				.add( EMPTY_3, document -> initDocument( index.binding(), document, null ) )
 				.join();
-
-		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = index.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 	}
 
 	private static class AbstractObjectMapping {
