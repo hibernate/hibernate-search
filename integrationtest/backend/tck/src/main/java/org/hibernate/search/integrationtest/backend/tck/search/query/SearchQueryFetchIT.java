@@ -278,13 +278,6 @@ public class SearchQueryFetchIT {
 						document -> document.addValue( index.binding().integer, i )
 				) )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasTotalHitCount( DOCUMENT_COUNT );
 	}
 
 	private static String docId(int i) {

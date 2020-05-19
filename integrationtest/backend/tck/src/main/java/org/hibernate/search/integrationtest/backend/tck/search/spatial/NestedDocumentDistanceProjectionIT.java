@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -19,8 +18,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -120,13 +117,6 @@ public class NestedDocumentDistanceProjectionIT {
 					flattenedDocument.addValue( index.binding().flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 				} )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 	}
 
 	private void checkResult(Double actual, Double expected, Offset<Double> offset) {

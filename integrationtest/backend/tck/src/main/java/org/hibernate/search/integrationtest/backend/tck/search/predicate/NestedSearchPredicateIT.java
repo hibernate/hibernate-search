@@ -379,17 +379,6 @@ public class NestedSearchPredicateIT {
 				} )
 				.add( "empty", document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder(
-						index.typeName(),
-						DOCUMENT_1, DOCUMENT_2, "neverMatching", "empty"
-				);
 	}
 
 	private static class IndexBinding {

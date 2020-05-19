@@ -273,18 +273,6 @@ public class AnalysisCustomIT {
 				}
 		);
 		indexer.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( c -> {
-					for ( String documentId : documentIds ) {
-						c.doc( index.typeName(), documentId );
-					}
-				} );
 	}
 
 	interface AnalysisITDocumentBuilder {

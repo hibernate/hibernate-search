@@ -300,14 +300,6 @@ public class SmokeIT {
 				} )
 				.add( "empty", document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3", "neverMatching", "empty" );
 	}
 
 	private static class IndexBinding {

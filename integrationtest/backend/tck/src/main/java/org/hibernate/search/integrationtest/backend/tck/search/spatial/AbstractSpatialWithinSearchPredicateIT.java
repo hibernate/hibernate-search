@@ -6,19 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -91,13 +86,6 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 				} )
 				.add( EMPTY_ID, document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = mainIndex.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
 	}
 
 	protected static class IndexBinding {

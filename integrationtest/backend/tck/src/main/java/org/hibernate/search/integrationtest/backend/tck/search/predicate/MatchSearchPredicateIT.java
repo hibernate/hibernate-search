@@ -1411,38 +1411,6 @@ public class MatchSearchPredicateIT {
 				compatibleIndexer, rawFieldCompatibleIndexer, compatibleSearchAnalyzerIndexer,
 				incompatibleAnalyzerIndexer, incompatibleDecimalScaleIndexer
 		);
-
-		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-
-		query = compatibleIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
-
-		query = rawFieldCompatibleIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
-
-		query = incompatibleAnalyzerIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( incompatibleAnalyzerIndex.typeName(), INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
-
-		query = compatibleSearchAnalyzerIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( compatibleSearchAnalyzerIndex.typeName(), COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
-
-		query = incompatibleDecimalScaleIndex.createScope().query()
-				.selectEntityReference()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( incompatibleDecimalScaleIndex.typeName(), INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {

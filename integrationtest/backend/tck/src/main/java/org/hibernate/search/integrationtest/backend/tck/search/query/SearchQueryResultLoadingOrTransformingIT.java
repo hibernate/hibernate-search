@@ -624,14 +624,6 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				} )
 				.add( EMPTY_ID, document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	private static class IndexBinding {

@@ -590,23 +590,6 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				} );
 			}
 			mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
-
-			// Check that all documents are searchable
-			SearchResultAssert.assertThat( mainIndex.createScope().query()
-					.where( f -> f.matchAll() )
-					.routing( name )
-					.toQuery() )
-					.hasTotalHitCount( mainIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
-			SearchResultAssert.assertThat( compatibleIndex.createScope().query()
-					.where( f -> f.matchAll() )
-					.routing( name )
-					.toQuery() )
-					.hasTotalHitCount( otherIndexDocumentFieldValues.size() );
-			SearchResultAssert.assertThat( rawFieldCompatibleIndex.createScope().query()
-					.where( f -> f.matchAll() )
-					.routing( name )
-					.toQuery() )
-					.hasTotalHitCount( otherIndexDocumentFieldValues.size() );
 		}
 	}
 

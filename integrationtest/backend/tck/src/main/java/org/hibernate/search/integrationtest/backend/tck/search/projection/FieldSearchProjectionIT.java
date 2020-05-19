@@ -26,7 +26,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
@@ -629,16 +628,6 @@ public class FieldSearchProjectionIT {
 					rawFieldCompatibleIndex.binding().supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 				} );
 		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
-
-		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = mainIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {

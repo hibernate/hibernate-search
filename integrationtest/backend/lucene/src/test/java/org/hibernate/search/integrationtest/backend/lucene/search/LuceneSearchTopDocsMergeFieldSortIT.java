@@ -31,7 +31,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -445,16 +444,6 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 				.add( SEGMENT_0_DOC_EMPTY, SEGMENT_0,
 						document -> initDocument( index.binding(), document, null ) )
 				.join();
-
-		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = index.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder(
-				index.typeName(),
-				SEGMENT_1_DOC_0, SEGMENT_0_DOC_1, SEGMENT_0_DOC_0,
-				SEGMENT_0_DOC_EMPTY, SEGMENT_1_DOC_EMPTY
-		);
 	}
 
 	private static class AbstractObjectMapping {

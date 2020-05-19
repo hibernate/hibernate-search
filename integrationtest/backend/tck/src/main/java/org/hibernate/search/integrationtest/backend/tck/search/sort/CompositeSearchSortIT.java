@@ -322,12 +322,6 @@ public class CompositeSearchSortIT {
 					index.binding().nestedField.write( nested, "aaa" );
 				} )
 				.join();
-
-		// Check that all documents are searchable
-		SearchQuery<DocumentReference> query = index.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexBinding {

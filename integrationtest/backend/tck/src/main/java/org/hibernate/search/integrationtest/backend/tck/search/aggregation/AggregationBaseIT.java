@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -94,13 +92,6 @@ public class AggregationBaseIT {
 				} )
 				.add( EMPTY, document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
 	private static class IndexBinding {

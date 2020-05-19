@@ -134,12 +134,5 @@ public class MatchIdWithConverterSearchPredicateIT {
 				.add( DOCUMENT_2, document -> { } )
 				.add( DOCUMENT_3, document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 }

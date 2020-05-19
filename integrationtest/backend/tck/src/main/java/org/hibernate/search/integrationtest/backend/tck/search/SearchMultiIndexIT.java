@@ -282,24 +282,6 @@ public class SearchMultiIndexIT {
 					document.addValue( index_2_1.binding().string, STRING_2 );
 				} );
 		indexer_1_1.join( indexer_1_2, indexer_2_1 );
-
-		StubMappingScope scope = index_1_1.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
-
-		scope = index_1_2.createScope();
-		query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index_1_2.typeName(), DOCUMENT_1_2_1 );
-
-		scope = index_2_1.createScope();
-		query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index_2_1.typeName(), DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}
 
 	private static class IndexBinding_1_1 {

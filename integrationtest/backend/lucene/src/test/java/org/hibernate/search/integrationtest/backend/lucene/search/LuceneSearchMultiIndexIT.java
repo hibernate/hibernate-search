@@ -117,18 +117,6 @@ public class LuceneSearchMultiIndexIT {
 					document.addValue( index2.binding().string, STRING_1 );
 				} );
 		indexer1.join( indexer2 );
-
-		StubMappingScope scope = index1.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index1.typeName(), DOCUMENT_1_1, DOCUMENT_1_2 );
-
-		scope = index2.createScope();
-		query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index2.typeName(), DOCUMENT_2_1 );
 	}
 
 	private static class IndexBinding1 {

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.bool;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -178,16 +177,6 @@ public class BooleanSortAndRangePredicateIT {
 			document.addValue( index.binding().bool, false );
 		} );
 		indexer.join();
-		checkAllDocumentsAreSearchable();
-	}
-
-	private void checkAllDocumentsAreSearchable() {
-		StubMappingScope scope = index.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
 	}
 
 	private static class IndexBinding {

@@ -524,22 +524,6 @@ public class WildcardSearchPredicateIT {
 					document.addValue( rawFieldCompatibleIndex.binding().analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 				} );
 		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
-
-		// Check that all documents are searchable
-		StubMappingScope scope = mainIndex.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
-		query = compatibleIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndex.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {

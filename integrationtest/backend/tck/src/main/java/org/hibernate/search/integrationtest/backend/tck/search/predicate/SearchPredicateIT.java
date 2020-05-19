@@ -340,13 +340,6 @@ public class SearchPredicateIT {
 				} )
 				.add( EMPTY, document -> { } )
 				.join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = mainIndex.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}
 
 	private static <T, R> Function<T, R> shouldNotBeCalled() {
