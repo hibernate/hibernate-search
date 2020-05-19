@@ -7,6 +7,27 @@
   -->
 <jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/analysis/rules/schema/v1.0">
 
+    <concept id="my-rules:MethodOverrides">
+        <requiresConcept refId="java:TypeAssignableFrom" />
+        <description>
+            A fixed version of java:MethodOverrides that works even for overrides of methods declared in the JDK,
+            which apparently don't have a name in the graph.
+            That's not important because the name is included in the signature.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)-[:DECLARES]->(method:Method),
+                (superType:Type)-[:DECLARES]->(otherMethod:Method),
+                (superType)-[:ASSIGNABLE_FROM]->(type)
+            WHERE
+                method.signature = otherMethod.signature
+                AND method.visibility <> 'private'
+            MERGE
+                (method)-[:OVERRIDES]->(otherMethod)
+            RETURN method AS OverriddenMethod, type AS DeclaringType, superType AS SuperType
+        ]]></cypher>
+    </concept>
+
     <concept id="my-rules:TypeMetadata">
         <description>
             Contributes additional metadata to the :Type nodes.
@@ -56,7 +77,7 @@
     <concept id="my-rules:Spi">
         <requiresConcept refId="my-rules:Test" />
         <description>
-            Contributes the :Spi label to SPI types
+            Contributes the :Spi and :Public labels to SPI types
         </description>
         <cypher><![CDATA[
             MATCH
@@ -117,7 +138,7 @@
         <requiresConcept refId="my-rules:Spi" />
         <requiresConcept refId="my-rules:Impl" />
         <description>
-            Contributes the :Api label to API types
+            Contributes the :Api and :Public labels to API types
         </description>
         <cypher><![CDATA[
             MATCH
@@ -261,6 +282,41 @@
                 (field.visibility="public" OR field.visibility="protected")
             RETURN
                 field
+        ]]></cypher>
+    </constraint>
+
+    <constraint id="my-rules:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix">
+        <requiresConcept refId="java:Deprecated" />
+        <requiresConcept refId="my-rules:MethodOverrides" />
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
+        <description>
+            API or SPI methods must not start with "get" or "set".
+            Exceptions are allowed when:
+            - the method is deprecated;
+            - or the method overrides another method;
+            - or the method name starts with 'getOrCreate';
+            - or the name of the declaring type ends with 'Provider';
+            - or the name of the declaring type ends with 'ConfigurationProperty';
+            - or the name of the declaring type ends with 'ConfigurationPropertySource'.
+            in which case the type may just be a marker (to be used in annotations for example).
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type:Public:HibernateSearch)-[:DECLARES]->(method:Method)
+            WHERE
+                method.name =~ "^(get|set).+"
+                AND (method.visibility="public" OR method.visibility="protected")
+                // Exceptions
+                AND NOT (method:Deprecated)
+                AND NOT (method)-[:OVERRIDES]->()
+                AND NOT method.name STARTS WITH "getOrCreate"
+                AND NOT type.name ENDS WITH "Provider"
+                AND NOT type.name ENDS WITH "ConfigurationProperty"
+                AND NOT type.name ENDS WITH "ConfigurationPropertySource"
+            RETURN
+                type, method
         ]]></cypher>
     </constraint>
 
@@ -579,6 +635,7 @@
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
         <includeConstraint refId="my-rules:PublicFieldsMayNotExposeInternalTypes" />
+        <includeConstraint refId="my-rules:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
         <includeConstraint refId="my-rules:APITypesMayNotExtendSPITypes" />
         <includeConstraint refId="my-rules:APIMethodsMayNotExposeSPITypes" />
         <includeConstraint refId="my-rules:APIFieldsMayNotExposeSPITypes" />
