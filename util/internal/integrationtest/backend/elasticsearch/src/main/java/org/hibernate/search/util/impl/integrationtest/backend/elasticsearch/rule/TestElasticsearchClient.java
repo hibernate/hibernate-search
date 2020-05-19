@@ -509,7 +509,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		ElasticsearchResponse response = performRequestIgnore404( ElasticsearchRequest.get()
 				.pathComponent( indexName )
 				.build() );
-		int code = response.getStatusCode();
+		int code = response.statusCode();
 		return 200 <= code && code < 300;
 	}
 
@@ -556,7 +556,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * In our case, an empty mapping is fine, so we'll just ignore 404.
 		 */
 		ElasticsearchResponse response = performRequestIgnore404( builder.build() );
-		JsonObject result = response.getBody();
+		JsonObject result = response.body();
 		JsonElement index = result.get( indexName.original );
 		if ( index == null ) {
 			return new JsonObject().toString();
@@ -642,7 +642,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
 				.build() );
-		JsonObject result = response.getBody();
+		JsonObject result = response.body();
 		JsonElement index = result.get( indexName.original );
 		if ( index == null ) {
 			return new JsonObject().toString();
@@ -666,7 +666,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( URLEncodedString.fromString( "_alias" ) )
 				.build() );
-		JsonObject result = response.getBody();
+		JsonObject result = response.body();
 		JsonElement index = result.get( indexName.original );
 		if ( index == null ) {
 			index = new JsonObject();
@@ -691,7 +691,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
 				.build() );
-		JsonObject result = response.getBody();
+		JsonObject result = response.body();
 		return result.get( "_source" ).getAsJsonObject();
 	}
 
@@ -700,7 +700,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
 				.param( "stored_fields", fieldName )
 				.build() );
-		JsonObject result = response.getBody();
+		JsonObject result = response.body();
 		return result.get( "fields" ).getAsJsonObject().get( fieldName );
 	}
 
@@ -823,7 +823,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		catch (Exception e) {
 			throw requestFailed( request, e );
 		}
-		int statusCode = response.getStatusCode();
+		int statusCode = response.statusCode();
 		if ( !ElasticsearchClientUtils.isSuccessCode( statusCode ) ) {
 			throw requestFailed( request, response );
 		}
@@ -838,7 +838,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		catch (Exception e) {
 			throw requestFailed( request, e );
 		}
-		int statusCode = response.getStatusCode();
+		int statusCode = response.statusCode();
 		if ( !ElasticsearchClientUtils.isSuccessCode( statusCode ) && 404 != statusCode ) {
 			throw requestFailed( request, response );
 		}

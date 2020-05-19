@@ -81,8 +81,8 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 
 	@Override
 	public void checkSuccess(ElasticsearchResponse response) throws SearchException {
-		JsonObject responseBody = response.getBody();
-		Optional<Integer> statusCode = Optional.of( response.getStatusCode() );
+		JsonObject responseBody = response.body();
+		Optional<Integer> statusCode = Optional.of( response.statusCode() );
 		checkSuccess( statusCode, responseBody );
 	}
 

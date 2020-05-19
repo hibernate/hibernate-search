@@ -30,7 +30,7 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 
 	@Override
 	protected BulkResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject parsedResponseBody = response.getBody();
+		JsonObject parsedResponseBody = response.body();
 		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
 		return new BulkResultImpl( resultItems );
 	}

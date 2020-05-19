@@ -41,7 +41,7 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 		return new StringBuilder()
 				.append( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "path = " ).append( request.getPath() )
+				.append( "path = " ).append( request.path() )
 				.append( "]" )
 				.toString();
 	}

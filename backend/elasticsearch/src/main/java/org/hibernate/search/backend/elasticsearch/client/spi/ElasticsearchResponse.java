@@ -24,15 +24,15 @@ public final class ElasticsearchResponse {
 		this.body = body;
 	}
 
-	public int getStatusCode() {
+	public int statusCode() {
 		return statusCode;
 	}
 
-	public String getStatusMessage() {
+	public String statusMessage() {
 		return statusMessage;
 	}
 
-	public JsonObject getBody() {
+	public JsonObject body() {
 		return body;
 	}
 

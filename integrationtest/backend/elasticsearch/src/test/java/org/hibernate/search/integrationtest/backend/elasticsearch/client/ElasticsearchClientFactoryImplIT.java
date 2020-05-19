@@ -129,9 +129,9 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient() ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.getBody().toString() );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -160,9 +160,9 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
-			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
-			assertJsonEquals( responseBody, result.getBody().toString() );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
 
 			wireMockRule1.verify(
 					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -184,8 +184,8 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient() ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 500 );
-			assertJsonEquals( responseBody, result.getBody().toString() );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 500 );
+			assertJsonEquals( responseBody, result.body().toString() );
 		}
 	}
 
@@ -287,9 +287,9 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -313,9 +313,9 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -324,9 +324,9 @@ public class ElasticsearchClientFactoryImplIT {
 			wireMockRule2.resetRequests();
 
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -367,9 +367,9 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -387,9 +387,9 @@ public class ElasticsearchClientFactoryImplIT {
 					.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -423,9 +423,9 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
 			wireMockRule2.verify( 1, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -434,9 +434,9 @@ public class ElasticsearchClientFactoryImplIT {
 			wireMockRule2.resetRequests();
 
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 			result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			// Must not use the failing node anymore
 			wireMockRule1.verify( 2, postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
@@ -473,7 +473,7 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 			/*
 			 * Send requests repeatedly until both hosts have been targeted.
@@ -484,7 +484,7 @@ public class ElasticsearchClientFactoryImplIT {
 			 */
 			await().untilAsserted( () -> {
 				ElasticsearchResponse newResult = doPost( client, "/myIndex/myType", payload );
-				assertThat( newResult.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+				assertThat( newResult.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 				wireMockRule2.verify(
 						postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -537,7 +537,7 @@ public class ElasticsearchClientFactoryImplIT {
 			 */
 			await().untilAsserted( () -> {
 				ElasticsearchResponse newResult = doPost( client, "/myIndex/myType", payload );
-				assertThat( newResult.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+				assertThat( newResult.statusCode() ).as( "status code" ).isEqualTo( 200 );
 
 				wireMockRule2.verify(
 						postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
@@ -594,7 +594,7 @@ public class ElasticsearchClientFactoryImplIT {
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
 		}
 	}
 
@@ -612,8 +612,8 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient() ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType/_search", payload );
-			assertThat( result.getStatusCode() ).as( "status code" ).isEqualTo( 401 );
-			assertThat( result.getStatusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 401 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
 		}
 	}
 

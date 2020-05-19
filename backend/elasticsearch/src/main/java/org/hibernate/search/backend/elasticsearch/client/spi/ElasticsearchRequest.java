@@ -58,27 +58,27 @@ public final class ElasticsearchRequest {
 		this.timeoutUnit = builder.timeoutUnit;
 	}
 
-	public String getMethod() {
+	public String method() {
 		return method;
 	}
 
-	public String getPath() {
+	public String path() {
 		return path;
 	}
 
-	public Map<String, String> getParameters() {
+	public Map<String, String> parameters() {
 		return parameters;
 	}
 
-	public List<JsonObject> getBodyParts() {
+	public List<JsonObject> bodyParts() {
 		return bodyParts;
 	}
 
-	public Long getTimeoutValue() {
+	public Long timeoutValue() {
 		return timeoutValue;
 	}
 
-	public TimeUnit getTimeoutUnit() {
+	public TimeUnit timeoutUnit() {
 		return timeoutUnit;
 	}
 

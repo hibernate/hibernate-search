@@ -43,34 +43,34 @@ class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> 
 
 	@Override
 	public boolean isSimilarTo(ElasticsearchClientSubmitCall other) {
-		return request.getPath().equals( other.request.getPath() );
+		return request.path().equals( other.request.path() );
 	}
 
 	void verify(ElasticsearchClientSubmitCall actualCall) {
 		SoftAssertions.assertSoftly( assertion -> {
-			assertion.assertThat( actualCall.request.getPath() ).isEqualTo( request.getPath() );
-			assertion.assertThat( actualCall.request.getMethod() ).isEqualTo( request.getMethod() );
+			assertion.assertThat( actualCall.request.path() ).isEqualTo( request.path() );
+			assertion.assertThat( actualCall.request.method() ).isEqualTo( request.method() );
 			switch ( assertionMode ) {
 				case PATH_AND_METHOD:
 					break;
 				case EXTENSIBLE:
 					// containsAllEntriesOf( emptyMap ) has a special, inconsistent meaning: "the actual map is empty"
 					// Avoid that...
-					if ( !request.getParameters().isEmpty() ) {
-						assertion.assertThat( actualCall.request.getParameters() )
-								.containsAllEntriesOf( request.getParameters() );
+					if ( !request.parameters().isEmpty() ) {
+						assertion.assertThat( actualCall.request.parameters() )
+								.containsAllEntriesOf( request.parameters() );
 					}
 					assertion.check( () -> assertJsonEquals(
-							toComparableJson( request.getBodyParts() ),
-							toComparableJson( actualCall.request.getBodyParts() ),
+							toComparableJson( request.bodyParts() ),
+							toComparableJson( actualCall.request.bodyParts() ),
 							JSONCompareMode.STRICT_ORDER
 					) );
 					break;
 				case STRICT:
-					assertion.assertThat( actualCall.request.getParameters() ).isEqualTo( request.getParameters() );
+					assertion.assertThat( actualCall.request.parameters() ).isEqualTo( request.parameters() );
 					assertion.check( () -> assertJsonEquals(
-							toComparableJson( request.getBodyParts() ),
-							toComparableJson( actualCall.request.getBodyParts() ),
+							toComparableJson( request.bodyParts() ),
+							toComparableJson( actualCall.request.bodyParts() ),
 							JSONCompareMode.STRICT
 					) );
 					break;

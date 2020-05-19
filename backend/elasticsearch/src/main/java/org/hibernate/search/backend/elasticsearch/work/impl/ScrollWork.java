@@ -25,7 +25,7 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject body = response.getBody();
+		JsonObject body = response.body();
 		return resultExtractor.extract( body );
 	}
 
