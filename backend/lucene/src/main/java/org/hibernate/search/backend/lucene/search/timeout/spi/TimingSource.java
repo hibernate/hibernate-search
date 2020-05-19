@@ -24,7 +24,7 @@ public interface TimingSource {
 	 *
 	 * @return an increasing value related to time in milliseconds. Only meaningful to compare time intervals, with no guarantees of high precision.
 	 */
-	long getMonotonicTimeEstimate();
+	long monotonicTimeEstimate();
 
 	/**
 	 * Invoked on backend shutdown. There is no start method as it's expected to be lazily initialized
@@ -32,7 +32,7 @@ public interface TimingSource {
 	void stop();
 
 	/**
-	 * Needs to be invoked at least once before {@link #getMonotonicTimeEstimate()} can be used.
+	 * Needs to be invoked at least once before {@link #monotonicTimeEstimate()} can be used.
 	 * Safe to be invoked multiple times.
 	 */
 	void ensureInitialized();

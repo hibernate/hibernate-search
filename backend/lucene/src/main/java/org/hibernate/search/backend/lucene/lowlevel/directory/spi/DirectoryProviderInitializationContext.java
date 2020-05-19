@@ -20,12 +20,12 @@ public interface DirectoryProviderInitializationContext {
 	/**
 	 * @return The event context to use for exceptions.
 	 */
-	EventContext getEventContext();
+	EventContext eventContext();
 
 	/**
 	 * @return A {@link BeanResolver}.
 	 */
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
 	/**
 	 * @return A configuration property source, appropriately masked so that the factory
@@ -33,7 +33,7 @@ public interface DirectoryProviderInitializationContext {
 	 * can be accessed at the root.
 	 * <strong>CAUTION:</strong> the property key "type" is reserved for use by the engine.
 	 */
-	ConfigurationPropertySource getConfigurationPropertySource();
+	ConfigurationPropertySource configurationPropertySource();
 
 	Optional<Supplier<LockFactory>> createConfiguredLockFactorySupplier();
 }

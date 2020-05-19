@@ -55,17 +55,17 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return eventContext;
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return beanResolver;
 	}
 
 	@Override
-	public ConfigurationPropertySource getConfigurationPropertySource() {
+	public ConfigurationPropertySource configurationPropertySource() {
 		return configurationPropertySource;
 	}
 

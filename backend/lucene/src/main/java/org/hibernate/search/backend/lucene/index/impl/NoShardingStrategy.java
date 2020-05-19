@@ -18,7 +18,7 @@ public class NoShardingStrategy implements ShardingStrategy {
 
 	@Override
 	public void initialize(ShardingStrategyInitializationContext context) {
-		context.setShardingDisabled();
+		context.disableSharding();
 	}
 
 	@Override

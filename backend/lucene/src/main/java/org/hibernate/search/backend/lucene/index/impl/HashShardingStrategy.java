@@ -35,7 +35,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 	@Override
 	public void initialize(ShardingStrategyInitializationContext context) {
 		int numberOfShards = NUMBER_OF_SHARDS.getOrThrow(
-				context.getConfigurationPropertySource(),
+				context.configurationPropertySource(),
 				key -> log.missingPropertyValueForShardingStrategy( NAME, key )
 		);
 		this.shardIds = new String[numberOfShards];
@@ -45,7 +45,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 			shardIds[i] = shardId;
 			shardIdSet.add( shardId );
 		}
-		context.setShardIdentifiers( shardIdSet );
+		context.shardIdentifiers( shardIdSet );
 	}
 
 	@Override

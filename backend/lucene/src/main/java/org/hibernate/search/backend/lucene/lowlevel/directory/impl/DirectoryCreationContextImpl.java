@@ -32,17 +32,17 @@ public class DirectoryCreationContextImpl implements DirectoryCreationContext {
 	}
 
 	@Override
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return eventContext;
 	}
 
 	@Override
-	public String getIndexName() {
+	public String indexName() {
 		return indexName;
 	}
 
 	@Override
-	public Optional<String> getShardId() {
+	public Optional<String> shardId() {
 		return shardId;
 	}
 

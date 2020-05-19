@@ -18,22 +18,22 @@ public interface ShardingStrategyInitializationContext {
 	 * i.e. values that can be returned by {@link ShardingStrategy#toShardIdentifier(String, String)}
 	 * or {@link ShardingStrategy#toShardIdentifiers(Set)}.
 	 */
-	void setShardIdentifiers(Set<String> shardIdentifiers);
+	void shardIdentifiers(Set<String> shardIdentifiers);
 
 	/**
 	 * Inform Hibernate Search that sharding is disabled.
 	 */
-	void setShardingDisabled();
+	void disableSharding();
 
 	/**
 	 * @return The name of the index in Hibernate Search.
 	 */
-	String getIndexName();
+	String indexName();
 
 	/**
 	 * @return A {@link BeanResolver}.
 	 */
-	BeanResolver getBeanResolver();
+	BeanResolver beanResolver();
 
 	/**
 	 * @return A configuration property source, appropriately masked so that the factory
@@ -41,6 +41,6 @@ public interface ShardingStrategyInitializationContext {
 	 * can be accessed at the root.
 	 * <strong>CAUTION:</strong> the property key "type" is reserved for use by the engine.
 	 */
-	ConfigurationPropertySource getConfigurationPropertySource();
+	ConfigurationPropertySource configurationPropertySource();
 
 }
