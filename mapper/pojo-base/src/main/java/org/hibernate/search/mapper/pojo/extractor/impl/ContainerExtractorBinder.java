@@ -97,7 +97,7 @@ public class ContainerExtractorBinder {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
 		else {
-			for ( String extractorName : extractorPath.getExplicitExtractorNames() ) {
+			for ( String extractorName : extractorPath.explicitExtractorNames() ) {
 				ExtractorContributor extractorContributor = getExtractorContributorForName( extractorName );
 				if ( !extractorContributor.tryAppend( state ) ) {
 					/*
@@ -131,7 +131,7 @@ public class ContainerExtractorBinder {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
 		else {
-			for ( String extractorName : extractorPath.getExplicitExtractorNames() ) {
+			for ( String extractorName : extractorPath.explicitExtractorNames() ) {
 				SingleExtractorContributor extractorContributor = getExtractorContributorForName( extractorName );
 				extractorContributor.append( state );
 			}
@@ -160,7 +160,7 @@ public class ContainerExtractorBinder {
 		ContainerExtractor<? super C, ?> extractor = null;
 		List<BeanHolder<?>> beanHolders = new ArrayList<>();
 		try {
-			for ( String extractorName : boundPath.getExtractorPath().getExplicitExtractorNames() ) {
+			for ( String extractorName : boundPath.getExtractorPath().explicitExtractorNames() ) {
 				Class<? extends ContainerExtractor> extractorClass =
 						containerExtractorRegistry.getForName( extractorName );
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =

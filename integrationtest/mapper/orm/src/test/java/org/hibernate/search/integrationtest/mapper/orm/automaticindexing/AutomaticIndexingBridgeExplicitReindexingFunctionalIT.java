@@ -238,11 +238,11 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
 		private QueryBasedTypeBridge(TypeBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.fromOtherEntity( ContainedEntity.class, "parent" )
 					.use( "includedInTypeBridge" );
 
-			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
+			IndexSchemaObjectField typeBridgeObjectField = context.indexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
 			includedInTypeBridgeFieldReference = typeBridgeObjectField.field(
 					"includedInTypeBridge", f -> f.asString()
@@ -276,7 +276,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new QueryBasedTypeBridge( context ) );
+				context.bridge( new QueryBasedTypeBridge( context ) );
 			}
 		}
 	}

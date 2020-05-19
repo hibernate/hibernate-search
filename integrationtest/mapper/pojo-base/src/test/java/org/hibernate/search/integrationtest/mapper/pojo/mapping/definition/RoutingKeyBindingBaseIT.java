@@ -68,8 +68,8 @@ public class RoutingKeyBindingBaseIT {
 	public static class WorkingRoutingKeyBinder implements RoutingKeyBinder {
 		@Override
 		public void bind(RoutingKeyBindingContext context) {
-			context.getDependencies().useRootOnly();
-			context.setBridge( (String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
+			context.dependencies().useRootOnly();
+			context.bridge( (String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
 						RoutingKeyBridgeToRoutingKeyContext context1) -> {
 				throw new UnsupportedOperationException( "Should not be called " );
 			} );

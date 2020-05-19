@@ -22,8 +22,8 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
 	 * Any read that was not declared during {@link RoutingKeyBinder#bind(RoutingKeyBindingContext) binding}
-	 * (by declaring dependencies using {@link RoutingKeyBindingContext#getDependencies()}
-	 * or (advanced use) creating an accessor using {@link RoutingKeyBindingContext#getBridgedElement()})
+	 * (by declaring dependencies using {@link RoutingKeyBindingContext#dependencies()}
+	 * or (advanced use) creating an accessor using {@link RoutingKeyBindingContext#bridgedElement()})
 	 * may lead to out-of-sync indexes,
 	 * because Hibernate Search will consider the read property irrelevant to indexing
 	 * and will not reindex entities when that property changes.

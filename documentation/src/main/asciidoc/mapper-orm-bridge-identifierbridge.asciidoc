@@ -111,7 +111,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identi
 ----
 <1> The binder must implement the `IdentifierBinder` interface.
 <2> Implement the `bind` method.
-<3> Call `context.setBridge` to define the identifier bridge to use.
+<3> Call `context.bridge(...)` to define the identifier bridge to use.
 <4> Pass the expected type of property values.
 <5> Pass the identifier bridge instance.
 <6> The identifier bridge must still be implemented.
@@ -224,7 +224,7 @@ Usual compatibility policies do not apply: incompatible changes may be introduce
 ====
 
 The context passed to the identifier binder's `bind` method
-exposes a `getBridgedElement` method that gives access to metadata about the value being bound,
+exposes a `bridgedElement()` method that gives access to metadata about the value being bound,
 in particular its type.
 
 See the javadoc for more information.

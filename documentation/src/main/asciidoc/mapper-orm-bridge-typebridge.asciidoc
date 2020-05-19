@@ -55,7 +55,7 @@ Since we're indexing a full name,
 we will use a `String` type with a `name` analyzer (defined separately, see <<concepts-analysis>>).
 See <<mapper-orm-bridge-index-field-type-dsl>>
 for more information about declaring index field types.
-<6> Call `context.setBridge` to define the type bridge to use,
+<6> Call `context.bridge(...)` to define the type bridge to use,
 and pass an instance of the bridge.
 <7> Pass a reference to the `fullName` field to the bridge.
 
@@ -178,7 +178,7 @@ Usual compatibility policies do not apply: incompatible changes may be introduce
 ====
 
 The context passed to the type binder's `bind` method
-exposes a `getBridgedElement` method that gives access to metadata about the type being bound.
+exposes a `bridgedElement()` method that gives access to metadata about the type being bound.
 
 The metadata can in particular be used to inspect the type in details:
 

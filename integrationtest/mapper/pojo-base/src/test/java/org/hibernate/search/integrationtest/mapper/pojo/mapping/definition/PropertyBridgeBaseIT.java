@@ -90,14 +90,14 @@ public class PropertyBridgeBaseIT {
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
 						.binder( (PropertyBinder) context -> {
-							PojoElementAccessor<String> pojoPropertyAccessor = context.getBridgedElement()
+							PojoElementAccessor<String> pojoPropertyAccessor = context.bridgedElement()
 									.createAccessor( String.class );
-							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
 									"someField",
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.setBridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
+							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
 								target.addValue(
 									indexFieldReference, pojoPropertyAccessor.read( bridgedElement )
 								);
@@ -169,13 +169,13 @@ public class PropertyBridgeBaseIT {
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "contained" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies().use( "stringProperty" );
-							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+							context.dependencies().use( "stringProperty" );
+							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
 									"someField",
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.setBridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
+							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
 								Contained castedBridgedElement = (Contained) bridgedElement;
 								target.addValue(
 									indexFieldReference, castedBridgedElement.getStringProperty()
@@ -239,8 +239,8 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies().use( "doesNotExist.stringProperty" );
-									context.setBridge( new UnusedPropertyBridge() );
+									context.dependencies().use( "doesNotExist.stringProperty" );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.withAnnotatedTypes( Contained.class )
@@ -284,12 +284,12 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.use(
 													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
 													"stringProperty"
 											);
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup( IndexedEntity.class )
@@ -327,15 +327,15 @@ public class PropertyBridgeBaseIT {
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies()
+							context.dependencies()
 									.fromOtherEntity( PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class, "parent" )
 									.use( "stringProperty" );
-							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
 									"someField",
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.setBridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
+							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
 								PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity castedBridgedElement =
 									(PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity) bridgedElement;
 								/*
@@ -441,13 +441,13 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
 													"parent"
 											)
 											.use( "doesNotExist" );
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup(
@@ -476,12 +476,12 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
 													"doesNotExist"
 											);
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup(
@@ -509,13 +509,13 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.fromOtherEntity(
 													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
 													PojoModelPath.parse( "parent" )
 											);
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup(
@@ -546,12 +546,12 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
 													"doesNotMatter"
 											);
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.withAnnotatedTypes( PropertyBridgeExplicitIndexingClasses.NotEntity.class )
@@ -582,12 +582,12 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.NotEntity.class,
 													"doesNotMatter"
 											);
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.withAnnotatedTypes( PropertyBridgeExplicitIndexingClasses.NotEntity.class )
@@ -618,12 +618,12 @@ public class PropertyBridgeBaseIT {
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
 								.binder( (PropertyBinder) context -> {
-									context.getDependencies()
+									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
 													"associationToDifferentEntity"
 											);
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup(
@@ -673,7 +673,7 @@ public class PropertyBridgeBaseIT {
 								.property( "contained" )
 								.binder( (PropertyBinder) context -> {
 									// Do not declare any dependency
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup( IndexedEntity.class )
@@ -719,10 +719,10 @@ public class PropertyBridgeBaseIT {
 								.property( "contained" )
 								.binder( (PropertyBinder) context -> {
 									// Declare no dependency, but also a dependency: this is inconsistent.
-									context.getDependencies()
+									context.dependencies()
 											.use( "stringProperty" )
 											.useRootOnly();
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 				)
 						.setup( IndexedEntity.class )
@@ -765,13 +765,13 @@ public class PropertyBridgeBaseIT {
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies().useRootOnly();
-							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
+							context.dependencies().useRootOnly();
+							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
 									"someField",
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.setBridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
+							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
 								List<String> castedBridgedElement = (List<String>) bridgedElement;
 								for ( String string : castedBridgedElement ) {
 									target.addValue( indexFieldReference, string );
@@ -835,17 +835,17 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies().useRootOnly();
+							context.dependencies().useRootOnly();
 							// Single-valued field
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.field( "stringFromBridge", f -> f.asString() )
 									.toReference();
 							// Multi-valued field
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.field( "listFromBridge", f -> f.asInteger() )
 									.multiValued()
 									.toReference();
-							context.setBridge( new UnusedPropertyBridge() );
+							context.bridge( new UnusedPropertyBridge() );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -886,21 +886,21 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies().useRootOnly();
+							context.dependencies().useRootOnly();
 							// Single-valued field
-							IndexSchemaObjectField stringObjectField = context.getIndexSchemaElement()
+							IndexSchemaObjectField stringObjectField = context.indexSchemaElement()
 									.objectField( "stringFromBridge" );
 							stringObjectField.toReference();
 							stringObjectField.field( "value", f -> f.asString() )
 									.toReference();
 							// Multi-valued field
-							IndexSchemaObjectField listObjectField = context.getIndexSchemaElement()
+							IndexSchemaObjectField listObjectField = context.indexSchemaElement()
 									.objectField( "listFromBridge", ObjectFieldStorage.NESTED )
 									.multiValued();
 							listObjectField.toReference();
 							listObjectField.field( "value", f -> f.asInteger() )
 									.toReference();
-							context.setBridge( new UnusedPropertyBridge() );
+							context.bridge( new UnusedPropertyBridge() );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -941,17 +941,17 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies().useRootOnly();
+							context.dependencies().useRootOnly();
 							// Single-valued field
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.fieldTemplate( "stringFromBridge", f -> f.asString() )
 									.matchingPathGlob( "*_string" );
 							// Multi-valued field
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.fieldTemplate( "listFromBridge", f -> f.asInteger() )
 									.matchingPathGlob( "*_list" )
 									.multiValued();
-							context.setBridge( new UnusedPropertyBridge() );
+							context.bridge( new UnusedPropertyBridge() );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -998,23 +998,23 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
 						.binder( (PropertyBinder) context -> {
-							context.getDependencies().useRootOnly();
+							context.dependencies().useRootOnly();
 							// Single-valued field
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.objectFieldTemplate( "stringFromBridge" )
 									.matchingPathGlob( "*_string" );
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.fieldTemplate( "stringFromBridge_value", f -> f.asString() )
 									.matchingPathGlob( "*_string.value" );
 							// Multi-valued field
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.objectFieldTemplate( "listFromBridge", ObjectFieldStorage.NESTED )
 									.matchingPathGlob( "*_list" )
 									.multiValued();
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 									.fieldTemplate( "listFromBridge_value", f -> f.asInteger() )
 									.matchingPathGlob( "*_list.value" );
-							context.setBridge( new UnusedPropertyBridge() );
+							context.bridge( new UnusedPropertyBridge() );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -1040,8 +1040,8 @@ public class PropertyBridgeBaseIT {
 						.withConfiguration( b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "stringProperty" )
 								.binder( (PropertyBinder) context -> {
-									context.getBridgedElement().createAccessor( Integer.class );
-									context.setBridge( new UnusedPropertyBridge() );
+									context.bridgedElement().createAccessor( Integer.class );
+									context.bridge( new UnusedPropertyBridge() );
 								} )
 						)
 						.setup( IndexedEntity.class )

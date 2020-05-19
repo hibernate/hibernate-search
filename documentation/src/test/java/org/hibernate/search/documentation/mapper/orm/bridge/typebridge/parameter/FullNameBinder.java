@@ -26,17 +26,17 @@ public class FullNameBinder implements TypeBinder {
 
 	@Override
 	public void bind(TypeBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				.use( "firstName" )
 				.use( "lastName" );
 
-		IndexFieldReference<String> fullNameField = context.getIndexSchemaElement()
+		IndexFieldReference<String> fullNameField = context.indexSchemaElement()
 				.field( "fullName", f -> f.asString().analyzer( "name" ) )
 				.toReference();
 
 		IndexFieldReference<String> fullNameSortField = null;
 		if ( this.sortField ) { // <2>
-			fullNameSortField = context.getIndexSchemaElement()
+			fullNameSortField = context.indexSchemaElement()
 					.field(
 							"fullName_sort",
 							f -> f.asString().normalizer( "name" ).sortable( Sortable.YES )
@@ -44,7 +44,7 @@ public class FullNameBinder implements TypeBinder {
 					.toReference();
 		}
 
-		context.setBridge( new Bridge(
+		context.bridge( new Bridge(
 				fullNameField,
 				fullNameSortField
 		) );

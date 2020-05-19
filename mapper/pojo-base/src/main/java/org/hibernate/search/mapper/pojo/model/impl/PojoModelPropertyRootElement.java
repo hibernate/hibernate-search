@@ -43,7 +43,7 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelCompositeE
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return modelPath.getParent().getPropertyModel().getName();
 	}
 

@@ -43,7 +43,7 @@ public final class BeanDelegatingBinder
 	@Override
 	public void bind(TypeBindingContext context) {
 		try ( BeanHolder<? extends TypeBinder> delegateHolder =
-				createDelegate( context.getBeanResolver(), TypeBinder.class ) ) {
+				createDelegate( context.beanResolver(), TypeBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}
@@ -51,7 +51,7 @@ public final class BeanDelegatingBinder
 	@Override
 	public void bind(PropertyBindingContext context) {
 		try ( BeanHolder<? extends PropertyBinder> delegateHolder =
-				createDelegate( context.getBeanResolver(), PropertyBinder.class ) ) {
+				createDelegate( context.beanResolver(), PropertyBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}
@@ -59,7 +59,7 @@ public final class BeanDelegatingBinder
 	@Override
 	public void bind(RoutingKeyBindingContext context) {
 		try ( BeanHolder<? extends RoutingKeyBinder> delegateHolder =
-				createDelegate( context.getBeanResolver(), RoutingKeyBinder.class ) ) {
+				createDelegate( context.beanResolver(), RoutingKeyBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}
@@ -67,7 +67,7 @@ public final class BeanDelegatingBinder
 	@Override
 	public void bind(MarkerBindingContext context) {
 		try ( BeanHolder<? extends MarkerBinder> delegateHolder =
-				createDelegate( context.getBeanResolver(), MarkerBinder.class ) ) {
+				createDelegate( context.beanResolver(), MarkerBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}
@@ -75,7 +75,7 @@ public final class BeanDelegatingBinder
 	@Override
 	public void bind(IdentifierBindingContext<?> context) {
 		try ( BeanHolder<? extends IdentifierBinder> delegateHolder =
-				createDelegate( context.getBeanResolver(), IdentifierBinder.class ) ) {
+				createDelegate( context.beanResolver(), IdentifierBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}
@@ -83,7 +83,7 @@ public final class BeanDelegatingBinder
 	@Override
 	public void bind(ValueBindingContext<?> context) {
 		try ( BeanHolder<? extends ValueBinder> delegateHolder =
-				createDelegate( context.getBeanResolver(), ValueBinder.class ) ) {
+				createDelegate( context.beanResolver(), ValueBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}

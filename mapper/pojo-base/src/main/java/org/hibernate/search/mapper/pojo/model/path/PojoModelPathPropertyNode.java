@@ -52,7 +52,7 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 	 * May be {@code null}.
 	 */
 	@Override
-	public PojoModelPathValueNode getParent() {
+	public PojoModelPathValueNode parent() {
 		return parent;
 	}
 
@@ -68,8 +68,17 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 	/**
 	 * @return The name of this property.
 	 */
-	public String getPropertyName() {
+	public String propertyName() {
 		return propertyName;
+	}
+
+	/**
+	 * @return The name of this property.
+	 * @deprecated Use {@link #propertyName()} instead.
+	 */
+	@Deprecated
+	public String getPropertyName() {
+		return propertyName();
 	}
 
 	/**
@@ -90,11 +99,11 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 	}
 
 	private static void addPropertyPathsRecursively(StringBuilder builder, PojoModelPathPropertyNode propertyNode) {
-		PojoModelPathValueNode parentValueNode = propertyNode.getParent();
+		PojoModelPathValueNode parentValueNode = propertyNode.parent();
 		if ( parentValueNode != null ) {
-			addPropertyPathsRecursively( builder, parentValueNode.getParent() );
+			addPropertyPathsRecursively( builder, parentValueNode.parent() );
 			builder.append( '.' );
 		}
-		builder.append( propertyNode.getPropertyName() );
+		builder.append( propertyNode.propertyName() );
 	}
 }

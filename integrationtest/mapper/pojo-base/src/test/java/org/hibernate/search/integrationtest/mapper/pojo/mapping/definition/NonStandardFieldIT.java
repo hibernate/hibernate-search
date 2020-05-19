@@ -227,9 +227,9 @@ public class NonStandardFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge(
+				context.bridge(
 						WrappedValue.class, new ValidTypeBridge(),
-						context.getTypeFactory().extension( StubBackendExtension.get() ).asNonStandard( String.class )
+						context.typeFactory().extension( StubBackendExtension.get() ).asNonStandard( String.class )
 				);
 			}
 		}
@@ -244,9 +244,9 @@ public class NonStandardFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge(
+				context.bridge(
 						WrappedValue.class, new InvalidTypeBridge(),
-						context.getTypeFactory().asString()
+						context.typeFactory().asString()
 				);
 			}
 		}

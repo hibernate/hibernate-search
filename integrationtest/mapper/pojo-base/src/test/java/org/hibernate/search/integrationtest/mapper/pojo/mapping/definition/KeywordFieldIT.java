@@ -496,7 +496,7 @@ public class KeywordFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asString() );
+				context.bridge( WrappedValue.class, new ValidTypeBridge(), context.typeFactory().asString() );
 			}
 		}
 	}
@@ -510,7 +510,7 @@ public class KeywordFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );
+				context.bridge( WrappedValue.class, new InvalidTypeBridge(), context.typeFactory().asInteger() );
 			}
 		}
 	}

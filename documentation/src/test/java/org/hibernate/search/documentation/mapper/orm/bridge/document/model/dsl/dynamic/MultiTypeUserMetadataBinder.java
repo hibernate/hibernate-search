@@ -23,13 +23,13 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				/* ... (declaration of dependencies, not relevant) ... */
 				//end::bind[]
 				.useRootOnly();
 		//tag::bind[]
 
-		IndexSchemaElement schemaElement = context.getIndexSchemaElement();
+		IndexSchemaElement schemaElement = context.indexSchemaElement();
 
 		IndexSchemaObjectField userMetadataField =
 				schemaElement.objectField( "multiTypeUserMetadata" ); // <1>
@@ -45,7 +45,7 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 				f -> f.asString().analyzer( "english" )
 		);
 
-		context.setBridge( new Bridge( userMetadataField.toReference() ) );
+		context.bridge( new Bridge( userMetadataField.toReference() ) );
 	}
 	//end::bind[]
 

@@ -145,42 +145,42 @@ public class StartupStubBridge<T>
 
 		@Override
 		public void bind(TypeBindingContext context) {
-			context.getDependencies().useRootOnly();
+			context.dependencies().useRootOnly();
 			// Add at least one field so that the bridge is not removed
-			context.getIndexSchemaElement().field(
+			context.indexSchemaElement().field(
 					"startupStubBridgeFieldFromTypeBridge",
 					f -> f.asString()
 			)
 					.toReference();
-			context.setBridge( build() );
+			context.bridge( build() );
 		}
 
 		@Override
 		public void bind(PropertyBindingContext context) {
-			context.getDependencies().useRootOnly();
+			context.dependencies().useRootOnly();
 			// Add at least one field so that the bridge is not removed
-			context.getIndexSchemaElement().field(
+			context.indexSchemaElement().field(
 					"startupStubBridgeFieldFromPropertyBridge",
 					f -> f.asString()
 			)
 					.toReference();
-			context.setBridge( build() );
+			context.bridge( build() );
 		}
 
 		@Override
 		public void bind(IdentifierBindingContext<?> context) {
-			context.setBridge( bridgeInputType, build() );
+			context.bridge( bridgeInputType, build() );
 		}
 
 		@Override
 		public void bind(RoutingKeyBindingContext context) {
-			context.getDependencies().useRootOnly();
-			context.setBridge( build() );
+			context.dependencies().useRootOnly();
+			context.bridge( build() );
 		}
 
 		@Override
 		public void bind(ValueBindingContext<?> context) {
-			context.setBridge( bridgeInputType, build(), null );
+			context.bridge( bridgeInputType, build(), null );
 		}
 
 		private BeanHolder<StartupStubBridge<T>> build() {

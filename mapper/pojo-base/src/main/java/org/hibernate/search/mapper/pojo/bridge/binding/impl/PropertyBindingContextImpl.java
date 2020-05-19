@@ -53,32 +53,32 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	}
 
 	@Override
-	public void setBridge(PropertyBridge bridge) {
-		setBridge( BeanHolder.of( bridge ) );
+	public void bridge(PropertyBridge bridge) {
+		bridge( BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public void setBridge(BeanHolder<? extends PropertyBridge> bridgeHolder) {
+	public void bridge(BeanHolder<? extends PropertyBridge> bridgeHolder) {
 		this.partialBinding = new PartialBinding<>( bridgeHolder );
 	}
 
 	@Override
-	public PojoModelProperty getBridgedElement() {
+	public PojoModelProperty bridgedElement() {
 		return bridgedElement;
 	}
 
 	@Override
-	public PojoPropertyIndexingDependencyConfigurationContext getDependencies() {
+	public PojoPropertyIndexingDependencyConfigurationContext dependencies() {
 		return dependencyContext;
 	}
 
 	@Override
-	public IndexFieldTypeFactory getTypeFactory() {
+	public IndexFieldTypeFactory typeFactory() {
 		return indexFieldTypeFactory;
 	}
 
 	@Override
-	public IndexSchemaElement getIndexSchemaElement() {
+	public IndexSchemaElement indexSchemaElement() {
 		return indexSchemaElement;
 	}
 

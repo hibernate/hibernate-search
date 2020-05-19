@@ -261,12 +261,12 @@ public class PojoModelPathTest {
 			PojoModelPath currentPath = path;
 			do {
 				if ( currentPath instanceof PojoModelPathValueNode ) {
-					components.addFirst( ( (PojoModelPathValueNode) currentPath ).getExtractorPath() );
+					components.addFirst( ( (PojoModelPathValueNode) currentPath ).extractorPath() );
 				}
 				else {
-					components.addFirst( ( (PojoModelPathPropertyNode) currentPath ).getPropertyName() );
+					components.addFirst( ( (PojoModelPathPropertyNode) currentPath ).propertyName() );
 				}
-				currentPath = currentPath.getParent();
+				currentPath = currentPath.parent();
 			}
 			while ( currentPath != null );
 

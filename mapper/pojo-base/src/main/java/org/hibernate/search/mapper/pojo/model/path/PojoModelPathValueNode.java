@@ -54,7 +54,7 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 	 * @return The model path to the property from which the value represented by this node is extracted.
 	 */
 	@Override
-	public PojoModelPathPropertyNode getParent() {
+	public PojoModelPathPropertyNode parent() {
 		return parent;
 	}
 
@@ -62,8 +62,18 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 	 * @return The extractor path from the parent property to this value.
 	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerExtractorPath#defaultExtractors()}).
 	 */
-	public ContainerExtractorPath getExtractorPath() {
+	public ContainerExtractorPath extractorPath() {
 		return extractorPath;
+	}
+
+	/**
+	 * @return The extractor path from the parent property to this value.
+	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerExtractorPath#defaultExtractors()}).
+	 * @deprecated Use {@link #extractorPath()} instead.
+	 */
+	@Deprecated
+	public ContainerExtractorPath getExtractorPath() {
+		return extractorPath();
 	}
 
 	/**
@@ -77,6 +87,6 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 
 	@Override
 	void appendSelfPath(StringBuilder builder) {
-		builder.append( getExtractorPath() );
+		builder.append( extractorPath() );
 	}
 }

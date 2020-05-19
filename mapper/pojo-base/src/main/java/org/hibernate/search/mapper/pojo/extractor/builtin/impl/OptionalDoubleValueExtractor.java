@@ -23,7 +23,7 @@ public class OptionalDoubleValueExtractor implements ContainerExtractor<Optional
 	}
 
 	@Override
-	public boolean isMultiValued() {
+	public boolean multiValued() {
 		return false;
 	}
 }

@@ -74,11 +74,11 @@ public class TypeBindingBaseIT {
 	public static class WorkingTypeBinder implements TypeBinder {
 		@Override
 		public void bind(TypeBindingContext context) {
-			context.getDependencies().use( "text" );
+			context.dependencies().use( "text" );
 			IndexFieldReference<String> indexFieldReference =
-					context.getIndexSchemaElement().field( "myText", f -> f.asString() )
+					context.indexSchemaElement().field( "myText", f -> f.asString() )
 							.toReference();
-			context.setBridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
+			context.bridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
 				IndexedEntityWithWorkingTypeBinding castedBridgedElement = (IndexedEntityWithWorkingTypeBinding) bridgedElement;
 				target.addValue(
 						indexFieldReference, castedBridgedElement.text

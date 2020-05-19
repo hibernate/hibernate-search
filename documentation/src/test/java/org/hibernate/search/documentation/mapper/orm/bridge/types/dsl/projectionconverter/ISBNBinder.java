@@ -20,10 +20,10 @@ public class ISBNBinder implements PropertyBinder {
 
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies().useRootOnly();
+		context.dependencies().useRootOnly();
 
 		//tag::include[]
-		IndexFieldType<String> type = context.getTypeFactory()
+		IndexFieldType<String> type = context.typeFactory()
 				.asString() // <1>
 				.projectable( Projectable.YES )
 				.projectionConverter( // <2>
@@ -33,8 +33,8 @@ public class ISBNBinder implements PropertyBinder {
 				.toIndexFieldType();
 		//end::include[]
 
-		context.setBridge( new Bridge(
-				context.getIndexSchemaElement()
+		context.bridge( new Bridge(
+				context.indexSchemaElement()
 						.field( "isbn", type )
 						.toReference()
 		) );

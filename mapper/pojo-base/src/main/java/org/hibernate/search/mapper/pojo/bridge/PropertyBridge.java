@@ -31,8 +31,8 @@ public interface PropertyBridge extends AutoCloseable {
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
 	 * Any read that was not declared during {@link PropertyBinder#bind(PropertyBindingContext) binding}
-	 * (by declaring dependencies using {@link PropertyBindingContext#getDependencies()}
-	 * or (advanced use) creating an accessor using {@link PropertyBindingContext#getBridgedElement()})
+	 * (by declaring dependencies using {@link PropertyBindingContext#dependencies()}
+	 * or (advanced use) creating an accessor using {@link PropertyBindingContext#bridgedElement()})
 	 * may lead to out-of-sync indexes,
 	 * because Hibernate Search will consider the read property irrelevant to indexing
 	 * and will not reindex entities when that property changes.

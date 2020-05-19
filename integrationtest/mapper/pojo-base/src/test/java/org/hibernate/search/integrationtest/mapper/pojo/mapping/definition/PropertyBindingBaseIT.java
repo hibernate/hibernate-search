@@ -74,11 +74,11 @@ public class PropertyBindingBaseIT {
 	public static class WorkingPropertyBinder implements PropertyBinder {
 		@Override
 		public void bind(PropertyBindingContext context) {
-			context.getDependencies().useRootOnly();
+			context.dependencies().useRootOnly();
 			IndexFieldReference<String> indexFieldReference =
-					context.getIndexSchemaElement().field( "myText", f -> f.asString() )
+					context.indexSchemaElement().field( "myText", f -> f.asString() )
 							.toReference();
-			context.setBridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
+			context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
 				IndexedEntityWithWorkingPropertyBinding castedBridgedElement = (IndexedEntityWithWorkingPropertyBinding) bridgedElement;
 				target.addValue(
 						indexFieldReference, castedBridgedElement.text

@@ -77,18 +77,18 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	}
 
 	@Override
-	public <V2, F> void setBridge(Class<V2> expectedValueType, ValueBridge<V2, F> bridge) {
-		setBridge( expectedValueType, bridge, null );
+	public <V2, F> void bridge(Class<V2> expectedValueType, ValueBridge<V2, F> bridge) {
+		bridge( expectedValueType, bridge, null );
 	}
 
 	@Override
-	public <V2, F> void setBridge(Class<V2> expectedValueType, ValueBridge<V2, F> bridge,
+	public <V2, F> void bridge(Class<V2> expectedValueType, ValueBridge<V2, F> bridge,
 			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
-		setBridge( expectedValueType, BeanHolder.of( bridge ), fieldTypeOptionsStep );
+		bridge( expectedValueType, BeanHolder.of( bridge ), fieldTypeOptionsStep );
 	}
 
 	@Override
-	public <V2, F> void setBridge(Class<V2> expectedValueType, BeanHolder<? extends ValueBridge<V2, F>> bridgeHolder,
+	public <V2, F> void bridge(Class<V2> expectedValueType, BeanHolder<? extends ValueBridge<V2, F>> bridgeHolder,
 			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		try {
 			PojoRawTypeModel<V2> expectedValueTypeModel = introspector.getTypeModel( expectedValueType );
@@ -114,12 +114,12 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	}
 
 	@Override
-	public PojoModelValue<V> getBridgedElement() {
+	public PojoModelValue<V> bridgedElement() {
 		return bridgedElement;
 	}
 
 	@Override
-	public IndexFieldTypeFactory getTypeFactory() {
+	public IndexFieldTypeFactory typeFactory() {
 		return indexFieldTypeFactory;
 	}
 

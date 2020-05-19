@@ -45,22 +45,22 @@ public class RoutingKeyBindingContextImpl<T> extends AbstractCompositeBindingCon
 	}
 
 	@Override
-	public void setBridge(RoutingKeyBridge bridge) {
-		setBridge( BeanHolder.of( bridge ) );
+	public void bridge(RoutingKeyBridge bridge) {
+		bridge( BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public void setBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+	public void bridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
 		this.partialBinding = new PartialBinding<>( bridgeHolder );
 	}
 
 	@Override
-	public PojoModelType getBridgedElement() {
+	public PojoModelType bridgedElement() {
 		return bridgedElement;
 	}
 
 	@Override
-	public PojoTypeIndexingDependencyConfigurationContext getDependencies() {
+	public PojoTypeIndexingDependencyConfigurationContext dependencies() {
 		return dependencyContext;
 	}
 

@@ -309,7 +309,7 @@ public class GenericFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asString() );
+				context.bridge( WrappedValue.class, new ValidTypeBridge(), context.typeFactory().asString() );
 			}
 		}
 	}
@@ -323,9 +323,9 @@ public class GenericFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge(
+				context.bridge(
 						WrappedValue.class, new InvalidTypeBridge(),
-						context.getTypeFactory().extension( StubBackendExtension.get() ).asNonStandard( Integer.class )
+						context.typeFactory().extension( StubBackendExtension.get() ).asNonStandard( Integer.class )
 				);
 			}
 		}

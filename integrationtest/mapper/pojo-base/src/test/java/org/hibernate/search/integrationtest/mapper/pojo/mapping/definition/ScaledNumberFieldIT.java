@@ -456,7 +456,7 @@ public class ScaledNumberFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asBigDecimal() );
+				context.bridge( WrappedValue.class, new ValidTypeBridge(), context.typeFactory().asBigDecimal() );
 			}
 		}
 	}
@@ -470,7 +470,7 @@ public class ScaledNumberFieldIT {
 		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
-				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );
+				context.bridge( WrappedValue.class, new InvalidTypeBridge(), context.typeFactory().asInteger() );
 			}
 		}
 	}

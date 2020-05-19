@@ -50,12 +50,12 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 	}
 
 	@Override
-	public <I2> void setBridge(Class<I2> expectedValueType, IdentifierBridge<I2> bridge) {
-		setBridge( expectedValueType, BeanHolder.of( bridge ) );
+	public <I2> void bridge(Class<I2> expectedValueType, IdentifierBridge<I2> bridge) {
+		bridge( expectedValueType, BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public <I2> void setBridge(Class<I2> expectedValueType, BeanHolder<? extends IdentifierBridge<I2>> bridgeHolder) {
+	public <I2> void bridge(Class<I2> expectedValueType, BeanHolder<? extends IdentifierBridge<I2>> bridgeHolder) {
 		try {
 			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.getTypeModel( expectedValueType );
 			// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
@@ -80,7 +80,7 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 	}
 
 	@Override
-	public PojoModelValue<I> getBridgedElement() {
+	public PojoModelValue<I> bridgedElement() {
 		return bridgedElement;
 	}
 

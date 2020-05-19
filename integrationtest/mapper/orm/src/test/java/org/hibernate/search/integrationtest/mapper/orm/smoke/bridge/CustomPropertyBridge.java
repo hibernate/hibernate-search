@@ -73,15 +73,15 @@ public final class CustomPropertyBridge implements PropertyBridge {
 
 		@Override
 		public void bind(PropertyBindingContext context) {
-			PojoModelProperty bridgedElement = context.getBridgedElement();
+			PojoModelProperty bridgedElement = context.bridgedElement();
 			PojoElementAccessor<String> textPropertyAccessor =
 					bridgedElement.property( TEXT_PROPERTY_NAME ).createAccessor( String.class );
 			PojoElementAccessor<LocalDate> localDatePropertyAccessor =
 					bridgedElement.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
-			context.setBridge(
+			context.bridge(
 					new CustomPropertyBridge(
 							textPropertyAccessor, localDatePropertyAccessor,
-							context.getIndexSchemaElement(), objectName
+							context.indexSchemaElement(), objectName
 					)
 			);
 		}

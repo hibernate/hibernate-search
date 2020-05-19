@@ -20,21 +20,21 @@ public class SingleValuedNamesBinder implements TypeBinder {
 	//tag::bind[]
 	@Override
 	public void bind(TypeBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				/* ... (declaration of dependencies, not relevant) ... */
 				//end::bind[]
 				.use( "firstName" )
 				.use( "lastName" );
 		//tag::bind[]
 
-		IndexSchemaElement schemaElement = context.getIndexSchemaElement();
+		IndexSchemaElement schemaElement = context.indexSchemaElement();
 
-		IndexFieldType<String> nameType = context.getTypeFactory() // <1>
+		IndexFieldType<String> nameType = context.typeFactory() // <1>
 				.asString() // <2>
 				.analyzer( "name" )
 				.toIndexFieldType(); // <3>
 
-		context.setBridge( new Bridge(
+		context.bridge( new Bridge(
 				schemaElement.field( "firstName", nameType ) // <4>
 						.toReference(),
 				schemaElement.field( "lastName", nameType ) // <4>

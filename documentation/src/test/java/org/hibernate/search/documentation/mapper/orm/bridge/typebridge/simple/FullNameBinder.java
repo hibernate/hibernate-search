@@ -18,15 +18,15 @@ public class FullNameBinder implements TypeBinder { // <1>
 
 	@Override
 	public void bind(TypeBindingContext context) { // <2>
-		context.getDependencies() // <3>
+		context.dependencies() // <3>
 				.use( "firstName" )
 				.use( "lastName" );
 
-		IndexFieldReference<String> fullNameField = context.getIndexSchemaElement() // <4>
+		IndexFieldReference<String> fullNameField = context.indexSchemaElement() // <4>
 				.field( "fullName", f -> f.asString().analyzer( "name" ) ) // <5>
 				.toReference();
 
-		context.setBridge( new Bridge( // <6>
+		context.bridge( new Bridge( // <6>
 				fullNameField // <7>
 		) );
 	}

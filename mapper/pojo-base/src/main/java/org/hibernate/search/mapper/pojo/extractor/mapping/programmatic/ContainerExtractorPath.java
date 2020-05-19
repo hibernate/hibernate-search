@@ -147,7 +147,17 @@ public class ContainerExtractorPath {
 	 * @return The list of extractor names explicitly referenced by this path.
 	 * Empty if this path represents the default extractor(s).
 	 */
-	public List<String> getExplicitExtractorNames() {
+	public List<String> explicitExtractorNames() {
 		return explicitExtractorNames;
+	}
+
+	/**
+	 * @return The list of extractor names explicitly referenced by this path.
+	 * Empty if this path represents the default extractor(s).
+	 * @deprecated Use {@link #explicitExtractorNames()} instead.
+	 */
+	@Deprecated
+	public List<String> getExplicitExtractorNames() {
+		return explicitExtractorNames();
 	}
 }

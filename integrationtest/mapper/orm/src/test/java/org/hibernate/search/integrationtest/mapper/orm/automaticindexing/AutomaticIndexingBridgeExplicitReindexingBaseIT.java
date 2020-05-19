@@ -54,14 +54,14 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
 		private ContainingEntityTypeBridge(TypeBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.use( "directField" )
 					// TODO HSEARCH-3567 this is currently necessary to handle removals, but it shouldn't be necessary
 					.use( "association1.containedSingle" )
 					.fromOtherEntity( ContainedEntity.class, "containingAsSingle.association1InverseSide" )
 							.use( "includedInTypeBridge" );
 
-			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
+			IndexSchemaObjectField typeBridgeObjectField = context.indexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
 			directFieldReference = typeBridgeObjectField.field( "directField", f -> f.asString() )
 					.toReference();
@@ -96,7 +96,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new ContainingEntityTypeBridge( context ) );
+				context.bridge( new ContainingEntityTypeBridge( context ) );
 			}
 		}
 	}
@@ -107,13 +107,13 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
 		private ContainingEntitySingleValuedPropertyBridge(PropertyBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					// TODO HSEARCH-3567 this is currently necessary to handle removals, but it shouldn't be necessary
 					.use( "containedSingle" )
 					.fromOtherEntity( ContainedEntity.class, "containingAsSingle" )
 							.use( "includedInSingleValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "singleValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInSingleValuedPropertyBridge", f -> f.asString()
@@ -137,7 +137,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
+				context.bridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
 			}
 		}
 	}
@@ -148,11 +148,11 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
 		private ContainingEntityMultiValuedPropertyBridge(PropertyBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.fromOtherEntity( ContainedEntity.class, "containingAsSingle" )
 					.use( "includedInMultiValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "multiValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "multiValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInMultiValuedPropertyBridge", f -> f.asString()
@@ -185,7 +185,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new ContainingEntityMultiValuedPropertyBridge( context ) );
+				context.bridge( new ContainingEntityMultiValuedPropertyBridge( context ) );
 			}
 		}
 	}

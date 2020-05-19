@@ -25,7 +25,18 @@ public interface RoutingKeyBindingContext extends BindingContext {
 	 */
 	// FIXME also require the caller to pass the expected raw type here, and validate it.
 	//  We'll need to add generic type parameters to TypeBridge, however.
-	void setBridge(RoutingKeyBridge bridge);
+	void bridge(RoutingKeyBridge bridge);
+
+	/**
+	 * Sets the bridge implementing the type/routing key binding.
+	 *
+	 * @param bridge The bridge to use at runtime to generate a routing key.
+	 * @deprecated Use {@link #bridge(RoutingKeyBridge)} instead.
+	 */
+	@Deprecated
+	default void setBridge(RoutingKeyBridge bridge) {
+		bridge( bridge );
+	}
 
 	/**
 	 * Sets the bridge implementing the type/routing key binding.
@@ -36,17 +47,48 @@ public interface RoutingKeyBindingContext extends BindingContext {
 	 */
 	// FIXME also require the caller to pass the expected raw type here, and validate it.
 	//  We'll need to add generic type parameters to TypeBridge, however.
-	void setBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder);
+	void bridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder);
+
+	/**
+	 * Sets the bridge implementing the type/routing key binding.
+	 *
+	 * @param bridgeHolder A {@link BeanHolder} containing
+	 * the bridge to use at runtime to generate a routing key.
+	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 * @deprecated Use {@link #bridge(BeanHolder)} instead.
+	 */
+	@Deprecated
+	default void setBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+		bridge( bridgeHolder );
+	}
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
 	 */
 	@Incubating
-	PojoModelType getBridgedElement();
+	PojoModelType bridgedElement();
+
+	/**
+	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
+	 * @deprecated Use {@link #bridgedElement()} instead.
+	 */
+	@Deprecated
+	default PojoModelType getBridgedElement() {
+		return bridgedElement();
+	}
 
 	/**
 	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
 	 */
-	PojoTypeIndexingDependencyConfigurationContext getDependencies();
+	PojoTypeIndexingDependencyConfigurationContext dependencies();
+
+	/**
+	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
+	 * @deprecated Use {@link #dependencies()} instead.
+	 */
+	@Deprecated
+	default PojoTypeIndexingDependencyConfigurationContext getDependencies() {
+		return dependencies();
+	}
 
 }

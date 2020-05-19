@@ -165,7 +165,7 @@ public final class BridgeResolver {
 	}
 
 	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridge<I> bridge) {
-		addIdentifierBinderForExactRawType( type, context -> context.setBridge( type, bridge ) );
+		addIdentifierBinderForExactRawType( type, context -> context.bridge( type, bridge ) );
 	}
 
 	private void addIdentifierBinderForTypePattern(TypePatternMatcher typePatternMatcher,
@@ -178,7 +178,7 @@ public final class BridgeResolver {
 	}
 
 	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridge<V, ?> bridge) {
-		addValueBinderForExactRawType( type, context -> context.setBridge( type, bridge ) );
+		addValueBinderForExactRawType( type, context -> context.bridge( type, bridge ) );
 	}
 
 	private void addValueBinderForTypePattern(TypePatternMatcher typePatternMatcher,
