@@ -99,10 +99,10 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 
 		@Override
 		public LoadingContext<EntityReference, E> build() {
-			DocumentReferenceConverter<EntityReference> referenceHitMapper = sessionContext.getReferenceHitMapper();
+			DocumentReferenceConverter<EntityReference> referenceHitMapper = sessionContext.referenceHitMapper();
 			EntityLoader<EntityReference, ? extends E> entityLoader = entityLoaderBuilder.build( loadingOptions );
 			return new HibernateOrmLoadingContext<>(
-					sessionContext.getSession(),
+					sessionContext.session(),
 					referenceHitMapper, entityLoader,
 					loadingOptions
 			);

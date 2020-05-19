@@ -27,9 +27,9 @@ public class EntityLoaderBuilder<E> {
 	public EntityLoaderBuilder(HibernateOrmLoadingMappingContext mappingContext,
 			HibernateOrmLoadingSessionContext sessionContext,
 			Set<? extends HibernateOrmLoadingIndexedTypeContext> concreteIndexedTypes) {
-		this.session = sessionContext.getSession();
+		this.session = sessionContext.session();
 		this.concreteIndexedTypes = concreteIndexedTypes;
-		this.cacheLookupStrategy = mappingContext.getCacheLookupStrategy();
+		this.cacheLookupStrategy = mappingContext.cacheLookupStrategy();
 	}
 
 	public void cacheLookupStrategy(EntityLoadingCacheLookupStrategy cacheLookupStrategy) {

@@ -79,7 +79,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		this.type = type;
 		this.idAttributeOfType = idAttributeOfType;
 		this.transactionTimeout = transactionTimeout;
-		this.transactionManager = mappingContext.getSessionFactory()
+		this.transactionManager = mappingContext.sessionFactory()
 				.getServiceRegistry()
 				.getService( JtaPlatform.class )
 				.retrieveTransactionManager();
@@ -90,7 +90,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	@Override
 	public void run() {
 		log.trace( "started" );
-		try ( SessionImplementor session = (SessionImplementor) mappingContext.getSessionFactory()
+		try ( SessionImplementor session = (SessionImplementor) mappingContext.sessionFactory()
 				.withOptions()
 				.tenantIdentifier( tenantId )
 				.openSession() ) {

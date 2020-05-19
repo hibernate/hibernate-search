@@ -119,7 +119,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		}
 
 		Set<String> typeNames = new LinkedHashSet<>( basicTypeMetadataProvider.getKnownDynamicMapTypeNames() );
-		typeNames.addAll( basicTypeMetadataProvider.getTypeIdentifierResolver().getKnownJpaOrHibernateOrmEntityNames() );
+		typeNames.addAll( basicTypeMetadataProvider.getTypeIdentifierResolver().allKnownJpaOrHibernateOrmEntityNames() );
 		throw log.unknownNamedType( name, typeNames );
 	}
 

@@ -14,11 +14,11 @@ import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 public interface HibernateOrmMassIndexingMappingContext {
 
-	SessionFactoryImplementor getSessionFactory();
+	SessionFactoryImplementor sessionFactory();
 
-	ThreadPoolProvider getThreadPoolProvider();
+	ThreadPoolProvider threadPoolProvider();
 
-	FailureHandler getFailureHandler();
+	FailureHandler failureHandler();
 
 	PojoIndexer createIndexer(SessionImplementor sessionImplementor);
 

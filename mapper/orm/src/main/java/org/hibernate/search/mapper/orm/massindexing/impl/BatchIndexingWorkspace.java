@@ -93,7 +93,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		}
 
 		final BatchTransactionalContext transactionalContext =
-				new BatchTransactionalContext( mappingContext.getSessionFactory() );
+				new BatchTransactionalContext( mappingContext.sessionFactory() );
 		// First start the consumers, then the producers (reverse order):
 		startIndexing();
 		startProducingPrimaryKeys( transactionalContext );
@@ -129,7 +129,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				transactionalContext,
 				getNotifier(),
 				new IdentifierProducer<>(
-						mappingContext.getSessionFactory(), sessionContext.tenantIdentifier(),
+						mappingContext.sessionFactory(), sessionContext.tenantIdentifier(),
 						getNotifier(),
 						primaryKeyStream,
 						objectLoadingBatchSize,
@@ -140,7 +140,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				transactionTimeout, sessionContext.tenantIdentifier()
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
-		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
+		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
 				MassIndexerImpl.THREAD_NAME_PREFIX + type.getJpaEntityName() + " - ID loading"
 		);
@@ -161,7 +161,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				cacheMode,
 				transactionTimeout
 		);
-		final ThreadPoolExecutor indexingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
+		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				documentBuilderThreads,
 				MassIndexerImpl.THREAD_NAME_PREFIX + type.getJpaEntityName() + " - Entity loading"
 		);

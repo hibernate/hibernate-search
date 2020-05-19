@@ -14,6 +14,6 @@ public interface HibernateOrmSessionTypeContextProvider
 		extends HibernateOrmScopeTypeContextProvider, HibernateOrmRuntimeIntrospectorTypeContextProvider,
 				SearchIndexingPlanTypeContextProvider {
 
-	HibernateOrmSessionIndexedTypeContext<?> getIndexedByJpaEntityName(String indexName);
+	HibernateOrmSessionIndexedTypeContext<?> indexedForJpaEntityName(String indexName);
 
 }

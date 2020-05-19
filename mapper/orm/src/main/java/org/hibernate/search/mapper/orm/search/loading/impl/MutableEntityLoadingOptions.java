@@ -12,7 +12,7 @@ public class MutableEntityLoadingOptions {
 	private int fetchSize;
 
 	public MutableEntityLoadingOptions(HibernateOrmLoadingMappingContext mappingContext) {
-		this.fetchSize = mappingContext.getFetchSize();
+		this.fetchSize = mappingContext.fetchSize();
 	}
 
 	int getFetchSize() {

@@ -74,11 +74,11 @@ public class HibernateOrmRawTypeIdentifierResolver {
 		return byJpaOrHibernateOrmEntityName.get( entityName );
 	}
 
-	public Set<String> getKnownHibernateOrmEntityNames() {
+	public Set<String> allKnownHibernateOrmEntityNames() {
 		return byHibernateOrmEntityName.keySet();
 	}
 
-	public Set<String> getKnownJpaOrHibernateOrmEntityNames() {
+	public Set<String> allKnownJpaOrHibernateOrmEntityNames() {
 		return byJpaOrHibernateOrmEntityName.keySet();
 	}
 

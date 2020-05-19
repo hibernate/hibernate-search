@@ -12,6 +12,6 @@ import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSe
 public interface HibernateOrmScopeSessionContext
 		extends HibernateOrmLoadingSessionContext {
 
-	BackendSessionContext getBackendSessionContext();
+	BackendSessionContext backendSessionContext();
 
 }

@@ -147,7 +147,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		// since the execute phase is supposed to be triggered by the transaction commit
 		if ( !session.isTransactionInProgress() ) {
 			// out of transaction it will trigger both of them
-			contextProvider.getCurrentAutomaticIndexingSynchronizationStrategy( session )
+			contextProvider.currentAutomaticIndexingSynchronizationStrategy( session )
 					.executeAndSynchronize( plan );
 		}
 	}
@@ -187,18 +187,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
-		return contextProvider.getCurrentIndexingPlan( sessionImplementor, true );
+		return contextProvider.currentIndexingPlan( sessionImplementor, true );
 	}
 
 	private PojoIndexingPlan<EntityReference> getCurrentIndexingPlanIfExisting(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
-		return contextProvider.getCurrentIndexingPlan( sessionImplementor, false );
+		return contextProvider.currentIndexingPlan( sessionImplementor, false );
 	}
 
 	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
 			EntityPersister entityPersister) {
 		String entityName = entityPersister.getEntityName();
-		return contextProvider.getTypeContextProvider().getByHibernateOrmEntityName( entityName );
+		return contextProvider.typeContextProvider().forHibernateOrmEntityName( entityName );
 	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
@@ -211,8 +211,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		HibernateOrmListenerTypeContext typeContext = contextProvider.getTypeContextProvider()
-				.getByHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
+		HibernateOrmListenerTypeContext typeContext = contextProvider.typeContextProvider()
+				.forHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
 		if ( typeContext != null ) {
 			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
