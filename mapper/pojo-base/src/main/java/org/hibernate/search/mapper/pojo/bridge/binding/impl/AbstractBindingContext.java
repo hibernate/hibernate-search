@@ -18,7 +18,7 @@ abstract class AbstractBindingContext implements BindingContext {
 	}
 
 	@Override
-	public BeanResolver getBeanResolver() {
+	public BeanResolver beanResolver() {
 		return beanResolver;
 	}
 

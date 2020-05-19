@@ -48,7 +48,7 @@ The lambda syntax to declare the type of each field is convenient,
 but sometimes gets in the way,
 in particular when multiple fields must be declared with the exact same type.
 
-For that reason, the context object passed to binders exposes a `getIndexFieldTypeFactory()` method.
+For that reason, the context object passed to binders exposes a `typeFactory()` method.
 Using this factory, it is possible to build `IndexFieldType` objects
 that can be re-used in multiple field declarations.
 

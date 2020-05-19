@@ -27,7 +27,18 @@ public interface TypeBindingContext extends BindingContext {
 	 */
 	// FIXME also require the caller to pass the expected raw type here, and validate it.
 	//  We'll need to add generic type parameters to TypeBridge, however.
-	void setBridge(TypeBridge bridge);
+	void bridge(TypeBridge bridge);
+
+	/**
+	 * Sets the bridge implementing the type/index binding.
+	 *
+	 * @param bridge The bridge to use at runtime to convert between the type and the index field value.
+	 * @deprecated Use {@link #bridge(TypeBridge)} instead.
+	 */
+	@Deprecated
+	default void setBridge(TypeBridge bridge) {
+		bridge( bridge );
+	}
 
 	/**
 	 * Sets the bridge implementing the type/index binding.
@@ -38,27 +49,76 @@ public interface TypeBindingContext extends BindingContext {
 	 */
 	// FIXME also require the caller to pass the expected raw type here, and validate it.
 	//  We'll need to add generic type parameters to TypeBridge, however.
-	void setBridge(BeanHolder<? extends TypeBridge> bridgeHolder);
+	void bridge(BeanHolder<? extends TypeBridge> bridgeHolder);
+
+	/**
+	 * Sets the bridge implementing the type/index binding.
+	 *
+	 * @param bridgeHolder A {@link BeanHolder} containing
+	 * the bridge to use at runtime to convert between the type and the index field value.
+	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 * @deprecated Use {@link #bridge(BeanHolder)} instead.
+	 */
+	@Deprecated
+	default void setBridge(BeanHolder<? extends TypeBridge> bridgeHolder) {
+		bridge( bridgeHolder );
+	}
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
 	 */
 	@Incubating
-	PojoModelType getBridgedElement();
+	PojoModelType bridgedElement();
+
+	/**
+	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
+	 * @deprecated Use {@link #bridgedElement()} instead.
+	 */
+	@Deprecated
+	default PojoModelType getBridgedElement() {
+		return bridgedElement();
+	}
 
 	/**
 	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
 	 */
-	PojoTypeIndexingDependencyConfigurationContext getDependencies();
+	PojoTypeIndexingDependencyConfigurationContext dependencies();
+
+	/**
+	 * @return An entry point allowing to declare the parts of the entity graph that this bridge will depend on.
+	 * @deprecated Use {@link #dependencies()} instead.
+	 */
+	@Deprecated
+	default PojoTypeIndexingDependencyConfigurationContext getDependencies() {
+		return dependencies();
+	}
 
 	/**
 	 * @return An entry point allowing to define a new field type.
 	 */
-	IndexFieldTypeFactory getTypeFactory();
+	IndexFieldTypeFactory typeFactory();
+
+	/**
+	 * @return An entry point allowing to define a new field type.
+	 * @deprecated Use {@link #typeFactory()} instead.
+	 */
+	@Deprecated
+	default IndexFieldTypeFactory getTypeFactory() {
+		return typeFactory();
+	}
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the index schema.
 	 */
-	IndexSchemaElement getIndexSchemaElement();
+	IndexSchemaElement indexSchemaElement();
+
+	/**
+	 * @return An entry point allowing to declare expectations and retrieve accessors to the index schema.
+	 * @deprecated Use {@link #indexSchemaElement()} instead.
+	 */
+	@Deprecated
+	default IndexSchemaElement getIndexSchemaElement() {
+		return indexSchemaElement();
+	}
 
 }

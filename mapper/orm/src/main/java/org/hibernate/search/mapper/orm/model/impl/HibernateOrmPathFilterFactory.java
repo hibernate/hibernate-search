@@ -177,8 +177,8 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	}
 
 	private Optional<Value> resolvePath(Set<String> pathsAsStrings, PojoModelPathValueNode path, boolean isWholePath) {
-		PojoModelPathPropertyNode propertyNode = path.getParent();
-		PojoModelPathValueNode propertyNodeParent = propertyNode.getParent();
+		PojoModelPathPropertyNode propertyNode = path.parent();
+		PojoModelPathValueNode propertyNodeParent = propertyNode.parent();
 
 		Property property;
 		if ( propertyNodeParent == null ) {
@@ -208,7 +208,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			PojoModelPathPropertyNode propertyNode, Property property) {
 		Value baseValue = property.getValue();
 
-		ContainerExtractorPath extractorPath = path.getExtractorPath();
+		ContainerExtractorPath extractorPath = path.extractorPath();
 		if ( extractorPath.isDefault() ) {
 			throw new AssertionFailure(
 					"Expected a non-default extractor path as per the "
@@ -256,7 +256,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				throw log.unknownPathForDirtyChecking( path, null );
 			}
 
-			List<String> extractorNames = extractorPath.getExplicitExtractorNames();
+			List<String> extractorNames = extractorPath.explicitExtractorNames();
 			Iterator<String> extractorNameIterator = extractorNames.iterator();
 
 			return resolveExtractorPath(
@@ -330,7 +330,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 
 	private Property resolvePropertyNode(PersistentClass persistentClass, PojoModelPathPropertyNode propertyNode) {
 		try {
-			return persistentClass.getProperty( propertyNode.getPropertyName() );
+			return persistentClass.getProperty( propertyNode.propertyName() );
 		}
 		catch (MappingException e) {
 			throw log.unknownPathForDirtyChecking( propertyNode, e );
@@ -339,7 +339,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 
 	private Property resolvePropertyNode(Component parentValue, PojoModelPathPropertyNode propertyNode) {
 		try {
-			return parentValue.getProperty( propertyNode.getPropertyName() );
+			return parentValue.getProperty( propertyNode.propertyName() );
 		}
 		catch (MappingException e) {
 			throw log.unknownPathForDirtyChecking( propertyNode, e );

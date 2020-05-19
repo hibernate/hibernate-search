@@ -27,7 +27,7 @@ public class JavaBeanSimpleStringSetPojoPathFilterFactory implements PojoPathFil
 		// Use a LinkedHashSet for deterministic iteration
 		Set<String> pathsAsStrings = CollectionHelper.newLinkedHashSet( paths.size() );
 		for ( PojoModelPathValueNode path : paths ) {
-			pathsAsStrings.add( path.getParent().toPropertyString() );
+			pathsAsStrings.add( path.parent().toPropertyString() );
 		}
 		return new StringSetPojoPathFilter( pathsAsStrings );
 	}

@@ -22,8 +22,8 @@ public class BookRoutingKeyBridge implements RoutingKeyBridge {
 	public static class Binder implements RoutingKeyBinder {
 		@Override
 		public void bind(RoutingKeyBindingContext context) {
-			context.getDependencies().use( "genre" );
-			context.setBridge( new BookRoutingKeyBridge() );
+			context.dependencies().use( "genre" );
+			context.bridge( new BookRoutingKeyBridge() );
 		}
 	}
 }

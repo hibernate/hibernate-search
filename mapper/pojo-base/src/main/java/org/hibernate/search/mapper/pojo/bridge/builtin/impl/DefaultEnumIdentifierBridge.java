@@ -44,11 +44,11 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 		@Override
 		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 		public void bind(IdentifierBindingContext<?> context) {
-			doBind( context, (Class) context.getBridgedElement().getRawType() );
+			doBind( context, (Class) context.bridgedElement().rawType() );
 		}
 
 		private <V extends Enum<V>> void doBind(IdentifierBindingContext<?> context, Class<V> enumType) {
-			context.setBridge( enumType, new DefaultEnumIdentifierBridge<>( enumType ) );
+			context.bridge( enumType, new DefaultEnumIdentifierBridge<>( enumType ) );
 		}
 	}
 

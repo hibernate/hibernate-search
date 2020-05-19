@@ -20,7 +20,7 @@ they are defined using a dedicated DSL.
 
 The entry point to this DSL is the `IndexFieldTypeFactory`.
 The type factory is generally accessible though the context object passed to the binders
-(`context.getTypeFactory()`).
+(`context.typeFactory()`).
 In the case of `PropertyBinder` and `TypeBinder`,
 the type factory can also be passed to the lambda expression passed to the `field` method
 to define the field type inline.
@@ -51,7 +51,7 @@ but not for `Double` fields.
 [NOTE]
 ====
 In `ValueBinder`, the call to `toIndexFieldType()` is omitted:
-`context.setBridge(...)` expects to be passed the last DSL step,
+`context.bridge(...)` expects to be passed the last DSL step,
 not a fully built type.
 
 `toIndexFieldType()` is also omitted in the lambda expressions

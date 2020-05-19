@@ -102,16 +102,16 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		@Override
 		public void bind(TypeBindingContext context) {
 			if ( fieldName == null || fieldName.isEmpty() ) {
-				throw log.missingFieldNameForGeoPointBridgeOnType( context.getBridgedElement().toString() );
+				throw log.missingFieldNameForGeoPointBridgeOnType( context.bridgedElement().toString() );
 			}
 
 			GeoPointBridge bridge = doBind(
 					fieldName,
-					context.getTypeFactory(),
-					context.getIndexSchemaElement(),
-					context.getBridgedElement()
+					context.typeFactory(),
+					context.indexSchemaElement(),
+					context.bridgedElement()
 			);
-			context.setBridge( bridge );
+			context.bridge( bridge );
 		}
 
 		@Override
@@ -121,16 +121,16 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 				defaultedFieldName = fieldName;
 			}
 			else {
-				defaultedFieldName = context.getBridgedElement().getName();
+				defaultedFieldName = context.bridgedElement().name();
 			}
 
 			GeoPointBridge bridge = doBind(
 					defaultedFieldName,
-					context.getTypeFactory(),
-					context.getIndexSchemaElement(),
-					context.getBridgedElement()
+					context.typeFactory(),
+					context.indexSchemaElement(),
+					context.bridgedElement()
 			);
-			context.setBridge( bridge );
+			context.bridge( bridge );
 		}
 
 		private GeoPointBridge doBind(String defaultedFieldName, IndexFieldTypeFactory typeFactory,

@@ -66,7 +66,7 @@ We're going to index monetary amounts,
 so we will use a `BigDecimal` type with two digits after the decimal point.
 See <<mapper-orm-bridge-index-field-type-dsl>>
 for more information about declaring index field types.
-<6> Call `context.setBridge` to define the property bridge to use,
+<6> Call `context.bridge(...)` to define the property bridge to use,
 and pass an instance of the bridge.
 <7> Pass a reference to the `summary` object field to the bridge.
 <8> Create a sub-field for the `total` amount of the invoice,
@@ -198,7 +198,7 @@ Usual compatibility policies do not apply: incompatible changes may be introduce
 ====
 
 The context passed to the property binder's `bind` method
-exposes a `getBridgedElement` method that gives access to metadata about the property being bound,
+exposes a `bridgedElement()` method that gives access to metadata about the property being bound,
 in particular its name and type.
 
 The metadata can also be used to inspect the type of the property in details:

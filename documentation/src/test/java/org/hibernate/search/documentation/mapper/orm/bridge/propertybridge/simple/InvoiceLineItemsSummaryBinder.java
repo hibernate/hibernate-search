@@ -24,17 +24,17 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 
 	@Override
 	public void bind(PropertyBindingContext context) { // <2>
-		context.getDependencies() // <3>
+		context.dependencies() // <3>
 				.use( "category" )
 				.use( "amount" );
 
-		IndexSchemaObjectField summaryField = context.getIndexSchemaElement() // <4>
+		IndexSchemaObjectField summaryField = context.indexSchemaElement() // <4>
 				.objectField( "summary" );
 
-		IndexFieldType<BigDecimal> amountFieldType = context.getTypeFactory() // <5>
+		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory() // <5>
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();
 
-		context.setBridge( new Bridge( // <6>
+		context.bridge( new Bridge( // <6>
 				summaryField.toReference(), // <7>
 				summaryField.field( "total", amountFieldType ).toReference(), // <8>
 				summaryField.field( "books", amountFieldType ).toReference(), // <8>

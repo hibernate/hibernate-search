@@ -18,7 +18,7 @@ public class OptionalValueExtractor<T> implements ContainerExtractor<Optional<T>
 	}
 
 	@Override
-	public boolean isMultiValued() {
+	public boolean multiValued() {
 		return false;
 	}
 }

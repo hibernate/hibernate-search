@@ -24,4 +24,4 @@ include::todo-placeholder.asciidoc[]
 == Experimental features
 
 include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3709 experimental support for reflection with getBridgedElement (advanced use, no example)
+// TODO HSEARCH-3709 experimental support for reflection with bridgedElement() (advanced use, no example)

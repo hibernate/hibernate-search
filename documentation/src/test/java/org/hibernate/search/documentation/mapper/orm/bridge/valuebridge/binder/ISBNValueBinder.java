@@ -16,10 +16,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 public class ISBNValueBinder implements ValueBinder { // <1>
 	@Override
 	public void bind(ValueBindingContext<?> context) { // <2>
-		context.setBridge( // <3>
+		context.bridge( // <3>
 				ISBN.class, // <4>
 				new ISBNValueBridge(), // <5>
-				context.getTypeFactory() // <6>
+				context.typeFactory() // <6>
 						.asString() // <7>
 						.normalizer( "isbn" ) // <8>
 		);

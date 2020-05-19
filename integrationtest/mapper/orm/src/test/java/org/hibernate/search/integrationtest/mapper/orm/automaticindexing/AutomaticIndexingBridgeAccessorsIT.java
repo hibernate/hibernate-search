@@ -53,14 +53,14 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
 		private ContainingEntityTypeBridge(TypeBindingContext context) {
-			PojoModelType bridgedElement = context.getBridgedElement();
+			PojoModelType bridgedElement = context.bridgedElement();
 			directFieldSourceAccessor = bridgedElement.property( "directField" )
 					.createAccessor( String.class );
 			includedInTypeBridgeFieldSourceAccessor = bridgedElement.property( "association1" )
 					.property( "containedSingle" )
 					.property( "includedInTypeBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
+			IndexSchemaObjectField typeBridgeObjectField = context.indexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
 			directFieldReference = typeBridgeObjectField.field( "directField", f -> f.asString() )
 					.toReference();
@@ -85,7 +85,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new ContainingEntityTypeBridge( context ) );
+				context.bridge( new ContainingEntityTypeBridge( context ) );
 			}
 		}
 	}
@@ -97,10 +97,10 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
 		private ContainingEntitySingleValuedPropertyBridge(PropertyBindingContext context) {
-			includedInPropertyBridgeSourceAccessor = context.getBridgedElement().property( "containedSingle" )
+			includedInPropertyBridgeSourceAccessor = context.bridgedElement().property( "containedSingle" )
 					.property( "includedInSingleValuedPropertyBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "singleValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInSingleValuedPropertyBridge", f -> f.asString()
@@ -120,7 +120,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
+				context.bridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
 			}
 		}
 	}

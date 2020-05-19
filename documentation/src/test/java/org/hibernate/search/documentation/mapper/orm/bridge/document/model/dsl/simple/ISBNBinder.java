@@ -20,13 +20,13 @@ public class ISBNBinder implements PropertyBinder {
 
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				/* ... (declaration of dependencies, not relevant) ... */
 				//end::bind[]
 				.useRootOnly();
 		//tag::bind[]
 
-		IndexSchemaElement schemaElement = context.getIndexSchemaElement(); // <1>
+		IndexSchemaElement schemaElement = context.indexSchemaElement(); // <1>
 
 		IndexFieldReference<String> field =
 				schemaElement.field( // <2>
@@ -36,7 +36,7 @@ public class ISBNBinder implements PropertyBinder {
 				)
 						.toReference(); // <5>
 
-		context.setBridge( new ISBNBridge( field ) ); // <6>
+		context.bridge( new ISBNBridge( field ) ); // <6>
 	}
 	//end::bind[]
 

@@ -19,11 +19,11 @@ public class MyDataPropertyBinder implements PropertyBinder {
 
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				.useRootOnly();
 
-		context.setBridge( new Bridge(
-				context.getIndexSchemaElement().field( "myData", f -> f.asString() ).toReference()
+		context.bridge( new Bridge(
+				context.indexSchemaElement().field( "myData", f -> f.asString() ).toReference()
 		) );
 	}
 

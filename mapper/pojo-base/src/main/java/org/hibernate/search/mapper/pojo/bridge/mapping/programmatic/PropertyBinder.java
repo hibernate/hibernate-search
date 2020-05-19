@@ -32,7 +32,7 @@ public interface PropertyBinder {
 	 * Implementations are also expected to declare dependencies, i.e. the properties
 	 * that will later be used in the
 	 * {@link PropertyBridge#write(DocumentElement, Object, PropertyBridgeWriteContext)} method,
-	 * using {@link PropertyBindingContext#getDependencies()}.
+	 * using {@link PropertyBindingContext#dependencies()}.
 	 * Failing that, Hibernate Search will not reindex entities properly when an indexed property is modified.
 	 *
 	 * @param context A context object providing information about the property being bound,

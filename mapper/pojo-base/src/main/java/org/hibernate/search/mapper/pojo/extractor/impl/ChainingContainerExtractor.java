@@ -27,8 +27,8 @@ class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 	}
 
 	@Override
-	public boolean isMultiValued() {
-		return parent.isMultiValued() || chained.isMultiValued();
+	public boolean multiValued() {
+		return parent.multiValued() || chained.multiValued();
 	}
 
 	@Override

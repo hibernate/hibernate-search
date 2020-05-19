@@ -201,9 +201,9 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		private IndexFieldReference<Integer> indexFieldReference;
 
 		private BridgeGoingThroughEntityBoundaries(PropertyBindingContext context) {
-			context.getDependencies().use( "indexedInContaining" );
+			context.dependencies().use( "indexedInContaining" );
 
-			indexFieldReference = context.getIndexSchemaElement().field(
+			indexFieldReference = context.indexSchemaElement().field(
 					"indexedInContaining", f -> f.asInteger()
 			)
 					.toReference();
@@ -219,7 +219,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new BridgeGoingThroughEntityBoundaries( context ) );
+				context.bridge( new BridgeGoingThroughEntityBoundaries( context ) );
 			}
 		}
 	}

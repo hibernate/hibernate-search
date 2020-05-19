@@ -6,21 +6,24 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
-import org.hibernate.search.engine.environment.bean.BeanResolver;
-
-public interface MarkerBindingContext {
+public interface MarkerBindingContext extends BindingContext {
 
 	/**
 	 * Sets the marker object resulting from this binding.
 	 *
 	 * @param marker The marker object to attach to the marked property.
 	 */
-	void setMarker(Object marker);
+	void marker(Object marker);
 
 	/**
-	 * @return A bean provider, allowing the retrieval of beans,
-	 * including CDI/Spring DI beans when in the appropriate environment.
+	 * Sets the marker object resulting from this binding.
+	 *
+	 * @param marker The marker object to attach to the marked property.
+	 * @deprecated Use {@link #marker(Object)} instead.
 	 */
-	BeanResolver getBeanResolver();
+	@Deprecated
+	default void setMarker(Object marker) {
+		marker( marker );
+	}
 
 }

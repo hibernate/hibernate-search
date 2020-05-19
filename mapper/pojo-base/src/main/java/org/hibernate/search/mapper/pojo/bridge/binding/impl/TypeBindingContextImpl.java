@@ -53,32 +53,32 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	}
 
 	@Override
-	public void setBridge(TypeBridge bridge) {
-		setBridge( BeanHolder.of( bridge ) );
+	public void bridge(TypeBridge bridge) {
+		bridge( BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public void setBridge(BeanHolder<? extends TypeBridge> bridgeHolder) {
+	public void bridge(BeanHolder<? extends TypeBridge> bridgeHolder) {
 		this.partialBinding = new PartialBinding<>( bridgeHolder );
 	}
 
 	@Override
-	public PojoModelType getBridgedElement() {
+	public PojoModelType bridgedElement() {
 		return bridgedElement;
 	}
 
 	@Override
-	public PojoTypeIndexingDependencyConfigurationContext getDependencies() {
+	public PojoTypeIndexingDependencyConfigurationContext dependencies() {
 		return dependencyContext;
 	}
 
 	@Override
-	public IndexFieldTypeFactory getTypeFactory() {
+	public IndexFieldTypeFactory typeFactory() {
 		return indexFieldTypeFactory;
 	}
 
 	@Override
-	public IndexSchemaElement getIndexSchemaElement() {
+	public IndexSchemaElement indexSchemaElement() {
 		return indexSchemaElement;
 	}
 

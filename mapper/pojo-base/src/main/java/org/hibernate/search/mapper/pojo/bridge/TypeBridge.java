@@ -31,8 +31,8 @@ public interface TypeBridge extends AutoCloseable {
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
 	 * Any read that was not declared during {@link TypeBinder#bind(TypeBindingContext) binding}
-	 * (by declaring dependencies using {@link TypeBindingContext#getDependencies()}
-	 * or (advanced use) creating an accessor using {@link TypeBindingContext#getBridgedElement()})
+	 * (by declaring dependencies using {@link TypeBindingContext#dependencies()}
+	 * or (advanced use) creating an accessor using {@link TypeBindingContext#bridgedElement()})
 	 * may lead to out-of-sync indexes,
 	 * because Hibernate Search will consider the read property irrelevant to indexing
 	 * and will not reindex entities when that property changes.

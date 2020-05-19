@@ -20,18 +20,18 @@ public class ISBNBinder implements PropertyBinder {
 
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies().useRootOnly();
+		context.dependencies().useRootOnly();
 
 		//tag::include[]
-		IndexFieldType<String> type = context.getTypeFactory() // <1>
+		IndexFieldType<String> type = context.typeFactory() // <1>
 				.asString() // <2>
 				.normalizer( "isbn" ) // <3>
 				.sortable( Sortable.YES ) // <3>
 				.toIndexFieldType(); // <4>
 		//end::include[]
 
-		context.setBridge( new Bridge(
-				context.getIndexSchemaElement()
+		context.bridge( new Bridge(
+				context.indexSchemaElement()
 						.field( "isbn", type )
 						.toReference()
 		) );

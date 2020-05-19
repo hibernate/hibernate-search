@@ -76,10 +76,10 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 
 		@Override
 		public void bind(ValueBindingContext<?> context) {
-			context.<F, F>setBridge(
+			context.<F, F>bridge(
 					rawValueType,
 					BeanHolder.of( bridge ),
-					context.getTypeFactory().as( rawValueType )
+					context.typeFactory().as( rawValueType )
 			);
 		}
 	}

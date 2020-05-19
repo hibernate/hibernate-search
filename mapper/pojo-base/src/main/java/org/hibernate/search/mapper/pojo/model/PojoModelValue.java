@@ -19,6 +19,15 @@ public interface PojoModelValue<T> extends PojoModelElement {
 	/**
 	 * @return The {@link Class} representing the raw type of this value.
 	 */
-	Class<?> getRawType();
+	Class<?> rawType();
+
+	/**
+	 * @return The {@link Class} representing the raw type of this value.
+	 * @deprecated Use {@link #rawType()} instead.
+	 */
+	@Deprecated
+	default Class<?> getRawType() {
+		return rawType();
+	}
 
 }

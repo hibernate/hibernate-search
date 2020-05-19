@@ -54,11 +54,11 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
 		private ContainingEntityTypeBridge(TypeBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.use( "directField" )
 					.use( "association1.containedSingle.includedInTypeBridge" );
 
-			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
+			IndexSchemaObjectField typeBridgeObjectField = context.indexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
 			directFieldReference = typeBridgeObjectField.field( "directField", f -> f.asString() )
 					.toReference();
@@ -93,7 +93,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new ContainingEntityTypeBridge( context ) );
+				context.bridge( new ContainingEntityTypeBridge( context ) );
 			}
 		}
 	}
@@ -104,10 +104,10 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
 		private ContainingEntitySingleValuedPropertyBridge(PropertyBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.use( "containedSingle.includedInSingleValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "singleValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "singleValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInSingleValuedPropertyBridge", f -> f.asString()
@@ -131,7 +131,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
+				context.bridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
 			}
 		}
 	}
@@ -142,10 +142,10 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
 		private ContainingEntityMultiValuedPropertyBridge(PropertyBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.use( "containedSingle.includedInMultiValuedPropertyBridge" );
 
-			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "multiValuedPropertyBridge" );
+			IndexSchemaObjectField propertyBridgeObjectField = context.indexSchemaElement().objectField( "multiValuedPropertyBridge" );
 			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
 			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInMultiValuedPropertyBridge", f -> f.asString()
@@ -178,7 +178,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new ContainingEntityMultiValuedPropertyBridge( context ) );
+				context.bridge( new ContainingEntityMultiValuedPropertyBridge( context ) );
 			}
 		}
 	}

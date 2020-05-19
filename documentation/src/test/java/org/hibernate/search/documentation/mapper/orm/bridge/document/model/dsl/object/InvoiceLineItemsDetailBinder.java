@@ -25,14 +25,14 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 	//tag::bind[]
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				/* ... (declaration of dependencies, not relevant) ... */
 				//end::bind[]
 				.use( "category" )
 				.use( "amount" );
 		//tag::bind[]
 
-		IndexSchemaElement schemaElement = context.getIndexSchemaElement();
+		IndexSchemaElement schemaElement = context.indexSchemaElement();
 
 		IndexSchemaObjectField lineItemsField =
 				schemaElement.objectField( // <1>
@@ -41,7 +41,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 				)
 				.multiValued(); // <4>
 
-		context.setBridge( new Bridge(
+		context.bridge( new Bridge(
 				lineItemsField.toReference(), // <5>
 				lineItemsField.field( "category", f -> f.asString() ) // <6>
 						.toReference(),

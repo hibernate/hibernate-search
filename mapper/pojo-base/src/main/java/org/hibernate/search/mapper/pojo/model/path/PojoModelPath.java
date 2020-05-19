@@ -111,12 +111,22 @@ public abstract class PojoModelPath {
 	 * @return The model path to the element from which the value represented by this node is extracted.
 	 * May be {@code null}.
 	 */
-	public abstract PojoModelPath getParent();
+	public abstract PojoModelPath parent();
+
+	/**
+	 * @return The model path to the element from which the value represented by this node is extracted.
+	 * May be {@code null}.
+	 * @deprecated Use {@link #parent()} instead.
+	 */
+	@Deprecated
+	public PojoModelPath getParent() {
+		return parent();
+	}
 
 	abstract void appendSelfPath(StringBuilder builder);
 
 	private void appendPath(StringBuilder builder) {
-		PojoModelPath parent = getParent();
+		PojoModelPath parent = parent();
 		if ( parent == null ) {
 			appendSelfPath( builder );
 		}
@@ -167,7 +177,7 @@ public abstract class PojoModelPath {
 				return valueWithoutExtractors();
 			}
 			else {
-				for ( String extractorName : extractorPath.getExplicitExtractorNames() ) {
+				for ( String extractorName : extractorPath.explicitExtractorNames() ) {
 					value( extractorName );
 				}
 				return this;

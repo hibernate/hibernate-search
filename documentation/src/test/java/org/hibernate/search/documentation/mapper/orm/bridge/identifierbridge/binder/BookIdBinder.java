@@ -17,7 +17,7 @@ public class BookIdBinder implements IdentifierBinder { // <1>
 
 	@Override
 	public void bind(IdentifierBindingContext<?> context) { // <2>
-		context.setBridge( // <3>
+		context.bridge( // <3>
 				BookId.class, // <4>
 				new Bridge() // <5>
 		);

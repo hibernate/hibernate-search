@@ -220,9 +220,9 @@ public class RoutingBaseIT {
 			@Override
 			public void bind(RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =
-						context.getBridgedElement().property( "category" )
+						context.bridgedElement().property( "category" )
 								.createAccessor( EntityCategory.class );
-				context.setBridge( new MyRoutingKeyBridge( categoryAccessor ) );
+				context.bridge( new MyRoutingKeyBridge( categoryAccessor ) );
 			}
 		}
 	}

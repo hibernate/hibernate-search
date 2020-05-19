@@ -41,7 +41,7 @@ public interface ContainerExtractor<C, V> {
 	 * @return {@code true} if this extractor's {@link #extract(Object)} method may return streams with more than one value.
 	 * {@code false} if it will never return streams with more than one value.
 	 */
-	default boolean isMultiValued() {
+	default boolean multiValued() {
 		return true;
 	}
 

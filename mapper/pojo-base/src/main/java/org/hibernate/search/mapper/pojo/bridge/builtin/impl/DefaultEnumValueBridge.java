@@ -55,11 +55,11 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		@Override
 		@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 		public void bind(ValueBindingContext<?> context) {
-			doBind( context, (Class) context.getBridgedElement().getRawType() );
+			doBind( context, (Class) context.bridgedElement().rawType() );
 		}
 
 		private <V extends Enum<V>> void doBind(ValueBindingContext<?> context, Class<V> enumType) {
-			context.setBridge( enumType, new DefaultEnumValueBridge<>( enumType ) );
+			context.bridge( enumType, new DefaultEnumValueBridge<>( enumType ) );
 		}
 	}
 

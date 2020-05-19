@@ -26,7 +26,7 @@ public final class MarkerBindingContextImpl extends AbstractBindingContext
 	}
 
 	@Override
-	public void setMarker(Object marker) {
+	public void marker(Object marker) {
 		this.marker = marker;
 	}
 

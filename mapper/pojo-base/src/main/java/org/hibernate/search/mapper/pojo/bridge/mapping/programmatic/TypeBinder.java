@@ -32,7 +32,7 @@ public interface TypeBinder {
 	 * Implementations are also expected to declare dependencies, i.e. the properties
 	 * that will later be used in the
 	 * {@link TypeBridge#write(DocumentElement, Object, TypeBridgeWriteContext)} method,
-	 * using {@link TypeBindingContext#getDependencies()}.
+	 * using {@link TypeBindingContext#dependencies()}.
 	 * Failing that, Hibernate Search will not reindex entities properly when an indexed property is modified.
 	 *
 	 * @param context A context object providing information about the type being bound,

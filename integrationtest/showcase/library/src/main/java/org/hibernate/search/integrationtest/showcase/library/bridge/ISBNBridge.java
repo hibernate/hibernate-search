@@ -39,9 +39,9 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	public static class Binder implements ValueBinder {
 		@Override
 		public void bind(ValueBindingContext<?> context) {
-			context.setBridge(
+			context.bridge(
 					ISBN.class, new ISBNBridge(),
-					context.getTypeFactory().asString().normalizer( LibraryAnalyzers.NORMALIZER_ISBN )
+					context.typeFactory().asString().normalizer( LibraryAnalyzers.NORMALIZER_ISBN )
 			);
 		}
 	}

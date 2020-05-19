@@ -279,7 +279,7 @@ public class AnnotationMappingDiscoveryIT {
 		public static class Binder implements MarkerBinder {
 			@Override
 			public void bind(MarkerBindingContext context) {
-				context.setMarker( new CustomMarker() );
+				context.marker( new CustomMarker() );
 			}
 		}
 	}
@@ -288,13 +288,13 @@ public class AnnotationMappingDiscoveryIT {
 		private List<IndexObjectFieldReference> objectFieldReferences = new ArrayList<>();
 
 		private CustomMarkerConsumingPropertyBridge(PropertyBindingContext context) {
-			List<PojoModelProperty> markedProperties = context.getBridgedElement().properties()
+			List<PojoModelProperty> markedProperties = context.bridgedElement().properties()
 					.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
 					.collect( Collectors.toList() );
 			for ( PojoModelProperty property : markedProperties ) {
 				property.createAccessor();
 				objectFieldReferences.add(
-						context.getIndexSchemaElement().objectField( property.getName() ).toReference()
+						context.indexSchemaElement().objectField( property.name() ).toReference()
 				);
 			}
 		}
@@ -309,7 +309,7 @@ public class AnnotationMappingDiscoveryIT {
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.setBridge( new CustomMarkerConsumingPropertyBridge( context ) );
+				context.bridge( new CustomMarkerConsumingPropertyBridge( context ) );
 			}
 		}
 	}

@@ -20,10 +20,10 @@ import org.apache.lucene.document.StoredField;
 public class PageRankValueBinder implements ValueBinder { // <1>
 	@Override
 	public void bind(ValueBindingContext<?> context) {
-		context.setBridge(
+		context.bridge(
 				Float.class,
 				new PageRankValueBridge(),
-				context.getTypeFactory() // <2>
+				context.typeFactory() // <2>
 						.extension( LuceneExtension.get() ) // <3>
 						.asNative( // <4>
 								Float.class, // <5>

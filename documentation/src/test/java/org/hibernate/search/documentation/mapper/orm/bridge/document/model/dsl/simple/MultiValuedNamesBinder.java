@@ -19,16 +19,16 @@ public class MultiValuedNamesBinder implements TypeBinder {
 	//tag::bind[]
 	@Override
 	public void bind(TypeBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				/* ... (declaration of dependencies, not relevant) ... */
 				//end::bind[]
 				.use( "firstName" )
 				.use( "lastName" );
 		//tag::bind[]
 
-		IndexSchemaElement schemaElement = context.getIndexSchemaElement();
+		IndexSchemaElement schemaElement = context.indexSchemaElement();
 
-		context.setBridge( new Bridge(
+		context.bridge( new Bridge(
 				schemaElement.field( "names", f -> f.asString().analyzer( "name" ) )
 						.multiValued() // <1>
 						.toReference()

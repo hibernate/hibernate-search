@@ -40,7 +40,7 @@ public final class BeanBinder
 	@Override
 	@SuppressWarnings({"unchecked"})
 	public void bind(IdentifierBindingContext<?> context) {
-		BeanHolder<? extends IdentifierBridge> bridgeHolder = doBuild( context.getBeanResolver(), IdentifierBridge.class );
+		BeanHolder<? extends IdentifierBridge> bridgeHolder = doBuild( context.beanResolver(), IdentifierBridge.class );
 		try {
 			doBind( bridgeHolder, context );
 		}
@@ -55,7 +55,7 @@ public final class BeanBinder
 	@Override
 	@SuppressWarnings({"unchecked"})
 	public void bind(ValueBindingContext<?> context) {
-		BeanHolder<? extends ValueBridge> bridgeHolder = doBuild( context.getBeanResolver(), ValueBridge.class );
+		BeanHolder<? extends ValueBridge> bridgeHolder = doBuild( context.beanResolver(), ValueBridge.class );
 		try {
 			doBind( bridgeHolder, context );
 		}
@@ -79,7 +79,7 @@ public final class BeanBinder
 						+ bridge + "'."
 						+ " There is a bug in Hibernate Search, please report it."
 				) );
-		context.setBridge( bridgeParameterType, bridge );
+		context.bridge( bridgeParameterType, bridge );
 	}
 
 	private <B extends ValueBridge<V, F>, V, F> void doBind(BeanHolder<B> bridgeHolder, ValueBindingContext<?> context) {
@@ -94,7 +94,7 @@ public final class BeanBinder
 						+ bridge + "'."
 						+ " There is a bug in Hibernate Search, please report it."
 				) );
-		context.setBridge( bridgeParameterType, bridge );
+		context.bridge( bridgeParameterType, bridge );
 	}
 
 	private <T> BeanHolder<? extends T> doBuild(BeanResolver beanResolver, Class<T> expectedType) {

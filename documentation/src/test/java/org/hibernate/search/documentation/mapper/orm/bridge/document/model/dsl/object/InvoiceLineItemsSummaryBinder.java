@@ -25,23 +25,23 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 	//tag::bind[]
 	@Override
 	public void bind(PropertyBindingContext context) {
-		context.getDependencies()
+		context.dependencies()
 				/* ... (declaration of dependencies, not relevant) ... */
 				//end::bind[]
 				.use( "category" )
 				.use( "amount" );
 		//tag::bind[]
 
-		IndexSchemaElement schemaElement = context.getIndexSchemaElement();
+		IndexSchemaElement schemaElement = context.indexSchemaElement();
 
 		IndexSchemaObjectField summaryField =
 				schemaElement.objectField( "summary" ); // <1>
 
-		IndexFieldType<BigDecimal> amountFieldType = context.getTypeFactory()
+		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory()
 				.asBigDecimal().decimalScale( 2 )
 				.toIndexFieldType();
 
-		context.setBridge( new Bridge(
+		context.bridge( new Bridge(
 				summaryField.toReference(), // <2>
 				summaryField.field( "total", amountFieldType ) // <3>
 						.toReference(),

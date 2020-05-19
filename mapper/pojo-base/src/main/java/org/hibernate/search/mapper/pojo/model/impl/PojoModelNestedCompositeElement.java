@@ -44,7 +44,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return modelPath.getParent().getPropertyModel().getName();
 	}
 
@@ -52,7 +52,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 		if ( hasAccessor() ) {
 			@SuppressWarnings( "unchecked" ) // We used the same property as in modelPath, on the same type. The result must have the same type.
 			PojoIndexingDependencyCollectorPropertyNode<T, P> collectorPropertyNode =
-					(PojoIndexingDependencyCollectorPropertyNode<T, P>) dependencyCollector.property( getName() );
+					(PojoIndexingDependencyCollectorPropertyNode<T, P>) dependencyCollector.property( name() );
 			PojoIndexingDependencyCollectorValueNode<P, P> collectorValueNode =
 					collectorPropertyNode.value( modelPath.getBoundExtractorPath() );
 			collectorValueNode.collectDependency();

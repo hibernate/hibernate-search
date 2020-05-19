@@ -281,10 +281,10 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		private final IndexFieldReference<String> valueFieldReference;
 
 		private FirstTypeBridge(TypeBindingContext context) {
-			valueSourcePropertyAccessor = context.getBridgedElement().property( "firstContained" )
+			valueSourcePropertyAccessor = context.bridgedElement().property( "firstContained" )
 					.property( "includedInFirstBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( "firstBridge" );
+			IndexSchemaObjectField objectField = context.indexSchemaElement().objectField( "firstBridge" );
 			firstBridgeObjectFieldReference = objectField.toReference();
 			valueFieldReference = objectField.field( "value", f -> f.asString() )
 					.toReference();
@@ -299,7 +299,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new FirstTypeBridge( context ) );
+				context.bridge( new FirstTypeBridge( context ) );
 			}
 		}
 
@@ -312,10 +312,10 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		private IndexFieldReference<String> valueFieldReference;
 
 		private SecondTypeBridge(TypeBindingContext context) {
-			valueSourcePropertyAccessor = context.getBridgedElement().property( "secondContained" )
+			valueSourcePropertyAccessor = context.bridgedElement().property( "secondContained" )
 					.property( "includedInSecondBridge" )
 					.createAccessor( String.class );
-			IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( "secondBridge" );
+			IndexSchemaObjectField objectField = context.indexSchemaElement().objectField( "secondBridge" );
 			secondBridgeObjectFieldReference = objectField.toReference();
 			valueFieldReference = objectField.field( "value", f -> f.asString() )
 					.toReference();
@@ -330,7 +330,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new SecondTypeBridge( context ) );
+				context.bridge( new SecondTypeBridge( context ) );
 			}
 		}
 

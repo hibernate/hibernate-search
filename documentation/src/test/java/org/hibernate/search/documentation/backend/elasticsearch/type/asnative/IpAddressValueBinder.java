@@ -20,10 +20,10 @@ import com.google.gson.JsonPrimitive;
 public class IpAddressValueBinder implements ValueBinder { // <1>
 	@Override
 	public void bind(ValueBindingContext<?> context) {
-		context.setBridge(
+		context.bridge(
 				String.class,
 				new IpAddressValueBridge(),
-				context.getTypeFactory() // <2>
+				context.typeFactory() // <2>
 						.extension( ElasticsearchExtension.get() ) // <3>
 						.asNative() // <4>
 								.mapping( "{\"type\": \"ip\"}" ) // <5>

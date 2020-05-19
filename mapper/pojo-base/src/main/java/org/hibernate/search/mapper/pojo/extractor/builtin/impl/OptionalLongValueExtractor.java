@@ -23,7 +23,7 @@ public class OptionalLongValueExtractor implements ContainerExtractor<OptionalLo
 	}
 
 	@Override
-	public boolean isMultiValued() {
+	public boolean multiValued() {
 		return false;
 	}
 }

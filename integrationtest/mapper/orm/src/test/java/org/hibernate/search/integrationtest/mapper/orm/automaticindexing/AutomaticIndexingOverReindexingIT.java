@@ -302,11 +302,11 @@ public class AutomaticIndexingOverReindexingIT {
 		private IndexFieldReference<String> property1FromBridgeFieldReference;
 
 		private Level3Property1Bridge(TypeBindingContext context) {
-			level3Property1SourceAccessor = context.getBridgedElement().property( "level2" )
+			level3Property1SourceAccessor = context.bridgedElement().property( "level2" )
 					.property( "level3" )
 					.property( "property1" )
 					.createAccessor( String.class );
-			property1FromBridgeFieldReference = context.getIndexSchemaElement().field(
+			property1FromBridgeFieldReference = context.indexSchemaElement().field(
 					"property1FromBridge", f -> f.asString()
 			)
 					.toReference();
@@ -323,7 +323,7 @@ public class AutomaticIndexingOverReindexingIT {
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.setBridge( new Level3Property1Bridge( context ) );
+				context.bridge( new Level3Property1Bridge( context ) );
 			}
 		}
 

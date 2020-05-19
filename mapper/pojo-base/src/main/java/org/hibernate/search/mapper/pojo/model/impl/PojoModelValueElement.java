@@ -35,7 +35,7 @@ public class PojoModelValueElement<T> implements PojoModelValue<T> {
 	}
 
 	@Override
-	public Class<?> getRawType() {
+	public Class<?> rawType() {
 		return typeModel.getRawType().getTypeIdentifier().getJavaClass();
 	}
 }

@@ -74,17 +74,17 @@ public final class CustomTypeBridge implements TypeBridge {
 
 		@Override
 		public void bind(TypeBindingContext context) {
-			PojoModelType bridgedElement = context.getBridgedElement();
+			PojoModelType bridgedElement = context.bridgedElement();
 			PojoElementAccessor<String> textPropertyAccessor =
 					bridgedElement.property( TEXT_PROPERTY_NAME ).createAccessor( String.class );
 			PojoElementAccessor<LocalDate> localDatePropertyAccessor =
 					bridgedElement.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
 
-			context.setBridge(
+			context.bridge(
 					new CustomTypeBridge(
 							textPropertyAccessor,
 							localDatePropertyAccessor,
-							context.getIndexSchemaElement(),
+							context.indexSchemaElement(),
 							objectName
 					)
 			);

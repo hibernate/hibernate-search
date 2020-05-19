@@ -64,13 +64,13 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 			if ( fieldName == null || fieldName.isEmpty() ) {
 				throw new IllegalArgumentException( "fieldName is a mandatory parameter" );
 			}
-			context.getDependencies().useRootOnly();
+			context.dependencies().useRootOnly();
 
-			context.setBridge(
+			context.bridge(
 					new MultiKeywordStringBridge(
 							fieldName,
 							separatorPattern,
-							context.getIndexSchemaElement()
+							context.indexSchemaElement()
 					)
 			);
 		}

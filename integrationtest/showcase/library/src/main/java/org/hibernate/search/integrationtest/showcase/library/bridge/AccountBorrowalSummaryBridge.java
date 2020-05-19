@@ -87,11 +87,11 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 	public static class Binder implements TypeBinder {
 		@Override
 		public void bind(TypeBindingContext context) {
-			context.getDependencies()
+			context.dependencies()
 					.use( "borrowals.type" );
 
-			context.setBridge(
-					new AccountBorrowalSummaryBridge( context.getIndexSchemaElement() )
+			context.bridge(
+					new AccountBorrowalSummaryBridge( context.indexSchemaElement() )
 			);
 		}
 	}

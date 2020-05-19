@@ -37,7 +37,7 @@ public class LongitudeMarker {
 
 		@Override
 		public void bind(MarkerBindingContext context) {
-			context.setMarker( new LongitudeMarker( markerSet ) );
+			context.marker( new LongitudeMarker( markerSet ) );
 		}
 	}
 
