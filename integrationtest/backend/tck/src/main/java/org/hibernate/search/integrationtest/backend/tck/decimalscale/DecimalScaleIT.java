@@ -280,10 +280,12 @@ public class DecimalScaleIT {
 		);
 		setupHelper.start().withIndex( index ).setup();
 
-		index.index( "1", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.114999" ) ) );
-		index.index( "2", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.115" ) ) );
-		index.index( "3", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.11" ) ) );
-		index.index( "4", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.12" ) ) );
+		index.bulkIndexer()
+				.add( "1", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.114999" ) ) )
+				.add( "2", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.115" ) ) )
+				.add( "3", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.11" ) ) )
+				.add( "4", doc -> doc.addValue( index.binding().scaled, new BigDecimal( "739.12" ) ) )
+				.join();
 
 		// RoundingMode.HALF_UP expected on both values:
 		match( index, new BigDecimal( "739.11" ), "1", "3" );
@@ -301,10 +303,12 @@ public class DecimalScaleIT {
 		);
 		setupHelper.start().withIndex( index ).setup();
 
-		index.index( "1", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7394999" ) ) );
-		index.index( "2", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7395000" ) ) );
-		index.index( "3", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7390000" ) ) );
-		index.index( "4", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7400000" ) ) );
+		index.bulkIndexer()
+				.add( "1", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7394999" ) ) )
+				.add( "2", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7395000" ) ) )
+				.add( "3", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7390000" ) ) )
+				.add( "4", doc -> doc.addValue( index.binding().scaled, new BigInteger( "7400000" ) ) )
+				.join();
 
 		// RoundingMode.HALF_UP expected on both values:
 		match( index, new BigInteger( "7390000" ), "1", "3" );
