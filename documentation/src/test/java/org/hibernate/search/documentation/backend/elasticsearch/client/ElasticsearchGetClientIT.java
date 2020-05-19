@@ -40,13 +40,13 @@ public class ElasticsearchGetClientIT {
 	}
 
 	@Test
-	public void getClient() throws IOException {
-		//tag::getClient[]
+	public void client() throws IOException {
+		//tag::client[]
 		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
 		Backend backend = mapping.getBackend( "myBackend" ); // <2>
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class ); // <3>
-		RestClient client = elasticsearchBackend.getClient( RestClient.class ); // <4>
-		//end::getClient[]
+		RestClient client = elasticsearchBackend.client( RestClient.class ); // <4>
+		//end::client[]
 
 		Response response = client.performRequest( new Request( "GET", "/" ) );
 		assertThat( response ).isNotNull();

@@ -520,7 +520,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				 * We only wait for YELLOW: it's perfectly fine, and some tests actually expect
 				 * the indexes to never reach a green status
 				 */
-				.param( "wait_for_status", IndexStatus.YELLOW.getElasticsearchString() )
+				.param( "wait_for_status", IndexStatus.YELLOW.externalRepresentation() )
 				.param( "timeout", ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
 				.build() );
 	}

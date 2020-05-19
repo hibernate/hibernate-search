@@ -46,7 +46,7 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 					.pathComponent( Paths._CLUSTER )
 					.pathComponent( Paths.HEALTH )
 					.pathComponent( indexName )
-					.param( "wait_for_status", requiredStatus.getElasticsearchString() )
+					.param( "wait_for_status", requiredStatus.externalRepresentation() )
 					.param( "timeout", timeout );
 
 			return builder.build();

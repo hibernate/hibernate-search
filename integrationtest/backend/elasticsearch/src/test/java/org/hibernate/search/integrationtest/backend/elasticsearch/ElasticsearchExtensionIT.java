@@ -175,7 +175,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.fetchAll();
 
-		Assertions.assertThat( result.getResponseBody() )
+		Assertions.assertThat( result.responseBody() )
 				.isNotNull()
 				.extracting( body -> body.get( "_shards" ) ).isInstanceOf( JsonObject.class );
 	}
@@ -1027,7 +1027,7 @@ public class ElasticsearchExtensionIT {
 	public void backend_getClient() throws Exception {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
-		RestClient restClient = elasticsearchBackend.getClient( RestClient.class );
+		RestClient restClient = elasticsearchBackend.client( RestClient.class );
 
 		// Test that the client actually works
 		Response response = restClient.performRequest( new Request( "GET", "/" ) );
@@ -1039,7 +1039,7 @@ public class ElasticsearchExtensionIT {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 
-		assertThatThrownBy( () -> elasticsearchBackend.getClient( HttpAsyncClient.class ) )
+		assertThatThrownBy( () -> elasticsearchBackend.client( HttpAsyncClient.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						HttpAsyncClient.class.getName(),

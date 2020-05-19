@@ -28,7 +28,7 @@ class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 	}
 
 	@Override
-	public JsonObject getResponseBody() {
+	public JsonObject responseBody() {
 		return responseBody;
 	}
 }

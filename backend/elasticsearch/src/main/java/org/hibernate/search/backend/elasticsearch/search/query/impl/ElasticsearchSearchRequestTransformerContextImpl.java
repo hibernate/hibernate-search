@@ -51,18 +51,18 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 	}
 
 	@Override
-	public String getPath() {
+	public String path() {
 		return path;
 	}
 
 	@Override
-	public void setPath(String newPath) {
+	public void path(String newPath) {
 		Contracts.assertNotNullNorEmpty( newPath, "newPath" );
 		this.path = newPath;
 	}
 
 	@Override
-	public Map<String, String> getParametersMap() {
+	public Map<String, String> parametersMap() {
 		// Avoid side-effects on the original request
 		if ( potentiallyTransformedParametersMap == null ) {
 			potentiallyTransformedParametersMap = new LinkedHashMap<>( originalRequest.getParameters() );
@@ -71,7 +71,7 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 	}
 
 	@Override
-	public JsonObject getBody() {
+	public JsonObject body() {
 		// Avoid side-effects on the original request
 		if ( potentiallyTransformedBody == null ) {
 			potentiallyTransformedBody = originalBody.deepCopy();

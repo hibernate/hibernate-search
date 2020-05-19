@@ -180,7 +180,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		Optional<ElasticsearchVersion> configuredVersionOptional = VERSION.get( propertySource );
 		boolean versionCheckEnabled = VERSION_CHECK_ENABLED.get( propertySource );
 		if ( !versionCheckEnabled ) {
-			if ( configuredVersionOptional.isPresent() && !configuredVersionOptional.get().getMinor().isPresent() ) {
+			if ( configuredVersionOptional.isPresent() && !configuredVersionOptional.get().minor().isPresent() ) {
 				throw log.invalidElasticsearchVersionCheckConfiguration( configuredVersionOptional.get().toString() );
 			}
 			else if ( !configuredVersionOptional.isPresent() ) {
