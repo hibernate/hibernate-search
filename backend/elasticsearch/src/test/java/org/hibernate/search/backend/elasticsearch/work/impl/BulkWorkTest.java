@@ -141,14 +141,14 @@ public class BulkWorkTest extends EasyMockSupport {
 	private void assertBulkRequest(ElasticsearchRequest request, int ... bulkableIndices) {
 		assertThat( request ).isNotNull();
 		assertSoftly( softly -> {
-			softly.assertThat( request.getMethod() ).isEqualTo( "POST" );
-			softly.assertThat( request.getPath() ).isEqualTo( "/_bulk" );
+			softly.assertThat( request.method() ).isEqualTo( "POST" );
+			softly.assertThat( request.path() ).isEqualTo( "/_bulk" );
 			List<JsonObject> expectedBodyParts = new ArrayList<>();
 			for ( int bulkableIndex : bulkableIndices ) {
 				expectedBodyParts.add( bulkableWorkMetadata( bulkableIndex ) );
 				expectedBodyParts.add( bulkableWorkBody( bulkableIndex ) );
 			}
-			softly.assertThat( request.getBodyParts() ).containsExactlyElementsOf( expectedBodyParts );
+			softly.assertThat( request.bodyParts() ).containsExactlyElementsOf( expectedBodyParts );
 		} );
 	}
 

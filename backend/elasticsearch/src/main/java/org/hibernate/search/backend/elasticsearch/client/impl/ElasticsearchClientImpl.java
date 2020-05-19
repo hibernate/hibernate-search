@@ -131,10 +131,10 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				}
 				);
 
-		long currentTimeoutValue = ( elasticsearchRequest.getTimeoutValue() == null ) ?
-				globalTimeoutValue : elasticsearchRequest.getTimeoutValue();
-		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.getTimeoutUnit() == null ) ?
-				globalTimeoutUnit : elasticsearchRequest.getTimeoutUnit();
+		long currentTimeoutValue = ( elasticsearchRequest.timeoutValue() == null ) ?
+				globalTimeoutValue : elasticsearchRequest.timeoutValue();
+		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.timeoutUnit() == null ) ?
+				globalTimeoutUnit : elasticsearchRequest.timeoutUnit();
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
@@ -158,9 +158,9 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private static Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity) {
-		Request request = new Request( elasticsearchRequest.getMethod(), elasticsearchRequest.getPath() );
+		Request request = new Request( elasticsearchRequest.method(), elasticsearchRequest.path() );
 
-		for ( Entry<String, String> parameter : elasticsearchRequest.getParameters().entrySet() ) {
+		for ( Entry<String, String> parameter : elasticsearchRequest.parameters().entrySet() ) {
 			request.addParameter( parameter.getKey(), parameter.getValue() );
 		}
 
@@ -208,16 +208,16 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( requestLog.isTraceEnabled() ) {
-			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(),
-					request.getBodyParts().size(), executionTimeMs,
-					response.getStatusCode(), response.getStatusMessage(),
-					jsonLogHelper.toString( request.getBodyParts() ),
-					jsonLogHelper.toString( response.getBody() ) );
+			requestLog.executedRequest( request.method(), request.path(), request.parameters(),
+					request.bodyParts().size(), executionTimeMs,
+					response.statusCode(), response.statusMessage(),
+					jsonLogHelper.toString( request.bodyParts() ),
+					jsonLogHelper.toString( response.body() ) );
 		}
 		else {
-			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(),
-					request.getBodyParts().size(), executionTimeMs,
-					response.getStatusCode(), response.getStatusMessage() );
+			requestLog.executedRequest( request.method(), request.path(), request.parameters(),
+					request.bodyParts().size(), executionTimeMs,
+					response.statusCode(), response.statusMessage() );
 		}
 	}
 

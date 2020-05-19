@@ -41,7 +41,7 @@ public class ElasticsearchClientUtils {
 	}
 
 	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) throws IOException {
-		final List<JsonObject> bodyParts = request.getBodyParts();
+		final List<JsonObject> bodyParts = request.bodyParts();
 		if ( bodyParts.isEmpty() ) {
 			return null;
 		}
@@ -63,11 +63,11 @@ public class ElasticsearchClientUtils {
 		try {
 			response = Futures.unwrappedExceptionJoin( client.submit( request ) );
 
-			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
+			if ( !ElasticsearchClientUtils.isSuccessCode( response.statusCode() ) ) {
 				throw log.elasticsearchResponseIndicatesFailure();
 			}
 
-			return VERSION_ACCESSOR.get( response.getBody() )
+			return VERSION_ACCESSOR.get( response.body() )
 					.map( ElasticsearchVersion::of )
 					.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
 		}

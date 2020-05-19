@@ -37,11 +37,11 @@ public final class ElasticsearchResponseFormatter {
 		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
 		//Also useful to hint the builder to use larger increment steps.
 		StringBuilder sb = new StringBuilder( 180 );
-		sb.append( response.getStatusCode() )
+		sb.append( response.statusCode() )
 				.append( " '" )
-				.append( response.getStatusMessage() )
+				.append( response.statusMessage() )
 				.append( "' with body " )
-				.append( helper.toString( response.getBody() ) );
+				.append( helper.toString( response.body() ) );
 
 		return sb.toString();
 	}

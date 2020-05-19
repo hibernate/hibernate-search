@@ -33,7 +33,7 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 
 	@Override
 	protected CreateIndexResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		int statusCode = response.getStatusCode();
+		int statusCode = response.statusCode();
 		if ( ElasticsearchClientUtils.isSuccessCode( statusCode ) ) {
 			return CreateIndexResult.CREATED;
 		}

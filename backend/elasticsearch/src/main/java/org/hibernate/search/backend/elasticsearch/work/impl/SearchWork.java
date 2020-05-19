@@ -38,16 +38,16 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
 		queryLog.executingElasticsearchQuery(
-				request.getPath(),
-				request.getParameters(),
-				executionContext.getGsonProvider().getLogHelper().toString( request.getBodyParts() )
+				request.path(),
+				request.parameters(),
+				executionContext.getGsonProvider().getLogHelper().toString( request.bodyParts() )
 				);
 		return super.beforeExecute( executionContext, request );
 	}
 
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject body = response.getBody();
+		JsonObject body = response.body();
 		return resultExtractor.extract( body );
 	}
 

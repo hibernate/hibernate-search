@@ -47,7 +47,7 @@ public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingI
 	@Override
 	protected List<ExistingIndexMetadata> generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
-		JsonObject body = response.getBody();
+		JsonObject body = response.body();
 		List<ExistingIndexMetadata> result = new ArrayList<>();
 		for ( Map.Entry<String, JsonElement> entry : body.entrySet() ) {
 			JsonObject indexAsObject = entry.getValue().getAsJsonObject();

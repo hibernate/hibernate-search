@@ -31,7 +31,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 
 	@Override
 	protected Long generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		JsonObject body = response.getBody();
+		JsonObject body = response.body();
 		return COUNT_ACCESSOR.get( body ).get();
 	}
 

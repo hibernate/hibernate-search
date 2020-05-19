@@ -38,10 +38,10 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	@Override
 	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
-		if ( response.getStatusCode() == 404 ) {
+		if ( response.statusCode() == 404 ) {
 			throw log.explainUnknownDocument( id );
 		}
-		JsonObject body = response.getBody();
+		JsonObject body = response.body();
 		return new ExplainResultImpl( body );
 	}
 

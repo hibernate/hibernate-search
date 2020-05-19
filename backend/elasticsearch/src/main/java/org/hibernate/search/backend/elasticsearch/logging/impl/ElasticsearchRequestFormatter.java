@@ -34,11 +34,11 @@ public final class ElasticsearchRequestFormatter {
 		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
 		StringBuilder sb = new StringBuilder( 180 );
 
-		sb.append( request.getMethod() )
+		sb.append( request.method() )
 				.append( " " )
-				.append( request.getPath() )
+				.append( request.path() )
 				.append( " with parameters " )
-				.append( request.getParameters() );
+				.append( request.parameters() );
 
 		return sb.toString();
 	}

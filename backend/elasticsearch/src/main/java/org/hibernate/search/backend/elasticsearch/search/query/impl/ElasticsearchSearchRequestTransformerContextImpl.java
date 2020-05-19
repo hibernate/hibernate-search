@@ -39,7 +39,7 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 
 	private ElasticsearchSearchRequestTransformerContextImpl(ElasticsearchRequest originalRequest) {
 		this.originalRequest = originalRequest;
-		List<JsonObject> originalBodyParts = originalRequest.getBodyParts();
+		List<JsonObject> originalBodyParts = originalRequest.bodyParts();
 		if ( originalBodyParts.size() != 1 ) {
 			throw new AssertionFailure(
 					"Request transformation was applied to a request with no body part or more than one body parts."
@@ -47,7 +47,7 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 			);
 		}
 		this.originalBody = originalBodyParts.get( 0 );
-		this.path = originalRequest.getPath();
+		this.path = originalRequest.path();
 	}
 
 	@Override
@@ -65,7 +65,7 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 	public Map<String, String> parametersMap() {
 		// Avoid side-effects on the original request
 		if ( potentiallyTransformedParametersMap == null ) {
-			potentiallyTransformedParametersMap = new LinkedHashMap<>( originalRequest.getParameters() );
+			potentiallyTransformedParametersMap = new LinkedHashMap<>( originalRequest.parameters() );
 		}
 		return potentiallyTransformedParametersMap;
 	}
@@ -82,12 +82,12 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 	public ElasticsearchRequest apply(ElasticsearchSearchRequestTransformer transformer) {
 		transformer.transform( this );
 
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.builder( originalRequest.getMethod() );
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.builder( originalRequest.method() );
 
 		builder.wholeEncodedPath( path );
 
 		Map<String, String> parameters = potentiallyTransformedParametersMap != null
-				? potentiallyTransformedParametersMap : originalRequest.getParameters();
+				? potentiallyTransformedParametersMap : originalRequest.parameters();
 		parameters.forEach( builder::param );
 
 		JsonObject body = potentiallyTransformedBody != null ? potentiallyTransformedBody : originalBody;
