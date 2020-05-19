@@ -14,8 +14,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,16 +34,6 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 
 	public SearchQueryEntityLoadingFetchSizeIT(SingleTypeLoadingModelPrimitives<T> primitives) {
 		super( primitives );
-	}
-
-	@Before
-	public void checkFetchSizeSupported() {
-		// TODO HSEARCH-962 fetch size should be supported and testable even when the document id is not the entity id,
-		//  once we execute multiple queries in HibernateOrmSingleTypeCriteriaEntityLoader
-		Assume.assumeTrue(
-				"This test only makes sense if cache lookups are supported",
-				primitives.isFetchSizeSupported()
-		);
 	}
 
 	@Test
