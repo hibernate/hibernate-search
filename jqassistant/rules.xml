@@ -7,7 +7,7 @@
   -->
 <jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/analysis/rules/schema/v1.0">
 
-    <concept id="my-rules:MethodOverrides">
+    <concept id="hsearch:MethodOverrides">
         <requiresConcept refId="java:TypeAssignableFrom" />
         <description>
             A fixed version of java:MethodOverrides that works even for overrides of methods declared in the JDK,
@@ -28,7 +28,7 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:TypeMetadata">
+    <concept id="hsearch:TypeMetadata">
         <description>
             Contributes additional metadata to the :Type nodes.
         </description>
@@ -42,7 +42,7 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:Anonymous">
+    <concept id="hsearch:Anonymous">
         <description>
             Contributes the :Anonymous label to anonymous types
         </description>
@@ -58,7 +58,7 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:Generated">
+    <concept id="hsearch:Generated">
         <description>
             Contributes the :Generated label to generated types
         </description>
@@ -74,8 +74,8 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:Spi">
-        <requiresConcept refId="my-rules:Test" />
+    <concept id="hsearch:Spi">
+        <requiresConcept refId="hsearch:Test" />
         <description>
             Contributes the :Spi and :Public labels to SPI types
         </description>
@@ -93,8 +93,8 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:Impl">
-        <requiresConcept refId="my-rules:Test" />
+    <concept id="hsearch:Impl">
+        <requiresConcept refId="hsearch:Test" />
         <description>
             Contributes the :Impl label to implementation types
         </description>
@@ -114,7 +114,7 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:Test">
+    <concept id="hsearch:Test">
         <description>
             Contributes the :Test label to :Type nodes that exist for test purposes only.
         </description>
@@ -133,10 +133,10 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:Api">
-        <requiresConcept refId="my-rules:Test" />
-        <requiresConcept refId="my-rules:Spi" />
-        <requiresConcept refId="my-rules:Impl" />
+    <concept id="hsearch:Api">
+        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Impl" />
         <description>
             Contributes the :Api and :Public labels to API types
         </description>
@@ -154,7 +154,7 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:HibernateSearch">
+    <concept id="hsearch:HibernateSearch">
         <description>
             Contributes the :HibernateSearch label to :Maven:Artifact, :Package and :Type nodes from Hibernate Search.
         </description>
@@ -172,8 +172,8 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:UtilArtifacts">
-        <requiresConcept refId="my-rules:HibernateSearch" />
+    <concept id="hsearch:UtilArtifacts">
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             Contributes the :Util label to :Maven:Artifact nodes representing utils artifacts.
         </description>
@@ -189,8 +189,8 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:IntegrationTestArtifacts">
-        <requiresConcept refId="my-rules:HibernateSearch" />
+    <concept id="hsearch:IntegrationTestArtifacts">
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             Contributes the :IntegrationTest label to :Maven:Artifact nodes representing integration testing artifacts.
         </description>
@@ -207,8 +207,8 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:ArtifactMetadata">
-        <requiresConcept refId="my-rules:HibernateSearch" />
+    <concept id="hsearch:ArtifactMetadata">
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             Contributes additional metadata to the :Maven:Artifact:HibernateSearch nodes.
         </description>
@@ -232,10 +232,10 @@
         ]]></cypher>
     </concept>
 
-    <constraint id="my-rules:PublicTypesMayNotExtendInternalTypes">
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
-        <requiresConcept refId="my-rules:Impl" />
+    <constraint id="hsearch:PublicTypesMayNotExtendInternalTypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Impl" />
         <description>API/SPI types must not extend/implement internal types.</description>
         <cypher><![CDATA[
             MATCH
@@ -245,10 +245,10 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:PublicMethodsMayNotExposeInternalTypes">
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
-        <requiresConcept refId="my-rules:Impl" />
+    <constraint id="hsearch:PublicMethodsMayNotExposeInternalTypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Impl" />
         <description>API/SPI methods must not expose internal types.</description>
         <cypher><![CDATA[
             // return values
@@ -270,10 +270,10 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:PublicFieldsMayNotExposeInternalTypes">
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
-        <requiresConcept refId="my-rules:Impl" />
+    <constraint id="hsearch:PublicFieldsMayNotExposeInternalTypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Impl" />
         <description>API/SPI fields must not expose internal types.</description>
         <cypher><![CDATA[
             MATCH
@@ -285,12 +285,12 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix">
+    <constraint id="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix">
         <requiresConcept refId="java:Deprecated" />
-        <requiresConcept refId="my-rules:MethodOverrides" />
-        <requiresConcept refId="my-rules:HibernateSearch" />
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
+        <requiresConcept refId="hsearch:MethodOverrides" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
         <description>
             API or SPI methods must not start with "get" or "set".
             Exceptions are allowed when:
@@ -320,9 +320,9 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:APITypesMayNotExtendSPITypes">
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
+    <constraint id="hsearch:APITypesMayNotExtendSPITypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
         <description>API types must not extend/implement SPI types.</description>
         <cypher><![CDATA[
             MATCH
@@ -332,9 +332,9 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:APIMethodsMayNotExposeSPITypes">
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
+    <constraint id="hsearch:APIMethodsMayNotExposeSPITypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
         <description>API methods must not expose SPI types.</description>
         <cypher><![CDATA[
             // return values
@@ -360,9 +360,9 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:APIFieldsMayNotExposeSPITypes">
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
+    <constraint id="hsearch:APIFieldsMayNotExposeSPITypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
         <description>API fields must not expose SPI types.</description>
         <cypher><![CDATA[
             MATCH
@@ -374,10 +374,10 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules">
-        <requiresConcept refId="my-rules:UtilArtifacts" />
-        <requiresConcept refId="my-rules:Test" />
-        <requiresConcept refId="my-rules:Impl" />
+    <constraint id="hsearch:TypesMayNotDependOnImplementationTypeFromOtherModules">
+        <requiresConcept refId="hsearch:UtilArtifacts" />
+        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:Impl" />
         <description>
             Types must not depend on implementation types from other modules.
             SPIs must be used for such dependencies.
@@ -397,10 +397,10 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:TypesShouldUseImplSuffixWithRestraint">
-        <requiresConcept refId="my-rules:TypeMetadata" />
-        <requiresConcept refId="my-rules:Test" />
-        <requiresConcept refId="my-rules:HibernateSearch" />
+    <constraint id="hsearch:TypesShouldUseImplSuffixWithRestraint">
+        <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             The 'Impl' suffix should only be used when naming classes that are the only implementation
             for a given Hibernate Search interface (excluding its own subclasses).
@@ -428,9 +428,9 @@
     </constraint>
 
 
-    <constraint id="my-rules:AbstractTypesShouldUseAbstractPrefix">
-        <requiresConcept refId="my-rules:TypeMetadata" />
-        <requiresConcept refId="my-rules:HibernateSearch" />
+    <constraint id="hsearch:AbstractTypesShouldUseAbstractPrefix">
+        <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             The 'Abstract' prefix should be used on abstract types.
             Exceptions are allowed when:
@@ -461,13 +461,13 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName">
-        <requiresConcept refId="my-rules:TypeMetadata" />
-        <requiresConcept refId="my-rules:Anonymous" />
-        <requiresConcept refId="my-rules:Generated" />
-        <requiresConcept refId="my-rules:Test" />
-        <requiresConcept refId="my-rules:HibernateSearch" />
-        <requiresConcept refId="my-rules:ArtifactMetadata" />
+    <constraint id="hsearch:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName">
+        <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:Anonymous" />
+        <requiresConcept refId="hsearch:Generated" />
+        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:ArtifactMetadata" />
         <description>
             Types extending/implementing a Hibernate Search type from another module must have a module-specific keyword in their name,
             either at the very start or just after "Abstract".
@@ -500,13 +500,13 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:TypeNamesShouldBeUniqueInInterdependentModules">
+    <constraint id="hsearch:TypeNamesShouldBeUniqueInInterdependentModules">
         <requiresConcept refId="java:Deprecated" />
-        <requiresConcept refId="my-rules:TypeMetadata" />
-        <requiresConcept refId="my-rules:HibernateSearch" />
-        <requiresConcept refId="my-rules:Api" />
-        <requiresConcept refId="my-rules:Spi" />
-        <requiresConcept refId="my-rules:Impl" />
+        <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Impl" />
         <description>
             The simple (non-qualified) name of public Hibernate Search types should be unique.
             Exceptions are only allowed when the two types sharing an identical name:
@@ -528,9 +528,9 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:PackagesShouldNotHaveCyclicDependencies">
+    <constraint id="hsearch:PackagesShouldNotHaveCyclicDependencies">
         <requiresConcept refId="dependency:Package" />
-        <requiresConcept refId="my-rules:HibernateSearch" />
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             Packages should not have cyclic dependencies.
             The following types are ignored when computing dependency paths:
@@ -576,9 +576,9 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:UnitTestsMustHaveProperSuffix">
-        <requiresConcept refId="my-rules:HibernateSearch" />
-        <requiresConcept refId="my-rules:IntegrationTestArtifacts" />
+    <constraint id="hsearch:UnitTestsMustHaveProperSuffix">
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:IntegrationTestArtifacts" />
         <description>
             Unit test class names must be suffixed with "Test".
         </description>
@@ -595,9 +595,9 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:IntegrationTestsMustHaveProperSuffix">
-        <requiresConcept refId="my-rules:HibernateSearch" />
-        <requiresConcept refId="my-rules:IntegrationTestArtifacts" />
+    <constraint id="hsearch:IntegrationTestsMustHaveProperSuffix">
+        <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:IntegrationTestArtifacts" />
         <description>
             Integration test class names must be suffixed with "IT".
         </description>
@@ -613,8 +613,8 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="my-rules:ImplPackagesMustNotHaveSubPackages">
-        <requiresConcept refId="my-rules:HibernateSearch" />
+    <constraint id="hsearch:ImplPackagesMustNotHaveSubPackages">
+        <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             ".impl" packages must be leaves: they must not have any sub-package.
             Exceptions are only allowed for:
@@ -632,25 +632,25 @@
     </constraint>
 
     <group id="default">
-        <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
-        <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
-        <includeConstraint refId="my-rules:PublicFieldsMayNotExposeInternalTypes" />
-        <includeConstraint refId="my-rules:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
-        <includeConstraint refId="my-rules:APITypesMayNotExtendSPITypes" />
-        <includeConstraint refId="my-rules:APIMethodsMayNotExposeSPITypes" />
-        <includeConstraint refId="my-rules:APIFieldsMayNotExposeSPITypes" />
-        <includeConstraint refId="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules" />
-        <includeConstraint refId="my-rules:TypesShouldUseImplSuffixWithRestraint" />
-        <includeConstraint refId="my-rules:AbstractTypesShouldUseAbstractPrefix" />
-        <includeConstraint refId="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
-        <includeConstraint refId="my-rules:TypeNamesShouldBeUniqueInInterdependentModules" />
-        <includeConstraint refId="my-rules:UnitTestsMustHaveProperSuffix" />
-        <includeConstraint refId="my-rules:IntegrationTestsMustHaveProperSuffix" />
-        <includeConstraint refId="my-rules:ImplPackagesMustNotHaveSubPackages" />
+        <includeConstraint refId="hsearch:PublicTypesMayNotExtendInternalTypes" />
+        <includeConstraint refId="hsearch:PublicMethodsMayNotExposeInternalTypes" />
+        <includeConstraint refId="hsearch:PublicFieldsMayNotExposeInternalTypes" />
+        <includeConstraint refId="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
+        <includeConstraint refId="hsearch:APITypesMayNotExtendSPITypes" />
+        <includeConstraint refId="hsearch:APIMethodsMayNotExposeSPITypes" />
+        <includeConstraint refId="hsearch:APIFieldsMayNotExposeSPITypes" />
+        <includeConstraint refId="hsearch:TypesMayNotDependOnImplementationTypeFromOtherModules" />
+        <includeConstraint refId="hsearch:TypesShouldUseImplSuffixWithRestraint" />
+        <includeConstraint refId="hsearch:AbstractTypesShouldUseAbstractPrefix" />
+        <includeConstraint refId="hsearch:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
+        <includeConstraint refId="hsearch:TypeNamesShouldBeUniqueInInterdependentModules" />
+        <includeConstraint refId="hsearch:UnitTestsMustHaveProperSuffix" />
+        <includeConstraint refId="hsearch:IntegrationTestsMustHaveProperSuffix" />
+        <includeConstraint refId="hsearch:ImplPackagesMustNotHaveSubPackages" />
     </group>
 
     <group id="cycles">
-        <includeConstraint refId="my-rules:PackagesShouldNotHaveCyclicDependencies" />
+        <includeConstraint refId="hsearch:PackagesShouldNotHaveCyclicDependencies" />
     </group>
 
 </jqa:jqassistant-rules>
