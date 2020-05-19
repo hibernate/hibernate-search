@@ -14,18 +14,18 @@ public interface EntityReference {
 	/**
 	 * @return The type of the referenced entity.
 	 */
-	Class<?> getType();
+	Class<?> type();
 
 	/**
 	 * @return The name of the referenced entity in the Hibernate Search mapping.
 	 * @see org.hibernate.search.mapper.javabean.mapping.SearchMappingBuilder#addEntityType(Class, String)
 	 */
-	String getName();
+	String name();
 
 	/**
 	 * @return The identifier of the referenced entity,
 	 * i.e. the value of the property marked as {@code @DocumentId}.
 	 */
-	Object getId();
+	Object id();
 
 }

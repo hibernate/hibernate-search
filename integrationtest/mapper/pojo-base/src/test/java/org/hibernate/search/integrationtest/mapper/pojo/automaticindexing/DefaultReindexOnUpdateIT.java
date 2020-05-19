@@ -62,7 +62,7 @@ public class DefaultReindexOnUpdateIT {
 		mapping = setupHelper.start()
 				.withConfiguration(
 						builder -> {
-							builder.setDefaultReindexOnUpdate( ReindexOnUpdate.DEFAULT );
+							builder.defaultReindexOnUpdate( ReindexOnUpdate.DEFAULT );
 
 							builder.addEntityType( ParentEntity.class );
 							builder.addEntityType( ChildEntity.class );
@@ -141,7 +141,7 @@ public class DefaultReindexOnUpdateIT {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withConfiguration(
 						builder -> {
-							builder.setDefaultReindexOnUpdate( ReindexOnUpdate.DEFAULT );
+							builder.defaultReindexOnUpdate( ReindexOnUpdate.DEFAULT );
 
 							builder.addEntityType( ParentEntity.class );
 							builder.addEntityType( ChildEntity.class );
@@ -196,7 +196,7 @@ public class DefaultReindexOnUpdateIT {
 		mapping = setupHelper.start()
 				.withConfiguration(
 						builder -> {
-							builder.setDefaultReindexOnUpdate( ReindexOnUpdate.NO );
+							builder.defaultReindexOnUpdate( ReindexOnUpdate.NO );
 
 							builder.addEntityType( ParentEntity.class );
 							builder.addEntityType( ChildEntity.class );

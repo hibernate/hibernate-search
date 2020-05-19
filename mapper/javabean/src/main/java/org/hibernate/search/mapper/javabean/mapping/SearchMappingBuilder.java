@@ -102,31 +102,31 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
-	public SearchMappingBuilder setMultiTenancyEnabled(boolean multiTenancyEnabled) {
+	public SearchMappingBuilder multiTenancyEnabled(boolean multiTenancyEnabled) {
 		mappingInitiator.setMultiTenancyEnabled( multiTenancyEnabled );
 		return this;
 	}
 
-	public void setDefaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
+	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
 		mappingInitiator.setDefaultReindexOnUpdate( defaultReindexOnUpdate );
 	}
 
-	public SearchMappingBuilder setProvidedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
+	public SearchMappingBuilder providedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
 		mappingInitiator.setProvidedIdentifierBridge( providedIdentifierBridge );
 		return this;
 	}
 
-	public SearchMappingBuilder setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
+	public SearchMappingBuilder annotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
 		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 		return this;
 	}
 
-	public SearchMappingBuilder setProperty(String name, Object value) {
+	public SearchMappingBuilder property(String name, Object value) {
 		properties.put( name, value );
 		return this;
 	}
 
-	public SearchMappingBuilder setProperties(Map<String, Object> map) {
+	public SearchMappingBuilder properties(Map<String, Object> map) {
 		properties.putAll( map );
 		return this;
 	}
