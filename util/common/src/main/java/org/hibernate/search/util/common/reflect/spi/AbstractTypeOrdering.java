@@ -17,14 +17,14 @@ public abstract class AbstractTypeOrdering<T> {
 	protected AbstractTypeOrdering() {
 	}
 
-	public Stream<? extends T> getAscendingSuperTypes(T subType) {
+	public Stream<? extends T> ascendingSuperTypes(T subType) {
 		// Use a LinkedHashSet to preserve order while still providing efficient element lookup
 		Set<T> result = new LinkedHashSet<>();
 		collectSuperTypesAscending( result, subType );
 		return result.stream();
 	}
 
-	public Stream<? extends T> getDescendingSuperTypes(T subType) {
+	public Stream<? extends T> descendingSuperTypes(T subType) {
 		// Use a LinkedHashSet to preserve order while still providing efficient element lookup
 		Set<T> result = new LinkedHashSet<>();
 		collectSuperTypesDescending( result, subType );
@@ -35,13 +35,13 @@ public abstract class AbstractTypeOrdering<T> {
 	 * @param subType A type (non-null)
 	 * @return The superclass of the given type, or Object for interfaces, or null for Object.
 	 */
-	protected abstract T getSuperClass(T subType);
+	protected abstract T superClass(T subType);
 
 	/**
 	 * @param subType A type (non-null)
 	 * @return A stream of all the interfaces of the given type, possibly empty.
 	 */
-	protected abstract Stream<T> getDeclaredInterfaces(T subType);
+	protected abstract Stream<T> declaredInterfaces(T subType);
 
 	private void collectSuperTypesAscending(Set<T> result, T subType) {
 		if ( subType == null ) {
@@ -52,9 +52,9 @@ public abstract class AbstractTypeOrdering<T> {
 			// We've already seen this type, skip the rest of this method
 			return;
 		}
-		getDeclaredInterfaces( subType )
+		declaredInterfaces( subType )
 				.forEach( interfaze -> collectSuperTypesAscending( result, interfaze ) );
-		collectSuperTypesAscending( result, getSuperClass( subType ) );
+		collectSuperTypesAscending( result, superClass( subType ) );
 	}
 
 	private void collectSuperTypesDescending(Set<T> result, T subType) {
@@ -66,8 +66,8 @@ public abstract class AbstractTypeOrdering<T> {
 			// We've already seen this type, skip the rest of this method
 			return;
 		}
-		collectSuperTypesDescending( result, getSuperClass( subType ) );
-		getDeclaredInterfaces( subType )
+		collectSuperTypesDescending( result, superClass( subType ) );
+		declaredInterfaces( subType )
 				.forEach( interfaze -> collectSuperTypesDescending( result, interfaze ) );
 		result.add( subType );
 	}

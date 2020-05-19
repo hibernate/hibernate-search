@@ -22,7 +22,7 @@ final class PojoXClassOrdering extends AbstractTypeOrdering<XClass> {
 	}
 
 	@Override
-	protected XClass getSuperClass(XClass subType) {
+	protected XClass superClass(XClass subType) {
 		XClass superClass = subType.getSuperclass();
 		if ( superClass == null && subType.isInterface() ) {
 			// Make sure Object is considered a superclass of *every* type, even interfaces.
@@ -32,7 +32,7 @@ final class PojoXClassOrdering extends AbstractTypeOrdering<XClass> {
 	}
 
 	@Override
-	protected Stream<XClass> getDeclaredInterfaces(XClass subType) {
+	protected Stream<XClass> declaredInterfaces(XClass subType) {
 		return Arrays.stream( subType.getInterfaces() );
 	}
 }
