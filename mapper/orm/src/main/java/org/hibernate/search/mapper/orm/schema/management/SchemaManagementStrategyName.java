@@ -121,7 +121,7 @@ public enum SchemaManagementStrategyName {
 	public static SchemaManagementStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				SchemaManagementStrategyName.values(),
-				SchemaManagementStrategyName::getExternalRepresentation,
+				SchemaManagementStrategyName::externalRepresentation,
 				log::invalidSchemaManagementStrategyName,
 				value
 		);
@@ -133,8 +133,20 @@ public enum SchemaManagementStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	public String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	public String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation()} instead.
+	 */
+	@Deprecated
+	public String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 
 }

@@ -91,9 +91,9 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	public void setAutomaticIndexingSynchronizationStrategy(
+	public void automaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		getDelegate().setAutomaticIndexingSynchronizationStrategy( synchronizationStrategy );
+		getDelegate().automaticIndexingSynchronizationStrategy( synchronizationStrategy );
 	}
 
 	private HibernateOrmSearchSession getDelegate() {

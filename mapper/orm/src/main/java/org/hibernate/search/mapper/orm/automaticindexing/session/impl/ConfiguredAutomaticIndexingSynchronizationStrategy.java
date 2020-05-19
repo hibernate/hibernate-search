@@ -78,7 +78,7 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		}
 
 		@Override
-		public FailureHandler getFailureHandler() {
+		public FailureHandler failureHandler() {
 			return failureHandler;
 		}
 

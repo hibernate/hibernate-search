@@ -19,7 +19,7 @@ public class MyDataValueBridge implements ValueBridge<MyData, String> {
 	@Override
 	public String toIndexedValue(MyData value, ValueBridgeToIndexedValueContext context) {
 		SessionFactory sessionFactory = context.extension( HibernateOrmExtension.get() ) // <1>
-				.getSessionFactory(); // <2>
+				.sessionFactory(); // <2>
 		// ... do something with the factory ...
 		//end::include[]
 		/*
@@ -35,7 +35,7 @@ public class MyDataValueBridge implements ValueBridge<MyData, String> {
 	@Override
 	public MyData fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
 		Session session = context.extension( HibernateOrmExtension.get() ) // <3>
-				.getSession(); // <4>
+				.session(); // <4>
 		// ... do something with the session ...
 		//end::include[]
 		/*

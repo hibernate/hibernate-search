@@ -24,17 +24,17 @@ public class DelegatingMassIndexingFailureHandler implements MassIndexingFailure
 	@Override
 	public void handle(MassIndexingFailureContext context) {
 		FailureContext.Builder builder = FailureContext.builder();
-		builder.throwable( context.getThrowable() );
-		builder.failingOperation( context.getFailingOperation() );
+		builder.throwable( context.throwable() );
+		builder.failingOperation( context.failingOperation() );
 		delegate.handle( builder.build() );
 	}
 
 	@Override
 	public void handle(MassIndexingEntityFailureContext context) {
 		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-		builder.throwable( context.getThrowable() );
-		builder.failingOperation( context.getFailingOperation() );
-		for ( Object entityReference : context.getEntityReferences() ) {
+		builder.throwable( context.throwable() );
+		builder.failingOperation( context.failingOperation() );
+		for ( Object entityReference : context.entityReferences() ) {
 			builder.entityReference( entityReference );
 		}
 		delegate.handle( builder.build() );

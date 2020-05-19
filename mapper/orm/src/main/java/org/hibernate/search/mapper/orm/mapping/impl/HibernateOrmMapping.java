@@ -225,12 +225,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public IndexManager getIndexManager(String indexName) {
+	public IndexManager indexManager(String indexName) {
 		return getSearchIntegration().getIndexManager( indexName );
 	}
 
 	@Override
-	public Backend getBackend(String backendName) {
+	public Backend backend(String backendName) {
 		return getSearchIntegration().getBackend( backendName );
 	}
 
@@ -254,6 +254,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return fetchSize;
 	}
 
+	@Override
+	public SessionFactoryImplementor sessionFactory() {
+		return sessionFactory;
+	}
+
+	// FIXME HSEARCH-3922 remove this once the SPIs have been updated.
 	@Override
 	public SessionFactoryImplementor getSessionFactory() {
 		return sessionFactory;
@@ -332,7 +338,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private SearchIntegration getSearchIntegration() {
-		return HibernateSearchContextProviderService.get( getSessionFactory() ).getIntegration();
+		return HibernateSearchContextProviderService.get( sessionFactory() ).getIntegration();
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(Class<T> expectedSuperType,

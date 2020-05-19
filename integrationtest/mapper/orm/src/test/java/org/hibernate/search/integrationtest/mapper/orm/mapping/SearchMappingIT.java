@@ -148,24 +148,24 @@ public class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void getIndexManager_customIndexName() {
-		IndexManager indexManager = mapping.getIndexManager( Person.INDEX_NAME );
+		IndexManager indexManager = mapping.indexManager( Person.INDEX_NAME );
 		checkIndexManager( Person.INDEX_NAME, indexManager );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void getIndexManager_defaultIndexName() {
-		IndexManager indexManager = mapping.getIndexManager( Pet.JPA_ENTITY_NAME );
+		IndexManager indexManager = mapping.indexManager( Pet.JPA_ENTITY_NAME );
 		checkIndexManager( Pet.JPA_ENTITY_NAME, indexManager );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void getBackendByName() {
-		Backend backend = mapping.getBackend( BACKEND_1_NAME );
+		Backend backend = mapping.backend( BACKEND_1_NAME );
 		checkBackend( BACKEND_1_NAME, backend );
 
-		backend = mapping.getBackend( BACKEND_2_NAME );
+		backend = mapping.backend( BACKEND_2_NAME );
 		checkBackend( BACKEND_2_NAME, backend );
 	}
 

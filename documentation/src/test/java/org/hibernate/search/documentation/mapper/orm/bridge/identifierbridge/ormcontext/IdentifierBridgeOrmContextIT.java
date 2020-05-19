@@ -75,7 +75,7 @@ public class IdentifierBridgeOrmContextIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 
-			assertThat( result ).extracting( EntityReference::getId ).containsExactly( MyData.VALUE2 );
+			assertThat( result ).extracting( EntityReference::id ).containsExactly( MyData.VALUE2 );
 		} );
 	}
 

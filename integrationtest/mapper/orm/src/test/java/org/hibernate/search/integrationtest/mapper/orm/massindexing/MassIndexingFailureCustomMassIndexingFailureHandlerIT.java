@@ -53,14 +53,14 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		MatcherAssert.assertThat(
-				context.getThrowable(),
+				context.throwable(),
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( exceptionMessage )
 						.build()
 		);
-		assertThat( context.getFailingOperation() ).asString()
+		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
-		assertThat( context.getEntityReferences() )
+		assertThat( context.entityReferences() )
 				.hasSize( 1 )
 				.element( 0 )
 				.asString()
@@ -82,16 +82,16 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		MatcherAssert.assertThat(
-				context.getThrowable(),
+				context.throwable(),
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "Exception while invoking" )
 						.causedBy( SimulatedFailure.class )
 						.withMessage( exceptionMessage )
 						.build()
 		);
-		assertThat( context.getFailingOperation() ).asString()
+		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
-		assertThat( context.getEntityReferences() )
+		assertThat( context.entityReferences() )
 				.hasSize( 1 )
 				.element( 0 )
 				.asString()
@@ -115,12 +115,12 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 		MassIndexingFailureContext context = genericFailureContextCapture.getValue();
 		MatcherAssert.assertThat(
-				context.getThrowable(),
+				context.throwable(),
 				ExceptionMatcherBuilder.isException( exceptionType )
 						.withMessage( exceptionMessage )
 						.build()
 		);
-		assertThat( context.getFailingOperation() ).asString()
+		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
 	}
 
@@ -144,14 +144,14 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 		MassIndexingEntityFailureContext entityFailureContext = entityFailureContextCapture.getValue();
 		MatcherAssert.assertThat(
-				entityFailureContext.getThrowable(),
+				entityFailureContext.throwable(),
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( failingEntityIndexingExceptionMessage )
 						.build()
 		);
-		assertThat( entityFailureContext.getFailingOperation() ).asString()
+		assertThat( entityFailureContext.failingOperation() ).asString()
 				.isEqualTo( failingEntityIndexingOperationAsString );
-		assertThat( entityFailureContext.getEntityReferences() )
+		assertThat( entityFailureContext.entityReferences() )
 				.hasSize( 1 )
 				.element( 0 )
 				.asString()
@@ -160,12 +160,12 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 		MassIndexingFailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();
 		MatcherAssert.assertThat(
-				massIndexerOperationFailureContext.getThrowable(),
+				massIndexerOperationFailureContext.throwable(),
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( failingMassIndexerOperationExceptionMessage )
 						.build()
 		);
-		assertThat( massIndexerOperationFailureContext.getFailingOperation() ).asString()
+		assertThat( massIndexerOperationFailureContext.failingOperation() ).asString()
 				.isEqualTo( failingMassIndexerOperationAsString );
 	}
 }

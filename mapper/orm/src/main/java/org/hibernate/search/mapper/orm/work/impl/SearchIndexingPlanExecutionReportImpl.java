@@ -39,12 +39,12 @@ public class SearchIndexingPlanExecutionReportImpl implements SearchIndexingPlan
 	}
 
 	@Override
-	public Optional<Throwable> getThrowable() {
+	public Optional<Throwable> throwable() {
 		return Optional.ofNullable( throwable );
 	}
 
 	@Override
-	public List<EntityReference> getFailingEntities() {
+	public List<EntityReference> failingEntities() {
 		return failingEntities;
 	}
 

@@ -183,7 +183,7 @@ which by default will simply log the failure.
 
 While the configuration property mentioned above defines a default,
 it is possible to override this default on a particular session
-by calling `SearchSession#setAutomaticIndexingSynchronizationStrategy` and passing a different strategy.
+by calling `SearchSession#automaticIndexingSynchronizationStrategy(...)` and passing a different strategy.
 
 The built-in strategies can be retrieved by calling:
 
@@ -215,4 +215,4 @@ The custom strategy can then be set just like the built-in strategies:
 the configuration property `hibernate.search.automatic_indexing.synchronization.strategy`
 to a <<configuration-property-types,bean reference>> pointing to the custom implementation.
 * at the session level by passing an instance of the custom implementation
-to `SearchSession#setAutomaticIndexingSynchronizationStrategy`.
+to `SearchSession#automaticIndexingSynchronizationStrategy(...)`.

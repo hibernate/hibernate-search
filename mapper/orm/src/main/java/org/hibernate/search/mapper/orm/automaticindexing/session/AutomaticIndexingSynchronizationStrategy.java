@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.impl.SyncAutoma
  * Determines how the thread will block upon committing a transaction
  * where indexed entities were modified.
  *
- * @see SearchSession#setAutomaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy)
+ * @see SearchSession#automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy)
  */
 public interface AutomaticIndexingSynchronizationStrategy {
 

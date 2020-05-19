@@ -92,7 +92,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		List<EntityReference> missingFromCacheReferences = new ArrayList<>( references.size() );
 
 		for ( EntityReference reference : references ) {
-			Object entityId = reference.getId();
+			Object entityId = reference.id();
 			Object loadedEntity = cacheLookupStrategyImplementor.lookup( entityId );
 			if ( loadedEntity == null ) {
 				missingFromCacheReferences.add( reference );
@@ -115,7 +115,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 	private List<E> loadEntities(List<EntityReference> references) {
 		List<Serializable> ids = new ArrayList<>( references.size() );
 		for ( EntityReference reference : references ) {
-			ids.add( (Serializable) reference.getId() );
+			ids.add( (Serializable) reference.id() );
 		}
 
 		List<?> loadedEntities = getMultiAccess().multiLoad( ids );
@@ -166,7 +166,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 	 * and these types are known to implement any interface that the user could possibly rely on.
 	 */
 	private static boolean hasExpectedType(EntityReference reference, Object loadedEntity) {
-		return reference.getType().isInstance( loadedEntity );
+		return reference.type().isInstance( loadedEntity );
 	}
 
 	private static EntityPersister toRootEntityType(

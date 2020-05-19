@@ -512,7 +512,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> transactionThreadFuture = CompletableFuture.runAsync( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				if ( overriddenStrategy != null ) {
-					Search.session( session ).setAutomaticIndexingSynchronizationStrategy( overriddenStrategy );
+					Search.session( session ).automaticIndexingSynchronizationStrategy( overriddenStrategy );
 				}
 				IndexedEntity entity1 = new IndexedEntity();
 				entity1.setId( ENTITY_1_ID );
@@ -639,8 +639,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				try {
 					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					SearchIndexingPlanExecutionReport report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
-					report.getThrowable().ifPresent( t -> {
-						throw log.indexingFailure( t.getMessage(), report.getFailingEntities(), t );
+					report.throwable().ifPresent( t -> {
+						throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
 					} );
 				}
 				catch (TimeoutException e) {
