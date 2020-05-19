@@ -30,7 +30,7 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 	@Override
 	// As long as T is the declared type of an entity or one of its supertypes, this cast is safe
 	@SuppressWarnings("unchecked")
-	public <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity) {
+	public <T> PojoRawTypeIdentifier<? extends T> detectEntityType(T entity) {
 		if ( entity == null ) {
 			return null;
 		}

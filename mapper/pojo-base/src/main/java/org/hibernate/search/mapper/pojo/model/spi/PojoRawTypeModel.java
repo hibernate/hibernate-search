@@ -30,7 +30,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	/**
 	 * @return The identifier for this type.
 	 */
-	PojoRawTypeIdentifier<T> getTypeIdentifier();
+	PojoRawTypeIdentifier<T> typeIdentifier();
 
 	/**
 	 * @return The supertypes of the current type, in ascending order.
@@ -44,10 +44,10 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	@Override
 	Stream<? extends PojoRawTypeModel<? super T>> descendingSuperTypes();
 
-	Stream<Annotation> getAnnotations();
+	Stream<Annotation> annotations();
 
-	Stream<PojoPropertyModel<?>> getDeclaredProperties();
+	Stream<PojoPropertyModel<?>> declaredProperties();
 
-	PojoCaster<T> getCaster();
+	PojoCaster<T> caster();
 
 }

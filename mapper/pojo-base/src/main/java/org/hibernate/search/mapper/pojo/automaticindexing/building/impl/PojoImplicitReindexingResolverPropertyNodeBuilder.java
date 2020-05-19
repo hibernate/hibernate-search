@@ -39,7 +39,7 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 		super( buildingHelper );
 		this.modelPath = modelPath;
 		BoundContainerExtractorPath<P, P> noExtractorsBoundPath = BoundContainerExtractorPath.noExtractors(
-				modelPath.getPropertyModel().getTypeModel()
+				modelPath.getPropertyModel().typeModel()
 		);
 		this.valueWithoutExtractorsBuilderDelegate =
 				new PojoImplicitReindexingResolverValueNodeBuilderDelegate<>(
@@ -70,7 +70,7 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 				checkNotFrozen();
 				BoundContainerExtractorPath<P, ?> boundExtractorPath =
 						buildingHelper.getExtractorBinder().bindPath(
-								modelPath.getPropertyModel().getTypeModel(), extractorPath
+								modelPath.getPropertyModel().typeModel(), extractorPath
 						);
 				ContainerExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();
 				if ( !explicitExtractorPath.isEmpty() ) {

@@ -122,7 +122,7 @@ public class PojoPropertyIndexingDependencyConfigurationContextImpl<P> extends A
 		private PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> addOtherEntityDependencyContext(
 				Class<?> otherEntityType, PojoModelPathValueNode pathFromOtherEntityTypeToBridgedPropertyExtractedType) {
 			PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherContext = createOtherEntityDependencyContext(
-					valueTypePath.getTypeModel().getRawType(),
+					valueTypePath.getTypeModel().rawType(),
 					otherEntityType, pathFromOtherEntityTypeToBridgedPropertyExtractedType
 			);
 

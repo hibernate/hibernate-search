@@ -72,7 +72,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
-		return getTypeModel().getRawType().isSubTypeOf( introspector.getTypeModel( clazz ) );
+		return getTypeModel().rawType().isSubTypeOf( introspector.typeModel( clazz ) );
 	}
 
 	@Override
@@ -92,9 +92,9 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 	public Stream<? extends PojoModelProperty> properties() {
 		if ( !propertiesInitialized ) {
 			// Populate all the known properties
-			getTypeModel().getRawType().ascendingSuperTypes()
-					.flatMap( PojoRawTypeModel::getDeclaredProperties )
-					.map( PojoPropertyModel::getName )
+			getTypeModel().rawType().ascendingSuperTypes()
+					.flatMap( PojoRawTypeModel::declaredProperties )
+					.map( PojoPropertyModel::name )
 					.forEach( this::property );
 			propertiesInitialized = true;
 		}
@@ -134,7 +134,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 
 	private PojoTypeAdditionalMetadata getTypeAdditionalMetadata() {
 		if ( typeAdditionalMetadata == null ) {
-			typeAdditionalMetadata = typeAdditionalMetadataProvider.get( getModelPathTypeNode().getTypeModel().getRawType() );
+			typeAdditionalMetadata = typeAdditionalMetadataProvider.get( getModelPathTypeNode().getTypeModel().rawType() );
 		}
 		return typeAdditionalMetadata;
 	}

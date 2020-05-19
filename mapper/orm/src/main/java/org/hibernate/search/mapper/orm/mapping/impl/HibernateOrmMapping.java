@@ -267,12 +267,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public ThreadPoolProvider getThreadPoolProvider() {
-		return delegate().getThreadPoolProvider();
+		return delegate().threadPoolProvider();
 	}
 
 	@Override
 	public FailureHandler getFailureHandler() {
-		return delegate().getFailureHandler();
+		return delegate().failureHandler();
 	}
 
 	@Override
@@ -345,7 +345,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			String entityName) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
 				typeContextContainer.getTypeIdentifierByEntityName( entityName );
-		Class<?> actualJavaType = typeIdentifier.getJavaClass();
+		Class<?> actualJavaType = typeIdentifier.javaClass();
 		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
 			throw log.invalidEntitySuperType( entityName, expectedSuperType, actualJavaType );
 		}

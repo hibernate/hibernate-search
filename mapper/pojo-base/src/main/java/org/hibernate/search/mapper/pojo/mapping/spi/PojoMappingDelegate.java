@@ -26,9 +26,9 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	@Override
 	void close();
 
-	ThreadPoolProvider getThreadPoolProvider();
+	ThreadPoolProvider threadPoolProvider();
 
-	FailureHandler getFailureHandler();
+	FailureHandler failureHandler();
 
 	<R, E, E2, C> PojoScopeDelegate<R, E2, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,

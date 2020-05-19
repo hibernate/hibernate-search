@@ -24,13 +24,13 @@ abstract class AbstractPropertyMappingStandardFieldOptionsStep<S extends Propert
 
 	@Override
 	public S projectable(Projectable projectable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().projectable( projectable ) );
+		fieldModelContributor.add( c -> c.standardTypeOptionsStep().projectable( projectable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S searchable(Searchable searchable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().searchable( searchable ) );
+		fieldModelContributor.add( c -> c.standardTypeOptionsStep().searchable( searchable ) );
 		return thisAsS();
 	}
 

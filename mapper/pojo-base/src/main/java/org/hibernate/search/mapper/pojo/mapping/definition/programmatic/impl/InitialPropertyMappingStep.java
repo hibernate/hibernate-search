@@ -44,13 +44,13 @@ class InitialPropertyMappingStep
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorPropertyNode collectorPropertyNode =
-				collector.property( propertyModel.getName() );
+				collector.property( propertyModel.name() );
 		children.contributeAdditionalMetadata( collectorPropertyNode );
 	}
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.getName() );
+		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.name() );
 		children.contributeMapping( collectorPropertyNode );
 	}
 

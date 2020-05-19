@@ -226,7 +226,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
 				typeContext.resolveEntitiesToReindex(
-						containingEntityCollector, sessionContext.getRuntimeIntrospector(), entitySupplier,
+						containingEntityCollector, sessionContext.runtimeIntrospector(), entitySupplier,
 						considerAllDirty ? null : dirtyPaths
 				);
 			}

@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 /**
  * A mapper-specific contained type context,
- * accessible through {@link PojoScopeDelegate#getIncludedIndexedTypes()}
+ * accessible through {@link PojoScopeDelegate#includedIndexedTypes()}
  * in particular.
  *
  * @param <E> The entity type.

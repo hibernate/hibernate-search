@@ -97,12 +97,12 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		this.reindexOnUpdate = buildingHelper.getReindexOnUpdate(
 				parentNode.getReindexOnUpdate(),
 				modelPathTypeNode.getTypeModel(),
-				modelPathPropertyNode.getPropertyModel().getName(),
+				modelPathPropertyNode.getPropertyModel().name(),
 				modelPathValueNode.getExtractorPath()
 		);
 		this.derivedFrom = buildingHelper.getDerivedFrom(
 				modelPathTypeNode.getTypeModel(),
-				modelPathPropertyNode.getPropertyModel().getName(),
+				modelPathPropertyNode.getPropertyModel().name(),
 				modelPathValueNode.getExtractorPath()
 		);
 	}
@@ -135,7 +135,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 				 * which in such case would have an infinite depth.
  				 */
 				throw log.infiniteRecursionForDerivedFrom(
-						modelPathFromLastTypeNode.getRootType().getRawType(),
+						modelPathFromLastTypeNode.getRootType().rawType(),
 						modelPathFromLastTypeNode.toUnboundPath()
 				);
 			}
@@ -180,9 +180,9 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();
-		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
+		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.rawType();
 		PojoTypeModel<V> expectedInverseSideEntityType = modelPathFromLastEntityNode.type().getTypeModel();
-		PojoRawTypeModel<?> expectedInverseSideEntityRawType = expectedInverseSideEntityType.getRawType();
+		PojoRawTypeModel<?> expectedInverseSideEntityRawType = expectedInverseSideEntityType.rawType();
 		if ( !inverseSideRawEntityType.isSubTypeOf( expectedInverseSideEntityRawType ) ) {
 			throw new AssertionFailure(
 					"Error while building the automatic reindexing resolver at path " + modelPathFromLastEntityNode
@@ -205,14 +205,14 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 
 	private Map<PojoRawTypeModel<?>, PojoModelPathValueNode> getInverseAssociationPathByConcreteEntityType(
 			PojoTypeModel<?> inverseSideEntityType) {
-		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
+		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.rawType();
 
 		// Cache the inverse association path, as we may compute it many times, which may be costly
 		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
 		if ( result == null ) {
 			if ( !inverseAssociationPathCache.containsKey( inverseSideRawEntityType ) ) {
 				PojoTypeModel<?> originalSideEntityType = lastEntityNode.getTypeModel();
-				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.getRawType();
+				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.rawType();
 
 				// Use a LinkedHashMap for deterministic iteration
 				result = new LinkedHashMap<>();
@@ -250,9 +250,9 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 			PojoModelPathValueNode inverseAssociationPath,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = typeNodeBuilder.getTypeModel();
-		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
+		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.rawType();
 
-		PojoRawTypeModel<?> originalSideRawConcreteEntityType = originalSideConcreteEntityType.getRawType();
+		PojoRawTypeModel<?> originalSideRawConcreteEntityType = originalSideConcreteEntityType.rawType();
 
 		// Attempt to apply the inverse association path to the given builder
 		PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> valueNodeBuilderDelegate;
@@ -262,7 +262,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 					typeNodeBuilder, inverseAssociationPath, PojoImplicitReindexingResolverBuilder.walker()
 			);
 
-			PojoRawTypeModel<?> inverseSideRawType = valueNodeBuilderDelegate.getTypeModel().getRawType();
+			PojoRawTypeModel<?> inverseSideRawType = valueNodeBuilderDelegate.getTypeModel().rawType();
 			valueNodeTypeConcreteEntitySubTypes = lastEntityNode.getConcreteEntitySubTypesForTypeToReindex(
 					originalSideRawConcreteEntityType, inverseSideRawType
 			);

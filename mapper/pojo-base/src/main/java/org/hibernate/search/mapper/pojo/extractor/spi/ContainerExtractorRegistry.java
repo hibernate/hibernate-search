@@ -56,11 +56,11 @@ public final class ContainerExtractorRegistry {
 		addNonDefaultExtractor( BuiltinContainerExtractors.MAP_KEY, MapKeyExtractor.class );
 	}
 
-	public List<String> getDefaults() {
+	public List<String> defaults() {
 		return Collections.unmodifiableList( defaultExtractors );
 	}
 
-	public Class<? extends ContainerExtractor> getForName(String name) {
+	public Class<? extends ContainerExtractor> forName(String name) {
 		Class<? extends ContainerExtractor> result = extractorsByName.get( name );
 		if ( result == null ) {
 			throw log.cannotResolveContainerExtractorName( name, BuiltinContainerExtractors.class );

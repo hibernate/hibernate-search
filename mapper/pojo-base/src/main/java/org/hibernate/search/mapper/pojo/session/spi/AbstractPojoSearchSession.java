@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.session.spi;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -32,38 +31,32 @@ public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionCon
 	}
 
 	@Override
-	public BackendMappingContext mappingContext() {
-		return mappingContext;
-	}
-
-	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
-	@Override
-	public PojoSearchSessionMappingContext getMappingContext() {
+	public PojoSearchSessionMappingContext mappingContext() {
 		return mappingContext;
 	}
 
 	@Override
-	public final IdentifierBridgeFromDocumentIdentifierContext getIdentifierBridgeFromDocumentIdentifierContext() {
+	public final IdentifierBridgeFromDocumentIdentifierContext identifierBridgeFromDocumentIdentifierContext() {
 		return sessionBasedBridgeOperationContext;
 	}
 
 	@Override
-	public final RoutingKeyBridgeToRoutingKeyContext getRoutingKeyBridgeToRoutingKeyContext() {
+	public final RoutingKeyBridgeToRoutingKeyContext routingKeyBridgeToRoutingKeyContext() {
 		return sessionBasedBridgeOperationContext;
 	}
 
 	@Override
-	public final TypeBridgeWriteContext getTypeBridgeWriteContext() {
+	public final TypeBridgeWriteContext typeBridgeWriteContext() {
 		return sessionBasedBridgeOperationContext;
 	}
 
 	@Override
-	public final PropertyBridgeWriteContext getPropertyBridgeWriteContext() {
+	public final PropertyBridgeWriteContext propertyBridgeWriteContext() {
 		return sessionBasedBridgeOperationContext;
 	}
 
 	@Override
-	public final ValueBridgeFromIndexedValueContext getValueBridgeFromIndexedValueContext() {
+	public final ValueBridgeFromIndexedValueContext valueBridgeFromIndexedValueContext() {
 		return sessionBasedBridgeOperationContext;
 	}
 

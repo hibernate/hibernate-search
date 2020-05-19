@@ -26,14 +26,14 @@ public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 	@Test
 	public void singleAnnotation() {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithSingleFieldAnnotation.class );
-		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.getAnnotationValueReadHandleFactory() );
+		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueReadHandleFactory() );
 
 		PojoRawTypeModel<EntityWithSingleFieldAnnotation> typeModel =
-				introspector.getTypeModel( EntityWithSingleFieldAnnotation.class );
+				introspector.typeModel( EntityWithSingleFieldAnnotation.class );
 
-		PojoPropertyModel<?> propertyModel = typeModel.getProperty( "annotatedProperty" );
+		PojoPropertyModel<?> propertyModel = typeModel.property( "annotatedProperty" );
 		assertThat(
-				propertyModel.getAnnotations()
+				propertyModel.annotations()
 						.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
 		)
 				.hasSize( 1 )
@@ -47,14 +47,14 @@ public class HibernateOrmBootstrapIntrospectorAnnotationReadingTest
 	@TestForIssue(jiraKey = "HSEARCH-3614")
 	public void repeatedAnnotation() {
 		HibernateOrmBootstrapIntrospector introspector = createIntrospector( EntityWithRepeatedFieldAnnotation.class );
-		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.getAnnotationValueReadHandleFactory() );
+		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueReadHandleFactory() );
 
 		PojoRawTypeModel<EntityWithRepeatedFieldAnnotation> typeModel =
-				introspector.getTypeModel( EntityWithRepeatedFieldAnnotation.class );
+				introspector.typeModel( EntityWithRepeatedFieldAnnotation.class );
 
-		PojoPropertyModel<?> propertyModel = typeModel.getProperty( "annotatedProperty" );
+		PojoPropertyModel<?> propertyModel = typeModel.property( "annotatedProperty" );
 		assertThat(
-				propertyModel.getAnnotations()
+				propertyModel.annotations()
 						.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
 		)
 				.hasSize( 2 )

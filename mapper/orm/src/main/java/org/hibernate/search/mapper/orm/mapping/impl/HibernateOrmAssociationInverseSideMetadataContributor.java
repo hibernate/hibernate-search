@@ -33,7 +33,7 @@ final class HibernateOrmAssociationInverseSideMetadataContributor implements Poj
 			collectorValueNode.associationInverseSide( inverseSideValuePath );
 		}
 		catch (RuntimeException e) {
-			collectorValueNode.getFailureCollector().add( e );
+			collectorValueNode.failureCollector().add( e );
 		}
 	}
 

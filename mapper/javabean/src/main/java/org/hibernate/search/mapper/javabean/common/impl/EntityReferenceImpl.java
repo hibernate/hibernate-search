@@ -35,7 +35,7 @@ public class EntityReferenceImpl implements EntityReference {
 
 	@Override
 	public Class<?> type() {
-		return typeIdentifier.getJavaClass();
+		return typeIdentifier.javaClass();
 	}
 
 	@Override

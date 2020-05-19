@@ -29,11 +29,11 @@ public class TypeMappingAnnotationProcessorContextImpl
 
 	@Override
 	public Class<?> javaClass() {
-		return typeModel.getTypeIdentifier().getJavaClass();
+		return typeModel.typeIdentifier().javaClass();
 	}
 
 	@Override
 	public Stream<Annotation> allAnnotations() {
-		return typeModel.getAnnotations();
+		return typeModel.annotations();
 	}
 }

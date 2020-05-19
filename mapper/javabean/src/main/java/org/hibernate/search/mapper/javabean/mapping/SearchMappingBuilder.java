@@ -53,7 +53,7 @@ public final class SearchMappingBuilder {
 		mappingInitiator = new JavaBeanMappingInitiator( introspector );
 		integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
 		// Enable annotated type discovery by default
-		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( true );
+		mappingInitiator.annotatedTypeDiscoveryEnabled( true );
 	}
 
 	public ProgrammaticMappingConfigurationContext programmaticMapping() {
@@ -103,21 +103,21 @@ public final class SearchMappingBuilder {
 	}
 
 	public SearchMappingBuilder multiTenancyEnabled(boolean multiTenancyEnabled) {
-		mappingInitiator.setMultiTenancyEnabled( multiTenancyEnabled );
+		mappingInitiator.multiTenancyEnabled( multiTenancyEnabled );
 		return this;
 	}
 
 	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
-		mappingInitiator.setDefaultReindexOnUpdate( defaultReindexOnUpdate );
+		mappingInitiator.defaultReindexOnUpdate( defaultReindexOnUpdate );
 	}
 
 	public SearchMappingBuilder providedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
-		mappingInitiator.setProvidedIdentifierBridge( providedIdentifierBridge );
+		mappingInitiator.providedIdentifierBridge( providedIdentifierBridge );
 		return this;
 	}
 
 	public SearchMappingBuilder annotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
-		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
+		mappingInitiator.annotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 		return this;
 	}
 

@@ -73,7 +73,7 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 			return doBuild( parentDependencyCollector );
 		}
 		catch (RuntimeException e) {
-			getFailureCollector().add( e );
+			failureCollector().add( e );
 			return Optional.empty();
 		}
 	}

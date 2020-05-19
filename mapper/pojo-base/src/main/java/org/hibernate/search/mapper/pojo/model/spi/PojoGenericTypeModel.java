@@ -29,13 +29,13 @@ public interface PojoGenericTypeModel<T> extends PojoTypeModel<T> {
 	 * does not extend {@code rawSuperType}.
 	 * Implementations may decide to return a model of the raw type argument, or to retain generics information.
 	 */
-	Optional<? extends PojoGenericTypeModel<?>> getTypeArgument(Class<?> rawSuperType, int typeParameterIndex);
+	Optional<? extends PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex);
 
 	/**
 	 * @return The model for the array element type, or an empty optional if the current type
 	 * is not an array type.
 	 * Implementations may decide to return a model of the raw array element type, or to retain generics information.
 	 */
-	Optional<? extends PojoGenericTypeModel<?>> getArrayElementType();
+	Optional<? extends PojoGenericTypeModel<?>> arrayElementType();
 
 }

@@ -74,19 +74,19 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		return containerExtractorRegistryBuilder;
 	}
 
-	public void setProvidedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
+	public void providedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
 		this.providedIdentifierBridge = providedIdentifierBridge;
 	}
 
-	public void setMultiTenancyEnabled(boolean multiTenancyEnabled) {
+	public void multiTenancyEnabled(boolean multiTenancyEnabled) {
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
-	public void setDefaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
+	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
 		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 	}
 
-	public void setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
+	public void annotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
 		annotationMappingConfiguration.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 	}
 

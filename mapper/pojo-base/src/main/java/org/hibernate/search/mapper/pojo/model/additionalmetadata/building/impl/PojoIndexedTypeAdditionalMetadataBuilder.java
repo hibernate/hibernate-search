@@ -31,9 +31,9 @@ class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadata
 	}
 
 	@Override
-	public ContextualFailureCollector getFailureCollector() {
+	public ContextualFailureCollector failureCollector() {
 		// There's nothing to add to the context
-		return rootBuilder.getFailureCollector();
+		return rootBuilder.failureCollector();
 	}
 
 	void checkSameIndex(Optional<String> backendName, Optional<String> indexName) {

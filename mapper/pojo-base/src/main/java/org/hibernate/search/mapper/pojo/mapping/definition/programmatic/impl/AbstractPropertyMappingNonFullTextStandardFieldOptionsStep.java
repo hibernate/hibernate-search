@@ -26,13 +26,13 @@ abstract class AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<
 
 	@Override
 	public S sortable(Sortable sortable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().sortable( sortable ) );
+		fieldModelContributor.add( c -> c.standardTypeOptionsStep().sortable( sortable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S aggregable(Aggregable aggregable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().aggregable( aggregable ) );
+		fieldModelContributor.add( c -> c.standardTypeOptionsStep().aggregable( aggregable ) );
 		return thisAsS();
 	}
 

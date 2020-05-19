@@ -40,7 +40,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel typeToInspectMock = createMock( PojoGenericTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = createMock( PojoRawTypeModel.class );
 
-		EasyMock.expect( introspectorMock.getTypeModel( String.class ) )
+		EasyMock.expect( introspectorMock.typeModel( String.class ) )
 				.andReturn( typeToMatchMock );
 		replayAll();
 		TypePatternMatcher matcher = factory.createExactRawTypeMatcher( String.class );
@@ -48,7 +48,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToMatchMock.getName() )
+		EasyMock.expect( typeToMatchMock.name() )
 				.andStubReturn( "THE_TYPE_TO_MATCH" );
 		replayAll();
 		assertThat( matcher.toString() )
@@ -56,7 +56,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( true );
@@ -67,7 +67,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( false );
@@ -78,7 +78,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( true );
@@ -89,7 +89,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( typeToMatchMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( false );
@@ -110,7 +110,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel typeToInspectMock = createMock( PojoGenericTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = createMock( PojoRawTypeModel.class );
 
-		EasyMock.expect( introspectorMock.getTypeModel( Enum.class ) )
+		EasyMock.expect( introspectorMock.typeModel( Enum.class ) )
 				.andReturn( enumTypeMock ).atLeastOnce();
 		replayAll();
 		TypePatternMatcher matcher = factory.createRawSuperTypeMatcher( Enum.class )
@@ -120,7 +120,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 
 		// Strict Enum subtype => match
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( false );
@@ -132,7 +132,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 
 		// Enum class itself => no match
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( true );
@@ -144,7 +144,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 
 		// Enum supertype => no match
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( true );
@@ -156,7 +156,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 
 		// Unrelated type => no match
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock ).atLeastOnce();
 		EasyMock.expect( enumTypeMock.isSubTypeOf( typeToInspectRawTypeMock ) )
 				.andStubReturn( false );
@@ -194,9 +194,9 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel<?> typeToInspectMock = createMock( PojoGenericTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = createMock( PojoRawTypeModel.class );
 
-		EasyMock.expect( introspectorMock.getTypeModel( String.class ) )
+		EasyMock.expect( introspectorMock.typeModel( String.class ) )
 				.andReturn( typeToMatchMock );
-		EasyMock.expect( introspectorMock.getGenericTypeModel( Integer.class ) )
+		EasyMock.expect( introspectorMock.genericTypeModel( Integer.class ) )
 				.andReturn( resultTypeMock );
 		replayAll();
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String.class, Integer.class );
@@ -204,9 +204,9 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToMatchMock.getName() )
+		EasyMock.expect( typeToMatchMock.name() )
 				.andReturn( "THE_TYPE_TO_MATCH" );
-		EasyMock.expect( resultTypeMock.getName() )
+		EasyMock.expect( resultTypeMock.name() )
 				.andReturn( "THE_RESULT_TYPE" );
 		replayAll();
 		assertThat( matcher.toString() )
@@ -216,7 +216,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock );
 		EasyMock.expect( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
 				.andReturn( true );
@@ -228,7 +228,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( (PojoRawTypeModel) typeToInspectRawTypeMock );
 		EasyMock.expect( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
 				.andReturn( false );
@@ -273,9 +273,9 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		PojoGenericTypeModel<?> typeToInspectMock = createMock( PojoGenericTypeModel.class );
 		PojoRawTypeModel typeToInspectRawTypeMock = createMock( PojoRawTypeModel.class );
 
-		EasyMock.expect( introspectorMock.getTypeModel( String[].class ) )
+		EasyMock.expect( introspectorMock.typeModel( String[].class ) )
 				.andReturn( typeToMatchMock );
-		EasyMock.expect( introspectorMock.getGenericTypeModel( Integer.class ) )
+		EasyMock.expect( introspectorMock.genericTypeModel( Integer.class ) )
 				.andReturn( resultTypeMock );
 		replayAll();
 		ExtractingTypePatternMatcher matcher = factory.createExtractingMatcher( String[].class, Integer.class );
@@ -283,9 +283,9 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		EasyMock.expect( typeToMatchMock.getName() )
+		EasyMock.expect( typeToMatchMock.name() )
 				.andReturn( "THE_TYPE_TO_MATCH" );
-		EasyMock.expect( resultTypeMock.getName() )
+		EasyMock.expect( resultTypeMock.name() )
 				.andReturn( "THE_RESULT_TYPE" );
 		replayAll();
 		assertThat( matcher.toString() )
@@ -295,7 +295,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getRawType() )
+		EasyMock.expect( typeToInspectMock.rawType() )
 				.andReturn( typeToInspectRawTypeMock );
 		EasyMock.expect( typeToInspectRawTypeMock.isSubTypeOf( typeToMatchMock ) )
 				.andReturn( true );
@@ -323,7 +323,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getArrayElementType() )
+		EasyMock.expect( typeToInspectMock.arrayElementType() )
 				.andReturn( (Optional) Optional.of( resultTypeMock ) );
 		replayAll();
 		actualReturn = matcher.extract( typeToInspectMock );
@@ -333,7 +333,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getArrayElementType() )
+		EasyMock.expect( typeToInspectMock.arrayElementType() )
 				.andReturn( Optional.empty() );
 		replayAll();
 		actualReturn = matcher.extract( typeToInspectMock );
@@ -394,7 +394,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		Optional<? extends PojoGenericTypeModel<?>> actualReturn;
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getTypeArgument( Map.class, 1 ) )
+		EasyMock.expect( typeToInspectMock.typeArgument( Map.class, 1 ) )
 				.andReturn( (Optional) Optional.of( resultTypeMock ) );
 		replayAll();
 		actualReturn = matcher.extract( typeToInspectMock );
@@ -404,7 +404,7 @@ public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 		assertThat( actualReturn.get() ).isSameAs( resultTypeMock );
 
 		resetAll();
-		EasyMock.expect( typeToInspectMock.getTypeArgument( Map.class, 1 ) )
+		EasyMock.expect( typeToInspectMock.typeArgument( Map.class, 1 ) )
 				.andReturn( Optional.empty() );
 		replayAll();
 		actualReturn = matcher.extract( typeToInspectMock );

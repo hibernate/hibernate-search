@@ -58,13 +58,13 @@ class HibernateOrmClassPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return name;
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
-		return declaredXProperties.stream().flatMap( introspector::getAnnotations );
+	public Stream<Annotation> annotations() {
+		return declaredXProperties.stream().flatMap( introspector::annotations );
 	}
 
 	@Override
@@ -73,14 +73,14 @@ class HibernateOrmClassPropertyModel<T> implements PojoPropertyModel<T> {
 	 * match the actual type for this property.
 	 */
 	@SuppressWarnings( "unchecked" )
-	public PojoGenericTypeModel<T> getTypeModel() {
+	public PojoGenericTypeModel<T> typeModel() {
 		if ( typeModel == null ) {
 			try {
 				typeModel = (PojoGenericTypeModel<T>) holderTypeModel.getRawTypeDeclaringContext()
 						.createGenericTypeModel( getGetterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
 		return typeModel;
@@ -88,15 +88,15 @@ class HibernateOrmClassPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	public ValueReadHandle<T> getHandle() {
+	public ValueReadHandle<T> handle() {
 		if ( handle == null ) {
 			try {
 				handle = (ValueReadHandle<T>) introspector.createValueReadHandle(
-						holderTypeModel.getTypeIdentifier().getJavaClass(), member, ormPropertyMetadata
+						holderTypeModel.typeIdentifier().javaClass(), member, ormPropertyMetadata
 				);
 			}
 			catch (IllegalAccessException | RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
 		return handle;

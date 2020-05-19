@@ -65,7 +65,7 @@ public final class PojoRawTypeIdentifier<T> {
 	/**
 	 * @return The exact Java {@link Class} for this type.
 	 */
-	public Class<T> getJavaClass() {
+	public Class<T> javaClass() {
 		return javaClass;
 	}
 

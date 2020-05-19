@@ -21,7 +21,7 @@ class ConstantExtractingTypePatternMatcherAdapter implements ExtractingTypePatte
 
 	@Override
 	public String toString() {
-		return delegate.toString() + " => " + resultType.getName();
+		return delegate.toString() + " => " + resultType.name();
 	}
 
 	@Override

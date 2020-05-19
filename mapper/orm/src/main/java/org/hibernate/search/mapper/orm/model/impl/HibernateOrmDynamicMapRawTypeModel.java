@@ -55,7 +55,7 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
+	public Stream<Annotation> annotations() {
 		return Stream.empty();
 	}
 
@@ -79,7 +79,7 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 			return entitySupertypeOrNull;
 		}
 		else {
-			return introspector.getTypeModel( typeIdentifier.getJavaClass() );
+			return introspector.typeModel( typeIdentifier.javaClass() );
 		}
 	}
 
@@ -88,7 +88,7 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 		if ( superEntityName != null ) {
 			// This cast is safe, because if a dynamic-map entity type has an entity supertype,
 			// that entity supertype is also a dynamic-map entity type.
-			return (HibernateOrmDynamicMapRawTypeModel) introspector.getTypeModel( superEntityName );
+			return (HibernateOrmDynamicMapRawTypeModel) introspector.typeModel( superEntityName );
 		}
 		return null;
 	}

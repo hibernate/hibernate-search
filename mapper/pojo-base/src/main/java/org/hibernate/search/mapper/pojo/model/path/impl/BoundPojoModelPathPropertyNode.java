@@ -26,7 +26,7 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 	BoundPojoModelPathPropertyNode(BoundPojoModelPathTypeNode<T> parent, PojoPropertyModel<P> propertyModel) {
 		this.parent = parent;
 		this.propertyModel = propertyModel;
-		this.valueReadHandle = propertyModel.getHandle();
+		this.valueReadHandle = propertyModel.handle();
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 	}
 
 	public BoundPojoModelPathValueNode<T, P, P> valueWithoutExtractors() {
-		return value( BoundContainerExtractorPath.noExtractors( propertyModel.getTypeModel() ) );
+		return value( BoundContainerExtractorPath.noExtractors( propertyModel.typeModel() ) );
 	}
 
 	public <V> BoundPojoModelPathValueNode<T, P, V> value(BoundContainerExtractorPath<P, V> extractorPath) {
@@ -64,11 +64,11 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 
 	@Override
 	void appendSelfPath(StringBuilder builder) {
-		builder.append( "." ).append( propertyModel.getName() );
+		builder.append( "." ).append( propertyModel.name() );
 	}
 
 	@Override
 	void appendSelfPath(PojoModelPath.Builder builder) {
-		builder.property( propertyModel.getName() );
+		builder.property( propertyModel.name() );
 	}
 }

@@ -31,7 +31,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 
 	@Override
 	public void indexNullAs(String value) {
-		getStandardTypeOptionsStep().indexNullAs( bridge.parse( value ) );
+		standardTypeOptionsStep().indexNullAs( bridge.parse( value ) );
 	}
 
 	/*
@@ -41,7 +41,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public StandardIndexFieldTypeOptionsStep<?, ? super F> getStandardTypeOptionsStep() {
+	public StandardIndexFieldTypeOptionsStep<?, ? super F> standardTypeOptionsStep() {
 		if ( fieldTypeOptionsStep instanceof StandardIndexFieldTypeOptionsStep ) {
 			return (StandardIndexFieldTypeOptionsStep<?, ? super F>) fieldTypeOptionsStep;
 		}
@@ -53,7 +53,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 	}
 
 	@Override
-	public StringIndexFieldTypeOptionsStep<?> getStringTypeOptionsStep() {
+	public StringIndexFieldTypeOptionsStep<?> stringTypeOptionsStep() {
 		if ( fieldTypeOptionsStep instanceof StringIndexFieldTypeOptionsStep ) {
 			return (StringIndexFieldTypeOptionsStep<?>) fieldTypeOptionsStep;
 		}
@@ -65,7 +65,7 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 	}
 
 	@Override
-	public ScaledNumberIndexFieldTypeOptionsStep<?, ?> getScaledNumberTypeOptionsStep() {
+	public ScaledNumberIndexFieldTypeOptionsStep<?, ?> scaledNumberTypeOptionsStep() {
 		if ( fieldTypeOptionsStep instanceof ScaledNumberIndexFieldTypeOptionsStep ) {
 			return (ScaledNumberIndexFieldTypeOptionsStep<?, ?>) fieldTypeOptionsStep;
 		}

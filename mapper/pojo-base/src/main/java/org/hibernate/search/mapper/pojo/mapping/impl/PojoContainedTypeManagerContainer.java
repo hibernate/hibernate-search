@@ -55,7 +55,7 @@ public class PojoContainedTypeManagerContainer
 		}
 
 		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<E> typeManager) {
-			byExactClass.put( typeModel.getTypeIdentifier(), typeManager );
+			byExactClass.put( typeModel.typeIdentifier(), typeManager );
 		}
 
 		public void closeOnFailure() {

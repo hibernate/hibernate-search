@@ -40,12 +40,12 @@ public class ProgrammaticMappingConfigurationContextImpl
 
 	@Override
 	public TypeMappingStep type(Class<?> clazz) {
-		return type( introspector.getTypeModel( clazz ) );
+		return type( introspector.typeModel( clazz ) );
 	}
 
 	@Override
 	public TypeMappingStep type(String typeName) {
-		return type( introspector.getTypeModel( typeName ) );
+		return type( introspector.typeModel( typeName ) );
 	}
 
 	private TypeMappingStep type(PojoRawTypeModel<?> typeModel) {

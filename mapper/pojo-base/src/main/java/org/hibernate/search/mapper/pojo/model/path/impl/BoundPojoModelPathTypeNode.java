@@ -32,7 +32,7 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 
 	// TODO HSEARCH-3318 This is an approximation, ideally we should pass a name AND access type
 	public BoundPojoModelPathPropertyNode<T, ?> property(String propertyName) {
-		PojoPropertyModel<?> propertyModel = getTypeModel().getProperty( propertyName );
+		PojoPropertyModel<?> propertyModel = getTypeModel().property( propertyName );
 		return new BoundPojoModelPathPropertyNode<>(
 				this, propertyModel
 		);

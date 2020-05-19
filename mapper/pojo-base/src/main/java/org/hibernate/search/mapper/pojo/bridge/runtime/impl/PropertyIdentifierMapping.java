@@ -54,12 +54,12 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMappingImpleme
 
 	@Override
 	public String toDocumentIdentifier(I identifier, BridgeMappingContext context) {
-		return bridgeHolder.get().toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
+		return bridgeHolder.get().toDocumentIdentifier( identifier, context.identifierBridgeToDocumentIdentifierContext() );
 	}
 
 	@Override
 	public I fromDocumentIdentifier(String documentId, BridgeSessionContext context) {
-		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
+		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.identifierBridgeFromDocumentIdentifierContext() );
 	}
 
 }

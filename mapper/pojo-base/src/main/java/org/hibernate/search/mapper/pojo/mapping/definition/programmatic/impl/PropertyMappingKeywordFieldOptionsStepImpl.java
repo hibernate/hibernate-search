@@ -17,7 +17,7 @@ class PropertyMappingKeywordFieldOptionsStepImpl
 		implements PropertyMappingKeywordFieldOptionsStep {
 
 	PropertyMappingKeywordFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
-		super( parent, relativeFieldName, FieldModelContributorContext::getStringTypeOptionsStep );
+		super( parent, relativeFieldName, FieldModelContributorContext::stringTypeOptionsStep );
 	}
 
 	@Override
@@ -27,13 +27,13 @@ class PropertyMappingKeywordFieldOptionsStepImpl
 
 	@Override
 	public PropertyMappingKeywordFieldOptionsStep normalizer(String normalizerName) {
-		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().normalizer( normalizerName ) );
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().normalizer( normalizerName ) );
 		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingKeywordFieldOptionsStep norms(Norms norms) {
-		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().norms( norms ) );
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().norms( norms ) );
 		return thisAsS();
 	}
 

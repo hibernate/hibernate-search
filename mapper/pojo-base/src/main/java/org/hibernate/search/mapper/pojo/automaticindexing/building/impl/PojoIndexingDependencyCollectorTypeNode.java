@@ -60,7 +60,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		this.parentNode = parentNode;
 		PojoTypeModel<T> typeModel = modelPathFromLastEntityNode.getTypeModel();
 		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
-		if ( buildingHelper.isEntity( typeModel.getRawType() ) ) {
+		if ( buildingHelper.isEntity( typeModel.rawType() ) ) {
 			this.lastEntityNode = this;
 			this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
 		}
@@ -102,8 +102,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			throw new AssertionFailure( "disjointValue() called on a non-entity node" );
 		}
 
-		PojoRawTypeModel<?> inverseSideEntityTypeModel = inverseAssociationPath.getRootType().getRawType();
-		if ( !buildingHelper.isEntity( inverseAssociationPath.getRootType().getRawType() ) ) {
+		PojoRawTypeModel<?> inverseSideEntityTypeModel = inverseAssociationPath.getRootType().rawType();
+		if ( !buildingHelper.isEntity( inverseAssociationPath.getRootType().rawType() ) ) {
 			throw new AssertionFailure(
 					"Encountered a type node whose parent is a disjoint value node, but does not represent an entity type?"
 			);
@@ -126,7 +126,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		if ( lastEntityNode != this ) {
 			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
 		}
-		PojoRawTypeModel<? super T> rawType = modelPathFromLastEntityNode.getTypeModel().getRawType();
+		PojoRawTypeModel<? super T> rawType = modelPathFromLastEntityNode.getTypeModel().rawType();
 		if ( parentNode == null ) {
 			/*
 			 * This node represents an indexed entity (A).

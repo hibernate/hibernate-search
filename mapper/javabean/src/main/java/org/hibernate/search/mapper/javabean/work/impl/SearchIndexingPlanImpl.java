@@ -80,7 +80,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
-		return introspector.getEntityTypeIdentifier( entity );
+		return introspector.detectEntityType( entity );
 	}
 
 	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {

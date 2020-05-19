@@ -149,14 +149,14 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 		else {
 			PojoTypeAdditionalMetadata typeAdditionalMetadata =
-					typeAdditionalMetadataProvider.get( typeModel.getRawType() );
+					typeAdditionalMetadataProvider.get( typeModel.rawType() );
 			Optional<ReindexOnUpdate> reindexOnUpdateOptional =
 					typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
 							.getValueAdditionalMetadata( extractorPath )
 							.getReindexOnUpdate();
 			if ( !reindexOnUpdateOptional.isPresent() ) {
 				if ( extractorBinder.isDefaultExtractorPath(
-						typeModel.getProperty( propertyName ).getTypeModel(),
+						typeModel.property( propertyName ).typeModel(),
 						extractorPath
 				) ) {
 					reindexOnUpdateOptional = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
@@ -172,14 +172,14 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	Set<PojoModelPathValueNode> getDerivedFrom(PojoTypeModel<?> typeModel, String propertyName,
 			ContainerExtractorPath extractorPath) {
 		PojoTypeAdditionalMetadata typeAdditionalMetadata =
-				typeAdditionalMetadataProvider.get( typeModel.getRawType() );
+				typeAdditionalMetadataProvider.get( typeModel.rawType() );
 		Set<PojoModelPathValueNode> derivedFrom =
 				typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
 						.getValueAdditionalMetadata( extractorPath )
 						.getDerivedFrom();
 		if ( derivedFrom.isEmpty() ) {
 			if ( extractorBinder.isDefaultExtractorPath(
-					typeModel.getProperty( propertyName ).getTypeModel(),
+					typeModel.property( propertyName ).typeModel(),
 					extractorPath
 			) ) {
 				derivedFrom = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )

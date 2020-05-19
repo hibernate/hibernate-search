@@ -57,11 +57,11 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 	@Override
 	public <I2> void bridge(Class<I2> expectedValueType, BeanHolder<? extends IdentifierBridge<I2>> bridgeHolder) {
 		try {
-			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.getTypeModel( expectedValueType );
+			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 			// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
 			//  Also we're checking that the bridge parameter type is a subtype, but we really should be checking it
 			//  is either the same type or a generic type parameter that can represent the same type.
-			if ( !identifierTypeModel.getRawType().isSubTypeOf( expectedValueTypeModel ) ) {
+			if ( !identifierTypeModel.rawType().isSubTypeOf( expectedValueTypeModel ) ) {
 				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel );
 			}
 

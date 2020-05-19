@@ -19,7 +19,7 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	/**
 	 * @return The identifier of the type to which metadata is being contributed.
 	 */
-	PojoRawTypeIdentifier<?> getTypeIdentifier();
+	PojoRawTypeIdentifier<?> typeIdentifier();
 
 	/**
 	 * Mark this type as an entity type.

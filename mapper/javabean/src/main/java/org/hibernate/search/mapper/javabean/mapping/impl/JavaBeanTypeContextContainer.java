@@ -41,7 +41,7 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 
 		<E> JavaBeanIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName) {
 			JavaBeanIndexedTypeContext.Builder<E> builder =
-					new JavaBeanIndexedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName );
+					new JavaBeanIndexedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName );
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}

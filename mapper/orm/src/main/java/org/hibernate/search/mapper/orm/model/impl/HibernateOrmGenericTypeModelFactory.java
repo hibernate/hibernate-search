@@ -28,20 +28,20 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 	}
 
 	static <T> HibernateOrmGenericTypeModelFactory<T> rawType(Class<T> javaClass) {
-		return introspector -> introspector.getGenericTypeModel( javaClass );
+		return introspector -> introspector.genericTypeModel( javaClass );
 	}
 
 	// This cast is safe if the caller made sure that this name really points to a dynamic-map type
 	@SuppressWarnings("unchecked")
 	static HibernateOrmGenericTypeModelFactory<Map> dynamicMap(String name) {
 		return introspector -> SyntheticPojoGenericTypeModel.opaqueType(
-				(PojoRawTypeModel<Map>) introspector.getTypeModel( name )
+				(PojoRawTypeModel<Map>) introspector.typeModel( name )
 		);
 	}
 
 	static <T> HibernateOrmGenericTypeModelFactory<T[]> array(HibernateOrmGenericTypeModelFactory<T> elementType) {
 		return introspector -> SyntheticPojoGenericTypeModel.array(
-				introspector.getTypeModel( Object[].class ),
+				introspector.typeModel( Object[].class ),
 				elementType.create( introspector )
 		);
 	}
@@ -49,7 +49,7 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 	static <C extends Collection> HibernateOrmGenericTypeModelFactory<C> collection(
 			Class<C> collectionType, HibernateOrmGenericTypeModelFactory<?> elementType) {
 		return introspector -> SyntheticPojoGenericTypeModel.genericType(
-				introspector.getTypeModel( collectionType ),
+				introspector.typeModel( collectionType ),
 				elementType.create( introspector )
 		);
 	}
@@ -59,7 +59,7 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 			HibernateOrmGenericTypeModelFactory<?> keyType,
 			HibernateOrmGenericTypeModelFactory<?> valueType) {
 		return introspector -> SyntheticPojoGenericTypeModel.genericType(
-				introspector.getTypeModel( mapType ),
+				introspector.typeModel( mapType ),
 				keyType.create( introspector ),
 				valueType.create( introspector )
 		);

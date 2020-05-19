@@ -18,13 +18,13 @@ class ExactRawTypeMatcher implements TypePatternMatcher {
 
 	@Override
 	public String toString() {
-		return "hasExactRawType(" + exactTypeToMatch.getName() + ")";
+		return "hasExactRawType(" + exactTypeToMatch.name() + ")";
 	}
 
 	@Override
 	public boolean matches(PojoGenericTypeModel<?> typeToInspect) {
-		PojoRawTypeModel<?> typeToMatchRawType = typeToInspect.getRawType();
-		return typeToInspect.getRawType().isSubTypeOf( exactTypeToMatch )
+		PojoRawTypeModel<?> typeToMatchRawType = typeToInspect.rawType();
+		return typeToInspect.rawType().isSubTypeOf( exactTypeToMatch )
 				&& exactTypeToMatch.isSubTypeOf( typeToMatchRawType );
 	}
 }

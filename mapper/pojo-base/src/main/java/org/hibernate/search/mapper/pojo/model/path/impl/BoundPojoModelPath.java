@@ -108,7 +108,7 @@ public abstract class BoundPojoModelPath {
 		private <P> BoundPojoModelPathValueNode<?, P, ?> doValue(BoundPojoModelPathPropertyNode<?, P> propertyNode,
 				ContainerExtractorPath extractorPath) {
 			BoundContainerExtractorPath<P, ?> boundExtractorPath = containerExtractorBinder
-					.bindPath( propertyNode.getPropertyModel().getTypeModel(), extractorPath );
+					.bindPath( propertyNode.getPropertyModel().typeModel(), extractorPath );
 			return propertyNode.value( boundExtractorPath );
 		}
 	}

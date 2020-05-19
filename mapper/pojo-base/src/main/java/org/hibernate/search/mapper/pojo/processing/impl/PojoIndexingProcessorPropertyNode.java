@@ -66,7 +66,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	public final void process(DocumentElement target, T source, PojoIndexingProcessorSessionContext sessionContext) {
 		P propertyValue = handle.get( source );
 		for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
-			bridgeHolder.get().write( target, propertyValue, sessionContext.getPropertyBridgeWriteContext() );
+			bridgeHolder.get().write( target, propertyValue, sessionContext.propertyBridgeWriteContext() );
 		}
 		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {
 			nestedNode.process( target, propertyValue, sessionContext );

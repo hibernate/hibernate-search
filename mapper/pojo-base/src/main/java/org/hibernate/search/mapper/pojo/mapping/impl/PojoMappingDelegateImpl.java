@@ -55,12 +55,12 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public ThreadPoolProvider getThreadPoolProvider() {
+	public ThreadPoolProvider threadPoolProvider() {
 		return threadPoolProvider;
 	}
 
 	@Override
-	public FailureHandler getFailureHandler() {
+	public FailureHandler failureHandler() {
 		return failureHandler;
 	}
 

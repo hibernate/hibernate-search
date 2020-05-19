@@ -74,8 +74,8 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();
-		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.getRawType();
-		PojoRawTypeModel<?> originalSideRawConcreteEntityType = parentNode.getTypeModel().getRawType();
+		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.rawType();
+		PojoRawTypeModel<?> originalSideRawConcreteEntityType = parentNode.getTypeModel().rawType();
 
 		PojoModelPathValueNode inverseAssociationUnboundPath = inverseAssociationPath.toUnboundPath();
 
@@ -99,7 +99,7 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 					PojoImplicitReindexingResolverBuilder.walker()
 			);
 
-			PojoRawTypeModel<?> inverseSideRawType = valueNodeBuilderDelegate.getTypeModel().getRawType();
+			PojoRawTypeModel<?> inverseSideRawType = valueNodeBuilderDelegate.getTypeModel().rawType();
 			valueNodeTypeConcreteEntitySubTypes = parentNode.getConcreteEntitySubTypesForTypeToReindex(
 					originalSideRawConcreteEntityType, inverseSideRawType
 			);

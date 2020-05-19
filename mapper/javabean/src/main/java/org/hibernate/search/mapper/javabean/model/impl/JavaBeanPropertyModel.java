@@ -38,12 +38,12 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 		this.introspector = introspector;
 		this.parentTypeModel = parentTypeModel;
 		this.property = property;
-		this.readMethod = PojoCommonsAnnotationsHelper.getUnderlyingMethod( property );
+		this.readMethod = PojoCommonsAnnotationsHelper.extractUnderlyingMethod( property );
 	}
 
 	/**
 	 * N.B.: equals and hashCode must be defined properly for
-	 * {@link JavaBeanGenericContextHelper#getPropertyCacheKey(PojoPropertyModel)}
+	 * {@link JavaBeanGenericContextHelper#propertyCacheKey(PojoPropertyModel)}
 	 * to work properly.
 	 */
 	@Override
@@ -57,7 +57,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 		JavaBeanPropertyModel<?> that = (JavaBeanPropertyModel<?>) o;
 		return Objects.equals( introspector, that.introspector ) &&
 				Objects.equals( parentTypeModel, that.parentTypeModel ) &&
-				Objects.equals( getHandle(), that.getHandle() );
+				Objects.equals( handle(), that.handle() );
 	}
 
 	@Override
@@ -67,17 +67,17 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + getName() + ", " + getGetterGenericReturnType().getTypeName() + "]";
+		return getClass().getSimpleName() + "[" + name() + ", " + getGetterGenericReturnType().getTypeName() + "]";
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return property.getName();
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
-		return introspector.getAnnotations( property );
+	public Stream<Annotation> annotations() {
+		return introspector.annotations( property );
 	}
 
 	@Override
@@ -86,14 +86,14 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	 * match the actual type for this property.
 	 */
 	@SuppressWarnings( "unchecked" )
-	public PojoGenericTypeModel<T> getTypeModel() {
+	public PojoGenericTypeModel<T> typeModel() {
 		if ( typeModel == null ) {
 			try {
 				typeModel = (PojoGenericTypeModel<T>) parentTypeModel.getRawTypeDeclaringContext()
 						.createGenericTypeModel( getGetterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), parentTypeModel, e );
 			}
 		}
 		return typeModel;
@@ -101,13 +101,13 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	public ValueReadHandle<T> getHandle() {
+	public ValueReadHandle<T> handle() {
 		if ( handle == null ) {
 			try {
 				handle = (ValueReadHandle<T>) introspector.createValueReadHandle( readMethod );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), parentTypeModel, e );
 			}
 		}
 		return handle;

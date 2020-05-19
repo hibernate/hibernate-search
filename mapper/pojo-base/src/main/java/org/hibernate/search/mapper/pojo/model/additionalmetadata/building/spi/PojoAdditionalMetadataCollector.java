@@ -10,6 +10,6 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 public interface PojoAdditionalMetadataCollector {
 
-	ContextualFailureCollector getFailureCollector();
+	ContextualFailureCollector failureCollector();
 
 }

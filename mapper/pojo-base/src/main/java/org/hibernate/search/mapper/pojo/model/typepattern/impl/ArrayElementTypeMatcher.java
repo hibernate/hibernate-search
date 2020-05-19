@@ -18,6 +18,6 @@ class ArrayElementTypeMatcher implements ExtractingTypePatternMatcher {
 
 	@Override
 	public Optional<? extends PojoGenericTypeModel<?>> extract(PojoGenericTypeModel<?> typeToInspect) {
-		return typeToInspect.getArrayElementType();
+		return typeToInspect.arrayElementType();
 	}
 }

@@ -66,14 +66,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 		return tenantId;
 	}
 
-	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
 	@Override
-	public String getTenantIdentifier() {
-		return tenantId;
-	}
-
-	@Override
-	public PojoRuntimeIntrospector getRuntimeIntrospector() {
+	public PojoRuntimeIntrospector runtimeIntrospector() {
 		return PojoRuntimeIntrospector.simple();
 	}
 
@@ -96,7 +90,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	public SearchIndexingPlan indexingPlan() {
 		if ( indexingPlan == null ) {
 			indexingPlan = new SearchIndexingPlanImpl(
-					getRuntimeIntrospector(),
+					runtimeIntrospector(),
 					createIndexingPlan( commitStrategy, refreshStrategy )
 			);
 		}
@@ -107,7 +101,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	public SearchIndexer indexer() {
 		if ( indexer == null ) {
 			indexer = new SearchIndexerImpl(
-					getRuntimeIntrospector(),
+					runtimeIntrospector(),
 					createIndexer(),
 					commitStrategy, refreshStrategy
 			);
@@ -130,7 +124,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	}
 
 	@Override
-	public EntityReferenceFactory<EntityReference> getEntityReferenceFactory() {
+	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
 		return this;
 	}
 

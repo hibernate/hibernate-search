@@ -93,7 +93,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			if ( containerElementNodeBuilder == null && !containerElementNodeBuilders.containsKey( extractorPath ) ) {
 				BoundContainerExtractorPath<P, ?> boundExtractorPath =
 						mappingHelper.getIndexModelBinder().bindExtractorPath(
-								modelPath.getPropertyModel().getTypeModel(),
+								modelPath.getPropertyModel().typeModel(),
 								extractorPath
 						);
 				ContainerExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();
@@ -156,7 +156,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			return doBuild( parentDependencyCollector );
 		}
 		catch (RuntimeException e) {
-			getFailureCollector().add( e );
+			failureCollector().add( e );
 			return Optional.empty();
 		}
 	}
@@ -166,7 +166,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 		@SuppressWarnings("unchecked") // We know from the property model that this property has type P
 		PojoIndexingDependencyCollectorPropertyNode<T, P> propertyDependencyCollector =
 				(PojoIndexingDependencyCollectorPropertyNode<T, P>)
-						parentDependencyCollector.property( modelPath.getPropertyModel().getName() );
+						parentDependencyCollector.property( modelPath.getPropertyModel().name() );
 
 		Collection<PojoIndexingProcessor<? super P>> immutableNestedNodes = Collections.emptyList();
 		try {

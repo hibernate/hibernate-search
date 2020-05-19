@@ -109,7 +109,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 			return doBuild( dependencyCollector );
 		}
 		catch (RuntimeException e) {
-			getFailureCollector().add( e );
+			failureCollector().add( e );
 			return Optional.empty();
 		}
 	}

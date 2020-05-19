@@ -33,9 +33,9 @@ public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider
 	public String toRoutingKey(Object identifier, Supplier<E> entitySupplier,
 			BridgeSessionContext context) {
 		return bridgeHolder.get().toRoutingKey(
-				context.getTenantIdentifier(), identifier,
+				context.tenantIdentifier(), identifier,
 				entitySupplier.get(),
-				context.getRoutingKeyBridgeToRoutingKeyContext()
+				context.routingKeyBridgeToRoutingKeyContext()
 		);
 	}
 }

@@ -32,7 +32,7 @@ public final class PojoValueBridgeContextExtension
 		BackendMappingContext mappingContext) {
 		if ( mappingContext instanceof BridgeMappingContext ) {
 			BridgeMappingContext pojoMappingContext = (BridgeMappingContext) mappingContext;
-			return Optional.of( pojoMappingContext.getValueBridgeToIndexedValueContext() );
+			return Optional.of( pojoMappingContext.valueBridgeToIndexedValueContext() );
 		}
 		else {
 			return Optional.empty();
@@ -44,7 +44,7 @@ public final class PojoValueBridgeContextExtension
 			BackendSessionContext sessionContext) {
 		if ( sessionContext instanceof BridgeSessionContext ) {
 			BridgeSessionContext pojoSessionContext = (BridgeSessionContext) sessionContext;
-			return Optional.of( pojoSessionContext.getValueBridgeFromIndexedValueContext() );
+			return Optional.of( pojoSessionContext.valueBridgeFromIndexedValueContext() );
 		}
 		else {
 			return Optional.empty();

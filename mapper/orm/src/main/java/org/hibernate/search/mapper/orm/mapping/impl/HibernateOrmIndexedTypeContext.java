@@ -65,7 +65,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	@Override
 	public Class<?> javaClass() {
-		return getTypeIdentifier().getJavaClass();
+		return getTypeIdentifier().javaClass();
 	}
 
 	@Override
@@ -115,8 +115,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 		@Override
 		public void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty) {
-			this.documentIdSourcePropertyName = documentIdSourceProperty.getName();
-			this.documentIdSourcePropertyHandle = documentIdSourceProperty.getHandle();
+			this.documentIdSourcePropertyName = documentIdSourceProperty.name();
+			this.documentIdSourcePropertyHandle = documentIdSourceProperty.handle();
 		}
 
 		@Override

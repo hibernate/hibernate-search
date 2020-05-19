@@ -38,7 +38,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	public HibernateOrmSearchQuerySelectStep<E> search(HibernateOrmScopeSessionContext sessionContext) {
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
-				mappingContext, sessionContext, delegate.getIncludedIndexedTypes()
+				mappingContext, sessionContext, delegate.includedIndexedTypes()
 		);
 		return new HibernateOrmSearchQuerySelectStepImpl<>(
 				delegate.search( sessionContext.getBackendSessionContext(), loadingContextBuilder ),
@@ -98,7 +98,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {
 		return new MassIndexerImpl(
 				mappingContext,
-				delegate.getIncludedIndexedTypes(),
+				delegate.includedIndexedTypes(),
 				detachedSessionContext,
 				delegate.schemaManager(),
 				delegate.workspace( detachedSessionContext )

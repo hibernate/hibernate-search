@@ -83,8 +83,8 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 				.bindIdentifier( bindingContext, modelPath, binder );
 		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 		this.identifierMapping = new PropertyIdentifierMapping<>(
-				propertyModel.getTypeModel().getRawType().getCaster(),
-				propertyModel.getHandle(),
+				propertyModel.typeModel().rawType().caster(),
+				propertyModel.handle(),
 				boundIdentifierBridge.getBridgeHolder()
 		);
 		this.documentIdSourceProperty = Optional.of( propertyModel );

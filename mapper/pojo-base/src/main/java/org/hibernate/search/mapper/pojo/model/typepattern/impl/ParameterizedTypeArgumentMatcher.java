@@ -43,6 +43,6 @@ class ParameterizedTypeArgumentMatcher implements ExtractingTypePatternMatcher {
 
 	@Override
 	public Optional<? extends PojoGenericTypeModel<?>> extract(PojoGenericTypeModel<?> typeToInspect) {
-		return typeToInspect.getTypeArgument( matchedRawType, resultTypeParameterIndex );
+		return typeToInspect.typeArgument( matchedRawType, resultTypeParameterIndex );
 	}
 }

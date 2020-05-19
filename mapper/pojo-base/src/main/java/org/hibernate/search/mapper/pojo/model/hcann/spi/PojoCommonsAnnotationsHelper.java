@@ -52,7 +52,7 @@ public class PojoCommonsAnnotationsHelper {
 		}
 	}
 
-	public static Member getUnderlyingMember(XProperty xProperty) {
+	public static Member extractUnderlyingMember(XProperty xProperty) {
 		try {
 			return (Member) getMemberMethod.invoke( xProperty );
 		}
@@ -70,8 +70,8 @@ public class PojoCommonsAnnotationsHelper {
 		}
 	}
 
-	public static Method getUnderlyingMethod(XProperty xProperty) {
-		Member member = getUnderlyingMember( xProperty );
+	public static Method extractUnderlyingMethod(XProperty xProperty) {
+		Member member = extractUnderlyingMember( xProperty );
 		if ( !( member instanceof Method ) ) {
 			throw log.cannotAccessPropertyMethod( xProperty.getName() );
 		}

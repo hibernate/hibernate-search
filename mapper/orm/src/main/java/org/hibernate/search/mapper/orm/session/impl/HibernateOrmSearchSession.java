@@ -125,12 +125,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		return session().getTenantIdentifier();
 	}
 
-	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
-	@Override
-	public String getTenantIdentifier() {
-		return session().getTenantIdentifier();
-	}
-
 	@Override
 	public PojoIndexer createIndexer() {
 		return super.createIndexer();
@@ -240,7 +234,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public EntityReferenceFactory<EntityReference> getEntityReferenceFactory() {
+	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
 		return this;
 	}
 
@@ -257,7 +251,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public PojoRuntimeIntrospector getRuntimeIntrospector() {
+	public PojoRuntimeIntrospector runtimeIntrospector() {
+		return runtimeIntrospector;
+	}
+
+	// FIXME HSEARCH-3922 remove this once the ORM mapper SPIs have been updated.
+	@Override
+	public HibernateOrmRuntimeIntrospector getRuntimeIntrospector() {
 		return runtimeIntrospector;
 	}
 

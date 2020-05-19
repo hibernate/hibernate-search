@@ -189,7 +189,7 @@ public final class BridgeResolver {
 	private static <B> B getBinderOrNull(PojoGenericTypeModel<?> sourceType,
 			Map<PojoRawTypeIdentifier<?>, B> exactRawTypeBridgeMappings,
 			List<TypePatternBinderMapping<B>> typePatternBinderMappings) {
-		PojoRawTypeIdentifier<?> rawType = sourceType.getRawType().getTypeIdentifier();
+		PojoRawTypeIdentifier<?> rawType = sourceType.rawType().typeIdentifier();
 		B result = exactRawTypeBridgeMappings.get( rawType );
 
 		if ( result == null ) {

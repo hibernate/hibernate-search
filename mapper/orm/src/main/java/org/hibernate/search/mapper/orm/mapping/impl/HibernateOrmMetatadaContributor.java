@@ -57,10 +57,10 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			Class<?> clazz = persistentClass.getMappedClass();
 			PojoRawTypeModel<?> typeModel;
 			if ( persistentClass.hasPojoRepresentation() ) {
-				typeModel = introspector.getTypeModel( clazz );
+				typeModel = introspector.typeModel( clazz );
 			}
 			else {
-				typeModel = introspector.getTypeModel( persistentClass.getEntityName() );
+				typeModel = introspector.typeModel( persistentClass.getEntityName() );
 			}
 			collectPropertyDelegates( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
 
@@ -73,7 +73,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 					typeModel,
 					new ErrorCollectingPojoTypeMetadataContributor()
 							.add( new HibernateOrmEntityTypeMetadataContributor(
-									typeModel.getTypeIdentifier(), persistentClass, identifierPropertyNameOptional
+									typeModel.typeIdentifier(), persistentClass, identifierPropertyNameOptional
 							) )
 							.addAll( delegates )
 			);
@@ -159,10 +159,10 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			Component componentValue = (Component) value;
 			PojoRawTypeModel<?> componentTypeModel;
 			if ( componentValue.isDynamic() ) {
-				componentTypeModel = introspector.getTypeModel( componentValue.getRoleName() );
+				componentTypeModel = introspector.typeModel( componentValue.getRoleName() );
 			}
 			else {
-				componentTypeModel = introspector.getTypeModel( componentValue.getComponentClass() );
+				componentTypeModel = introspector.typeModel( componentValue.getComponentClass() );
 			}
 			/*
 			 * Different Component instances for the same component class may carry different metadata

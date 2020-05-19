@@ -77,7 +77,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		MultiTenancyStrategy multiTenancyStrategy =
 				MultiTenancyStrategy.determineMultiTenancyStrategy( ormConfigurationService.getSettings() );
 
-		setMultiTenancyEnabled(
+		multiTenancyEnabled(
 				!MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
 		);
 	}
@@ -94,7 +94,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
 		if ( processAnnotations ) {
-			setAnnotatedTypeDiscoveryEnabled( true );
+			annotatedTypeDiscoveryEnabled( true );
 
 			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();
 			for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {

@@ -123,7 +123,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 
 		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
 			HibernateOrmIndexedTypeContext.Builder<E> builder = new HibernateOrmIndexedTypeContext.Builder<>(
-					typeModel.getTypeIdentifier(),
+					typeModel.typeIdentifier(),
 					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
 			);
 			indexedTypeContextBuilders.add( builder );
@@ -132,7 +132,7 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 
 		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
 			HibernateOrmContainedTypeContext.Builder<E> builder = new HibernateOrmContainedTypeContext.Builder<>(
-					typeModel.getTypeIdentifier(),
+					typeModel.typeIdentifier(),
 					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
 			);
 			containedTypeContextBuilders.add( builder );

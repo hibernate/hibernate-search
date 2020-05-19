@@ -27,12 +27,12 @@ public interface PojoTypeModel<T> {
 	/**
 	 * @return A human-readable name for this type.
 	 */
-	String getName();
+	String name();
 
 	/**
 	 * @return A representation of the closest parent Java {@link Class} for this type.
 	 */
-	PojoRawTypeModel<? super T> getRawType();
+	PojoRawTypeModel<? super T> rawType();
 
-	PojoPropertyModel<?> getProperty(String propertyName);
+	PojoPropertyModel<?> property(String propertyName);
 }

@@ -54,11 +54,11 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	private final Map<Object, PojoPropertyModel<?>> genericPropertyCache = new HashMap<>();
 
 	public interface Helper {
-		<T> PojoRawTypeModel<T> getRawTypeModel(Class<T> clazz);
+		<T> PojoRawTypeModel<T> rawTypeModel(Class<T> clazz);
 
-		Object getPropertyCacheKey(PojoPropertyModel<?> rawPropertyModel);
+		Object propertyCacheKey(PojoPropertyModel<?> rawPropertyModel);
 
-		Type getPropertyGenericType(PojoPropertyModel<?> rawPropertyModel);
+		Type propertyGenericType(PojoPropertyModel<?> rawPropertyModel);
 	}
 
 	public static class RawTypeDeclaringContext<T> {
@@ -100,7 +100,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 
 	@SuppressWarnings("unchecked") // Can't do better here, this code is all about reflection
 	private GenericContextAwarePojoGenericTypeModel(Helper helper, GenericTypeContext genericTypeContext) {
-		super( helper.getRawTypeModel(
+		super( helper.rawTypeModel(
 				(Class<? super T>) ReflectionUtils.getRawType( genericTypeContext.getResolvedType() )
 		) );
 		this.helper = helper;
@@ -108,17 +108,17 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return genericTypeContext.getResolvedType().getTypeName();
 	}
 
 	@Override
-	public PojoPropertyModel<?> getProperty(String propertyName) {
-		return wrapProperty( super.getProperty( propertyName ) );
+	public PojoPropertyModel<?> property(String propertyName) {
+		return wrapProperty( super.property( propertyName ) );
 	}
 
 	@Override
-	public Optional<PojoGenericTypeModel<?>> getTypeArgument(Class<?> rawSuperType, int typeParameterIndex) {
+	public Optional<PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
 		return genericTypeContext.resolveTypeArgument( rawSuperType, typeParameterIndex )
 				.map( type -> new GenericContextAwarePojoGenericTypeModel<>(
 						helper, new GenericTypeContext( genericTypeContext.getDeclaringContext(), type )
@@ -126,7 +126,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	}
 
 	@Override
-	public Optional<PojoGenericTypeModel<?>> getArrayElementType() {
+	public Optional<PojoGenericTypeModel<?>> arrayElementType() {
 		return genericTypeContext.resolveArrayElementType()
 				.map( type -> new GenericContextAwarePojoGenericTypeModel<>(
 						helper, new GenericTypeContext( genericTypeContext.getDeclaringContext(), type )
@@ -134,13 +134,13 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	}
 
 	private <U> PojoPropertyModel<? extends U> wrapProperty(PojoPropertyModel<U> rawPropertyModel) {
-		Object cacheKey = helper.getPropertyCacheKey( rawPropertyModel );
+		Object cacheKey = helper.propertyCacheKey( rawPropertyModel );
 		@SuppressWarnings("unchecked") // See how we add values to the cache
 		PojoPropertyModel<? extends U> cached = (PojoPropertyModel<? extends U>) genericPropertyCache.get( cacheKey );
 		if ( cached != null ) {
 			return cached;
 		}
-		Type propertyType = helper.getPropertyGenericType( rawPropertyModel );
+		Type propertyType = helper.propertyGenericType( rawPropertyModel );
 		GenericTypeContext propertyGenericTypeContext = new GenericTypeContext( genericTypeContext, propertyType );
 		GenericContextAwarePojoGenericTypeModel<? extends U> genericPropertyTypeModel =
 				new GenericContextAwarePojoGenericTypeModel<>( helper, propertyGenericTypeContext );

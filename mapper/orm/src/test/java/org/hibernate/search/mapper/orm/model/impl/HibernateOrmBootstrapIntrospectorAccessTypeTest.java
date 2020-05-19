@@ -141,52 +141,52 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 	private void testEntityWithDefaultFieldAccess(HibernateOrmBootstrapIntrospector introspector) {
 		EntityWithDefaultFieldAccess entity = new EntityWithDefaultFieldAccess();
 		PojoRawTypeModel<EntityWithDefaultFieldAccess> typeModel =
-				introspector.getTypeModel( EntityWithDefaultFieldAccess.class );
+				introspector.typeModel( EntityWithDefaultFieldAccess.class );
 
 		/*
 		 * Try to get the value from each handle.
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		ValueReadHandle<?> valueReadHandle = typeModel.getProperty( "propertyWithDefaultFieldAccess" ).getHandle();
+		ValueReadHandle<?> valueReadHandle = typeModel.property( "propertyWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.propertyWithDefaultFieldAccess );
-		valueReadHandle = typeModel.getProperty( "idWithDefaultFieldAccess" ).getHandle();
+		valueReadHandle = typeModel.property( "idWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.idWithDefaultFieldAccess );
-		valueReadHandle = typeModel.getProperty( "propertyWithNonDefaultMethodAccess" ).getHandle();
+		valueReadHandle = typeModel.property( "propertyWithNonDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.getPropertyWithNonDefaultMethodAccess() );
 	}
 
 	private void testEntityWithDefaultMethodAccess(HibernateOrmBootstrapIntrospector introspector) {
 		EntityWithDefaultMethodAccess entity = new EntityWithDefaultMethodAccess();
 		PojoRawTypeModel<EntityWithDefaultMethodAccess> typeModel =
-				introspector.getTypeModel( EntityWithDefaultMethodAccess.class );
+				introspector.typeModel( EntityWithDefaultMethodAccess.class );
 
 		/*
 		 * Try to get the value from each handle.
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		ValueReadHandle<?> valueReadHandle = typeModel.getProperty( "propertyWithDefaultMethodAccess" ).getHandle();
+		ValueReadHandle<?> valueReadHandle = typeModel.property( "propertyWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.getPropertyWithDefaultMethodAccess() );
-		valueReadHandle = typeModel.getProperty( "idWithDefaultMethodAccess" ).getHandle();
+		valueReadHandle = typeModel.property( "idWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.getIdWithDefaultMethodAccess() );
-		valueReadHandle = typeModel.getProperty( "propertyWithNonDefaultFieldAccess" ).getHandle();
+		valueReadHandle = typeModel.property( "propertyWithNonDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( entity ) ).isEqualTo( entity.propertyWithNonDefaultFieldAccess );
 	}
 
 	private void testEmbeddableWithDefaultFieldAccess(HibernateOrmBootstrapIntrospector introspector) {
 		EmbeddableWithDefaultFieldAccess embeddable = new EmbeddableWithDefaultFieldAccess();
 		PojoRawTypeModel<EmbeddableWithDefaultFieldAccess> typeModel =
-				introspector.getTypeModel( EmbeddableWithDefaultFieldAccess.class );
+				introspector.typeModel( EmbeddableWithDefaultFieldAccess.class );
 
 		/*
 		 * Try to get the value from each handle.
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		ValueReadHandle<?> valueReadHandle = typeModel.getProperty( "propertyWithDefaultFieldAccess" ).getHandle();
+		ValueReadHandle<?> valueReadHandle = typeModel.property( "propertyWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.propertyWithDefaultFieldAccess );
-		valueReadHandle = typeModel.getProperty( "propertyWithNonDefaultMethodAccess" ).getHandle();
+		valueReadHandle = typeModel.property( "propertyWithNonDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.getPropertyWithNonDefaultMethodAccess() );
 
 		/*
@@ -194,26 +194,26 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		 */
 		NestedEmbeddableWithDefaultFieldAccess nestedEmbeddable = new NestedEmbeddableWithDefaultFieldAccess();
 		PojoRawTypeModel<NestedEmbeddableWithDefaultFieldAccess> nestedEmbeddableTypeModel =
-				introspector.getTypeModel( NestedEmbeddableWithDefaultFieldAccess.class );
-		valueReadHandle = nestedEmbeddableTypeModel.getProperty( "propertyWithDefaultFieldAccess" ).getHandle();
+				introspector.typeModel( NestedEmbeddableWithDefaultFieldAccess.class );
+		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.propertyWithDefaultFieldAccess );
-		valueReadHandle = nestedEmbeddableTypeModel.getProperty( "propertyWithNonDefaultMethodAccess" ).getHandle();
+		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithNonDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.getPropertyWithNonDefaultMethodAccess() );
 	}
 
 	private void testEmbeddableWithDefaultMethodAccess(HibernateOrmBootstrapIntrospector introspector) {
 		EmbeddableWithDefaultMethodAccess embeddable = new EmbeddableWithDefaultMethodAccess();
 		PojoRawTypeModel<EmbeddableWithDefaultMethodAccess> typeModel =
-				introspector.getTypeModel( EmbeddableWithDefaultMethodAccess.class );
+				introspector.typeModel( EmbeddableWithDefaultMethodAccess.class );
 
 		/*
 		 * Try to get the value from each handle.
 		 * If they return the correct value, we know they work correctly,
 		 * because the types are designed in such a way that any other access type wouldn't work.
 		 */
-		ValueReadHandle<?> valueReadHandle = typeModel.getProperty( "propertyWithDefaultMethodAccess" ).getHandle();
+		ValueReadHandle<?> valueReadHandle = typeModel.property( "propertyWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.getPropertyWithDefaultMethodAccess() );
-		valueReadHandle = typeModel.getProperty( "propertyWithNonDefaultFieldAccess" ).getHandle();
+		valueReadHandle = typeModel.property( "propertyWithNonDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( embeddable ) ).isEqualTo( embeddable.propertyWithNonDefaultFieldAccess );
 
 		/*
@@ -221,10 +221,10 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 		 */
 		NestedEmbeddableWithDefaultMethodAccess nestedEmbeddable = new NestedEmbeddableWithDefaultMethodAccess();
 		PojoRawTypeModel<NestedEmbeddableWithDefaultMethodAccess> nestedEmbeddableTypeModel =
-				introspector.getTypeModel( NestedEmbeddableWithDefaultMethodAccess.class );
-		valueReadHandle = nestedEmbeddableTypeModel.getProperty( "propertyWithDefaultMethodAccess" ).getHandle();
+				introspector.typeModel( NestedEmbeddableWithDefaultMethodAccess.class );
+		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithDefaultMethodAccess" ).handle();
 		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.getPropertyWithDefaultMethodAccess() );
-		valueReadHandle = nestedEmbeddableTypeModel.getProperty( "propertyWithNonDefaultFieldAccess" ).getHandle();
+		valueReadHandle = nestedEmbeddableTypeModel.property( "propertyWithNonDefaultFieldAccess" ).handle();
 		assertThat( valueReadHandle.get( nestedEmbeddable ) ).isEqualTo( nestedEmbeddable.propertyWithNonDefaultFieldAccess );
 	}
 

@@ -97,7 +97,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	@Override
-	public Set<C> getIncludedIndexedTypes() {
+	public Set<C> includedIndexedTypes() {
 		return targetedTypeExtendedContexts;
 	}
 

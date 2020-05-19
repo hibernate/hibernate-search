@@ -21,26 +21,26 @@ public abstract class AbstractPojoGenericTypeModel<T> implements PojoGenericType
 
 	@Override
 	public final String toString() {
-		return getClass().getSimpleName() + "[" + getName() + "]";
+		return getClass().getSimpleName() + "[" + name() + "]";
 	}
 
 	@Override
-	public final PojoRawTypeModel<? super T> getRawType() {
+	public final PojoRawTypeModel<? super T> rawType() {
 		return rawTypeModel;
 	}
 
 	@Override
-	public PojoPropertyModel<?> getProperty(String propertyName) {
-		return rawTypeModel.getProperty( propertyName );
+	public PojoPropertyModel<?> property(String propertyName) {
+		return rawTypeModel.property( propertyName );
 	}
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> getTypeArgument(Class<?> rawSuperType, int typeParameterIndex) {
+	public Optional<? extends PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
 		return Optional.empty();
 	}
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> getArrayElementType() {
+	public Optional<? extends PojoGenericTypeModel<?>> arrayElementType() {
 		return Optional.empty();
 	}
 }

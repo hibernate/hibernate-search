@@ -29,7 +29,7 @@ final class HibernateOrmAssociationEmbeddedMetadataContributor implements PojoTy
 			collectorValueNode.associationEmbedded();
 		}
 		catch (RuntimeException e) {
-			collectorValueNode.getFailureCollector().add( e );
+			collectorValueNode.failureCollector().add( e );
 		}
 	}
 
