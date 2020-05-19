@@ -30,7 +30,7 @@ public final class FailureReportUtils {
 	 */
 	public static <T extends Throwable> Consumer<T> hasContext(EventContext first, EventContext... others) {
 		return hasContext(
-				EventContext.concat( first, others ).getElements().toArray( new EventContextElement[] { } )
+				EventContext.concat( first, others ).elements().toArray( new EventContextElement[] { } )
 		);
 	}
 
@@ -43,9 +43,9 @@ public final class FailureReportUtils {
 		return throwable -> {
 			Assertions.assertThat( throwable )
 					.isInstanceOf( SearchException.class );
-			EventContext actualContext = ( (SearchException) throwable ).getContext();
+			EventContext actualContext = ( (SearchException) throwable ).context();
 			Assertions.assertThat( actualContext ).as( "throwable.getContext()" ).isNotNull();
-			Assertions.assertThat( actualContext.getElements() )
+			Assertions.assertThat( actualContext.elements() )
 					.containsExactly( contextElements );
 			String renderedContextElements = Arrays.stream( contextElements ).map( EventContextElement::render )
 					.collect( Collectors.joining( ", " ) );

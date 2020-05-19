@@ -87,7 +87,7 @@ class RangePredicateFieldMoreStepImpl<B>
 
 		CommonState<B> range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
 			Contracts.assertNotNull( range, "range" );
-			if ( !range.getLowerBoundValue().isPresent() && !range.getUpperBoundValue().isPresent() ) {
+			if ( !range.lowerBoundValue().isPresent() && !range.upperBoundValue().isPresent() ) {
 				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
 			}
 			for ( RangePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {

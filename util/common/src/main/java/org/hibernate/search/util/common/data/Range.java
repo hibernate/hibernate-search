@@ -20,8 +20,8 @@ import org.hibernate.search.util.common.impl.Contracts;
  * As a result, only minimal consistency checks are performed: null-checks, mostly.
  * In particular, <strong>this class does not check that the lower bound is actually lower than the upper bound</strong>,
  * because it has no idea what ordering to use.
- * Checking the relative order of bounds is the responsibility of callers of the {@link #getLowerBoundValue()}
- * and {@link #getUpperBoundValue()} methods.
+ * Checking the relative order of bounds is the responsibility of callers of the {@link #lowerBoundValue()}
+ * and {@link #upperBoundValue()} methods.
  *
  * @param <T> The type of values in this range.
  */
@@ -196,31 +196,69 @@ public final class Range<T> {
 	/**
 	 * @return The value of the lower bound, or an empty optional to represent {-Infinity} (no lower bound).
 	 */
-	public Optional<T> getLowerBoundValue() {
+	public Optional<T> lowerBoundValue() {
 		return lowerBoundValue;
+	}
+
+	/**
+	 * @return The value of the lower bound, or an empty optional to represent {-Infinity} (no lower bound).
+	 * @deprecated Use {@link #lowerBoundValue()} instead.
+	 */
+	@Deprecated
+	public Optional<T> getLowerBoundValue() {
+		return lowerBoundValue();
 	}
 
 	/**
 	 * @return Whether the lower bound is included in the range or excluded.
 	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no lower bound.
 	 */
-	public RangeBoundInclusion getLowerBoundInclusion() {
+	public RangeBoundInclusion lowerBoundInclusion() {
 		return lowerBoundInclusion;
+	}
+
+	/**
+	 * @return Whether the lower bound is included in the range or excluded.
+	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no lower bound.
+	 * @deprecated Use {@link #lowerBoundInclusion()} instead.
+	 */
+	@Deprecated
+	public RangeBoundInclusion getLowerBoundInclusion() {
+		return lowerBoundInclusion();
 	}
 
 	/**
 	 * @return The value of the lower bound, or an empty optional to represent {+Infinity} (no upper bound).
 	 */
-	public Optional<T> getUpperBoundValue() {
+	public Optional<T> upperBoundValue() {
 		return upperBoundValue;
+	}
+
+	/**
+	 * @return The value of the lower bound, or an empty optional to represent {+Infinity} (no upper bound).
+	 * @deprecated Use {@link #upperBoundValue()} instead.
+	 */
+	@Deprecated
+	public Optional<T> getUpperBoundValue() {
+		return upperBoundValue();
 	}
 
 	/**
 	 * @return Whether the upper bound is included in the range or excluded.
 	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no upper bound.
 	 */
-	public RangeBoundInclusion getUpperBoundInclusion() {
+	public RangeBoundInclusion upperBoundInclusion() {
 		return upperBoundInclusion;
+	}
+
+	/**
+	 * @return Whether the upper bound is included in the range or excluded.
+	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no upper bound.
+	 * @deprecated Use {@link #upperBoundInclusion()} instead.
+	 */
+	@Deprecated
+	public RangeBoundInclusion getUpperBoundInclusion() {
+		return upperBoundInclusion();
 	}
 
 	public <R> Range<R> map(Function<? super T, ? extends R> function) {

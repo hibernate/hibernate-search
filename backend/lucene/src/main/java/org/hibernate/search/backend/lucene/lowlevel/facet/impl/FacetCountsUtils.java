@@ -34,18 +34,18 @@ public class FacetCountsUtils {
 		LongRange[] longRanges = new LongRange[ranges.size()];
 		int i = 0;
 		for ( Range<? extends T> range : ranges ) {
-			T lowerBoundValue = range.getLowerBoundValue().orElse( null );
-			T upperBoundValue = range.getUpperBoundValue().orElse( null );
+			T lowerBoundValue = range.lowerBoundValue().orElse( null );
+			T upperBoundValue = range.upperBoundValue().orElse( null );
 			longRanges[i] = new LongRange(
 					String.valueOf( i ),
 					encoder.applyAsLong( lowerBoundValue == null ? lowestPossibleValue : lowerBoundValue ),
 					// The lower bound is included if it is explicitly included
-					RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() )
+					RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() )
 							// ... or if it is infinity but infinity cannot be represented
 							|| !extremaAreInfinity && lowerBoundValue == null,
 					encoder.applyAsLong( upperBoundValue == null ? highestPossibleValue : upperBoundValue ),
 					// The upper bound is included if it is explicitly included
-					RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
+					RangeBoundInclusion.INCLUDED.equals( range.upperBoundInclusion() )
 							// ... or if it is infinity but infinity cannot be represented
 							|| !extremaAreInfinity && upperBoundValue == null
 			);
