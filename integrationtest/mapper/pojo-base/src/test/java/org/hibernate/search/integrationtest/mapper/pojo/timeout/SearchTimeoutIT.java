@@ -63,7 +63,7 @@ public class SearchTimeoutIT {
 					StubSearchWorkBehavior.of( 0L, Collections.emptyList() )
 			);
 
-			Assertions.assertThat( query.fetchAll().getHits() ).isEmpty();
+			Assertions.assertThat( query.fetchAll().hits() ).isEmpty();
 		}
 	}
 

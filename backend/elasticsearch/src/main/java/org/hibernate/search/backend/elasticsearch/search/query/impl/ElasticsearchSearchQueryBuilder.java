@@ -199,7 +199,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			JsonObject jsonAggregations = new JsonObject();
 
 			for ( Map.Entry<AggregationKey<?>, ElasticsearchSearchAggregation<?>> entry : aggregations.entrySet() ) {
-				jsonAggregations.add( entry.getKey().getName(), entry.getValue().request( requestContext ) );
+				jsonAggregations.add( entry.getKey().name(), entry.getValue().request( requestContext ) );
 			}
 
 			payload.add( "aggregations", jsonAggregations );

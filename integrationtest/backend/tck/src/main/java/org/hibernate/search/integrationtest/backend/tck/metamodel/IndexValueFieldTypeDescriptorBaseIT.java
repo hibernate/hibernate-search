@@ -70,47 +70,47 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 	@Test
 	public void isSearchable() {
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( true, IndexValueFieldTypeDescriptor::isSearchable );
+				.returns( true, IndexValueFieldTypeDescriptor::searchable );
 		assertThat( getTypeDescriptor( "searchable" ) )
-				.returns( true, IndexValueFieldTypeDescriptor::isSearchable );
+				.returns( true, IndexValueFieldTypeDescriptor::searchable );
 		assertThat( getTypeDescriptor( "nonSearchable" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isSearchable );
+				.returns( false, IndexValueFieldTypeDescriptor::searchable );
 	}
 
 	@Test
 	public void isSortable() {
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isSortable );
+				.returns( false, IndexValueFieldTypeDescriptor::sortable );
 		if ( isSortSupported() ) {
 			assertThat( getTypeDescriptor( "sortable" ) )
-					.returns( true, IndexValueFieldTypeDescriptor::isSortable );
+					.returns( true, IndexValueFieldTypeDescriptor::sortable );
 		}
 		assertThat( getTypeDescriptor( "nonSortable" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isSortable );
+				.returns( false, IndexValueFieldTypeDescriptor::sortable );
 	}
 
 	@Test
 	public void isProjectable() {
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isProjectable );
+				.returns( false, IndexValueFieldTypeDescriptor::projectable );
 		if ( isProjectionSupported() ) {
 			assertThat( getTypeDescriptor( "projectable" ) )
-					.returns( true, IndexValueFieldTypeDescriptor::isProjectable );
+					.returns( true, IndexValueFieldTypeDescriptor::projectable );
 		}
 		assertThat( getTypeDescriptor( "nonProjectable" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isProjectable );
+				.returns( false, IndexValueFieldTypeDescriptor::projectable );
 	}
 
 	@Test
 	public void isAggregable() {
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isAggregable );
+				.returns( false, IndexValueFieldTypeDescriptor::aggregable );
 		if ( isAggregationSupported() ) {
 			assertThat( getTypeDescriptor( "aggregable" ) )
-					.returns( true, IndexValueFieldTypeDescriptor::isAggregable );
+					.returns( true, IndexValueFieldTypeDescriptor::aggregable );
 		}
 		assertThat( getTypeDescriptor( "nonAggregable" ) )
-				.returns( false, IndexValueFieldTypeDescriptor::isAggregable );
+				.returns( false, IndexValueFieldTypeDescriptor::aggregable );
 	}
 
 	@Test

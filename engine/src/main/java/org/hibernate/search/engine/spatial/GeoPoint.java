@@ -15,12 +15,30 @@ public interface GeoPoint {
 	/**
 	 * @return the latitude, in degrees
 	 */
-	double getLatitude();
+	double latitude();
+
+	/**
+	 * @return the latitude, in degrees
+	 * @deprecated Use {@link #latitude()} instead.
+	 */
+	@Deprecated
+	default double getLatitude() {
+		return latitude();
+	}
 
 	/**
 	 * @return the longitude, in degrees
 	 */
-	double getLongitude();
+	double longitude();
+
+	/**
+	 * @return the longitude, in degrees
+	 * @deprecated Use {@link #longitude()} instead.
+	 */
+	@Deprecated
+	default double getLongitude() {
+		return longitude();
+	}
 
 	/**
 	 * Create a {@link GeoPoint} from a latitude and a longitude.

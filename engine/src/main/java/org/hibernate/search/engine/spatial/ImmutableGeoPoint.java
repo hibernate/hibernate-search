@@ -45,12 +45,12 @@ final class ImmutableGeoPoint implements GeoPoint {
 	}
 
 	@Override
-	public double getLatitude() {
+	public double latitude() {
 		return latitude;
 	}
 
 	@Override
-	public double getLongitude() {
+	public double longitude() {
 		return longitude;
 	}
 

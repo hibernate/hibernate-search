@@ -46,8 +46,18 @@ public class FailureContext {
 	 * @return The {@link Exception} or {@link Error} thrown when the operation failed.
 	 * Never {@code null}.
 	 */
+	public Throwable throwable() {
+		return throwable;
+	}
+
+	/**
+	 * @return The {@link Exception} or {@link Error} thrown when the operation failed.
+	 * Never {@code null}.
+	 * @deprecated Use {@link #throwable} instead.
+	 */
+	@Deprecated
 	public Throwable getThrowable() {
-		return this.throwable;
+		return throwable();
 	}
 
 	/**
@@ -55,6 +65,17 @@ public class FailureContext {
 	 * Never {@code null}.
 	 * Use {@link Object#toString()} to get a textual representation.
 	 */
+	public Object failingOperation() {
+		return this.failingOperation;
+	}
+
+	/**
+	 * @return The operation that triggered the failure.
+	 * Never {@code null}.
+	 * Use {@link Object#toString()} to get a textual representation.
+	 * @deprecated Use {@link #failingOperation()} instead.
+	 */
+	@Deprecated
 	public Object getFailingOperation() {
 		return this.failingOperation;
 	}

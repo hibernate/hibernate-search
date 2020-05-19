@@ -26,17 +26,17 @@ public class LogFailureHandler implements FailureHandler {
 
 	@Override
 	public void handle(FailureContext context) {
-		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
+		log.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
 	}
 
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
-		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
+		log.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );
 	}
 
 	private StringBuilder formatMessage(FailureContext context) {
-		final Throwable throwable = context.getThrowable();
-		final Object failingOperation = context.getFailingOperation();
+		final Throwable throwable = context.throwable();
+		final Object failingOperation = context.failingOperation();
 
 		final StringBuilder messageBuilder = new StringBuilder();
 
@@ -51,7 +51,7 @@ public class LogFailureHandler implements FailureHandler {
 	}
 
 	private StringBuilder formatMessage(EntityIndexingFailureContext context) {
-		final List<?> entityReferences = context.getEntityReferences();
+		final List<?> entityReferences = context.entityReferences();
 
 		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
 

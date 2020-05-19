@@ -16,8 +16,20 @@ public final class Version {
 		//not allowed
 	}
 
-	public static String getVersionString() {
+	/**
+	 * @return A string representation of the version of Hibernate Search.
+	 */
+	public static String versionString() {
 		return Version.class.getPackage().getImplementationVersion();
+	}
+
+	/**
+	 * @return A string representation of the version of Hibernate Search.
+	 * @deprecated Use {@link #versionString()} instead.
+	 */
+	@Deprecated
+	public static String getVersionString() {
+		return versionString();
 	}
 
 }

@@ -43,11 +43,11 @@ public class IndexObjectFieldTypeDescriptorBaseIT {
 	@Test
 	public void isNested() {
 		assertThat( getTypeDescriptor( "default" ) )
-				.returns( false, IndexObjectFieldTypeDescriptor::isNested );
+				.returns( false, IndexObjectFieldTypeDescriptor::nested );
 		assertThat( getTypeDescriptor( "flattened" ) )
-				.returns( false, IndexObjectFieldTypeDescriptor::isNested );
+				.returns( false, IndexObjectFieldTypeDescriptor::nested );
 		assertThat( getTypeDescriptor( "nested" ) )
-				.returns( true, IndexObjectFieldTypeDescriptor::isNested );
+				.returns( true, IndexObjectFieldTypeDescriptor::nested );
 	}
 
 	private IndexObjectFieldTypeDescriptor getTypeDescriptor(String fieldName) {

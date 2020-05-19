@@ -99,7 +99,7 @@ public class IndexingFieldTypesIT<F> {
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
 					.select( f -> f.composite(
-							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
+							(ref, val) -> new IdAndValue<>( ref.id(), val ),
 							f.entityReference(),
 							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
 					) )
@@ -139,7 +139,7 @@ public class IndexingFieldTypesIT<F> {
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
 					.select( f -> f.composite(
-							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
+							(ref, val) -> new IdAndValue<>( ref.id(), val ),
 							f.entityReference(),
 							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
 					) )
@@ -186,7 +186,7 @@ public class IndexingFieldTypesIT<F> {
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
 					.select( f -> f.composite(
-							(ref, val) -> new IdAndValue<>( ref.getId(), val ),
+							(ref, val) -> new IdAndValue<>( ref.id(), val ),
 							f.entityReference(),
 							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
 					) )

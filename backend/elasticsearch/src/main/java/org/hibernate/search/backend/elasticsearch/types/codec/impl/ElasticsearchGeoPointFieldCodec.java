@@ -38,8 +38,8 @@ public class ElasticsearchGeoPointFieldCodec implements ElasticsearchFieldCodec<
 			return JsonNull.INSTANCE;
 		}
 		JsonObject result = new JsonObject();
-		LATITUDE_ACCESSOR.set( result, value.getLatitude() );
-		LONGITUDE_ACCESSOR.set( result, value.getLongitude() );
+		LATITUDE_ACCESSOR.set( result, value.latitude() );
+		LONGITUDE_ACCESSOR.set( result, value.longitude() );
 		return result;
 	}
 

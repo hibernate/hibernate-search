@@ -21,28 +21,72 @@ public interface IndexValueFieldTypeDescriptor {
 	 * Some sorts may still be unsupported because they don't make sense
 	 * (e.g. a "within circle" predicate on a string field).
 	 */
-	boolean isSearchable();
+	boolean searchable();
+
+	/**
+	 * @return {@code true} if search predicates are supported on fields of this type.
+	 * Some sorts may still be unsupported because they don't make sense
+	 * (e.g. a "within circle" predicate on a string field).
+	 * @deprecated Use {@link #searchable()} instead.
+	 */
+	@Deprecated
+	default boolean isSearchable() {
+		return searchable();
+	}
 
 	/**
 	 * @return {@code true} if sorts are supported on fields of this type.
 	 * Some sorts may still be unsupported because they don't make sense
 	 * (e.g. a distance sort aggregation on a string field).
 	 */
-	boolean isSortable();
+	boolean sortable();
+
+	/**
+	 * @return {@code true} if sorts are supported on fields of this type.
+	 * Some sorts may still be unsupported because they don't make sense
+	 * (e.g. a distance sort aggregation on a string field).
+	 * @deprecated Use {@link #sortable()} instead.
+	 */
+	@Deprecated
+	default boolean isSortable() {
+		return sortable();
+	}
 
 	/**
 	 * @return {@code true} if projections are supported on fields of this type.
 	 * Some projections may still be unsupported because they don't make sense
 	 * (e.g. a distance projection aggregation on a string field).
 	 */
-	boolean isProjectable();
+	boolean projectable();
+
+	/**
+	 * @return {@code true} if projections are supported on fields of this type.
+	 * Some projections may still be unsupported because they don't make sense
+	 * (e.g. a distance projection aggregation on a string field).
+	 * @deprecated Use {@link #projectable()} instead.
+	 */
+	@Deprecated
+	default boolean isProjectable() {
+		return projectable();
+	}
 
 	/**
 	 * @return {@code true} if aggregations are supported on fields of this type.
 	 * Some aggregations may still be unsupported because they don't make sense
 	 * (e.g. a range aggregation on an analyzed string field).
 	 */
-	boolean isAggregable();
+	boolean aggregable();
+
+	/**
+	 * @return {@code true} if aggregations are supported on fields of this type.
+	 * Some aggregations may still be unsupported because they don't make sense
+	 * (e.g. a range aggregation on an analyzed string field).
+	 * @deprecated Use {@link #aggregable()} instead.
+	 */
+	@Deprecated
+	default boolean isAggregable() {
+		return aggregable();
+	}
 
 	/**
 	 * @return The expected raw Java type of arguments passed to the DSL for this field.

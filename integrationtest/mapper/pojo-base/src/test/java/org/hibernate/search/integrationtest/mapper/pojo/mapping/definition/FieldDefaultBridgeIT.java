@@ -158,7 +158,7 @@ public class FieldDefaultBridgeIT<V, F> {
 					)
 			);
 
-			Assertions.<Object>assertThat( query.fetchAll().getHits() )
+			Assertions.<Object>assertThat( query.fetchAll().hits() )
 					.containsExactly( getProjectionValues().toArray() );
 		}
 	}

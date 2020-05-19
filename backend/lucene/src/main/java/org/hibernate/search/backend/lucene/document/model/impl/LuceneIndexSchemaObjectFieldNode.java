@@ -95,7 +95,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
-	public boolean isNested() {
+	public boolean nested() {
 		return ObjectFieldStorage.NESTED.equals( storage );
 	}
 

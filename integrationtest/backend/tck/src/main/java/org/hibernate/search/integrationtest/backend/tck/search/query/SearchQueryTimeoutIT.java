@@ -107,9 +107,9 @@ public class SearchQueryTimeoutIT {
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetchAll();
 
-		assertThat( result.getTotalHitCount() ).isLessThan( TOTAL_DOCUMENT_COUNT );
-		assertThat( result.getTook() ).isNotNull(); // May be 0 due to low resolution
-		assertThat( result.isTimedOut() ).isTrue();
+		assertThat( result.totalHitCount() ).isLessThan( TOTAL_DOCUMENT_COUNT );
+		assertThat( result.took() ).isNotNull(); // May be 0 due to low resolution
+		assertThat( result.timedOut() ).isTrue();
 	}
 
 	@Test
@@ -120,8 +120,8 @@ public class SearchQueryTimeoutIT {
 
 		SearchResultAssert.assertThat( result ).hasNoHits();
 
-		assertThat( result.getTook() ).isLessThan( Duration.ofDays( 1L ) );
-		assertThat( result.isTimedOut() ).isFalse();
+		assertThat( result.took() ).isLessThan( Duration.ofDays( 1L ) );
+		assertThat( result.timedOut() ).isFalse();
 	}
 
 	@Test

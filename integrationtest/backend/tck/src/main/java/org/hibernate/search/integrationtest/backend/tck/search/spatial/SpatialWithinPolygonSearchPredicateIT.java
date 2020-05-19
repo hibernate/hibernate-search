@@ -388,8 +388,8 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	private static GeoPolygon movePolygon(GeoPolygon originalPolygon, double degrees) {
 		List<GeoPoint> movedPoints = new ArrayList<>();
 
-		for ( GeoPoint originalPoint : originalPolygon.getPoints() ) {
-			movedPoints.add( GeoPoint.of( originalPoint.getLatitude() + degrees, originalPoint.getLongitude() + degrees ) );
+		for ( GeoPoint originalPoint : originalPolygon.points() ) {
+			movedPoints.add( GeoPoint.of( originalPoint.latitude() + degrees, originalPoint.longitude() + degrees ) );
 		}
 
 		return GeoPolygon.of( movedPoints );

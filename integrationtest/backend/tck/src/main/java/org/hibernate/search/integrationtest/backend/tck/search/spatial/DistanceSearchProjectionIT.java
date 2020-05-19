@@ -39,10 +39,10 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
 
-		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, null );
+		checkResult( results.hits().get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 1 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 3 ), null, null );
 	}
 
 	@Test
@@ -59,10 +59,10 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
 
-		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, null );
+		checkResult( results.hits().get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 1 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 3 ), null, null );
 	}
 
 	@Test
@@ -79,10 +79,10 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
 
-		checkResult( results.getHits().get( 0 ), 0.430d, Offset.offset( 0.010d ) );
-		checkResult( results.getHits().get( 1 ), 1.300d, Offset.offset( 0.010d ) );
-		checkResult( results.getHits().get( 2 ), 2.730d, Offset.offset( 0.010d ) );
-		checkResult( results.getHits().get( 3 ), null, null );
+		checkResult( results.hits().get( 0 ), 0.430d, Offset.offset( 0.010d ) );
+		checkResult( results.hits().get( 1 ), 1.300d, Offset.offset( 0.010d ) );
+		checkResult( results.hits().get( 2 ), 2.730d, Offset.offset( 0.010d ) );
+		checkResult( results.hits().get( 3 ), null, null );
 	}
 
 	@Test
@@ -103,20 +103,20 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<List<?>> results = query.fetchAll();
 
-		checkResult( (Double) results.getHits().get( 0 ).get( 0 ), 430d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 1 ).get( 0 ), 1300d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 2 ).get( 0 ), 2730d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 3 ).get( 0 ), null, null );
+		checkResult( (Double) results.hits().get( 0 ).get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 1 ).get( 0 ), 1300d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 2 ).get( 0 ), 2730d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 3 ).get( 0 ), null, null );
 
-		checkResult( (Double) results.getHits().get( 0 ).get( 1 ), 1780d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 1 ).get( 1 ), 1095d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 2 ).get( 1 ), 812d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 3 ).get( 1 ), null, null );
+		checkResult( (Double) results.hits().get( 0 ).get( 1 ), 1780d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 1 ).get( 1 ), 1095d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 2 ).get( 1 ), 812d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 3 ).get( 1 ), null, null );
 
-		checkResult( (Double) results.getHits().get( 0 ).get( 2 ), 136d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 1 ).get( 2 ), 136d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 2 ).get( 2 ), 136d, Offset.offset( 10d ) );
-		checkResult( (Double) results.getHits().get( 3 ).get( 2 ), null, null );
+		checkResult( (Double) results.hits().get( 0 ).get( 2 ), 136d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 1 ).get( 2 ), 136d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 2 ).get( 2 ), 136d, Offset.offset( 10d ) );
+		checkResult( (Double) results.hits().get( 3 ).get( 2 ), null, null );
 	}
 
 	@Test
@@ -137,10 +137,10 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
 
-		checkResult( results.getHits().get( 0 ), 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, null );
+		checkResult( results.hits().get( 0 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 1 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 3 ), null, null );
 	}
 
 	@Test
@@ -159,10 +159,10 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
 
-		checkResult( results.getHits().get( 0 ), 430d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 1 ), 1300d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 2 ), 2730d, Offset.offset( 10d ) );
-		checkResult( results.getHits().get( 3 ), null, null );
+		checkResult( results.hits().get( 0 ), 430d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 1 ), 1300d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 2 ), 2730d, Offset.offset( 10d ) );
+		checkResult( results.hits().get( 3 ), null, null );
 	}
 
 	@Test

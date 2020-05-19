@@ -44,8 +44,8 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 
 	@Override
 	public void boundingBox(GeoBoundingBox boundingBox) {
-		this.topLeft = codec.encode( boundingBox.getTopLeft() );
-		this.bottomRight = codec.encode( boundingBox.getBottomRight() );
+		this.topLeft = codec.encode( boundingBox.topLeft() );
+		this.bottomRight = codec.encode( boundingBox.bottomRight() );
 	}
 
 	@Override

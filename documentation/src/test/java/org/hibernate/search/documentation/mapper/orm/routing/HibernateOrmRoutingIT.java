@@ -75,7 +75,7 @@ public class HibernateOrmRoutingIT {
 			// end::routing-single[]
 
 			// We can't really test whether sharding worked here; see the backend TCK for such test.
-			assertThat( result.getHits() ).extracting( Book::getId )
+			assertThat( result.hits() ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 	}

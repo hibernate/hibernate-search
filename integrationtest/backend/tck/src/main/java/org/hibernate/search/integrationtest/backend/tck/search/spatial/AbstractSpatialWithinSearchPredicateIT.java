@@ -57,30 +57,30 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 				.add( OURSON_QUI_BOIT_ID, document -> {
 					document.addValue( mainIndex.binding().string, OURSON_QUI_BOIT_STRING );
 					document.addValue( mainIndex.binding().geoPoint, OURSON_QUI_BOIT_GEO_POINT );
-					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
-							OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
-					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
-							OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
+					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.latitude() - 1,
+							OURSON_QUI_BOIT_GEO_POINT.longitude() - 1 ) );
+					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.latitude() - 2,
+							OURSON_QUI_BOIT_GEO_POINT.longitude() - 2 ) );
 					document.addValue( mainIndex.binding().geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
 					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 				} )
 				.add( IMOUTO_ID, document -> {
 					document.addValue( mainIndex.binding().string, IMOUTO_STRING );
 					document.addValue( mainIndex.binding().geoPoint, IMOUTO_GEO_POINT );
-					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
-							IMOUTO_GEO_POINT.getLongitude() - 1 ) );
-					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
-							IMOUTO_GEO_POINT.getLongitude() - 2 ) );
+					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.latitude() - 1,
+							IMOUTO_GEO_POINT.longitude() - 1 ) );
+					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.latitude() - 2,
+							IMOUTO_GEO_POINT.longitude() - 2 ) );
 					document.addValue( mainIndex.binding().geoPoint_with_longName, IMOUTO_GEO_POINT );
 					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
 				} )
 				.add( CHEZ_MARGOTTE_ID, document -> {
 					document.addValue( mainIndex.binding().string, CHEZ_MARGOTTE_STRING );
 					document.addValue( mainIndex.binding().geoPoint, CHEZ_MARGOTTE_GEO_POINT );
-					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
-							CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
-					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
-							CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
+					document.addValue( mainIndex.binding().geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.latitude() - 1,
+							CHEZ_MARGOTTE_GEO_POINT.longitude() - 1 ) );
+					document.addValue( mainIndex.binding().geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.latitude() - 2,
+							CHEZ_MARGOTTE_GEO_POINT.longitude() - 2 ) );
 					document.addValue( mainIndex.binding().geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
 					document.addValue( mainIndex.binding().projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 				} )

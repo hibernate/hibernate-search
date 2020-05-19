@@ -196,9 +196,9 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		verifyAllAsynchronously();
 
 		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
+		assertThat( failureContext.throwable() )
 				.isSameAs( simulatedFailure );
-		assertThat( failureContext.getFailingOperation() ).asString()
+		assertThat( failureContext.failingOperation() ).asString()
 				.contains( "Executing task '" + NAME + "'" );
 
 		// The executor should still try to process submitted works, even after a failure
@@ -279,9 +279,9 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		verifyAllAsynchronously();
 
 		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
+		assertThat( failureContext.throwable() )
 				.isSameAs( simulatedFailure );
-		assertThat( failureContext.getFailingOperation() ).asString()
+		assertThat( failureContext.failingOperation() ).asString()
 				.contains( "Executing task '" + NAME + "'" );
 
 		// The executor should still try to process submitted works, even after a failure

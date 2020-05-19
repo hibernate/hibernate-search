@@ -25,12 +25,12 @@ final class ImmutableGeoBoundingBox implements GeoBoundingBox {
 	}
 
 	@Override
-	public GeoPoint getTopLeft() {
+	public GeoPoint topLeft() {
 		return topLeft;
 	}
 
 	@Override
-	public GeoPoint getBottomRight() {
+	public GeoPoint bottomRight() {
 		return bottomRight;
 	}
 

@@ -151,7 +151,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public String getQueryString() {
-		return delegate.getQueryString();
+		return delegate.queryString();
 	}
 
 	@Override

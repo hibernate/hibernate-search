@@ -37,10 +37,10 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends
 	@Override
 	public void polygon(GeoPolygon polygon) {
 		this.pointsArray = new JsonArray();
-		for ( GeoPoint point : polygon.getPoints() ) {
+		for ( GeoPoint point : polygon.points() ) {
 			JsonArray pointArray = new JsonArray();
-			pointArray.add( point.getLongitude() );
-			pointArray.add( point.getLatitude() );
+			pointArray.add( point.longitude() );
+			pointArray.add( point.latitude() );
 			pointsArray.add( pointArray );
 		}
 	}

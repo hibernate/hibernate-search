@@ -31,12 +31,12 @@ public class MyCoordinates implements GeoPoint { // <1>
 	}
 
 	@Override
-	public double getLatitude() { // <2>
+	public double latitude() { // <2>
 		return latitude;
 	}
 
 	@Override
-	public double getLongitude() {
+	public double longitude() {
 		return longitude;
 	}
 }

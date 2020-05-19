@@ -22,7 +22,7 @@ class LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.getBottomRight().getLatitude(), boundingBox.getTopLeft().getLatitude(),
-				boundingBox.getTopLeft().getLongitude(), boundingBox.getBottomRight().getLongitude() );
+		return LatLonPoint.newBoxQuery( absoluteFieldPath, boundingBox.bottomRight().latitude(), boundingBox.topLeft().latitude(),
+				boundingBox.topLeft().longitude(), boundingBox.bottomRight().longitude() );
 	}
 }

@@ -223,8 +223,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchResult<Float> result = query.fetchAll();
 		assertThat( result ).hasTotalHitCount( 2 );
 
-		Float score1 = result.getHits().get( 0 );
-		Float score2 = result.getHits().get( 1 );
+		Float score1 = result.hits().get( 0 );
+		Float score2 = result.hits().get( 1 );
 
 		Assertions.assertThat( score1 ).isNotNull().isNotNaN();
 		Assertions.assertThat( score2 ).isNotNull().isNotNaN();
@@ -248,8 +248,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchResult<Float> result = query.fetchAll();
 		assertThat( result ).hasTotalHitCount( 2 );
 
-		Float score1 = result.getHits().get( 0 );
-		Float score2 = result.getHits().get( 1 );
+		Float score1 = result.hits().get( 0 );
+		Float score2 = result.hits().get( 1 );
 
 		Assertions.assertThat( score1 ).isNotNull().isNotNaN();
 		Assertions.assertThat( score2 ).isNotNull().isNotNaN();

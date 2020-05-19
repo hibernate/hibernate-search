@@ -88,7 +88,7 @@ public class SearchSortIT {
 		SearchResult<DocumentReference> firstCallResult = query.fetchAll();
 		assertThat( firstCallResult ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-		List<DocumentReference> firstCallHits = firstCallResult.getHits();
+		List<DocumentReference> firstCallHits = firstCallResult.hits();
 
 		for ( int i = 0; i < INDEX_ORDER_CHECKS; ++i ) {
 			// Rebuild the query to bypass any cache in the query object

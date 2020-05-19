@@ -98,7 +98,7 @@ public class IndexFieldDescriptorIT {
 		assertThat( fieldDescriptor )
 				.returns( getRelativeFieldName(), IndexFieldDescriptor::relativeName )
 				.returns( getAbsoluteFieldPath(), IndexFieldDescriptor::absolutePath )
-				.returns( fieldStructure.isMultiValued(), IndexFieldDescriptor::isMultiValued );
+				.returns( fieldStructure.isMultiValued(), IndexFieldDescriptor::multiValued );
 
 		// Type
 		// More advanced tests in IndexValueFieldTypeDescriptorIT
@@ -149,7 +149,7 @@ public class IndexFieldDescriptorIT {
 				.returns( getParentAbsoluteFieldPath(), IndexFieldDescriptor::absolutePath )
 				// In this specific test, we decided that nested fields are multi-valued, while flattened fields are not.
 				// That's just a detail though: the two characteristics are not usually related.
-				.returns( fieldStructure.isInNested(), IndexFieldDescriptor::isMultiValued );
+				.returns( fieldStructure.isInNested(), IndexFieldDescriptor::multiValued );
 
 		// Type
 		// More advanced tests in IndexObjectFieldTypeDescriptorIT

@@ -26,8 +26,8 @@ public class GeoPointDistanceDocValues extends SortedNumericDoubleDocValues {
 
 	public GeoPointDistanceDocValues(SortedNumericDocValues values, GeoPoint center) {
 		this.values = values;
-		this.latitude = center.getLatitude();
-		this.longitude = center.getLongitude();
+		this.latitude = center.latitude();
+		this.longitude = center.longitude();
 	}
 
 	@Override

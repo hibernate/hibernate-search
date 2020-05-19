@@ -120,7 +120,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 		JsonObject geoPoint = projectedFieldElement.get().getAsJsonObject();
 		double distanceInMeters = SloppyMath.haversinMeters(
-				center.getLatitude(), center.getLongitude(), geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
+				center.latitude(), center.longitude(), geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
 
 		return Optional.of( unit.fromMeters( distanceInMeters ) );
 	}
@@ -152,9 +152,9 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		sb.append( "distance_" )
 				.append( absoluteFieldPath )
 				.append( "_" )
-				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.getLatitude() ) ).replaceAll( "_" ) )
+				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.latitude() ) ).replaceAll( "_" ) )
 				.append( "_" )
-				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.getLongitude() ) ).replaceAll( "_" ) )
+				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.longitude() ) ).replaceAll( "_" ) )
 				.append( "_" )
 				.append( unit.name() );
 		return sb.toString();
@@ -165,8 +165,8 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			absoluteFieldPath.substring( nestedPath.length() + 1 ) : null;
 
 		JsonObject params = new JsonObject();
-		params.addProperty( "lat", center.getLatitude() );
-		params.addProperty( "lon", center.getLongitude() );
+		params.addProperty( "lat", center.latitude() );
+		params.addProperty( "lon", center.longitude() );
 		params.addProperty( "fieldPath", absoluteFieldPath );
 		params.addProperty( "nestedPath", nestedPath );
 		params.addProperty( "relativeFieldPath", relativeFieldPath );

@@ -33,8 +33,20 @@ public class EntityIndexingFailureContext extends FailureContext {
 	 * Use {@link Object#toString()} to get a textual representation of each reference,
 	 * or cast it to the mapper-specific {@code EntityReference} type.
 	 */
-	public List<Object> getEntityReferences() {
+	public List<Object> entityReferences() {
 		return entityReferences;
+	}
+
+	/**
+	 * @return A list of references to entities that may not be indexed correctly as a result of the failure.
+	 * Never {@code null}, but may be empty.
+	 * Use {@link Object#toString()} to get a textual representation of each reference,
+	 * or cast it to the mapper-specific {@code EntityReference} type.
+	 * @deprecated Use {@link #entityReferences()} instead.
+	 */
+	@Deprecated
+	public List<Object> getEntityReferences() {
+		return entityReferences();
 	}
 
 	public static class Builder extends FailureContext.Builder {

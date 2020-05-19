@@ -83,9 +83,9 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 				)
 				.fetch( offset, limit );
 		return new LibraryFacetedSearchResult(
-				result.getTotalHitCount(), result.getHits(),
-				result.getAggregation( aggByCollectionSizekey ),
-				result.getAggregation( aggByLibraryServiceKey )
+				result.totalHitCount(), result.hits(),
+				result.aggregation( aggByCollectionSizekey ),
+				result.aggregation( aggByLibraryServiceKey )
 		);
 	}
 }

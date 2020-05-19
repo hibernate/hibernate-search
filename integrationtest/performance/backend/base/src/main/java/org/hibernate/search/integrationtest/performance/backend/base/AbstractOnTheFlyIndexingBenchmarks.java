@@ -175,8 +175,8 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 				.sort( f -> f.field( MappedIndex.SHORT_TEXT_FIELD_NAME ) )
 				.fetch( params.getQueryMaxResults() );
 
-		blackhole.consume( results.getTotalHitCount() );
-		for ( DocumentReference hit : results.getHits() ) {
+		blackhole.consume( results.totalHitCount() );
+		for ( DocumentReference hit : results.hits() ) {
 			blackhole.consume( hit );
 		}
 	}

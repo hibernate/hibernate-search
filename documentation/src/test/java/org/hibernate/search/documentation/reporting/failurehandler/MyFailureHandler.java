@@ -26,18 +26,18 @@ public class MyFailureHandler implements FailureHandler {
 
 	@Override
 	public void handle(FailureContext context) { // <1>
-		String failingOperationDescription = context.getFailingOperation().toString(); // <2>
-		Throwable throwable = context.getThrowable(); // <3>
+		String failingOperationDescription = context.failingOperation().toString(); // <2>
+		Throwable throwable = context.throwable(); // <3>
 
 		// ... report the failure ... // <4>
 	}
 
 	@Override
 	public void handle(EntityIndexingFailureContext context) { // <5>
-		String failingOperationDescription = context.getFailingOperation().toString();
-		Throwable throwable = context.getThrowable();
+		String failingOperationDescription = context.failingOperation().toString();
+		Throwable throwable = context.throwable();
 		List<String> entityReferencesAsStrings = new ArrayList<>();
-		for ( Object entityReference : context.getEntityReferences() ) { // <6>
+		for ( Object entityReference : context.entityReferences() ) { // <6>
 			entityReferencesAsStrings.add( entityReference.toString() );
 		}
 

@@ -101,7 +101,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	}
 
 	@Override
-	public boolean isNested() {
+	public boolean nested() {
 		return ObjectFieldStorage.NESTED.equals( storage );
 	}
 

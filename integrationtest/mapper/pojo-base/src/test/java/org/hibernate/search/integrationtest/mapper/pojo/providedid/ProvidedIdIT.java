@@ -83,7 +83,7 @@ public class ProvidedIdIT {
 					.where( f -> f.matchAll() )
 					.toQuery();
 
-			assertThat( query.fetchAll().getHits() )
+			assertThat( query.fetchAll().hits() )
 					.containsExactly( EntityReferenceImpl.withName( IndexedEntity.class, entityAndIndexName, "42" ) );
 		}
 		backendMock.verifyExpectationsMet();

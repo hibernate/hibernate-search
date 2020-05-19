@@ -118,7 +118,7 @@ public interface SearchQueryOptionsStep<
 
 	/**
 	 * Add an aggregation to this query.
-	 * @param key The key that will be used to {@link SearchResult#getAggregation(AggregationKey) retrieve the aggregation}
+	 * @param key The key that will be used to {@link SearchResult#aggregation(AggregationKey) retrieve the aggregation}
 	 * from the {@link SearchResult}.
 	 * @param aggregation A {@link SearchAggregation} object obtained from the search scope.
 	 * @param <T> The type of aggregation values.
@@ -128,7 +128,7 @@ public interface SearchQueryOptionsStep<
 
 	/**
 	 * Add an aggregation to this query.
-	 * @param key The key that will be used to {@link SearchResult#getAggregation(AggregationKey) retrieve the aggregation}
+	 * @param key The key that will be used to {@link SearchResult#aggregation(AggregationKey) retrieve the aggregation}
 	 * from the {@link SearchResult}.
 	 * @param aggregationContributor A function that will use the factory passed in parameter to create an aggregation,
 	 * returning the final step in the sort DSL.

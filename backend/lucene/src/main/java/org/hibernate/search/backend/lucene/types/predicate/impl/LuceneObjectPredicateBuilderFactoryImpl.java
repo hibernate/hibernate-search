@@ -63,7 +63,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	private void addLeafFields(LuceneIndexSchemaObjectFieldNode objectNode) {
 		for ( AbstractLuceneIndexSchemaFieldNode child : objectNode.staticChildren() ) {
-			if ( child.isObjectField() && !child.toObjectField().type().isNested() ) {
+			if ( child.isObjectField() && !child.toObjectField().type().nested() ) {
 				// add recursively flattened nested object fields: this is the ES behavior
 				addLeafFields( child.toObjectField() );
 			}

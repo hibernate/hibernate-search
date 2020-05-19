@@ -79,12 +79,12 @@ public class AnnotationMappingGeoPointBindingIT {
 			entity2.setId( 2 );
 			entity2.setCoord( new GeoPoint() {
 				@Override
-				public double getLatitude() {
+				public double latitude() {
 					return 2.1d;
 				}
 
 				@Override
-				public double getLongitude() {
+				public double longitude() {
 					return 2.2d;
 				}
 			} );

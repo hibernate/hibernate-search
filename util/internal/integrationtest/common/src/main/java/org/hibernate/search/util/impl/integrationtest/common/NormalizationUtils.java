@@ -79,7 +79,7 @@ public final class NormalizationUtils {
 	}
 
 	public static DocumentReference normalize(DocumentReference original) {
-		return original == null ? null : reference( original.getTypeName(), original.getId() );
+		return original == null ? null : reference( original.typeName(), original.id() );
 	}
 
 	public static BigDecimal normalize(BigDecimal original) {
@@ -126,12 +126,12 @@ public final class NormalizationUtils {
 		}
 
 		@Override
-		public String getTypeName() {
+		public String typeName() {
 			return typeName;
 		}
 
 		@Override
-		public String getId() {
+		public String id() {
 			return id;
 		}
 

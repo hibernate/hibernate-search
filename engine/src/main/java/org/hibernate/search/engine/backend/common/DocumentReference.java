@@ -15,7 +15,17 @@ public interface DocumentReference {
 	 * @return The name of the type of the referenced document.
 	 * The type name is mapper-specific. For example, in the Hibernate ORM mapper, it will be the JPA entity name.
 	 */
-	String getTypeName();
+	String typeName();
+
+	/**
+	 * @return The name of the type of the referenced document.
+	 * The type name is mapper-specific. For example, in the Hibernate ORM mapper, it will be the JPA entity name.
+	 * @deprecated Use {@link #typeName()} instead.
+	 */
+	@Deprecated
+	default String getTypeName() {
+		return typeName();
+	}
 
 	/**
 	 * @return The identifier of the referenced document.
@@ -23,6 +33,18 @@ public interface DocumentReference {
 	 * i.e. it does <strong>not</strong> take into account backend-specific transformations
 	 * such as appending a tenant ID when using multi-tenancy.
 	 */
-	String getId();
+	String id();
+
+	/**
+	 * @return The identifier of the referenced document.
+	 * The identifier is returned as it was generated during document building,
+	 * i.e. it does <strong>not</strong> take into account backend-specific transformations
+	 * such as appending a tenant ID when using multi-tenancy.
+	 * @deprecated Use {@link #id()} instead.
+	 */
+	@Deprecated
+	default String getId() {
+		return id();
+	}
 
 }
