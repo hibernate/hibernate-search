@@ -103,11 +103,31 @@ public interface SearchMapping {
 	 * @param indexName The key to get the required {@link IndexManager} instance.
 	 * @return The index manager for the index having {@code indexName} as name.
 	 */
-	IndexManager getIndexManager(String indexName);
+	IndexManager indexManager(String indexName);
+
+	/**
+	 * @param indexName The key to get the required {@link IndexManager} instance.
+	 * @return The index manager for the index having {@code indexName} as name.
+	 * @deprecated Use {@link #indexManager(String)} instead.
+	 */
+	@Deprecated
+	default IndexManager getIndexManager(String indexName) {
+		return indexManager( indexName );
+	}
 
 	/**
 	 * @param backendName The key to get the required {@link Backend} instance.
 	 * @return The backend having {@code backendName} as name.
 	 */
-	Backend getBackend(String backendName);
+	Backend backend(String backendName);
+
+	/**
+	 * @param backendName The key to get the required {@link Backend} instance.
+	 * @return The backend having {@code backendName} as name.
+	 * @deprecated Use {@link #backend(String)} instead.
+	 */
+	@Deprecated
+	default Backend getBackend(String backendName) {
+		return backend( backendName );
+	}
 }

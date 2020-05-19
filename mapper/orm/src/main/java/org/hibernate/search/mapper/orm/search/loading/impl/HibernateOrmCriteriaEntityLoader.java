@@ -65,7 +65,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference) {
 		Map<Object, EntityReference> documentIdSourceValueToReference = new HashMap<>();
 		for ( EntityReference reference : references ) {
-			documentIdSourceValueToReference.put( reference.getId(), reference );
+			documentIdSourceValueToReference.put( reference.id(), reference );
 		}
 
 		List<? extends E> loadedEntities = loadEntities( documentIdSourceValueToReference.keySet() );

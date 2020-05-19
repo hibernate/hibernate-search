@@ -254,7 +254,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
 
-			Session session = context.extension( HibernateOrmExtension.get() ).getSession();
+			Session session = context.extension( HibernateOrmExtension.get() ).session();
 			/*
 			 * Note this approach is rather limited as it does not allow batching.
 			 * HSEARCH-1937 should address this problem.

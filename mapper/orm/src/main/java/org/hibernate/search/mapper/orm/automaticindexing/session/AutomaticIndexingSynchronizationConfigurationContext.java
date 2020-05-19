@@ -39,8 +39,8 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 * The future will be completed with an execution report once all document changes are applied.
 	 * If any document change or the commit/refresh required by{@link #documentCommitStrategy(DocumentCommitStrategy)}
 	 * and {@link #documentRefreshStrategy(DocumentRefreshStrategy)} failed,
-	 * the report will {@link SearchIndexingPlanExecutionReport#getThrowable() contain a throwable}
-	 * and (if applicable) {@link SearchIndexingPlanExecutionReport#getFailingEntities() a list of failing entities}.
+	 * the report will {@link SearchIndexingPlanExecutionReport#throwable() contain a throwable}
+	 * and (if applicable) {@link SearchIndexingPlanExecutionReport#failingEntities() a list of failing entities}.
 	 */
 	void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler);
 
@@ -48,6 +48,16 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 * @return The failure handler.
 	 * Use this to report failures that cannot be propagated by the {@link #indexingFutureHandler(Consumer)}.
 	 */
-	FailureHandler getFailureHandler();
+	FailureHandler failureHandler();
+
+	/**
+	 * @return The failure handler.
+	 * Use this to report failures that cannot be propagated by the {@link #indexingFutureHandler(Consumer)}.
+	 * @deprecated Use {@link #failureHandler()} instead.
+	 */
+	@Deprecated
+	default FailureHandler getFailureHandler() {
+		return failureHandler();
+	}
 
 }

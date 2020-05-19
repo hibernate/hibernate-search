@@ -38,7 +38,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 		SessionFactory sessionFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-						strategyName == null ? null : strategyName.getExternalRepresentation()
+						strategyName == null ? null : strategyName.externalRepresentation()
 				)
 				.setup();
 		// Nothing should have happened
@@ -120,7 +120,7 @@ public abstract class AbstractSchemaManagementStrategyIT {
 		return setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
-						strategyName == null ? null : strategyName.getExternalRepresentation()
+						strategyName == null ? null : strategyName.externalRepresentation()
 				)
 				.setup( IndexedEntity1.class, IndexedEntity2.class );
 	}

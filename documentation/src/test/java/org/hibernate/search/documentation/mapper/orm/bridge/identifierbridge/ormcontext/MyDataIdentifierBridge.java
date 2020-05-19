@@ -19,7 +19,7 @@ public class MyDataIdentifierBridge implements IdentifierBridge<MyData> {
 	@Override
 	public String toDocumentIdentifier(MyData propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
 		SessionFactory sessionFactory = context.extension( HibernateOrmExtension.get() ) // <1>
-				.getSessionFactory(); // <2>
+				.sessionFactory(); // <2>
 		// ... do something with the factory ...
 		//end::include[]
 		/*
@@ -36,7 +36,7 @@ public class MyDataIdentifierBridge implements IdentifierBridge<MyData> {
 	public MyData fromDocumentIdentifier(String documentIdentifier,
 			IdentifierBridgeFromDocumentIdentifierContext context) {
 		Session session = context.extension( HibernateOrmExtension.get() ) // <3>
-				.getSession(); // <4>
+				.session(); // <4>
 		// ... do something with the session ...
 		//end::include[]
 		/*

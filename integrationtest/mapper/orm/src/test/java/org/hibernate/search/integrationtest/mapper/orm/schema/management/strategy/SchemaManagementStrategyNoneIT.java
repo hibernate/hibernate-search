@@ -50,7 +50,7 @@ public class SchemaManagementStrategyNoneIT {
 	}
 
 	protected String getStrategyName() {
-		return SchemaManagementStrategyName.NONE.getExternalRepresentation();
+		return SchemaManagementStrategyName.NONE.externalRepresentation();
 	}
 
 	@Entity(name = IndexedEntity1.NAME)

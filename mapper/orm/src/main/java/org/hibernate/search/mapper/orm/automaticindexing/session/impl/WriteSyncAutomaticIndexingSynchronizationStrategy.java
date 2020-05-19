@@ -40,8 +40,8 @@ public final class WriteSyncAutomaticIndexingSynchronizationStrategy
 		context.indexingFutureHandler( future -> {
 			// Wait for the result of indexing, so that we're sure changes were committed.
 			SearchIndexingPlanExecutionReport report = Futures.unwrappedExceptionJoin( future );
-			report.getThrowable().ifPresent( t -> {
-				throw log.indexingFailure( t.getMessage(), report.getFailingEntities(), t );
+			report.throwable().ifPresent( t -> {
+				throw log.indexingFailure( t.getMessage(), report.failingEntities(), t );
 			} );
 		} );
 	}

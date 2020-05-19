@@ -220,5 +220,22 @@ public interface SearchSession {
 	 * @param synchronizationStrategy The synchronization strategy to use
 	 * @see AutomaticIndexingSynchronizationStrategy
 	 */
-	void setAutomaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
+	void automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
+
+	/**
+	 * Set the {@link AutomaticIndexingSynchronizationStrategy} to use for this session.
+	 * <p>
+	 * Behavior is undefined if called while entity changes are pending:
+	 * be sure to call this only just after creating a session,
+	 * or just after committing a transaction.
+	 *
+	 * @param synchronizationStrategy The synchronization strategy to use
+	 * @see AutomaticIndexingSynchronizationStrategy
+	 * @deprecated Use {@link #automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy)} instead.
+	 */
+	@Deprecated
+	default void setAutomaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+		automaticIndexingSynchronizationStrategy( synchronizationStrategy );
+	}
+
 }

@@ -13,6 +13,15 @@ public interface HibernateOrmMappingContext {
 	/**
 	 * @return The Hibernate ORM {@link SessionFactory}.
 	 */
-	SessionFactory getSessionFactory();
+	SessionFactory sessionFactory();
+
+	/**
+	 * @return The Hibernate ORM {@link SessionFactory}.
+	 * @deprecated Use {@link #sessionFactory()} instead.
+	 */
+	@Deprecated
+	default SessionFactory getSessionFactory() {
+		return sessionFactory();
+	}
 
 }

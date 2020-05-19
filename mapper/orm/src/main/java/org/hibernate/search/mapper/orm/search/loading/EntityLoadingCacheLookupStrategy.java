@@ -51,7 +51,7 @@ public enum EntityLoadingCacheLookupStrategy {
 	public static EntityLoadingCacheLookupStrategy of(String value) {
 		return StringHelper.parseDiscreteValues(
 				EntityLoadingCacheLookupStrategy.values(),
-				EntityLoadingCacheLookupStrategy::getExternalRepresentation,
+				EntityLoadingCacheLookupStrategy::externalRepresentation,
 				log::invalidAutomaticIndexingSynchronizationStrategyName,
 				value
 		);
@@ -63,7 +63,10 @@ public enum EntityLoadingCacheLookupStrategy {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	public String externalRepresentation() {
 		return externalRepresentation;
 	}
 

@@ -34,17 +34,17 @@ public class EntityReferenceImpl implements EntityReference {
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> type() {
 		return typeIdentifier.getJavaClass();
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return name;
 	}
 
 	@Override
-	public Object getId() {
+	public Object id() {
 		return id;
 	}
 

@@ -38,7 +38,7 @@ public final class AsyncAutomaticIndexingSynchronizationStrategy
 	public void apply(AutomaticIndexingSynchronizationConfigurationContext context) {
 		context.documentCommitStrategy( DocumentCommitStrategy.NONE );
 		context.documentRefreshStrategy( DocumentRefreshStrategy.NONE );
-		FailureHandler failureHandler = context.getFailureHandler();
+		FailureHandler failureHandler = context.failureHandler();
 		context.indexingFutureHandler( future -> {
 			future.whenComplete( Futures.handler( (result, throwable) -> {
 				if ( throwable != null ) {
@@ -47,11 +47,11 @@ public final class AsyncAutomaticIndexingSynchronizationStrategy
 					contextBuilder.failingOperation( log.automaticIndexing() );
 					failureHandler.handle( contextBuilder.build() );
 				}
-				else if ( result != null && result.getThrowable().isPresent() ) {
+				else if ( result != null && result.throwable().isPresent() ) {
 					EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
-					contextBuilder.throwable( result.getThrowable().get() );
+					contextBuilder.throwable( result.throwable().get() );
 					contextBuilder.failingOperation( log.automaticIndexing() );
-					for ( EntityReference entityReference : result.getFailingEntities() ) {
+					for ( EntityReference entityReference : result.failingEntities() ) {
 						contextBuilder.entityReference( entityReference );
 					}
 					failureHandler.handle( contextBuilder.build() );

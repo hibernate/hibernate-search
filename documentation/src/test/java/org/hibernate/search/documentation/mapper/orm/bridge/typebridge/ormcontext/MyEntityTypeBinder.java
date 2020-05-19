@@ -39,7 +39,7 @@ public class MyEntityTypeBinder implements TypeBinder {
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			Session session = context.extension( HibernateOrmExtension.get() ) // <1>
-					.getSession(); // <2>
+					.session(); // <2>
 			// ... do something with the session ...
 			//end::include[]
 			/*

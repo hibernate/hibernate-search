@@ -113,7 +113,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		this.typeContextProvider = builder.typeContextProvider;
 		this.sessionImplementor = builder.sessionImplementor;
 		this.runtimeIntrospector = builder.buildRuntimeIntrospector();
-		setAutomaticIndexingSynchronizationStrategy( builder.automaticIndexingSynchronizationStrategy );
+		automaticIndexingSynchronizationStrategy( builder.automaticIndexingSynchronizationStrategy );
 	}
 
 	public void close() {
@@ -122,7 +122,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	@Override
 	public String getTenantIdentifier() {
-		return getSession().getTenantIdentifier();
+		return session().getTenantIdentifier();
 	}
 
 	@Override
@@ -190,7 +190,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public void setAutomaticIndexingSynchronizationStrategy(
+	public void automaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
 				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.getFailureHandler() );
@@ -199,8 +199,14 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public SessionImplementor getSession() {
+	public SessionImplementor session() {
 		return sessionImplementor;
+	}
+
+	// FIXME HSEARCH-3922 remove this once the SPIs have been updated.
+	@Override
+	public SessionImplementor getSession() {
+		return session();
 	}
 
 	@Override
