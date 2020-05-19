@@ -520,7 +520,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 [WARNING]
 ====
 The resulting query *does not support all operations*,
-so is recommended to only convert search queries when absolutely required,
+so it is recommended to only convert search queries when absolutely required,
 for example when integrating with code that only works with Hibernate ORM queries.
 
 The following operations are expected to work correctly in most cases,

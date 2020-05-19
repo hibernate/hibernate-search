@@ -1424,9 +1424,9 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/de
 ----
 <1> Authors are modeled as a list of string containing the author names.
 <2> The transient `mainAuthor` property dynamically returns the main author (the first one).
-<3> We use `@FullTextField` to on the `getMainAuthor()` getter to index the name of the main author.
+<3> We use `@FullTextField` on the `getMainAuthor()` getter to index the name of the main author.
 <4> We use `@IndexingDependency.derivedFrom` to tell Hibernate Search
-that whenever the list of authors changes, the result of `getMainAuthor()` main author may have changed.
+that whenever the list of authors changes, the result of `getMainAuthor()` may have changed.
 ====
 
 [[mapper-orm-reindexing-reindexonupdate]]
