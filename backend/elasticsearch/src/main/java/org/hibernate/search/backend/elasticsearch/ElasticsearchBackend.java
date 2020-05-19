@@ -21,6 +21,22 @@ public interface ElasticsearchBackend extends Backend {
 	 * @return The client.
 	 * @throws SearchException if the underlying client does not implement the given class.
 	 */
-	<T> T getClient(Class<T> clientClass);
+	<T> T client(Class<T> clientClass);
+
+	/**
+	 * Retrieve the underlying, low-level client used to communicate with the Elasticsearch cluster.
+	 * <p>
+	 * <strong>WARNING - Unsupported API:</strong> the underlying client class may change without notice.
+	 *
+	 * @param clientClass The {@link Class} representing the expected client type
+	 * @param <T> The expected client type
+	 * @return The client.
+	 * @throws SearchException if the underlying client does not implement the given class.
+	 * @deprecated Use {@link #client(Class)} instead.
+	 */
+	@Deprecated
+	default <T> T getClient(Class<T> clientClass) {
+		return client( clientClass );
+	}
 
 }

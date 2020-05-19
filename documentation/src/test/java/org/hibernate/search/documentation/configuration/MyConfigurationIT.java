@@ -36,7 +36,7 @@ public class MyConfigurationIT {
 				BackendSettings.backendKey( myBackend, BackendSettings.TYPE ), ElasticsearchBackendSettings.TYPE_NAME );
 		config.put(
 				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
-				MultiTenancyStrategyName.DISCRIMINATOR.getExternalRepresentation()
+				MultiTenancyStrategyName.DISCRIMINATOR.externalRepresentation()
 		);
 		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION ), "7.7" );
 		config.put(
@@ -44,7 +44,7 @@ public class MyConfigurationIT {
 		// index configuration
 		config.put(
 				IndexSettings.indexDefaultsKey( myBackend, ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
-				IndexStatus.YELLOW.getElasticsearchString()
+				IndexStatus.YELLOW.externalRepresentation()
 		);
 		// orm configuration
 		config.put(

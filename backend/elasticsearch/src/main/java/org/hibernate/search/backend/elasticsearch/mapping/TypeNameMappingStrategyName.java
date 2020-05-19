@@ -33,7 +33,7 @@ public enum TypeNameMappingStrategyName {
 	public static TypeNameMappingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				TypeNameMappingStrategyName.values(),
-				TypeNameMappingStrategyName::getExternalRepresentation,
+				TypeNameMappingStrategyName::externalRepresentation,
 				log::invalidTypeNameMappingStrategyName,
 				value
 		);
@@ -45,7 +45,19 @@ public enum TypeNameMappingStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	private String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation()} instead.
+	 */
+	@Deprecated
+	private String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 }

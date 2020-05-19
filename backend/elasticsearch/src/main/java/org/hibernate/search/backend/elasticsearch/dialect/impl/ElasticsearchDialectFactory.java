@@ -33,8 +33,8 @@ public class ElasticsearchDialectFactory {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchModelDialect createModelDialect(ElasticsearchVersion version) {
-		int major = version.getMajor();
-		OptionalInt minorOptional = version.getMinor();
+		int major = version.major();
+		OptionalInt minorOptional = version.minor();
 
 		if ( major < 5 ) {
 			throw log.unsupportedElasticsearchVersion( version );
@@ -58,8 +58,8 @@ public class ElasticsearchDialectFactory {
 	}
 
 	public ElasticsearchProtocolDialect createProtocolDialect(ElasticsearchVersion version) {
-		int major = version.getMajor();
-		OptionalInt minorOptional = version.getMinor();
+		int major = version.major();
+		OptionalInt minorOptional = version.minor();
 		if ( !minorOptional.isPresent() ) {
 			// The version is supposed to be fetched from the cluster itself, so it should be complete
 			throw new AssertionFailure(

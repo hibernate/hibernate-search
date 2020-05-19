@@ -69,11 +69,11 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
-					assertThat( context.getPath() ).isEqualTo( "/" + defaultReadAlias( mainIndex.name() ).original + "/_search" );
+					assertThat( context.path() ).isEqualTo( "/" + defaultReadAlias( mainIndex.name() ).original + "/_search" );
 					String newPath = "/" + defaultReadAlias( otherIndex.name() ).original + "/_search";
-					context.setPath( newPath );
+					context.path( newPath );
 					// Changes should be visible immediately
-					assertThat( context.getPath() ).isEqualTo( newPath );
+					assertThat( context.path() ).isEqualTo( newPath );
 				} )
 				.toQuery();
 
@@ -96,11 +96,11 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
-					assertThat( context.getParametersMap() )
+					assertThat( context.parametersMap() )
 							.doesNotContainKeys( "search_type" );
-					context.getParametersMap().put( "search_type", "dfs_query_then_fetch" );
+					context.parametersMap().put( "search_type", "dfs_query_then_fetch" );
 					// Changes should be visible immediately
-					assertThat( context.getParametersMap() )
+					assertThat( context.parametersMap() )
 							.contains( entry( "search_type", "dfs_query_then_fetch" ) );
 				} )
 				.toQuery();
@@ -125,12 +125,12 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
-					assertThat( context.getBody() )
+					assertThat( context.body() )
 							.isNotNull()
 							.extracting( body -> body.get( "min_score" ) ).isNull();
-					context.getBody().addProperty( "min_score", 0.5f );
+					context.body().addProperty( "min_score", 0.5f );
 					// Changes should be visible immediately
-					assertThat( context.getBody() )
+					assertThat( context.body() )
 							.isNotNull()
 							.extracting( body -> body.get( "min_score" ) )
 							.extracting( JsonElement::getAsFloat ).isEqualTo( 0.5f );

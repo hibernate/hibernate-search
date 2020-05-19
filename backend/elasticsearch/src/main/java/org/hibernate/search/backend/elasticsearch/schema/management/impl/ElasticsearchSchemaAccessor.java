@@ -154,7 +154,7 @@ public class ElasticsearchSchemaAccessor {
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.unexpectedIndexStatus(
-							alias, requiredIndexStatus.getElasticsearchString(), timeoutAndUnit,
+							alias, requiredIndexStatus.externalRepresentation(), timeoutAndUnit,
 							Throwables.expectException( e )
 					);
 				} ) );

@@ -153,7 +153,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	}
 
 	@Override
-	public <T> T getClient(Class<T> clientClass) {
+	public <T> T client(Class<T> clientClass) {
 		return link.getClient().unwrap( clientClass );
 	}
 

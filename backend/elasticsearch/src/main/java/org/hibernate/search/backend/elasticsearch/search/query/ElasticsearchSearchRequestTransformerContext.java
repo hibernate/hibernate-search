@@ -27,26 +27,67 @@ public interface ElasticsearchSearchRequestTransformerContext {
 	/**
 	 * @return The URL-encoded path of the HTTP request for this search.
 	 */
-	String getPath();
+	String path();
+
+	/**
+	 * @return The URL-encoded path of the HTTP request for this search.
+	 * @deprecated Use {@link #path()} instead.
+	 */
+	@Deprecated
+	default String getPath() {
+		return path();
+	}
 
 	/**
 	 * Set a new path for the HTTP request for this search.
 	 *
 	 * @param newPath A HTTP path, already URL-encoded.
 	 * Should not include the query parameters ({@code ?foo=bar&...}):
-	 * use {@link #getParametersMap()} for that instead.
+	 * use {@link #parametersMap()} for that instead.
 	 */
-	void setPath(String newPath);
+	void path(String newPath);
+
+	/**
+	 * Set a new path for the HTTP request for this search.
+	 *
+	 * @param newPath A HTTP path, already URL-encoded.
+	 * Should not include the query parameters ({@code ?foo=bar&...}):
+	 * use {@link #parametersMap()} for that instead.
+	 * @deprecated Use {@link #path(String)} instead.
+	 */
+	@Deprecated
+	default void setPath(String newPath) {
+		path( newPath );
+	}
 
 	/**
 	 * @return A (mutable) representation of the HTTP query parameters for this search, as a {@link Map}.
 	 * The query parameters are <strong>not</strong> URL-encoded.
 	 */
-	Map<String, String> getParametersMap();
+	Map<String, String> parametersMap();
+
+	/**
+	 * @return A (mutable) representation of the HTTP query parameters for this search, as a {@link Map}.
+	 * The query parameters are <strong>not</strong> URL-encoded.
+	 * @deprecated Use {@link #parametersMap()} instead.
+	 */
+	@Deprecated
+	default Map<String, String> getParametersMap() {
+		return parametersMap();
+	}
 
 	/**
 	 * @return A (mutable) representation of the HTTP request body for this search, as a {@link JsonObject}.
 	 */
-	JsonObject getBody();
+	JsonObject body();
+
+	/**
+	 * @return A (mutable) representation of the HTTP request body for this search, as a {@link JsonObject}.
+	 * @deprecated Use {@link #body()} instead.
+	 */
+	@Deprecated
+	default JsonObject getBody() {
+		return body();
+	}
 
 }

@@ -491,10 +491,10 @@ public class QueryDslIT {
 							.field( "title" )
 							.matching( "robot" ) )
 					.requestTransformer( context -> { // <2>
-						Map<String, String> parameters = context.getParametersMap(); // <3>
+						Map<String, String> parameters = context.parametersMap(); // <3>
 						parameters.put( "search_type", "dfs_query_then_fetch" );
 
-						JsonObject body = context.getBody(); // <4>
+						JsonObject body = context.body(); // <4>
 						body.addProperty( "min_score", 0.5f );
 					} )
 					.fetchHits( 20 ); // <5>
@@ -513,7 +513,7 @@ public class QueryDslIT {
 							.field( "title" )
 							.matching( "robt" ) )
 					.requestTransformer( context -> { // <2>
-						JsonObject body = context.getBody();
+						JsonObject body = context.body();
 						body.add( "suggest", jsonObject( suggest -> { // <3>
 							suggest.add( "my-suggest", jsonObject( mySuggest -> {
 								mySuggest.addProperty( "text", "robt" );
@@ -525,7 +525,7 @@ public class QueryDslIT {
 					} )
 					.fetch( 20 ); // <4>
 
-			JsonObject responseBody = result.getResponseBody(); // <5>
+			JsonObject responseBody = result.responseBody(); // <5>
 			JsonArray mySuggestResults = responseBody.getAsJsonObject( "suggest" ) // <6>
 					.getAsJsonArray( "my-suggest" );
 			// end::elasticsearch-responseBody[]
