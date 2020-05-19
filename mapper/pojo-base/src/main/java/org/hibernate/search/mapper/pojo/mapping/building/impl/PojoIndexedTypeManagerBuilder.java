@@ -133,7 +133,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		extendedMappingCollector.indexManager( indexManager );
 
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
-				typeModel.getTypeIdentifier(), typeModel.getCaster(),
+				typeModel.typeIdentifier(), typeModel.caster(),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,

@@ -45,13 +45,13 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
-	public ContextualFailureCollector getFailureCollector() {
+	public ContextualFailureCollector failureCollector() {
 		return failureCollector.withContext( PojoEventContexts.fromType( rawTypeModel ) );
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<?> getTypeIdentifier() {
-		return rawTypeModel.getTypeIdentifier();
+	public PojoRawTypeIdentifier<?> typeIdentifier() {
+		return rawTypeModel.typeIdentifier();
 	}
 
 	@Override

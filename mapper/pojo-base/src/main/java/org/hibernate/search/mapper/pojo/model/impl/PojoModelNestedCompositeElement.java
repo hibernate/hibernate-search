@@ -45,7 +45,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 
 	@Override
 	public String name() {
-		return modelPath.getParent().getPropertyModel().getName();
+		return modelPath.getParent().getPropertyModel().name();
 	}
 
 	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {

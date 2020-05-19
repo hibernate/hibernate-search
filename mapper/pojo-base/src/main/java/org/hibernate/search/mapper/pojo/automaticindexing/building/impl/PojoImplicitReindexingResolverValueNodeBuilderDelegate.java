@@ -54,7 +54,7 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 	}
 
 	<U> AbstractPojoImplicitReindexingResolverTypeNodeBuilder<V, ?> type(PojoRawTypeModel<U> targetTypeModel) {
-		PojoRawTypeModel<? super V> valueRawTypeModel = getTypeModel().getRawType();
+		PojoRawTypeModel<? super V> valueRawTypeModel = getTypeModel().rawType();
 		if ( valueRawTypeModel.isSubTypeOf( targetTypeModel ) ) {
 			// No need to cast, we're already satisfying the requirements
 			return type();

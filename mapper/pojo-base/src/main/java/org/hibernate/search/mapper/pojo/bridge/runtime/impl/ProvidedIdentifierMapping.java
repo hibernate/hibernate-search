@@ -56,12 +56,12 @@ public class ProvidedIdentifierMapping implements IdentifierMappingImplementor<O
 
 	@Override
 	public String toDocumentIdentifier(Object identifier, BridgeMappingContext context) {
-		return bridgeHolder.get().toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
+		return bridgeHolder.get().toDocumentIdentifier( identifier, context.identifierBridgeToDocumentIdentifierContext() );
 	}
 
 	@Override
 	public Object fromDocumentIdentifier(String documentId, BridgeSessionContext context) {
-		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
+		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.identifierBridgeFromDocumentIdentifierContext() );
 	}
 
 }

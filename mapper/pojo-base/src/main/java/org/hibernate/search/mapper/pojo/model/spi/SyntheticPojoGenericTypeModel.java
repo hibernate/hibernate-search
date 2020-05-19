@@ -46,17 +46,17 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		if ( arrayElementType != null ) {
-			return arrayElementType.getName() + "[]";
+			return arrayElementType.name() + "[]";
 		}
 
 		if ( genericTypeArguments.isEmpty() ) {
-			return getRawType().getName();
+			return rawType().name();
 		}
 
 		StringBuilder builder = new StringBuilder();
-		builder.append( getRawType().getName() );
+		builder.append( rawType().name() );
 		builder.append( '<' );
 		boolean first = true;
 		for ( PojoGenericTypeModel<?> genericTypeArgument : genericTypeArguments ) {
@@ -66,25 +66,25 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 			else {
 				builder.append( ", " );
 			}
-			builder.append( genericTypeArgument.getName() );
+			builder.append( genericTypeArgument.name() );
 		}
 		builder.append( '>' );
 		return builder.toString();
 	}
 
 	@Override
-	public Optional<PojoGenericTypeModel<?>> getArrayElementType() {
+	public Optional<PojoGenericTypeModel<?>> arrayElementType() {
 		return Optional.ofNullable( arrayElementType );
 	}
 
 	@Override
-	public Optional<? extends PojoGenericTypeModel<?>> getTypeArgument(Class<?> rawSuperType,
+	public Optional<? extends PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType,
 			int typeParameterIndex) {
 		if ( genericTypeArguments.isEmpty() ) {
 			// Raw type
 			return Optional.empty();
 		}
-		if ( rawSuperType.isAssignableFrom( getRawType().getTypeIdentifier().getJavaClass() ) ) {
+		if ( rawSuperType.isAssignableFrom( rawType().typeIdentifier().javaClass() ) ) {
 			return Optional.of( genericTypeArguments.get( typeParameterIndex ) );
 		}
 		return Optional.empty();

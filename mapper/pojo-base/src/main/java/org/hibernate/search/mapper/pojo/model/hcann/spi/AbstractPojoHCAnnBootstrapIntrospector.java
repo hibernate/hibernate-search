@@ -32,7 +32,7 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 		this.typeOrdering = new PojoXClassOrdering( reflectionManager );
 	}
 
-	public Stream<Annotation> getAnnotations(XAnnotatedElement xAnnotated) {
+	public Stream<Annotation> annotations(XAnnotatedElement xAnnotated) {
 		return Arrays.stream( xAnnotated.getAnnotations() );
 	}
 
@@ -40,23 +40,23 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 		return reflectionManager.toXClass( type );
 	}
 
-	public Map<String, XProperty> getDeclaredFieldAccessXPropertiesByName(XClass xClass) {
+	public Map<String, XProperty> declaredFieldAccessXPropertiesByName(XClass xClass) {
 		// TODO HSEARCH-3056 remove lambdas if possible
 		return xClass.getDeclaredProperties( XClass.ACCESS_FIELD ).stream()
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
-	public Map<String, XProperty> getDeclaredMethodAccessXPropertiesByName(XClass xClass) {
+	public Map<String, XProperty> declaredMethodAccessXPropertiesByName(XClass xClass) {
 		// TODO HSEARCH-3056 remove lambdas if possible
 		return xClass.getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
-	protected Stream<Class<?>> getAscendingSuperClasses(XClass xClass) {
+	protected Stream<Class<?>> ascendingSuperClasses(XClass xClass) {
 		return typeOrdering.ascendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	protected Stream<Class<?>> getDescendingSuperClasses(XClass xClass) {
+	protected Stream<Class<?>> descendingSuperClasses(XClass xClass) {
 		return typeOrdering.descendingSuperTypes( xClass ).map( this::toClass );
 	}
 

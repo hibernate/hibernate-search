@@ -21,7 +21,7 @@ final class SimplePojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 
 	@Override
 	@SuppressWarnings("unchecked") // The class of an object of type T is always a Class<? extends T>
-	public <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity) {
+	public <T> PojoRawTypeIdentifier<? extends T> detectEntityType(T entity) {
 		if ( entity == null ) {
 			return null;
 		}

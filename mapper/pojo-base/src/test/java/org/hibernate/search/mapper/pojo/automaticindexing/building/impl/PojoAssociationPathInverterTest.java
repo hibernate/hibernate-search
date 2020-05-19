@@ -61,7 +61,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		 */
 		PojoRawTypeModel<?> originalSideEntityTypeMock =
 				createMock( "originalSideEntityTypeMock", PojoRawTypeModel.class );
-		EasyMock.expect( originalSideEntityTypeMock.getRawType() )
+		EasyMock.expect( originalSideEntityTypeMock.rawType() )
 				.andStubReturn( (PojoRawTypeModel) originalSideEntityTypeMock );
 
 		PojoGenericTypeModel<?> originalSidePropertyTypeMock =
@@ -99,9 +99,9 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 				createMock( "inverseSideEmbeddableType1Mock", PojoRawTypeModel.class );
 		PojoRawTypeModel<?> inverseSideEmbeddableType2Mock =
 				createMock( "inverseSideEmbeddableType2Mock", PojoRawTypeModel.class );
-		EasyMock.expect( inverseSideEntityTypeMock.getRawType() )
+		EasyMock.expect( inverseSideEntityTypeMock.rawType() )
 				.andStubReturn( (PojoRawTypeModel) inverseSideEntityTypeMock );
-		EasyMock.expect( inverseSideEntityTypeMock.getName() )
+		EasyMock.expect( inverseSideEntityTypeMock.name() )
 				.andStubReturn( "inverseSideEntityTypeMock" );
 
 		PojoGenericTypeModel<?> inverseSideProperty1TypeMock =
@@ -109,7 +109,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		setupPropertyStub(
 				inverseSideEntityTypeMock, inverseSideProperty1Name, inverseSideProperty1TypeMock
 		);
-		EasyMock.expect( inverseSideProperty1TypeMock.getRawType() )
+		EasyMock.expect( inverseSideProperty1TypeMock.rawType() )
 				.andStubReturn( (PojoRawTypeModel) inverseSideEmbeddableType1Mock );
 
 		PojoGenericTypeModel<?> inverseSideProperty2TypeMock =
@@ -117,7 +117,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		setupPropertyStub(
 				inverseSideProperty1TypeMock, inverseSideProperty2Name, inverseSideProperty2TypeMock
 		);
-		EasyMock.expect( inverseSideProperty2TypeMock.getRawType() )
+		EasyMock.expect( inverseSideProperty2TypeMock.rawType() )
 				.andStubReturn( (PojoRawTypeModel) inverseSideEmbeddableType2Mock );
 
 		PojoGenericTypeModel<?> inverseSideProperty3TypeMock =
@@ -125,7 +125,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		setupPropertyStub(
 				inverseSideProperty2TypeMock, inverseSideProperty3Name, inverseSideProperty2TypeMock
 		);
-		EasyMock.expect( inverseSideProperty3TypeMock.getRawType() )
+		EasyMock.expect( inverseSideProperty3TypeMock.rawType() )
 				.andStubReturn( (PojoRawTypeModel) inverseSideEmbeddableType1Mock );
 
 		PojoTypeAdditionalMetadata inverseSideEntityTypeAdditionalMetadataMock =
@@ -179,7 +179,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 										.property( inverseSideProperty3Name ).value( ContainerExtractorPath.noExtractors() )
 										.toValuePath()
 										.toPathString()
-								+ "' on type '" + inverseSideEntityTypeMock.getName() + "'"
+								+ "' on type '" + inverseSideEntityTypeMock.name() + "'"
 				);
 		verifyAll();
 	}
@@ -190,11 +190,11 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 				createMock( propertyName + "HandleMock", ValueReadHandle.class );
 		PojoPropertyModel<?> propertyModelMock =
 				createMock( propertyName + "ModelMock", PojoPropertyModel.class );
-		EasyMock.expect( holdingTypeMock.getProperty( propertyName ) )
+		EasyMock.expect( holdingTypeMock.property( propertyName ) )
 				.andStubReturn( (PojoPropertyModel) propertyModelMock );
-		EasyMock.expect( propertyModelMock.getName() ).andStubReturn( propertyName );
-		EasyMock.expect( propertyModelMock.getHandle() ).andStubReturn( (ValueReadHandle) valueReadHandleMock );
-		EasyMock.expect( propertyModelMock.getTypeModel() )
+		EasyMock.expect( propertyModelMock.name() ).andStubReturn( propertyName );
+		EasyMock.expect( propertyModelMock.handle() ).andStubReturn( (ValueReadHandle) valueReadHandleMock );
+		EasyMock.expect( propertyModelMock.typeModel() )
 				.andStubReturn( (PojoGenericTypeModel) propertyTypeMock );
 	}
 

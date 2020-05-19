@@ -40,24 +40,24 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return name;
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
+	public Stream<Annotation> annotations() {
 		return Stream.empty();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // We will just trust ORM metadata on this one.
-	public PojoGenericTypeModel<T> getTypeModel() {
+	public PojoGenericTypeModel<T> typeModel() {
 		if ( typeModel == null ) {
 			try {
 				typeModel = ormPropertyMetadata.getTypeModelFactory().create( introspector );
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
 		return typeModel;
@@ -65,15 +65,15 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 
 	@Override
 	@SuppressWarnings("unchecked") // We will just trust ORM metadata on this one.
-	public ValueReadHandle<T> getHandle() {
+	public ValueReadHandle<T> handle() {
 		if ( handle == null ) {
 			try {
 				handle = (ValueReadHandle<T>) new HibernateOrmDynamicMapValueReadHandle<>(
-						name, getTypeModel().getRawType().getTypeIdentifier().getJavaClass()
+						name, typeModel().rawType().typeIdentifier().javaClass()
 				);
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
 		return handle;

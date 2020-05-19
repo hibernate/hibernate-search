@@ -31,11 +31,11 @@ public class PojoModelValueElement<T> implements PojoModelValue<T> {
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
-		return typeModel.getRawType().isSubTypeOf( introspector.getTypeModel( clazz ) );
+		return typeModel.rawType().isSubTypeOf( introspector.typeModel( clazz ) );
 	}
 
 	@Override
 	public Class<?> rawType() {
-		return typeModel.getRawType().getTypeIdentifier().getJavaClass();
+		return typeModel.rawType().typeIdentifier().javaClass();
 	}
 }

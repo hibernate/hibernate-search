@@ -15,7 +15,7 @@ class PropertyMappingScaledNumberFieldOptionsStepImpl
 		implements PropertyMappingScaledNumberFieldOptionsStep {
 
 	PropertyMappingScaledNumberFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
-		super( parent, relativeFieldName, FieldModelContributorContext::getScaledNumberTypeOptionsStep );
+		super( parent, relativeFieldName, FieldModelContributorContext::scaledNumberTypeOptionsStep );
 	}
 
 	@Override
@@ -25,7 +25,7 @@ class PropertyMappingScaledNumberFieldOptionsStepImpl
 
 	@Override
 	public PropertyMappingScaledNumberFieldOptionsStep decimalScale(int decimalScale) {
-		fieldModelContributor.add( c -> c.getScaledNumberTypeOptionsStep().decimalScale( decimalScale ) );
+		fieldModelContributor.add( c -> c.scaledNumberTypeOptionsStep().decimalScale( decimalScale ) );
 		return thisAsS();
 	}
 }

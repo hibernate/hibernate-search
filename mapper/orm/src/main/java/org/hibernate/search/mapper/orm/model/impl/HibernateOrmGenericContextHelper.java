@@ -20,17 +20,17 @@ public class HibernateOrmGenericContextHelper implements GenericContextAwarePojo
 	}
 
 	@Override
-	public <T> PojoRawTypeModel<T> getRawTypeModel(Class<T> clazz) {
-		return introspector.getTypeModel( clazz );
+	public <T> PojoRawTypeModel<T> rawTypeModel(Class<T> clazz) {
+		return introspector.typeModel( clazz );
 	}
 
 	@Override
-	public Object getPropertyCacheKey(PojoPropertyModel<?> rawPropertyModel) {
+	public Object propertyCacheKey(PojoPropertyModel<?> rawPropertyModel) {
 		return rawPropertyModel; // Properties are instantiated only once per type model
 	}
 
 	@Override
-	public Type getPropertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
+	public Type propertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
 		HibernateOrmClassPropertyModel<?> ormPropertyModel = (HibernateOrmClassPropertyModel<?>) rawPropertyModel;
 		return ormPropertyModel.getGetterGenericReturnType();
 	}

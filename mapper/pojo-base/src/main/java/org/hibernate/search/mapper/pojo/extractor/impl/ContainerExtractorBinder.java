@@ -74,7 +74,7 @@ public class ContainerExtractorBinder {
 		this.beanResolver = buildContext.beanResolver();
 		this.containerExtractorRegistry = containerExtractorRegistry;
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
-		for ( String extractorName : containerExtractorRegistry.getDefaults() ) {
+		for ( String extractorName : containerExtractorRegistry.defaults() ) {
 			addDefaultExtractor( extractorName );
 		}
 	}
@@ -162,7 +162,7 @@ public class ContainerExtractorBinder {
 		try {
 			for ( String extractorName : boundPath.getExtractorPath().explicitExtractorNames() ) {
 				Class<? extends ContainerExtractor> extractorClass =
-						containerExtractorRegistry.getForName( extractorName );
+						containerExtractorRegistry.forName( extractorName );
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
 						beanResolver.resolve( extractorClass );
 				beanHolders.add( newExtractorHolder );
@@ -206,7 +206,7 @@ public class ContainerExtractorBinder {
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private SingleExtractorContributor createExtractorContributorForName(String extractorName) {
-		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.getForName( extractorName );
+		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.forName( extractorName );
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
 		Type typePattern = typeContext.resolveTypeArgument( ContainerExtractor.class, 0 )
 				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );

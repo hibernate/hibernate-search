@@ -59,7 +59,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 			ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				buildingHelper.getExtractorBinder().bindPath(
-						modelPathFromLastEntityNode.getPropertyModel().getTypeModel(),
+						modelPathFromLastEntityNode.getPropertyModel().typeModel(),
 						extractorPath
 				);
 		return value( boundExtractorPath );

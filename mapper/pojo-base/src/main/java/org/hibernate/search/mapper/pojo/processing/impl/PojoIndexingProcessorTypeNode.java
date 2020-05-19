@@ -67,13 +67,13 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		if ( source == null ) {
 			return;
 		}
-		source = (T) sessionContext.getRuntimeIntrospector().unproxy( source );
+		source = (T) sessionContext.runtimeIntrospector().unproxy( source );
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );
 		}
 		for ( BeanHolder<? extends TypeBridge> bridgeHolder : bridgeHolders ) {
-			bridgeHolder.get().write( parentObject, source, sessionContext.getTypeBridgeWriteContext() );
+			bridgeHolder.get().write( parentObject, source, sessionContext.typeBridgeWriteContext() );
 		}
 		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
 			// Recursion here

@@ -50,7 +50,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.containedTypeContextProvider = containedTypeContextProvider;
 		this.sessionContext = sessionContext;
-		this.introspector = sessionContext.getRuntimeIntrospector();
+		this.introspector = sessionContext.runtimeIntrospector();
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -205,7 +205,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 
 	private void updateBecauseOfContained(Object containingEntity) {
 		// TODO ignore the event when containingEntity has provided IDs
-		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().getEntityTypeIdentifier( containingEntity );
+		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().detectEntityType( containingEntity );
 		if ( typeIdentifier == null ) {
 			throw new AssertionFailure(
 					"Attempt to reindex entity " + containingEntity + " because a contained entity was modified,"

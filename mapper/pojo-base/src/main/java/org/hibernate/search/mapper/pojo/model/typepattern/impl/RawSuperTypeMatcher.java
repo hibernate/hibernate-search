@@ -18,11 +18,11 @@ class RawSuperTypeMatcher implements TypePatternMatcher {
 
 	@Override
 	public String toString() {
-		return "hasRawSuperType(" + matchedRawType.getName() + ")";
+		return "hasRawSuperType(" + matchedRawType.name() + ")";
 	}
 
 	@Override
 	public boolean matches(PojoGenericTypeModel<?> typeToInspect) {
-		return typeToInspect.getRawType().isSubTypeOf( matchedRawType );
+		return typeToInspect.rawType().isSubTypeOf( matchedRawType );
 	}
 }

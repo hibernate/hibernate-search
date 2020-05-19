@@ -18,6 +18,6 @@ public final class PojoTypeModelFormatter {
 
 	@Override
 	public String toString() {
-		return typeModel.getName();
+		return typeModel.name();
 	}
 }

@@ -15,7 +15,7 @@ class PropertyMappingGenericFieldOptionsStepImpl
 		implements PropertyMappingGenericFieldOptionsStep {
 
 	PropertyMappingGenericFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
-		super( parent, relativeFieldName, FieldModelContributorContext::getStandardTypeOptionsStep );
+		super( parent, relativeFieldName, FieldModelContributorContext::standardTypeOptionsStep );
 	}
 
 	@Override

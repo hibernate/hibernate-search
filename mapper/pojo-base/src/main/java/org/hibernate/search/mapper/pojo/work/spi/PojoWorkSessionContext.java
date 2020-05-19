@@ -20,8 +20,8 @@ public interface PojoWorkSessionContext<R>
 		extends BackendSessionContext, BridgeSessionContext, PojoIndexingProcessorSessionContext {
 
 	@Override
-	PojoWorkMappingContext getMappingContext();
+	PojoWorkMappingContext mappingContext();
 
-	EntityReferenceFactory<R> getEntityReferenceFactory();
+	EntityReferenceFactory<R> entityReferenceFactory();
 
 }

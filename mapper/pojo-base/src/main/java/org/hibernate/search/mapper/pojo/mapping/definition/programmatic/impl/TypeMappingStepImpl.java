@@ -59,7 +59,7 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep indexed(String backendName, String indexName) {
-		children.add( new IndexedMetadataContributor( typeModel.getTypeIdentifier(), backendName, indexName ) );
+		children.add( new IndexedMetadataContributor( typeModel.typeIdentifier(), backendName, indexName ) );
 		return this;
 	}
 
@@ -77,7 +77,7 @@ public class TypeMappingStepImpl
 
 	@Override
 	public PropertyMappingStep property(String propertyName) {
-		PojoPropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
+		PojoPropertyModel<?> propertyModel = typeModel.property( propertyName );
 		InitialPropertyMappingStep child = new InitialPropertyMappingStep( this, propertyModel );
 		children.add( child );
 		return child;

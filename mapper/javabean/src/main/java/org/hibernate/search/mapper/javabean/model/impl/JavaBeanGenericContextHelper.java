@@ -20,17 +20,17 @@ public class JavaBeanGenericContextHelper implements GenericContextAwarePojoGene
 	}
 
 	@Override
-	public <T> PojoRawTypeModel<T> getRawTypeModel(Class<T> clazz) {
-		return introspector.getTypeModel( clazz );
+	public <T> PojoRawTypeModel<T> rawTypeModel(Class<T> clazz) {
+		return introspector.typeModel( clazz );
 	}
 
 	@Override
-	public Object getPropertyCacheKey(PojoPropertyModel<?> rawPropertyModel) {
+	public Object propertyCacheKey(PojoPropertyModel<?> rawPropertyModel) {
 		return rawPropertyModel; // Properties define equals and hashCode as required
 	}
 
 	@Override
-	public Type getPropertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
+	public Type propertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
 		JavaBeanPropertyModel<?> javaBeanPropertyModel = (JavaBeanPropertyModel<?>) rawPropertyModel;
 		return javaBeanPropertyModel.getGetterGenericReturnType();
 	}

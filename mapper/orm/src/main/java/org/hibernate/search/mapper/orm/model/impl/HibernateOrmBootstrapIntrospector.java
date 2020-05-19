@@ -103,7 +103,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	@Override
-	public AbstractHibernateOrmRawTypeModel<?> getTypeModel(String name) {
+	public AbstractHibernateOrmRawTypeModel<?> typeModel(String name) {
 		HibernateOrmBasicDynamicMapTypeMetadata dynamicMapTypeOrmMetadata =
 				basicTypeMetadataProvider.getBasicDynamicMapTypeMetadata( name );
 		if ( dynamicMapTypeOrmMetadata != null ) {
@@ -115,7 +115,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 				.resolveByJpaOrHibernateOrmEntityName( name );
 		if ( typeIdentifier != null ) {
 			// Class entity type
-			return getTypeModel( typeIdentifier.getJavaClass() );
+			return typeModel( typeIdentifier.javaClass() );
 		}
 
 		Set<String> typeNames = new LinkedHashSet<>( basicTypeMetadataProvider.getKnownDynamicMapTypeNames() );
@@ -125,7 +125,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> HibernateOrmClassRawTypeModel<T> getTypeModel(Class<T> clazz) {
+	public <T> HibernateOrmClassRawTypeModel<T> typeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -137,21 +137,21 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	@Override
-	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
+	public <T> PojoGenericTypeModel<T> genericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
 	@Override
-	public ValueReadHandleFactory getAnnotationValueReadHandleFactory() {
+	public ValueReadHandleFactory annotationValueReadHandleFactory() {
 		return valueReadHandleFactory;
 	}
 
 	Stream<? extends HibernateOrmClassRawTypeModel<?>> getAscendingSuperTypes(XClass xClass) {
-		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
+		return ascendingSuperClasses( xClass ).map( this::typeModel );
 	}
 
 	Stream<? extends HibernateOrmClassRawTypeModel<?>> getDescendingSuperTypes(XClass xClass) {
-		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
+		return descendingSuperClasses( xClass ).map( this::typeModel );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,

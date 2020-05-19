@@ -33,12 +33,12 @@ abstract class AbstractPojoProcessorNodeBuilder {
 
 	abstract void closeOnFailure();
 
-	public final ContextualFailureCollector getFailureCollector() {
+	public final ContextualFailureCollector failureCollector() {
 		BoundPojoModelPath modelPath = getModelPath();
 
 		ContextualFailureCollector failureCollector = mappingHelper.getFailureCollector()
 				.withContext(
-						PojoEventContexts.fromType( modelPath.getRootType().getRawType() )
+						PojoEventContexts.fromType( modelPath.getRootType().rawType() )
 				);
 
 		PojoModelPath unboundPath = modelPath.toUnboundPath();

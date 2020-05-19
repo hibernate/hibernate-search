@@ -24,23 +24,23 @@ final class GenericContextAwarePojoPropertyModel<T> implements PojoPropertyModel
 	}
 
 	@Override
-	public String getName() {
-		return rawPropertyModel.getName();
+	public String name() {
+		return rawPropertyModel.name();
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
-		return rawPropertyModel.getAnnotations();
+	public Stream<Annotation> annotations() {
+		return rawPropertyModel.annotations();
 	}
 
 	@Override
-	public PojoGenericTypeModel<T> getTypeModel() {
+	public PojoGenericTypeModel<T> typeModel() {
 		return genericPropertyTypeModel;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // We know that, in the current generic context, this cast is legal
-	public ValueReadHandle<T> getHandle() {
-		return (ValueReadHandle<T>) rawPropertyModel.getHandle();
+	public ValueReadHandle<T> handle() {
+		return (ValueReadHandle<T>) rawPropertyModel.handle();
 	}
 }

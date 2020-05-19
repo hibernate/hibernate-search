@@ -26,7 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test for {@link org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator#setDefaultReindexOnUpdate(ReindexOnUpdate)}.
+ * Test for {@link org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator#defaultReindexOnUpdate(ReindexOnUpdate)}.
  */
 public class DefaultReindexOnUpdateIT {
 

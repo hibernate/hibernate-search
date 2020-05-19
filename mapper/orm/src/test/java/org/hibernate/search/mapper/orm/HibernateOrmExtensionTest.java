@@ -121,7 +121,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 			extends HibernateOrmSessionContext, BridgeSessionContext, BackendSessionContext {
 
 		@Override
-		HibernateOrmMappingContextMock getMappingContext();
+		HibernateOrmMappingContextMock mappingContext();
 
 	}
 }

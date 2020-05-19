@@ -55,7 +55,7 @@ public abstract class AbstractPojoBridgedElementDependencyContext {
 			throw log.cannotDefineOtherEntityDependencyOnNonEntityBridgedType( bridgedType );
 		}
 
-		PojoRawTypeModel<?> otherEntityType = introspector.getTypeModel( otherEntityClass );
+		PojoRawTypeModel<?> otherEntityType = introspector.typeModel( otherEntityClass );
 		if ( !typeAdditionalMetadataProvider.get( otherEntityType ).isEntity() ) {
 			throw log.cannotDefineOtherEntityDependencyFromNonEntityType( otherEntityType );
 		}
@@ -69,7 +69,7 @@ public abstract class AbstractPojoBridgedElementDependencyContext {
 						bindingPathWalker
 				);
 
-		PojoRawTypeModel<?> inverseSideRawType = boundPathFromOtherEntityTypeToBridgedType.getTypeModel().getRawType();
+		PojoRawTypeModel<?> inverseSideRawType = boundPathFromOtherEntityTypeToBridgedType.getTypeModel().rawType();
 		if ( !inverseSideRawType.isSubTypeOf( bridgedType ) && !bridgedType.isSubTypeOf( inverseSideRawType ) ) {
 			throw log.incorrectTargetTypeForInverseAssociation( inverseSideRawType, bridgedType );
 		}

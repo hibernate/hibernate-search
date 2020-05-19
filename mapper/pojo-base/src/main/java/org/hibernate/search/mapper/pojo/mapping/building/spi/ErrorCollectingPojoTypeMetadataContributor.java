@@ -24,7 +24,7 @@ public final class ErrorCollectingPojoTypeMetadataContributor implements PojoTyp
 					child.contributeAdditionalMetadata( collector );
 				}
 				catch (RuntimeException e) {
-					collector.getFailureCollector().add( e );
+					collector.failureCollector().add( e );
 				}
 			}
 		}
@@ -38,7 +38,7 @@ public final class ErrorCollectingPojoTypeMetadataContributor implements PojoTyp
 					child.contributeMapping( collector );
 				}
 				catch (RuntimeException e) {
-					collector.getFailureCollector().add( e );
+					collector.failureCollector().add( e );
 				}
 			}
 		}

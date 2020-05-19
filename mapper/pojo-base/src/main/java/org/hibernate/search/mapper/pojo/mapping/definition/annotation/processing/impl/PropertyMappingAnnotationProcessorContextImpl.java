@@ -29,16 +29,16 @@ public class PropertyMappingAnnotationProcessorContextImpl
 
 	@Override
 	public Class<?> javaClass() {
-		return propertyModel.getTypeModel().getRawType().getTypeIdentifier().getJavaClass();
+		return propertyModel.typeModel().rawType().typeIdentifier().javaClass();
 	}
 
 	@Override
 	public String name() {
-		return propertyModel.getName();
+		return propertyModel.name();
 	}
 
 	@Override
 	public Stream<Annotation> allAnnotations() {
-		return propertyModel.getAnnotations();
+		return propertyModel.annotations();
 	}
 }

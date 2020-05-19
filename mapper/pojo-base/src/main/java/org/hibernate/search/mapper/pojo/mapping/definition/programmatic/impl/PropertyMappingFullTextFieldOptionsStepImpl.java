@@ -18,7 +18,7 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 		implements PropertyMappingFullTextFieldOptionsStep {
 
 	PropertyMappingFullTextFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
-		super( parent, relativeFieldName, FieldModelContributorContext::getStringTypeOptionsStep );
+		super( parent, relativeFieldName, FieldModelContributorContext::stringTypeOptionsStep );
 	}
 
 	@Override
@@ -28,25 +28,25 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep analyzer(String normalizerName) {
-		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().analyzer( normalizerName ) );
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().analyzer( normalizerName ) );
 		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep searchAnalyzer(String searchAnalyzerName) {
-		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().searchAnalyzer( searchAnalyzerName ) );
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().searchAnalyzer( searchAnalyzerName ) );
 		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep norms(Norms norms) {
-		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().norms( norms ) );
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().norms( norms ) );
 		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep termVector(TermVector termVector) {
-		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().termVector( termVector ) );
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().termVector( termVector ) );
 		return thisAsS();
 	}
 

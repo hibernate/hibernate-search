@@ -20,7 +20,7 @@ public interface PojoRuntimeIntrospector {
 	 * May be {@code null} if the entity type is not known from this mapper,
 	 * because it's neither indexed nor contained in an indexed type.
 	 */
-	<T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity);
+	<T> PojoRawTypeIdentifier<? extends T> detectEntityType(T entity);
 
 	/**
 	 * @param value the object to unproxy

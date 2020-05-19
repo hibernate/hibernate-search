@@ -13,16 +13,16 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public interface PojoPropertyModel<T> {
 
-	String getName();
+	String name();
 
-	Stream<Annotation> getAnnotations();
+	Stream<Annotation> annotations();
 
 	/**
 	 * @return A model of this property's type. Implementations may decide to implement their own,
 	 * but could also simply use {@link GenericContextAwarePojoGenericTypeModel}.
 	 */
-	PojoGenericTypeModel<T> getTypeModel();
+	PojoGenericTypeModel<T> typeModel();
 
-	ValueReadHandle<T> getHandle();
+	ValueReadHandle<T> handle();
 
 }

@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
  */
 public interface BridgeMappingContext {
 
-	IdentifierBridgeToDocumentIdentifierContext getIdentifierBridgeToDocumentIdentifierContext();
+	IdentifierBridgeToDocumentIdentifierContext identifierBridgeToDocumentIdentifierContext();
 
-	ValueBridgeToIndexedValueContext getValueBridgeToIndexedValueContext();
+	ValueBridgeToIndexedValueContext valueBridgeToIndexedValueContext();
 
 }

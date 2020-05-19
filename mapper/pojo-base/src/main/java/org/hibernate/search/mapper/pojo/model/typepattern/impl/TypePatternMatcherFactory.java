@@ -23,19 +23,19 @@ public class TypePatternMatcherFactory {
 
 	/**
 	 * @param introspector An introspector to use for reflection,
-	 * mainly for {@link PojoBootstrapIntrospector#getGenericTypeModel(Class)}
+	 * mainly for {@link PojoBootstrapIntrospector#genericTypeModel(Class)}
 	 */
 	public TypePatternMatcherFactory(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 
 	public TypePatternMatcher createExactRawTypeMatcher(Class<?> exactTypeToMatch) {
-		PojoRawTypeModel<?> exactTypeToMatchModel = introspector.getTypeModel( exactTypeToMatch );
+		PojoRawTypeModel<?> exactTypeToMatchModel = introspector.typeModel( exactTypeToMatch );
 		return new ExactRawTypeMatcher( exactTypeToMatchModel );
 	}
 
 	public TypePatternMatcher createRawSuperTypeMatcher(Class<?> superTypeToMatch) {
-		PojoRawTypeModel<?> superTypeToMatchModel = introspector.getTypeModel( superTypeToMatch );
+		PojoRawTypeModel<?> superTypeToMatchModel = introspector.typeModel( superTypeToMatch );
 		return new RawSuperTypeMatcher( superTypeToMatchModel );
 	}
 
@@ -98,8 +98,8 @@ public class TypePatternMatcherFactory {
 					"Extracting a non-raw result type when matching a raw type is not supported"
 			);
 		}
-		PojoRawTypeModel<?> typePatternModel = introspector.getTypeModel( typePattern );
-		PojoGenericTypeModel<?> typeToExtractModel = introspector.getGenericTypeModel( (Class<?>) typeToExtract );
+		PojoRawTypeModel<?> typePatternModel = introspector.typeModel( typePattern );
+		PojoGenericTypeModel<?> typeToExtractModel = introspector.genericTypeModel( (Class<?>) typeToExtract );
 		return new ConstantExtractingTypePatternMatcherAdapter(
 				new RawSuperTypeMatcher( typePatternModel ),
 				typeToExtractModel

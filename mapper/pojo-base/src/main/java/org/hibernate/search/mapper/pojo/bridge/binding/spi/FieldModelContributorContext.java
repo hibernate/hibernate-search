@@ -14,11 +14,11 @@ public interface FieldModelContributorContext {
 
 	void indexNullAs(String value);
 
-	StandardIndexFieldTypeOptionsStep<?, ?> getStandardTypeOptionsStep();
+	StandardIndexFieldTypeOptionsStep<?, ?> standardTypeOptionsStep();
 
-	StringIndexFieldTypeOptionsStep<?> getStringTypeOptionsStep();
+	StringIndexFieldTypeOptionsStep<?> stringTypeOptionsStep();
 
-	ScaledNumberIndexFieldTypeOptionsStep<?, ?> getScaledNumberTypeOptionsStep();
+	ScaledNumberIndexFieldTypeOptionsStep<?, ?> scaledNumberTypeOptionsStep();
 
 	void checkNonStandardTypeOptionsStep();
 }

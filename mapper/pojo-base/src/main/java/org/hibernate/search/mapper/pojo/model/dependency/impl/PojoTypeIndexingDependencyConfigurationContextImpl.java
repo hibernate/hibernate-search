@@ -57,7 +57,7 @@ public class PojoTypeIndexingDependencyConfigurationContextImpl<T> extends Abstr
 	public PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
 		PojoOtherEntityIndexingDependencyConfigurationContextImpl<?> otherEntityDependencyContext = createOtherEntityDependencyContext(
-				modelPath.getTypeModel().getRawType(),
+				modelPath.getTypeModel().rawType(),
 				otherEntityType, pathFromOtherEntityTypeToBridgedType
 		);
 

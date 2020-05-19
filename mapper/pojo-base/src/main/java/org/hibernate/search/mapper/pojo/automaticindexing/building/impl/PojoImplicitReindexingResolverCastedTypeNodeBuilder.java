@@ -24,7 +24,7 @@ class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 	<S> PojoImplicitReindexingResolverNode<T, S> doBuild(
 			Collection<PojoImplicitReindexingResolverNode<? super U, S>> immutableNestedNodes) {
 		return new PojoImplicitReindexingResolverCastedTypeNode<>(
-				getTypeModel().getRawType().getCaster(), immutableNestedNodes
+				getTypeModel().rawType().caster(), immutableNestedNodes
 		);
 	}
 }

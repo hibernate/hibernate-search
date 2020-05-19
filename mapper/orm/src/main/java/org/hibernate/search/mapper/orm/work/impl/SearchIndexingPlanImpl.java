@@ -66,7 +66,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
-		return sessionContext.getRuntimeIntrospector().getEntityTypeIdentifier( entity );
+		return sessionContext.getRuntimeIntrospector().detectEntityType( entity );
 	}
 
 	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {

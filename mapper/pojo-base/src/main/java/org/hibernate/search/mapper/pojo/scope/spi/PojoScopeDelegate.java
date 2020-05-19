@@ -26,12 +26,12 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
  * {@link SearchQuerySelectStep#selectEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  * @param <C> The type of indexed type extended contexts; i.e. the type of elements in the set returned by
- * {@link #getIncludedIndexedTypes()}.
+ * {@link #includedIndexedTypes()}.
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  */
 public interface PojoScopeDelegate<R, E, C> {
 
-	Set<C> getIncludedIndexedTypes();
+	Set<C> includedIndexedTypes();
 
 	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,

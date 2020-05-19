@@ -63,7 +63,7 @@ public final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> imp
 				BackendMappingContext mappingContext) {
 			if ( mappingContext instanceof BridgeMappingContext ) {
 				BridgeMappingContext pojoMappingContext = (BridgeMappingContext) mappingContext;
-				return Optional.of( pojoMappingContext.getIdentifierBridgeToDocumentIdentifierContext() );
+				return Optional.of( pojoMappingContext.identifierBridgeToDocumentIdentifierContext() );
 			}
 			else {
 				return Optional.empty();

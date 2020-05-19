@@ -22,18 +22,18 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
  */
 public interface BridgeSessionContext {
 
-	BridgeMappingContext getMappingContext();
+	BridgeMappingContext mappingContext();
 
-	String getTenantIdentifier();
+	String tenantIdentifier();
 
-	IdentifierBridgeFromDocumentIdentifierContext getIdentifierBridgeFromDocumentIdentifierContext();
+	IdentifierBridgeFromDocumentIdentifierContext identifierBridgeFromDocumentIdentifierContext();
 
-	RoutingKeyBridgeToRoutingKeyContext getRoutingKeyBridgeToRoutingKeyContext();
+	RoutingKeyBridgeToRoutingKeyContext routingKeyBridgeToRoutingKeyContext();
 
-	TypeBridgeWriteContext getTypeBridgeWriteContext();
+	TypeBridgeWriteContext typeBridgeWriteContext();
 
-	PropertyBridgeWriteContext getPropertyBridgeWriteContext();
+	PropertyBridgeWriteContext propertyBridgeWriteContext();
 
-	ValueBridgeFromIndexedValueContext getValueBridgeFromIndexedValueContext();
+	ValueBridgeFromIndexedValueContext valueBridgeFromIndexedValueContext();
 
 }

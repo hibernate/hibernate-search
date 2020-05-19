@@ -41,9 +41,9 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 		this.introspector = introspector;
 		this.typeIdentifier = typeIdentifier;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
-		this.caster = new JavaClassPojoCaster<>( typeIdentifier.getJavaClass() );
-		this.xClass = introspector.toXClass( typeIdentifier.getJavaClass() );
-		this.declaredProperties = introspector.getDeclaredMethodAccessXPropertiesByName( xClass );
+		this.caster = new JavaClassPojoCaster<>( typeIdentifier.javaClass() );
+		this.xClass = introspector.toXClass( typeIdentifier.javaClass() );
+		this.declaredProperties = introspector.declaredMethodAccessXPropertiesByName( xClass );
 	}
 
 	@Override
@@ -74,7 +74,7 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<T> getTypeIdentifier() {
+	public PojoRawTypeIdentifier<T> typeIdentifier() {
 		return typeIdentifier;
 	}
 
@@ -83,25 +83,19 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 		return typeIdentifier.toString();
 	}
 
-	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
-	@Override
-	public String getName() {
-		return name();
-	}
-
 	@Override
 	public boolean isAbstract() {
-		return Modifier.isAbstract( typeIdentifier.getJavaClass().getModifiers() );
+		return Modifier.isAbstract( typeIdentifier.javaClass().getModifiers() );
 	}
 
 	@Override
 	public boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof JavaBeanTypeModel
-				&& ( (JavaBeanTypeModel<?>) other ).typeIdentifier.getJavaClass().isAssignableFrom( typeIdentifier.getJavaClass() );
+				&& ( (JavaBeanTypeModel<?>) other ).typeIdentifier.javaClass().isAssignableFrom( typeIdentifier.javaClass() );
 	}
 
 	@Override
-	public PojoRawTypeModel<? super T> getRawType() {
+	public PojoRawTypeModel<? super T> rawType() {
 		return this;
 	}
 
@@ -118,12 +112,12 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
-		return introspector.getAnnotations( xClass );
+	public Stream<Annotation> annotations() {
+		return introspector.annotations( xClass );
 	}
 
 	@Override
-	public PojoPropertyModel<?> getProperty(String propertyName) {
+	public PojoPropertyModel<?> property(String propertyName) {
 		return ascendingSuperTypes()
 				.map( model -> model.declaredProperties.get( propertyName ) )
 				.filter( Objects::nonNull )
@@ -132,13 +126,13 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public Stream<PojoPropertyModel<?>> getDeclaredProperties() {
+	public Stream<PojoPropertyModel<?>> declaredProperties() {
 		return declaredProperties.values().stream()
 				.map( this::createProperty );
 	}
 
 	@Override
-	public PojoCaster<T> getCaster() {
+	public PojoCaster<T> caster() {
 		return caster;
 	}
 

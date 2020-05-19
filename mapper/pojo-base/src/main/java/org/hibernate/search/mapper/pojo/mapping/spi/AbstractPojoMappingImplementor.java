@@ -65,12 +65,12 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public final IdentifierBridgeToDocumentIdentifierContext getIdentifierBridgeToDocumentIdentifierContext() {
+	public final IdentifierBridgeToDocumentIdentifierContext identifierBridgeToDocumentIdentifierContext() {
 		return toDocumentIdentifierContext;
 	}
 
 	@Override
-	public ValueBridgeToIndexedValueContext getValueBridgeToIndexedValueContext() {
+	public ValueBridgeToIndexedValueContext valueBridgeToIndexedValueContext() {
 		return toIndexedValueContext;
 	}
 

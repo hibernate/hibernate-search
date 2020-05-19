@@ -23,7 +23,7 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 					child.contributeAdditionalMetadata( collector );
 				}
 				catch (RuntimeException e) {
-					collector.getFailureCollector().add( e );
+					collector.failureCollector().add( e );
 				}
 			}
 		}
@@ -37,7 +37,7 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 					child.contributeMapping( collector );
 				}
 				catch (RuntimeException e) {
-					collector.getFailureCollector().add( e );
+					collector.failureCollector().add( e );
 				}
 			}
 		}

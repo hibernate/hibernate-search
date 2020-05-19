@@ -14,6 +14,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
  */
 public interface PojoIndexingProcessorSessionContext extends BridgeSessionContext {
 
-	PojoRuntimeIntrospector getRuntimeIntrospector();
+	PojoRuntimeIntrospector runtimeIntrospector();
 
 }

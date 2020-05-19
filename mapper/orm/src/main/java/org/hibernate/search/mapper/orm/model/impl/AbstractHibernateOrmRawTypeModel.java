@@ -37,8 +37,8 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 			PojoRawTypeIdentifier<T> typeIdentifier) {
 		this.introspector = introspector;
 		this.typeIdentifier = typeIdentifier;
-		this.xClass = introspector.toXClass( typeIdentifier.getJavaClass() );
-		this.caster = new JavaClassPojoCaster<>( typeIdentifier.getJavaClass() );
+		this.xClass = introspector.toXClass( typeIdentifier.javaClass() );
+		this.caster = new JavaClassPojoCaster<>( typeIdentifier.javaClass() );
 	}
 
 	@Override
@@ -69,19 +69,13 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<T> getTypeIdentifier() {
+	public PojoRawTypeIdentifier<T> typeIdentifier() {
 		return typeIdentifier;
 	}
 
 	@Override
 	public final String name() {
 		return typeIdentifier.toString();
-	}
-
-	// FIXME HSEARCH-3922 remove this once the POJO mapper SPIs have been updated.
-	@Override
-	public String getName() {
-		return name();
 	}
 
 	@Override
@@ -91,7 +85,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public final PojoRawTypeModel<? super T> getRawType() {
+	public final PojoRawTypeModel<? super T> rawType() {
 		return this;
 	}
 
@@ -102,7 +96,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> descendingSuperTypes();
 
 	@Override
-	public final PojoPropertyModel<?> getProperty(String propertyName) {
+	public final PojoPropertyModel<?> property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = getPropertyOrNull( propertyName );
 		if ( propertyModel == null ) {
 			throw log.cannotFindReadableProperty( this, propertyName );
@@ -111,7 +105,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public final Stream<PojoPropertyModel<?>> getDeclaredProperties() {
+	public final Stream<PojoPropertyModel<?>> declaredProperties() {
 		if ( declaredProperties == null ) {
 			// TODO HSEARCH-3056 remove lambdas if possible
 			declaredProperties = getDeclaredPropertyNames()
@@ -123,7 +117,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public final PojoCaster<T> getCaster() {
+	public final PojoCaster<T> caster() {
 		return caster;
 	}
 

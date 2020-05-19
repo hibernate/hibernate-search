@@ -35,9 +35,9 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	}
 
 	@Override
-	public ContextualFailureCollector getFailureCollector() {
+	public ContextualFailureCollector failureCollector() {
 		// There's nothing to add to the context
-		return rootBuilder.getFailureCollector();
+		return rootBuilder.failureCollector();
 	}
 
 	void checkSameEntity(String entityName) {

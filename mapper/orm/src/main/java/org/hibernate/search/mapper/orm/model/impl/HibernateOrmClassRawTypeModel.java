@@ -79,8 +79,8 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	}
 
 	@Override
-	public Stream<Annotation> getAnnotations() {
-		return introspector.getAnnotations( xClass );
+	public Stream<Annotation> annotations() {
+		return introspector.annotations( xClass );
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	private Map<String, XProperty> getDeclaredFieldAccessXPropertiesByName() {
 		if ( declaredFieldAccessXPropertiesByName == null ) {
 			declaredFieldAccessXPropertiesByName =
-					introspector.getDeclaredFieldAccessXPropertiesByName( xClass );
+					introspector.declaredFieldAccessXPropertiesByName( xClass );
 		}
 		return declaredFieldAccessXPropertiesByName;
 	}
@@ -112,7 +112,7 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	private Map<String, XProperty> getDeclaredMethodAccessXPropertiesByName() {
 		if ( declaredMethodAccessXPropertiesByName == null ) {
 			declaredMethodAccessXPropertiesByName =
-					introspector.getDeclaredMethodAccessXPropertiesByName( xClass );
+					introspector.declaredMethodAccessXPropertiesByName( xClass );
 		}
 		return declaredMethodAccessXPropertiesByName;
 	}
@@ -231,12 +231,12 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 		if ( memberFromHibernateOrmMetamodel instanceof Method ) {
 			return methodAccessXProperty == null
 					? memberFromHibernateOrmMetamodel
-					: PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
+					: PojoCommonsAnnotationsHelper.extractUnderlyingMember( methodAccessXProperty );
 		}
 		else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
 			return fieldAccessXProperty == null
 					? memberFromHibernateOrmMetamodel
-					: PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
+					: PojoCommonsAnnotationsHelper.extractUnderlyingMember( fieldAccessXProperty );
 		}
 		else {
 			return null;
@@ -252,11 +252,11 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 			XProperty methodAccessXProperty, XProperty fieldAccessXProperty) {
 		if ( methodAccessXProperty != null ) {
 			// Method access is available. Get values from the getter.
-			return PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
+			return PojoCommonsAnnotationsHelper.extractUnderlyingMember( methodAccessXProperty );
 		}
 		else if ( fieldAccessXProperty != null ) {
 			// Method access is not available, but field access is. Get values directly from the field.
-			return PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
+			return PojoCommonsAnnotationsHelper.extractUnderlyingMember( fieldAccessXProperty );
 		}
 		else {
 			// Neither method access nor field access is available.

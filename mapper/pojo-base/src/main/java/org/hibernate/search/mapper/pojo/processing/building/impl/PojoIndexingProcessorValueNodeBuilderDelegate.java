@@ -69,7 +69,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			FieldModelContributor fieldModelContributor) {
 		String defaultedRelativeFieldName = relativeFieldName;
 		if ( defaultedRelativeFieldName == null ) {
-			defaultedRelativeFieldName = modelPath.getParent().getPropertyModel().getName();
+			defaultedRelativeFieldName = modelPath.getParent().getPropertyModel().name();
 		}
 
 		mappingHelper.getIndexModelBinder().bindValue(
@@ -86,7 +86,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			Integer maxDepth, Set<String> includePaths) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
-			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().getName() + ".";
+			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().name() + ".";
 		}
 
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
@@ -107,7 +107,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 
-			Set<PojoTypeMetadataContributor> contributors = mappingHelper.getContributorProvider().get( embeddedTypeModelPath.getTypeModel().getRawType() );
+			Set<PojoTypeMetadataContributor> contributors = mappingHelper.getContributorProvider().get( embeddedTypeModelPath.getTypeModel().rawType() );
 			if ( contributors.isEmpty() ) {
 				throw log.invalidIndexedEmbedded( modelPath.getTypeModel() );
 			}
@@ -135,7 +135,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			return doBuild( parentDependencyCollector );
 		}
 		catch (RuntimeException e) {
-			getFailureCollector().add( e );
+			failureCollector().add( e );
 			return Collections.emptyList();
 		}
 	}

@@ -50,7 +50,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 		// Process annotations and add metadata to the type mapping
 		boolean processedTypeLevelAnnotation = processTypeLevelAnnotations( typeMappingStep, typeModel );
-		boolean processedPropertyLevelAnnotation = typeModel.getDeclaredProperties()
+		boolean processedPropertyLevelAnnotation = typeModel.declaredProperties()
 				.map( propertyModel -> processPropertyLevelAnnotations( typeMappingStep, typeModel, propertyModel ) )
 				.reduce( (processedAnnotationHere, processedAnnotationThere) -> processedAnnotationHere || processedAnnotationThere )
 				.orElse( false );
@@ -66,7 +66,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private boolean processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
 		boolean processedAtLeastOneAnnotation = false;
-		List<Annotation> annotationList = typeModel.getAnnotations()
+		List<Annotation> annotationList = typeModel.annotations()
 				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
 				.collect( Collectors.toList() );
 		for ( Annotation annotation : annotationList ) {
@@ -79,10 +79,10 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private boolean processPropertyLevelAnnotations(TypeMappingStepImpl typeMappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
-		String propertyName = propertyModel.getName();
+		String propertyName = propertyModel.name();
 		PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
 		boolean processedAtLeastOneAnnotation = false;
-		List<Annotation> annotationList = propertyModel.getAnnotations()
+		List<Annotation> annotationList = propertyModel.annotations()
 				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
 				.collect( Collectors.toList() );
 		for ( Annotation annotation : annotationList ) {
@@ -137,7 +137,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			rootFailureCollector
 					.withContext( PojoEventContexts.fromType( typeModel ) )
 					.withContext( PojoEventContexts.fromPath(
-							PojoModelPath.ofProperty( propertyModel.getName() )
+							PojoModelPath.ofProperty( propertyModel.name() )
 					) )
 					.withContext( PojoEventContexts.fromAnnotation( annotation ) )
 					.add( e );

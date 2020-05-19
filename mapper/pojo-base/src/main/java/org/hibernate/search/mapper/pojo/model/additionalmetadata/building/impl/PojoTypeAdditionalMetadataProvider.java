@@ -44,8 +44,8 @@ public class PojoTypeAdditionalMetadataProvider {
 		BoundPojoModelPathPropertyNode<?, ?> propertyNode = valueNode.getParent();
 		BoundPojoModelPathTypeNode<?> typeNode = propertyNode.getParent();
 		PojoTypeModel<?> typeModel = typeNode.getTypeModel();
-		return get( typeModel.getRawType() )
-				.getPropertyAdditionalMetadata( propertyNode.getPropertyModel().getName() )
+		return get( typeModel.rawType() )
+				.getPropertyAdditionalMetadata( propertyNode.getPropertyModel().name() )
 				.getValueAdditionalMetadata( valueNode.getExtractorPath() );
 	}
 

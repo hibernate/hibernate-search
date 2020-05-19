@@ -58,7 +58,7 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> JavaBeanTypeModel<T> getTypeModel(Class<T> clazz) {
+	public <T> JavaBeanTypeModel<T> typeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -70,26 +70,26 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 	}
 
 	@Override
-	public PojoRawTypeModel<?> getTypeModel(String name) {
+	public PojoRawTypeModel<?> typeModel(String name) {
 		throw log.namedTypesNotSupported( name );
 	}
 
 	@Override
-	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
+	public <T> PojoGenericTypeModel<T> genericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}
 
 	@Override
-	public ValueReadHandleFactory getAnnotationValueReadHandleFactory() {
+	public ValueReadHandleFactory annotationValueReadHandleFactory() {
 		return valueReadHandleFactory;
 	}
 
 	Stream<? extends JavaBeanTypeModel<?>> getAscendingSuperTypes(XClass xClass) {
-		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
+		return ascendingSuperClasses( xClass ).map( this::typeModel );
 	}
 
 	Stream<? extends JavaBeanTypeModel<?>> getDescendingSuperTypes(XClass xClass) {
-		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
+		return descendingSuperClasses( xClass ).map( this::typeModel );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Method method) throws IllegalAccessException {
