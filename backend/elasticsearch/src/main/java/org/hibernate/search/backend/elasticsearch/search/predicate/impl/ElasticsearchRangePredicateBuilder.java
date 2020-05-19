@@ -65,10 +65,10 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	@Override
 	public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 		this.range = Range.between(
-				convertToFieldValue( range.getLowerBoundValue(), convertLowerBound ),
-				range.getLowerBoundInclusion(),
-				convertToFieldValue( range.getUpperBoundValue(), convertUpperBound ),
-				range.getUpperBoundInclusion()
+				convertToFieldValue( range.lowerBoundValue(), convertLowerBound ),
+				range.lowerBoundInclusion(),
+				convertToFieldValue( range.upperBoundValue(), convertUpperBound ),
+				range.upperBoundInclusion()
 		);
 	}
 
@@ -76,14 +76,14 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonAccessor<JsonElement> accessor;
-		Optional<JsonElement> lowerBoundValue = range.getLowerBoundValue();
+		Optional<JsonElement> lowerBoundValue = range.lowerBoundValue();
 		if ( lowerBoundValue.isPresent() ) {
-			accessor = RangeBoundInclusion.EXCLUDED.equals( range.getLowerBoundInclusion() ) ? GT_ACCESSOR : GTE_ACCESSOR;
+			accessor = RangeBoundInclusion.EXCLUDED.equals( range.lowerBoundInclusion() ) ? GT_ACCESSOR : GTE_ACCESSOR;
 			accessor.set( innerObject, lowerBoundValue.get() );
 		}
-		Optional<JsonElement> upperBoundValue = range.getUpperBoundValue();
+		Optional<JsonElement> upperBoundValue = range.upperBoundValue();
 		if ( upperBoundValue.isPresent() ) {
-			accessor = RangeBoundInclusion.EXCLUDED.equals( range.getUpperBoundInclusion() ) ? LT_ACCESSOR : LTE_ACCESSOR;
+			accessor = RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ? LT_ACCESSOR : LTE_ACCESSOR;
 			accessor.set( innerObject, upperBoundValue.get() );
 		}
 

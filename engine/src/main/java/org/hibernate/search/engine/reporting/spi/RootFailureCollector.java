@@ -98,7 +98,7 @@ public final class RootFailureCollector implements FailureCollector {
 
 		@Override
 		public synchronized ContextualFailureCollectorImpl withContext(EventContext context) {
-			List<EventContextElement> elements = context.getElements();
+			List<EventContextElement> elements = context.elements();
 			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
 			if ( elements.isEmpty() ) {
 				// Just log the problem and degrade gracefully.
@@ -181,12 +181,12 @@ public final class RootFailureCollector implements FailureCollector {
 			if ( t instanceof SearchException ) {
 				SearchException e = (SearchException) t;
 				ContextualFailureCollectorImpl failureCollector = this;
-				EventContext eventContext = e.getContext();
+				EventContext eventContext = e.context();
 				if ( eventContext != null ) {
-					failureCollector = failureCollector.withContext( e.getContext() );
+					failureCollector = failureCollector.withContext( e.context() );
 				}
 				// Do not include the context in the failure message, since we will render it as part of the failure report
-				failureCollector.doAdd( e, e.getMessageWithoutContext() );
+				failureCollector.doAdd( e, e.messageWithoutContext() );
 			}
 			else {
 				doAdd( t, t.getMessage() );

@@ -93,16 +93,16 @@ public class ElasticsearchRangeAggregation<F, K>
 		@Override
 		public void range(Range<? extends K> range) {
 			JsonObject rangeJson = new JsonObject();
-			Optional<? extends K> lowerBoundValue = range.getLowerBoundValue();
+			Optional<? extends K> lowerBoundValue = range.lowerBoundValue();
 			if ( lowerBoundValue.isPresent() ) {
-				if ( !RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ) ) {
+				if ( !RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() ) ) {
 					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
 				rangeJson.add( "from", convertToFieldValue( lowerBoundValue.get() ) );
 			}
-			Optional<? extends K> upperBoundValue = range.getUpperBoundValue();
+			Optional<? extends K> upperBoundValue = range.upperBoundValue();
 			if ( upperBoundValue.isPresent() ) {
-				if ( !RangeBoundInclusion.EXCLUDED.equals( range.getUpperBoundInclusion() ) ) {
+				if ( !RangeBoundInclusion.EXCLUDED.equals( range.upperBoundInclusion() ) ) {
 					throw log.elasticsearchRangeAggregationRequiresCanonicalFormForRanges( range );
 				}
 				rangeJson.add( "to", convertToFieldValue( upperBoundValue.get() ) );

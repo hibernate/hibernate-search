@@ -38,13 +38,13 @@ class LuceneTextRangePredicateBuilder<F>
 
 		return new TermRangeQuery(
 				absoluteFieldPath,
-				codec.normalize( absoluteFieldPath, range.getLowerBoundValue().orElse( null ) ),
-				codec.normalize( absoluteFieldPath, range.getUpperBoundValue().orElse( null ) ),
+				codec.normalize( absoluteFieldPath, range.lowerBoundValue().orElse( null ) ),
+				codec.normalize( absoluteFieldPath, range.upperBoundValue().orElse( null ) ),
 				// we force the true value if the bound is null because of some Lucene checks down the hill
-				RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() )
-						|| !range.getLowerBoundValue().isPresent(),
-				RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
-						|| !range.getUpperBoundValue().isPresent()
+				RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() )
+						|| !range.lowerBoundValue().isPresent(),
+				RangeBoundInclusion.INCLUDED.equals( range.upperBoundInclusion() )
+						|| !range.upperBoundValue().isPresent()
 		);
 	}
 }

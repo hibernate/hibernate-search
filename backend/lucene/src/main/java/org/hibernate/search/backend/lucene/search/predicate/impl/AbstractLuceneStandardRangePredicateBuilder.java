@@ -59,10 +59,10 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	@Override
 	public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 		this.range = Range.between(
-				convertAndEncode( range.getLowerBoundValue(), convertLowerBound ),
-				range.getLowerBoundInclusion(),
-				convertAndEncode( range.getUpperBoundValue(), convertUpperBound ),
-				range.getUpperBoundInclusion()
+				convertAndEncode( range.lowerBoundValue(), convertLowerBound ),
+				range.lowerBoundInclusion(),
+				convertAndEncode( range.upperBoundValue(), convertUpperBound ),
+				range.upperBoundInclusion()
 		);
 	}
 

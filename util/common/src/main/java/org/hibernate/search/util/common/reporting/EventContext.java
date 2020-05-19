@@ -66,10 +66,22 @@ public final class EventContext {
 		return Objects.hash( parent, element );
 	}
 
-	public List<EventContextElement> getElements() {
+	/**
+	 * @return The elements of this context. Never empty, does not contain {@code null} values.
+	 */
+	public List<EventContextElement> elements() {
 		List<EventContextElement> result = new ArrayList<>();
 		addTo( result );
 		return result;
+	}
+
+	/**
+	 * @return The elements of this context. Never empty, does not contain {@code null} values.
+	 * @deprecated Use {@link #elements()} instead.
+	 */
+	@Deprecated
+	public List<EventContextElement> getElements() {
+		return elements();
 	}
 
 	/**
@@ -77,7 +89,7 @@ public final class EventContext {
 	 */
 	public String render() {
 		StringJoiner contextJoiner = new StringJoiner( MESSAGES.contextSeparator() );
-		for ( EventContextElement element : getElements() ) {
+		for ( EventContextElement element : elements() ) {
 			contextJoiner.add( element.render() );
 		}
 		return contextJoiner.toString();

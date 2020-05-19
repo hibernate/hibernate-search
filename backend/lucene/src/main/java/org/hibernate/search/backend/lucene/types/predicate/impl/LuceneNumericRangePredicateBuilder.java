@@ -36,8 +36,8 @@ class LuceneNumericRangePredicateBuilder<F, E extends Number>
 		LuceneNumericDomain<E> domain = codec.getDomain();
 		return domain.createRangeQuery(
 				absoluteFieldPath,
-				getLowerValue( domain, range.getLowerBoundValue(), range.getLowerBoundInclusion() ),
-				getUpperValue( domain, range.getUpperBoundValue(), range.getUpperBoundInclusion() )
+				getLowerValue( domain, range.lowerBoundValue(), range.lowerBoundInclusion() ),
+				getUpperValue( domain, range.upperBoundValue(), range.upperBoundInclusion() )
 		);
 	}
 
