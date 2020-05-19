@@ -19,7 +19,10 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 public interface SearchLoadingOptionsStep {
 
 	/**
-	 * Set the JDBC fetch size for this query.
+	 * Set the fetch size for this query,
+	 * i.e. the amount of entities to load for each query to the database.
+	 * <p>
+	 * Higher numbers mean fewer queries, but larger result sets.
 	 *
 	 * @param fetchSize The fetch size. Must be positive or zero.
 	 * @return {@code this} for method chaining.
