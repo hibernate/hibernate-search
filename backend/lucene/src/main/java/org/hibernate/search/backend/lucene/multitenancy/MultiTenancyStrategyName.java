@@ -30,7 +30,7 @@ public enum MultiTenancyStrategyName {
 	public static MultiTenancyStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				MultiTenancyStrategyName.values(),
-				MultiTenancyStrategyName::getExternalRepresentation,
+				MultiTenancyStrategyName::externalRepresentation,
 				log::invalidMultiTenancyStrategyName,
 				value
 		);
@@ -42,7 +42,19 @@ public enum MultiTenancyStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	private String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation()} instead.
+	 */
+	@Deprecated
+	private String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 }

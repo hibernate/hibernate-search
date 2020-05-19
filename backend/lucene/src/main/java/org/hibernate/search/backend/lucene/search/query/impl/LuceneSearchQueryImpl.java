@@ -138,7 +138,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	@Override
-	public Sort getLuceneSort() {
+	public Sort luceneSort() {
 		return luceneSort;
 	}
 

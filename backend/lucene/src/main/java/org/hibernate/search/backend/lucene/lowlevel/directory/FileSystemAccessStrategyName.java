@@ -25,7 +25,7 @@ public enum FileSystemAccessStrategyName {
 	public static FileSystemAccessStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				FileSystemAccessStrategyName.values(),
-				FileSystemAccessStrategyName::getExternalRepresentation,
+				FileSystemAccessStrategyName::externalRepresentation,
 				log::invalidFileSystemAccessStrategyName,
 				value
 		);
@@ -37,7 +37,19 @@ public enum FileSystemAccessStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	/**
+	 * @return The expected string representation in configuration properties.
+	 */
+	private String externalRepresentation() {
 		return externalRepresentation;
+	}
+
+	/**
+	 * @return The expected string representation in configuration properties.
+	 * @deprecated Use {@link #externalRepresentation()} instead.
+	 */
+	@Deprecated
+	private String getExternalRepresentation() {
+		return externalRepresentation();
 	}
 }
