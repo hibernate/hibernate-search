@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.scope.impl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface HibernateOrmScopeTypeContextProvider {
-	<E> HibernateOrmScopeIndexedTypeContext<E> getIndexedByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> HibernateOrmScopeIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	<E> HibernateOrmScopeContainedTypeContext<E> getContainedByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> HibernateOrmScopeContainedTypeContext<E> containedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 }

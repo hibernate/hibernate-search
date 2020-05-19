@@ -10,8 +10,8 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 
 public interface HibernateOrmLoadingMappingContext {
 
-	EntityLoadingCacheLookupStrategy getCacheLookupStrategy();
+	EntityLoadingCacheLookupStrategy cacheLookupStrategy();
 
-	int getFetchSize();
+	int fetchSize();
 
 }

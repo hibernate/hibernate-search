@@ -8,6 +8,6 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 public interface HibernateOrmListenerTypeContextProvider {
 
-	HibernateOrmListenerTypeContext getByHibernateOrmEntityName(String hibernateOrmEntityName);
+	HibernateOrmListenerTypeContext forHibernateOrmEntityName(String hibernateOrmEntityName);
 
 }

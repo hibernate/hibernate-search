@@ -56,23 +56,23 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> HibernateOrmIndexedTypeContext<E> getIndexedByExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+	public <E> HibernateOrmIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
 		return (HibernateOrmIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
 	}
 
 	@Override
-	public HibernateOrmIndexedTypeContext<?> getIndexedByJpaEntityName(String indexName) {
+	public HibernateOrmIndexedTypeContext<?> indexedForJpaEntityName(String indexName) {
 		return indexedTypeContextsByJpaEntityName.get( indexName );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> HibernateOrmContainedTypeContext<E> getContainedByExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+	public <E> HibernateOrmContainedTypeContext<E> containedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
 		return (HibernateOrmContainedTypeContext<E>) containedTypeContexts.get( typeIdentifier );
 	}
 
 	@Override
-	public AbstractHibernateOrmTypeContext<?> getByHibernateOrmEntityName(String hibernateOrmEntityName) {
+	public AbstractHibernateOrmTypeContext<?> forHibernateOrmEntityName(String hibernateOrmEntityName) {
 		AbstractHibernateOrmTypeContext<?> result =
 				indexedTypeContextsByHibernateOrmEntityName.get( hibernateOrmEntityName );
 		if ( result != null ) {
@@ -85,29 +85,29 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 	}
 
 	@Override
-	public <T> PojoRawTypeIdentifier<T> getTypeIdentifierByJavaClass(Class<T> clazz) {
+	public <T> PojoRawTypeIdentifier<T> typeIdentifierForJavaClass(Class<T> clazz) {
 		return typeIdentifierResolver.resolveByJavaClass( clazz );
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<?> getTypeIdentifierByHibernateOrmEntityName(String entityName) {
+	public PojoRawTypeIdentifier<?> typeIdentifierForHibernateOrmEntityName(String entityName) {
 		PojoRawTypeIdentifier<?> result = typeIdentifierResolver.resolveByHibernateOrmEntityName( entityName );
 		if ( result == null ) {
-			throw log.invalidEntityName( entityName, typeIdentifierResolver.getKnownHibernateOrmEntityNames() );
+			throw log.invalidEntityName( entityName, typeIdentifierResolver.allKnownHibernateOrmEntityNames() );
 		}
 		return result;
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<?> getTypeIdentifierByEntityName(String entityName) {
+	public PojoRawTypeIdentifier<?> typeIdentifierForEntityName(String entityName) {
 		PojoRawTypeIdentifier<?> result = typeIdentifierResolver.resolveByJpaOrHibernateOrmEntityName( entityName );
 		if ( result == null ) {
-			throw log.invalidEntityName( entityName, typeIdentifierResolver.getKnownJpaOrHibernateOrmEntityNames() );
+			throw log.invalidEntityName( entityName, typeIdentifierResolver.allKnownJpaOrHibernateOrmEntityNames() );
 		}
 		return result;
 	}
 
-	Collection<HibernateOrmIndexedTypeContext<?>> getAllIndexed() {
+	Collection<HibernateOrmIndexedTypeContext<?>> allIndexed() {
 		return indexedTypeContexts.values();
 	}
 

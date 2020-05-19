@@ -12,8 +12,8 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public interface HibernateOrmLoadingSessionContext {
 
-	SessionImplementor getSession();
+	SessionImplementor session();
 
-	DocumentReferenceConverter<EntityReference> getReferenceHitMapper();
+	DocumentReferenceConverter<EntityReference> referenceHitMapper();
 
 }

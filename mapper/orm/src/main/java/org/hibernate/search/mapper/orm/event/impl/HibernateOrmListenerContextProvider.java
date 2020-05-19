@@ -13,11 +13,11 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface HibernateOrmListenerContextProvider {
 
-	HibernateOrmListenerTypeContextProvider getTypeContextProvider();
+	HibernateOrmListenerTypeContextProvider typeContextProvider();
 
-	PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
+	PojoIndexingPlan<EntityReference> currentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
 
-	ConfiguredAutomaticIndexingSynchronizationStrategy getCurrentAutomaticIndexingSynchronizationStrategy(
+	ConfiguredAutomaticIndexingSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(
 			SessionImplementor session);
 
 }

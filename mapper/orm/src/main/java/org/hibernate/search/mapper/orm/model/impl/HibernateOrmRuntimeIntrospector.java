@@ -38,7 +38,7 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 		if ( entityName == null ) {
 			return null;
 		}
-		return (PojoRawTypeIdentifier<? extends T>) typeContextProvider.getTypeIdentifierByHibernateOrmEntityName( entityName );
+		return (PojoRawTypeIdentifier<? extends T>) typeContextProvider.typeIdentifierForHibernateOrmEntityName( entityName );
 	}
 
 	@Override

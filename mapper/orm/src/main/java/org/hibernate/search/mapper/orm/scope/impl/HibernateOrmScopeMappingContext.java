@@ -15,8 +15,8 @@ import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMa
 public interface HibernateOrmScopeMappingContext
 		extends HibernateOrmMassIndexingMappingContext, HibernateOrmLoadingMappingContext {
 
-	HibernateOrmScopeSessionContext getSessionContext(EntityManager entityManager);
+	HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager);
 
-	DetachedBackendSessionContext getDetachedBackendSessionContext(String tenantId);
+	DetachedBackendSessionContext detachedBackendSessionContext(String tenantId);
 
 }

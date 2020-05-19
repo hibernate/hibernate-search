@@ -14,6 +14,6 @@ public interface HibernateOrmRuntimeIntrospectorTypeContextProvider {
 	 * @param entityName The Hibernate ORM entity name (different from the JPA entity name).
 	 * @return The corresponding type identifier.
 	 */
-	PojoRawTypeIdentifier<?> getTypeIdentifierByHibernateOrmEntityName(String entityName);
+	PojoRawTypeIdentifier<?> typeIdentifierForHibernateOrmEntityName(String entityName);
 
 }

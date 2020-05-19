@@ -137,7 +137,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 * @throws InterruptedException if interrupted while waiting for endAllSignal.
 	 */
 	private void doBatchWork() throws InterruptedException {
-		ExecutorService executor = mappingContext.getThreadPoolProvider()
+		ExecutorService executor = mappingContext.threadPoolProvider()
 				.newFixedThreadPool( typesToIndexInParallel, MassIndexerImpl.THREAD_NAME_PREFIX + "Workspace" );
 		for ( HibernateOrmMassIndexingIndexedTypeContext<?> type : rootEntityTypes ) {
 			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( type ), executor ) );

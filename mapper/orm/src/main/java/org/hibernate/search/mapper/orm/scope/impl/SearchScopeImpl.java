@@ -41,7 +41,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 				mappingContext, sessionContext, delegate.includedIndexedTypes()
 		);
 		return new HibernateOrmSearchQuerySelectStepImpl<>(
-				delegate.search( sessionContext.getBackendSessionContext(), loadingContextBuilder ),
+				delegate.search( sessionContext.backendSessionContext(), loadingContextBuilder ),
 				loadingContextBuilder
 		);
 	}
@@ -78,7 +78,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public SearchWorkspace workspace(String tenantId) {
-		return workspace( mappingContext.getDetachedBackendSessionContext( tenantId ) );
+		return workspace( mappingContext.detachedBackendSessionContext( tenantId ) );
 	}
 
 	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
@@ -92,7 +92,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	@Override
 	public MassIndexer massIndexer(String tenantId) {
-		return massIndexer( mappingContext.getDetachedBackendSessionContext( tenantId ) );
+		return massIndexer( mappingContext.detachedBackendSessionContext( tenantId ) );
 	}
 
 	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {

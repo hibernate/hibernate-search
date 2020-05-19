@@ -200,8 +200,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public SearchIndexedEntity indexedEntity(Class<?> entityType) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.getTypeIdentifierByJavaClass( entityType );
-		SearchIndexedEntity type = typeContextContainer.getIndexedByExactType( typeIdentifier );
+				typeContextContainer.typeIdentifierForJavaClass( entityType );
+		SearchIndexedEntity type = typeContextContainer.indexedForExactType( typeIdentifier );
 		if ( type == null ) {
 			throw log.notIndexedEntityType( entityType );
 		}
@@ -211,8 +211,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public SearchIndexedEntity indexedEntity(String entityName) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.getTypeIdentifierByEntityName( entityName );
-		SearchIndexedEntity type = typeContextContainer.getIndexedByExactType( typeIdentifier );
+				typeContextContainer.typeIdentifierForEntityName( entityName );
+		SearchIndexedEntity type = typeContextContainer.indexedForExactType( typeIdentifier );
 		if ( type == null ) {
 			throw log.notIndexedEntityName( entityName );
 		}
@@ -221,17 +221,17 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public Collection<SearchIndexedEntity> allIndexedEntities() {
-		return Collections.unmodifiableCollection( typeContextContainer.getAllIndexed() );
+		return Collections.unmodifiableCollection( typeContextContainer.allIndexed() );
 	}
 
 	@Override
 	public IndexManager indexManager(String indexName) {
-		return getSearchIntegration().indexManager( indexName );
+		return searchIntegration().indexManager( indexName );
 	}
 
 	@Override
 	public Backend backend(String backendName) {
-		return getSearchIntegration().backend( backendName );
+		return searchIntegration().backend( backendName );
 	}
 
 	@Override
@@ -245,12 +245,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public EntityLoadingCacheLookupStrategy getCacheLookupStrategy() {
+	public EntityLoadingCacheLookupStrategy cacheLookupStrategy() {
 		return cacheLookupStrategy;
 	}
 
 	@Override
-	public int getFetchSize() {
+	public int fetchSize() {
 		return fetchSize;
 	}
 
@@ -259,47 +259,41 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return sessionFactory;
 	}
 
-	// FIXME HSEARCH-3922 remove this once the SPIs have been updated.
 	@Override
-	public SessionFactoryImplementor getSessionFactory() {
-		return sessionFactory;
-	}
-
-	@Override
-	public ThreadPoolProvider getThreadPoolProvider() {
+	public ThreadPoolProvider threadPoolProvider() {
 		return delegate().threadPoolProvider();
 	}
 
 	@Override
-	public FailureHandler getFailureHandler() {
+	public FailureHandler failureHandler() {
 		return delegate().failureHandler();
 	}
 
 	@Override
-	public HibernateOrmScopeSessionContext getSessionContext(EntityManager entityManager) {
+	public HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager) {
 		return HibernateOrmSearchSession.get( this, HibernateOrmUtils.toSessionImplementor( entityManager ) );
 	}
 
 	@Override
-	public DetachedBackendSessionContext getDetachedBackendSessionContext(String tenantId) {
+	public DetachedBackendSessionContext detachedBackendSessionContext(String tenantId) {
 		return DetachedBackendSessionContext.of( this, tenantId );
 	}
 
 	@Override
-	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(SessionImplementor session,
+	public PojoIndexingPlan<EntityReference> currentIndexingPlan(SessionImplementor session,
 			boolean createIfDoesNotExist) {
 		return HibernateOrmSearchSession.get( this, session ).currentIndexingPlan( createIfDoesNotExist );
 	}
 
 	@Override
-	public ConfiguredAutomaticIndexingSynchronizationStrategy getCurrentAutomaticIndexingSynchronizationStrategy(
+	public ConfiguredAutomaticIndexingSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(
 			SessionImplementor session) {
 		return HibernateOrmSearchSession.get( this, session )
 				.configuredAutomaticIndexingSynchronizationStrategy();
 	}
 
 	@Override
-	public HibernateOrmTypeContextContainer getTypeContextProvider() {
+	public HibernateOrmTypeContextContainer typeContextProvider() {
 		return typeContextContainer;
 	}
 
@@ -307,7 +301,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
 		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
 		for ( Class<? extends T> clazz : classes ) {
-			typeIdentifiers.add( typeContextContainer.getTypeIdentifierByJavaClass( clazz ) );
+			typeIdentifiers.add( typeContextContainer.typeIdentifierForJavaClass( clazz ) );
 		}
 		return doCreateScope( typeIdentifiers );
 	}
@@ -316,7 +310,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( entityNames.size() );
 		for ( String entityName : entityNames ) {
-			typeIdentifiers.add( getEntityTypeIdentifier( expectedSuperType, entityName ) );
+			typeIdentifiers.add( entityTypeIdentifier( expectedSuperType, entityName ) );
 		}
 		return doCreateScope( typeIdentifiers );
 	}
@@ -337,14 +331,14 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		);
 	}
 
-	private SearchIntegration getSearchIntegration() {
+	private SearchIntegration searchIntegration() {
 		return HibernateSearchContextProviderService.get( sessionFactory() ).getIntegration();
 	}
 
-	private <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(Class<T> expectedSuperType,
+	private <T> PojoRawTypeIdentifier<? extends T> entityTypeIdentifier(Class<T> expectedSuperType,
 			String entityName) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.getTypeIdentifierByEntityName( entityName );
+				typeContextContainer.typeIdentifierForEntityName( entityName );
 		Class<?> actualJavaType = typeIdentifier.javaClass();
 		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
 			throw log.invalidEntitySuperType( entityName, expectedSuperType, actualJavaType );
@@ -359,7 +353,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return delegate()
 				.<EntityReference, HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
 						this,
-						typeContextContainer::getIndexedByExactType
+						typeContextContainer::indexedForExactType
 				)
 				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
 	}
@@ -369,7 +363,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				delegate().createPojoScope(
 						this,
 						typeIdentifiers,
-						typeContextContainer::getIndexedByExactType
+						typeContextContainer::indexedForExactType
 				);
 
 		return new SearchScopeImpl<T>( this, scopeDelegate );

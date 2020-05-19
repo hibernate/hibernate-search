@@ -193,7 +193,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	public void automaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.getFailureHandler() );
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler() );
 		synchronizationStrategy.apply( builder );
 		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}
@@ -203,26 +203,20 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		return sessionImplementor;
 	}
 
-	// FIXME HSEARCH-3922 remove this once the SPIs have been updated.
 	@Override
-	public SessionImplementor getSession() {
-		return session();
-	}
-
-	@Override
-	public BackendSessionContext getBackendSessionContext() {
+	public BackendSessionContext backendSessionContext() {
 		return this;
 	}
 
 	@Override
-	public DocumentReferenceConverter<EntityReference> getReferenceHitMapper() {
+	public DocumentReferenceConverter<EntityReference> referenceHitMapper() {
 		return this;
 	}
 
 	@Override
 	public EntityReference fromDocumentReference(DocumentReference reference) {
 		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.getIndexedByJpaEntityName( reference.typeName() );
+				typeContextProvider.indexedForJpaEntityName( reference.typeName() );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Document reference " + reference + " refers to an unknown type"
@@ -241,7 +235,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	@Override
 	public EntityReference createEntityReference(String typeName, Object identifier) {
 		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.getIndexedByJpaEntityName( typeName );
+				typeContextProvider.indexedForJpaEntityName( typeName );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Type " + typeName + " refers to an unknown type"

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingCont
 
 public interface HibernateOrmSearchSessionMappingContext extends PojoSearchSessionMappingContext {
 
-	FailureHandler getFailureHandler();
+	FailureHandler failureHandler();
 
 	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 

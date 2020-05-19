@@ -180,7 +180,7 @@ public class MassIndexerImpl implements MassIndexer {
 	@Override
 	public CompletableFuture<?> start() {
 		BatchCoordinator coordinator = createCoordinator();
-		ExecutorService executor = mappingContext.getThreadPoolProvider()
+		ExecutorService executor = mappingContext.threadPoolProvider()
 				.newFixedThreadPool( 1, THREAD_NAME_PREFIX + "Coordinator" );
 		try {
 			return Futures.runAsync( coordinator, executor );
@@ -239,7 +239,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private MassIndexingFailureHandler getOrCreateFailureHandler() {
 		MassIndexingFailureHandler result = failureHandler;
 		if ( result == null ) {
-			result = new DelegatingMassIndexingFailureHandler( mappingContext.getFailureHandler() );
+			result = new DelegatingMassIndexingFailureHandler( mappingContext.failureHandler() );
 		}
 		result = new FailSafeMassIndexingFailureHandlerWrapper( result );
 		return result;

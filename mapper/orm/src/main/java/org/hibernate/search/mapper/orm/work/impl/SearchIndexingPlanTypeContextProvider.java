@@ -10,8 +10,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface SearchIndexingPlanTypeContextProvider {
 
-	<T> PojoRawTypeIdentifier<T> getTypeIdentifierByJavaClass(Class<T> javaClass);
+	<T> PojoRawTypeIdentifier<T> typeIdentifierForJavaClass(Class<T> javaClass);
 
-	PojoRawTypeIdentifier<?> getTypeIdentifierByEntityName(String entityName);
+	PojoRawTypeIdentifier<?> typeIdentifierForEntityName(String entityName);
 
 }

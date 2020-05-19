@@ -70,10 +70,10 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {
-		return typeContextProvider.getTypeIdentifierByJavaClass( entityType );
+		return typeContextProvider.typeIdentifierForJavaClass( entityType );
 	}
 
 	private PojoRawTypeIdentifier<?> getTypeIdentifier(String hibernateOrmEntityName) {
-		return typeContextProvider.getTypeIdentifierByEntityName( hibernateOrmEntityName );
+		return typeContextProvider.typeIdentifierForEntityName( hibernateOrmEntityName );
 	}
 }
