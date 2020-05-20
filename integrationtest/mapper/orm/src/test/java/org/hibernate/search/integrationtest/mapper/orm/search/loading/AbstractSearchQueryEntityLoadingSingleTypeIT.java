@@ -9,10 +9,13 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.Session;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.EntityIdDocumentIdContainedEntity;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.EntityIdDocumentIdIndexedEntity;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.NonEntityIdDocumentIdContainedEntity;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.NonEntityIdDocumentIdIndexedEntity;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
@@ -83,24 +86,54 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		);
 	}
 
+	protected final void testLoading(
+			Consumer<Session> sessionSetup,
+			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
+			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
+			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
+			BiConsumer<OrmSoftAssertions, List<T>> assertionsContributor) {
+		testLoading(
+				sessionSetup,
+				Collections.singletonList( primitives.getIndexedClass() ),
+				Collections.singletonList( primitives.getIndexName() ),
+				loadingOptionsContributor,
+				hitDocumentReferencesContributor,
+				expectedLoadedEntitiesContributor,
+				assertionsContributor
+		);
+	}
+
 	protected abstract static class SingleTypeLoadingModelPrimitives<T> {
-
-		public abstract String getIndexName();
-
-		public abstract Class<T> getIndexedClass();
-
-		public abstract String getIndexedEntityName();
-
-		public abstract boolean isCacheLookupSupported();
-
-		public abstract T newIndexed(int id);
-
-		public abstract String getDocumentIdForEntityId(int id);
 
 		@Override
 		public String toString() {
 			return getClass().getSimpleName();
 		}
+
+		public abstract String getIndexName();
+
+		public abstract Class<T> getIndexedClass();
+
+		public abstract Class<?>[] getEntityClasses();
+
+		public abstract String getIndexedEntityName();
+
+		public abstract boolean isCacheLookupSupported();
+
+		public abstract String getEagerGraphName();
+
+		public abstract String getLazyGraphName();
+
+		public abstract T newIndexed(int id);
+
+		public abstract T newIndexedWithContained(int id);
+
+		public abstract String getDocumentIdForEntityId(int id);
+
+		public abstract Object getContainedEager(T entity);
+
+		public abstract List<?> getContainedLazy(T entity);
+
 	}
 
 	private static final class EntityIdDocumentIdLoadingModelPrimitives
@@ -117,6 +150,11 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		}
 
 		@Override
+		public Class<?>[] getEntityClasses() {
+			return new Class[] { EntityIdDocumentIdIndexedEntity.class, EntityIdDocumentIdContainedEntity.class };
+		}
+
+		@Override
 		public String getIndexedEntityName() {
 			return EntityIdDocumentIdIndexedEntity.NAME;
 		}
@@ -127,8 +165,30 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		}
 
 		@Override
+		public String getEagerGraphName() {
+			return EntityIdDocumentIdIndexedEntity.GRAPH_EAGER;
+		}
+
+		@Override
+		public String getLazyGraphName() {
+			return EntityIdDocumentIdIndexedEntity.GRAPH_LAZY;
+		}
+
+		@Override
 		public EntityIdDocumentIdIndexedEntity newIndexed(int id) {
 			return new EntityIdDocumentIdIndexedEntity( id );
+		}
+
+		@Override
+		public EntityIdDocumentIdIndexedEntity newIndexedWithContained(int id) {
+			EntityIdDocumentIdIndexedEntity entity = newIndexed( id );
+			EntityIdDocumentIdContainedEntity containedEager = new EntityIdDocumentIdContainedEntity( id * 10000 );
+			entity.setContainedEager( containedEager );
+			containedEager.setContainingEager( entity );
+			EntityIdDocumentIdContainedEntity containedLazy = new EntityIdDocumentIdContainedEntity( id * 10000 + 1 );
+			entity.getContainedLazy().add( containedLazy );
+			containedLazy.setContainingLazy( entity );
+			return entity;
 		}
 
 		@Override
@@ -136,6 +196,15 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 			return String.valueOf( id );
 		}
 
+		@Override
+		public Object getContainedEager(EntityIdDocumentIdIndexedEntity entity) {
+			return entity.getContainedEager();
+		}
+
+		@Override
+		public List<?> getContainedLazy(EntityIdDocumentIdIndexedEntity entity) {
+			return entity.getContainedLazy();
+		}
 	}
 
 	private static final class NonEntityIdDocumentIdLoadingModelPrimitives
@@ -152,6 +221,11 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		}
 
 		@Override
+		public Class<?>[] getEntityClasses() {
+			return new Class[] { NonEntityIdDocumentIdIndexedEntity.class, NonEntityIdDocumentIdContainedEntity.class };
+		}
+
+		@Override
 		public String getIndexedEntityName() {
 			return NonEntityIdDocumentIdIndexedEntity.NAME;
 		}
@@ -162,8 +236,30 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 		}
 
 		@Override
+		public String getEagerGraphName() {
+			return NonEntityIdDocumentIdIndexedEntity.GRAPH_EAGER;
+		}
+
+		@Override
+		public String getLazyGraphName() {
+			return NonEntityIdDocumentIdIndexedEntity.GRAPH_LAZY;
+		}
+
+		@Override
 		public NonEntityIdDocumentIdIndexedEntity newIndexed(int id) {
 			return new NonEntityIdDocumentIdIndexedEntity( id, getIntegerDocumentIdForEntityId( id ) );
+		}
+
+		@Override
+		public NonEntityIdDocumentIdIndexedEntity newIndexedWithContained(int id) {
+			NonEntityIdDocumentIdIndexedEntity entity = newIndexed( id );
+			NonEntityIdDocumentIdContainedEntity containedEager = new NonEntityIdDocumentIdContainedEntity( id * 10000 );
+			entity.setContainedEager( containedEager );
+			containedEager.setContainingEager( entity );
+			NonEntityIdDocumentIdContainedEntity containedLazy = new NonEntityIdDocumentIdContainedEntity( id * 10000 + 1 );
+			entity.getContainedLazy().add( containedLazy );
+			containedLazy.setContainingLazy( entity );
+			return entity;
 		}
 
 		@Override
@@ -176,5 +272,14 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 			return id + 40;
 		}
 
+		@Override
+		public Object getContainedEager(NonEntityIdDocumentIdIndexedEntity entity) {
+			return entity.getContainedEager();
+		}
+
+		@Override
+		public List<?> getContainedLazy(NonEntityIdDocumentIdIndexedEntity entity) {
+			return entity.getContainedLazy();
+		}
 	}
 }

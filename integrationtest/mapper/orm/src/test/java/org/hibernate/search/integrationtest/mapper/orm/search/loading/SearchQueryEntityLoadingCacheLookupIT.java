@@ -72,7 +72,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 						defaultCacheLookupStrategy
 				)
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
-				.setup( primitives.getIndexedClass() );
+				.setup( primitives.getEntityClasses() );
 
 		backendMock.verifyExpectationsMet();
 	}

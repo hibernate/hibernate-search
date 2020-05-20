@@ -152,7 +152,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 						HibernateOrmMapperSettings.QUERY_LOADING_FETCH_SIZE,
 						searchLoadingFetchSize
 				)
-				.setup( primitives.getIndexedClass() );
+				.setup( primitives.getEntityClasses() );
 
 		backendMock.verifyExpectationsMet();
 	}

@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,21 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
+		testLoading(
+				sessionSetup, targetClasses, targetIndexes,
+				loadingOptionsContributor, hitDocumentReferencesContributor, expectedLoadedEntitiesContributor,
+				(assertions, ignored) -> assertionsContributor.accept( assertions )
+		);
+	}
+
+	protected final <T> void testLoading(
+			Consumer<Session> sessionSetup,
+			List<? extends Class<? extends T>> targetClasses,
+			List<String> targetIndexes,
+			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
+			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
+			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
+			BiConsumer<OrmSoftAssertions, List<T>> assertionsContributor) {
 		OrmSoftAssertions.withinSession( sessionFactory(), (session, softAssertions) -> {
 			sessionSetup.accept( session );
 
@@ -84,7 +100,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 						assertThat( Hibernate.isInitialized( loadedEntity ) ).isTrue();
 					} );
 
-			assertionsContributor.accept( softAssertions );
+			assertionsContributor.accept( softAssertions, loadedEntities );
 
 			// Be sure to do this after having executed the query and checked loading,
 			// because it may trigger additional loading.
