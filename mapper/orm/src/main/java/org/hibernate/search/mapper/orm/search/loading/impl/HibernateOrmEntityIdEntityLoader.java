@@ -31,21 +31,21 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 
 	public static EntityLoaderFactory factory(SessionFactoryImplementor sessionFactory,
-			EntityPersister entityType) {
-		return new Factory( HibernateOrmUtils.toRootEntityType( sessionFactory, entityType ) );
+			EntityPersister entityPersister) {
+		return new Factory( HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister ) );
 	}
 
 	private final Session session;
-	private final EntityPersister targetEntityType;
+	private final EntityPersister entityPersister;
 	private final EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmEntityIdEntityLoader(
-			EntityPersister targetEntityType,
+			EntityPersister entityPersister,
 			Session session,
 			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
-		this.targetEntityType = targetEntityType;
+		this.entityPersister = entityPersister;
 		this.session = session;
 		this.cacheLookupStrategyImplementor = cacheLookupStrategyImplementor;
 		this.loadingOptions = loadingOptions;
@@ -139,7 +139,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	}
 
 	private MultiIdentifierLoadAccess<?> createMultiAccess() {
-		MultiIdentifierLoadAccess<?> multiAccess = session.byMultipleIds( targetEntityType.getEntityName() );
+		MultiIdentifierLoadAccess<?> multiAccess = session.byMultipleIds( entityPersister.getEntityName() );
 
 		multiAccess.withBatchSize( loadingOptions.fetchSize() );
 
@@ -176,10 +176,10 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 
 	private static class Factory implements EntityLoaderFactory {
 
-		private final EntityPersister rootEntityType;
+		private final EntityPersister rootEntityPersister;
 
-		private Factory(EntityPersister rootEntityType) {
-			this.rootEntityType = rootEntityType;
+		private Factory(EntityPersister rootEntityPersister) {
+			this.rootEntityPersister = rootEntityPersister;
 		}
 
 		@Override
@@ -190,12 +190,12 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			Factory other = (Factory) obj;
 			// If the root entity type is different,
 			// the factories work in separate ID spaces and should be used separately.
-			return rootEntityType.equals( other.rootEntityType );
+			return rootEntityPersister.equals( other.rootEntityPersister );
 		}
 
 		@Override
 		public int hashCode() {
-			return rootEntityType.hashCode();
+			return rootEntityPersister.hashCode();
 		}
 
 		@Override
@@ -241,15 +241,15 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			return result;
 		}
 
-		private HibernateOrmComposableEntityLoader<?> doCreate(EntityPersister targetEntityType,
+		private HibernateOrmComposableEntityLoader<?> doCreate(EntityPersister entityPersister,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-			if ( !rootEntityType.getMappedClass().isAssignableFrom( targetEntityType.getMappedClass() ) ) {
+			if ( !rootEntityPersister.getMappedClass().isAssignableFrom( entityPersister.getMappedClass() ) ) {
 				throw new AssertionFailure(
 						"Some types among the targeted entity types are not subclasses of the expected root entity type."
 								+ " There is a bug in Hibernate Search, please report it."
-								+ " Expected root entity name: " + rootEntityType.getEntityName()
-								+ " Targeted entity name: " + targetEntityType.getEntityName()
+								+ " Expected root entity name: " + rootEntityPersister.getEntityName()
+								+ " Targeted entity name: " + entityPersister.getEntityName()
 				);
 			}
 
@@ -272,18 +272,18 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 					break;
 				case PERSISTENCE_CONTEXT:
 					cacheLookupStrategyImplementor =
-							PersistenceContextLookupStrategy.create( targetEntityType, session );
+							PersistenceContextLookupStrategy.create( entityPersister, session );
 					break;
 				case PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE:
 					cacheLookupStrategyImplementor =
-							PersistenceContextThenSecondLevelCacheLookupStrategy.create( targetEntityType, session );
+							PersistenceContextThenSecondLevelCacheLookupStrategy.create( entityPersister, session );
 					break;
 				default:
 					throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
 			}
 
 			return new HibernateOrmEntityIdEntityLoader<>(
-					targetEntityType, session, cacheLookupStrategyImplementor, loadingOptions
+					entityPersister, session, cacheLookupStrategyImplementor, loadingOptions
 			);
 		}
 
