@@ -100,7 +100,7 @@ so we call `addValue` on `summaryValue` instead of `target`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/simple/Invoice.java[tags=include,!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/simple/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using the `@PropertyBinding` annotation.
 ====
@@ -159,7 +159,7 @@ defining a normalizer,
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/Invoice.java[tags=include,!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the `fieldName` parameter.

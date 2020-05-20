@@ -121,7 +121,7 @@ but you are obviously free to implement it in a separate java file.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/binder/Book.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/binder/Book.java[tags=include;!getters-setters]
 ----
 <1> Map the property to the document identifier.
 <2> Instruct Hibernate Search to use our custom identifier binder.
@@ -178,7 +178,7 @@ using the `identifierBinder()` method.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/Book.java[tags=include,!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/Book.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the parameter.

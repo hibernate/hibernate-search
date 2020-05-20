@@ -539,7 +539,7 @@ from `JsonElement` to the mapped type (here, `String`).
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include,!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include;!getters-setters]
 ----
 <1> Map the property to an index field.
 Note that value bridges using a non-standard type (such as Elasticsearch's "native" type)
