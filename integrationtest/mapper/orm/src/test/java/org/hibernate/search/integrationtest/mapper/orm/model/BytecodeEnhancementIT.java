@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,7 +29,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.LazyGroup;
-import org.hibernate.internal.util.ReflectHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -225,43 +222,28 @@ public class BytecodeEnhancementIT {
 	private static void assertOnlyLoadedPropertiesAre(Object object, String[] allProperties,
 			String ... expectedLoadedProperties) {
 		Set<String> expectedNotLoadedPropertyNames = new HashSet<>();
+		Set<String> expectedLoadedPropertyNames = CollectionHelper.asImmutableSet( expectedLoadedProperties );
 		Collections.addAll( expectedNotLoadedPropertyNames, allProperties );
-		expectedNotLoadedPropertyNames.removeAll( CollectionHelper.asImmutableSet( expectedLoadedProperties ) );
+		expectedNotLoadedPropertyNames.removeAll( expectedLoadedPropertyNames );
+
 		assertPropertiesAreNotLoaded( object, expectedNotLoadedPropertyNames );
+		assertPropertiesAreLoaded( object, expectedLoadedPropertyNames );
 	}
 
 	private static void assertPropertiesAreNotLoaded(Object object, String expectedNotLoadedProperties) {
 		assertPropertiesAreNotLoaded( object, CollectionHelper.asImmutableSet( expectedNotLoadedProperties ) );
 	}
 
-	private static void assertPropertiesAreNotLoaded(Object object, Set<String> expectedNotLoadedProperties) {
-		for ( String propertyName : expectedNotLoadedProperties ) {
-			Object loadedValue = getFieldByReflection( object, propertyName );
-			assertThat( loadedValue )
-					.as(
-							"Loaded value of '" + propertyName + "' in object of type '"
-							+ object.getClass().getSimpleName() + "'"
-					)
-					.satisfiesAnyOf(
-							obj -> assertThat( obj ).isNull(),
-							// Primitive fields cannot be null
-							obj -> assertThat( obj ).isIn( 0, 0L, 0.0f, 0.0d, false )
-					);
+	private static void assertPropertiesAreLoaded(Object object, Set<String> expectedLoadedProperties) {
+		for ( String propertyName : expectedLoadedProperties ) {
+			assertThatManaged( object ).hasPropertyInitialized( propertyName );
 		}
 	}
 
-	// EnhancerTestUtils.getFieldByReflection uses getDeclaredField and thus doesn't work in our case.
-	// Maybe this will be fixed as part of https://hibernate.atlassian.net/browse/HHH-14006 ?
-	private static Object getFieldByReflection(Object entity, String fieldName) {
-		try {
-			Field field = entity.getClass().getField( fieldName );
-			ReflectHelper.ensureAccessibility( field );
-			return field.get( entity );
+	private static void assertPropertiesAreNotLoaded(Object object, Set<String> expectedNotLoadedProperties) {
+		for ( String propertyName : expectedNotLoadedProperties ) {
+			assertThatManaged( object ).hasPropertyNotInitialized( propertyName );
 		}
-		catch (NoSuchFieldException | IllegalAccessException e) {
-			fail( "Fail to get field '" + fieldName + "' in entity " + entity + ": " + e.getMessage() );
-		}
-		return null;
 	}
 
 	@MappedSuperclass
