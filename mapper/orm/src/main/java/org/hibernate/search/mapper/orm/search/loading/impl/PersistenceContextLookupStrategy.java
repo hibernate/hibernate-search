@@ -23,7 +23,7 @@ import org.hibernate.persister.entity.EntityPersister;
 class PersistenceContextLookupStrategy<E>
 		implements EntityLoadingCacheLookupStrategyImplementor<E> {
 
-	static EntityLoadingCacheLookupStrategyImplementor<?> create(EntityPersister commonEntitySuperTypePersister,
+	static PersistenceContextLookupStrategy<?> create(EntityPersister commonEntitySuperTypePersister,
 			SessionImplementor session) {
 		return new PersistenceContextLookupStrategy<>(
 				commonEntitySuperTypePersister, session

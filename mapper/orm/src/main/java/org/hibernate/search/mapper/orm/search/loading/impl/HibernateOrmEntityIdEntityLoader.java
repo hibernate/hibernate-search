@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -35,18 +35,23 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		return new Factory( HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister ) );
 	}
 
+	private static final String IDS_PARAMETER_NAME = "ids";
+
 	private final Session session;
 	private final EntityPersister entityPersister;
+	private final PersistenceContextLookupStrategy persistenceContextLookup;
 	private final EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmEntityIdEntityLoader(
 			EntityPersister entityPersister,
 			Session session,
+			PersistenceContextLookupStrategy persistenceContextLookup,
 			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.entityPersister = entityPersister;
 		this.session = session;
+		this.persistenceContextLookup = persistenceContextLookup;
 		this.cacheLookupStrategyImplementor = cacheLookupStrategyImplementor;
 		this.loadingOptions = loadingOptions;
 	}
@@ -123,7 +128,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			ids.add( (Serializable) reference.id() );
 		}
 
-		List<?> loadedEntities = createMultiAccess().multiLoad( ids );
+		List<?> loadedEntities = loadEntitiesById( ids );
 
 		for ( int i = 0; i < references.size(); i++ ) {
 			EntityReference reference = references.get( i );
@@ -138,12 +143,53 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		return (List<E>) loadedEntities;
 	}
 
-	private MultiIdentifierLoadAccess<?> createMultiAccess() {
-		MultiIdentifierLoadAccess<?> multiAccess = session.byMultipleIds( entityPersister.getEntityName() );
+	private List<?> loadEntitiesById(List<Serializable> allIds) {
+		int fetchSize = loadingOptions.fetchSize();
+		Query<?> query = createQuery( fetchSize );
 
-		multiAccess.withBatchSize( loadingOptions.fetchSize() );
+		if ( fetchSize >= allIds.size() ) {
+			query.setParameterList( IDS_PARAMETER_NAME, allIds );
+			// The result is worthless, as entities are not in the right order.
+			// However, this will load entities into the persistence context... see further down.
+			query.getResultList();
+		}
+		else {
+			List<Object> ids = new ArrayList<>( fetchSize );
+			for ( Object documentIdSourceValue : allIds ) {
+				ids.add( documentIdSourceValue );
+				if ( ids.size() >= fetchSize ) {
+					query.setParameterList( IDS_PARAMETER_NAME, ids );
+					// Same as above: the result is worthless.
+					query.getResultList();
+					ids.clear();
+				}
+			}
+			if ( !ids.isEmpty() ) {
+				query.setParameterList( IDS_PARAMETER_NAME, ids );
+				// Same as above: the result is worthless.
+				query.getResultList();
+			}
+		}
 
-		return multiAccess;
+		// All entities are now in the persistence context. Get them!
+		List<Object> result = new ArrayList<>( allIds.size() );
+		for ( Serializable id : allIds ) {
+			result.add( persistenceContextLookup.lookup( id ) );
+		}
+		return result;
+	}
+
+	private Query<?> createQuery(int fetchSize) {
+		// We can't use the criteria API here, because it doesn't work for dynamic-map entities.
+		Query<?> query = session.createQuery(
+				"select e from " + entityPersister.getEntityName()
+						+ " e where " + entityPersister.getIdentifierPropertyName() + " in (:" + IDS_PARAMETER_NAME + ")",
+				(Class<?>) entityPersister.getMappedClass()
+		);
+
+		query.setFetchSize( fetchSize );
+
+		return query;
 	}
 
 	/*
@@ -253,6 +299,8 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 				);
 			}
 
+			PersistenceContextLookupStrategy<?> persistenceContextLookup =
+					PersistenceContextLookupStrategy.create( entityPersister, session );
 			EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
 
 			/*
@@ -271,8 +319,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 					cacheLookupStrategyImplementor = null;
 					break;
 				case PERSISTENCE_CONTEXT:
-					cacheLookupStrategyImplementor =
-							PersistenceContextLookupStrategy.create( entityPersister, session );
+					cacheLookupStrategyImplementor = persistenceContextLookup;
 					break;
 				case PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE:
 					cacheLookupStrategyImplementor =
@@ -283,7 +330,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			}
 
 			return new HibernateOrmEntityIdEntityLoader<>(
-					entityPersister, session, cacheLookupStrategyImplementor, loadingOptions
+					entityPersister, session, persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions
 			);
 		}
 
