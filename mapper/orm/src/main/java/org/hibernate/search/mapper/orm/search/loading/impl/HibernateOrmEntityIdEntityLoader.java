@@ -23,7 +23,12 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
-public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
+/**
+ * An entity loader for indexed entities whose document ID is the entity ID.
+ *
+ * @param <E> The type of loaded entities.
+ */
+public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 
 	public static EntityLoaderFactory factory(SessionFactoryImplementor sessionFactory,
 			EntityPersister entityType) {
@@ -35,7 +40,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 	private final EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	private HibernateOrmByIdEntityLoader(
+	private HibernateOrmEntityIdEntityLoader(
 			EntityPersister targetEntityType,
 			Session session,
 			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor,
@@ -290,7 +295,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 					throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
 			}
 
-			return new HibernateOrmByIdEntityLoader<>(
+			return new HibernateOrmEntityIdEntityLoader<>(
 					targetEntityType, session, cacheLookupStrategyImplementor, loadingOptions
 			);
 		}

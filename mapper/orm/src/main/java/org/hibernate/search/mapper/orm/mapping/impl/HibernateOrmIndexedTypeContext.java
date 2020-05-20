@@ -15,8 +15,8 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmByIdEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmCriteriaEntityLoader;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmEntityIdEntityLoader;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoader;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -38,7 +38,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 		if ( entityPersister().getIdentifierPropertyName().equals( builder.documentIdSourcePropertyName ) ) {
 			documentIdIsEntityId = true;
-			loaderFactory = HibernateOrmByIdEntityLoader.factory(
+			loaderFactory = HibernateOrmEntityIdEntityLoader.factory(
 					sessionFactory, entityPersister()
 			);
 		}
@@ -49,7 +49,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			EntityTypeDescriptor<E> typeDescriptor = entityTypeDescriptor();
 			SingularAttribute<? super E, ?> documentIdSourceAttribute =
 					typeDescriptor.getSingularAttribute( builder.documentIdSourcePropertyName );
-			loaderFactory = HibernateOrmCriteriaEntityLoader.factory(
+			loaderFactory = HibernateOrmNonEntityIdPropertyEntityLoader.factory(
 					typeDescriptor, documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
 			);
 		}

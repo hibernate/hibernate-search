@@ -33,7 +33,13 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
+/**
+ * An entity loader for indexed entities whose document ID is not the entity ID,
+ * but another property.
+ *
+ * @param <E> The type of loaded entities.
+ */
+public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -49,7 +55,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 	private final Session session;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	private HibernateOrmCriteriaEntityLoader(
+	private HibernateOrmNonEntityIdPropertyEntityLoader(
 			EntityTypeDescriptor<? extends E> entityType,
 			SingularAttribute<? super E, ?> documentIdSourceAttribute,
 			ValueReadHandle<?> documentIdSourceHandle,
@@ -209,7 +215,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 			 */
 			@SuppressWarnings("unchecked")
 			HibernateOrmComposableEntityLoader<E2> result =
-					(HibernateOrmComposableEntityLoader<E2>) new HibernateOrmCriteriaEntityLoader<>(
+					(HibernateOrmComposableEntityLoader<E2>) new HibernateOrmNonEntityIdPropertyEntityLoader<>(
 							entityType, documentIdSourceAttribute, documentIdSourceHandle,
 							session, loadingOptions
 					);
