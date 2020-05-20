@@ -8,6 +8,9 @@ package org.hibernate.search.mapper.orm.search.loading.dsl;
 
 import java.util.function.Consumer;
 
+import javax.persistence.EntityGraph;
+
+import org.hibernate.graph.GraphSemantic;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
@@ -37,5 +40,29 @@ public interface SearchLoadingOptionsStep {
 	 * @return {@code this} for method chaining.
 	 */
 	SearchLoadingOptionsStep cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy);
+
+	/**
+	 * Customize fetching/loading of entity attributes and associations
+	 * according to the given entity graph, with the given semantic.
+	 *
+	 * @param graph The graph to apply.
+	 * @param semantic The semantic to use when applying the graph.
+	 * @return {@code this} for method chaining.
+	 * @see org.hibernate.Session#createEntityGraph(Class)
+	 * @see org.hibernate.Session#createEntityGraph(String)
+	 * @see org.hibernate.Session#getEntityGraph(String)
+	 */
+	SearchLoadingOptionsStep graph(EntityGraph<?> graph, GraphSemantic semantic);
+
+	/**
+	 * Customize fetching/loading of entity attributes and associations
+	 * according to the entity graph with the given name, with the given semantic.
+	 *
+	 * @param graphName The name of the graph to apply.
+	 * @param semantic The semantic to use when applying the graph.
+	 * @return {@code this} for method chaining.
+	 * @see javax.persistence.NamedEntityGraph
+	 */
+	SearchLoadingOptionsStep graph(String graphName, GraphSemantic semantic);
 
 }

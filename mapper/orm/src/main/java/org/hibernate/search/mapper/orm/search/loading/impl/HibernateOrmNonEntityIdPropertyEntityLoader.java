@@ -121,6 +121,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 		query.setFetchSize( fetchSize );
 
+		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
+		if ( entityGraphHint != null ) {
+			query.applyGraph( entityGraphHint.graph, entityGraphHint.semantic );
+		}
+
 		return query;
 	}
 

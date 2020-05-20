@@ -27,7 +27,10 @@ import org.hibernate.QueryException;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.graph.GraphSemantic;
+import org.hibernate.graph.RootGraph;
 import org.hibernate.jpa.QueryHints;
+import org.hibernate.query.Query;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -35,6 +38,7 @@ import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
+import org.hibernate.search.mapper.orm.search.loading.impl.EntityGraphHint;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.transform.ResultTransformer;
@@ -155,6 +159,13 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public Query<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
+		loadingOptions.entityGraphHint( new EntityGraphHint<>( graph, semantic ), true );
+		return this;
+	}
+
+	@Override
 	protected boolean isNativeQuery() {
 		return false;
 	}
@@ -202,6 +213,12 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 				break;
 			case QueryHints.HINT_TIMEOUT:
 				setTimeout( hintValueToInteger( value ) );
+				break;
+			case "javax.persistence.fetchgraph":
+				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
+				break;
+			case "javax.persistence.loadgraph":
+				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
 				break;
 			default:
 				handleUnrecognizedHint( hintName, value );
@@ -408,5 +425,9 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		else {
 			return Integer.parseInt( String.valueOf( value ) );
 		}
+	}
+
+	private static RootGraph<?> hintValueToEntityGraph(Object value) {
+		return (RootGraph) value;
 	}
 }
