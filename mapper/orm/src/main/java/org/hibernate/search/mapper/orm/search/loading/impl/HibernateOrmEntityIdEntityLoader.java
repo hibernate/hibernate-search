@@ -32,7 +32,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 
 	public static EntityLoaderFactory factory(SessionFactoryImplementor sessionFactory,
 			EntityPersister entityType) {
-		return new Factory( toRootEntityType( sessionFactory, entityType ) );
+		return new Factory( HibernateOrmUtils.toRootEntityType( sessionFactory, entityType ) );
 	}
 
 	private final Session session;
@@ -174,19 +174,6 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		return reference.type().isInstance( loadedEntity );
 	}
 
-	private static EntityPersister toRootEntityType(
-			SessionFactoryImplementor sessionFactory, EntityPersister entityType) {
-		/*
-		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
-		 * For example there may be class hierarchies such as A > B > C
-		 * where A and C are entity types and B is a mapped superclass.
-		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
-		 */
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		String rootEntityName = metamodel.entityPersister( entityType.getEntityName() ).getRootEntityName();
-		return metamodel.entityPersister( rootEntityName ).getEntityPersister();
-	}
-
 	private static class Factory implements EntityLoaderFactory {
 
 		private final EntityPersister rootEntityType;
@@ -310,35 +297,11 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 					result = type;
 				}
 				else {
-					result = toMostSpecificCommonEntitySuperType( metamodel, result, type );
+					result = HibernateOrmUtils.toMostSpecificCommonEntitySuperType( metamodel, result, type );
 				}
 			}
 			return result;
 		}
 
-		private static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
-				EntityPersister type1, EntityPersister type2) {
-			/*
-			 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
-			 * For example there may be class hierarchies such as A > B > C
-			 * where A and C are entity types and B is a mapped superclass.
-			 * So even if we know the two types have a common superclass,
-			 * we need to skip non-entity superclasses, and for that we need the Hibernate ORM metamodel.
-			 */
-			EntityPersister superTypeCandidate = type1;
-			while ( superTypeCandidate != null && !HibernateOrmUtils.isSuperTypeOf( superTypeCandidate, type2 ) ) {
-				String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
-				superTypeCandidate = superSuperTypeEntityName == null ? null
-						: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
-			}
-			if ( superTypeCandidate == null ) {
-				throw new AssertionFailure(
-						"Cannot find a common entity supertype for " + type1.getEntityName()
-								+ " and " + type2.getEntityName() + "."
-								+ " There is a bug in Hibernate Search, please report it."
-				);
-			}
-			return superTypeCandidate;
-		}
 	}
 }
