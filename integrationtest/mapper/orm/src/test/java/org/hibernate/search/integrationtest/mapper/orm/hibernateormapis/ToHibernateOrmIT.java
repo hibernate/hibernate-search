@@ -8,16 +8,24 @@ package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.QueryTimeoutException;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.graph.GraphSemantic;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -25,6 +33,7 @@ import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -54,27 +63,63 @@ public class ToHibernateOrmIT {
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		sessionFactory = ormSetupHelper.start()
-				.setup( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class, ContainedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setText( "this is text (1)" );
-			IndexedEntity entity2 = new IndexedEntity();
-			entity2.setId( 2 );
-			entity2.setText( "some more text (2)" );
+			IndexedEntity indexed1 = new IndexedEntity();
+			indexed1.setId( 1 );
+			indexed1.setText( "this is text (1)" );
+			ContainedEntity contained1_1 = new ContainedEntity();
+			contained1_1.setId( 11 );
+			contained1_1.setText( "this is text (1_1)" );
+			indexed1.setContainedEager( contained1_1 );
+			contained1_1.setContainingEager( indexed1 );
+			ContainedEntity contained1_2 = new ContainedEntity();
+			contained1_2.setId( 12 );
+			contained1_2.setText( "this is text (1_2)" );
+			indexed1.getContainedLazy().add( contained1_2 );
+			contained1_2.setContainingLazy( indexed1 );
 
-			session.persist( entity1 );
-			session.persist( entity2 );
+			IndexedEntity indexed2 = new IndexedEntity();
+			indexed2.setId( 2 );
+			indexed2.setText( "some more text (2)" );
+			ContainedEntity contained2_1 = new ContainedEntity();
+			contained2_1.setId( 21 );
+			contained2_1.setText( "this is text (2_1)" );
+			indexed2.setContainedEager( contained2_1 );
+			contained2_1.setContainingEager( indexed2 );
+			ContainedEntity contained2_2 = new ContainedEntity();
+			contained2_2.setId( 22 );
+			contained2_2.setText( "this is text (2_2)" );
+			indexed2.getContainedLazy().add( contained2_2 );
+			contained2_2.setContainingLazy( indexed2 );
+
+			session.persist( contained1_1 );
+			session.persist( contained1_2 );
+			session.persist( indexed1 );
+			session.persist( contained2_1 );
+			session.persist( contained2_2 );
+			session.persist( indexed2 );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
-							.field( "text", entity1.getText() )
+							.field( "text", indexed1.getText() )
+							.objectField( "containedEager", b2 -> b2
+									.field( "text", contained1_1.getText() )
+							)
+							.objectField( "containedLazy", b2 -> b2
+									.field( "text", contained1_2.getText() )
+							)
 					)
 					.add( "2", b -> b
-							.field( "text", entity2.getText() )
+							.field( "text", indexed2.getText() )
+							.objectField( "containedEager", b2 -> b2
+									.field( "text", contained2_1.getText() )
+							)
+							.objectField( "containedLazy", b2 -> b2
+									.field( "text", contained2_2.getText() )
+							)
 					)
 					.processedThenExecuted();
 		} );
@@ -387,6 +432,205 @@ public class ToHibernateOrmIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_jpaHint_fetch() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "javax.persistence.fetchgraph", session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "javax.persistence.fetchgraph", session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// FETCH graph => associations can be forced to lazy even if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_jpaHint_load() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "javax.persistence.loadgraph", session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.NAME ), b -> { },
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "javax.persistence.loadgraph", session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// LOAD graph => associations cannot be forced to lazy if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_setter_fetch() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// FETCH graph => associations can be forced to lazy even if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_setter_load() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// LOAD graph => associations cannot be forced to lazy if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	public void graph_override_jpaHint() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.where( f -> f.matchAll() )
+							.loading( o -> o.graph( IndexedEntity.GRAPH_EAGER, GraphSemantic.LOAD ) )
+							.toQuery()
+			);
+
+			query.setHint( "javax.persistence.fetchgraph", session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// FETCH graph => associations can be forced to lazy even if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_override_setter() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.where( f -> f.matchAll() )
+							.loading( o -> o.graph( IndexedEntity.GRAPH_EAGER, GraphSemantic.LOAD ) )
+							.toQuery()
+			);
+
+			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// FETCH graph => associations can be forced to lazy even if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1857" )
 	public void reuseSearchSessionAfterOrmSessionIsClosed_noMatching() {
 		Session session = sessionFactory.openSession();
@@ -448,15 +692,38 @@ public class ToHibernateOrmIT {
 
 	@Entity(name = IndexedEntity.NAME)
 	@Indexed(index = IndexedEntity.NAME)
+	@NamedEntityGraph(
+			name = IndexedEntity.GRAPH_EAGER,
+			includeAllAttributes = true
+	)
+	@NamedEntityGraph(
+			name = IndexedEntity.GRAPH_LAZY
+	)
 	public static class IndexedEntity {
 
 		public static final String NAME = "indexed";
+
+		public static final String GRAPH_EAGER = "graph-eager";
+		public static final String GRAPH_LAZY = "graph-lazy";
 
 		@Id
 		private Integer id;
 
 		@FullTextField(analyzer = "myAnalyzer")
 		private String text;
+
+		@OneToOne(fetch = FetchType.EAGER)
+		@IndexedEmbedded
+		private ContainedEntity containedEager;
+
+		@OneToMany(mappedBy = "containingLazy", fetch = FetchType.LAZY)
+		@IndexedEmbedded
+		private List<ContainedEntity> containedLazy = new ArrayList<>();
+
+		@Override
+		public String toString() {
+			return "IndexedEntity[id=" + id + "]";
+		}
 
 		public Integer getId() {
 			return id;
@@ -474,6 +741,72 @@ public class ToHibernateOrmIT {
 			this.text = text;
 		}
 
+		public ContainedEntity getContainedEager() {
+			return containedEager;
+		}
+
+		public void setContainedEager(ContainedEntity containedEager) {
+			this.containedEager = containedEager;
+		}
+
+		public List<ContainedEntity> getContainedLazy() {
+			return containedLazy;
+		}
+	}
+
+	@Entity(name = ContainedEntity.NAME)
+	public static class ContainedEntity {
+
+		public static final String NAME = "contained";
+
+		@Id
+		private Integer id;
+
+		@FullTextField(analyzer = "myAnalyzer")
+		private String text;
+
+		@OneToOne(mappedBy = "containedEager")
+		private IndexedEntity containingEager;
+
+		@ManyToOne
+		private IndexedEntity containingLazy;
+
+		@Override
+		public String toString() {
+			return "ContainedEntity[id=" + id + "]";
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
+		public IndexedEntity getContainingEager() {
+			return containingEager;
+		}
+
+		public void setContainingEager(IndexedEntity containingEager) {
+			this.containingEager = containingEager;
+		}
+
+		public IndexedEntity getContainingLazy() {
+			return containingLazy;
+		}
+
+		public void setContainingLazy(IndexedEntity containingLazy) {
+			this.containingLazy = containingLazy;
+		}
 	}
 
 }
