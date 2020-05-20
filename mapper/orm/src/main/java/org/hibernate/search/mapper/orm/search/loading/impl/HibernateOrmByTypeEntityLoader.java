@@ -37,7 +37,7 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 		// Note that multiple entity types may share the same loader
 		for ( EntityReference reference : references ) {
 			objectsByReference.put( reference, null );
-			HibernateOrmComposableEntityLoader<? extends T> delegate = getDelegate( reference.name() );
+			HibernateOrmComposableEntityLoader<? extends T> delegate = delegateForType( reference.name() );
 			referencesByDelegate.computeIfAbsent( delegate, ignored -> new ArrayList<>() )
 					.add( reference );
 		}
@@ -58,7 +58,7 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 		return result;
 	}
 
-	private HibernateOrmComposableEntityLoader<? extends T> getDelegate(String entityName) {
+	private HibernateOrmComposableEntityLoader<? extends T> delegateForType(String entityName) {
 		HibernateOrmComposableEntityLoader<? extends T> delegate = delegatesByEntityName.get( entityName );
 		if ( delegate == null ) {
 			throw log.unexpectedSearchHitEntityName( entityName, delegatesByEntityName.keySet() );

@@ -58,11 +58,11 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 		return new DefaultProjectionHitMapper<>( referenceHitMapper, entityLoader );
 	}
 
-	public SessionImplementor getSessionImplementor() {
+	public SessionImplementor sessionImplementor() {
 		return sessionImplementor;
 	}
 
-	public MutableEntityLoadingOptions getLoadingOptions() {
+	public MutableEntityLoadingOptions loadingOptions() {
 		return loadingOptions;
 	}
 
@@ -87,7 +87,7 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 
 		@Override
 		public SearchLoadingOptionsStep fetchSize(int fetchSize) {
-			loadingOptions.setFetchSize( fetchSize );
+			loadingOptions.fetchSize( fetchSize );
 			return this;
 		}
 

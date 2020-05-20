@@ -51,7 +51,7 @@ public class EntityLoaderBuilder<E> {
 		Map<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext>> typesByEntityLoaderFactory =
 				new HashMap<>( concreteIndexedTypes.size() );
 		for ( HibernateOrmLoadingIndexedTypeContext typeContext : concreteIndexedTypes ) {
-			EntityLoaderFactory loaderFactoryForType = typeContext.getLoaderFactory();
+			EntityLoaderFactory loaderFactoryForType = typeContext.loaderFactory();
 			typesByEntityLoaderFactory.computeIfAbsent( loaderFactoryForType, ignored -> new ArrayList<>() )
 					.add( typeContext );
 		}
@@ -77,7 +77,7 @@ public class EntityLoaderBuilder<E> {
 				HibernateOrmComposableEntityLoader<? extends E> loader =
 						createForMultipleTypes( loaderFactory, types, mutableLoadingOptions );
 				for ( HibernateOrmLoadingIndexedTypeContext type : types ) {
-					delegateByEntityName.put( type.getJpaEntityName(), loader );
+					delegateByEntityName.put( type.jpaEntityName(), loader );
 				}
 			}
 			return new HibernateOrmByTypeEntityLoader<>( delegateByEntityName );
@@ -87,7 +87,7 @@ public class EntityLoaderBuilder<E> {
 	private HibernateOrmComposableEntityLoader<? extends E> createForSingleType(
 			HibernateOrmLoadingIndexedTypeContext typeContext,
 			MutableEntityLoadingOptions mutableLoadingOptions) {
-		return typeContext.getLoaderFactory().create(
+		return typeContext.loaderFactory().create(
 				typeContext,
 				session,
 				cacheLookupStrategy,

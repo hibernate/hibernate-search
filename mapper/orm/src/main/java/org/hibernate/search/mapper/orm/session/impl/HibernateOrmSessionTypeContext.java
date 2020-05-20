@@ -13,8 +13,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
  */
 public interface HibernateOrmSessionTypeContext<E> {
 
-	PojoRawTypeIdentifier<E> getTypeIdentifier();
+	PojoRawTypeIdentifier<E> typeIdentifier();
 
-	String getJpaEntityName();
+	String jpaEntityName();
 
 }

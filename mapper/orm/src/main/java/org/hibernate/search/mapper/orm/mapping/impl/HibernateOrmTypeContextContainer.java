@@ -39,16 +39,16 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
-			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.getTypeIdentifier();
+			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.typeIdentifier();
 			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
-			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.getHibernateOrmEntityName(), indexedTypeContext );
-			indexedTypeContextsByJpaEntityName.put( indexedTypeContext.getJpaEntityName(), indexedTypeContext );
+			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.hibernateOrmEntityName(), indexedTypeContext );
+			indexedTypeContextsByJpaEntityName.put( indexedTypeContext.jpaEntityName(), indexedTypeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
-			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.getTypeIdentifier();
+			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.typeIdentifier();
 			containedTypeContexts.put( typeIdentifier, containedTypeContext );
-			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.getHibernateOrmEntityName(), containedTypeContext );
+			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.hibernateOrmEntityName(), containedTypeContext );
 		}
 
 		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();

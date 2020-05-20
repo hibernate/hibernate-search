@@ -13,13 +13,13 @@ public interface HibernateOrmLoadingIndexedTypeContext {
 	/**
 	 * @return The name of the entity in the JPA metamodel.
 	 */
-	String getJpaEntityName();
+	String jpaEntityName();
 
 	/**
 	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.
 	 */
-	EntityPersister getEntityPersister();
+	EntityPersister entityPersister();
 
-	EntityLoaderFactory getLoaderFactory();
+	EntityLoaderFactory loaderFactory();
 
 }

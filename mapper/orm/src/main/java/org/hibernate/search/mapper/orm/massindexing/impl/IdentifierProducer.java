@@ -92,7 +92,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			inTransactionWrapper( upperSession );
 		}
 		catch (RuntimeException exception) {
-			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( type.getJpaEntityName() ) );
+			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( type.jpaEntityName() ) );
 		}
 		finally {
 			destination.producerStopping();
@@ -159,7 +159,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 					SharedSessionContractImplementor sessionImpl = (SharedSessionContractImplementor) session;
 					if ( !sessionImpl.isTransactionInProgress() ) {
 						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing(
-								type.getJpaEntityName()
+								type.jpaEntityName()
 						);
 					}
 
@@ -179,7 +179,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery( Long.class );
 
-		Root<E> root = criteriaQuery.from( type.getEntityTypeDescriptor() );
+		Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
 		criteriaQuery.select( criteriaBuilder.count( root ) );
 
 		return session.createQuery( criteriaQuery )
@@ -190,7 +190,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
 		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( idAttributeOfType.getJavaType() );
 
-		Root<E> root = criteriaQuery.from( type.getEntityTypeDescriptor() );
+		Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
 		Path<I> idPath = root.get( idAttributeOfType );
 		criteriaQuery.select( idPath );
 

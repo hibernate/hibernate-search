@@ -78,7 +78,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.delete( typeContext.getTypeIdentifier(), providedId, entity );
+					.delete( typeContext.typeIdentifier(), providedId, entity );
 		}
 	}
 
@@ -90,7 +90,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.add( typeContext.getTypeIdentifier(), providedId, entity );
+					.add( typeContext.typeIdentifier(), providedId, entity );
 		}
 	}
 
@@ -103,10 +103,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
-				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, entity, getDirtyPropertyNames( event ) );
+				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, entity );
+				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, entity );
 			}
 		}
 	}
@@ -230,18 +230,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, ownerEntity, collectionRole );
+					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, ownerEntity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, ownerEntity );
+					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, ownerEntity );
 				}
 			}
 			else {
-				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, ownerEntity );
+				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, ownerEntity );
 			}
 		}
 	}

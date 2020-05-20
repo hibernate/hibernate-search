@@ -15,11 +15,11 @@ public class MutableEntityLoadingOptions {
 		this.fetchSize = mappingContext.fetchSize();
 	}
 
-	int getFetchSize() {
+	int fetchSize() {
 		return fetchSize;
 	}
 
-	public void setFetchSize(int fetchSize) {
+	public void fetchSize(int fetchSize) {
 		Contracts.assertStrictlyPositive( fetchSize, "fetchSize" );
 		this.fetchSize = fetchSize;
 	}

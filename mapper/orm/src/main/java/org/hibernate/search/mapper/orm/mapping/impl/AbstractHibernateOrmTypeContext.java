@@ -39,24 +39,24 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
 	}
 
 	@Override
-	public String getJpaEntityName() {
+	public String jpaEntityName() {
 		return jpaEntityName;
 	}
 
-	public String getHibernateOrmEntityName() {
+	public String hibernateOrmEntityName() {
 		return entityPersister.getEntityName();
 	}
 
-	public EntityPersister getEntityPersister() {
+	public EntityPersister entityPersister() {
 		return entityPersister;
 	}
 
-	public EntityTypeDescriptor<E> getEntityTypeDescriptor() {
+	public EntityTypeDescriptor<E> entityTypeDescriptor() {
 		if ( entityTypeDescriptor == null ) {
 			// TODO HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
 			// TODO HSEARCH-3772 Allow mapping the document id to non-entity-id properties for ORM's dynamic-map entity types

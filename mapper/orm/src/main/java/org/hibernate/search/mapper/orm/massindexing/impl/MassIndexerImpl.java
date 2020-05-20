@@ -84,10 +84,10 @@ public class MassIndexerImpl implements MassIndexer {
 		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRemove = new HashSet<>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
 		for ( HibernateOrmMassIndexingIndexedTypeContext<?> typeContext : targetedIndexedTypeContexts ) {
-			EntityPersister entityPersister = typeContext.getEntityPersister();
+			EntityPersister entityPersister = typeContext.entityPersister();
 			boolean typeIsOk = true;
 			for ( HibernateOrmMassIndexingIndexedTypeContext<?> existing : cleaned ) {
-				EntityPersister existingEntityPersister = existing.getEntityPersister();
+				EntityPersister existingEntityPersister = existing.entityPersister();
 				if ( HibernateOrmUtils.isSuperTypeOf( existingEntityPersister, entityPersister ) ) {
 					typeIsOk = false;
 					break;

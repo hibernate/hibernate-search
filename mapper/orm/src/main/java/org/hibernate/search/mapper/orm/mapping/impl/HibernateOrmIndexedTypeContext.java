@@ -36,17 +36,17 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
 
-		if ( getEntityPersister().getIdentifierPropertyName().equals( builder.documentIdSourcePropertyName ) ) {
+		if ( entityPersister().getIdentifierPropertyName().equals( builder.documentIdSourcePropertyName ) ) {
 			documentIdIsEntityId = true;
 			loaderFactory = HibernateOrmByIdEntityLoader.factory(
-					sessionFactory, getEntityPersister()
+					sessionFactory, entityPersister()
 			);
 		}
 		else {
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			EntityTypeDescriptor<E> typeDescriptor = getEntityTypeDescriptor();
+			EntityTypeDescriptor<E> typeDescriptor = entityTypeDescriptor();
 			SingularAttribute<? super E, ?> documentIdSourceAttribute =
 					typeDescriptor.getSingularAttribute( builder.documentIdSourcePropertyName );
 			loaderFactory = HibernateOrmCriteriaEntityLoader.factory(
@@ -60,12 +60,12 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	@Override
 	public String jpaName() {
-		return getJpaEntityName();
+		return jpaEntityName();
 	}
 
 	@Override
 	public Class<?> javaClass() {
-		return getTypeIdentifier().javaClass();
+		return typeIdentifier().javaClass();
 	}
 
 	@Override
@@ -91,7 +91,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public EntityLoaderFactory getLoaderFactory() {
+	public EntityLoaderFactory loaderFactory() {
 		return loaderFactory;
 	}
 

@@ -21,6 +21,6 @@ public interface HibernateOrmScopeTypeContext<E> {
 	/**
 	 * @return The identifier of the entity type.
 	 */
-	PojoRawTypeIdentifier<E> getTypeIdentifier();
+	PojoRawTypeIdentifier<E> typeIdentifier();
 
 }

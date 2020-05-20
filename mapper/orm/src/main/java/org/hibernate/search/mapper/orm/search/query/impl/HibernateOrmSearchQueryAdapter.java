@@ -139,7 +139,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setFetchSize(int fetchSize) {
-		loadingOptions.setFetchSize( fetchSize );
+		loadingOptions.fetchSize( fetchSize );
 		return this;
 	}
 

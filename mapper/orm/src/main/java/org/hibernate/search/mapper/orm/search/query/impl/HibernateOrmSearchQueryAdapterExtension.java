@@ -31,8 +31,8 @@ final class HibernateOrmSearchQueryAdapterExtension<H> implements
 			return Optional.of( new HibernateOrmSearchQueryAdapter<>(
 					// All SearchQuery implementations should implement SearchQueryImplementor
 					(SearchQueryImplementor<H>) original,
-					castedLoadingContext.getSessionImplementor(),
-					castedLoadingContext.getLoadingOptions()
+					castedLoadingContext.sessionImplementor(),
+					castedLoadingContext.loadingOptions()
 			) );
 		}
 		else {

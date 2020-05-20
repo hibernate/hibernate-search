@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface HibernateOrmListenerTypeContext {
 
-	PojoRawTypeIdentifier<?> getTypeIdentifier();
+	PojoRawTypeIdentifier<?> typeIdentifier();
 
 	Object toIndexingPlanProvidedId(Object entityId);
 

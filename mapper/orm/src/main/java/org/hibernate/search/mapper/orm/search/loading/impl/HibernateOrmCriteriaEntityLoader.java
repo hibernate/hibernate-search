@@ -92,7 +92,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 		Query<? extends E> query = session.createQuery( criteriaQuery );
 
-		query.setFetchSize( loadingOptions.getFetchSize() );
+		query.setFetchSize( loadingOptions.fetchSize() );
 
 		return query.getResultList();
 	}
@@ -149,7 +149,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 								+ " Expected entity name: " + entityType.getName()
 								+ " Targeted entity names: "
 								+ targetEntityTypeContexts.stream()
-										.map( HibernateOrmLoadingIndexedTypeContext::getJpaEntityName )
+										.map( HibernateOrmLoadingIndexedTypeContext::jpaEntityName )
 										.collect( Collectors.toList() )
 				);
 			}
@@ -162,12 +162,12 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
-			if ( !entityType.getName().equals( targetEntityTypeContext.getJpaEntityName() ) ) {
+			if ( !entityType.getName().equals( targetEntityTypeContext.jpaEntityName() ) ) {
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with an unexpected target entity type."
 								+ " There is a bug in Hibernate Search, please report it."
 								+ " Expected entity name: " + entityType.getName()
-								+ " Targeted entity name: " + targetEntityTypeContext.getJpaEntityName()
+								+ " Targeted entity name: " + targetEntityTypeContext.jpaEntityName()
 				);
 			}
 

@@ -118,7 +118,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			ids.add( (Serializable) reference.id() );
 		}
 
-		List<?> loadedEntities = getMultiAccess().multiLoad( ids );
+		List<?> loadedEntities = createMultiAccess().multiLoad( ids );
 
 		for ( int i = 0; i < references.size(); i++ ) {
 			EntityReference reference = references.get( i );
@@ -133,10 +133,10 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		return (List<E>) loadedEntities;
 	}
 
-	private MultiIdentifierLoadAccess<?> getMultiAccess() {
+	private MultiIdentifierLoadAccess<?> createMultiAccess() {
 		MultiIdentifierLoadAccess<?> multiAccess = session.byMultipleIds( targetEntityType.getEntityName() );
 
-		multiAccess.withBatchSize( loadingOptions.getFetchSize() );
+		multiAccess.withBatchSize( loadingOptions.fetchSize() );
 
 		return multiAccess;
 	}
@@ -218,7 +218,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			 */
 			@SuppressWarnings("unchecked")
 			HibernateOrmComposableEntityLoader<E> result = (HibernateOrmComposableEntityLoader<E>) doCreate(
-					targetEntityTypeContext.getEntityPersister(), session, cacheLookupStrategy, loadingOptions
+					targetEntityTypeContext.entityPersister(), session, cacheLookupStrategy, loadingOptions
 			);
 			return result;
 		}
@@ -300,7 +300,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
 			EntityPersister result = null;
 			for ( HibernateOrmLoadingIndexedTypeContext targetTypeContext : targetEntityTypeContexts ) {
-				EntityPersister type = targetTypeContext.getEntityPersister();
+				EntityPersister type = targetTypeContext.entityPersister();
 				if ( result == null ) {
 					result = type;
 				}

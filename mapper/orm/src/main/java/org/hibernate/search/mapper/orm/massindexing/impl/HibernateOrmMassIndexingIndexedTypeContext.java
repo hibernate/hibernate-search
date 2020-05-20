@@ -12,17 +12,17 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface HibernateOrmMassIndexingIndexedTypeContext<E> {
 
-	PojoRawTypeIdentifier<E> getTypeIdentifier();
+	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	/**
 	 * @return The name of the entity in the JPA metamodel.
 	 */
-	String getJpaEntityName();
+	String jpaEntityName();
 
 	/**
 	 * @return The Hibernate ORM entity persister.
 	 */
-	EntityPersister getEntityPersister();
+	EntityPersister entityPersister();
 
 	/**
 	 * @return A representation of the entity type in the Hibernate ORM metamodel.
@@ -31,6 +31,6 @@ public interface HibernateOrmMassIndexingIndexedTypeContext<E> {
 	 * Typically, dynamic-map entities do not have a representation in the Hibernate ORM metamodel
 	 * (which prevents any operation relying on JPA Criteria, in particular).
 	 */
-	EntityTypeDescriptor<E> getEntityTypeDescriptor();
+	EntityTypeDescriptor<E> entityTypeDescriptor();
 
 }

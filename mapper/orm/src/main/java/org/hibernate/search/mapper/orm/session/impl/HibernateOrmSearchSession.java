@@ -224,7 +224,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		}
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.id(), this );
-		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getJpaEntityName(), id );
+		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), id );
 	}
 
 	@Override
@@ -241,7 +241,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 					"Type " + typeName + " refers to an unknown type"
 			);
 		}
-		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getJpaEntityName(), identifier );
+		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
 	}
 
 	@Override

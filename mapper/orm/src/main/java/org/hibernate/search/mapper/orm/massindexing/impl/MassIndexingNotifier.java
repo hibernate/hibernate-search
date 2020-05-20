@@ -69,7 +69,7 @@ class MassIndexingNotifier {
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( throwable );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( type.getJpaEntityName() ) );
+		contextBuilder.failingOperation( log.massIndexerIndexingInstance( type.jpaEntityName() ) );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
 		EntityReference entityReference = extractReferenceOrSuppress( type, session, entity, throwable );
@@ -125,7 +125,7 @@ class MassIndexingNotifier {
 			Session session, Object entity, Throwable throwable) {
 		try {
 			return new EntityReferenceImpl(
-					type.getTypeIdentifier(), type.getJpaEntityName(), session.getIdentifier( entity )
+					type.typeIdentifier(), type.jpaEntityName(), session.getIdentifier( entity )
 			);
 		}
 		catch (RuntimeException e) {

@@ -151,7 +151,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	}
 
 	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(HibernateOrmMassIndexingIndexedTypeContext<E> type) {
-		EntityType<E> typeDescriptor = type.getEntityTypeDescriptor();
+		EntityType<E> typeDescriptor = type.entityTypeDescriptor();
 		SingularAttribute<? super E, ?> idAttributeOfType = typeDescriptor.getId( typeDescriptor.getIdType().getJavaType() );
 
 		return new BatchIndexingWorkspace<>(

@@ -102,7 +102,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		catch (Exception exception) {
 			notifier.notifyRunnableFailure(
 					exception,
-					log.massIndexingLoadingAndExtractingEntityData( type.getJpaEntityName() )
+					log.massIndexingLoadingAndExtractingEntityData( type.jpaEntityName() )
 			);
 		}
 		log.trace( "finished" );
@@ -143,8 +143,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			beginTransaction( session );
 
 			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.getEntityTypeDescriptor().getJavaType() );
-			Root<E> root = criteriaQuery.from( type.getEntityTypeDescriptor() );
+			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.entityTypeDescriptor().getJavaType() );
+			Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
 			criteriaQuery.select( root );
 			criteriaQuery.where( root.get( idAttributeOfType ).in( listIds ) );
 
@@ -238,7 +238,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		CompletableFuture<?> future;
 		try {
-			future = indexer.add( type.getTypeIdentifier(), null, entity,
+			future = indexer.add( type.typeIdentifier(), null, entity,
 					// Commit and refresh are handled globally after all documents are indexed.
 					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 		}
