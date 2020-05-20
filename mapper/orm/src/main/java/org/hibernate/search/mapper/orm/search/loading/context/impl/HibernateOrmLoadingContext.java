@@ -9,7 +9,11 @@ package org.hibernate.search.mapper.orm.search.loading.context.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import javax.persistence.EntityGraph;
+
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.graph.GraphSemantic;
+import org.hibernate.graph.RootGraph;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -20,11 +24,13 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.search.loading.impl.EntityGraphHint;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMappingContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class HibernateOrmLoadingContext<E> implements LoadingContext<EntityReference, E> {
@@ -95,6 +101,18 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 		public SearchLoadingOptionsStep cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
 			entityLoaderBuilder.cacheLookupStrategy( strategy );
 			return this;
+		}
+
+		@Override
+		public SearchLoadingOptionsStep graph(EntityGraph<?> graph, GraphSemantic semantic) {
+			loadingOptions.entityGraphHint( new EntityGraphHint<>( (RootGraph<?>) graph, semantic ), false );
+			return this;
+		}
+
+		@Override
+		public SearchLoadingOptionsStep graph(String graphName, GraphSemantic semantic) {
+			Contracts.assertNotNull( graphName, "graphName" );
+			return graph( sessionContext.session().getEntityGraph( graphName ), semantic );
 		}
 
 		@Override
