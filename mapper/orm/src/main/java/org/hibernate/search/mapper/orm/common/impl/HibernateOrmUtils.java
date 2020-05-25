@@ -64,8 +64,8 @@ public final class HibernateOrmUtils {
 		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
 		 */
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		String rootEntityName = metamodel.entityPersister( entityType.getEntityName() ).getRootEntityName();
-		return metamodel.entityPersister( rootEntityName ).getEntityPersister();
+		String rootEntityName = entityType.getRootEntityName();
+		return metamodel.entityPersister( rootEntityName );
 	}
 
 	public static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
