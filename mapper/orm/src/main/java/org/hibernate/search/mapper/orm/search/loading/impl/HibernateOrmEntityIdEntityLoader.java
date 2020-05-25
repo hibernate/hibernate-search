@@ -143,11 +143,8 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	}
 
 	private Query<?> createQuery(int fetchSize) {
-		// We can't use the criteria API here, because it doesn't work for dynamic-map entities.
-		Query<?> query = session.createQuery(
-				"select e from " + entityPersister.getEntityName()
-						+ " e where " + entityPersister.getIdentifierPropertyName() + " in (:" + IDS_PARAMETER_NAME + ")",
-				(Class<?>) entityPersister.getMappedClass()
+		Query<?> query = HibernateOrmUtils.createQueryForLoadByUniqueProperty(
+				session, entityPersister, entityPersister.getIdentifierPropertyName(), IDS_PARAMETER_NAME
 		);
 
 		query.setFetchSize( fetchSize );
