@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
@@ -46,11 +43,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			EntityTypeDescriptor<E> typeDescriptor = entityTypeDescriptor();
-			SingularAttribute<? super E, ?> documentIdSourceAttribute =
-					typeDescriptor.getSingularAttribute( builder.documentIdSourcePropertyName );
 			loaderFactory = HibernateOrmNonEntityIdPropertyEntityLoader.factory(
-					typeDescriptor, documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
+					entityPersister(), builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle
 			);
 		}
 

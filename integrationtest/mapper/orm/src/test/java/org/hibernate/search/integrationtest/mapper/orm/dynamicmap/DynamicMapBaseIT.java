@@ -240,26 +240,60 @@ public class DynamicMapBaseIT {
 		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
 		String entityTypeName = "Book";
 
-		backendMock.expectAnySchema( INDEX1_NAME );
-		Assertions.assertThatThrownBy(
-				() -> ormSetupHelper.start()
-						.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
-						.withProperty(
-								HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-								(HibernateOrmSearchMappingConfigurer) context -> {
-									TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
-									typeMapping.indexed( INDEX1_NAME );
-									typeMapping.property( "title" ).documentId();
-								}
-						)
-						.setup()
-		)
-				.hasMessageContainingAll(
-						"Type '" + entityTypeName + " (" + Map.class.getName()
-								+ ")' doesn't have any representation in the JPA metamodel.",
-						"Hibernate Search cannot use the Criteria API to automatically build queries targeting this type",
-						"this type cannot", "set its document ID to a property that is not its entity ID"
-				);
+		backendMock.expectSchema( INDEX1_NAME, b -> b
+				.field( "title", String.class )
+		);
+		SessionFactory sessionFactory = ormSetupHelper.start()
+				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> {
+							TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
+							typeMapping.indexed( INDEX1_NAME );
+							typeMapping.property( "title" ).documentId()
+									.genericField();
+						}
+				)
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			Map<String, Object> entity1 = new HashMap<>();
+			entity1.put( "id", 1 );
+			entity1.put( "title", "Hyperion" );
+
+			session.persist( entityTypeName, entity1 );
+
+			backendMock.expectWorks( INDEX1_NAME )
+					.add( "Hyperion", b -> b
+							.field( "title", entity1.get( "title" ) )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Object> query = searchSession.search(
+					searchSession.scope( Object.class )
+			)
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( INDEX1_NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							1L,
+							reference( entityTypeName, "Hyperion" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+					session.load( entityTypeName, 1 )
+			);
+		} );
 	}
 
 	@Test
