@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.AssertionFailure;
-import org.hibernate.Session;
+import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
@@ -37,17 +37,17 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 
 	private static final String IDS_PARAMETER_NAME = "ids";
 
-	private final Session session;
+	private final SessionImplementor session;
 	private final EntityPersister entityPersister;
 	private final PersistenceContextLookupStrategy persistenceContextLookup;
-	private final EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
+	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmEntityIdEntityLoader(
 			EntityPersister entityPersister,
-			Session session,
+			SessionImplementor session,
 			PersistenceContextLookupStrategy persistenceContextLookup,
-			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor,
+			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.entityPersister = entityPersister;
 		this.session = session;
@@ -60,7 +60,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	public List<E> loadBlocking(List<EntityReference> references) {
 		if ( cacheLookupStrategyImplementor == null ) {
 			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
-			return loadEntities( references );
+			return doLoadEntities( references );
 		}
 		else {
 			return HibernateOrmComposableEntityLoader.super.loadBlocking( references );
@@ -69,13 +69,8 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 
 	@Override
 	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference) {
-		List<EntityReference> missingFromCacheReferences = loadBlockingFromCache( references, entitiesByReference );
-		if ( missingFromCacheReferences.isEmpty() ) {
-			return;
-		}
-
-		List<? extends E> loadedEntities = loadEntities( missingFromCacheReferences );
-		Iterator<EntityReference> referencesIterator = missingFromCacheReferences.iterator();
+		List<? extends E> loadedEntities = doLoadEntities( references );
+		Iterator<EntityReference> referencesIterator = references.iterator();
 		Iterator<? extends E> loadedEntityIterator = loadedEntities.iterator();
 		while ( referencesIterator.hasNext() ) {
 			EntityReference reference = referencesIterator.next();
@@ -86,97 +81,65 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		}
 	}
 
-	/**
-	 * @param references The references to entities to load from the cache.
-	 * @param entitiesByReference The map where loaded entities should be put.
-	 * @return The references that could not be loaded from the cache.
-	 */
-	// The cast is safe because we check that every loaded element is an instance of the type from the entity reference.
-	@SuppressWarnings("unchecked")
-	private List<EntityReference> loadBlockingFromCache(List<EntityReference> references,
-			Map<? super EntityReference,? super E> entitiesByReference) {
-		if ( cacheLookupStrategyImplementor == null ) {
-			return references;
-		}
+	private List<E> doLoadEntities(List<EntityReference> references) {
+		EntityKey[] keys = toEntityKeys( references );
+		List<E> loadedEntities = createListContainingNulls( references.size() );
 
-		List<EntityReference> missingFromCacheReferences = new ArrayList<>( references.size() );
-
-		for ( EntityReference reference : references ) {
-			Object entityId = reference.id();
-			Object loadedEntity = cacheLookupStrategyImplementor.lookup( entityId );
-			if ( loadedEntity == null ) {
-				missingFromCacheReferences.add( reference );
-			}
-			else if ( hasExpectedType( reference, loadedEntity ) ) {
-				entitiesByReference.put( reference, (E) loadedEntity );
-			}
-			else {
-				// The index is out of sync and the referenced entity does not exist anymore.
-				// Assume the entity we were attempting to load was deleted, and mark it as such.
-				entitiesByReference.put( reference, null );
-			}
-		}
-
-		return missingFromCacheReferences;
-	}
-
-	// The cast is safe because we check that every loaded element is an instance of the type from the entity reference.
-	@SuppressWarnings("unchecked")
-	private List<E> loadEntities(List<EntityReference> references) {
-		List<Serializable> ids = new ArrayList<>( references.size() );
-		for ( EntityReference reference : references ) {
-			ids.add( (Serializable) reference.id() );
-		}
-
-		List<?> loadedEntities = loadEntitiesById( ids );
-
-		for ( int i = 0; i < references.size(); i++ ) {
-			EntityReference reference = references.get( i );
-			Object loadedEntity = loadedEntities.get( i );
-			if ( !hasExpectedType( reference, loadedEntity ) ) {
-				// The index is out of sync and the referenced entity does not exist anymore.
-				// Assume the entity we were attempting to load was deleted and mark it as such.
-				loadedEntities.set( i, null );
-			}
-		}
-
-		return (List<E>) loadedEntities;
-	}
-
-	private List<?> loadEntitiesById(List<Serializable> allIds) {
 		int fetchSize = loadingOptions.fetchSize();
 		Query<?> query = createQuery( fetchSize );
 
-		if ( fetchSize >= allIds.size() ) {
-			query.setParameterList( IDS_PARAMETER_NAME, allIds );
-			// The result is worthless, as entities are not in the right order.
-			// However, this will load entities into the persistence context... see further down.
-			query.getResultList();
-		}
-		else {
-			List<Object> ids = new ArrayList<>( fetchSize );
-			for ( Object documentIdSourceValue : allIds ) {
-				ids.add( documentIdSourceValue );
-				if ( ids.size() >= fetchSize ) {
-					query.setParameterList( IDS_PARAMETER_NAME, ids );
-					// Same as above: the result is worthless.
-					query.getResultList();
-					ids.clear();
+		List<Object> ids = new ArrayList<>( fetchSize );
+		for ( int i = 0; i < keys.length; i++ ) {
+			EntityKey key = keys[i];
+			if ( cacheLookupStrategyImplementor != null ) {
+				Object cacheHit = cacheLookupStrategyImplementor.lookup( key );
+				if ( cacheHit != null ) {
+					EntityReference reference = references.get( i );
+					loadedEntities.set( i, castOrNull( reference, cacheHit ) );
+					keys[i] = null; // Make sure we won't include this key in the query.
+					continue;
 				}
 			}
-			if ( !ids.isEmpty() ) {
+
+			ids.add( key.getIdentifier() );
+			if ( ids.size() >= fetchSize ) {
 				query.setParameterList( IDS_PARAMETER_NAME, ids );
-				// Same as above: the result is worthless.
+				// The result is worthless, as entities are not in the right order.
+				// However, this will load entities into the persistence context... see further down.
 				query.getResultList();
+				ids.clear();
 			}
+		}
+		if ( !ids.isEmpty() ) {
+			query.setParameterList( IDS_PARAMETER_NAME, ids );
+			// Same as above: the result is worthless.
+			query.getResultList();
 		}
 
 		// All entities are now in the persistence context. Get them!
-		List<Object> result = new ArrayList<>( allIds.size() );
-		for ( Serializable id : allIds ) {
-			result.add( persistenceContextLookup.lookup( id ) );
+		for ( int i = 0; i < keys.length; i++ ) {
+			EntityKey key = keys[i];
+			if ( key == null ) {
+				// Already loaded through a cache; skip.
+				continue;
+			}
+			EntityReference reference = references.get( i );
+			Object loaded = persistenceContextLookup.lookup( key );
+			loadedEntities.set( i, castOrNull( reference, loaded ) );
 		}
-		return result;
+
+		return loadedEntities;
+	}
+
+	// The cast is safe because we check is an instance of the type from the entity reference.
+	@SuppressWarnings("unchecked")
+	private E castOrNull(EntityReference reference, Object loadedEntity) {
+		if ( !hasExpectedType( reference, loadedEntity ) ) {
+			// The index is out of sync and the referenced entity does not exist anymore.
+			// Assume the entity we were attempting to load was deleted and mark it as such.
+			return null;
+		}
+		return (E) loadedEntity;
 	}
 
 	private Query<?> createQuery(int fetchSize) {
@@ -190,6 +153,24 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		query.setFetchSize( fetchSize );
 
 		return query;
+	}
+
+	private EntityKey[] toEntityKeys(List<EntityReference> references) {
+		EntityKey[] entityKeys = new EntityKey[references.size()];
+		for ( int i = 0; i < references.size(); i++ ) {
+			EntityReference reference = references.get( i );
+			EntityKey entityKey = session.generateEntityKey( (Serializable) reference.id(), entityPersister );
+			entityKeys[i] = ( entityKey );
+		}
+		return entityKeys;
+	}
+
+	private static <T> List<T> createListContainingNulls(int size) {
+		List<T> list = new ArrayList<>( size );
+		for ( int i = 0; i < size; i++ ) {
+			list.add( null );
+		}
+		return list;
 	}
 
 	/*
@@ -299,9 +280,9 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 				);
 			}
 
-			PersistenceContextLookupStrategy<?> persistenceContextLookup =
-					PersistenceContextLookupStrategy.create( entityPersister, session );
-			EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
+			PersistenceContextLookupStrategy persistenceContextLookup =
+					PersistenceContextLookupStrategy.create( session );
+			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
 
 			/*
 			 * Ideally, in order to comply with the cache lookup strategy,

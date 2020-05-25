@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
+import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -24,22 +24,22 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
-		implements EntityLoadingCacheLookupStrategyImplementor<E> {
+class PersistenceContextThenSecondLevelCacheLookupStrategy
+		implements EntityLoadingCacheLookupStrategyImplementor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static EntityLoadingCacheLookupStrategyImplementor create(EntityPersister commonEntitySuperTypePersister,
 			SessionImplementor session) {
-		EntityLoadingCacheLookupStrategyImplementor<?> persistenceContextLookupStrategy =
-				PersistenceContextLookupStrategy.create( commonEntitySuperTypePersister, session );
+		EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy =
+				PersistenceContextLookupStrategy.create( session );
 		EntityDataAccess cacheAccess = commonEntitySuperTypePersister.getCacheAccessStrategy();
 		if ( cacheAccess == null ) {
 			// No second-level cache
 			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader( commonEntitySuperTypePersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}
-		return new PersistenceContextThenSecondLevelCacheLookupStrategy<>(
+		return new PersistenceContextThenSecondLevelCacheLookupStrategy(
 				persistenceContextLookupStrategy,
 				commonEntitySuperTypePersister,
 				cacheAccess,
@@ -47,13 +47,13 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
 		);
 	}
 
-	private final EntityLoadingCacheLookupStrategyImplementor<E> persistenceContextLookupStrategy;
+	private final EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy;
 	private final EntityPersister persister;
 	private final EntityDataAccess cacheAccess;
 	private final SessionImplementor session;
 
 	private PersistenceContextThenSecondLevelCacheLookupStrategy(
-			EntityLoadingCacheLookupStrategyImplementor<E> persistenceContextLookupStrategy,
+			EntityLoadingCacheLookupStrategyImplementor persistenceContextLookupStrategy,
 			EntityPersister persister,
 			EntityDataAccess cacheAccess,
 			SessionImplementor session) {
@@ -64,10 +64,9 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // By contract,
-	public E lookup(Object entityId) {
+	public Object lookup(EntityKey entityKey) {
 		// Try the persistence context first, because it's faster
-		E fromPersistenceContext = persistenceContextLookupStrategy.lookup( entityId );
+		Object fromPersistenceContext = persistenceContextLookupStrategy.lookup( entityKey );
 		if ( fromPersistenceContext != null ) {
 			return fromPersistenceContext;
 		}
@@ -77,15 +76,13 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
 			return null;
 		}
 
-		Serializable serializableEntityId = (Serializable) entityId;
-
 		/*
 		 * Note we must call this method specifically,
 		 * and not sessionFactory.getCache().containsEntity() which is unaware of the session
 		 * and thus cannot take the tenant identifier into account.
 		 */
 		final Object key = cacheAccess.generateCacheKey(
-				serializableEntityId, persister, session.getSessionFactory(), session.getTenantIdentifier()
+				entityKey.getIdentifier(), persister, session.getSessionFactory(), session.getTenantIdentifier()
 		);
 
 		if ( !cacheAccess.contains( key ) ) {
@@ -94,7 +91,7 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
 
 		try {
 			// This will load the object from the second level cache
-			return (E) session.get( persister.getEntityName(), serializableEntityId );
+			return session.get( persister.getEntityName(), entityKey.getIdentifier() );
 		}
 		catch (ObjectNotFoundException ignored) {
 			// Unlikely but needed: an index might be out of sync, and the cache might be as well

@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-public interface EntityLoadingCacheLookupStrategyImplementor<E> {
+import org.hibernate.engine.spi.EntityKey;
+
+public interface EntityLoadingCacheLookupStrategyImplementor {
 
 	/**
-	 * @param entityId The ID of an entity.
+	 * @param entityKey The key of an entity.
 	 * @return The entity, loaded from the cache, or {@code null} if not found.
 	 */
-	E lookup(Object entityId);
+	Object lookup(EntityKey entityKey);
 
 }
