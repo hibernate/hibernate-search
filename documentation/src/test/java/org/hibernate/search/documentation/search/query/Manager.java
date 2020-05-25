@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 
@@ -19,6 +21,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
 @Indexed
+@NamedEntityGraph(
+		name = "preload-associates",
+		attributeNodes = @NamedAttributeNode("associates")
+)
 public class Manager implements Person {
 
 	@Id

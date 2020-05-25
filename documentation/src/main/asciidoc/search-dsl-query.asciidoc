@@ -391,9 +391,50 @@ etc.
 // Search 5 anchors backward compatibility
 [[_fetching_strategy]]
 
-include::todo-placeholder.asciidoc[]
+By default, Hibernate Search will load associations according to the defaults of your mappings:
+associations marked as lazy won't be loaded,
+while associations marked as eager will be loaded before returning the entities.
 
-// TODO HSEARCH-3628 https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_fetching_strategy
+It is possible to force the loading of a lazy association, or to prevent the loading of an eager association,
+by referencing an entity graph in the query.
+See below for an example, and
+link:{hibernateDocUrl}#fetching-strategies-dynamic-fetching-entity-graph[this section of the Hibernate ORM documentation]
+for more information about entity graphs.
+
+.Applying an entity graph to a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=graph-byReference]
+----
+<1> Build an entity graph.
+<2> Start building the query.
+<3> Access the loading options of the query,
+then set the entity graph to the graph built above.
+You must also pass a semantic: `GraphSemantic.FETCH` means only associations referenced in the graph will be loaded;
+`GraphSemantic.LOAD` means associations referenced in the graph *and* associations marked as `EAGER` in the mapping will be loaded.
+<4> Fetch the results.
+All managers loaded by this search query will have their `associates` association already populated.
+====
+
+Instead of building the entity graph on the spot,
+you can also define the entity graph statically using the `@NamedEntityGraph` annotation,
+and pass the name of your graph to Hibernate Search, as shown below.
+See link:{hibernateDocUrl}#fetching-strategies-dynamic-fetching-entity-graph[this section of the Hibernate ORM documentation]
+for more information about `@NamedEntityGraph`.
+
+.Applying a named entity graph to a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=graph-byName]
+----
+<1> Start building the query.
+<2> Access the loading options of the query,
+then set the entity graph to "preload-associates", which was defined elsewhere using the `@NamedEntityGraph` annotation.
+<3> Fetch the results.
+All managers loaded by this search query will have their `associates` association already populated.
+====
 
 [[search-dsl-query-timeout]]
 == Timeout
