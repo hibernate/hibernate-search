@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -15,11 +16,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import javax.persistence.EntityGraph;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.SharedCacheMode;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.graph.GraphSemantic;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
@@ -475,6 +479,62 @@ public class QueryDslIT {
 
 			assertThat( result.hits() ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void graph() {
+		// By default associates are not loaded
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			SearchResult<Manager> result = searchSession.search( Manager.class ) // <1>
+					.where( f -> f.match()
+							.field( "name" )
+							.matching( "james" ) )
+					.fetch( 20 ); // <3>
+
+			assertThat( result.hits() )
+					.isNotEmpty()
+					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isNotInitialized() );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, theEntityManager -> {
+			// tag::graph-byReference[]
+			EntityManager entityManager = /* ... */
+					// end::graph-byReference[]
+					theEntityManager;
+			// tag::graph-byReference[]
+
+			EntityGraph<Manager> graph = entityManager.createEntityGraph( Manager.class ); // <1>
+			graph.addAttributeNodes( "associates" );
+
+			SearchResult<Manager> result = Search.session( entityManager ).search( Manager.class ) // <2>
+					.where( f -> f.match()
+							.field( "name" )
+							.matching( "james" ) )
+					.loading( o -> o.graph( graph, GraphSemantic.FETCH ) ) // <3>
+					.fetch( 20 ); // <4>
+			// end::graph-byReference[]
+
+			assertThat( result.hits() )
+					.isNotEmpty()
+					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isInitialized() );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::graph-byName[]
+			SearchResult<Manager> result = Search.session( entityManager ).search( Manager.class ) // <1>
+					.where( f -> f.match()
+							.field( "name" )
+							.matching( "james" ) )
+					.loading( o -> o.graph( "preload-associates", GraphSemantic.FETCH ) ) // <2>
+					.fetch( 20 ); // <3>
+			// end::graph-byName[]
+
+			assertThat( result.hits() )
+					.isNotEmpty()
+					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isInitialized() );
 		} );
 	}
 
