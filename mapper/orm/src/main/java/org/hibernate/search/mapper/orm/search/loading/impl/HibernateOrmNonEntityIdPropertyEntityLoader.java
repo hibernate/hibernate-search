@@ -14,20 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ParameterExpression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,26 +37,27 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static <E> EntityLoaderFactory factory(EntityTypeDescriptor<E> entityType,
-			SingularAttribute<? super E,?> documentIdSourceAttribute,
-			ValueReadHandle<?> documentIdSourceHandle) {
-		return new Factory<>( entityType, documentIdSourceAttribute, documentIdSourceHandle );
+	private static final String DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME = "docId";
+
+	public static EntityLoaderFactory factory(EntityPersister entityPersister,
+			String documentIdSourcePropertyName, ValueReadHandle<?> documentIdSourceHandle) {
+		return new Factory( entityPersister, documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
-	private final EntityTypeDescriptor<? extends E> entityType;
-	private final SingularAttribute<? super E, ?> documentIdSourceAttribute;
+	private final EntityPersister entityPersister;
+	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
-	private final Session session;
+	private final SessionImplementor session;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoader(
-			EntityTypeDescriptor<? extends E> entityType,
-			SingularAttribute<? super E, ?> documentIdSourceAttribute,
+			EntityPersister entityPersister,
+			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,
-			Session session,
+			SessionImplementor session,
 			MutableEntityLoadingOptions loadingOptions) {
-		this.entityType = entityType;
-		this.documentIdSourceAttribute = documentIdSourceAttribute;
+		this.entityPersister = entityPersister;
+		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;
 		this.session = session;
 		this.loadingOptions = loadingOptions;
@@ -89,13 +84,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 	}
 
 	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues) {
-		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-		ParameterExpression<Collection> idsParameter = criteriaBuilder.parameter( Collection.class, "ids" );
 		int fetchSize = loadingOptions.fetchSize();
-		Query<? extends E> query = createQuery( criteriaBuilder, idsParameter, fetchSize );
+		Query<? extends E> query = createQuery( fetchSize );
 
 		if ( fetchSize >= documentIdSourceValues.size() ) {
-			query.setParameter( idsParameter, documentIdSourceValues );
+			query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, documentIdSourceValues );
 			return query.getResultList();
 		}
 		else {
@@ -105,13 +98,13 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 			for ( Object documentIdSourceValue : documentIdSourceValues ) {
 				ids.add( documentIdSourceValue );
 				if ( ids.size() >= fetchSize ) {
-					query.setParameter( idsParameter, ids );
+					query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, ids );
 					result.addAll( query.getResultList() );
 					ids.clear();
 				}
 			}
 			if ( !ids.isEmpty() ) {
-				query.setParameter( idsParameter, ids );
+				query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, ids );
 				result.addAll( query.getResultList() );
 			}
 
@@ -119,33 +112,29 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 		}
 	}
 
-	private Query<? extends E> createQuery(CriteriaBuilder criteriaBuilder,
-			ParameterExpression<Collection> idsParameter, int fetchSize) {
-		CriteriaQuery<? extends E> criteriaQuery = criteriaBuilder.createQuery( entityType.getJavaType() );
-
-		Root<? extends E> root = criteriaQuery.from( entityType );
-		Path<?> documentIdSourcePropertyInRoot = root.get( documentIdSourceAttribute );
-
-		criteriaQuery.where( documentIdSourcePropertyInRoot.in( idsParameter ) );
-
-		Query<? extends E> query = session.createQuery( criteriaQuery );
+	@SuppressWarnings("unchecked") // Cast is safe because entityPersister represents type E. See Factory.doCreate().
+	private Query<? extends E> createQuery(int fetchSize) {
+		Query<? extends E> query = (Query<? extends E>) HibernateOrmUtils.createQueryForLoadByUniqueProperty(
+				session, entityPersister, documentIdSourcePropertyName,
+				DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME
+		);
 
 		query.setFetchSize( fetchSize );
 
 		return query;
 	}
 
-	private static class Factory<E> implements EntityLoaderFactory {
+	private static class Factory implements EntityLoaderFactory {
 
-		private final EntityTypeDescriptor<E> entityType;
-		private final SingularAttribute<? super E, ?> documentIdSourceAttribute;
+		private final EntityPersister entityPersister;
+		private final String documentIdSourcePropertyName;
 		private final ValueReadHandle<?> documentIdSourceHandle;
 
-		private Factory(EntityTypeDescriptor<E> entityType,
-				SingularAttribute<? super E, ?> documentIdSourceAttribute,
+		private Factory(EntityPersister entityPersister,
+				String documentIdSourcePropertyName,
 				ValueReadHandle<?> documentIdSourceHandle) {
-			this.entityType = entityType;
-			this.documentIdSourceAttribute = documentIdSourceAttribute;
+			this.entityPersister = entityPersister;
+			this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 			this.documentIdSourceHandle = documentIdSourceHandle;
 		}
 
@@ -157,18 +146,18 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 			Factory other = (Factory) obj;
 			// If the entity type is different,
 			// the factories work in separate ID spaces and should be used separately.
-			return entityType.equals( other.entityType )
-					&& documentIdSourceAttribute.equals( other.documentIdSourceAttribute )
+			return entityPersister.equals( other.entityPersister )
+					&& documentIdSourcePropertyName.equals( other.documentIdSourcePropertyName )
 					&& documentIdSourceHandle.equals( other.documentIdSourceHandle );
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( entityType, documentIdSourceAttribute, documentIdSourceHandle );
+			return Objects.hash( entityPersister, documentIdSourcePropertyName, documentIdSourceHandle );
 		}
 
 		@Override
-		public <E2> HibernateOrmComposableEntityLoader<E2> create(
+		public <E> HibernateOrmComposableEntityLoader<E> create(
 				HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
@@ -176,7 +165,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 		}
 
 		@Override
-		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(
+		public <E> HibernateOrmComposableEntityLoader<? extends E> create(
 				List<HibernateOrmLoadingIndexedTypeContext> targetEntityTypeContexts,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
@@ -184,10 +173,10 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with multiple target entity types."
 								+ " There is a bug in Hibernate Search, please report it."
-								+ " Expected entity name: " + entityType.getName()
+								+ " Expected entity name: " + entityPersister.getEntityName()
 								+ " Targeted entity names: "
 								+ targetEntityTypeContexts.stream()
-										.map( HibernateOrmLoadingIndexedTypeContext::jpaEntityName )
+										.map( HibernateOrmLoadingIndexedTypeContext::hibernateOrmEntityName )
 										.collect( Collectors.toList() )
 				);
 			}
@@ -195,30 +184,28 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 			return doCreate( targetEntityTypeContexts.get( 0 ), session, cacheLookupStrategy, loadingOptions );
 		}
 
-		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(
+		private <E> HibernateOrmComposableEntityLoader<E> doCreate(
 				HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
-			if ( !entityType.getName().equals( targetEntityTypeContext.jpaEntityName() ) ) {
+			if ( !entityPersister.equals( targetEntityTypeContext.entityPersister() ) ) {
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with an unexpected target entity type."
 								+ " There is a bug in Hibernate Search, please report it."
-								+ " Expected entity name: " + entityType.getName()
-								+ " Targeted entity name: " + targetEntityTypeContext.jpaEntityName()
+								+ " Expected entity name: " + entityPersister.getEntityName()
+								+ " Targeted entity name: " + targetEntityTypeContext.hibernateOrmEntityName()
 				);
 			}
 
 			/*
-			 * We checked just above that "entityType" is equal to "targetEntityType",
-			 * so E = (? extends E2), so this cast is safe.
+			 * We checked just above that "entityPersister" is equal to "targetEntityTypeContext.entityPersister()",
+			 * so this loader will actually return entities of type E.
 			 */
-			@SuppressWarnings("unchecked")
-			HibernateOrmComposableEntityLoader<E2> result =
-					(HibernateOrmComposableEntityLoader<E2>) new HibernateOrmNonEntityIdPropertyEntityLoader<>(
-							entityType, documentIdSourceAttribute, documentIdSourceHandle,
-							session, loadingOptions
-					);
+			HibernateOrmComposableEntityLoader<E> result = new HibernateOrmNonEntityIdPropertyEntityLoader<>(
+					entityPersister, documentIdSourcePropertyName, documentIdSourceHandle,
+					session, loadingOptions
+			);
 
 			if ( !EntityLoadingCacheLookupStrategy.SKIP.equals( cacheLookupStrategy ) ) {
 				/*
@@ -229,7 +216,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 				 * Let's log something, at least.
 				 */
 				log.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
-						entityType.getName(), cacheLookupStrategy
+						targetEntityTypeContext.jpaEntityName(), cacheLookupStrategy
 				);
 			}
 
