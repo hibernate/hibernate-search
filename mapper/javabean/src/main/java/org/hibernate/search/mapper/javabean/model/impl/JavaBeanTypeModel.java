@@ -95,11 +95,6 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public PojoRawTypeModel<? super T> rawType() {
-		return this;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<JavaBeanTypeModel<? super T>> ascendingSuperTypes() {
 		return (Stream<JavaBeanTypeModel<? super T>>) introspector.getAscendingSuperTypes( xClass );
