@@ -50,7 +50,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 
 		Class<?> cleanedUpTargetType = annotation.targetType();
 		if ( cleanedUpTargetType.equals( void.class ) ) {
-			cleanedUpMaxDepth = null;
+			cleanedUpTargetType = null;
 		}
 
 		mappingContext.indexedEmbedded( cleanedUpName )

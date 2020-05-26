@@ -41,6 +41,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private final Set<String> includePaths = new HashSet<>();
 
+	private Class<?> targetType;
+
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent, PojoRawTypeModel<?> definingTypeModel,
@@ -68,7 +70,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			actualPrefix = prefix;
 		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, actualPrefix, storage, maxDepth, includePaths
+				definingTypeModel, actualPrefix, storage, maxDepth, includePaths, targetType
 		);
 	}
 
@@ -108,6 +110,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	@Override
 	public PropertyMappingIndexedEmbeddedStep targetType(Class<?> targetType) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		this.targetType = targetType;
+		return this;
 	}
 }

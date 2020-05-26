@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorTypeNodeBuilder;
+import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorOriginalTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -43,7 +43,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 	private final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
 	private final PojoIdentityMappingCollectorImpl<E> identityMappingCollector;
-	private final PojoIndexingProcessorTypeNodeBuilder<E> processorBuilder;
+	private final PojoIndexingProcessorOriginalTypeNodeBuilder<E> processorBuilder;
 
 	private PojoIndexingProcessor<E> preBuiltIndexingProcessor;
 
@@ -66,7 +66,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 				indexManagerBuilder.rootBindingContext(),
 				providedIdentifierBridge, beanResolver
 		);
-		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
+		this.processorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
 				mappingHelper, indexManagerBuilder.rootBindingContext(),
 				Optional.of( identityMappingCollector ),
@@ -80,7 +80,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		}
 
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( PojoIndexingProcessorTypeNodeBuilder::closeOnFailure, processorBuilder );
+			closer.push( PojoIndexingProcessorOriginalTypeNodeBuilder::closeOnFailure, processorBuilder );
 			closer.push( PojoIdentityMappingCollectorImpl::closeOnFailure, identityMappingCollector );
 			closer.push( PojoIndexingProcessor::close, preBuiltIndexingProcessor );
 			closed = true;
