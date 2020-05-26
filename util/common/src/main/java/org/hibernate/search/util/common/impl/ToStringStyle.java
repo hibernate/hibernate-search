@@ -19,6 +19,10 @@ public class ToStringStyle {
 			"[", "]", "\t", "\t", false
 	);
 
+	private static final ToStringStyle MULTILINE_INDENT_STRUCTURE = multilineIndentStructure(
+			": ", "  ", "  - ", "    "
+	);
+
 	/**
 	 * @return A single-line format relying on delimiters to display the structure (JSON-style).
 	 */
@@ -31,6 +35,14 @@ public class ToStringStyle {
 	 */
 	public static ToStringStyle multilineDelimiterStructure() {
 		return MULTILINE_DELIMITER_STRUCTURE;
+	}
+
+	/**
+	 * @return A multi-line format relying on indenting and bullet points to display the structure (YAML-style).
+	 * Object and array delimiters are not shown.
+	 */
+	public static ToStringStyle multilineIndentStructure() {
+		return MULTILINE_INDENT_STRUCTURE;
 	}
 
 	/**
