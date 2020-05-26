@@ -41,9 +41,9 @@ public class PojoIndexingProcessorValueBridgeNode<V, F> extends PojoIndexingProc
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "apply value bridge" );
 		builder.attribute( "bridge", bridgeHolder );
-		builder.attribute( "indexFieldReference", indexFieldReference );
+		builder.attribute( "indexField", indexFieldReference );
 	}
 
 	@Override

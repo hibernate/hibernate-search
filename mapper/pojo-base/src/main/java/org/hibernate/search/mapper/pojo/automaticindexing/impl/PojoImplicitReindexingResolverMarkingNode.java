@@ -24,7 +24,7 @@ public class PojoImplicitReindexingResolverMarkingNode<T, S> extends PojoImplici
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "mark for reindexing" );
 	}
 
 	@Override

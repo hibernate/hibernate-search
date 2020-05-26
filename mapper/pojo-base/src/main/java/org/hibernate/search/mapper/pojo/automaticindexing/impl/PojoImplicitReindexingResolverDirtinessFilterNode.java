@@ -22,27 +22,27 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
 
 	private final PojoPathFilter<S> dirtyPathFilter;
-	private final PojoImplicitReindexingResolverNode<T, S> delegate;
+	private final PojoImplicitReindexingResolverNode<T, S> nested;
 
 	public PojoImplicitReindexingResolverDirtinessFilterNode(PojoPathFilter<S> dirtyPathFilter,
-			PojoImplicitReindexingResolverNode<T, S> delegate) {
+			PojoImplicitReindexingResolverNode<T, S> nested) {
 		Contracts.assertNotNull(
 				dirtyPathFilter, "dirtyPathFilter"
 		);
 		this.dirtyPathFilter = dirtyPathFilter;
-		this.delegate = delegate;
+		this.nested = nested;
 	}
 
 	@Override
 	public void close() {
-		delegate.close();
+		nested.close();
 	}
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "reindex only if paths are dirty" );
 		builder.attribute( "dirtyPathFilter", dirtyPathFilter );
-		builder.attribute( "delegate", delegate );
+		builder.attribute( "nested", nested );
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends Poj
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
 		// See method javadoc: null means we must consider all paths as dirty
 		if ( dirtinessState == null || dirtyPathFilter.test( dirtinessState ) ) {
-			delegate.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
+			nested.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 		}
 	}
 }

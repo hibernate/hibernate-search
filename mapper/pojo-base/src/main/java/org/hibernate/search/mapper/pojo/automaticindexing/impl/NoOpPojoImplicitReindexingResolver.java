@@ -41,6 +41,6 @@ class NoOpPojoImplicitReindexingResolver implements PojoImplicitReindexingResolv
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "no op" );
 	}
 }

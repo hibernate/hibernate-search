@@ -46,7 +46,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "process property" );
 		builder.attribute( "handle", handle );
 		builder.startList( "nestedNodes" );
 		for ( PojoImplicitReindexingResolverNode<?, ?> nestedNode : nestedNodes ) {

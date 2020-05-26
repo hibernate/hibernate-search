@@ -46,7 +46,7 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, S, U> extends PojoI
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "process type (with cast)" );
 		builder.attribute( "caster", caster );
 		builder.startList( "nestedNodes" );
 		for ( PojoImplicitReindexingResolverNode<?, ?> node : nestedNodes ) {
