@@ -864,6 +864,29 @@ in <<mapper-orm-bridge-index-field-dsl,some APIs exposed to custom bridges>>:
 the `addValue`/`addObject` methods that accept a field name.
 ====
 
+[[mapper-orm-indexedembedded-targetType]]
+=== Casting the target of `@IndexedEmbedded` with `targetType`
+
+By default, the type of indexed-embedded values is detected automatically using reflection,
+taking into account <<mapper-orm-containerextractor,container extraction>> if relevant;
+for example `@IndexedEmbedded List<MyEntity>` will be detected as having values of type `MyEntity`.
+Fields to be embedded will be inferred from the mapping of the value type and its supertypes;
+in the example, `@GenericField` annotations present on `MyEntity` and its superclasses will be taken into account,
+but annotations defined in its subclasses will be ignored.
+
+If for some reason a schema does not expose the correct type for a property
+(e.g. a raw `List`, or `List<MyEntityInterface>` instead of `List<MyEntityImpl>`)
+it is possible to define the expected type of values
+by setting the `targetType` attribute in `@IndexedEmbedded`.
+On bootstrap, Hibernate Search will then resolve fields to be embedded based on the given target type,
+and at runtime it will cast values to the given target type.
+
+[WARNING]
+====
+Failures to cast indexed-embedded values to the designated type will be propagated
+and lead to indexing failure.
+====
+
 [[mapper-orm-indexedembedded-reindexing]]
 === Reindexing when embedded elements change
 // Search 5 anchors backward compatibility
