@@ -367,11 +367,6 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public void setContainedUsedInCrossEntityDerivedProperty(
-				Map<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
-			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
-		}
-
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {

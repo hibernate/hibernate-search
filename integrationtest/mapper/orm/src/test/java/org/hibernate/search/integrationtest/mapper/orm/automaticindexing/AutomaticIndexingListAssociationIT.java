@@ -339,11 +339,6 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public void setContainedUsedInCrossEntityDerivedProperty(
-				List<ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
-			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
-		}
-
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
