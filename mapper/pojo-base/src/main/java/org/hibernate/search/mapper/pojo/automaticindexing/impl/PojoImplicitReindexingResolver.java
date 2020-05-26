@@ -44,8 +44,4 @@ public interface PojoImplicitReindexingResolver<T, S> extends AutoCloseable, ToS
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState);
 
-	static <T, D> PojoImplicitReindexingResolver<T, D> noOp() {
-		return NoOpPojoImplicitReindexingResolver.get();
-	}
-
 }

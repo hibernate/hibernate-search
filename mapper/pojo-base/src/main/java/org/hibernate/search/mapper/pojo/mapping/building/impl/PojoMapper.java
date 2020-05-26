@@ -360,7 +360,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( entityType ) );
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
-				reindexingResolverBuildingHelper.build( entityType, pathFilterFactory );
+				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
 			// Nothing to contribute to contained types at the moment,
 			// but create the collector just so the mapper knows the type is contained
