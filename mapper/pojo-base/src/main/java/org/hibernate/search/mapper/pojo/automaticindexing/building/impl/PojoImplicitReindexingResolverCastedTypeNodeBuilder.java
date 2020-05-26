@@ -13,15 +13,23 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCasted
 class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 		extends AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U> {
 
+	private final BoundPojoModelPathCastedTypeNode<T, U> modelPath;
+
 	PojoImplicitReindexingResolverCastedTypeNodeBuilder(BoundPojoModelPathCastedTypeNode<T, U> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( modelPath, buildingHelper );
+		this.modelPath = modelPath;
+	}
+
+	@Override
+	BoundPojoModelPathCastedTypeNode<T, U> getModelPath() {
+		return modelPath;
 	}
 
 	@Override
 	<S> PojoImplicitReindexingResolverNode<T, S> doBuild(PojoImplicitReindexingResolverNode<? super U, S> nestedNode) {
 		return new PojoImplicitReindexingResolverCastedTypeNode<>(
-				getTypeModel().rawType().caster(), nestedNode
+				getModelPath().getTypeModel().caster(), nestedNode
 		);
 	}
 }

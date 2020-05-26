@@ -13,9 +13,17 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 		extends AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, T> {
 
+	private final BoundPojoModelPathTypeNode<T> modelPath;
+
 	PojoImplicitReindexingResolverOriginalTypeNodeBuilder(BoundPojoModelPathTypeNode<T> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( modelPath, buildingHelper );
+		this.modelPath = modelPath;
+	}
+
+	@Override
+	public BoundPojoModelPathTypeNode<T> getModelPath() {
+		return modelPath;
 	}
 
 	@Override

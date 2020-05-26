@@ -24,8 +24,6 @@ import org.hibernate.search.util.common.impl.Closer;
 abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 
-	private final BoundPojoModelPathTypeNode<U> modelPath;
-
 	private final PojoImplicitReindexingResolverMarkingNodeBuilder<U> markingNodeBuilder;
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -35,13 +33,7 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	AbstractPojoImplicitReindexingResolverTypeNodeBuilder(BoundPojoModelPathTypeNode<U> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
-		this.modelPath = modelPath;
 		this.markingNodeBuilder = new PojoImplicitReindexingResolverMarkingNodeBuilder<>( modelPath, buildingHelper );
-	}
-
-	@Override
-	BoundPojoModelPathTypeNode<U> getModelPath() {
-		return modelPath;
 	}
 
 	@Override
@@ -55,8 +47,11 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		}
 	}
 
+	@Override
+	abstract BoundPojoModelPathTypeNode<U> getModelPath();
+
 	PojoTypeModel<U> getTypeModel() {
-		return modelPath.getTypeModel();
+		return getModelPath().getTypeModel();
 	}
 
 	PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> property(String propertyName) {
@@ -118,7 +113,7 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> createPropertyBuilder(String propertyName) {
 		checkNotFrozen();
 		return new PojoImplicitReindexingResolverPropertyNodeBuilder<>(
-				modelPath.property( propertyName ), buildingHelper
+				getModelPath().property( propertyName ), buildingHelper
 		);
 	}
 }
