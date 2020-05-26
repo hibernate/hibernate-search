@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -25,19 +24,19 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexingProcessor<C> {
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
-	private final Collection<PojoIndexingProcessor<? super V>> nestedNodes;
+	private final PojoIndexingProcessor<? super V> nested;
 
 	public PojoIndexingProcessorContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
-			Collection<PojoIndexingProcessor<? super V>> nestedNodes) {
+			PojoIndexingProcessor<? super V> nested) {
 		this.extractorHolder = extractorHolder;
-		this.nestedNodes = nestedNodes;
+		this.nested = nested;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ContainerExtractorHolder::close, extractorHolder );
-			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
+			closer.push( PojoIndexingProcessor::close, nested );
 		}
 	}
 
@@ -45,11 +44,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "operation", "process container element" );
 		builder.attribute( "extractor", extractorHolder.get() );
-		builder.startList( "nestedNodes" );
-		for ( PojoIndexingProcessor<?> nestedNode : nestedNodes ) {
-			builder.value( nestedNode );
-		}
-		builder.endList();
+		builder.attribute( "nested", nested );
 	}
 
 	@Override
@@ -60,9 +55,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	}
 
 	private void processItem(DocumentElement target, V sourceItem, PojoIndexingProcessorSessionContext sessionContext) {
-		for ( PojoIndexingProcessor<? super V> nestedNode : nestedNodes ) {
-			nestedNode.process( target, sourceItem, sessionContext );
-		}
+		nested.process( target, sourceItem, sessionContext );
 	}
 
 }

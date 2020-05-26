@@ -27,14 +27,14 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 
 	private final ValueReadHandle<P> handle;
 	private final Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders;
-	private final Collection<PojoIndexingProcessor<? super P>> nestedNodes;
+	private final PojoIndexingProcessor<? super P> nested;
 
 	public PojoIndexingProcessorPropertyNode(ValueReadHandle<P> handle,
 			Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders,
-			Collection<PojoIndexingProcessor<? super P>> nestedNodes) {
+			PojoIndexingProcessor<? super P> nested) {
 		this.handle = handle;
 		this.propertyBridgeHolders = propertyBridgeHolders;
-		this.nestedNodes = nestedNodes;
+		this.nested = nested;
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( holder -> holder.get().close(), propertyBridgeHolders );
 			closer.pushAll( BeanHolder::close, propertyBridgeHolders );
-			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
+			closer.push( PojoIndexingProcessor::close, nested );
 		}
 	}
 
@@ -55,11 +55,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 			builder.value( bridgeHolder.get() );
 		}
 		builder.endList();
-		builder.startList( "nestedNodes" );
-		for ( PojoIndexingProcessor<?> nestedNode : nestedNodes ) {
-			builder.value( nestedNode );
-		}
-		builder.endList();
+		builder.attribute( "nested", nested );
 	}
 
 	@Override
@@ -68,8 +64,6 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 		for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
 			bridgeHolder.get().write( target, propertyValue, sessionContext.propertyBridgeWriteContext() );
 		}
-		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {
-			nestedNode.process( target, propertyValue, sessionContext );
-		}
+		nested.process( target, propertyValue, sessionContext );
 	}
 }
