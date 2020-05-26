@@ -31,6 +31,13 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "implementor=" + implementor
+				+ "]";
+	}
+
+	@Override
 	public IndexManager toAPI() {
 		return implementor.toAPI();
 	}

@@ -19,6 +19,13 @@ final class HibernateOrmContainedBeanBeanHolderAdapter<T> implements BeanHolder<
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "containedBean=" + containedBean
+				+ "]";
+	}
+
+	@Override
 	public T get() {
 		return containedBean.getBeanInstance();
 	}

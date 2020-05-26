@@ -14,16 +14,24 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 
 final class CompositeBeanHolder<T> implements BeanHolder<List<T>> {
 
-	private final List<? extends BeanHolder<? extends T>> delegates;
+	private final List<? extends BeanHolder<? extends T>> dependencies;
 	private final List<T> instances;
 
-	CompositeBeanHolder(List<? extends BeanHolder<? extends T>> delegates) {
-		this.delegates = delegates;
-		List<T> tmp = new ArrayList<>( delegates.size() );
-		for ( BeanHolder<? extends T> delegate : delegates ) {
+	CompositeBeanHolder(List<? extends BeanHolder<? extends T>> dependencies) {
+		this.dependencies = dependencies;
+		List<T> tmp = new ArrayList<>( dependencies.size() );
+		for ( BeanHolder<? extends T> delegate : dependencies ) {
 			tmp.add( delegate.get() );
 		}
 		this.instances = CollectionHelper.toImmutableList( tmp );
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "instances=" + instances
+				+ ", dependencies=" + dependencies
+				+ "]";
 	}
 
 	@Override
@@ -34,7 +42,7 @@ final class CompositeBeanHolder<T> implements BeanHolder<List<T>> {
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( BeanHolder::close, delegates );
+			closer.pushAll( BeanHolder::close, dependencies );
 		}
 	}
 }

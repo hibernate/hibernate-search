@@ -22,8 +22,9 @@ public interface RoutingKeyProvider<E> extends AutoCloseable {
 	String toRoutingKey(Object identifier, Supplier<E> entitySupplier,
 			BridgeSessionContext context);
 
+	@SuppressWarnings("unchecked") // The instance works with any E
 	static <E> RoutingKeyProvider<E> alwaysNull() {
-		return (tenantIdentifier, entity, context) -> null;
+		return (RoutingKeyProvider<E>) AlwaysNullRoutingKeyProvider.INSTANCE;
 	}
 
 }

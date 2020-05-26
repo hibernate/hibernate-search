@@ -15,6 +15,13 @@ final class SimpleBeanHolder<T> implements BeanHolder<T> {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "instance=" + instance
+				+ "]";
+	}
+
+	@Override
 	public T get() {
 		return instance;
 	}

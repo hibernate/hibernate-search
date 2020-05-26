@@ -31,6 +31,14 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMappingImpleme
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "handle=" + property
+				+ ", bridgeHolder=" + bridgeHolder
+				+ "]";
+	}
+
+	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( holder -> holder.get().close(), bridgeHolder );

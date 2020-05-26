@@ -10,8 +10,14 @@ import java.util.OptionalLong;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class OptionalLongValueExtractor implements ContainerExtractor<OptionalLong, Long> {
+	@Override
+	public String toString() {
+		return BuiltinContainerExtractors.OPTIONAL_LONG;
+	}
+
 	@Override
 	public Stream<Long> extract(OptionalLong container) {
 		if ( container != null && container.isPresent() ) {

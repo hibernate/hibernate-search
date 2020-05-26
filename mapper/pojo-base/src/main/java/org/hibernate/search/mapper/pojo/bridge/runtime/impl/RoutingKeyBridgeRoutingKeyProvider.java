@@ -22,6 +22,13 @@ public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "bridgeHolder=" + bridgeHolder
+				+ "]";
+	}
+
+	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( holder -> holder.get().close(), bridgeHolder );

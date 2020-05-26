@@ -10,8 +10,14 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class MapValueExtractor<T> implements ContainerExtractor<Map<?, T>, T> {
+	@Override
+	public String toString() {
+		return BuiltinContainerExtractors.MAP_VALUE;
+	}
+
 	@Override
 	public Stream<T> extract(Map<?, T> container) {
 		return container == null ? Stream.empty() : container.values().stream();
