@@ -174,6 +174,14 @@ public @interface IndexedEmbedded {
 	 */
 	ContainerExtraction extraction() default @ContainerExtraction;
 
+	/**
+	 * @return A type indexed-embedded elements should be cast to.
+	 * When relying on {@link #extraction() container extraction},
+	 * the extracted values are cast, not the container.
+	 * By default, no casting occurs.
+	 */
+	Class<?> targetType() default void.class;
+
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })
 	@Retention(RetentionPolicy.RUNTIME)
@@ -182,6 +190,5 @@ public @interface IndexedEmbedded {
 	}
 
 	// TODO HSEARCH-3071 includeEmbeddedObjectId
-	// TODO HSEARCH-3072 targetElement
 
 }

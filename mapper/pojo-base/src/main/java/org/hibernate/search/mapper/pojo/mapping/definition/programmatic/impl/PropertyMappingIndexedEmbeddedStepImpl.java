@@ -106,4 +106,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 		return this;
 	}
 
+	@Override
+	public PropertyMappingIndexedEmbeddedStep targetType(Class<?> targetType) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
 }
