@@ -10,12 +10,12 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
-public class DefaultPojoImplicitReindexingResolver<T, S> implements PojoImplicitReindexingResolver<T, S> {
+public class PojoImplicitReindexingResolverImpl<T, S> implements PojoImplicitReindexingResolver<T, S> {
 
 	private final PojoPathFilter<S> dirtyPathsTriggeringSelfReindexing;
 	private final PojoImplicitReindexingResolverNode<T, S> containingEntitiesResolverRoot;
 
-	public DefaultPojoImplicitReindexingResolver(
+	public PojoImplicitReindexingResolverImpl(
 			PojoPathFilter<S> dirtyPathsTriggeringSelfReindexing,
 			PojoImplicitReindexingResolverNode<T, S> containingEntitiesResolverRoot) {
 		this.dirtyPathsTriggeringSelfReindexing = dirtyPathsTriggeringSelfReindexing;

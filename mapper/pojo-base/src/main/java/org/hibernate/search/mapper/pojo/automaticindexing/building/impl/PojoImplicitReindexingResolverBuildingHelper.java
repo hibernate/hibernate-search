@@ -15,6 +15,8 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverImpl;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
@@ -22,6 +24,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -83,7 +86,15 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 	}
 
-	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoRawTypeModel<T> typeModel,
+	public <T, S> PojoImplicitReindexingResolver<T, S> build(PojoRawTypeModel<T> typeModel,
+			PojoPathFilterFactory<S> pathFilterFactory) {
+		return buildOptional( typeModel, pathFilterFactory )
+				.orElseGet( () -> new PojoImplicitReindexingResolverImpl<>(
+						PojoPathFilter.empty(), PojoImplicitReindexingResolverNode.noOp()
+				) );
+	}
+
+	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> buildOptional(PojoRawTypeModel<T> typeModel,
 			PojoPathFilterFactory<S> pathFilterFactory) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverBuilder<T> builder =

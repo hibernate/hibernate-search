@@ -126,7 +126,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadata
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
 				.getPathFilterFactory();
-		Optional<PojoImplicitReindexingResolver<E, Set<String>>> reindexingResolverOptional =
+		PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver =
 				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
 		MappedIndexManager indexManager = indexManagerBuilder.build();
@@ -138,7 +138,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,
 				indexManager,
-				reindexingResolverOptional.orElseGet( PojoImplicitReindexingResolver::noOp )
+				reindexingResolver
 		);
 		log.createdPojoIndexedTypeManager( typeManager );
 
