@@ -252,7 +252,7 @@ The POJO mapper assigns one tree to each indexed entity type.
 
 Here are the main types of nodes:
 
-* `PojoIndexingProcessorTypeNode`: A node representing a POJO type (a Java class).
+* `PojoIndexingProcessorOriginalTypeNode`: A node representing a POJO type (a Java class).
 * `PojoIndexingProcessorPropertyNode`: A node representing a POJO property.
 * `PojoIndexingProcessorContainerElementNode`: A node representing elements in a container (`List`, `Optional`, ...).
 
@@ -280,7 +280,7 @@ tree that was generated for a given mapping.
 
 ==== Bootstrap
 
-For each indexed type, the building process consists in creating a root `PojoIndexingProcessorTypeNode` builder,
+For each indexed type, the building process consists in creating a root `PojoIndexingProcessorOriginalTypeNode` builder,
 and applying metadata contributors to this builder (see <<internals-overall-bootstrap>>),
 creating nested builders as the need arises (when a metadata contributor mentions a POJO property, for instance).
 Whenever an `@IndexedEmbedded` is found, the process is simply applied recursively

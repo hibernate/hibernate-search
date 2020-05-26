@@ -26,9 +26,9 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 import org.hibernate.search.util.common.impl.Closer;
@@ -51,7 +51,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	private final Collection<BoundValueBridge<V, ?>> boundBridges = new ArrayList<>();
 
-	private final Collection<PojoIndexingProcessorTypeNodeBuilder<V>> typeNodeBuilders = new ArrayList<>();
+	private final Collection<AbstractPojoIndexingProcessorTypeNodeBuilder<V, ?>> typeNodeBuilders = new ArrayList<>();
 
 	private final boolean multiValuedFromContainerExtractor;
 
@@ -83,7 +83,8 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	@Override
 	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
 			ObjectFieldStorage storage,
-			Integer maxDepth, Set<String> includePaths) {
+			Integer maxDepth, Set<String> includePaths,
+			Class<?> targetType) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
 			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().name() + ".";
@@ -98,18 +99,32 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				definition, multiValuedFromContainerExtractor
 		);
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
-			BoundPojoModelPathTypeNode<V> embeddedTypeModelPath = modelPath.type();
-			PojoIndexingProcessorTypeNodeBuilder<V> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
-					embeddedTypeModelPath, mappingHelper, nestedBindingContext,
-					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-					Optional.empty(),
-					nestedBindingContext.parentIndexObjectReferences()
-			);
+			AbstractPojoIndexingProcessorTypeNodeBuilder<V, ?> nestedProcessorBuilder;
+			if ( targetType == null ) {
+				nestedProcessorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
+						modelPath.type(), mappingHelper, nestedBindingContext,
+						// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
+						Optional.empty(),
+						nestedBindingContext.parentIndexObjectReferences()
+				);
+			}
+			else {
+				PojoRawTypeModel<?> castedType = mappingHelper.getIntrospector().typeModel( targetType );
+				nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(
+						modelPath.castedType( castedType ), mappingHelper, nestedBindingContext,
+						// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
+						Optional.empty(),
+						nestedBindingContext.parentIndexObjectReferences()
+				);
+			}
 			typeNodeBuilders.add( nestedProcessorBuilder );
 
-			Set<PojoTypeMetadataContributor> contributors = mappingHelper.getContributorProvider().get( embeddedTypeModelPath.getTypeModel().rawType() );
+			PojoTypeModel<?> targetTypeModel = nestedProcessorBuilder.getModelPath().getTypeModel();
+
+			Set<PojoTypeMetadataContributor> contributors = mappingHelper.getContributorProvider()
+					.get( targetTypeModel.rawType() );
 			if ( contributors.isEmpty() ) {
-				throw log.invalidIndexedEmbedded( modelPath.getTypeModel() );
+				throw log.invalidIndexedEmbedded( targetTypeModel );
 			}
 			contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
 		} );
@@ -125,7 +140,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().get().close(), boundBridges );
 			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().close(), boundBridges );
-			closer.pushAll( PojoIndexingProcessorTypeNodeBuilder::closeOnFailure, typeNodeBuilders );
+			closer.pushAll( AbstractPojoIndexingProcessorTypeNodeBuilder::closeOnFailure, typeNodeBuilders );
 		}
 	}
 
@@ -154,7 +169,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				immutableNestedNodes.add( createValueBridgeNode( boundBridge ) );
 			}
 			typeNodeBuilders.stream()
-					.map( builder -> builder.build( valueDependencyCollector.type() ) )
+					.map( builder -> builder.build( valueDependencyCollector ) )
 					.filter( Optional::isPresent )
 					.map( Optional::get )
 					.forEach( immutableNestedNodes::add );

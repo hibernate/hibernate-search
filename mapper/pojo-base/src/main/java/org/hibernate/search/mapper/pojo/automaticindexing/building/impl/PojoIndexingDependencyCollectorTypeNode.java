@@ -52,7 +52,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
 	}
 
-	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, T> parentNode,
+	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, ?> parentNode,
 			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
