@@ -24,7 +24,7 @@ public final class ToStringTreeAppendableMultilineFormatter {
 
 	@Override
 	public String toString() {
-		return new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() )
+		return new ToStringTreeBuilder( ToStringStyle.multilineIndentStructure() )
 				.value( appendable )
 				.toString();
 	}
