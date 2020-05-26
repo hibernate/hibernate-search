@@ -14,6 +14,12 @@ public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldR
 
 	private ElasticsearchIndexSchemaObjectFieldNode schemaNode;
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()
+				+ "[absolutePath=" + ( schemaNode == null ? null : schemaNode.absolutePath() ) + "]";
+	}
+
 	public void setSchemaNode(ElasticsearchIndexSchemaObjectFieldNode schemaNode) {
 		this.schemaNode = schemaNode;
 	}

@@ -14,6 +14,12 @@ public class LuceneIndexObjectFieldReference implements IndexObjectFieldReferenc
 
 	private LuceneIndexSchemaObjectFieldNode schemaNode;
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()
+				+ "[absolutePath=" + ( schemaNode == null ? null : schemaNode.absolutePath() ) + "]";
+	}
+
 	public void setSchemaNode(LuceneIndexSchemaObjectFieldNode schemaNode) {
 		this.schemaNode = schemaNode;
 	}

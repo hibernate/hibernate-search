@@ -10,8 +10,14 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class CollectionElementExtractor<T> implements ContainerExtractor<Collection<T>, T> {
+	@Override
+	public String toString() {
+		return BuiltinContainerExtractors.COLLECTION;
+	}
+
 	@Override
 	public Stream<T> extract(Collection<T> container) {
 		return container == null ? Stream.empty() : container.stream();

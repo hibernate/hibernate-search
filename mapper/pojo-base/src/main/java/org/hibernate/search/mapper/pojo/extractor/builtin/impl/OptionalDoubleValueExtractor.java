@@ -10,8 +10,14 @@ import java.util.OptionalDouble;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class OptionalDoubleValueExtractor implements ContainerExtractor<OptionalDouble, Double> {
+	@Override
+	public String toString() {
+		return BuiltinContainerExtractors.OPTIONAL_DOUBLE;
+	}
+
 	@Override
 	public Stream<Double> extract(OptionalDouble container) {
 		if ( container != null && container.isPresent() ) {

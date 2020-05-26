@@ -10,8 +10,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class IterableElementExtractor<T> implements ContainerExtractor<Iterable<T>, T> {
+	@Override
+	public String toString() {
+		return BuiltinContainerExtractors.ITERABLE;
+	}
+
 	@Override
 	public Stream<T> extract(Iterable<T> container) {
 		return container == null ? Stream.empty() : StreamSupport.stream( container.spliterator(), false );

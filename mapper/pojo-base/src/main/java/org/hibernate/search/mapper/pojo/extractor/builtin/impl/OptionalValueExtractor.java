@@ -10,8 +10,14 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class OptionalValueExtractor<T> implements ContainerExtractor<Optional<T>, T> {
+	@Override
+	public String toString() {
+		return BuiltinContainerExtractors.OPTIONAL;
+	}
+
 	@Override
 	public Stream<T> extract(Optional<T> container) {
 		return container == null ? Stream.empty() : container.map( Stream::of ).orElseGet( Stream::empty );

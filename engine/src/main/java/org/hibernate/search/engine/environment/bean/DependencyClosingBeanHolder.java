@@ -21,6 +21,14 @@ final class DependencyClosingBeanHolder<T> implements BeanHolder<T> {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "delegate=" + delegate
+				+ ", dependencies=" + dependencies
+				+ "]";
+	}
+
+	@Override
 	public T get() {
 		return delegate.get();
 	}
