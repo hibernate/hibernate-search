@@ -145,7 +145,8 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 			}
 			else {
 				return Optional.of( new PojoIndexingProcessorTypeNode<>(
-						parentIndexObjectReferences, immutableBridgeHolders, immutablePropertyNodes
+						parentIndexObjectReferences, immutableBridgeHolders,
+						this.<T>createNested( immutablePropertyNodes )
 				) );
 			}
 		}

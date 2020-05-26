@@ -94,7 +94,7 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 		}
 		else {
 			return Optional.of( new PojoIndexingProcessorContainerElementNode<>(
-					extractorHolder, immutableNestedProcessors
+					extractorHolder, createNested( immutableNestedProcessors )
 			) );
 		}
 	}

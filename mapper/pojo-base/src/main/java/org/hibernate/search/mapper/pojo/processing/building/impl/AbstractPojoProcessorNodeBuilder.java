@@ -6,7 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
+import java.util.Collection;
+
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorMultiNode;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -50,4 +54,21 @@ abstract class AbstractPojoProcessorNodeBuilder {
 
 		return failureCollector;
 	}
+
+	protected final <T> PojoIndexingProcessor<? super T> createNested(
+			Collection<? extends PojoIndexingProcessor<? super T>> elements) {
+		int size = elements.size();
+		if ( size == 0 ) {
+			// Simplify the tree: no need for a node here
+			return PojoIndexingProcessor.noOp();
+		}
+		else if ( size == 1 ) {
+			// Simplify the tree: no need for a multi-node here
+			return elements.iterator().next();
+		}
+		else {
+			return new PojoIndexingProcessorMultiNode<>( elements );
+		}
+	}
+
 }

@@ -26,14 +26,14 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 
 	private final Iterable<IndexObjectFieldReference> parentIndexObjectReferences;
 	private final Collection<BeanHolder<? extends TypeBridge>> bridgeHolders;
-	private final Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes;
+	private final PojoIndexingProcessor<? super T> nested;
 
 	public PojoIndexingProcessorTypeNode(Iterable<IndexObjectFieldReference> parentIndexObjectReferences,
 			Collection<BeanHolder<? extends TypeBridge>> bridgeHolders,
-			Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes) {
+			PojoIndexingProcessor<? super T> nested) {
 		this.parentIndexObjectReferences = parentIndexObjectReferences;
 		this.bridgeHolders = bridgeHolders;
-		this.propertyNodes = propertyNodes;
+		this.nested = nested;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( holder -> holder.get().close(), bridgeHolders );
 			closer.pushAll( BeanHolder::close, bridgeHolders );
-			closer.pushAll( PojoIndexingProcessor::close, propertyNodes );
+			closer.push( PojoIndexingProcessor::close, nested );
 		}
 	}
 
@@ -54,11 +54,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 			builder.value( bridgeHolder.get() );
 		}
 		builder.endList();
-		builder.startList( "propertyNodes" );
-		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
-			builder.value( propertyNode );
-		}
-		builder.endList();
+		builder.attribute( "nested", nested );
 	}
 
 	@Override
@@ -75,10 +71,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		for ( BeanHolder<? extends TypeBridge> bridgeHolder : bridgeHolders ) {
 			bridgeHolder.get().write( parentObject, source, sessionContext.typeBridgeWriteContext() );
 		}
-		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
-			// Recursion here
-			propertyNode.process( parentObject, source, sessionContext );
-		}
+		nested.process( parentObject, source, sessionContext );
 	}
 
 }
