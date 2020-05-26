@@ -34,7 +34,7 @@ public class DefaultPojoImplicitReindexingResolver<T, S> implements PojoImplicit
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "root" );
 		builder.attribute( "dirtyPathsTriggeringSelfReindexing", dirtyPathsTriggeringSelfReindexing );
 		builder.attribute( "containingEntitiesResolverRoot", containingEntitiesResolverRoot );
 	}

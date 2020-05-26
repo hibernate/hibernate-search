@@ -49,7 +49,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "process container element" );
 		builder.attribute( "extractor", extractorHolder.get() );
 		builder.startList( "nestedNodes" );
 		for ( PojoImplicitReindexingResolverNode<?, ?> nestedNode : nestedNodes ) {

@@ -43,7 +43,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "process container element" );
 		builder.attribute( "extractor", extractorHolder.get() );
 		builder.startList( "nestedNodes" );
 		for ( PojoIndexingProcessor<?> nestedNode : nestedNodes ) {

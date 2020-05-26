@@ -48,7 +48,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
+		builder.attribute( "operation", "process property" );
 		builder.attribute( "handle", handle );
 		builder.startList( "bridges" );
 		for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {

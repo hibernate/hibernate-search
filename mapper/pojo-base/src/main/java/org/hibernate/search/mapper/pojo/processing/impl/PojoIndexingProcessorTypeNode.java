@@ -47,8 +47,8 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "parentIndexObjectReferences", parentIndexObjectReferences );
+		builder.attribute( "operation", "process type" );
+		builder.attribute( "objectFieldsToCreate", parentIndexObjectReferences );
 		builder.startList( "bridges" );
 		for ( BeanHolder<? extends TypeBridge> bridgeHolder : bridgeHolders ) {
 			builder.value( bridgeHolder.get() );
