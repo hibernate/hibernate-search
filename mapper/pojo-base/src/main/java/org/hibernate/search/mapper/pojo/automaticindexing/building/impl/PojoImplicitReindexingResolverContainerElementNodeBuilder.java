@@ -73,7 +73,7 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 		}
 		else {
 			return Optional.of( new PojoImplicitReindexingResolverContainerElementNode<>(
-					extractorHolder, valueTypeNodes
+					extractorHolder, createNested( valueTypeNodes )
 			) );
 		}
 	}

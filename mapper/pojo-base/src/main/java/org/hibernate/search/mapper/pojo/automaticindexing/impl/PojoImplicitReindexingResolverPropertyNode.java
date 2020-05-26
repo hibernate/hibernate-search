@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.util.Collection;
-
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
@@ -29,18 +27,18 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImplicitReindexingResolverNode<T, S> {
 
 	private final ValueReadHandle<P> handle;
-	private final Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes;
+	private final PojoImplicitReindexingResolverNode<? super P, S> nested;
 
 	public PojoImplicitReindexingResolverPropertyNode(ValueReadHandle<P> handle,
-			Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes) {
+			PojoImplicitReindexingResolverNode<? super P, S> nested) {
 		this.handle = handle;
-		this.nestedNodes = nestedNodes;
+		this.nested = nested;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
+			closer.push( PojoImplicitReindexingResolverNode::close, nested );
 		}
 	}
 
@@ -48,11 +46,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "operation", "process property" );
 		builder.attribute( "handle", handle );
-		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolverNode<?, ?> nestedNode : nestedNodes ) {
-			builder.value( nestedNode );
-		}
-		builder.endList();
+		builder.attribute( "nested", nested );
 	}
 
 	@Override
@@ -60,9 +54,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
 		P propertyValue = handle.get( dirty );
 		if ( propertyValue != null ) {
-			for ( PojoImplicitReindexingResolverNode<? super P, S> node : nestedNodes ) {
-				node.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue, dirtinessState );
-			}
+			nested.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue, dirtinessState );
 		}
 	}
 }

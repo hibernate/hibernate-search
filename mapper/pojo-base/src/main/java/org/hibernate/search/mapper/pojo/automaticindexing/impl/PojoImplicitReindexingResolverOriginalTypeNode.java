@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.util.Collection;
-
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -24,28 +22,23 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
 
-	private final Collection<PojoImplicitReindexingResolverNode<? super T, S>> nestedNodes;
+	private final PojoImplicitReindexingResolverNode<? super T, S> nested;
 
-	public PojoImplicitReindexingResolverOriginalTypeNode(
-			Collection<PojoImplicitReindexingResolverNode<? super T, S>> nestedNodes) {
-		this.nestedNodes = nestedNodes;
+	public PojoImplicitReindexingResolverOriginalTypeNode(PojoImplicitReindexingResolverNode<? super T, S> nested) {
+		this.nested = nested;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
+			closer.push( PojoImplicitReindexingResolverNode::close, nested );
 		}
 	}
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "operation", "process type" );
-		builder.startList( "nestedNodes" );
-		for ( PojoImplicitReindexingResolverNode<?, ?> node : nestedNodes ) {
-			builder.value( node );
-		}
-		builder.endList();
+		builder.attribute( "nested", nested );
 	}
 
 	@Override
@@ -53,8 +46,6 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
 		dirty = (T) runtimeIntrospector.unproxy( dirty );
-		for ( PojoImplicitReindexingResolverNode<? super T, S> node : nestedNodes ) {
-			node.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
-		}
+		nested.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
 	}
 }
