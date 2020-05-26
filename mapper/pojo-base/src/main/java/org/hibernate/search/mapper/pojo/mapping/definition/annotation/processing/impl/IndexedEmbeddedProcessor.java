@@ -48,11 +48,17 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 
 		ContainerExtractorPath extractorPath = context.toContainerExtractorPath( annotation.extraction() );
 
+		Class<?> cleanedUpTargetType = annotation.targetType();
+		if ( cleanedUpTargetType.equals( void.class ) ) {
+			cleanedUpMaxDepth = null;
+		}
+
 		mappingContext.indexedEmbedded( cleanedUpName )
 				.extractors( extractorPath )
 				.prefix( cleanedUpPrefix )
 				.storage( annotation.storage() )
 				.maxDepth( cleanedUpMaxDepth )
-				.includePaths( cleanedUpIncludePaths );
+				.includePaths( cleanedUpIncludePaths )
+				.targetType( cleanedUpTargetType );
 	}
 }

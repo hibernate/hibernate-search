@@ -87,4 +87,14 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 */
 	PropertyMappingIndexedEmbeddedStep extractors(ContainerExtractorPath extractorPath);
 
+	/**
+	 * @param targetType A type indexed-embedded elements should be cast to.
+	 * When relying on {@link #extractors(ContainerExtractorPath) container extraction},
+	 * the extracted values are cast, not the container.
+	 * By default, no casting occurs.
+	 * @return {@code this}, for method chaining.
+	 * @see IndexedEmbedded#targetType()
+	 */
+	PropertyMappingIndexedEmbeddedStep targetType(Class<?> targetType);
+
 }
