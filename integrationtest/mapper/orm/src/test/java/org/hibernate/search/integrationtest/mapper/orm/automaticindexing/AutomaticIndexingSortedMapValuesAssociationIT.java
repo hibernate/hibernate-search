@@ -202,6 +202,19 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
 		}
 
+		@SuppressWarnings("unchecked")
+		@Override
+		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedWithCast(
+				ContainingEntity containingEntity) {
+			return (SortedMap) containingEntity.getContainedIndexedEmbeddedWithCast();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedWithCast(ContainedEntity containedEntity) {
+			return (List) containedEntity.getContainingAsIndexedEmbeddedWithCast();
+		}
+
 		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
@@ -270,6 +283,7 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+				"containedIndexedEmbeddedWithCast.indexedField",
 				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
@@ -316,6 +330,17 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 		@MapKeyColumn(name = "map_key")
 		@SortNatural
 		private SortedMap<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty = new TreeMap<>();
+
+		@ManyToMany(targetEntity = ContainedEntity.class)
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedWithCast",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
+		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
+		@SortNatural
+		private SortedMap<String, Object> containedIndexedEmbeddedWithCast = new TreeMap<>();
 
 		public Integer getId() {
 			return id;
@@ -370,6 +395,10 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
+		public SortedMap<String, Object> getContainedIndexedEmbeddedWithCast() {
+			return containedIndexedEmbeddedWithCast;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
@@ -421,6 +450,10 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class)
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
 		@Basic
 		@GenericField
@@ -474,6 +507,10 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
 			return containingAsUsedInCrossEntityDerivedProperty;
+		}
+
+		public List<Object> getContainingAsIndexedEmbeddedWithCast() {
+			return containingAsIndexedEmbeddedWithCast;
 		}
 
 		public String getIndexedField() {

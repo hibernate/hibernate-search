@@ -20,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapKeyClass;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
@@ -203,6 +204,18 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
 		}
 
+		@SuppressWarnings("unchecked")
+		@Override
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedWithCast(ContainingEntity containingEntity) {
+			return (Map) containingEntity.getContainedIndexedEmbeddedWithCast();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedWithCast(ContainedEntity containedEntity) {
+			return (List) containedEntity.getContainingAsIndexedEmbeddedWithCast();
+		}
+
 		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
@@ -271,6 +284,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+				"containedIndexedEmbeddedWithCast.indexedField",
 				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
@@ -327,6 +341,22 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<ContainedEntity, String> containedUsedInCrossEntityDerivedProperty = new LinkedHashMap<>();
 
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedWithCast",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyClass(ContainedEntity.class)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@IndexedEmbedded(
+				includePaths = { "indexedField" },
+				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY),
+				targetType = ContainedEntity.class
+		)
+		private Map<Object, String> containedIndexedEmbeddedWithCast = new LinkedHashMap<>();
+
 		public Integer getId() {
 			return id;
 		}
@@ -378,6 +408,10 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		public Map<ContainedEntity, String> getContainedUsedInCrossEntityDerivedProperty() {
 			return containedUsedInCrossEntityDerivedProperty;
+		}
+
+		public Map<Object, String> getContainedIndexedEmbeddedWithCast() {
+			return containedIndexedEmbeddedWithCast;
 		}
 
 		@Transient
@@ -479,6 +513,24 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		)
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
+		/*
+		 * No mappedBy here. The inverse side of associations modeled by a Map key cannot use mappedBy.
+		 * If they do, Hibernate assumes that map *values* are the opposite side of the association,
+		 * and ends up adding all kind of wrong foreign keys.
+		 */
+		@ManyToMany(targetEntity = ContainingEntity.class)
+		@JoinTable(name = "contained_withCastMapHolder")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbeddedWithCast",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
+		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
+
 		@Basic
 		@GenericField
 		private String indexedField;
@@ -531,6 +583,10 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
 			return containingAsUsedInCrossEntityDerivedProperty;
+		}
+
+		public List<Object> getContainingAsIndexedEmbeddedWithCast() {
+			return containingAsIndexedEmbeddedWithCast;
 		}
 
 		public String getIndexedField() {

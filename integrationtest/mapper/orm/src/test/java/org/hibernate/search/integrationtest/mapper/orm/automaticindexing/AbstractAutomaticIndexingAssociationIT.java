@@ -127,6 +127,11 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 								.field( "containedDerivedField", String.class )
 						)
 				)
+				.objectField( "containedIndexedEmbeddedWithCast",
+						associationFieldContributor.andThen( b2 -> b2
+								.field( "indexedField", String.class )
+						)
+				)
 				.field( "crossEntityDerivedField", String.class )
 				.objectField( "child", b3 -> b3
 						.objectField( "containedIndexedEmbedded",
@@ -141,6 +146,11 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 										.field( "indexedField", String.class )
 										.field( "indexedElementCollectionField", String.class, b4 -> b4.multiValued( true ) )
 										.field( "containedDerivedField", String.class )
+								)
+						)
+						.objectField( "containedIndexedEmbeddedWithCast",
+								associationFieldContributor.andThen( b2 -> b2
+										.field( "indexedField", String.class )
 								)
 						)
 						.field( "crossEntityDerivedField", String.class )
@@ -877,6 +887,75 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3072")
+	public void indirectValueUpdate_indexedEmbeddedWithCast_singleValue() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContaining deeplyNestedContainingEntity = primitives.newContaining( 3 );
+			primitives.setChild( containingEntity1, deeplyNestedContainingEntity );
+			primitives.setParent( deeplyNestedContainingEntity, containingEntity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.setIndexedField( contained1, "initialValue" );
+			primitives.setContainedIndexedEmbeddedWithCastSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedWithCastSingle( contained1, containingEntity1 );
+
+			TContained contained2 = primitives.newContained( 5 );
+			primitives.setIndexedField( contained2, "initialOutOfScopeValue" );
+			primitives.setContainedIndexedEmbeddedWithCastSingle( deeplyNestedContainingEntity, contained2 );
+			primitives.setContainingAsIndexedEmbeddedWithCastSingle( contained2, deeplyNestedContainingEntity );
+
+			session.persist( contained1 );
+			session.persist( contained2 );
+			session.persist( deeplyNestedContainingEntity );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedWithCast", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating the value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setIndexedField( contained, "updatedValue" );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedWithCast", b3 -> b3
+											.field( "indexedField", "updatedValue" )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value that is too deeply nested to matter (it's out of the IndexedEmbedded scope)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContained contained = session.get( primitives.getContainedClass(), 5 );
+			primitives.setIndexedField( contained, "updatedOutOfScopeValue" );
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	/*
 	 * Use the type "Optional<String>" for computed fields instead of just "String" for two reasons:
 	 * 1/ It means the field will not appear in the indexed document produced by the stub backend
@@ -932,6 +1011,10 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		void setContainedUsedInCrossEntityDerivedPropertySingle(TContaining containing, TContained contained);
 
 		void setContainingAsUsedInCrossEntityDerivedPropertySingle(TContained contained, TContaining containing);
+
+		void setContainedIndexedEmbeddedWithCastSingle(TContaining containing, TContained contained);
+
+		void setContainingAsIndexedEmbeddedWithCastSingle(TContained contained, TContaining containing);
 
 		void setIndexedField(TContained contained, String value);
 

@@ -734,6 +734,18 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		}
 
 		@Override
+		public void setContainedIndexedEmbeddedWithCastSingle(ContainingEntity containingEntity,
+				ContainedEntity containedEntity) {
+			containingEntity.setContainedIndexedEmbeddedWithCast( containedEntity );
+		}
+
+		@Override
+		public void setContainingAsIndexedEmbeddedWithCastSingle(ContainedEntity containedEntity,
+				ContainingEntity containingEntity) {
+			containedEntity.setContainingAsIndexedEmbeddedWithCast( containingEntity );
+		}
+
+		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
 		}
@@ -801,6 +813,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+				"containedIndexedEmbeddedWithCast.indexedField",
 				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
@@ -819,6 +832,10 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 		@OneToOne
 		private ContainedEntity containedUsedInCrossEntityDerivedProperty;
+
+		@OneToOne(targetEntity = ContainedEntity.class)
+		@IndexedEmbedded(includePaths = { "indexedField" }, targetType = ContainedEntity.class)
+		private Object containedIndexedEmbeddedWithCast;
 
 		public Integer getId() {
 			return id;
@@ -878,6 +895,14 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
 		}
 
+		public Object getContainedIndexedEmbeddedWithCast() {
+			return containedIndexedEmbeddedWithCast;
+		}
+
+		public void setContainedIndexedEmbeddedWithCast(Object containedIndexedEmbeddedWithCast) {
+			this.containedIndexedEmbeddedWithCast = containedIndexedEmbeddedWithCast;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
@@ -924,6 +949,9 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 		@OneToOne(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
+
+		@OneToOne(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class)
+		private Object containingAsIndexedEmbeddedWithCast;
 
 		@Basic
 		@GenericField
@@ -995,6 +1023,14 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		public void setContainingAsUsedInCrossEntityDerivedProperty(
 				ContainingEntity containingAsUsedInCrossEntityDerivedProperty) {
 			this.containingAsUsedInCrossEntityDerivedProperty = containingAsUsedInCrossEntityDerivedProperty;
+		}
+
+		public Object getContainingAsIndexedEmbeddedWithCast() {
+			return containingAsIndexedEmbeddedWithCast;
+		}
+
+		public void setContainingAsIndexedEmbeddedWithCast(Object containingAsIndexedEmbeddedWithCast) {
+			this.containingAsIndexedEmbeddedWithCast = containingAsIndexedEmbeddedWithCast;
 		}
 
 		public String getIndexedField() {

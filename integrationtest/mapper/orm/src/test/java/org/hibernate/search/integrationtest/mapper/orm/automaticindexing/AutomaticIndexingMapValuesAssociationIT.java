@@ -199,6 +199,18 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
 		}
 
+		@SuppressWarnings("unchecked")
+		@Override
+		public Map<String, ContainedEntity> getContainedIndexedEmbeddedWithCast(ContainingEntity containingEntity) {
+			return (Map) containingEntity.getContainedIndexedEmbeddedWithCast();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedWithCast(ContainedEntity containedEntity) {
+			return (List) containedEntity.getContainingAsIndexedEmbeddedWithCast();
+		}
+
 		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
@@ -267,6 +279,7 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+				"containedIndexedEmbeddedWithCast.indexedField",
 				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
@@ -313,6 +326,17 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@MapKeyColumn(name = "map_key")
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty = new LinkedHashMap<>();
+
+		@ManyToMany(targetEntity = ContainedEntity.class)
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedWithCast",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
+		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
+		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<String, Object> containedIndexedEmbeddedWithCast = new LinkedHashMap<>();
 
 		public Integer getId() {
 			return id;
@@ -367,6 +391,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
+		public Map<String, Object> getContainedIndexedEmbeddedWithCast() {
+			return containedIndexedEmbeddedWithCast;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
@@ -418,6 +446,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class)
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
 		@Basic
 		@GenericField
@@ -471,6 +503,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
 			return containingAsUsedInCrossEntityDerivedProperty;
+		}
+
+		public List<Object> getContainingAsIndexedEmbeddedWithCast() {
+			return containingAsIndexedEmbeddedWithCast;
 		}
 
 		public String getIndexedField() {
