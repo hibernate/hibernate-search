@@ -200,6 +200,18 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 			return containedEntity.getContainingAsUsedInCrossEntityDerivedProperty();
 		}
 
+		@SuppressWarnings("unchecked")
+		@Override
+		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedWithCast(ContainingEntity containingEntity) {
+			return (SortedSet) containingEntity.getContainedIndexedEmbeddedWithCast();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedWithCast(ContainedEntity containedEntity) {
+			return (List) containedEntity.getContainingAsIndexedEmbeddedWithCast();
+		}
+
 		@Override
 		public void setIndexedField(ContainedEntity containedEntity, String value) {
 			containedEntity.setIndexedField( value );
@@ -268,6 +280,7 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
+				"containedIndexedEmbeddedWithCast.indexedField",
 				"crossEntityDerivedField"
 		})
 		private ContainingEntity child;
@@ -294,6 +307,12 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		@JoinTable(name = "indexed_containedUsedInCrossEntityDerivedProperty")
 		@SortNatural
 		private SortedSet<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new TreeSet<>();
+
+		@ManyToMany(targetEntity = ContainedEntity.class)
+		@JoinTable(name = "indexed_containedIndexedEmbeddedWithCast")
+		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
+		@SortNatural
+		private SortedSet<Object> containedIndexedEmbeddedWithCast = new TreeSet<>();
 
 		public Integer getId() {
 			return id;
@@ -348,6 +367,10 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
+		public SortedSet<Object> getContainedIndexedEmbeddedWithCast() {
+			return containedIndexedEmbeddedWithCast;
+		}
+
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
@@ -399,6 +422,10 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
+
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class)
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
 		@Basic
 		@GenericField
@@ -457,6 +484,10 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {
 			return containingAsUsedInCrossEntityDerivedProperty;
+		}
+
+		public List<Object> getContainingAsIndexedEmbeddedWithCast() {
+			return containingAsIndexedEmbeddedWithCast;
 		}
 
 		public String getIndexedField() {
