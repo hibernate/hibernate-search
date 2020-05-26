@@ -370,11 +370,6 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public void setContainedUsedInCrossEntityDerivedProperty(
-				SortedMap<String, ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
-			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
-		}
-
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {

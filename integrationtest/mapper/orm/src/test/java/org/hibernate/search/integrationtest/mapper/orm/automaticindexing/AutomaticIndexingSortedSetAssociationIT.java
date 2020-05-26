@@ -348,11 +348,6 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public void setContainedUsedInCrossEntityDerivedProperty(
-				SortedSet<ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
-			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
-		}
-
 		@Transient
 		@GenericField
 		@IndexingDependency(derivedFrom = {
