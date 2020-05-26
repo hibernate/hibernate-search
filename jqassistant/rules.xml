@@ -411,6 +411,7 @@
             MATCH (implementingTypeEndingWithImpl:Class:HibernateSearch)
             WHERE
                 implementingTypeEndingWithImpl.nameWithoutContainingTypeName =~ ".*Impl$"
+                AND NOT implementingTypeEndingWithImpl:Test // Ignore test types
             // The interface they implement, named "<prefix>" (if any)
             OPTIONAL MATCH (implementingTypeEndingWithImpl)-[:IMPLEMENTS|EXTENDS *]->(implementedType:Interface:HibernateSearch)
             WHERE
