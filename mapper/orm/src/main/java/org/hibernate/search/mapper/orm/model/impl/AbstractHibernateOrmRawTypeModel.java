@@ -85,11 +85,6 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public final PojoRawTypeModel<? super T> rawType() {
-		return this;
-	}
-
-	@Override
 	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> ascendingSuperTypes();
 
 	@Override
