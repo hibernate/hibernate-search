@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverMultiNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverDirtinessFilterNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -156,4 +158,19 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 		);
 	}
 
+	protected final <T2, S> PojoImplicitReindexingResolverNode<? super T2, S> createNested(
+			Collection<? extends PojoImplicitReindexingResolverNode<? super T2, S>> elements) {
+		int size = elements.size();
+		if ( size == 0 ) {
+			// Simplify the tree: no need for a node here
+			return PojoImplicitReindexingResolverNode.noOp();
+		}
+		else if ( size == 1 ) {
+			// Simplify the tree: no need for a multi-node here
+			return elements.iterator().next();
+		}
+		else {
+			return new PojoImplicitReindexingResolverMultiNode<>( elements );
+		}
+	}
 }

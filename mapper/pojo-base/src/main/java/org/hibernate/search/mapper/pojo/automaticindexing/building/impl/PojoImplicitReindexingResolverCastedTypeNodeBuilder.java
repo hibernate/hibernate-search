@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
-import java.util.Collection;
-
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverCastedTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
@@ -21,10 +19,9 @@ class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	<S> PojoImplicitReindexingResolverNode<T, S> doBuild(
-			Collection<PojoImplicitReindexingResolverNode<? super U, S>> immutableNestedNodes) {
+	<S> PojoImplicitReindexingResolverNode<T, S> doBuild(PojoImplicitReindexingResolverNode<? super U, S> nestedNode) {
 		return new PojoImplicitReindexingResolverCastedTypeNode<>(
-				getTypeModel().rawType().caster(), immutableNestedNodes
+				getTypeModel().rawType().caster(), nestedNode
 		);
 	}
 }

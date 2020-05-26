@@ -104,12 +104,12 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( doBuild( immutableNestedNodes ) );
+			return Optional.of( doBuild( createNested( immutableNestedNodes ) ) );
 		}
 	}
 
 	abstract <S> PojoImplicitReindexingResolverNode<T, S> doBuild(
-			Collection<PojoImplicitReindexingResolverNode<? super U, S>> immutableNestedNodes);
+			PojoImplicitReindexingResolverNode<? super U, S> nestedNode);
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyBuilder );
