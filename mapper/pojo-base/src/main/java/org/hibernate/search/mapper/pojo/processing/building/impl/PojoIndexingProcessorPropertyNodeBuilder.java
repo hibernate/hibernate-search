@@ -8,15 +8,12 @@ package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
@@ -32,6 +29,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyBridgeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyNode;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -168,23 +166,16 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 				(PojoIndexingDependencyCollectorPropertyNode<T, P>)
 						parentDependencyCollector.property( modelPath.getPropertyModel().name() );
 
-		Collection<PojoIndexingProcessor<? super P>> immutableNestedNodes = Collections.emptyList();
+		Collection<PojoIndexingProcessor<? super P>> nestedNodes = new ArrayList<>();
 		try {
-			Collection<BeanHolder<? extends PropertyBridge>> immutableBridgeHolders = boundPropertyBridges.isEmpty()
-					? Collections.emptyList() : new ArrayList<>();
 			for ( BoundPropertyBridge<P> boundBridge : boundPropertyBridges ) {
-				immutableBridgeHolders.add( boundBridge.getBridgeHolder() );
+				nestedNodes.add( new PojoIndexingProcessorPropertyBridgeNode<>( boundBridge.getBridgeHolder() ) );
 				boundBridge.contributeDependencies( propertyDependencyCollector );
 			}
 			Collection<PojoIndexingProcessor<? super P>> valueWithoutExtractorNodes =
 					valueWithoutExtractorBuilderDelegate.build( propertyDependencyCollector );
-			if ( !valueWithoutExtractorNodes.isEmpty() || !containerElementNodeBuilders.isEmpty() ) {
-				immutableNestedNodes = new ArrayList<>(
-						valueWithoutExtractorNodes.size() + containerElementNodeBuilders.size()
-				);
-			}
 			if ( !valueWithoutExtractorNodes.isEmpty() ) {
-				immutableNestedNodes.addAll( valueWithoutExtractorNodes );
+				nestedNodes.addAll( valueWithoutExtractorNodes );
 			}
 			containerElementNodeBuilders.values().stream()
 					.distinct() // Necessary because the default extractor path has two possible keys with the same value
@@ -192,9 +183,9 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 					.map( builder -> builder.build( propertyDependencyCollector ) )
 					.filter( Optional::isPresent )
 					.map( Optional::get )
-					.forEach( immutableNestedNodes::add );
+					.forEach( nestedNodes::add );
 
-			if ( immutableBridgeHolders.isEmpty() && immutableNestedNodes.isEmpty() ) {
+			if ( nestedNodes.isEmpty() ) {
 				/*
 				 * If this node doesn't have any bridge, nor any nested node,
 				 * it is useless and we don't need to build it.
@@ -203,15 +194,15 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			}
 			else {
 				return Optional.of( new PojoIndexingProcessorPropertyNode<>(
-						modelPath.getValueReadHandle(), immutableBridgeHolders,
-						createNested( immutableNestedNodes )
+						modelPath.getValueReadHandle(),
+						createNested( nestedNodes )
 				) );
 			}
 		}
 		catch (RuntimeException e) {
 			// Close the nested processors created so far before aborting
 			new SuppressingCloser( e )
-					.pushAll( PojoIndexingProcessor::close, immutableNestedNodes );
+					.pushAll( PojoIndexingProcessor::close, nestedNodes );
 			throw e;
 		}
 	}
