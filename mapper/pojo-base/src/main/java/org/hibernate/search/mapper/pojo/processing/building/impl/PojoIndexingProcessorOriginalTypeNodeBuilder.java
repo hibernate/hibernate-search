@@ -10,11 +10,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -51,10 +49,9 @@ public class PojoIndexingProcessorOriginalTypeNodeBuilder<T> extends AbstractPoj
 
 	@Override
 	protected PojoIndexingProcessor<T> doBuild(Collection<IndexObjectFieldReference> parentIndexObjectReferences,
-			Collection<BeanHolder<? extends TypeBridge>> immutableBridgeHolders,
 			PojoIndexingProcessor<? super T> nested) {
 		return new PojoIndexingProcessorOriginalTypeNode<>(
-				parentIndexObjectReferences, immutableBridgeHolders, nested
+				parentIndexObjectReferences, nested
 		);
 	}
 }
