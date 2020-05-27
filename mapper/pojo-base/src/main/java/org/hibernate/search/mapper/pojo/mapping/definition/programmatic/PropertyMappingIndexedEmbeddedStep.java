@@ -75,7 +75,7 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * @return {@code this}, for method chaining.
 	 * @see IndexedEmbedded#extraction()
 	 */
-	default PropertyMappingIndexedEmbeddedStep extractors() {
+	default PropertyMappingIndexedEmbeddedStep noExtractors() {
 		return extractors( ContainerExtractorPath.noExtractors() );
 	}
 
