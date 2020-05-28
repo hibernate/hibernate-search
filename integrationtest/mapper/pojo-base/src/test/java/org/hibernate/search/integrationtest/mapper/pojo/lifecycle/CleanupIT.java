@@ -77,7 +77,7 @@ public class CleanupIT {
 
 		startup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
@@ -126,7 +126,7 @@ public class CleanupIT {
 	public void failingRoutingKeyBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId()
@@ -161,7 +161,7 @@ public class CleanupIT {
 	public void failingTypeBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId()
@@ -196,7 +196,7 @@ public class CleanupIT {
 	public void failingIdentifierBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "text" )
@@ -231,7 +231,7 @@ public class CleanupIT {
 	public void failingPropertyBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
@@ -266,7 +266,7 @@ public class CleanupIT {
 	public void failingValueBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
@@ -304,7 +304,7 @@ public class CleanupIT {
 	public void failingContainerExtractorBuilding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
@@ -380,7 +380,7 @@ public class CleanupIT {
 
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							TypeMappingStep indexedEntityMapping = mappingDefinition.type( IndexedEntity.class );
-							indexedEntityMapping.indexed( IndexedEntity.INDEX );
+							indexedEntityMapping.indexed().index( IndexedEntity.INDEX );
 							indexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 							indexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 							indexedEntityMapping.property( "id" )

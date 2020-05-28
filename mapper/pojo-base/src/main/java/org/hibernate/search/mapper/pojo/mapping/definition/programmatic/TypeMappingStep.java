@@ -21,27 +21,7 @@ public interface TypeMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see Indexed
 	 */
-	TypeMappingStep indexed();
-
-	/**
-	 * Maps an entity type to an index.
-	 * @param indexName The name of the index.
-	 * @return {@code this}, for method chaining.
-	 * @see Indexed
-	 * @see Indexed#index()
-	 */
-	TypeMappingStep indexed(String indexName);
-
-	/**
-	 * Maps an entity type to an index.
-	 * @param backendName The name of the backend.
-	 * @param indexName The name of the index.
-	 * @return {@code this}, for method chaining.
-	 * @see Indexed
-	 * @see Indexed#backend()
-	 * @see Indexed#index()
-	 */
-	TypeMappingStep indexed(String backendName, String indexName);
+	TypeMappingIndexedStep indexed();
 
 	/**
 	 * @param binder A {@link RoutingKeyBinder} responsible for creating a bridge.

@@ -142,7 +142,7 @@ public class ProgrammaticMappingAccessTypeIT {
 		public void configure(HibernateOrmMappingConfigurationContext context) {
 			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
 			TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
-			indexedEntityMapping.indexed( IndexedEntity.INDEX );
+			indexedEntityMapping.indexed().index( IndexedEntity.INDEX );
 			indexedEntityMapping.property( "id" ).documentId();
 			indexedEntityMapping.property( "fieldWithNonDefaultFieldAccess" ).genericField();
 			indexedEntityMapping.property( "fieldWithDefaultFieldAccess" ).genericField();
@@ -153,7 +153,7 @@ public class ProgrammaticMappingAccessTypeIT {
 			indexedEntityMapping.property( "nonManaged" ).indexedEmbedded();
 
 			TypeMappingStep indexedEntityWithoutIdSetterMapping = mapping.type( IndexedEntityWithoutIdSetter.class );
-			indexedEntityWithoutIdSetterMapping.indexed( IndexedEntityWithoutIdSetter.INDEX );
+			indexedEntityWithoutIdSetterMapping.indexed().index( IndexedEntityWithoutIdSetter.INDEX );
 			indexedEntityWithoutIdSetterMapping.property( "id" ).documentId();
 
 			TypeMappingStep embeddableWithDefaultFieldAccessMapping = mapping.type( EmbeddableWithDefaultFieldAccess.class );

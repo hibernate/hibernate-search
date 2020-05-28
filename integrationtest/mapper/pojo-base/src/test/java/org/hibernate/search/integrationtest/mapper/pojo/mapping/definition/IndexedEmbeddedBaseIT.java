@@ -870,7 +870,7 @@ public class IndexedEmbeddedBaseIT {
 				.withConfiguration( b -> {
 					b.addEntityType( IndexedEntity.class );
 					TypeMappingStep indexedEntityMapping = b.programmaticMapping().type( IndexedEntity.class );
-					indexedEntityMapping.indexed( INDEX_NAME );
+					indexedEntityMapping.indexed().index( INDEX_NAME );
 					indexedEntityMapping.property( "id" ).documentId();
 					indexedEntityMapping.property( "level1" )
 							.indexedEmbedded()

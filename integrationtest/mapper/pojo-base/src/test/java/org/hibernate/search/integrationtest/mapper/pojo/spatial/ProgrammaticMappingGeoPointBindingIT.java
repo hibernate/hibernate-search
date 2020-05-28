@@ -61,7 +61,7 @@ public class ProgrammaticMappingGeoPointBindingIT {
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 
 					TypeMappingStep geoPointOntTypeEntityMapping = mappingDefinition.type( GeoPointOnTypeEntity.class );
-					geoPointOntTypeEntityMapping.indexed( GeoPointOnTypeEntity.INDEX );
+					geoPointOntTypeEntityMapping.indexed().index( GeoPointOnTypeEntity.INDEX );
 					geoPointOntTypeEntityMapping.binder( GeoPointBinder.create()
 							.fieldName( "homeLocation" )
 							.markerSet( "home" )
@@ -84,7 +84,7 @@ public class ProgrammaticMappingGeoPointBindingIT {
 
 					TypeMappingStep geoPointOnCoordinatesPropertyEntityMapping =
 							mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class );
-					geoPointOnCoordinatesPropertyEntityMapping.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX );
+					geoPointOnCoordinatesPropertyEntityMapping.indexed().index( GeoPointOnCoordinatesPropertyEntity.INDEX );
 					geoPointOnCoordinatesPropertyEntityMapping.property( "id" )
 									.documentId();
 					geoPointOnCoordinatesPropertyEntityMapping.property( "coord" )
@@ -93,7 +93,7 @@ public class ProgrammaticMappingGeoPointBindingIT {
 
 					TypeMappingStep geoPointOnCustomCoordinatesPropertyEntityMapping =
 							mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class );
-					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX );
+					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed().index( GeoPointOnCustomCoordinatesPropertyEntity.INDEX );
 					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "id" ).documentId();
 					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "coord" )
 							.binder( GeoPointBinder.create() )

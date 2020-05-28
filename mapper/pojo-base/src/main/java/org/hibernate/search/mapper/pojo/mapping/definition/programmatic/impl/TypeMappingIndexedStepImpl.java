@@ -10,22 +10,32 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 
-class IndexedMetadataContributor implements PojoTypeMetadataContributor {
+class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMetadataContributor {
 
 	private final PojoRawTypeIdentifier<?> typeIdentifier;
 
-	private final String backendName;
-	private final String indexName;
+	private String backendName;
+	private String indexName;
 
-	IndexedMetadataContributor(PojoRawTypeIdentifier<?> typeIdentifier,
-			String backendName, String indexName) {
+	TypeMappingIndexedStepImpl(PojoRawTypeIdentifier<?> typeIdentifier) {
 		this.typeIdentifier = typeIdentifier;
+	}
+
+	@Override
+	public TypeMappingIndexedStep backend(String backendName) {
 		this.backendName = backendName;
+		return this;
+	}
+
+	@Override
+	public TypeMappingIndexedStep index(String indexName) {
 		this.indexName = indexName;
+		return this;
 	}
 
 	@Override
