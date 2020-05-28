@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorIndexedTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
@@ -40,14 +39,14 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		if ( !typeIdentifier.equals( collector.typeIdentifier() ) ) {
-			// Index mapping is not inherited; only contribute it to the exact type.
-			return;
+		PojoAdditionalMetadataCollectorIndexedTypeNode indexedCollector = collector.markAsIndexed();
+		if ( backendName != null ) {
+			indexedCollector.backendName( backendName );
 		}
-		collector.markAsIndexed(
-				Optional.ofNullable( backendName ),
-				Optional.ofNullable( indexName )
-		);
+		// The fact that an entity is indexed is inherited, but not the index name.
+		if ( typeIdentifier.equals( collector.typeIdentifier() ) && indexName != null ) {
+			indexedCollector.indexName( indexName );
+		}
 	}
 
 	@Override

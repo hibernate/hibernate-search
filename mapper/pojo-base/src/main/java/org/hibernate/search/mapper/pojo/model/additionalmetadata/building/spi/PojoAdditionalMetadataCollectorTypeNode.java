@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
@@ -38,7 +37,7 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * @param pathFilterFactory The path filter factory for this entity type,
 	 * i.e. the object allowing to create path filters that will be used in particular
 	 * when performing dirty checking during automatic reindexing.
-	 * @return A {@link PojoAdditionalMetadataCollectorEntityTypeNode}, allowing to provide optional metadata
+	 * @return A {@link PojoAdditionalMetadataCollectorEntityTypeNode}, to provide optional metadata
 	 * about the entity.
 	 */
 	PojoAdditionalMetadataCollectorEntityTypeNode markAsEntity(String entityName,
@@ -49,14 +48,10 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * <p>
 	 * <strong>WARNING:</strong> only entity types may be indexed.
 	 *
-	 * @param backendName The name of the backend where this type should be indexed,
-	 * or {@link Optional#empty()} to target the default backend.
-	 * @param indexName The name of the index where this type should be indexed,
-	 * or {@link Optional#empty()} to derive the index name from the entity type.
-	 * @return A {@link PojoAdditionalMetadataCollectorIndexedTypeNode}, allowing to provide optional metadata
+	 * @return A {@link PojoAdditionalMetadataCollectorIndexedTypeNode}, to provide optional metadata
 	 * about the indexed type.
 	 */
-	PojoAdditionalMetadataCollectorIndexedTypeNode markAsIndexed(Optional<String> backendName, Optional<String> indexName);
+	PojoAdditionalMetadataCollectorIndexedTypeNode markAsIndexed();
 
 	PojoAdditionalMetadataCollectorPropertyNode property(String propertyName);
 

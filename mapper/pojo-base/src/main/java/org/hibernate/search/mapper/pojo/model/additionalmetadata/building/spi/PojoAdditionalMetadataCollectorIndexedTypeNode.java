@@ -8,4 +8,16 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
 public interface PojoAdditionalMetadataCollectorIndexedTypeNode extends PojoAdditionalMetadataCollector {
 
+	/**
+	 * @param backendName The name of the backend where this type should be indexed,
+	 * or {@code null} (the default) to target the default backend.
+	 */
+	void backendName(String backendName);
+
+	/**
+	 * @param indexName The name of the backend where this type should be indexed,
+	 * or {@code null} (the default) to derive the index name from the entity type.
+	 */
+	void indexName(String indexName);
+
 }
