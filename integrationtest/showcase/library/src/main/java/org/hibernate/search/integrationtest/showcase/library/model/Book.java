@@ -13,7 +13,6 @@ import javax.persistence.Entity;
 import org.hibernate.search.integrationtest.showcase.library.attributeconverter.ISBNAttributeConverter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
 
 /**
@@ -22,7 +21,6 @@ import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
  * @see Document
  */
 @Entity
-@Indexed
 public class Book extends Document<BookCopy> {
 
 	@Basic

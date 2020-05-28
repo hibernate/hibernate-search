@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -31,6 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  * @param <C> The type of document copies.
  */
 @Entity
+@Indexed
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity<Integer> {
 
