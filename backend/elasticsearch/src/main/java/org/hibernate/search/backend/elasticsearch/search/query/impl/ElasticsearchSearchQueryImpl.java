@@ -33,6 +33,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
@@ -153,6 +154,11 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				);
 		NonBulkableWork<Long> work = builder.build();
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
+	}
+
+	@Override
+	public SearchScroll<H> scroll(Integer pageSize) {
+		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override

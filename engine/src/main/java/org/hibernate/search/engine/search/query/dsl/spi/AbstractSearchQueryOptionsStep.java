@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
@@ -198,6 +199,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 	@Override
 	public long fetchTotalHitCount() {
 		return toQuery().fetchTotalHitCount();
+	}
+
+	@Override
+	public SearchScroll<H> scroll(Integer pageSize) {
+		return toQuery().scroll( pageSize );
 	}
 
 	private void contribute(SearchPredicateBuilderFactory<? super C> factory, SearchPredicate predicate) {

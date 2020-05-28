@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -114,6 +115,11 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Integer result = doSubmit( work );
 		timeoutManager.stop();
 		return result;
+	}
+
+	@Override
+	public SearchScroll<H> scroll(Integer pageSize) {
+		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override

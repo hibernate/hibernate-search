@@ -140,4 +140,15 @@ public interface SearchFetchable<H> {
 	 */
 	List<H> fetchAllHits();
 
+	/**
+	 * Execute the query continuously to deliver results in small chunks through a {@link SearchScroll}.
+	 * <p>
+	 * Useful to process large datasets.
+	 *
+	 * @param pageSize The maximum number of hits to be returned for each call to {@link SearchScroll#next()}
+	 * @return The {@link SearchScroll}.
+	 * @throws IllegalArgumentException if passed 0 or less for pageSize.
+	 */
+	SearchScroll<H> scroll(Integer pageSize);
+
 }

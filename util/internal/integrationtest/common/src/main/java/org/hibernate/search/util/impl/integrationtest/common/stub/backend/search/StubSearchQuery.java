@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -63,6 +64,11 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	@Override
 	public long fetchTotalHitCount() {
 		return backend.getBehavior().executeCountWork( indexNames );
+	}
+
+	@Override
+	public SearchScroll<H> scroll(Integer pageSize) {
+		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 
 	@Override
