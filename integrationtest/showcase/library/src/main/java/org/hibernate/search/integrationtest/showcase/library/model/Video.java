@@ -8,15 +8,12 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import javax.persistence.Entity;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-
 /**
  * A video document.
  *
  * @see Document
  */
 @Entity
-@Indexed
 public class Video extends Document<VideoCopy> {
 
 	public Video() {
