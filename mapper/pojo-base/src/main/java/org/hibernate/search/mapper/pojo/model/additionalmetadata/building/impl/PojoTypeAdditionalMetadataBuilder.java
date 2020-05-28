@@ -69,15 +69,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
-	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed(Optional<String> backendName,
-			Optional<String> indexName) {
+	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed() {
 		if ( indexedTypeMetadataBuilder == null ) {
-			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder(
-					this, backendName, indexName
-			);
-		}
-		else {
-			indexedTypeMetadataBuilder.checkSameIndex( backendName, indexName );
+			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder( this );
 		}
 		return indexedTypeMetadataBuilder;
 	}

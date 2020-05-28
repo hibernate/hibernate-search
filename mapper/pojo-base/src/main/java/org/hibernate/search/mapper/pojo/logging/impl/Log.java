@@ -10,12 +10,10 @@ import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.mapper.pojo.logging.spi.OptionalEmptyAsDefaultFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -208,7 +206,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
 	@Message(id = ID_OFFSET_2 + 27,
-			value = "Type '%1$s' is not marked as an entity type, yet it is indexed or targeted"
+			value = "Type '%1$s' is not marked as an entity type and is not abstract, yet it is indexed or targeted"
 			+ " by an association from an indexed type. Please check your configuration.")
 	SearchException missingEntityTypeMetadata(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
 
@@ -383,23 +381,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Type '%1$s' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type.")
 	SearchException invalidIndexedEmbedded(@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
-
-	@Message(id = ID_OFFSET_2 + 62,
-			value = "Cannot map type '%1$s' to an index, because this type is abstract."
-					+ " Index mappings are not inherited: they apply to exact instances of a given type."
-					+ " As a result, mapping an abstract type to an index does not make sense,"
-					+ " since the index would always be empty.")
-	SearchException cannotMapAbstractTypeToIndex(
-			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
-
-	@Message(id = ID_OFFSET_2 + 63, value = "Trying to map type to multiple indexes:"
-			+ " '%2$s' in backend '%1$s',"
-			+ " '%4$s' in backend '%3$s.")
-	SearchException multipleIndexMapping(
-			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> backendName,
-			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> indexName,
-			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> otherBackendName,
-			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> otherIndexName);
 
 	@Message(id = ID_OFFSET_2 + 64, value = "Multiple entity names assigned to the same type: '%1$s', '%2$s'.")
 	SearchException multipleEntityNames(String entityName, String otherEntityName);

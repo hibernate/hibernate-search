@@ -6,28 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorIndexedTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoIndexedTypeAdditionalMetadata;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorIndexedTypeNode {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
-	private final Optional<String> backendName;
-	private final Optional<String> indexName;
+	private Optional<String> backendName = Optional.empty();
+	private Optional<String> indexName = Optional.empty();
 
-	PojoIndexedTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder,
-			Optional<String> backendName, Optional<String> indexName) {
+	PojoIndexedTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder) {
 		this.rootBuilder = rootBuilder;
-		this.backendName = backendName;
-		this.indexName = indexName;
 	}
 
 	@Override
@@ -36,14 +28,14 @@ class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadata
 		return rootBuilder.failureCollector();
 	}
 
-	void checkSameIndex(Optional<String> backendName, Optional<String> indexName) {
-		if ( this.backendName.equals( backendName ) && this.indexName.equals( indexName ) ) {
-			return;
-		}
-		throw log.multipleIndexMapping(
-				this.backendName, this.indexName,
-				backendName, indexName
-		);
+	@Override
+	public void backendName(String backendName) {
+		this.backendName = Optional.ofNullable( backendName );
+	}
+
+	@Override
+	public void indexName(String indexName) {
+		this.indexName = Optional.ofNullable( indexName );
 	}
 
 	public PojoIndexedTypeAdditionalMetadata build() {
