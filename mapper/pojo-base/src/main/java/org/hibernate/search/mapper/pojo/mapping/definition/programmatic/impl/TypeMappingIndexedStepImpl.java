@@ -20,6 +20,7 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 
 	private String backendName;
 	private String indexName;
+	private boolean enabled = true;
 
 	TypeMappingIndexedStepImpl(PojoRawTypeIdentifier<?> typeIdentifier) {
 		this.typeIdentifier = typeIdentifier;
@@ -38,8 +39,14 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 	}
 
 	@Override
+	public TypeMappingIndexedStep enabled(boolean enabled) {
+		this.enabled = enabled;
+		return this;
+	}
+
+	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		PojoAdditionalMetadataCollectorIndexedTypeNode indexedCollector = collector.markAsIndexed();
+		PojoAdditionalMetadataCollectorIndexedTypeNode indexedCollector = collector.markAsIndexed( enabled );
 		if ( backendName != null ) {
 			indexedCollector.backendName( backendName );
 		}

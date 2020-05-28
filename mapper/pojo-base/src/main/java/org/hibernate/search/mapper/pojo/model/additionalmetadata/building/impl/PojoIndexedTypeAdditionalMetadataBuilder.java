@@ -17,6 +17,7 @@ class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadata
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
 	private Optional<String> backendName = Optional.empty();
 	private Optional<String> indexName = Optional.empty();
+	private boolean enabled = true;
 
 	PojoIndexedTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder) {
 		this.rootBuilder = rootBuilder;
@@ -38,7 +39,17 @@ class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadata
 		this.indexName = Optional.ofNullable( indexName );
 	}
 
-	public PojoIndexedTypeAdditionalMetadata build() {
-		return new PojoIndexedTypeAdditionalMetadata( backendName, indexName );
+	@Override
+	public void enabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public Optional<PojoIndexedTypeAdditionalMetadata> build() {
+		if ( enabled ) {
+			return Optional.of( new PojoIndexedTypeAdditionalMetadata( backendName, indexName ) );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 }

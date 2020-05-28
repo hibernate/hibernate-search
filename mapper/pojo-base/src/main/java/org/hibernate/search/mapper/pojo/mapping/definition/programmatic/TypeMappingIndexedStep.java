@@ -27,4 +27,13 @@ public interface TypeMappingIndexedStep {
 	 */
 	TypeMappingIndexedStep index(String indexName);
 
+	/**
+	 * @param enabled {@code true} to map the type to an index (the default),
+	 * {@code false} to disable the mapping to an index.
+	 * Useful to disable indexing when subclassing an indexed type.
+	 * @return {@code this}, for method chaining.
+	 * @see Indexed#enabled()
+	 */
+	TypeMappingIndexedStep enabled(boolean enabled);
+
 }
