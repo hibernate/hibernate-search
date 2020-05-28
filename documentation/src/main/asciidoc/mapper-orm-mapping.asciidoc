@@ -48,7 +48,6 @@ link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/orm/cfg/HibernateOr
 == Entity/index mapping
 
 In order to index an entity, it must be annotated with `@Indexed`.
-All entities not annotated with `@Indexed` will be ignored by the indexing process.
 
 .Marking a class for indexing with `@Indexed`
 ====
@@ -56,6 +55,17 @@ All entities not annotated with `@Indexed` will be ignored by the indexing proce
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/Book.java[tags=indexed-default]
 ----
+====
+
+[NOTE]
+====
+Subclasses inherit the `@Indexed` annotation and will also be indexed by default.
+Each indexed subclass will have its own index,
+though this will be transparent when searching
+(<<search-dsl-query-targeting-multiple,all targeted indexes will be queried simultaneously>>).
+
+If the fact that `@Indexed` is inherited is a problem for your application,
+you can annotate subclasses with `@Indexed(enabled = false)`.
 ====
 
 By default:
