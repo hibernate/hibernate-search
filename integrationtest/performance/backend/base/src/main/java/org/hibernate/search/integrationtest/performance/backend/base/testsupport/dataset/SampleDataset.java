@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.MappedIndex;
+import org.hibernate.search.util.common.impl.Contracts;
 
 import org.openjdk.jmh.annotations.CompilerControl;
 
@@ -23,6 +24,10 @@ final class SampleDataset implements Dataset {
 	private final int size;
 
 	SampleDataset(Collection<DataSample> samples) {
+		if ( samples.size() < 10 ) {
+			// Just in case something turned wrong during sample generation
+			throw new IllegalArgumentException( "Expected 10 samples or more" );
+		}
 		this.samples = new ArrayList<>( samples );
 		this.size = this.samples.size();
 	}
@@ -48,6 +53,9 @@ final class SampleDataset implements Dataset {
 		private final int numeric;
 
 		public DataSample(String shortText, String longText, int numeric) {
+			// Just in case something turned wrong during sample generation
+			Contracts.assertNotNullNorEmpty( shortText, "shortText" );
+			Contracts.assertNotNullNorEmpty( longText, "longText" );
 			this.shortText = shortText;
 			this.longText = longText;
 			this.numeric = numeric;

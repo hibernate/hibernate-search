@@ -57,10 +57,12 @@ final class MailingListDigestParser {
 	}
 
 	private void pushCurrentSample() {
-		result.add( new SampleDataset.DataSample(
-				currentSampleSubject, currentSampleText.toString(), currentSampleId
-		) );
-		++this.currentSampleId;
+		if ( currentSampleSubject != null ) {
+			result.add( new SampleDataset.DataSample(
+					currentSampleSubject, currentSampleText.toString(), currentSampleId
+			) );
+			++this.currentSampleId;
+		}
 		this.currentSampleSubject = null;
 		this.currentSampleText.setLength( 0 );
 	}
