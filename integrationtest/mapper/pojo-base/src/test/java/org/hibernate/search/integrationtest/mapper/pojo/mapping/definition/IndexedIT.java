@@ -315,6 +315,36 @@ public class IndexedIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance_disabled() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		@Indexed(enabled = false)
+		class IndexedEntitySubClass extends IndexedEntity {
+			@GenericField
+			public Integer getNumber() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+		);
+		// The subclass should NOT be indexed.
+		setupHelper.start().setup( IndexedEntity.class, IndexedEntitySubClass.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
 	public void inheritance_explicitAttributes() {
 		@Indexed(backend = "backend2", index = "parentClassIndex")
 		class IndexedEntity {
