@@ -12,7 +12,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -187,6 +186,236 @@ public class IndexedIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		class IndexedEntitySubClass extends IndexedEntity {
+			@GenericField
+			public Integer getNumber() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+		);
+		// The subclass should be indexed too.
+		defaultBackendMock.expectSchema( IndexedEntitySubClass.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number", Integer.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class, IndexedEntitySubClass.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance_abstract() {
+		@Indexed
+		abstract class AbstractIndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		class IndexedEntitySubClass1 extends AbstractIndexedEntity {
+			@GenericField
+			public Long getNumber1() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		class IndexedEntitySubClass2 extends AbstractIndexedEntity {
+			@GenericField
+			public Integer getNumber2() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		// The abstract class should not be indexed.
+		// The concrete subclasses should be indexed.
+		defaultBackendMock.expectSchema( IndexedEntitySubClass1.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number1", Long.class )
+		);
+		defaultBackendMock.expectSchema( IndexedEntitySubClass2.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number2", Integer.class )
+		);
+		setupHelper.start().setup( AbstractIndexedEntity.class,
+				IndexedEntitySubClass1.class, IndexedEntitySubClass2.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance_abstract_subclass() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		abstract class AbstractIndexedEntitySubClass extends IndexedEntity {
+			@GenericField
+			public Integer getNumber() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		class IndexedEntitySubClass1 extends AbstractIndexedEntitySubClass {
+			@GenericField
+			public Long getNumber1() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		class IndexedEntitySubClass2 extends AbstractIndexedEntitySubClass {
+			@GenericField
+			public Integer getNumber2() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+		);
+		// The abstract subclass should not be indexed.
+		// The concrete subclasses should be indexed.
+		defaultBackendMock.expectSchema( IndexedEntitySubClass1.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number", Integer.class )
+				.field( "number1", Long.class )
+		);
+		defaultBackendMock.expectSchema( IndexedEntitySubClass2.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number", Integer.class )
+				.field( "number2", Integer.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class, AbstractIndexedEntitySubClass.class,
+				IndexedEntitySubClass1.class, IndexedEntitySubClass2.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance_explicitAttributes() {
+		@Indexed(backend = "backend2", index = "parentClassIndex")
+		class IndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		class IndexedEntitySubClass extends IndexedEntity {
+			@GenericField
+			public Integer getNumber() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		backend2Mock.expectSchema( "parentClassIndex", b -> b
+				.field( "text", String.class )
+		);
+		// The subclass should be indexed and use the same backend,
+		// but the default index name for that entity (not the parent index name).
+		backend2Mock.expectSchema( IndexedEntitySubClass.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number", Integer.class )
+		);
+		multiBackendSetupHelper.start().setup( IndexedEntity.class, IndexedEntitySubClass.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance_override_backend() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		@Indexed(backend = "backend2")
+		class IndexedEntitySubClass extends IndexedEntity {
+			@GenericField
+			public Integer getNumber() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+		);
+		// The subclass should be indexed too, but in a different backend.
+		backend2Mock.expectSchema( IndexedEntitySubClass.class.getSimpleName(), b -> b
+				.field( "text", String.class )
+				.field( "number", Integer.class )
+		);
+		multiBackendSetupHelper.start().setup( IndexedEntity.class, IndexedEntitySubClass.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1231")
+	public void inheritance_override_index() {
+		@Indexed(index = "parentClassIndex")
+		class IndexedEntity {
+			@DocumentId
+			public Integer getId() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+		@Indexed(index = "subClassIndex")
+		class IndexedEntitySubClass extends IndexedEntity {
+			@GenericField
+			public Integer getNumber() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		defaultBackendMock.expectSchema( "parentClassIndex", b -> b
+				.field( "text", String.class )
+		);
+		// The subclass should be indexed too, with the given explicit name.
+		defaultBackendMock.expectSchema( "subClassIndex", b -> b
+				.field( "text", String.class )
+				.field( "number", Integer.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class, IndexedEntitySubClass.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void error_indexedWithoutEntityMetadata() {
 		@Indexed
 		class IndexedWithoutEntityMetadata {
@@ -212,64 +441,8 @@ public class IndexedIT {
 						.typeContext( IndexedWithoutEntityMetadata.class.getName() )
 						.failure(
 								"Type '" + IndexedWithoutEntityMetadata.class.getName()
-										+ "' is not marked as an entity type, yet it is indexed or targeted"
+										+ "' is not marked as an entity type and is not abstract, yet it is indexed or targeted"
 										+ " by an association from an indexed type. Please check your configuration."
-						)
-						.build()
-				);
-	}
-
-	@Test
-	public void error_indexedAbstractType_annotationMapping() {
-		final String indexName = "indexName";
-		@Indexed(index = indexName)
-		abstract class AbstractIndexedEntity {
-			Integer id;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-		}
-		Assertions.assertThatThrownBy(
-				() -> setupHelper.start().setup( AbstractIndexedEntity.class )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( AbstractIndexedEntity.class.getName() )
-						.failure(
-								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to an index,"
-										+ " because this type is abstract."
-						)
-						.build()
-				);
-	}
-
-	@Test
-	public void error_indexedAbstractType_programmaticMapping() {
-		final String indexName = "indexName";
-		abstract class AbstractIndexedEntity {
-			Integer id;
-			public Integer getId() {
-				return id;
-			}
-		}
-		Assertions.assertThatThrownBy(
-				() -> setupHelper.start()
-						.withConfiguration( builder -> {
-							builder.annotatedTypeDiscoveryEnabled( false );
-							builder.addEntityType( AbstractIndexedEntity.class );
-							TypeMappingStep typeMapping = builder.programmaticMapping().type( AbstractIndexedEntity.class );
-							typeMapping.indexed().index( indexName );
-							typeMapping.property( "id" ).documentId();
-						} )
-						.setup()
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( AbstractIndexedEntity.class.getName() )
-						.failure(
-								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to an index,"
-										+ " because this type is abstract."
 						)
 						.build()
 				);
