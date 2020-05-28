@@ -27,7 +27,7 @@ public final class Datasets {
 	private static final String DATASET_CACHE_DIRECTORY = "dataset";
 
 	private static final URI HIBERNATE_DEV_MAILING_LIST_URI =
-			URI.create( "http://lists.jboss.org/pipermail/hibernate-dev/2016-January.txt" );
+			URI.create( "https://lists.jboss.org/pipermail/hibernate-dev/2016-January.txt" );
 
 	private Datasets() {
 	}
