@@ -48,10 +48,11 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * <p>
 	 * <strong>WARNING:</strong> only entity types may be indexed.
 	 *
+	 * @param enabled {@code true} to mark the type as indexed, {@code false} to mark it as not indexed.
 	 * @return A {@link PojoAdditionalMetadataCollectorIndexedTypeNode}, to provide optional metadata
 	 * about the indexed type.
 	 */
-	PojoAdditionalMetadataCollectorIndexedTypeNode markAsIndexed();
+	PojoAdditionalMetadataCollectorIndexedTypeNode markAsIndexed(boolean enabled);
 
 	PojoAdditionalMetadataCollectorPropertyNode property(String propertyName);
 

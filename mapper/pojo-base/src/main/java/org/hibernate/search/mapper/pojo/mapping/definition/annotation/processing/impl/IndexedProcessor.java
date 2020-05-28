@@ -24,6 +24,7 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 		if ( backendName.isEmpty() ) {
 			backendName = null;
 		}
-		mappingContext.indexed().backend( backendName ).index( indexName );
+		mappingContext.indexed().backend( backendName ).index( indexName )
+				.enabled( annotation.enabled() );
 	}
 }

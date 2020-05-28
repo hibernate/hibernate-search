@@ -69,10 +69,11 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
-	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed() {
+	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed(boolean enabled) {
 		if ( indexedTypeMetadataBuilder == null ) {
 			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder( this );
 		}
+		indexedTypeMetadataBuilder.enabled( enabled );
 		return indexedTypeMetadataBuilder;
 	}
 
@@ -96,7 +97,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		}
 		return new PojoTypeAdditionalMetadata(
 				entityTypeMetadataBuilder == null ? Optional.empty() : Optional.of( entityTypeMetadataBuilder.build() ),
-				indexedTypeMetadataBuilder == null ? Optional.empty() : Optional.of( indexedTypeMetadataBuilder.build() ),
+				indexedTypeMetadataBuilder == null ? Optional.empty() : indexedTypeMetadataBuilder.build(),
 				properties
 		);
 	}

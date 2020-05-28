@@ -37,4 +37,11 @@ public @interface Indexed {
 	 */
 	String index() default "";
 
+	/**
+	 * @return {@code true} to map the type to an index (the default),
+	 * {@code false} to disable the mapping to an index.
+	 * Useful to disable indexing when subclassing an indexed type.
+	 */
+	boolean enabled() default true;
+
 }

@@ -20,4 +20,11 @@ public interface PojoAdditionalMetadataCollectorIndexedTypeNode extends PojoAddi
 	 */
 	void indexName(String indexName);
 
+	/**
+	 * @param enabled {@code true} if this type must be indexed
+	 * (the default once a {@link PojoAdditionalMetadataCollectorIndexedTypeNode} is created),
+	 * {@code false} if it must not (in which case metadata provided through other methods is ignored).
+	 */
+	void enabled(boolean enabled);
+
 }
