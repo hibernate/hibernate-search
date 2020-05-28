@@ -9,15 +9,17 @@ package org.hibernate.search.documentation.mapper.orm.mappingconfigurer;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 //tag::include[]
 public class MySearchMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 	@Override
 	public void configure(HibernateOrmMappingConfigurationContext context) {
 		ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
-		mapping.type( Book.class )
-				.indexed()
-				.property( "title" ).fullTextField().analyzer( "english" );
+		TypeMappingStep typeMapping = mapping.type( Book.class );
+		typeMapping.indexed();
+		typeMapping.property( "title" )
+				.fullTextField().analyzer( "english" );
 	}
 }
 //end::include[]

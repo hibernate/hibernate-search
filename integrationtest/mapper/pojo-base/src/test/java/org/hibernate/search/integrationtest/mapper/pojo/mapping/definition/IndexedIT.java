@@ -12,6 +12,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -257,10 +258,9 @@ public class IndexedIT {
 						.withConfiguration( builder -> {
 							builder.annotatedTypeDiscoveryEnabled( false );
 							builder.addEntityType( AbstractIndexedEntity.class );
-							builder.programmaticMapping()
-									.type( AbstractIndexedEntity.class )
-									.indexed( indexName )
-											.property( "id" ).documentId();
+							TypeMappingStep typeMapping = builder.programmaticMapping().type( AbstractIndexedEntity.class );
+							typeMapping.indexed().index( indexName );
+							typeMapping.property( "id" ).documentId();
 						} )
 						.setup()
 		)

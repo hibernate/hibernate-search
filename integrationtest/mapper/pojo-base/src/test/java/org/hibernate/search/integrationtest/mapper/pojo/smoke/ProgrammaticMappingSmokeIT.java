@@ -140,7 +140,7 @@ public class ProgrammaticMappingSmokeIT {
 
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 					TypeMappingStep indexedEntityMapping = mappingDefinition.type( IndexedEntity.class );
-					indexedEntityMapping.indexed( IndexedEntity.INDEX );
+					indexedEntityMapping.indexed().index( IndexedEntity.INDEX );
 					indexedEntityMapping.binder(
 							new CustomTypeBridge.Binder()
 							.objectName( "customBridgeOnClass" )
@@ -168,7 +168,7 @@ public class ProgrammaticMappingSmokeIT {
 							);
 
 					TypeMappingStep otherIndexedEntityMapping = secondMappingDefinition.type( OtherIndexedEntity.class );
-					otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+					otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
 					otherIndexedEntityMapping.property( "id" )
 							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class );
 					otherIndexedEntityMapping.property( "numeric" )
@@ -176,7 +176,7 @@ public class ProgrammaticMappingSmokeIT {
 							.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 
 					TypeMappingStep yetAnotherIndexedEntityMapping = secondMappingDefinition.type( YetAnotherIndexedEntity.class );
-					yetAnotherIndexedEntityMapping.indexed( YetAnotherIndexedEntity.INDEX );
+					yetAnotherIndexedEntityMapping.indexed().index( YetAnotherIndexedEntity.INDEX );
 					yetAnotherIndexedEntityMapping.property( "id" ).documentId();
 					yetAnotherIndexedEntityMapping.property( "numeric" ).genericField();
 					yetAnotherIndexedEntityMapping.property( "embeddedIterable" )

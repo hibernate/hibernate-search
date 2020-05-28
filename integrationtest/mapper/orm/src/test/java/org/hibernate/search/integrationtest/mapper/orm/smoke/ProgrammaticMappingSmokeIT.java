@@ -345,7 +345,7 @@ public class ProgrammaticMappingSmokeIT {
 		public void configure(HibernateOrmMappingConfigurationContext context) {
 			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
 			TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
-			indexedEntityMapping.indexed( IndexedEntity.NAME );
+			indexedEntityMapping.indexed().index( IndexedEntity.NAME );
 			indexedEntityMapping.binder(
 					new CustomTypeBridge.Binder()
 					.objectName( "customBridgeOnClass" )
@@ -369,7 +369,7 @@ public class ProgrammaticMappingSmokeIT {
 					);
 
 			TypeMappingStep otherIndexedEntityMapping = secondMapping.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed( OtherIndexedEntity.NAME );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.NAME );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class );
 			otherIndexedEntityMapping.property( "numeric" )
@@ -377,7 +377,7 @@ public class ProgrammaticMappingSmokeIT {
 					.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 
 			TypeMappingStep yetAnotherIndexedEntityMapping = secondMapping.type( YetAnotherIndexedEntity.class );
-			yetAnotherIndexedEntityMapping.indexed( YetAnotherIndexedEntity.NAME );
+			yetAnotherIndexedEntityMapping.indexed().index( YetAnotherIndexedEntity.NAME );
 			yetAnotherIndexedEntityMapping.property( "id" ).documentId();
 			yetAnotherIndexedEntityMapping.property( "numeric" ).genericField();
 			yetAnotherIndexedEntityMapping.property( "embeddedList" )

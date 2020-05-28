@@ -75,7 +75,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
-							typeMapping.indexed( INDEX1_NAME );
+							typeMapping.indexed().index( INDEX1_NAME );
 							typeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							typeMapping.property( "pageCount" ).genericField();
 							typeMapping.property( "publicationDate" ).genericField();
@@ -142,7 +142,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
-							typeMapping.indexed( INDEX1_NAME );
+							typeMapping.indexed().index( INDEX1_NAME );
 							typeMapping.property( "title" ).keywordField();
 						}
 				)
@@ -202,7 +202,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
-							typeMapping.indexed( INDEX1_NAME );
+							typeMapping.indexed().index( INDEX1_NAME );
 							typeMapping.property( "title" ).genericField();
 						}
 				)
@@ -249,7 +249,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
-							typeMapping.indexed( INDEX1_NAME );
+							typeMapping.indexed().index( INDEX1_NAME );
 							typeMapping.property( "title" ).documentId()
 									.genericField();
 						}
@@ -320,11 +320,11 @@ public class DynamicMapBaseIT {
 							entityATypeMapping.property( "propertyOfA" ).fullTextField().analyzer( "myAnalyzer" );
 
 							TypeMappingStep entityA_BTypeMapping = context.programmaticMapping().type( entityA_BTypeName );
-							entityA_BTypeMapping.indexed( INDEX1_NAME );
+							entityA_BTypeMapping.indexed().index( INDEX1_NAME );
 							entityA_BTypeMapping.property( "propertyOfB" ).genericField();
 
 							TypeMappingStep entityA_CTypeMapping = context.programmaticMapping().type( entityA_CTypeName );
-							entityA_CTypeMapping.indexed( INDEX2_NAME );
+							entityA_CTypeMapping.indexed().index( INDEX2_NAME );
 							entityA_CTypeMapping.property( "propertyOfC" ).genericField();
 						}
 				)
@@ -405,7 +405,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quote" ).indexedEmbedded();
 
@@ -461,7 +461,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quote" ).indexedEmbedded();
 
@@ -518,7 +518,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" ).indexedEmbedded();
 
@@ -582,7 +582,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" ).fullTextField().analyzer( "myAnalyzer" );
 						}
@@ -634,7 +634,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quote" ).indexedEmbedded();
 
@@ -695,7 +695,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" )
 									.indexedEmbedded()
@@ -773,7 +773,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" )
 									.indexedEmbedded()
@@ -851,7 +851,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" )
 									.indexedEmbedded()
@@ -929,7 +929,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" )
 									.indexedEmbedded()
@@ -1009,7 +1009,7 @@ public class DynamicMapBaseIT {
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
 							TypeMappingStep bookTypeMapping = context.programmaticMapping().type( bookTypeName );
-							bookTypeMapping.indexed( INDEX1_NAME );
+							bookTypeMapping.indexed().index( INDEX1_NAME );
 							bookTypeMapping.property( "title" ).fullTextField().analyzer( "myAnalyzer" );
 							bookTypeMapping.property( "quotes" )
 									.indexedEmbedded()

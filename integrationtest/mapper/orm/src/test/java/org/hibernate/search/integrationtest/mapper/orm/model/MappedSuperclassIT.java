@@ -45,7 +45,7 @@ public class MappedSuperclassIT {
 				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, (HibernateOrmSearchMappingConfigurer) context -> {
 					ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
 					TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
-					indexedEntityMapping.indexed( INDEX_NAME );
+					indexedEntityMapping.indexed().index( INDEX_NAME );
 					indexedEntityMapping.property( "id" ).documentId();
 					indexedEntityMapping.property( "text" ).fullTextField();
 				} )

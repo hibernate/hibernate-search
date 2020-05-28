@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojo
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -48,19 +49,10 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public TypeMappingStep indexed() {
-		return indexed( null, null );
-	}
-
-	@Override
-	public TypeMappingStep indexed(String indexName) {
-		return indexed( null, indexName );
-	}
-
-	@Override
-	public TypeMappingStep indexed(String backendName, String indexName) {
-		children.add( new IndexedMetadataContributor( typeModel.typeIdentifier(), backendName, indexName ) );
-		return this;
+	public TypeMappingIndexedStep indexed() {
+		TypeMappingIndexedStepImpl child = new TypeMappingIndexedStepImpl( typeModel.typeIdentifier() );
+		children.add( child );
+		return child;
 	}
 
 	@Override

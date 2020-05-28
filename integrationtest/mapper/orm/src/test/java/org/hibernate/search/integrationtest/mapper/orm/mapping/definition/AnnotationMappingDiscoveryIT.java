@@ -134,7 +134,7 @@ public class AnnotationMappingDiscoveryIT {
 							 * just to check that discovery is disabled for nested types.
 							 */
 							TypeMappingStep indexedEntityMapping = context.programmaticMapping().type( IndexedEntity.class );
-							indexedEntityMapping.indexed( IndexedEntity.INDEX );
+							indexedEntityMapping.indexed().index( IndexedEntity.INDEX );
 							indexedEntityMapping.property( "id" ).documentId();
 							indexedEntityMapping.property( "annotationMappedEmbedded" )
 									.indexedEmbedded();
