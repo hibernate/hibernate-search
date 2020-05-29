@@ -226,6 +226,39 @@ public class BackendMock implements TestRule {
 		return backendBehavior;
 	}
 
+	public BackendMock expectScrollObjects(Collection<String> indexNames, int pageSize, Consumer<StubSearchWork.Builder> contributor) {
+		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, pageSize );
+	}
+
+	public BackendMock expectScrollProjections(Collection<String> indexNames, int pageSize, Consumer<StubSearchWork.Builder> contributor) {
+		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, pageSize );
+	}
+
+	public BackendMock expectScrollProjection(Collection<String> indexNames, int pageSize, Consumer<StubSearchWork.Builder> contributor) {
+		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, pageSize );
+	}
+
+	private BackendMock expectScroll(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+			StubSearchWork.ResultType resultType, Integer pageSize) {
+		CallQueue<ScrollWorkCall<?>> callQueue = backendBehavior().getScrollCalls();
+		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
+		contributor.accept( builder );
+		callQueue.expectInOrder( new ScrollWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), pageSize ) );
+		return this;
+	}
+
+	public BackendMock expectCloseScroll(Collection<String> indexNames) {
+		CallQueue<CloseScrollWorkCall> callQueue = backendBehavior().getCloseScrollCalls();
+		callQueue.expectInOrder( new CloseScrollWorkCall( new LinkedHashSet<>( indexNames ) ) );
+		return this;
+	}
+
+	public BackendMock expectNextScroll(Collection<String> indexNames, StubSearchWorkBehavior<?> behavior) {
+		CallQueue<NextScrollWorkCall<?>> callQueue = backendBehavior().getNextScrollCalls();
+		callQueue.expectInOrder( new NextScrollWorkCall<>( new LinkedHashSet<>( indexNames ), behavior ) );
+		return this;
+	}
+
 	public static class SchemaManagementWorkCallListContext {
 		private final String indexName;
 		private final Consumer<SchemaManagementWorkCall> expectationConsumer;

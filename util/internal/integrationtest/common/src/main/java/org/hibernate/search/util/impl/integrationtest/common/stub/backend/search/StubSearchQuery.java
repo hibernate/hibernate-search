@@ -68,7 +68,9 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 
 	@Override
 	public SearchScroll<H> scroll(Integer pageSize) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		return backend.getBehavior().executeScrollWork(
+				indexNames, workBuilder.build(), pageSize, projectionContext, loadingContext, rootProjection
+		);
 	}
 
 	@Override

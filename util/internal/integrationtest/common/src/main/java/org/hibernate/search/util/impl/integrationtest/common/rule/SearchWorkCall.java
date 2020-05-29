@@ -84,7 +84,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 
-	private static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
+	static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
 			StubSearchProjection<H> actualRootProjection,
 			List<?> rawHits) {
