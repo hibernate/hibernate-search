@@ -93,10 +93,13 @@ public class MassIndexingInterruptionIT {
 
 		waitForMassIndexingThreadsToSpawn( expectedThreadCount );
 
-		// Interrupt the thread that triggered mass indexing
-		massIndexingThread.interrupt();
+		// inLenientMode since with interrupt final flush, refresh and merge segment are invoked
+		backendMock.inLenientMode( () -> {
+			// Interrupt the thread that triggered mass indexing
+			massIndexingThread.interrupt();
 
-		waitForMassIndexingThreadsToTerminate( expectedThreadCount );
+			waitForMassIndexingThreadsToTerminate( expectedThreadCount );
+		} );
 
 		assertThat( interrupted ).isTrue();
 		// Most JDK methods unset the interrupt flag when they throw an InterruptedException:
@@ -141,11 +144,6 @@ public class MassIndexingInterruptionIT {
 				)
 				// Return a CompletableFuture that will never complete
 				.processedThenExecuted( new CompletableFuture<>() );
-
-		backendMock.expectIndexScaleWorks( Book.INDEX )
-				.flush()
-				.refresh()
-				.mergeSegments();
 
 		return indexer;
 	}
