@@ -22,12 +22,16 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchScroll;
+import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchScroll;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
@@ -53,6 +57,12 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
 	private final CallQueue<CountWorkCall> countCalls = new CallQueue<>();
+
+	private final CallQueue<ScrollWorkCall<?>> scrollCalls = new CallQueue<>();
+
+	private final CallQueue<CloseScrollWorkCall> closeScrollCalls = new CallQueue<>();
+
+	private final CallQueue<NextScrollWorkCall<?>> nextScrollCalls = new CallQueue<>();
 
 	private boolean lenient = false;
 
@@ -96,6 +106,18 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return countCalls;
 	}
 
+	CallQueue<ScrollWorkCall<?>> getScrollCalls() {
+		return scrollCalls;
+	}
+
+	CallQueue<CloseScrollWorkCall> getCloseScrollCalls() {
+		return closeScrollCalls;
+	}
+
+	CallQueue<NextScrollWorkCall<?>> getNextScrollCalls() {
+		return nextScrollCalls;
+	}
+
 	void resetExpectations() {
 		indexFieldAddBehaviors.clear();
 		createBackendBehaviors.clear();
@@ -106,6 +128,12 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		indexScaleWorkCalls.reset();
 		searchCalls.reset();
 		countCalls.reset();
+		scrollCalls.reset();
+		closeScrollCalls.reset();
+		nextScrollCalls.reset();
+		scrollCalls.reset();
+		closeScrollCalls.reset();
+		nextScrollCalls.reset();
 	}
 
 	void verifyExpectationsMet() {
@@ -116,6 +144,12 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		indexScaleWorkCalls.verifyExpectationsMet();
 		searchCalls.verifyExpectationsMet();
 		countCalls.verifyExpectationsMet();
+		scrollCalls.verifyExpectationsMet();
+		closeScrollCalls.verifyExpectationsMet();
+		nextScrollCalls.verifyExpectationsMet();
+		scrollCalls.verifyExpectationsMet();
+		closeScrollCalls.verifyExpectationsMet();
+		nextScrollCalls.verifyExpectationsMet();
 	}
 
 	@Override
@@ -234,6 +268,37 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 				new CountWorkCall( indexNames, null ),
 				CountWorkCall::verify,
 				noExpectationsBehavior( () -> 0L )
+		);
+	}
+
+	@Override
+	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, Integer pageSize,
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+		return scrollCalls.verify(
+				new ScrollWorkCall( indexNames, work, pageSize, this, projectionContext, loadingContext, rootProjection ),
+				(call1, call2) -> call1.verify( call2 ),
+				noExpectationsBehavior( () -> new StubSearchScroll<>(
+						this, indexNames, null, null, null
+				) )
+		);
+	}
+
+	@Override
+	public void executeCloseScrollWork(Set<String> indexNames) {
+		closeScrollCalls.verify(
+				new CloseScrollWorkCall( indexNames ),
+				CloseScrollWorkCall::verify,
+				noExpectationsBehavior( () -> null )
+		);
+	}
+
+	@Override
+	public <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchProjectionContext projectionContext,
+			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+		return nextScrollCalls.verify(
+				new NextScrollWorkCall( indexNames, projectionContext, loadingContext, rootProjection ),
+				(call1, call2) -> call1.verify( call2 ),
+				noExpectationsBehavior( () -> new SimpleSearchScrollResult( false, Collections.emptyList() ) )
 		);
 	}
 

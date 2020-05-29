@@ -13,6 +13,8 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchScroll;
+import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
@@ -52,4 +54,13 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
 
 	public abstract long executeCountWork(Set<String> indexNames);
+
+	public abstract <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, Integer pageSize,
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
+
+	public abstract void executeCloseScrollWork(Set<String> indexNames);
+
+	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchProjectionContext projectionContext,
+			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
+
 }
