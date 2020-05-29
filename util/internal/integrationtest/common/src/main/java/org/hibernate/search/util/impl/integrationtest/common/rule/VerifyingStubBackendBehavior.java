@@ -113,7 +113,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
 		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		indexScaleWorkCalls.verifyExpectationsMet();
 		searchCalls.verifyExpectationsMet();
+		countCalls.verifyExpectationsMet();
 	}
 
 	@Override
