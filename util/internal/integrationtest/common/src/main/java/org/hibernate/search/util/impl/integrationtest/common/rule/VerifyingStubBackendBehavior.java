@@ -97,13 +97,15 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	void resetExpectations() {
+		indexFieldAddBehaviors.clear();
 		createBackendBehaviors.clear();
 		stopBackendBehaviors.clear();
-		indexFieldAddBehaviors.clear();
 		schemaDefinitionCalls.clear();
 		schemaManagementWorkCall.clear();
 		documentWorkCalls.clear();
+		indexScaleWorkCalls.reset();
 		searchCalls.reset();
+		countCalls.reset();
 	}
 
 	void verifyExpectationsMet() {
