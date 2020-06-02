@@ -1,6 +1,54 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta8 (02-06-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3913 @FullTextField.aggregable doesn't do anything
+    * HSEARCH-962 HibernateOrmCriteriaEntityLoader needs to execute multiple queries in cases where the underlying database has a limit on the total amount of query parameters
+    * HSEARCH-551 Using Programmatic API, getters are not inherited
+    * HSEARCH-550 Using Programmatic API, the document ID is not inherited
+
+** Improvement
+    * HSEARCH-3932 Upgrade to Hibernate ORM 5.4.17.Final
+    * HSEARCH-3930 Upgrade to Lucene Lucene 8.5.2
+    * HSEARCH-3772 Allow mapping the document id to non-entity-id properties for ORM's dynamic-map entity types
+    * HSEARCH-3584 Support ORM bytecode enhancement when embeddables, mapped superclasses or entity hierarchies are involved
+    * HSEARCH-1344 Offer compiler or runtime error if range types are incompatible in range faceting
+    * HSEARCH-1301 Trigger/Set analyzer in classbridge
+    * HSEARCH-1086 Have more user friendly messages upon incorrect types in query DSLs
+    * HSEARCH-661 Improve documentation around query dsl options like ignoreAnalyzer and ignoreFieldBridge
+
+** New Feature
+    * HSEARCH-3628 Finer loading options in search queries (fetch graph, ...)
+    * HSEARCH-1865 Extend public meta-data API to provide information on embedded properties/fields
+
+** Task
+    * HSEARCH-3933 Fix reset expectations and verify expectations met for the stub backend
+    * HSEARCH-3931 Fix the dataset used in performance tests
+    * HSEARCH-3928 Rename PropertyMappingIndexedEmbeddedStep#extractors() (no parameters) to "noExtractors"
+    * HSEARCH-3925 Move away from session.byId for entity loading
+    * HSEARCH-3924 Hide obvious getters and setters from the documentation examples
+    * HSEARCH-3923 Upgrade to Hibernate ORM 5.4.16.Final
+    * HSEARCH-3922 Remove "get"/"set" prefixes from API methods
+    * HSEARCH-3921 Fix a typo in the index layout documentation
+    * HSEARCH-3920 Update tests to take advantage of the latest changes to test utils
+    * HSEARCH-3919 Add test configuration to test AWS Elasticsearch Service 7.4
+    * HSEARCH-3918 Upgrade to Elasticsearch 7.7.0
+    * HSEARCH-3916 DynamicTemplateJsonAdapterFactory should be public
+    * HSEARCH-3915 Upgrade to the Ubuntu Bionic environment in .travis.yml
+    * HSEARCH-3912 Increase the amount of RAM assigned to Elasticsearch in integration tests
+    * HSEARCH-3902 Expose addOrUpdate/delete/purge on IndexIndexer/PojoIndexer
+    * HSEARCH-3855 Improve formatting of logged indexing processors and reindexing resolvers
+    * HSEARCH-3842 Expose a global option to use ReindexOnUpdate.NO as a default
+    * HSEARCH-3275 Search 6 groundwork - Move to a stable implementation of Lucene spatial support
+    * HSEARCH-3097 Search 6 groundwork - Deprecate the IndexedEmbedded "prefix" feature
+    * HSEARCH-3072 Search 6 groundwork - Restore support for @IndexedEmbedded.targetElement (now targetType)
+    * HSEARCH-1853 Expose facet metadata in public metadata API
+    * HSEARCH-1807 Provide SPIs required by ISPN query
+    * HSEARCH-1231 Inherit @Indexed annotations by default
+
 6.0.0.Beta7 (07-05-2020)
 -------------------------
 
