@@ -87,10 +87,10 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Long>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Long> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				1L, 3L, 5L
-		) );
+		);
 	}
 
 	@Override

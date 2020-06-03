@@ -102,12 +102,12 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<LocalTime>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<LocalTime> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				LocalTime.of( 10, 10, 10, 123_000_000 ),
 				LocalTime.of( 11, 10, 10, 123_450_000 ),
 				LocalTime.of( 12, 10, 10, 123_456_789 )
-		) );
+		);
 	}
 
 	@Override

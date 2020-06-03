@@ -107,10 +107,10 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Year>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Year> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				Year.of( -1200 ), Year.of( 1797 ), Year.of( 1979 )
-		) );
+		);
 	}
 
 	@Override

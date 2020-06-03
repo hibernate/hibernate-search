@@ -107,10 +107,11 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<MonthDay>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
-			MonthDay.of( Month.JANUARY, 7 ), MonthDay.of( Month.NOVEMBER, 7 ), MonthDay.of( Month.NOVEMBER, 21 )
-		) );
+	public FieldProjectionExpectations<MonthDay> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
+				MonthDay.of( Month.JANUARY, 7 ), MonthDay.of( Month.NOVEMBER, 7 ),
+				MonthDay.of( Month.NOVEMBER, 21 )
+		);
 	}
 
 	@Override

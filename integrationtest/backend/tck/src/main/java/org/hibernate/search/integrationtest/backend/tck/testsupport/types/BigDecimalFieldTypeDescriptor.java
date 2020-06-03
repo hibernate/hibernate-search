@@ -107,10 +107,10 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<BigDecimal>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<BigDecimal> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				BigDecimal.valueOf( -1001 ), BigDecimal.valueOf( 3 ), BigDecimal.valueOf( 51 )
-		) );
+		);
 	}
 
 	@Override

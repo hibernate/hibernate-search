@@ -86,10 +86,10 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Integer>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Integer> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				1, 3, 5
-		) );
+		);
 	}
 
 	@Override

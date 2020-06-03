@@ -135,7 +135,7 @@ public abstract class FieldTypeDescriptor<F> {
 		return ExpectationsAlternative.supported( this );
 	}
 
-	public abstract Optional<FieldProjectionExpectations<F>> getFieldProjectionExpectations();
+	public abstract FieldProjectionExpectations<F> getFieldProjectionExpectations();
 
 	public abstract Optional<IndexNullAsMatchPredicateExpectactions<F>> getIndexNullAsMatchPredicateExpectations();
 }

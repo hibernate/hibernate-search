@@ -99,12 +99,12 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Instant>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Instant> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				Instant.parse( "2018-02-01T10:15:30.00Z" ),
 				Instant.parse( "2018-03-01T10:15:30.00Z" ),
 				Instant.parse( "2018-04-01T10:15:30.00Z" )
-		) );
+		);
 	}
 
 	@Override

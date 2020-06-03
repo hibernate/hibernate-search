@@ -102,12 +102,12 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<LocalDate>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<LocalDate> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				LocalDate.of( 2018, 2, 1 ),
 				LocalDate.of( 2018, 3, 1 ),
 				LocalDate.of( 2018, 4, 1 )
-		) );
+		);
 	}
 
 	@Override

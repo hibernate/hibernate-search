@@ -111,10 +111,10 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<String>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<String> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				"Aaron", "george", "Zach"
-		) );
+		);
 	}
 
 	@Override

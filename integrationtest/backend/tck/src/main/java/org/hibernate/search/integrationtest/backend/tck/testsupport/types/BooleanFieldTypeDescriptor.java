@@ -86,10 +86,10 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Boolean>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Boolean> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				true, false, true
-		) );
+		);
 	}
 
 	@Override

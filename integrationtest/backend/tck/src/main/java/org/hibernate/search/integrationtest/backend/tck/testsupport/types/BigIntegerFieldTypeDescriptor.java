@@ -109,10 +109,10 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<BigInteger>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<BigInteger> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				BigInteger.ONE, BigInteger.valueOf( 300 ), BigInteger.valueOf( 500 )
-		) );
+		);
 	}
 
 	@Override

@@ -153,12 +153,12 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<ZonedDateTime>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<ZonedDateTime> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				LocalDateTime.of( 2018, 2, 1, 23, 0, 0, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
 				LocalDateTime.of( 2018, 3, 1, 23, 59, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
 				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) )
-		) );
+		);
 	}
 
 	@Override

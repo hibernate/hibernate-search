@@ -107,12 +107,12 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<OffsetTime>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<OffsetTime> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				LocalTime.of( 10, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
 				LocalTime.of( 10, 0, 1, 1 ).atOffset( ZoneOffset.UTC ),
 				LocalTime.of( 18, 2, 0, 1 ).atOffset( ZoneOffset.ofHours( -6 ) )
-		) );
+		);
 	}
 
 	@Override

@@ -93,10 +93,10 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Byte>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Byte> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				(byte) 1, (byte) 3, (byte) 5
-		) );
+		);
 	}
 
 	@Override
