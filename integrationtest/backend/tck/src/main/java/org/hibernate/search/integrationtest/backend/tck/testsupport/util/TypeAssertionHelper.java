@@ -45,25 +45,6 @@ public abstract class TypeAssertionHelper<F, T> {
 		};
 	}
 
-	public static <F> TypeAssertionHelper<F, ? super F> superClass(FieldTypeDescriptor<F> typeDescriptor) {
-		return superType( typeDescriptor, typeDescriptor.getJavaType().getSuperclass() );
-	}
-
-	private static <F extends S, S> TypeAssertionHelper<F, S> superType(FieldTypeDescriptor<F> typeDescriptor,
-			Class<S> superType) {
-		return new TypeAssertionHelper<F, S>() {
-			@Override
-			public Class<S> getJavaClass() {
-				return superType;
-			}
-
-			@Override
-			public S create(F fieldValue) {
-				return typeDescriptor.getJavaType().cast( fieldValue );
-			}
-		};
-	}
-
 	public static <F, T> TypeAssertionHelper<F, T> nullType() {
 		return new TypeAssertionHelper<F, T>() {
 			@Override
