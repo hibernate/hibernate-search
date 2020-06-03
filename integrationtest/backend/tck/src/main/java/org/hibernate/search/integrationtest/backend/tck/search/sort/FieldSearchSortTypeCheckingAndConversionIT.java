@@ -19,7 +19,6 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -32,7 +31,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -41,13 +39,14 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
@@ -437,39 +436,17 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	private static class IncompatibleIndexBinding {
 		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
+			 * Add fields with the same name as the fieldModels from IndexBinding,
 			 * but with an incompatible type.
 			 */
 			mapFieldsWithIncompatibleType( root );
 		}
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
-			supportedTypeDescriptors().forEach( typeDescriptor -> {
-				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
-				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
-					mapper = IncompatibleFieldModel.mapper( context -> context.asLong() );
-				}
-				else {
-					mapper = IncompatibleFieldModel.mapper( context -> context.asInteger() );
-				}
-				mapper.map( parent, "" + typeDescriptor.getUniqueName() );
-			} );
-		}
-	}
-
-	private static class IncompatibleFieldModel {
-		static <F> StandardFieldMapper<F, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
-			return StandardFieldMapper.of(
-					configuration,
-					(reference, name) -> new IncompatibleFieldModel( name )
+			supportedTypeDescriptors().forEach( typeDescriptor ->
+					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
+							.map( parent, "" + typeDescriptor.getUniqueName() )
 			);
-		}
-
-		final String relativeFieldName;
-
-		private IncompatibleFieldModel(String relativeFieldName) {
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 

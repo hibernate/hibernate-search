@@ -21,11 +21,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -37,8 +34,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -662,26 +659,9 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
 			supportedFieldTypes.forEach( typeDescriptor ->
-					IncompatibleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor )::configure )
+					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
 							.map( parent, "" + typeDescriptor.getUniqueName() )
 			);
-		}
-	}
-
-	private static class IncompatibleFieldModel {
-		static <F> StandardFieldMapper<F, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
-			return StandardFieldMapper.of(
-					configuration,
-					c -> c.projectable( Projectable.YES ),
-					(reference, name) -> new IncompatibleFieldModel( name )
-			);
-		}
-
-		final String relativeFieldName;
-
-		private IncompatibleFieldModel(String relativeFieldName) {
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 }
