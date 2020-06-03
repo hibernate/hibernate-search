@@ -81,14 +81,14 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	}
 
 	@Override
-	public Optional<IndexingExpectations<OffsetDateTime>> getIndexingExpectations() {
+	public IndexingExpectations<OffsetDateTime> getIndexingExpectations() {
 		List<OffsetDateTime> values = new ArrayList<>();
 		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
 			getOffsetsForIndexingExpectations().forEach( offset -> {
 				values.add( localDateTime.atOffset( offset ) );
 			} );
 		} );
-		return Optional.of( new IndexingExpectations<>( values ) );
+		return new IndexingExpectations<>( values );
 	}
 
 	@Override

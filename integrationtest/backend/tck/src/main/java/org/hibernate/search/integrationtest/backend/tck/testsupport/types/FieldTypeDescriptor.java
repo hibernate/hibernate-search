@@ -122,7 +122,7 @@ public abstract class FieldTypeDescriptor<F> {
 
 	protected abstract AscendingUniqueTermValues<F> createAscendingUniqueTermValues();
 
-	public abstract Optional<IndexingExpectations<F>> getIndexingExpectations();
+	public abstract IndexingExpectations<F> getIndexingExpectations();
 
 	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
 

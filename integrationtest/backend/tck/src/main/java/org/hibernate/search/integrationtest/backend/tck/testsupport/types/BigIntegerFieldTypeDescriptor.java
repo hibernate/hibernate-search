@@ -67,8 +67,8 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
-	public Optional<IndexingExpectations<BigInteger>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<BigInteger> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
 				BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
 				BigInteger.valueOf( Long.MIN_VALUE ),
@@ -83,7 +83,7 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 				BigInteger.TEN,
 				new BigInteger( "42" ),
 				BigInteger.valueOf( 151_484_254L )
-		) );
+		);
 	}
 
 	@Override

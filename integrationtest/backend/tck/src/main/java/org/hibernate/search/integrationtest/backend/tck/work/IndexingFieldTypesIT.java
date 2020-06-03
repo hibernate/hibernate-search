@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -43,9 +42,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class IndexingFieldTypesIT<F> {
 
-	private static final List<FieldTypeDescriptor<?>> supportedTypeDescriptors = FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getIndexingExpectations().isPresent() )
-				.collect( Collectors.toList() );
+	private static final List<FieldTypeDescriptor<?>> supportedTypeDescriptors = FieldTypeDescriptor.getAll();
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<FieldTypeDescriptor<?>> parameters() {
@@ -62,7 +59,7 @@ public class IndexingFieldTypesIT<F> {
 
 	public IndexingFieldTypesIT(FieldTypeDescriptor<F> typeDescriptor) {
 		this.typeDescriptor = typeDescriptor;
-		this.expectations = typeDescriptor.getIndexingExpectations().get();
+		this.expectations = typeDescriptor.getIndexingExpectations();
 	}
 
 	@Before

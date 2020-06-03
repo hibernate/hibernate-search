@@ -313,7 +313,7 @@ public class DocumentElementMultiValuedIT<F> {
 	}
 
 	private F getValue(int ordinal) {
-		return fieldType.getIndexingExpectations().get().getValues().get( ordinal );
+		return fieldType.getIndexingExpectations().getValues().get( ordinal );
 	}
 
 	private SimpleFieldModel<F> getSingleValuedField(AbstractObjectBinding binding) {

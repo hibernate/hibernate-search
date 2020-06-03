@@ -60,14 +60,14 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
-	public Optional<IndexingExpectations<YearMonth>> getIndexingExpectations() {
+	public IndexingExpectations<YearMonth> getIndexingExpectations() {
 		List<YearMonth> values = new ArrayList<>();
 		YearFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( year -> {
 			Arrays.stream( Month.values() ).forEach( month -> {
 				values.add( year.atMonth( month ) );
 			} );
 		} );
-		return Optional.of( new IndexingExpectations<>( values ) );
+		return new IndexingExpectations<>( values );
 	}
 
 	@Override

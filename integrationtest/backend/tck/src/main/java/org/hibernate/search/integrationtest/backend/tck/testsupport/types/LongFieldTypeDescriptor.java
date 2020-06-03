@@ -56,12 +56,12 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Long>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Long> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				Long.MIN_VALUE, Long.MAX_VALUE,
 				(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
 				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
-		) );
+		);
 	}
 
 	@Override

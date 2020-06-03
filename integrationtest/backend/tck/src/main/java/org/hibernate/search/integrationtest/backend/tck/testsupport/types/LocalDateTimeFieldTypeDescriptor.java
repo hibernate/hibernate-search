@@ -82,8 +82,8 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	}
 
 	@Override
-	public Optional<IndexingExpectations<LocalDateTime>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
+	public IndexingExpectations<LocalDateTime> getIndexingExpectations() {
+		return new IndexingExpectations<>( getValuesForIndexingExpectations() );
 	}
 
 	@Override

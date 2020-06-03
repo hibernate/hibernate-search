@@ -63,11 +63,11 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Byte>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Byte> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				Byte.MIN_VALUE, Byte.MAX_VALUE,
 				(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42
-		) );
+		);
 	}
 
 	@Override

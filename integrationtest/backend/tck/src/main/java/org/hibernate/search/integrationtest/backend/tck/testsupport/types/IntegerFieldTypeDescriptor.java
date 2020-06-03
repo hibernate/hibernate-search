@@ -56,11 +56,11 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Integer>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Integer> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				Integer.MIN_VALUE, Integer.MAX_VALUE,
 				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
-		) );
+		);
 	}
 
 	@Override

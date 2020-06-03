@@ -78,8 +78,8 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Year>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>( getValuesForIndexingExpectations() ) );
+	public IndexingExpectations<Year> getIndexingExpectations() {
+		return new IndexingExpectations<>( getValuesForIndexingExpectations() );
 	}
 
 	@Override

@@ -63,11 +63,11 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Short>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Short> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				Short.MIN_VALUE, Short.MAX_VALUE,
 				(short) -25435, (short) -42, (short) -1, (short) 0, (short) 1, (short) 3, (short) 42, (short) 18353
-		) );
+		);
 	}
 
 	@Override
