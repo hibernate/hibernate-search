@@ -18,14 +18,14 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 
 public class SimpleFieldModelsByType {
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAll(Collection<FieldTypeDescriptor<?>> typeDescriptors,
+	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
 		return mapAll( typeDescriptors.stream(), parent, prefix, additionalConfiguration );
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAll(Stream<FieldTypeDescriptor<?>> typeDescriptors,
+	public static SimpleFieldModelsByType mapAll(Stream<? extends FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
 		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
@@ -40,14 +40,14 @@ public class SimpleFieldModelsByType {
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAllMultiValued(Collection<FieldTypeDescriptor<?>> typeDescriptors,
+	public static SimpleFieldModelsByType mapAllMultiValued(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
 		return mapAllMultiValued( typeDescriptors.stream(), parent, prefix, additionalConfiguration );
 	}
 
 	@SafeVarargs
-	public static SimpleFieldModelsByType mapAllMultiValued(Stream<FieldTypeDescriptor<?>> typeDescriptors,
+	public static SimpleFieldModelsByType mapAllMultiValued(Stream<? extends FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
 		SimpleFieldModelsByType result = new SimpleFieldModelsByType();

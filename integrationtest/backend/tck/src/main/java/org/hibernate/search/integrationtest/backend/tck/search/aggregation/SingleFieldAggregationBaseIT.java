@@ -18,12 +18,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -31,12 +26,12 @@ import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -88,12 +83,16 @@ public class SingleFieldAggregationBaseIT<F> {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new )
-			.name( "Main" );
-	private static final SimpleMappedIndex<IndexBinding> emptyIndex = SimpleMappedIndex.of( IndexBinding::new )
-			.name( "Empty" );
-	private static final SimpleMappedIndex<IndexBinding> nullOnlyIndex = SimpleMappedIndex.of( IndexBinding::new )
-			.name( "NullOnly" );
+	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
+			root -> new SingleFieldIndexBinding( root, supportedFieldTypes, c -> c.aggregable( Aggregable.YES ) );
+
+	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
+			SimpleMappedIndex.of( bindingFactory ).name( "Main" );
+
+	private static final SimpleMappedIndex<SingleFieldIndexBinding> emptyIndex =
+			SimpleMappedIndex.of( bindingFactory ).name( "Empty" );
+	private static final SimpleMappedIndex<SingleFieldIndexBinding> nullOnlyIndex =
+			SimpleMappedIndex.of( bindingFactory ).name( "NullOnly" );
 
 	@BeforeClass
 	public static void setup() {
@@ -152,7 +151,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				scope.query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, f -> scenario.setup( f, fieldPath, getFilterOrNull( mainIndex.binding() ) ) )
-						.routing( dataSet.name )
+						.routing( dataSet.routingKey )
 						.toQuery()
 		)
 				.aggregation(
@@ -161,11 +160,12 @@ public class SingleFieldAggregationBaseIT<F> {
 				);
 	}
 
-	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(IndexBinding binding) {
+	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
+			SingleFieldIndexBinding binding) {
 		if ( fieldStructure.isInNested() ) {
 			return pf -> pf.match()
-					.field( getFieldPath( binding, parent -> "discriminator" ) )
-					.matching( "included" );
+					.field( binding.getDiscriminatorFieldPath( fieldStructure ) )
+					.matching( SingleFieldIndexBinding.DISCRIMINATOR_VALUE_INCLUDED );
 		}
 		else {
 			return null;
@@ -190,7 +190,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				mainIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
-						.routing( dataSet.name )
+						.routing( dataSet.routingKey )
 						.toQuery()
 		)
 				.aggregation(
@@ -265,7 +265,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				scope.query()
 						.where( predicateContributor )
 						.aggregation( aggregationKey, f -> aggregationContributor.apply( f, scenario ) )
-						.routing( dataSet.name )
+						.routing( dataSet.routingKey )
 						.toQuery()
 		)
 				.aggregation(
@@ -285,53 +285,21 @@ public class SingleFieldAggregationBaseIT<F> {
 		return scenario;
 	}
 
-	private String getFieldPath(IndexBinding indexBinding) {
-		return getFieldPath( indexBinding, this::getRelativeFieldName );
-	}
-
-	private String getFieldPath(IndexBinding indexBinding, Function<AbstractObjectBinding, String> relativeFieldNameFunction) {
-		switch ( fieldStructure.location ) {
-			case ROOT:
-				return relativeFieldNameFunction.apply( indexBinding );
-			case IN_FLATTENED:
-				return indexBinding.flattenedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( indexBinding.flattenedObject );
-			case IN_NESTED:
-				return indexBinding.nestedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( indexBinding.nestedObject );
-			case IN_NESTED_TWICE:
-				return indexBinding.nestedObject.relativeFieldName
-						+ "." + indexBinding.nestedObject.nestedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( indexBinding.nestedObject.nestedObject );
-			default:
-				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
-		}
-	}
-
-	private String getRelativeFieldName(AbstractObjectBinding binding) {
-		return getFieldModelsByType( binding ).get( fieldType ).relativeFieldName;
-	}
-
-	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectBinding binding) {
-		if ( fieldStructure.isSingleValued() ) {
-			return binding.fieldWithSingleValueModels;
-		}
-		else {
-			return binding.fieldWithMultipleValuesModels;
-		}
+	private String getFieldPath(SingleFieldIndexBinding indexBinding) {
+		return indexBinding.getFieldPath( fieldStructure, fieldType );
 	}
 
 	private static class DataSet<F> {
 		final SupportedSingleFieldAggregationExpectations<F> expectations;
 		final FieldTypeDescriptor<F> fieldType;
-		final String name;
+		final String routingKey;
 		private final TestedFieldStructure fieldStructure;
 
 		private DataSet(SupportedSingleFieldAggregationExpectations<F> expectations,
 				TestedFieldStructure fieldStructure) {
 			this.expectations = expectations;
 			this.fieldType = expectations.fieldType();
-			this.name = expectations.aggregationName() + "_" + expectations.fieldType().getUniqueName()
+			this.routingKey = expectations.aggregationName() + "_" + expectations.fieldType().getUniqueName()
 					+ "_" + fieldStructure.getUniqueName();
 			this.fieldStructure = fieldStructure;
 		}
@@ -343,9 +311,9 @@ public class SingleFieldAggregationBaseIT<F> {
 					F valueForDocument = values.get( i );
 					F garbageValueForDocument = values.get( i == 0 ? 1 : i - 1 );
 					mainIndexer.add(
-							documentProvider( name + "_document_" + i, name, document -> {
-								initSingleValued( mainIndex.binding(), document,
-										valueForDocument, garbageValueForDocument );
+							documentProvider( routingKey + "_document_" + i, routingKey, document -> {
+								mainIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+										document, valueForDocument, garbageValueForDocument );
 							} )
 					);
 				}
@@ -356,234 +324,29 @@ public class SingleFieldAggregationBaseIT<F> {
 					List<F> valuesForDocument = values.get( i );
 					List<F> garbageValuesForDocument = values.get( i == 0 ? 1 : i - 1 );
 					mainIndexer.add(
-							documentProvider( name + "_document_" + i, name, document -> {
-								initMultiValued( mainIndex.binding(), document,
-										valuesForDocument, garbageValuesForDocument );
+							documentProvider( routingKey + "_document_" + i, routingKey, document -> {
+								mainIndex.binding().initMultiValued( fieldType, fieldStructure.location,
+										document, valuesForDocument, garbageValuesForDocument );
 							} )
 					);
 				}
 			}
 			mainIndexer.add(
-					documentProvider( name + "_document_empty", name, document -> { } )
+					documentProvider( routingKey + "_document_empty", routingKey, document -> { } )
 			);
 
 			nullOnlyIndexer.add(
-					documentProvider( name + "_nullOnlyIndex_document_0", name, document -> {
+					documentProvider( routingKey + "_nullOnlyIndex_document_0", routingKey, document -> {
 						if ( fieldStructure.isSingleValued() ) {
-							initSingleValued( nullOnlyIndex.binding(), document, null, null );
+							nullOnlyIndex.binding().initSingleValued( fieldType, fieldStructure.location,
+									document, null, null );
 						}
 						else {
-							initMultiValued( nullOnlyIndex.binding(), document, Arrays.asList( null, null ), Arrays.asList( null, null ) );
+							nullOnlyIndex.binding().initMultiValued( fieldType, fieldStructure.location,
+									document, Arrays.asList( null, null ), Arrays.asList( null, null ) );
 						}
 					} )
 			);
-		}
-
-		private void initSingleValued(IndexBinding binding, DocumentElement document, F value, F garbageValue) {
-			switch ( fieldStructure.location ) {
-				case ROOT:
-					document.addValue( binding.fieldWithSingleValueModels.get( fieldType ).reference, value );
-					break;
-				case IN_FLATTENED:
-					DocumentElement flattenedObject = document.addObject( binding.flattenedObject.self );
-					flattenedObject.addValue( binding.flattenedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-							value
-					);
-					break;
-				case IN_NESTED:
-					// Make sure to create multiple nested documents here, to test all the scenarios.
-					DocumentElement nestedObject0 = document.addObject( binding.nestedObject.self );
-					nestedObject0.addValue( binding.nestedObject.discriminator, "included" );
-					nestedObject0.addValue(
-							binding.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-							value
-					);
-					DocumentElement nestedObject1 = document.addObject( binding.nestedObject.self );
-					nestedObject1.addValue( binding.nestedObject.discriminator, "excluded" );
-					nestedObject1.addValue(
-							binding.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-							garbageValue
-					);
-				case IN_NESTED_TWICE:
-					// Same as for IN_NESTED, but one level deeper
-					DocumentElement nestedObjectFirstLevel = document.addObject( binding.nestedObject.self );
-					DocumentElement nestedNestedObject0 = nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
-					nestedNestedObject0.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
-					nestedNestedObject0.addValue(
-							binding.nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-							value
-					);
-					DocumentElement nestedNestedObject1 = nestedObjectFirstLevel.addObject( binding.nestedObject.nestedObject.self );
-					nestedNestedObject1.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
-					nestedNestedObject1.addValue(
-							binding.nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-							garbageValue
-					);
-					break;
-			}
-		}
-
-		private void initMultiValued(IndexBinding binding, DocumentElement document, List<F> values, List<F> garbageValues) {
-			switch ( fieldStructure.location ) {
-				case ROOT:
-					for ( F value : values ) {
-						document.addValue( binding.fieldWithMultipleValuesModels.get( fieldType ).reference, value );
-					}
-					break;
-				case IN_FLATTENED:
-					DocumentElement flattenedObject = document.addObject( binding.flattenedObject.self );
-					for ( F value : values ) {
-						flattenedObject.addValue(
-								binding.flattenedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					break;
-				case IN_NESTED:
-					// The nested object requiring filters is split into four objects:
-					// the first two are included by the filter and each hold part of the values that will be sorted on,
-					// and the last two are excluded by the filter and hold garbage values that, if they were taken into account,
-					// would mess with the sort order and eventually fail at least *some* tests.
-					DocumentElement nestedObject0 = document.addObject( binding.nestedObject.self );
-					nestedObject0.addValue( binding.nestedObject.discriminator, "included" );
-					nestedObject0.addValue(
-							binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							values.get( 0 )
-					);
-					DocumentElement nestedObject1 = document.addObject( binding.nestedObject.self );
-					nestedObject1.addValue( binding.nestedObject.discriminator, "included" );
-					for ( F value : values.subList( 1, values.size() ) ) {
-						nestedObject1.addValue(
-								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					DocumentElement nestedObject2 = document.addObject( binding.nestedObject.self );
-					nestedObject2.addValue( binding.nestedObject.discriminator, "excluded" );
-					for ( F value : garbageValues ) {
-						nestedObject2.addValue(
-								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					DocumentElement nestedObject3 = document.addObject( binding.nestedObject.self );
-					nestedObject3.addValue( binding.nestedObject.discriminator, "excluded" );
-					for ( F value : garbageValues ) {
-						nestedObject3.addValue(
-								binding.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					break;
-				case IN_NESTED_TWICE:
-					// Same as for IN_NESTED, but one level deeper
-					DocumentElement nestedObjectFirstLevel0 = document.addObject( binding.nestedObject.self );
-					DocumentElement nestedObjectFirstLevel1 = document.addObject( binding.nestedObject.self );
-					DocumentElement nestedNestedObject0 = nestedObjectFirstLevel0.addObject( binding.nestedObject.nestedObject.self );
-					nestedNestedObject0.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
-					nestedNestedObject0.addValue(
-							binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-							values.get( 0 )
-					);
-					DocumentElement nestedNestedObject1 = nestedObjectFirstLevel1.addObject( binding.nestedObject.nestedObject.self );
-					nestedNestedObject1.addValue( binding.nestedObject.nestedObject.discriminator, "included" );
-					for ( F value : values.subList( 1, values.size() ) ) {
-						nestedNestedObject1.addValue(
-								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					DocumentElement nestedNestedObject2 = nestedObjectFirstLevel0.addObject( binding.nestedObject.nestedObject.self );
-					nestedNestedObject2.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
-					for ( F value : garbageValues ) {
-						nestedNestedObject2.addValue(
-								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					DocumentElement nestedNestedObject3 = nestedObjectFirstLevel1.addObject( binding.nestedObject.nestedObject.self );
-					nestedNestedObject3.addValue( binding.nestedObject.nestedObject.discriminator, "excluded" );
-					for ( F value : garbageValues ) {
-						nestedNestedObject3.addValue(
-								binding.nestedObject.nestedObject.fieldWithMultipleValuesModels.get( fieldType ).reference,
-								value
-						);
-					}
-					break;
-			}
-		}
-	}
-
-	private static class AbstractObjectBinding {
-		final SimpleFieldModelsByType fieldWithSingleValueModels;
-		final SimpleFieldModelsByType fieldWithMultipleValuesModels;
-
-		AbstractObjectBinding(IndexSchemaElement self) {
-			fieldWithSingleValueModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, self,
-					"", c -> c.aggregable( Aggregable.YES ) );
-			fieldWithMultipleValuesModels = SimpleFieldModelsByType.mapAllMultiValued( supportedFieldTypes, self,
-					"multiValued_", c -> c.aggregable( Aggregable.YES ) );
-		}
-	}
-
-	private static class IndexBinding extends AbstractObjectBinding {
-		final FirstLevelObjectBinding flattenedObject;
-		final FirstLevelObjectBinding nestedObject;
-
-		IndexBinding(IndexSchemaElement root) {
-			super( root );
-			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED, false );
-			nestedObject = FirstLevelObjectBinding.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
-		}
-	}
-
-	private static class FirstLevelObjectBinding extends AbstractObjectBinding {
-		final String relativeFieldName;
-		final IndexObjectFieldReference self;
-
-		final IndexFieldReference<String> discriminator;
-
-		final SecondLevelObjectBinding nestedObject;
-
-		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage,
-				boolean multiValued) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-			if ( multiValued ) {
-				objectField.multiValued();
-			}
-			return new FirstLevelObjectBinding( relativeFieldName, objectField );
-		}
-
-		FirstLevelObjectBinding(String relativeFieldName, IndexSchemaObjectField objectField) {
-			super( objectField );
-			this.relativeFieldName = relativeFieldName;
-			self = objectField.toReference();
-			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
-			nestedObject = SecondLevelObjectBinding.create(
-					objectField, "nestedObject", ObjectFieldStorage.NESTED
-			);
-		}
-	}
-
-	private static class SecondLevelObjectBinding extends AbstractObjectBinding {
-		final String relativeFieldName;
-		final IndexObjectFieldReference self;
-
-		final IndexFieldReference<String> discriminator;
-
-		public static SecondLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-			objectField.multiValued();
-			return new SecondLevelObjectBinding( relativeFieldName, objectField );
-		}
-
-		SecondLevelObjectBinding(String relativeFieldName, IndexSchemaObjectField objectField) {
-			super( objectField );
-			this.relativeFieldName = relativeFieldName;
-			self = objectField.toReference();
-			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 		}
 	}
 
