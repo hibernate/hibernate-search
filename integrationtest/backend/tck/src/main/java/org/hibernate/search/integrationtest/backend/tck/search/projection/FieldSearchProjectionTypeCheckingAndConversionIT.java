@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -18,19 +17,19 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -38,15 +37,19 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.SubTest;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class FieldSearchProjectionIT {
+import org.assertj.core.api.Assertions;
+
+/**
+ * Tests behavior related to type checking and type conversion of
+ * projections on field value.
+ */
+public class FieldSearchProjectionTypeCheckingAndConversionIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -78,50 +81,6 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void simple() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = model.relativeFieldName;
-
-				assertThat(
-						scope.query()
-								.select( f -> f.field( fieldPath, model.type ) )
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						model.document1Value.indexedValue,
-						model.document2Value.indexedValue,
-						model.document3Value.indexedValue,
-						null // Empty document
-				);
-			} );
-		}
-	}
-
-	@Test
-	public void noClass() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
-			SearchQuery<Object> query;
-			String fieldPath = fieldModel.relativeFieldName;
-
-			query = scope.query()
-					.select( f -> f.field( fieldPath ) )
-					.where( f -> f.matchAll() )
-					.toQuery();
-			assertThat( query ).hasHitsAnyOrder(
-					fieldModel.document1Value.indexedValue,
-					fieldModel.document2Value.indexedValue,
-					fieldModel.document3Value.indexedValue,
-					null // Empty document
-			);
-		}
-	}
-
-	@Test
 	public void validSuperClass() {
 		StubMappingScope scope = mainIndex.createScope();
 
@@ -141,22 +100,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_nullClass() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		assertThatThrownBy( () -> scope.projection()
-				.field( mainIndex.binding().string1Field.relativeFieldName, (Class<? extends Object>) null )
-				.toProjection()
-		)
-				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContainingAll(
-						"must not be null",
-						"clazz"
-				);
-	}
-
-	@Test
-	public void error_invalidProjectionType_projectionConverterEnabled() {
+	public void invalidProjectionType_projectionConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
@@ -176,7 +120,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_invalidProjectionType_projectionConverterDisabled() {
+	public void invalidProjectionType_projectionConverterDisabled() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
@@ -196,52 +140,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_unknownField() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		assertThatThrownBy( () -> scope.projection()
-				.field( "unknownField", Object.class )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Unknown field",
-						"unknownField",
-						mainIndex.name()
-				);
-	}
-
-	@Test
-	public void error_objectField_nested() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		assertThatThrownBy( () -> scope.projection()
-				.field( "nestedObject", Object.class )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Unknown field",
-						"nestedObject",
-						mainIndex.name()
-				);
-	}
-
-	@Test
-	public void error_objectField_flattened() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		assertThatThrownBy( () -> scope.projection()
-				.field( "flattenedObject", Object.class )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Unknown field",
-						"flattenedObject",
-						mainIndex.name()
-				);
-	}
-
-	@Test
-	public void error_nonProjectable() {
+	public void nonProjectable() {
 		StubMappingScope scope = mainIndex.createScope();
 
 		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedNonProjectableFieldModels ) {
@@ -326,7 +225,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_invalidProjectionType_withProjectionConverter() {
+	public void invalidProjectionType_withProjectionConverter() {
 		FieldModel<?> fieldModel = mainIndex.binding().supportedFieldWithProjectionConverterModels.get( 0 );
 
 		StubMappingScope scope = mainIndex.createScope();
@@ -341,94 +240,6 @@ public class FieldSearchProjectionIT {
 						"for projection on field",
 						fieldModel.relativeFieldName
 				);
-	}
-
-	/**
-	 * Test that mentioning the same projection twice works as expected.
-	 */
-	@Test
-	public void duplicated() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		for ( FieldModel<?> fieldModel : mainIndex.binding().supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = model.relativeFieldName;
-
-				assertThat(
-						scope.query()
-								.select( f ->
-										f.composite(
-												f.field( fieldPath, model.type ),
-												f.field( fieldPath, model.type )
-										)
-								)
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						Arrays.asList( model.document1Value.indexedValue, model.document1Value.indexedValue ),
-						Arrays.asList( model.document2Value.indexedValue, model.document2Value.indexedValue ),
-						Arrays.asList( model.document3Value.indexedValue, model.document3Value.indexedValue ),
-						Arrays.asList( null, null ) // Empty document
-				);
-			} );
-		}
-	}
-
-	@Test
-	public void inFlattenedObject() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		for ( FieldModel<?> fieldModel : mainIndex.binding().flattenedObject.supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "." + model.relativeFieldName;
-
-				assertThat(
-						scope.query()
-								.select(
-										f -> f.field( fieldPath, model.type )
-								)
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						model.document1Value.indexedValue,
-						model.document2Value.indexedValue,
-						model.document3Value.indexedValue,
-						null // Empty document
-				);
-			} );
-		}
-	}
-
-	@Test
-	public void inNestedObject() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		for ( FieldModel<?> fieldModel : mainIndex.binding().nestedObject.supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "." + model.relativeFieldName;
-
-				assertThat(
-						scope.query()
-								.select( f -> f.field( fieldPath, model.type ) )
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						model.document1Value.indexedValue,
-						model.document2Value.indexedValue,
-						model.document3Value.indexedValue,
-						null // Empty document
-				);
-			} );
-		}
-	}
-
-	@Test
-	public void multivalued() {
-		Assume.assumeTrue( "Multi-valued projections are not supported yet", false );
-		// TODO HSEARCH-3391 support multi-valued projections
-		//  Project on multi-valued field
-		//  Project on fields within a multi-valued flattened object
-		//  Project on fields within a multi-valued nested object
 	}
 
 	@Test
