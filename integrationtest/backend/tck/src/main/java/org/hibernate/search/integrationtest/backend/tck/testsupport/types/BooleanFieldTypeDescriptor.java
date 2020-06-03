@@ -53,11 +53,11 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Boolean>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Boolean> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				true,
 				false
-		) );
+		);
 	}
 
 	@Override

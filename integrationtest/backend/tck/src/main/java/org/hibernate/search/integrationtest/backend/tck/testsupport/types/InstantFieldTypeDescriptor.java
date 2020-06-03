@@ -61,13 +61,13 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Instant>> getIndexingExpectations() {
+	public IndexingExpectations<Instant> getIndexingExpectations() {
 		List<Instant> values = new ArrayList<>();
 		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
 			values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
 		} );
 		values.add( Instant.EPOCH );
-		return Optional.of( new IndexingExpectations<>( values ) );
+		return new IndexingExpectations<>( values );
 	}
 
 	@Override

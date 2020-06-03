@@ -56,8 +56,8 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Float>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Float> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				Float.MIN_VALUE, Float.MAX_VALUE,
 				- Float.MIN_VALUE, - Float.MAX_VALUE,
 				// Elasticsearch doesn't support these: it fails when parsing them
@@ -68,7 +68,7 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 				Math.nextUp( 0.0f ),
 				42.42f,
 				1584514514.000000184f
-		) );
+		);
 	}
 
 	@Override

@@ -68,8 +68,8 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	}
 
 	@Override
-	public Optional<IndexingExpectations<BigDecimal>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<BigDecimal> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				BigDecimal.ZERO,
 				BigDecimal.ONE,
 				BigDecimal.TEN,
@@ -81,7 +81,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 				scaled( Long.MIN_VALUE ),
 				new BigDecimal( "-0.00000000012" ),
 				BigDecimal.valueOf( 0.0000000001 )
-		) );
+		);
 	}
 
 	@Override

@@ -56,8 +56,8 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<Double>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<Double> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				Double.MIN_VALUE, Double.MAX_VALUE,
 				- Double.MIN_VALUE, - Double.MAX_VALUE,
 				// Elasticsearch doesn't support these: it fails when parsing them
@@ -68,7 +68,7 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 				Math.nextUp( 0.0 ),
 				42.42,
 				1584514514.000000184
-		) );
+		);
 	}
 
 	@Override

@@ -105,7 +105,7 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	}
 
 	@Override
-	public Optional<IndexingExpectations<ZonedDateTime>> getIndexingExpectations() {
+	public IndexingExpectations<ZonedDateTime> getIndexingExpectations() {
 		List<ZonedDateTime> values = new ArrayList<>();
 		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
 			getZoneIdsForIndexingExpectations().forEach( zoneId -> {
@@ -120,7 +120,7 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 				LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
 						.withLaterOffsetAtOverlap()
 		);
-		return Optional.of( new IndexingExpectations<>( values ) );
+		return new IndexingExpectations<>( values );
 	}
 
 	@Override

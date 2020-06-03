@@ -70,15 +70,15 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
-	public Optional<IndexingExpectations<String>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<String> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				"several tokens",
 				"onetoken",
 				"to the", // Only stopwords
 				"    trailingspaces   ",
 				"      ",
 				""
-		) );
+		);
 	}
 
 	@Override

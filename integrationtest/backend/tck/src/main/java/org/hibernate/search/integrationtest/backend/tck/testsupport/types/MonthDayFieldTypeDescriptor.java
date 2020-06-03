@@ -63,7 +63,7 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<MonthDay>> getIndexingExpectations() {
+	public IndexingExpectations<MonthDay> getIndexingExpectations() {
 		List<MonthDay> values = new ArrayList<>();
 		Arrays.stream( Month.values() ).forEach( month -> {
 			values.add( MonthDay.of( month, 1 ) );
@@ -78,7 +78,7 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 				MonthDay.of( Month.JUNE, 30 ),
 				MonthDay.of( Month.DECEMBER, 31 )
 		);
-		return Optional.of( new IndexingExpectations<>( values ) );
+		return new IndexingExpectations<>( values );
 	}
 
 	@Override

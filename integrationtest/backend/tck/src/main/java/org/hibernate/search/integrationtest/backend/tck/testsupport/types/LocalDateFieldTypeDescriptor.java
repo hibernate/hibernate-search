@@ -58,8 +58,8 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 	}
 
 	@Override
-	public Optional<IndexingExpectations<LocalDate>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<LocalDate> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				LocalDate.of( 1970, 1, 1 ),
 				LocalDate.of( 1980, 1, 1 ),
 				LocalDate.of( 2017, 7, 7 ),
@@ -69,7 +69,7 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 				LocalDate.of( 1600, 2, 28 ),
 				LocalDate.of( -52, 10, 11 ),
 				LocalDate.of( 22500, 10, 11 )
-		) );
+		);
 	}
 
 	@Override

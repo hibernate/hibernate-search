@@ -32,8 +32,8 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
-	public Optional<IndexingExpectations<GeoPoint>> getIndexingExpectations() {
-		return Optional.of( new IndexingExpectations<>(
+	public IndexingExpectations<GeoPoint> getIndexingExpectations() {
+		return new IndexingExpectations<>(
 				GeoPoint.of( 0.0, 0.0 ),
 				// Negative 0 is a thing with doubles.
 				GeoPoint.of( 0.0, -0.0 ),
@@ -46,7 +46,7 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 				GeoPoint.of( -90.0, 180.0 ),
 				GeoPoint.of( -90.0, -180.0 ),
 				GeoPoint.of( 42.0, -42.0 )
-		) );
+		);
 	}
 
 	@Override
