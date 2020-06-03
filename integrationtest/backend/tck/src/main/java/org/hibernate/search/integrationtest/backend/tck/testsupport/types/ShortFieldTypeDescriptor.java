@@ -93,10 +93,10 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Short>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Short> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				(short) 1, (short) 3, (short) 5
-		) );
+		);
 	}
 
 	@Override

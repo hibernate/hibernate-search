@@ -94,10 +94,10 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Float>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Float> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				-1.001f, 3.0f, 5.1f
-		) );
+		);
 	}
 
 	@Override

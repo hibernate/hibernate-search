@@ -121,12 +121,12 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<OffsetDateTime>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<OffsetDateTime> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				LocalDateTime.of( 2018, 2, 1, 16, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
 				LocalDateTime.of( 2018, 3, 1, 23, 59, 59 ).atOffset( ZoneOffset.ofHours( 1 ) ),
 				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.UTC )
-		) );
+		);
 	}
 
 	@Override

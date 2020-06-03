@@ -93,12 +93,12 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<GeoPoint>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<GeoPoint> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				GeoPoint.of( 40, 70 ),
 				GeoPoint.of( 40, 75 ),
 				GeoPoint.of( 40, 80 )
-		) );
+		);
 	}
 
 	@Override

@@ -109,11 +109,11 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<String>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<String> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				// Mix capitalized and non-capitalized text on purpose
 				"Aaron", "george", "Zach"
-		) );
+		);
 	}
 
 	@Override

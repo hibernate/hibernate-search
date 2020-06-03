@@ -94,10 +94,10 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<Double>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<Double> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				-1.001, 3.0, 5.1
-		) );
+		);
 	}
 
 	@Override

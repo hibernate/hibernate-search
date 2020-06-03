@@ -93,10 +93,8 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 	public void isProjectable() {
 		assertThat( getTypeDescriptor( "default" ) )
 				.returns( false, IndexValueFieldTypeDescriptor::projectable );
-		if ( isProjectionSupported() ) {
-			assertThat( getTypeDescriptor( "projectable" ) )
-					.returns( true, IndexValueFieldTypeDescriptor::projectable );
-		}
+		assertThat( getTypeDescriptor( "projectable" ) )
+				.returns( true, IndexValueFieldTypeDescriptor::projectable );
 		assertThat( getTypeDescriptor( "nonProjectable" ) )
 				.returns( false, IndexValueFieldTypeDescriptor::projectable );
 	}
@@ -181,10 +179,6 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 		return fieldType.getFieldSortExpectations().isSupported();
 	}
 
-	private boolean isProjectionSupported() {
-		return fieldType.getFieldProjectionExpectations().isPresent();
-	}
-
 	private boolean isAggregationSupported() {
 		return new TermsAggregationDescriptor().getSingleFieldAggregationExpectations( fieldType ).isSupported();
 	}
@@ -204,9 +198,7 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 				mapper( fieldType, c -> c.sortable( Sortable.YES ) ).map( root, "sortable" );
 			}
 			mapper( fieldType, c -> c.sortable( Sortable.NO ) ).map( root, "nonSortable" );
-			if ( isProjectionSupported() ) {
-				mapper( fieldType, c -> c.projectable( Projectable.YES ) ).map( root, "projectable" );
-			}
+			mapper( fieldType, c -> c.projectable( Projectable.YES ) ).map( root, "projectable" );
 			mapper( fieldType, c -> c.projectable( Projectable.NO ) ).map( root, "nonProjectable" );
 			if ( isAggregationSupported() ) {
 				mapper( fieldType, c -> c.aggregable( Aggregable.YES ) ).map( root, "aggregable" );

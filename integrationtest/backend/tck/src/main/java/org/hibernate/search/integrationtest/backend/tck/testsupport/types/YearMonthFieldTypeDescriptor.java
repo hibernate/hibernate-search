@@ -96,10 +96,10 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<YearMonth>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<YearMonth> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 			YearMonth.of( -320, Month.NOVEMBER ), YearMonth.of( 1984, Month.JANUARY ), YearMonth.of( 6001, Month.NOVEMBER )
-		) );
+		);
 	}
 
 	@Override

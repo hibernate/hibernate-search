@@ -96,10 +96,10 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 	}
 
 	@Override
-	public Optional<FieldProjectionExpectations<String>> getFieldProjectionExpectations() {
-		return Optional.of( new FieldProjectionExpectations<>(
+	public FieldProjectionExpectations<String> getFieldProjectionExpectations() {
+		return new FieldProjectionExpectations<>(
 				"aaron", "george", "zach"
-		) );
+		);
 	}
 
 	@Override

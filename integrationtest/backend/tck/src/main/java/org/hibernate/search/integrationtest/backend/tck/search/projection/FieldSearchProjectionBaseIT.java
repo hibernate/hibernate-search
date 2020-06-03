@@ -232,17 +232,14 @@ public class FieldSearchProjectionBaseIT {
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
-		FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
-				.forEach( action );
+		FieldTypeDescriptor.getAll().stream().forEach( action );
 	}
 
 	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			FieldModelConsumer<FieldProjectionExpectations<?>, FieldModel<?>> consumer) {
 		forEachTypeDescriptor( typeDescriptor -> {
-			// Safe, see forEachTypeDescriptor
-			FieldProjectionExpectations<?> expectations = typeDescriptor.getFieldProjectionExpectations().get();
+			FieldProjectionExpectations<?> expectations = typeDescriptor.getFieldProjectionExpectations();
 			FieldModel<?> fieldModel = FieldModel.mapper( typeDescriptor )
 					.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
 			consumer.accept( typeDescriptor, expectations, fieldModel );
@@ -311,8 +308,7 @@ public class FieldSearchProjectionBaseIT {
 		}
 
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			// Safe, see caller
-			FieldProjectionExpectations<F> expectations = typeDescriptor.getFieldProjectionExpectations().get();
+			FieldProjectionExpectations<F> expectations = typeDescriptor.getFieldProjectionExpectations();
 			return mapper(
 					typeDescriptor.getJavaType(), typeDescriptor::configure,
 					expectations.getDocument1Value(), expectations.getDocument2Value(), expectations.getDocument3Value()
