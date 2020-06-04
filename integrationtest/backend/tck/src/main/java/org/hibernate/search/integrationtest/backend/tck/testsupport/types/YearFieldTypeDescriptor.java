@@ -42,7 +42,9 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 		);
 	}
 
-	YearFieldTypeDescriptor() {
+	public static final YearFieldTypeDescriptor INSTANCE = new YearFieldTypeDescriptor();
+
+	private YearFieldTypeDescriptor() {
 		super( Year.class );
 	}
 

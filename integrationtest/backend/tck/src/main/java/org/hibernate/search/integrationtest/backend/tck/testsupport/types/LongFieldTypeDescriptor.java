@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
-	LongFieldTypeDescriptor() {
+	public static final LongFieldTypeDescriptor INSTANCE = new LongFieldTypeDescriptor();
+
+	private LongFieldTypeDescriptor() {
 		super( Long.class );
 	}
 

@@ -42,7 +42,9 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 		);
 	}
 
-	ZonedDateTimeFieldTypeDescriptor() {
+	public static final ZonedDateTimeFieldTypeDescriptor INSTANCE = new ZonedDateTimeFieldTypeDescriptor();
+
+	private ZonedDateTimeFieldTypeDescriptor() {
 		super( ZonedDateTime.class );
 	}
 

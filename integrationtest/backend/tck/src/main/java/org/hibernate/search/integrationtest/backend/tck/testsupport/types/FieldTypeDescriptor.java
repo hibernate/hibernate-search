@@ -29,40 +29,40 @@ public abstract class FieldTypeDescriptor<F> {
 	public static List<FieldTypeDescriptor<?>> getAll() {
 		if ( all == null ) {
 			all = Collections.unmodifiableList( Arrays.asList(
-					new KeywordStringFieldTypeDescriptor(),
-					new AnalyzedStringFieldTypeDescriptor(),
-					new NormalizedStringFieldTypeDescriptor(),
-					new IntegerFieldTypeDescriptor(),
-					new FloatFieldTypeDescriptor(),
-					new LongFieldTypeDescriptor(),
-					new BooleanFieldTypeDescriptor(),
-					new ByteFieldTypeDescriptor(),
-					new ShortFieldTypeDescriptor(),
-					new DoubleFieldTypeDescriptor(),
-					new InstantFieldTypeDescriptor(),
-					new LocalDateFieldTypeDescriptor(),
-					new LocalDateTimeFieldTypeDescriptor(),
-					new LocalTimeFieldTypeDescriptor(),
-					new ZonedDateTimeFieldTypeDescriptor(),
-					new YearFieldTypeDescriptor(),
-					new YearMonthFieldTypeDescriptor(),
-					new MonthDayFieldTypeDescriptor(),
-					new OffsetDateTimeFieldTypeDescriptor(),
-					new OffsetTimeFieldTypeDescriptor(),
-					new GeoPointFieldTypeDescriptor(),
-					new BigDecimalFieldTypeDescriptor(),
-					new BigIntegerFieldTypeDescriptor()
+					KeywordStringFieldTypeDescriptor.INSTANCE,
+					AnalyzedStringFieldTypeDescriptor.INSTANCE,
+					NormalizedStringFieldTypeDescriptor.INSTANCE,
+					IntegerFieldTypeDescriptor.INSTANCE,
+					FloatFieldTypeDescriptor.INSTANCE,
+					LongFieldTypeDescriptor.INSTANCE,
+					BooleanFieldTypeDescriptor.INSTANCE,
+					ByteFieldTypeDescriptor.INSTANCE,
+					ShortFieldTypeDescriptor.INSTANCE,
+					DoubleFieldTypeDescriptor.INSTANCE,
+					InstantFieldTypeDescriptor.INSTANCE,
+					LocalDateFieldTypeDescriptor.INSTANCE,
+					LocalDateTimeFieldTypeDescriptor.INSTANCE,
+					LocalTimeFieldTypeDescriptor.INSTANCE,
+					ZonedDateTimeFieldTypeDescriptor.INSTANCE,
+					YearFieldTypeDescriptor.INSTANCE,
+					YearMonthFieldTypeDescriptor.INSTANCE,
+					MonthDayFieldTypeDescriptor.INSTANCE,
+					OffsetDateTimeFieldTypeDescriptor.INSTANCE,
+					OffsetTimeFieldTypeDescriptor.INSTANCE,
+					GeoPointFieldTypeDescriptor.INSTANCE,
+					BigDecimalFieldTypeDescriptor.INSTANCE,
+					BigIntegerFieldTypeDescriptor.INSTANCE
 			) );
 		}
 		return all;
 	}
 
 	public static FieldTypeDescriptor<?> getIncompatible(FieldTypeDescriptor<?> typeDescriptor) {
-		if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
-			return new LongFieldTypeDescriptor();
+		if ( IntegerFieldTypeDescriptor.INSTANCE.equals( typeDescriptor ) ) {
+			return LongFieldTypeDescriptor.INSTANCE;
 		}
 		else {
-			return new IntegerFieldTypeDescriptor();
+			return IntegerFieldTypeDescriptor.INSTANCE;
 		}
 	}
 

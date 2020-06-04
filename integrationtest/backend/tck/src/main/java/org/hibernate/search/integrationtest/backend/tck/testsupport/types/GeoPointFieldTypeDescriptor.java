@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 
 public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 
-	GeoPointFieldTypeDescriptor() {
+	public static final GeoPointFieldTypeDescriptor INSTANCE = new GeoPointFieldTypeDescriptor();
+
+	private GeoPointFieldTypeDescriptor() {
 		super( GeoPoint.class );
 	}
 

@@ -26,7 +26,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 
-	MonthDayFieldTypeDescriptor() {
+	public static final MonthDayFieldTypeDescriptor INSTANCE = new MonthDayFieldTypeDescriptor();
+
+	private MonthDayFieldTypeDescriptor() {
 		super( MonthDay.class );
 	}
 

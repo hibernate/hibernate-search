@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 
-	ShortFieldTypeDescriptor() {
+	public static final ShortFieldTypeDescriptor INSTANCE = new ShortFieldTypeDescriptor();
+
+	private ShortFieldTypeDescriptor() {
 		super( Short.class );
 	}
 

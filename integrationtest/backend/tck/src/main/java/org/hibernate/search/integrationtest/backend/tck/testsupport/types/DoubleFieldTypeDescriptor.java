@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 
-	DoubleFieldTypeDescriptor() {
+	public static final DoubleFieldTypeDescriptor INSTANCE = new DoubleFieldTypeDescriptor();
+
+	private DoubleFieldTypeDescriptor() {
 		super( Double.class );
 	}
 

@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 
-	ByteFieldTypeDescriptor() {
+	public static final ByteFieldTypeDescriptor INSTANCE = new ByteFieldTypeDescriptor();
+
+	private ByteFieldTypeDescriptor() {
 		super( Byte.class );
 	}
 

@@ -45,7 +45,9 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 		);
 	}
 
-	LocalDateTimeFieldTypeDescriptor() {
+	public static final LocalDateTimeFieldTypeDescriptor INSTANCE = new LocalDateTimeFieldTypeDescriptor();
+
+	private LocalDateTimeFieldTypeDescriptor() {
 		super( LocalDateTime.class );
 	}
 

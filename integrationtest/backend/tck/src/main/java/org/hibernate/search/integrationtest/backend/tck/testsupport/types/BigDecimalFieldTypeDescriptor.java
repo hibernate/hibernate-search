@@ -24,9 +24,11 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecimal> {
 
+	public static final BigDecimalFieldTypeDescriptor INSTANCE = new BigDecimalFieldTypeDescriptor();
+
 	private static final int DECIMAL_SCALE = 2;
 
-	BigDecimalFieldTypeDescriptor() {
+	private BigDecimalFieldTypeDescriptor() {
 		super( BigDecimal.class );
 	}
 

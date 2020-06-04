@@ -22,7 +22,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate> {
 
-	LocalDateFieldTypeDescriptor() {
+	public static final LocalDateFieldTypeDescriptor INSTANCE = new LocalDateFieldTypeDescriptor();
+
+	private LocalDateFieldTypeDescriptor() {
 		super( LocalDate.class );
 	}
 
