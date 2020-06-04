@@ -355,7 +355,7 @@ public class DistanceSearchSortBaseIT {
 					asList( getSingle().get( 3 ), getSingle().get( 5 ) ), // ~6km
 					asList( getSingle().get( 4 ), getSingle().get( 6 ) ), // ~8km
 					asList( getSingle().get( 4 ), getSingle().get( 7 ) ), // ~10km
-					asList( getSingle().get( 7 ),getSingle().get( 7 ), getSingle().get( 7 ) ) // ~14km
+					asList( getSingle().get( 7 ), getSingle().get( 7 ), getSingle().get( 7 ) ) // ~14km
 			);
 		}
 	}
