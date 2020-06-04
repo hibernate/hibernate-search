@@ -8,17 +8,12 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.function.Function;
-
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -108,13 +103,14 @@ public class FieldSearchProjectionTypeIndependentIT {
 	}
 
 	private static class IndexBinding {
-		final FieldModel<String> string1Field;
+		final SimpleFieldModel<String> string1Field;
 
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
 		IndexBinding(IndexSchemaElement root) {
-			string1Field = FieldModel.mapper( String.class ).map( root, "string1" );
+			string1Field = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE, c -> { } )
+					.map( root, "string1" );
 
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
@@ -129,34 +125,6 @@ public class FieldSearchProjectionTypeIndependentIT {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.toReference();
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type) {
-			return mapper(
-					type,
-					c -> (StandardIndexFieldTypeOptionsStep<?, F>) c.as( type )
-			);
-		}
-
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
-			return StandardFieldMapper.of(
-					configuration,
-					c -> c.projectable( Projectable.YES ),
-					(reference, name) -> new FieldModel<>(
-							reference, name, type
-					)
-			);
-		}
-
-		final String relativeFieldName;
-		final Class<F> type;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName, Class<F> type) {
-			this.relativeFieldName = relativeFieldName;
-			this.type = type;
 		}
 	}
 

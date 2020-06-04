@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -71,7 +72,17 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	}
 
 	public <F> void initSingleValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+			DocumentElement document, F value) {
+		initSingleValued( fieldType, location, document, value, null, false );
+	}
+
+	public <F> void initSingleValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
 			DocumentElement document, F value, F garbageValue) {
+		initSingleValued( fieldType, location, document, value, garbageValue, true );
+	}
+
+	public <F> void initSingleValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+			DocumentElement document, F value, F garbageValue, boolean includeGarbageValueInNested) {
 		switch ( location ) {
 			case ROOT:
 				document.addValue( fieldWithSingleValueModels.get( fieldType ).reference, value );
@@ -92,10 +103,12 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 				);
 				DocumentElement nestedObject1 = document.addObject( nestedObject.self );
 				nestedObject1.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
-				nestedObject1.addValue(
-						nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-						garbageValue
-				);
+				if ( includeGarbageValueInNested ) {
+					nestedObject1.addValue(
+							nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+							garbageValue
+					);
+				}
 			case IN_NESTED_TWICE:
 				// Same as for IN_NESTED, but one level deeper
 				DocumentElement nestedObjectFirstLevel = document.addObject( nestedObject.self );
@@ -107,12 +120,19 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 				);
 				DocumentElement nestedNestedObject1 = nestedObjectFirstLevel.addObject( nestedObject.nestedObject.self );
 				nestedNestedObject1.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
-				nestedNestedObject1.addValue(
-						nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
-						garbageValue
-				);
+				if ( includeGarbageValueInNested ) {
+					nestedNestedObject1.addValue(
+							nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
+							garbageValue
+					);
+				}
 				break;
 		}
+	}
+
+	public <F> void initMultiValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,
+			DocumentElement document, List<F> values) {
+		initMultiValued( fieldType, location, document, values, Collections.emptyList() );
 	}
 
 	public <F> void initMultiValued(FieldTypeDescriptor<F> fieldType, IndexFieldLocation location,

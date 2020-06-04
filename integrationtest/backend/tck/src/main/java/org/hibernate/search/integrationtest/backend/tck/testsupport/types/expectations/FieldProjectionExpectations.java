@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class FieldProjectionExpectations<F> {
 
 	private final F document1Value;
