@@ -24,7 +24,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 
 public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
-	AnalyzedStringFieldTypeDescriptor() {
+	public static final AnalyzedStringFieldTypeDescriptor INSTANCE = new AnalyzedStringFieldTypeDescriptor();
+
+	private AnalyzedStringFieldTypeDescriptor() {
 		super( String.class, "analyzedString" );
 	}
 

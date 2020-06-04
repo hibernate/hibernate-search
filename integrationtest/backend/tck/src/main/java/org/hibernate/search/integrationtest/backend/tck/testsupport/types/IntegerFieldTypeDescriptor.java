@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
-	IntegerFieldTypeDescriptor() {
+	public static final IntegerFieldTypeDescriptor INSTANCE = new IntegerFieldTypeDescriptor();
+
+	private IntegerFieldTypeDescriptor() {
 		super( Integer.class );
 	}
 

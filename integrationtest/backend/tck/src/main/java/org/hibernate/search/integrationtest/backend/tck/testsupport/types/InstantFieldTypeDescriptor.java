@@ -24,7 +24,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 
-	InstantFieldTypeDescriptor() {
+	public static final InstantFieldTypeDescriptor INSTANCE = new InstantFieldTypeDescriptor();
+
+	private InstantFieldTypeDescriptor() {
 		super( Instant.class );
 	}
 

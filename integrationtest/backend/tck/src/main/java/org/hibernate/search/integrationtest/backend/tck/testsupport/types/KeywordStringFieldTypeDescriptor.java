@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
-	KeywordStringFieldTypeDescriptor() {
+	public static final KeywordStringFieldTypeDescriptor INSTANCE = new KeywordStringFieldTypeDescriptor();
+
+	private KeywordStringFieldTypeDescriptor() {
 		super( String.class, "keywordString" );
 	}
 

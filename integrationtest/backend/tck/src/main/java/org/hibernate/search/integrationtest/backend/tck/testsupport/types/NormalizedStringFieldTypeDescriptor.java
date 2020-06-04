@@ -24,7 +24,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
-	NormalizedStringFieldTypeDescriptor() {
+	public static final NormalizedStringFieldTypeDescriptor INSTANCE = new NormalizedStringFieldTypeDescriptor();
+
+	private NormalizedStringFieldTypeDescriptor() {
 		super( String.class, "normalizedString" );
 	}
 

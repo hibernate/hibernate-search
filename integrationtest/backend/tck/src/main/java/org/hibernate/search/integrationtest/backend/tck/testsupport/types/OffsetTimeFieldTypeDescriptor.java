@@ -25,7 +25,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTime> {
 
-	OffsetTimeFieldTypeDescriptor() {
+	public static final OffsetTimeFieldTypeDescriptor INSTANCE = new OffsetTimeFieldTypeDescriptor();
+
+	private OffsetTimeFieldTypeDescriptor() {
 		super( OffsetTime.class );
 	}
 

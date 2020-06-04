@@ -21,7 +21,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 
 public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 
-	BooleanFieldTypeDescriptor() {
+	public static final BooleanFieldTypeDescriptor INSTANCE = new BooleanFieldTypeDescriptor();
+
+	private BooleanFieldTypeDescriptor() {
 		super( Boolean.class );
 	}
 

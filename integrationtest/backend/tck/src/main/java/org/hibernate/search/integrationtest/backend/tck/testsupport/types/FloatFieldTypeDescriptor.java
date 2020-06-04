@@ -20,7 +20,9 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values
 
 public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 
-	FloatFieldTypeDescriptor() {
+	public static final FloatFieldTypeDescriptor INSTANCE = new FloatFieldTypeDescriptor();
+
+	private FloatFieldTypeDescriptor() {
 		super( Float.class );
 	}
 

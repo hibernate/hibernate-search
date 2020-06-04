@@ -38,7 +38,9 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 		);
 	}
 
-	OffsetDateTimeFieldTypeDescriptor() {
+	public static final OffsetDateTimeFieldTypeDescriptor INSTANCE = new OffsetDateTimeFieldTypeDescriptor();
+
+	private OffsetDateTimeFieldTypeDescriptor() {
 		super( OffsetDateTime.class );
 	}
 
