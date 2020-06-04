@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.engine.backend.types.Norms;
-import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -770,32 +769,6 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		);
 
 		setupAndValidate( index );
-	}
-
-	@Test
-	public void attribute_store_invalid() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
-				root -> root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference()
-		);
-
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
-		elasticSearchClient.index( index.name() ).type().putMapping(
-				simpleMappingForInitialization(
-					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'store': false"
-					+ "}"
-				)
-		);
-
-		assertThatThrownBy( () -> setupAndValidate( index ) )
-				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField" )
-						.mappingAttributeContext( "store" )
-						.failure( "Invalid value. Expected 'true', actual is 'null'" )
-						.build() );
 	}
 
 	@Test
