@@ -158,7 +158,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			mapping.setDocValues( resolvedSortable || resolvedAggregable );
 		}
 
-		mapping.setStore( resolvedProjectable );
+		mapping.setStore( false ); // Not needed, even if projectable
 		mapping.setNorms( resolveNorms() );
 
 		if ( indexNullAs != null ) {
