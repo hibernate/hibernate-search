@@ -353,7 +353,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 	}
 
 	private static <F> F getFieldValue(FieldTypeDescriptor<F> fieldType, int documentNumber) {
-		return fieldType.getIndexableValues().get().get( documentNumber - 1 );
+		return fieldType.getIndexableValues().getSingle().get( documentNumber - 1 );
 	}
 
 	private static <F> void initDocument(IndexBinding binding, DocumentElement document, int documentNumber) {

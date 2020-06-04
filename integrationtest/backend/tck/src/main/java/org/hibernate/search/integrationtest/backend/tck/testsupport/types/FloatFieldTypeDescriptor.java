@@ -58,7 +58,7 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	protected IndexableValues<Float> createIndexableValues() {
 		return new IndexableValues<Float>() {
 			@Override
-			protected List<Float> create() {
+			protected List<Float> createSingle() {
 				return Arrays.asList(
 						Float.MIN_VALUE, Float.MAX_VALUE,
 						- Float.MIN_VALUE, - Float.MAX_VALUE,

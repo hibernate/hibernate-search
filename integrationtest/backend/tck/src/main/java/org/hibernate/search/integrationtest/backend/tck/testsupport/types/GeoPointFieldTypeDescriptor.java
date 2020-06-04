@@ -36,7 +36,7 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	protected IndexableValues<GeoPoint> createIndexableValues() {
 		return new IndexableValues<GeoPoint>() {
 			@Override
-			protected List<GeoPoint> create() {
+			protected List<GeoPoint> createSingle() {
 				return Arrays.asList(
 						GeoPoint.of( 0.0, 0.0 ),
 						// Negative 0 is a thing with doubles.

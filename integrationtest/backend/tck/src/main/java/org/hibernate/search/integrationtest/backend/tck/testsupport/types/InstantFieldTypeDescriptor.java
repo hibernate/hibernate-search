@@ -64,9 +64,9 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	protected IndexableValues<Instant> createIndexableValues() {
 		return new IndexableValues<Instant>() {
 			@Override
-			protected List<Instant> create() {
+			protected List<Instant> createSingle() {
 				List<Instant> values = new ArrayList<>();
-				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
 					values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
 				}
 				values.add( Instant.EPOCH );

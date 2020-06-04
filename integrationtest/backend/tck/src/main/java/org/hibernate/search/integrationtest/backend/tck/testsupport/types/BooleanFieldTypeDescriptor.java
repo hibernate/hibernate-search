@@ -55,7 +55,7 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	protected IndexableValues<Boolean> createIndexableValues() {
 		return new IndexableValues<Boolean>() {
 			@Override
-			protected List<Boolean> create() {
+			protected List<Boolean> createSingle() {
 				return Arrays.asList(
 						true,
 						false,

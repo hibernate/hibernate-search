@@ -58,7 +58,7 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	protected IndexableValues<Long> createIndexableValues() {
 		return new IndexableValues<Long>() {
 			@Override
-			protected List<Long> create() {
+			protected List<Long> createSingle() {
 				return Arrays.asList(
 						Long.MIN_VALUE, Long.MAX_VALUE,
 						(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,

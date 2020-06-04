@@ -69,7 +69,7 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	protected IndexableValues<BigInteger> createIndexableValues() {
 		return new IndexableValues<BigInteger>() {
 			@Override
-			protected List<BigInteger> create() {
+			protected List<BigInteger> createSingle() {
 				return Arrays.asList(
 						BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
 						BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 100 ) ),

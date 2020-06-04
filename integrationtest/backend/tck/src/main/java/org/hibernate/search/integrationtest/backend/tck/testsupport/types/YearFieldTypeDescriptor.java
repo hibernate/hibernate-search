@@ -60,7 +60,7 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	protected IndexableValues<Year> createIndexableValues() {
 		return new IndexableValues<Year>() {
 			@Override
-			protected List<Year> create() {
+			protected List<Year> createSingle() {
 				return Arrays.asList(
 						Year.of( -25435 ), Year.of( -42 ), Year.of( -1 ),
 						Year.of( 0 ),

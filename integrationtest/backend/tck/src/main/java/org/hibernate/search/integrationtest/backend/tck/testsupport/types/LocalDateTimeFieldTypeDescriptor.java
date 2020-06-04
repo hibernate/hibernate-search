@@ -61,7 +61,7 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	protected IndexableValues<LocalDateTime> createIndexableValues() {
 		return new IndexableValues<LocalDateTime>() {
 			@Override
-			protected List<LocalDateTime> create() {
+			protected List<LocalDateTime> createSingle() {
 				return Arrays.asList(
 						LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
 						LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),

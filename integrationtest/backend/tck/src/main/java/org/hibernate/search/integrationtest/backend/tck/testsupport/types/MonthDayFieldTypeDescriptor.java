@@ -65,7 +65,7 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	protected IndexableValues<MonthDay> createIndexableValues() {
 		return new IndexableValues<MonthDay>() {
 			@Override
-			protected List<MonthDay> create() {
+			protected List<MonthDay> createSingle() {
 				List<MonthDay> values = new ArrayList<>();
 				Arrays.stream( Month.values() ).forEach( month -> {
 					values.add( MonthDay.of( month, 1 ) );
