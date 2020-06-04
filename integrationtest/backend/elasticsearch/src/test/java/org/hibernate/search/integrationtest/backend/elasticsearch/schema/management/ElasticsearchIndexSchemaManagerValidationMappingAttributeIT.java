@@ -735,43 +735,6 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 	}
 
 	@Test
-	public void attribute_store_true() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
-				root -> root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference()
-		);
-
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
-		elasticSearchClient.index( index.name() ).type().putMapping(
-				simpleMappingForInitialization(
-					"'myField': {"
-							+ "'type': 'keyword',"
-							+ "'store': true"
-					+ "}"
-				)
-		);
-
-		setupAndValidate( index );
-	}
-
-	@Test
-	public void attribute_store_default() {
-		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
-				root -> root.field( "myField", f -> f.asString().projectable( Projectable.DEFAULT ) ).toReference()
-		);
-
-		elasticSearchClient.index( index.name() ).deleteAndCreate();
-		elasticSearchClient.index( index.name() ).type().putMapping(
-				simpleMappingForInitialization(
-					"'myField': {"
-							+ "'type': 'keyword'"
-					+ "}"
-				)
-		);
-
-		setupAndValidate( index );
-	}
-
-	@Test
 	public void attribute_nullValue_valid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 				root -> root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference()

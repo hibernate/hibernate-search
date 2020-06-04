@@ -50,14 +50,6 @@ class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapp
 
 		validateIndexOptions( errorCollector, expectedMapping, actualMapping );
 
-		Boolean expectedStore = expectedMapping.getStore();
-		if ( Boolean.TRUE.equals( expectedStore ) ) { // If we don't need storage, we don't care
-			LeafValidators.EQUAL.validateWithDefault(
-					errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "store",
-					expectedStore, actualMapping.getStore(), false
-			);
-		}
-
 		LeafValidators.jsonElement( expectedMapping.getType() ).validate(
 				errorCollector, ValidationContextType.MAPPING_ATTRIBUTE, "null_value",
 				expectedMapping.getNullValue(), actualMapping.getNullValue()

@@ -37,8 +37,6 @@ public class PropertyMapping extends AbstractTypeMapping {
 	@SerializedName("doc_values")
 	private Boolean docValues;
 
-	private Boolean store;
-
 	/**
 	 * The null-value replacement, which can be a string (real string or formatted date), a boolean
 	 * or a numeric value, depending on the data type.
@@ -126,14 +124,6 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setDocValues(Boolean docValues) {
 		this.docValues = docValues;
-	}
-
-	public Boolean getStore() {
-		return store;
-	}
-
-	public void setStore(Boolean store) {
-		this.store = store;
 	}
 
 	public JsonElement getNullValue() {

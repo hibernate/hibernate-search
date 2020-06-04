@@ -92,14 +92,12 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 			PropertyMapping idPropertyMapping = new PropertyMapping();
 			idPropertyMapping.setType( DataTypes.KEYWORD );
 			idPropertyMapping.setIndex( false );
-			idPropertyMapping.setStore( false );
 			idPropertyMapping.setDocValues( true );
 			rootTypeMapping.addProperty( ID_FIELD_NAME, idPropertyMapping );
 
 			PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
 			tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
 			tenantIdPropertyMapping.setIndex( true );
-			tenantIdPropertyMapping.setStore( false );
 			tenantIdPropertyMapping.setDocValues( true );
 			rootTypeMapping.addProperty( TENANT_ID_FIELD_NAME, tenantIdPropertyMapping );
 		}

@@ -111,7 +111,6 @@ public class ElasticsearchIndexMetadataTestUtils {
 		JsonObject discriminatorMapping = new JsonObject();
 		discriminatorMapping.addProperty( "type", "keyword" );
 		discriminatorMapping.addProperty( "index", false );
-		discriminatorMapping.addProperty( "store", false );
 		discriminatorMapping.addProperty( "doc_values", true );
 		return discriminatorMapping;
 	}
@@ -120,7 +119,7 @@ public class ElasticsearchIndexMetadataTestUtils {
 		JsonObject discriminatorMapping = new JsonObject();
 		discriminatorMapping.addProperty( "type", "keyword" );
 		discriminatorMapping.addProperty( "index", false );
-		// "store" and "doc_values" have default values: omit them.
+		// "doc_values" has the default value: omit it.
 		return discriminatorMapping;
 	}
 }

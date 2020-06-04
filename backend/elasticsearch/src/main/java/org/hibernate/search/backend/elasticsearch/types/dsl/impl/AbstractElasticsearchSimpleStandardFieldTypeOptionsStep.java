@@ -82,7 +82,6 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 		resolvedAggregable = resolveDefault( aggregable );
 
 		mapping.setIndex( resolvedSearchable );
-		mapping.setStore( false ); // Not needed, even if projectable
 		mapping.setDocValues( resolvedSortable || resolvedAggregable );
 
 		ElasticsearchIndexFieldType<F> indexFieldType = toIndexFieldType( mapping );
