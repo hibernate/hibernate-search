@@ -66,7 +66,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The resulting type of the projection.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default <T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> type) {
+	default <T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> type) {
 		return field( absoluteFieldPath, type, ValueConvert.YES );
 	}
 
@@ -80,7 +80,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	<T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert);
+	<T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert);
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
@@ -91,7 +91,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath) {
+	default FieldProjectionValueStep<?, Object> field(String absoluteFieldPath) {
 		return field( absoluteFieldPath, ValueConvert.YES );
 	}
 
@@ -103,7 +103,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath, ValueConvert convert);
+	FieldProjectionValueStep<?, Object> field(String absoluteFieldPath, ValueConvert convert);
 
 	/**
 	 * Project on the score of the hit.

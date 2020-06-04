@@ -8,19 +8,16 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class FieldProjectionOptionsStepImpl<T>
 		implements FieldProjectionOptionsStep<FieldProjectionOptionsStepImpl<T>, T> {
 
-	private final FieldProjectionBuilder<T> fieldProjectionBuilder;
+	protected final FieldProjectionBuilder<T> fieldProjectionBuilder;
 
-	FieldProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, Class<T> clazz,
-			ValueConvert convert) {
-		this.fieldProjectionBuilder = factory.field( absoluteFieldPath, clazz, convert );
+	FieldProjectionOptionsStepImpl(FieldProjectionBuilder<T> fieldProjectionBuilder) {
+		this.fieldProjectionBuilder = fieldProjectionBuilder;
 	}
 
 	@Override
