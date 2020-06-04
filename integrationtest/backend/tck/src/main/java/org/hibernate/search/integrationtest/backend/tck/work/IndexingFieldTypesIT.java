@@ -66,7 +66,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@Test
 	public void withReference() {
-		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().get() );
+		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -106,7 +106,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@Test
 	public void withPath() {
-		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().get() );
+		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -152,7 +152,7 @@ public class IndexingFieldTypesIT<F> {
 						.supportsValuesForDynamicField( typeDescriptor.getJavaType() )
 		);
 
-		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().get() );
+		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().getSingle() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 

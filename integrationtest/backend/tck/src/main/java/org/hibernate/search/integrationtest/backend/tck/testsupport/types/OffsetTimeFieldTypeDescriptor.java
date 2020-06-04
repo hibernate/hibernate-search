@@ -69,9 +69,9 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 	protected IndexableValues<OffsetTime> createIndexableValues() {
 		return new IndexableValues<OffsetTime>() {
 			@Override
-			protected List<OffsetTime> create() {
+			protected List<OffsetTime> createSingle() {
 				List<OffsetTime> values = new ArrayList<>();
-				for ( LocalTime localTime : LocalTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+				for ( LocalTime localTime : LocalTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
 					for ( ZoneOffset offset : OffsetDateTimeFieldTypeDescriptor.INSTANCE.createIndexableOffsetList() ) {
 						values.add( localTime.atOffset( offset ) );
 					}

@@ -215,7 +215,7 @@ public class DocumentElementFieldReferenceIT<F> {
 
 	private void setNonNullValue(AbstractObjectBinding binding, DocumentElement document) {
 		document.addValue( binding.fieldModels.get( fieldType ).reference,
-				fieldType.getIndexableValues().get().get( 0 ) );
+				fieldType.getIndexableValues().getSingle().get( 0 ) );
 	}
 
 	private void setNullValue(AbstractObjectBinding binding, DocumentElement document) {

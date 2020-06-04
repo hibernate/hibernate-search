@@ -70,7 +70,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	protected IndexableValues<BigDecimal> createIndexableValues() {
 		return new IndexableValues<BigDecimal>() {
 			@Override
-			protected List<BigDecimal> create() {
+			protected List<BigDecimal> createSingle() {
 				return Arrays.asList(
 						BigDecimal.ZERO,
 						BigDecimal.ONE,

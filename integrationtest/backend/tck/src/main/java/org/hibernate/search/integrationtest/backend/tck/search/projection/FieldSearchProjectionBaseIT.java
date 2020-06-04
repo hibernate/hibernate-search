@@ -199,7 +199,7 @@ public class FieldSearchProjectionBaseIT<F> {
 		}
 
 		private F getFieldValue(int documentNumber) {
-			return fieldType.getIndexableValues().get().get( documentNumber - 1 );
+			return fieldType.getIndexableValues().getSingle().get( documentNumber - 1 );
 		}
 	}
 }

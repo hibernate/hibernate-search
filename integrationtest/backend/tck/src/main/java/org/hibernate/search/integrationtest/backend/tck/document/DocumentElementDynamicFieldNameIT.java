@@ -208,7 +208,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	@Test
 	public void addValue_invalidType() {
 		FieldTypeDescriptor<?> invalidType = FieldTypeDescriptor.getIncompatible( fieldType );
-		Object valueWithInvalidType = invalidType.getIndexableValues().get().get( 0 );
+		Object valueWithInvalidType = invalidType.getIndexableValues().getSingle().get( 0 );
 
 		String relativeFieldName = getRelativeFieldName();
 
@@ -225,7 +225,7 @@ public class DocumentElementDynamicFieldNameIT<F> {
 	}
 
 	private void setNonNullValue(DocumentElement document) {
-		document.addValue( getRelativeFieldName(), fieldType.getIndexableValues().get().get( 0 ) );
+		document.addValue( getRelativeFieldName(), fieldType.getIndexableValues().getSingle().get( 0 ) );
 	}
 
 	private void setNullValue(DocumentElement document) {

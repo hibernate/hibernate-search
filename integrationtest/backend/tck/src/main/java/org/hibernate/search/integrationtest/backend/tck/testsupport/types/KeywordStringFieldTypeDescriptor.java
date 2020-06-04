@@ -63,7 +63,7 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 	protected IndexableValues<String> createIndexableValues() {
 		return new IndexableValues<String>() {
 			@Override
-			protected List<String> create() {
+			protected List<String> createSingle() {
 				return Arrays.asList(
 						"several tokens",
 						"onetoken",

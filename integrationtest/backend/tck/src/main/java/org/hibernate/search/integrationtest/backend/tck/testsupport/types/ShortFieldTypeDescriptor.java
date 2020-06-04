@@ -65,7 +65,7 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	protected IndexableValues<Short> createIndexableValues() {
 		return new IndexableValues<Short>() {
 			@Override
-			protected List<Short> create() {
+			protected List<Short> createSingle() {
 				return Arrays.asList(
 						Short.MIN_VALUE, Short.MAX_VALUE,
 						(short) -25435, (short) -42, (short) -1, (short) 0, (short) 1, (short) 3, (short) 42, (short) 18353

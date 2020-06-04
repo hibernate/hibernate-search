@@ -58,7 +58,7 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	protected IndexableValues<Double> createIndexableValues() {
 		return new IndexableValues<Double>() {
 			@Override
-			protected List<Double> create() {
+			protected List<Double> createSingle() {
 				return Arrays.asList(
 						Double.MIN_VALUE, Double.MAX_VALUE,
 						- Double.MIN_VALUE, - Double.MAX_VALUE,

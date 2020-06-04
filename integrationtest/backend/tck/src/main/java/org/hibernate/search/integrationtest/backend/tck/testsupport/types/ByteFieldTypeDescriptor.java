@@ -65,7 +65,7 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	protected IndexableValues<Byte> createIndexableValues() {
 		return new IndexableValues<Byte>() {
 			@Override
-			protected List<Byte> create() {
+			protected List<Byte> createSingle() {
 				return Arrays.asList(
 						Byte.MIN_VALUE, Byte.MAX_VALUE,
 						(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42

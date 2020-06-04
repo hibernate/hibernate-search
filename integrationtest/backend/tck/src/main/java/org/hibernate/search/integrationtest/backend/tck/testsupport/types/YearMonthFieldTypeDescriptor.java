@@ -63,9 +63,9 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	protected IndexableValues<YearMonth> createIndexableValues() {
 		return new IndexableValues<YearMonth>() {
 			@Override
-			protected List<YearMonth> create() {
+			protected List<YearMonth> createSingle() {
 				List<YearMonth> values = new ArrayList<>();
-				for ( Year year : YearFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+				for ( Year year : YearFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
 					for ( Month month : Month.values() ) {
 						values.add( year.atMonth( month ) );
 					}
