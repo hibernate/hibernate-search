@@ -7,101 +7,123 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Tests basic behavior of projections on field value common to all supported types.
  */
-public class FieldSearchProjectionBaseIT {
+@RunWith(Parameterized.class)
+public class FieldSearchProjectionBaseIT<F> {
 
-	private static final String DOCUMENT_1 = "1";
-	private static final String DOCUMENT_2 = "2";
-	private static final String DOCUMENT_3 = "3";
-	private static final String EMPTY = "empty";
+	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
+	private static List<DataSet<?>> dataSets;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@Parameterized.Parameters(name = "{0} - {1}")
+	public static Object[][] parameters() {
+		dataSets = new ArrayList<>();
+		List<Object[]> parameters = new ArrayList<>();
+		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
+				if ( fieldStructure.isMultiValued() ) {
+					// TODO HSEARCH-3391 support multi-valued projections
+					continue;
+				}
+				DataSet<?> dataSet = new DataSet<>( fieldStructure, fieldType );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { fieldStructure, fieldType, dataSet } );
+			}
+		}
+		return parameters.toArray( new Object[0][] );
+	}
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	@ClassRule
+	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Before
-	public void setup() {
+	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
+			root -> new SingleFieldIndexBinding( root, supportedFieldTypes, c -> c.projectable( Projectable.YES ) );
+
+	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
+
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
-		initData();
+		BulkIndexer indexer = index.bulkIndexer();
+		for ( DataSet<?> dataSet : dataSets ) {
+			dataSet.contribute( indexer );
+		}
+		indexer.join();
+	}
+
+	private final TestedFieldStructure fieldStructure;
+	private final FieldTypeDescriptor<F> fieldType;
+	private final DataSet<F> dataSet;
+
+	public FieldSearchProjectionBaseIT(TestedFieldStructure fieldStructure,
+			FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+		this.fieldStructure = fieldStructure;
+		this.fieldType = fieldType;
+		this.dataSet = dataSet;
 	}
 
 	@Test
 	public void simple() {
 		StubMappingScope scope = index.createScope();
 
-		for ( FieldModel<?> fieldModel : index.binding().supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = model.relativeFieldName;
+		String fieldPath = getFieldPath();
 
-				assertThat(
-						scope.query()
-								.select( f -> f.field( fieldPath, model.type ) )
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						model.document1Value.indexedValue,
-						model.document2Value.indexedValue,
-						model.document3Value.indexedValue,
+		assertThat( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType() ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValue( 1 ),
+						dataSet.getFieldValue( 2 ),
+						dataSet.getFieldValue( 3 ),
 						null // Empty document
 				);
-			} );
-		}
 	}
 
 	@Test
 	public void noClass() {
 		StubMappingScope scope = index.createScope();
 
-		for ( FieldModel<?> fieldModel : index.binding().supportedFieldModels ) {
-			SearchQuery<Object> query;
-			String fieldPath = fieldModel.relativeFieldName;
+		String fieldPath = getFieldPath();
 
-			query = scope.query()
-					.select( f -> f.field( fieldPath ) )
-					.where( f -> f.matchAll() )
-					.toQuery();
-			assertThat( query ).hasHitsAnyOrder(
-					fieldModel.document1Value.indexedValue,
-					fieldModel.document2Value.indexedValue,
-					fieldModel.document3Value.indexedValue,
-					null // Empty document
-			);
-		}
+		assertThat( scope.query()
+				.select( f -> f.field( fieldPath ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValue( 1 ),
+						dataSet.getFieldValue( 2 ),
+						dataSet.getFieldValue( 3 ),
+						null // Empty document
+				);
 	}
 
 	/**
@@ -111,236 +133,84 @@ public class FieldSearchProjectionBaseIT {
 	public void duplicated() {
 		StubMappingScope scope = index.createScope();
 
-		for ( FieldModel<?> fieldModel : index.binding().supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = model.relativeFieldName;
+		String fieldPath = getFieldPath();
 
-				assertThat(
-						scope.query()
-								.select( f ->
-										f.composite(
-												f.field( fieldPath, model.type ),
-												f.field( fieldPath, model.type )
-										)
-								)
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						Arrays.asList( model.document1Value.indexedValue, model.document1Value.indexedValue ),
-						Arrays.asList( model.document2Value.indexedValue, model.document2Value.indexedValue ),
-						Arrays.asList( model.document3Value.indexedValue, model.document3Value.indexedValue ),
+		assertThat( scope.query()
+				.select( f ->
+						f.composite(
+								f.field( fieldPath, fieldType.getJavaType() ),
+								f.field( fieldPath, fieldType.getJavaType() )
+						)
+				)
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						Arrays.asList( dataSet.getFieldValue( 1 ), dataSet.getFieldValue( 1 ) ),
+						Arrays.asList( dataSet.getFieldValue( 2 ), dataSet.getFieldValue( 2 ) ),
+						Arrays.asList( dataSet.getFieldValue( 3 ), dataSet.getFieldValue( 3 ) ),
 						Arrays.asList( null, null ) // Empty document
 				);
-			} );
-		}
 	}
 
-	@Test
-	public void inFlattenedObject() {
-		StubMappingScope scope = index.createScope();
-
-		for ( FieldModel<?> fieldModel : index.binding().flattenedObject.supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = index.binding().flattenedObject.relativeFieldName + "." + model.relativeFieldName;
-
-				assertThat(
-						scope.query()
-								.select(
-										f -> f.field( fieldPath, model.type )
-								)
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						model.document1Value.indexedValue,
-						model.document2Value.indexedValue,
-						model.document3Value.indexedValue,
-						null // Empty document
-				);
-			} );
-		}
+	private String getFieldPath() {
+		return index.binding().getFieldPath( fieldStructure, fieldType );
 	}
 
-	@Test
-	public void inNestedObject() {
-		StubMappingScope scope = index.createScope();
+	private static class DataSet<F> {
+		private final TestedFieldStructure fieldStructure;
+		private final FieldTypeDescriptor<F> fieldType;
+		private final String routingKey;
 
-		for ( FieldModel<?> fieldModel : index.binding().nestedObject.supportedFieldModels ) {
-			SubTest.expectSuccess( fieldModel, model -> {
-				String fieldPath = index.binding().nestedObject.relativeFieldName + "." + model.relativeFieldName;
-
-				assertThat(
-						scope.query()
-								.select( f -> f.field( fieldPath, model.type ) )
-								.where( f -> f.matchAll() )
-								.toQuery()
-				).hasHitsAnyOrder(
-						model.document1Value.indexedValue,
-						model.document2Value.indexedValue,
-						model.document3Value.indexedValue,
-						null // Empty document
-				);
-			} );
-		}
-	}
-
-	@Test
-	public void multivalued() {
-		Assume.assumeTrue( "Multi-valued projections are not supported yet", false );
-		// TODO HSEARCH-3391 support multi-valued projections
-		//  Project on multi-valued field
-		//  Project on fields within a multi-valued flattened object
-		//  Project on fields within a multi-valued nested object
-	}
-
-	private void initData() {
-		index.bulkIndexer()
-				.add( DOCUMENT_1, document -> {
-					index.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-					index.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-					index.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
-				} )
-				.add( DOCUMENT_2, document -> {
-					index.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-					index.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-					index.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
-				} )
-				.add( DOCUMENT_3, document -> {
-					index.binding().supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement flattenedObject = document.addObject( index.binding().flattenedObject.self );
-					index.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
-
-					// Note: this object must be single-valued for these tests
-					DocumentElement nestedObject = document.addObject( index.binding().nestedObject.self );
-					index.binding().nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
-				} )
-				.add( EMPTY, document -> { } )
-				.join();
-	}
-
-	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
-		FieldTypeDescriptor.getAll().stream().forEach( action );
-	}
-
-	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
-			FieldModelConsumer<FieldProjectionExpectations<?>, FieldModel<?>> consumer) {
-		forEachTypeDescriptor( typeDescriptor -> {
-			FieldProjectionExpectations<?> expectations = typeDescriptor.getFieldProjectionExpectations();
-			FieldModel<?> fieldModel = FieldModel.mapper( typeDescriptor )
-					.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
-			consumer.accept( typeDescriptor, expectations, fieldModel );
-		} );
-	}
-
-	private static class IndexBinding {
-		final List<FieldModel<?>> supportedFieldModels = new ArrayList<>();
-
-		final ObjectMapping flattenedObject;
-		final ObjectMapping nestedObject;
-
-		IndexBinding(IndexSchemaElement root) {
-			mapByTypeFields(
-					root, "byType_", ignored -> { },
-					(typeDescriptor, expectations, model) -> {
-						supportedFieldModels.add( model );
-					}
-			);
-
-			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
-		}
-	}
-
-	private static class ObjectMapping {
-		final String relativeFieldName;
-		final IndexObjectFieldReference self;
-		final List<FieldModel<?>> supportedFieldModels = new ArrayList<>();
-
-		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
-			this.relativeFieldName = relativeFieldName;
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-			self = objectField.toReference();
-			mapByTypeFields(
-					objectField, "byType_", ignored -> { },
-					(typeDescriptor, expectations, model) -> {
-						supportedFieldModels.add( model );
-					}
-			);
-		}
-	}
-
-	private static class ValueModel<F> {
-		private final IndexFieldReference<F> reference;
-		final F indexedValue;
-
-		private ValueModel(IndexFieldReference<F> reference, F indexedValue) {
-			this.reference = reference;
-			this.indexedValue = indexedValue;
+		private DataSet(TestedFieldStructure fieldStructure, FieldTypeDescriptor<F> fieldType) {
+			this.fieldStructure = fieldStructure;
+			this.fieldType = fieldType;
+			this.routingKey = fieldType.getUniqueName() + "_" + fieldStructure.getUniqueName();
 		}
 
-		public void write(DocumentElement target) {
-			target.addValue( reference, indexedValue );
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				F document1Value, F document2Value, F document3Value) {
-			return mapper(
-					type,
-					c -> (StandardIndexFieldTypeOptionsStep<?, F>) c.as( type ),
-					document1Value, document2Value, document3Value
-			);
+		private String docId(int docNumber) {
+			return routingKey + "_doc_" + docNumber;
 		}
 
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			FieldProjectionExpectations<F> expectations = typeDescriptor.getFieldProjectionExpectations();
-			return mapper(
-					typeDescriptor.getJavaType(), typeDescriptor::configure,
-					expectations.getDocument1Value(), expectations.getDocument2Value(), expectations.getDocument3Value()
-			);
+		private String emptyDocId(int docNumber) {
+			return routingKey + "_emptyDoc_" + docNumber;
 		}
 
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration,
-				F document1Value, F document2Value, F document3Value) {
-			return StandardFieldMapper.of(
-					configuration,
-					c -> c.projectable( Projectable.YES ),
-					(reference, name) -> new FieldModel<>(
-							reference, name, type, document1Value, document2Value, document3Value
-					)
-			);
+		private void contribute(BulkIndexer indexer) {
+			if ( fieldStructure.isSingleValued() ) {
+				indexer.add( documentProvider( emptyDocId( 1 ), routingKey,
+						document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+								document, null ) ) );
+				indexer.add( documentProvider( docId( 1 ), routingKey,
+						document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+								document, getFieldValue( 1 ) ) ) );
+				indexer.add( documentProvider( docId( 2 ), routingKey,
+						document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+								document, getFieldValue( 2 ) ) ) );
+				indexer.add( documentProvider( docId( 3 ), routingKey,
+						document -> index.binding().initSingleValued( fieldType, fieldStructure.location,
+								document, getFieldValue( 3 ) ) ) );
+			}
+			else {
+				// TODO HSEARCH-3391 support multi-valued projections
+				//  Project on multi-valued field
+				//  Project on fields within a multi-valued flattened object
+				//  Project on fields within a multi-valued nested object
+			}
 		}
 
-		final String relativeFieldName;
-		final Class<F> type;
-
-		final ValueModel<F> document1Value;
-		final ValueModel<F> document2Value;
-		final ValueModel<F> document3Value;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName, Class<F> type,
-				F document1Value, F document2Value, F document3Value) {
-			this.relativeFieldName = relativeFieldName;
-			this.type = type;
-			this.document1Value = new ValueModel<>( reference, document1Value );
-			this.document2Value = new ValueModel<>( reference, document2Value );
-			this.document3Value = new ValueModel<>( reference, document3Value );
+		private F getFieldValue(int documentNumber) {
+			FieldProjectionExpectations<F> expectations = fieldType.getFieldProjectionExpectations();
+			switch ( documentNumber ) {
+				case 1:
+					return expectations.getDocument1Value();
+				case 2:
+					return expectations.getDocument2Value();
+				case 3:
+					return expectations.getDocument3Value();
+				default:
+					throw new IllegalArgumentException();
+			}
 		}
 	}
 }
