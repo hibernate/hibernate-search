@@ -68,7 +68,6 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 			PropertyMapping mappedTypePropertyMapping = new PropertyMapping();
 			mappedTypePropertyMapping.setType( DataTypes.KEYWORD );
 			mappedTypePropertyMapping.setIndex( false );
-			mappedTypePropertyMapping.setStore( false );
 			mappedTypePropertyMapping.setDocValues( true );
 			rootTypeMapping.addProperty( MAPPED_TYPE_FIELD_NAME, mappedTypePropertyMapping );
 		}

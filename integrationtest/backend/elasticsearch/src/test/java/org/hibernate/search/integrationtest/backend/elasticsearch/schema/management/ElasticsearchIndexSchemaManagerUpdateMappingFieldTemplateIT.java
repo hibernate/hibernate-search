@@ -674,8 +674,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 		return "{"
 				+ "'type': 'integer',"
 				+ "'doc_values': false,"
-				+ "'index': true,"
-				+ "'store': false"
+				+ "'index': true"
 				+ "}";
 	}
 
@@ -685,7 +684,6 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "'analyzer': 'default',"
 				+ "'index': true,"
 				+ "'norms': true,"
-				+ "'store': false,"
 				+ "'term_vector': 'no'"
 				+ "}";
 	}
@@ -695,8 +693,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 				+ "'type': 'keyword',"
 				+ "'doc_values': false,"
 				+ "'index': true,"
-				+ "'norms': false,"
-				+ "'store': false"
+				+ "'norms': false"
 				+ "}";
 	}
 }
