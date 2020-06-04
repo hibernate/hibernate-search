@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -56,6 +57,18 @@ abstract class AbstractTypingJsonAccessor<T> extends AbstractNonRootJsonAccessor
 			return null;
 		}
 		else if ( !expectedType.isInstance( parent ) ) {
+			if ( JsonElementTypes.ARRAY.isInstance( parent ) ) {
+				// Unexpected multi-valued item
+				JsonArray parentAsArray = JsonElementTypes.ARRAY.fromElement( parent );
+				// Let it go if there's zero or one item
+				int parentSize = parentAsArray.size();
+				if ( parentSize == 0 ) {
+					return null;
+				}
+				else if ( parentSize == 1 ) {
+					return fromElement( parentAsArray.get( 0 ) );
+				}
+			}
 			throw new UnexpectedJsonElementTypeException( this, expectedType, parent );
 		}
 		else {
