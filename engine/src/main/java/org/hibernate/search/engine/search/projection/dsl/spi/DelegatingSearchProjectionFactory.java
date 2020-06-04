@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
@@ -49,12 +49,12 @@ public class DelegatingSearchProjectionFactory<R, E> implements SearchProjection
 	}
 
 	@Override
-	public <T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert) {
+	public <T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert) {
 		return delegate.field( absoluteFieldPath, type, convert );
 	}
 
 	@Override
-	public FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath, ValueConvert convert) {
+	public FieldProjectionValueStep<?, Object> field(String absoluteFieldPath, ValueConvert convert) {
 		return delegate.field( absoluteFieldPath, convert );
 	}
 
