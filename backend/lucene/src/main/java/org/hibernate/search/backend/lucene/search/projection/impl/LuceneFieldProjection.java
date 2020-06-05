@@ -15,6 +15,8 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
+import org.apache.lucene.index.IndexableField;
+
 class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
 	private final Set<String> indexNames;
@@ -36,13 +38,17 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
 	@Override
 	public void request(SearchProjectionRequestContext context) {
-		codec.contributeStoredFields( absoluteFieldPath, nestedDocumentPath, context::requireStoredField );
+		context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
 	}
 
 	@Override
 	public F extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		return codec.decode( documentResult.getDocument(), absoluteFieldPath );
+		IndexableField field = documentResult.getDocument().getField( absoluteFieldPath );
+		if ( field == null ) {
+			return null;
+		}
+		return codec.decode( field );
 	}
 
 	@Override

@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.function.BiConsumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 
 /**
@@ -33,26 +32,14 @@ public interface LuceneFieldCodec<F> {
 	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value);
 
 	/**
-	 * Assuming a field is stored, add the absolute paths of (sub-)fields that should be extracted from a document
-	 * to later {@link #decode(Document, String)} the value of the field.
+	 * Extract the value from the given stored field.
+	 * <p>
+	 * Typically used in projections.
 	 *
-	 * @param absoluteFieldPath The path of the field whose value is assumed to be stored.
-	 * @param collector A collector of absolute field paths to be extracted from the document.
-	 * First argument is the absolute field path,
-	 * second argument is the path of the nested document containing that field (or null if not relevant).
-	 */
-	default void contributeStoredFields(String absoluteFieldPath, String nestedDocumentPath, BiConsumer<String, String> collector) {
-		collector.accept( absoluteFieldPath, nestedDocumentPath );
-	}
-
-	/**
-	 * Extract the value from the Lucene document, typically used in projections.
-	 *
-	 * @param document The Lucene document.
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param field The document field. Never {@code null}.
 	 * @return The decoded value.
 	 */
-	F decode(Document document, String absoluteFieldPath);
+	F decode(IndexableField field);
 
 	/**
 	 * Create a {@link Query} that will match every document in which the field with the given path appears.

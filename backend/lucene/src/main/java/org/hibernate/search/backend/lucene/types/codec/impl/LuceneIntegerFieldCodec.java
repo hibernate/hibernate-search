@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -27,13 +26,7 @@ public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCod
 	}
 
 	@Override
-	public Integer decode(Document document, String absoluteFieldPath) {
-		IndexableField field = document.getField( absoluteFieldPath );
-
-		if ( field == null ) {
-			return null;
-		}
-
+	public Integer decode(IndexableField field) {
 		return (Integer) field.numericValue();
 	}
 

@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 
@@ -44,19 +43,12 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 	}
 
 	@Override
-	public F decode(Document document, String absoluteFieldPath) {
+	public F decode(IndexableField field) {
 		if ( fieldValueExtractor == null ) {
 			throw log.unsupportedProjectionForNativeField(
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					EventContexts.fromIndexFieldAbsolutePath( field.name() )
 			);
 		}
-
-		IndexableField field = document.getField( absoluteFieldPath );
-
-		if ( field == null ) {
-			return null;
-		}
-
 		return fieldValueExtractor.extract( field );
 	}
 

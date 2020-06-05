@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.function.BiConsumer;
-
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
@@ -69,20 +66,8 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public GeoPoint decode(Document document, String absoluteFieldPath) {
-		IndexableField field = document.getField( absoluteFieldPath );
-
-		if ( field == null ) {
-			return null;
-		}
-
+	public GeoPoint decode(IndexableField field) {
 		return fromStoredBytes( field.binaryValue() );
-	}
-
-	@Override
-	public void contributeStoredFields(String absoluteFieldPath, String nestedDocumentPath,
-			BiConsumer<String, String> collector) {
-		collector.accept( absoluteFieldPath, nestedDocumentPath );
 	}
 
 	@Override

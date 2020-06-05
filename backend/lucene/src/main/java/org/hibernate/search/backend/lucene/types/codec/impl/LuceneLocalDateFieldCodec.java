@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -42,13 +41,7 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
-	public LocalDate decode(Document document, String absoluteFieldPath) {
-		IndexableField field = document.getField( absoluteFieldPath );
-
-		if ( field == null ) {
-			return null;
-		}
-
+	public LocalDate decode(IndexableField field) {
 		String value = field.stringValue();
 
 		if ( value == null ) {
