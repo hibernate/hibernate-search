@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LatLonPoint;
@@ -614,9 +615,7 @@ public class LuceneExtensionIT {
 						doc -> doc.hasField( "nativeField", "13" )
 								.hasField( "nativeField_converted", "13" )
 								.hasField( "nativeField_unsupportedProjection", "13" )
-								// Geo points are stored as two internal fields
-								.hasInternalField( "geoPoint_latitude", 40.12 )
-								.hasInternalField( "geoPoint_longitude", -71.34 )
+								.hasField( "geoPoint", toStoredBytes( GeoPoint.of( 40.12, -71.34 ) ) )
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
@@ -628,9 +627,7 @@ public class LuceneExtensionIT {
 				.satisfies( containsDocument(
 						doc -> doc.hasField( "string", "text 2" )
 								.hasField( "integer", 1 )
-								// Geo points are stored as two internal fields
-								.hasInternalField( "geoPoint_latitude", 45.12 )
-								.hasInternalField( "geoPoint_longitude", -75.34 )
+								.hasField( "geoPoint", toStoredBytes( GeoPoint.of( 45.12, -75.34 ) ) )
 								.andOnlyInternalFields()
 				) );
 	}
@@ -776,6 +773,13 @@ public class LuceneExtensionIT {
 						otherIndex.typeName(),
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 				);
+	}
+
+	private static byte[] toStoredBytes(GeoPoint geoPoint) {
+		byte[] bytes = new byte[2 * Double.BYTES];
+		DoublePoint.encodeDimension( geoPoint.latitude(), bytes, 0 );
+		DoublePoint.encodeDimension( geoPoint.longitude(), bytes, Double.BYTES );
+		return bytes;
 	}
 
 	private static void indexDataSet(SimpleMappedIndex<IndexBinding> index) {
