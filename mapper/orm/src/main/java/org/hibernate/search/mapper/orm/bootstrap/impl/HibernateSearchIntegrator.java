@@ -88,9 +88,7 @@ public class HibernateSearchIntegrator implements Integrator {
 
 		// Listen to the session factory lifecycle to boot/shutdown Hibernate Search at the right time
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
-				sessionFactoryCreatedFuture,
-				sessionFactoryClosingFuture,
-				contextFuture
+				contextFuture, sessionFactoryCreatedFuture, sessionFactoryClosingFuture
 		);
 		sessionFactory.addObserver( observer );
 

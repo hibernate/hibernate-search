@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -33,19 +34,24 @@ import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegrationBooter {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@SuppressWarnings("unchecked")
 	static ConfigurationPropertySource getPropertySource(ServiceRegistry serviceRegistry,
@@ -132,12 +138,23 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	CompletableFuture<HibernateSearchContextProviderService> orchestrateBootAndShutdown(
 			CompletionStage<SessionFactoryImplementor> sessionFactoryReadyStage,
 			CompletionStage<?> sessionFactoryDestroyingStage) {
+		CompletableFuture<HibernateSearchContextProviderService> contextFuture = new CompletableFuture<>();
+
 		CompletableFuture<Void> environmentSynchronizerReadyStage = new CompletableFuture<>();
 		CompletableFuture<Void> environmentSynchronizerStartedDestroyingStage = new CompletableFuture<>();
 
 		if ( environmentSynchronizer.isPresent() ) {
-			environmentSynchronizer.get().whenEnvironmentDestroying( () -> environmentSynchronizerStartedDestroyingStage.complete( null ) );
-			environmentSynchronizer.get().whenEnvironmentReady( () -> environmentSynchronizerReadyStage.complete( null ) );
+			environmentSynchronizer.get().whenEnvironmentDestroying( () -> {
+				environmentSynchronizerStartedDestroyingStage.complete( null );
+				// If the above triggered shutdown and it failed, the exception will be logged.
+			} );
+			environmentSynchronizer.get().whenEnvironmentReady( () -> {
+				environmentSynchronizerReadyStage.complete( null );
+				// If the above triggered bootstrap and it failed, propagate the exception.
+				if ( contextFuture.isCompletedExceptionally() ) {
+					Futures.unwrappedExceptionJoin( contextFuture );
+				}
+			} );
 		}
 		else {
 			/*
@@ -167,8 +184,9 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		/*
 		 * As soon as boot is required, we need to, well... boot.
 		 */
-		CompletableFuture<HibernateSearchContextProviderService> contextBootedFuture =
-				bootRequiredStage.thenApply( this::bootNow );
+		bootRequiredStage.thenApply( this::bootNow )
+				// Notify whoever wants to hear about the result of the boot.
+				.whenComplete( Futures.copyHandler( contextFuture ) );
 
 		/*
 		 * As soon as a shutdown is required,
@@ -176,9 +194,23 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		 * or shut down Hibernate Search if it already started.
 		 */
 		shutdownRequiredStage.thenRun( () -> bootRequiredStage.cancel( false ) );
-		shutdownRequiredStage.thenAcceptBoth( contextBootedFuture, (ignored, context) -> context.close() );
+		// Ignore bootstrap failures
+		contextFuture.exceptionally( throwable -> null )
+				.thenAcceptBoth( shutdownRequiredStage, (context, ignored) -> {
+					if ( context != null ) {
+						context.close();
+					}
+				} )
+				// If the above triggered shutdown and it failed, log the exception.
+				// We don't propagate it because that may cause the environment
+				// to skip further cleanup of other resources.
+				.whenComplete( Futures.handler( (ignored, throwable) -> {
+					if ( throwable != null ) {
+						log.shutdownFailed( throwable.getMessage(), throwable );
+					}
+				} ) );
 
-		return contextBootedFuture;
+		return contextFuture;
 	}
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {

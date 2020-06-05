@@ -22,17 +22,17 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 class HibernateSearchSessionFactoryObserver implements SessionFactoryObserver {
 
+	private final CompletableFuture<?> contextFuture;
 	private final CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture;
 	private final CompletableFuture<?> sessionFactoryClosingFuture;
-	private final CompletableFuture<?> contextFuture;
 
 	HibernateSearchSessionFactoryObserver(
+			CompletableFuture<?> contextFuture,
 			CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture,
-			CompletableFuture<?> sessionFactoryClosingFuture,
-			CompletableFuture<?> contextFuture) {
+			CompletableFuture<?> sessionFactoryClosingFuture) {
+		this.contextFuture = contextFuture;
 		this.sessionFactoryCreatedFuture = sessionFactoryCreatedFuture;
 		this.sessionFactoryClosingFuture = sessionFactoryClosingFuture;
-		this.contextFuture = contextFuture;
 	}
 
 	@Override
@@ -48,6 +48,7 @@ class HibernateSearchSessionFactoryObserver implements SessionFactoryObserver {
 	@Override
 	public synchronized void sessionFactoryClosing(SessionFactory factory) {
 		sessionFactoryClosingFuture.complete( null );
+		// If the above triggered shutdown and it failed, the exception will be logged.
 	}
 
 }
