@@ -136,8 +136,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		CompletableFuture<Void> environmentSynchronizerStartedDestroyingStage = new CompletableFuture<>();
 
 		if ( environmentSynchronizer.isPresent() ) {
-			environmentSynchronizer.get().whenEnvironmentDestroying( () -> environmentSynchronizerReadyStage.complete( null ) );
-			environmentSynchronizer.get().whenEnvironmentReady( () -> environmentSynchronizerStartedDestroyingStage.complete( null ) );
+			environmentSynchronizer.get().whenEnvironmentDestroying( () -> environmentSynchronizerStartedDestroyingStage.complete( null ) );
+			environmentSynchronizer.get().whenEnvironmentReady( () -> environmentSynchronizerReadyStage.complete( null ) );
 		}
 		else {
 			/*
