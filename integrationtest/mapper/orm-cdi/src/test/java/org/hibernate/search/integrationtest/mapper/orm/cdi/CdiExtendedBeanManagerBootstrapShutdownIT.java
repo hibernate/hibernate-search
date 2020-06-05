@@ -25,10 +25,12 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.After;
@@ -50,6 +52,9 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 
 	@Rule
 	public final StaticCounters counters = new StaticCounters();
+
+	@Rule
+	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final StubExtendedBeanManager extendedBeanManager = new StubExtendedBeanManager();
 
@@ -135,7 +140,12 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 			assertThat( retrievedBeans ).isEmpty();
 
 			// But once the bean manager is ready...
-			extendedBeanManager.simulateBoot( DependentBean.class );
+			assertThatThrownBy( () -> extendedBeanManager.simulateBoot( DependentBean.class ) )
+					// Hibernate Search should have attempted to boot, but failed.
+					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+							.backendContext( backendMock.getBackendName() )
+							.failure( bootFailedException.getMessage() )
+							.build() );
 
 			// Hibernate Search should have started to boot, then shut down.
 			backendMock.verifyExpectationsMet();
@@ -198,6 +208,62 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 						.fetchAll() )
 						.hasMessageContaining( "Hibernate Search was not initialized" );
 			}
+		}
+	}
+
+	@Test
+	public void failedShutdown() {
+		List<BeanHolder<DependentBean>> retrievedBeans = new ArrayList<>();
+
+		SearchException bootFailedException = new SearchException( "Simulated shutdown failure" );
+
+		backendMock.onCreate( context -> {
+			BeanHolder<DependentBean> retrievedBean = context.beanResolver().resolve( BeanReference.of( DependentBean.class ) );
+			retrievedBeans.add( retrievedBean );
+		} );
+		backendMock.onStop( () -> {
+			for ( BeanHolder<DependentBean> retrievedBean : retrievedBeans ) {
+				retrievedBean.close();
+			}
+			throw bootFailedException;
+		} );
+
+		try ( @SuppressWarnings("unused") SessionFactory sessionFactory = ormSetupHelper.start()
+				.withProperty( AvailableSettings.CDI_BEAN_MANAGER, extendedBeanManager )
+				.setup( IndexedEntity.class ) ) {
+			// Hibernate Search should not have booted yet.
+			backendMock.verifyExpectationsMet();
+			assertThat( retrievedBeans ).isEmpty();
+
+			// But once the bean manager is ready...
+			backendMock.expectAnySchema( IndexedEntity.NAME );
+			extendedBeanManager.simulateBoot( DependentBean.class );
+
+			// Hibernate Search should have booted.
+			backendMock.verifyExpectationsMet();
+			assertThat( retrievedBeans )
+					.hasSize( 1 )
+					.element( 0 ).isNotNull()
+					.extracting( BeanHolder::get ).isNotNull();
+			assertThat( StaticCounters.get().get( DependentBean.KEYS.instantiate ) ).isEqualTo( 1 );
+			assertThat( StaticCounters.get().get( DependentBean.KEYS.postConstruct ) ).isEqualTo( 1 );
+			assertThat( StaticCounters.get().get( DependentBean.KEYS.preDestroy ) ).isEqualTo( 0 );
+
+			// We should be able to use Hibernate Search
+			try ( Session session = sessionFactory.openSession() ) {
+				backendMock.expectSearchObjects( IndexedEntity.NAME, StubSearchWorkBehavior.empty() );
+				Search.session( session ).search( IndexedEntity.class )
+						.where( f -> f.matchAll() )
+						.fetchAll();
+				backendMock.verifyExpectationsMet();
+			}
+
+			// The bean manager shuts down.
+			// Hibernate Search should fail to shut down, and report the failure through the logs.
+			logged.expectMessage( "Simulated shutdown failure" );
+			extendedBeanManager.simulateShutdown();
+
+			assertThat( StaticCounters.get().get( DependentBean.KEYS.preDestroy ) ).isEqualTo( 1 );
 		}
 	}
 
