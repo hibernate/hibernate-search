@@ -272,4 +272,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 34, value = "Entity '%1$s' is not indexed.")
 	SearchException notIndexedEntityName(String name);
+
+	@LogMessage(level = Logger.Level.ERROR)
+	@Message(id = ID_OFFSET_2 + 35, value = "Hibernate Search shutdown failed: %1$s")
+	void shutdownFailed(String causeMessage, @Cause Throwable cause);
+
 }
