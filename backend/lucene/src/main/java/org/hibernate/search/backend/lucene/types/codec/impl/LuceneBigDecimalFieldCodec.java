@@ -18,7 +18,6 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 import org.hibernate.search.engine.cfg.spi.NumberScaleConstants;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
@@ -46,12 +45,7 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
-	public BigDecimal decode(Document document, String absoluteFieldPath) {
-		IndexableField field = document.getField( absoluteFieldPath );
-		if ( field == null ) {
-			return null;
-		}
-
+	public BigDecimal decode(IndexableField field) {
 		return new BigDecimal( field.stringValue() );
 	}
 

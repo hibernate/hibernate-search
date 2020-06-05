@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneDoubleDomain;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
@@ -28,13 +27,7 @@ public final class LuceneDoubleFieldCodec extends AbstractLuceneNumericFieldCode
 	}
 
 	@Override
-	public Double decode(Document document, String absoluteFieldPath) {
-		IndexableField field = document.getField( absoluteFieldPath );
-
-		if ( field == null ) {
-			return null;
-		}
-
+	public Double decode(IndexableField field) {
 		return (Double) field.numericValue();
 	}
 

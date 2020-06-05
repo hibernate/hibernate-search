@@ -13,10 +13,10 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstant
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.SortedSetDocValuesField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.NormsFieldExistsQuery;
@@ -73,8 +73,8 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 	}
 
 	@Override
-	public String decode(Document document, String absoluteFieldPath) {
-		return document.get( absoluteFieldPath );
+	public String decode(IndexableField field) {
+		return field.stringValue();
 	}
 
 	@Override

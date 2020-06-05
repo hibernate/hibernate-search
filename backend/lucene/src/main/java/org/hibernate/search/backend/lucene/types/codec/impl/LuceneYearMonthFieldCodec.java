@@ -21,7 +21,6 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneLongDomain;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
@@ -51,13 +50,7 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
-	public YearMonth decode(Document document, String absoluteFieldPath) {
-		IndexableField field = document.getField( absoluteFieldPath );
-
-		if ( field == null ) {
-			return null;
-		}
-
+	public YearMonth decode(IndexableField field) {
 		String value = field.stringValue();
 
 		if ( value == null ) {

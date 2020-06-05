@@ -17,6 +17,6 @@ import org.junit.runner.RunWith;
  * @author Gunnar Morling
  */
 @RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({ ".*\\.tck\\..*" })
+@ClasspathSuite.ClassnameFilters({ ".*\\.tck\\..*FieldSearchProjection.*IT" })
 public class LuceneTckTestRunner {
 }
