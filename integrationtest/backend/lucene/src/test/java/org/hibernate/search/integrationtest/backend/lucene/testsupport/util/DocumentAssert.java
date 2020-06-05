@@ -60,18 +60,14 @@ public class DocumentAssert {
 		return hasField( "numeric", absoluteFieldPath, values );
 	}
 
-	public DocumentAssert hasInternalField(String absoluteFieldPath, String ... values) {
-		return hasField( INTERNAL_FIELDS_PREFIX + absoluteFieldPath, values );
-	}
-
-	public DocumentAssert hasInternalField(String absoluteFieldPath, Number ... values) {
-		return hasField( INTERNAL_FIELDS_PREFIX + absoluteFieldPath, values );
+	public DocumentAssert hasField(String absoluteFieldPath, byte[] ... values) {
+		return hasField( "byte[]", absoluteFieldPath, values );
 	}
 
 	@SafeVarargs
 	private final <T> DocumentAssert hasField(String type, String absoluteFieldPath, T ... values) {
 		String fieldDescription = "field at path '" + absoluteFieldPath + "'"
-				+ " with expected type '" + type + "' and expected values '" + Arrays.toString( values ) + "'";
+				+ " with expected type '" + type + "' and expected values '" + Arrays.deepToString( values ) + "'";
 		Predicate<IndexableField> predicate = field -> absoluteFieldPath.equals( field.name() );
 		asFields()
 				.areAtLeastOne( new Condition<>( predicate, fieldDescription ) )
@@ -85,7 +81,7 @@ public class DocumentAssert {
 					}
 					BytesRef bytesRef = f.binaryValue();
 					if ( bytesRef != null ) {
-						return bytesRef.bytes;
+						return BytesRef.deepCopyOf( bytesRef ).bytes;
 					}
 					String string = f.stringValue();
 					if ( string != null ) {

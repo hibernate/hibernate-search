@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import static org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields.internalFieldName;
-
 import java.util.function.BiConsumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
@@ -15,6 +13,7 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
@@ -23,11 +22,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.util.BytesRef;
 
 public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
-
-	private static final String LATITUDE = "latitude";
-	private static final String LONGITUDE = "longitude";
 
 	private final boolean projectable;
 	private final boolean searchable;
@@ -53,8 +50,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		}
 
 		if ( projectable ) {
-			documentBuilder.addField( new StoredField( getLatitudeAbsoluteFieldPath( absoluteFieldPath ), value.latitude() ) );
-			documentBuilder.addField( new StoredField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), value.longitude() ) );
+			documentBuilder.addField( new StoredField( absoluteFieldPath, toStoredBytes( value ) ) );
 		}
 
 		if ( sortable || projectable ) {
@@ -74,21 +70,19 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 
 	@Override
 	public GeoPoint decode(Document document, String absoluteFieldPath) {
-		IndexableField latitudeField = document.getField( getLatitudeAbsoluteFieldPath( absoluteFieldPath ) );
-		IndexableField longitudeField = document.getField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ) );
+		IndexableField field = document.getField( absoluteFieldPath );
 
-		if ( latitudeField == null || longitudeField == null ) {
+		if ( field == null ) {
 			return null;
 		}
 
-		return GeoPoint.of( (double) latitudeField.numericValue(), (double) longitudeField.numericValue() );
+		return fromStoredBytes( field.binaryValue() );
 	}
 
 	@Override
 	public void contributeStoredFields(String absoluteFieldPath, String nestedDocumentPath,
 			BiConsumer<String, String> collector) {
-		collector.accept( getLatitudeAbsoluteFieldPath( absoluteFieldPath ), nestedDocumentPath );
-		collector.accept( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), nestedDocumentPath );
+		collector.accept( absoluteFieldPath, nestedDocumentPath );
 	}
 
 	@Override
@@ -116,11 +110,16 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 				&& ( sortable == other.sortable );
 	}
 
-	private String getLatitudeAbsoluteFieldPath(String absoluteFieldPath) {
-		return internalFieldName( absoluteFieldPath, LATITUDE );
+	private static BytesRef toStoredBytes(GeoPoint geoPoint) {
+		byte[] bytes = new byte[2 * Double.BYTES];
+		DoublePoint.encodeDimension( geoPoint.latitude(), bytes, 0 );
+		DoublePoint.encodeDimension( geoPoint.longitude(), bytes, Double.BYTES );
+		return new BytesRef( bytes );
 	}
 
-	private String getLongitudeAbsoluteFieldPath(String absoluteFieldPath) {
-		return internalFieldName( absoluteFieldPath, LONGITUDE );
+	private static GeoPoint fromStoredBytes(BytesRef bytesRef) {
+		double latitude = DoublePoint.decodeDimension( bytesRef.bytes, bytesRef.offset );
+		double longitude = DoublePoint.decodeDimension( bytesRef.bytes, bytesRef.offset + Double.BYTES );
+		return GeoPoint.of( latitude, longitude );
 	}
 }

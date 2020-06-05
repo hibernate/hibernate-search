@@ -60,15 +60,6 @@ public class MetadataFields {
 		return sb.toString();
 	}
 
-	public static String internalFieldName(String fieldName, String suffix) {
-		StringBuilder sb = new StringBuilder( INTERNAL_FIELD_PREFIX.length() + fieldName.length() + suffix.length() + 1 );
-		sb.append( INTERNAL_FIELD_PREFIX );
-		sb.append( fieldName );
-		sb.append( '_' );
-		sb.append( suffix );
-		return sb.toString();
-	}
-
 	public static IndexableField searchableMetadataField(String name, String value) {
 		return new Field( name, value, METADATA_FIELD_TYPE_WITH_INDEX );
 	}
