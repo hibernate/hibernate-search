@@ -14,26 +14,45 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import org.apache.lucene.index.IndexableField;
 
-class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
+/**
+ * A projection on the values of an index field.
+ *
+ * @param <E> The type of the aggregated value extracted from the Lucene index (before conversion).
+ * @param <P> The type of the aggregated value returned by the projection (after conversion).
+ * @param <F> The type of individual field values obtained from the backend (before conversion).
+ * @param <V> The type of individual field values after conversion.
+ */
+class LuceneFieldProjection<E, P, F, V> implements LuceneSearchProjection<E, P> {
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 
 	private final LuceneFieldCodec<F> codec;
-
 	private final ProjectionConverter<? super F, V> converter;
+	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	LuceneFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
-			LuceneFieldCodec<F> codec, ProjectionConverter<? super F, V> converter) {
+			LuceneFieldCodec<F> codec, ProjectionConverter<? super F, V> converter,
+			ProjectionAccumulator<F, V, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
 		this.codec = codec;
 		this.converter = converter;
+		this.accumulator = accumulator;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "absoluteFieldPath=" + absoluteFieldPath
+				+ ", accumulator=" + accumulator
+				+ "]";
 	}
 
 	@Override
@@ -42,33 +61,26 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 	}
 
 	@Override
-	public F extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
+		E extracted = accumulator.createInitial();
 		IndexableField field = documentResult.getDocument().getField( absoluteFieldPath );
-		if ( field == null ) {
-			return null;
+		if ( field != null ) {
+			F decoded = codec.decode( field );
+			extracted = accumulator.accumulate( extracted, decoded );
 		}
-		return codec.decode( field );
+		return extracted;
 	}
 
 	@Override
-	public V transform(LoadingResult<?> loadingResult, F extractedData,
+	public P transform(LoadingResult<?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
-		return converter.convert( extractedData, convertContext );
+		return accumulator.finish( extractedData, converter, convertContext );
 	}
 
 	@Override
 	public Set<String> getIndexNames() {
 		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
-				.append( "]" );
-		return sb.toString();
 	}
 }
