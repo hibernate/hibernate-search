@@ -18,12 +18,21 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjection<F, V> {
+/**
+ * A projection on the values of an index field.
+ *
+ * @param <E> The type of aggregated values extracted from the backend response (before conversion).
+ * @param <P> The type of aggregated values returned by the projection (after conversion).
+ * @param <F> The type of individual field values obtained from the backend (before conversion).
+ * @param <V> The type of individual field values after conversion.
+ */
+class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchProjection<E, P> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -32,17 +41,27 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
 
-	private final ProjectionConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
+	private final ProjectionConverter<? super F, V> converter;
+	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath,
-			ProjectionConverter<? super F, V> converter,
-			ElasticsearchFieldCodec<F> codec) {
+			ElasticsearchFieldCodec<F> codec, ProjectionConverter<? super F, V> converter,
+			ProjectionAccumulator<F, V, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
+		this.accumulator = accumulator;
 		this.converter = converter;
 		this.codec = codec;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "absoluteFieldPath=" + absoluteFieldPath
+				+ ", accumulator=" + accumulator
+				+ "]";
 	}
 
 	@Override
@@ -52,34 +71,25 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public F extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
+		E extracted = accumulator.createInitial();
 		Optional<JsonElement> fieldValue = hitFieldValueAccessor.get( hit );
 		if ( fieldValue.isPresent() ) {
-			return codec.decode( fieldValue.get() );
+			F decoded = codec.decode( fieldValue.get() );
+			extracted = accumulator.accumulate( extracted, decoded );
 		}
-		else {
-			return null;
-		}
+		return extracted;
 	}
 
 	@Override
-	public V transform(LoadingResult<?> loadingResult, F extractedData, SearchProjectionTransformContext context) {
+	public P transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
-		return converter.convert( extractedData, convertContext );
+		return accumulator.finish( extractedData, converter, convertContext );
 	}
 
 	@Override
 	public Set<String> getIndexNames() {
 		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
-				.append( "]" );
-		return sb.toString();
 	}
 }

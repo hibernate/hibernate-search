@@ -318,4 +318,9 @@ public interface Log extends BasicLogger {
 			value = "Field template name '%1$s' is invalid: field template names cannot contain a dot ('.').")
 	SearchException fieldTemplateNameCannotContainDot(String relativeFieldName,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 72,
+			value = "Found multiple values while projecting on a supposedly single-valued field: [%1$s, %2$s].")
+	SearchException unexpectedMultiValuedField(Object value1, Object value2);
+
 }
