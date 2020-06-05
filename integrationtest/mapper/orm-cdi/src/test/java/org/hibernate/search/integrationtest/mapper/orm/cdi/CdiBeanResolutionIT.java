@@ -52,7 +52,7 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 		"org.hibernate.search.test.integration.wildfly.cdi.CDIInjectionIT",
 		"org.hibernate.search.test.integration.wildfly.cdi.CDIInjectionLifecycleEventsIT"
 })
-public class CdiIT {
+public class CdiBeanResolutionIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
