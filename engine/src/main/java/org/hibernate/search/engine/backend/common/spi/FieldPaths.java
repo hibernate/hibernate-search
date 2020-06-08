@@ -14,6 +14,7 @@ public class FieldPaths {
 
 	public static final char PATH_SEPARATOR = '.';
 	public static final String PATH_SEPARATOR_STRING = String.valueOf( PATH_SEPARATOR );
+	public static final String PATH_SEPARATOR_REGEX_STRING = "\\.";
 
 	private FieldPaths() {
 	}
@@ -68,6 +69,10 @@ public class FieldPaths {
 				Optional.of( absolutePath.substring( 0, lastSeparatorIndex ) ),
 				absolutePath.substring( lastSeparatorIndex + 1 )
 		);
+	}
+
+	public static String[] split(String absoluteFieldPath) {
+		return absoluteFieldPath.split( PATH_SEPARATOR_REGEX_STRING );
 	}
 
 	public static final class RelativizedPath {

@@ -19,22 +19,25 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
+	private final String[] absoluteFieldPathComponents;
 
 	private final ProjectionConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+			String[] absoluteFieldPathComponents,
 			ProjectionConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
 		this.converter = converter;
 		this.codec = codec;
 	}
 
 	@Override
 	public <R> SearchProjection<R> build(ProjectionAccumulator.Provider<V, R> accumulatorProvider) {
-		return new ElasticsearchFieldProjection<>( indexNames, absoluteFieldPath,
+		return new ElasticsearchFieldProjection<>( indexNames, absoluteFieldPath, absoluteFieldPathComponents,
 				codec, converter, accumulatorProvider.get() );
 	}
 }

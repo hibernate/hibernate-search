@@ -6,16 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Optional;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -39,18 +41,18 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
+	private final String[] absoluteFieldPathComponents;
 
 	private final ElasticsearchFieldCodec<F> codec;
 	private final ProjectionConverter<? super F, V> converter;
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
-	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath,
+	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath, String[] absoluteFieldPathComponents,
 			ElasticsearchFieldCodec<F> codec, ProjectionConverter<? super F, V> converter,
 			ProjectionAccumulator<F, V, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
+		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
 		this.accumulator = accumulator;
 		this.converter = converter;
 		this.codec = codec;
@@ -74,11 +76,8 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		E extracted = accumulator.createInitial();
-		Optional<JsonElement> fieldValue = hitFieldValueAccessor.get( hit );
-		if ( fieldValue.isPresent() ) {
-			F decoded = codec.decode( fieldValue.get() );
-			extracted = accumulator.accumulate( extracted, decoded );
-		}
+		JsonObject source = HIT_SOURCE_ACCESSOR.get( hit ).get();
+		extracted = collect( source, extracted, 0 );
 		return extracted;
 	}
 
@@ -91,5 +90,61 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 	@Override
 	public Set<String> getIndexNames() {
 		return indexNames;
+	}
+
+	private E collect(JsonObject parent, E accumulated, int currentPathComponentIndex) {
+		JsonElement child = parent.get( absoluteFieldPathComponents[currentPathComponentIndex] );
+
+		if ( currentPathComponentIndex == (absoluteFieldPathComponents.length - 1) ) {
+			// We reached the field we want to collect.
+			if ( child == null ) {
+				// Not present
+				return accumulated;
+			}
+			else if ( child.isJsonNull() ) {
+				// Present, but null
+				return accumulator.accumulate( accumulated, null );
+			}
+			else if ( child.isJsonArray() ) {
+				for ( JsonElement childElement : child.getAsJsonArray() ) {
+					F decoded = codec.decode( childElement );
+					accumulated = accumulator.accumulate( accumulated, decoded );
+				}
+				return accumulated;
+			}
+			else {
+				F decoded = codec.decode( child );
+				return accumulator.accumulate( accumulated, decoded );
+			}
+		}
+		else {
+			// We just reached an intermediary object field leading to the field we want to collect.
+			if ( child == null || child.isJsonNull() ) {
+				// Not present
+				return accumulated;
+			}
+			else if ( child.isJsonArray() ) {
+				for ( JsonElement childElement : child.getAsJsonArray() ) {
+					JsonObject childElementAsObject = toJsonObject( childElement, currentPathComponentIndex );
+					accumulated = collect( childElementAsObject, accumulated, currentPathComponentIndex + 1 );
+				}
+				return accumulated;
+			}
+			else {
+				JsonObject childAsObject = toJsonObject( child, currentPathComponentIndex );
+				return collect( childAsObject, accumulated, currentPathComponentIndex + 1 );
+			}
+		}
+	}
+
+	private JsonObject toJsonObject(JsonElement childElement, int currentPathComponentIndex) {
+		if ( !JsonElementTypes.OBJECT.isInstance( childElement ) ) {
+			throw new UnexpectedJsonElementTypeException(
+					Arrays.stream( absoluteFieldPathComponents, 0, currentPathComponentIndex + 1 )
+							.collect( Collectors.joining( "." ) ),
+					JsonElementTypes.OBJECT, childElement
+			);
+		}
+		return childElement.getAsJsonObject();
 	}
 }

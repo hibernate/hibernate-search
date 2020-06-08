@@ -12,6 +12,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -57,7 +58,11 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>( indexNames, absoluteFieldPath, requestConverter, codec );
+		// FIXME HSEARCH-3945 ideally this should be done at bootstrap
+		String[] absoluteFieldPathComponents = FieldPaths.split( absoluteFieldPath );
+
+		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>(
+				indexNames, absoluteFieldPath, absoluteFieldPathComponents, requestConverter, codec );
 	}
 
 	@Override
