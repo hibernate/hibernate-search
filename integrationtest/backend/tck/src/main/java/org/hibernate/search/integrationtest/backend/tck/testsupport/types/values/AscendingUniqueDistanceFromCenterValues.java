@@ -23,11 +23,11 @@ public class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTerm
 				CENTER_POINT, // ~0km
 				GeoPoint.of( 46.038683, 3.964652 ), // ~1km
 				GeoPoint.of( 46.059852, 3.978235 ), // ~2km
-				GeoPoint.of( 46.039763, 3.914977 ), // ~4km
-				GeoPoint.of( 46.000833, 3.931265 ), // ~6km
+				GeoPoint.of( 46.039763, 3.914977 ), // ~5km
+				GeoPoint.of( 46.000833, 3.931265 ), // ~55.5km
 				GeoPoint.of( 46.094712, 4.044507 ), // ~8km
-				GeoPoint.of( 46.018378, 4.196792 ), // ~10km
-				GeoPoint.of( 46.123025, 3.845305 ) // ~14km
+				GeoPoint.of( 46.123025, 3.845305 ), // ~14km
+				GeoPoint.of( 46.018378, 4.196792 ) // ~17km
 		);
 	}
 
