@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types.value
 
 import static java.util.Arrays.asList;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -16,6 +17,16 @@ public class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTerm
 	public static final GeoPoint CENTER_POINT = GeoPoint.of( 46.038673, 3.978563 );
 
 	public static final AscendingUniqueDistanceFromCenterValues INSTANCE = new AscendingUniqueDistanceFromCenterValues();
+
+	private final List<Double> singleDistancesFromCenterPoint;
+
+	private AscendingUniqueDistanceFromCenterValues() {
+		this.singleDistancesFromCenterPoint = Collections.unmodifiableList( createDistancesFromCenterPoint() );
+	}
+
+	public List<Double> getSingleDistancesFromCenterPoint() {
+		return singleDistancesFromCenterPoint;
+	}
 
 	@Override
 	protected List<GeoPoint> createSingle() {
@@ -47,6 +58,19 @@ public class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTerm
 				asList( getSingle().get( 4 ), getSingle().get( 6 ) ), // ~8km
 				asList( getSingle().get( 4 ), getSingle().get( 7 ) ), // ~10km
 				asList( getSingle().get( 7 ), getSingle().get( 7 ), getSingle().get( 7 ) ) // ~14km
+		);
+	}
+
+	private List<Double> createDistancesFromCenterPoint() {
+		return asList(
+				0.0,
+				1_073.8,
+				2_355.1,
+				4_909.5,
+				5_571.5,
+				8_044.3,
+				13_914.5,
+				16_998.3
 		);
 	}
 }
