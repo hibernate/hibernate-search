@@ -119,7 +119,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param center The center to compute the distance from.
 	 * @return A DSL step where the "distance" projection can be defined in more details.
 	 */
-	DistanceToFieldProjectionOptionsStep<?> distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionValueStep<?, Double> distance(String absoluteFieldPath, GeoPoint center);
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given projections.
