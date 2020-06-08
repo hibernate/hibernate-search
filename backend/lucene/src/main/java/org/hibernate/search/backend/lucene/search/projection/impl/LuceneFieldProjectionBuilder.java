@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 public class LuceneFieldProjectionBuilder<F, V> implements FieldProjectionBuilder<V> {
 
@@ -34,8 +34,8 @@ public class LuceneFieldProjectionBuilder<F, V> implements FieldProjectionBuilde
 	}
 
 	@Override
-	public SearchProjection<V> build() {
+	public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
 		return new LuceneFieldProjection<>( indexNames, absoluteFieldPath, nestedDocumentPath,
-				codec, converter, SingleValuedProjectionAccumulator.<V>provider().get() );
+				codec, converter, accumulatorProvider.get() );
 	}
 }

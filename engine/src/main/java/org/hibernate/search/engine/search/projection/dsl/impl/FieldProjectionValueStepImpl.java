@@ -12,21 +12,23 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
+import org.hibernate.search.engine.search.projection.spi.ListProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 
 
 public class FieldProjectionValueStepImpl<T>
-		extends FieldProjectionOptionsStepImpl<T>
-		implements FieldProjectionValueStep<FieldProjectionOptionsStepImpl<T>, T> {
+		extends FieldProjectionOptionsStepImpl<T, T>
+		implements FieldProjectionValueStep<FieldProjectionOptionsStepImpl<T, T>, T> {
 
 	FieldProjectionValueStepImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, Class<T> clazz,
 			ValueConvert convert) {
-		super( factory.field( absoluteFieldPath, clazz, convert ) );
+		super( factory.field( absoluteFieldPath, clazz, convert ), SingleValuedProjectionAccumulator.provider() );
 	}
 
 	@Override
 	public FieldProjectionOptionsStep<?, List<T>> multi() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new FieldProjectionOptionsStepImpl<>( fieldProjectionBuilder, ListProjectionAccumulator.provider() );
 	}
 
 	@Override
