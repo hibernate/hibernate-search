@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
-import static java.util.Arrays.asList;
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
@@ -27,7 +27,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -78,8 +78,6 @@ public class DistanceSearchSortBaseIT {
 		}
 		return parameters.toArray( new Object[0][] );
 	}
-
-	private static final GeoPoint CENTER_POINT = GeoPoint.of( 46.038673, 3.978563 );
 
 	// TODO HSEARCH-3863 use the other ordinals when we implement.missing().use/last/first for distance sorts
 	private static final int BEFORE_DOCUMENT_1_ORDINAL = 0;
@@ -322,42 +320,4 @@ public class DistanceSearchSortBaseIT {
 			}
 		}
 	}
-
-	private static class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTermValues<GeoPoint> {
-		private static final AscendingUniqueDistanceFromCenterValues INSTANCE = new AscendingUniqueDistanceFromCenterValues();
-
-		@Override
-		protected List<GeoPoint> createSingle() {
-			return asList(
-					CENTER_POINT, // ~0km
-					GeoPoint.of( 46.038683, 3.964652 ), // ~1km
-					GeoPoint.of( 46.059852, 3.978235 ), // ~2km
-					GeoPoint.of( 46.039763, 3.914977 ), // ~4km
-					GeoPoint.of( 46.000833, 3.931265 ), // ~6km
-					GeoPoint.of( 46.094712, 4.044507 ), // ~8km
-					GeoPoint.of( 46.018378, 4.196792 ), // ~10km
-					GeoPoint.of( 46.123025, 3.845305 ) // ~14km
-			);
-		}
-
-		@Override
-		protected List<List<GeoPoint>> createMultiResultingInSingleAfterSum() {
-			return valuesThatWontBeUsed();
-		}
-
-		@Override
-		protected List<List<GeoPoint>> createMultiResultingInSingleAfterAvg() {
-			return asList(
-					asList( CENTER_POINT, CENTER_POINT ), // ~0km
-					asList( getSingle().get( 0 ), getSingle().get( 2 ) ), // ~1km
-					asList( getSingle().get( 1 ), getSingle().get( 1 ), getSingle().get( 4 ) ), // ~2km
-					asList( getSingle().get( 2 ), getSingle().get( 4 ) ), // ~4km
-					asList( getSingle().get( 3 ), getSingle().get( 5 ) ), // ~6km
-					asList( getSingle().get( 4 ), getSingle().get( 6 ) ), // ~8km
-					asList( getSingle().get( 4 ), getSingle().get( 7 ) ), // ~10km
-					asList( getSingle().get( 7 ), getSingle().get( 7 ), getSingle().get( 7 ) ) // ~14km
-			);
-		}
-	}
-
 }
