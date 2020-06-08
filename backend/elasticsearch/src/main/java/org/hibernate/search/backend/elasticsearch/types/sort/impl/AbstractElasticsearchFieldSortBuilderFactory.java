@@ -39,7 +39,7 @@ public abstract class AbstractElasticsearchFieldSortBuilderFactory<F>
 			return false;
 		}
 
-		ElasticsearchStandardFieldSortBuilderFactory<?> other = (ElasticsearchStandardFieldSortBuilderFactory<?>) obj;
+		AbstractElasticsearchFieldSortBuilderFactory<?> other = (AbstractElasticsearchFieldSortBuilderFactory<?>) obj;
 		return sortable == other.sortable && codec.isCompatibleWith( other.codec );
 	}
 
