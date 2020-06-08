@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
@@ -64,7 +64,7 @@ public class DelegatingSearchProjectionFactory<R, E> implements SearchProjection
 	}
 
 	@Override
-	public DistanceToFieldProjectionOptionsStep<?> distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionValueStep<?, Double> distance(String absoluteFieldPath, GeoPoint center) {
 		return delegate.distance( absoluteFieldPath, center );
 	}
 
