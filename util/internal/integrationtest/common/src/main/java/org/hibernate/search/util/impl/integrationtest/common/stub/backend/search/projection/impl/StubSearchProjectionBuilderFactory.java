@@ -21,8 +21,10 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjec
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -55,6 +57,17 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 			@Override
 			public SearchProjection<T> build() {
 				return new StubFieldSearchProjection<>( clazz, converter );
+			}
+
+			@Override
+			@SuppressWarnings("unchecked")
+			public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<T, P> accumulatorProvider) {
+				if ( accumulatorProvider == SingleValuedProjectionAccumulator.provider() ) {
+					return (SearchProjection<P>) build();
+				}
+				else {
+					throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
+				}
 			}
 		};
 	}

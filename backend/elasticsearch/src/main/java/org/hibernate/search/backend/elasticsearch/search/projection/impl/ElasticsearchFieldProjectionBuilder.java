@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 
 
 public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectionBuilder<V> {
@@ -33,8 +33,8 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 	}
 
 	@Override
-	public SearchProjection<V> build() {
+	public <R> SearchProjection<R> build(ProjectionAccumulator.Provider<V, R> accumulatorProvider) {
 		return new ElasticsearchFieldProjection<>( indexNames, absoluteFieldPath,
-				codec, converter, SingleValuedProjectionAccumulator.<V>provider().get() );
+				codec, converter, accumulatorProvider.get() );
 	}
 }
