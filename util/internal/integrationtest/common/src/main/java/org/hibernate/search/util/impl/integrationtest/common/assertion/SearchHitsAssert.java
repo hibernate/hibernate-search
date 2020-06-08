@@ -116,7 +116,7 @@ public class SearchHitsAssert<H> {
 			newActuals.add( actual.get( ordinal ) );
 		}
 
-		return new SearchHitsAssert( newActuals );
+		return new SearchHitsAssert<>( newActuals );
 	}
 
 	public SearchHitsAssert<H> hasDocRefHitsExactOrder(Consumer<NormalizedDocRefHit.Builder> expectation) {
