@@ -209,14 +209,15 @@ public class LibraryShowcaseBaseIT {
 				null,
 				0, 10
 		);
-		// Should only include content from university
-		// TODO HSEARCH-3103 check results are sorted by distance once we do sort them (see the query implementation)
+		// Should only include content from university (my location).
 		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				INDONESIAN_ECONOMY_ID,
 				JAVA_FOR_DUMMIES_ID,
 				ART_OF_COMPUTER_PROG_ID,
 				THESAURUS_OF_LANGUAGES_ID
 		);
+		// Should be sorted by increasing distance,
+		// but here all hits are in a library right at my location, so the sort doesn't matter.
 
 		documents = documentService.searchAroundMe(
 				null, null,
@@ -224,8 +225,7 @@ public class LibraryShowcaseBaseIT {
 				null,
 				0, 10
 		);
-		// Should only include content from suburb1 or university
-		// TODO HSEARCH-3103 check results are sorted by distance once we do sort them (see the query implementation)
+		// Should only include content from suburb1 or university.
 		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				CALLIGRAPHY_ID,
 				INDONESIAN_ECONOMY_ID,
@@ -233,6 +233,12 @@ public class LibraryShowcaseBaseIT {
 				ART_OF_COMPUTER_PROG_ID,
 				THESAURUS_OF_LANGUAGES_ID
 		);
+		// Should be sorted by increasing distance.
+		// All books are in the university library right at my location,
+		// except the book about calligraphy, which is in "suburb1".
+		// So it should appear last.
+		assertThat( documents ).extracting( Document::getId )
+				.element( 4 ).isEqualTo( CALLIGRAPHY_ID );
 
 		documents = documentService.searchAroundMe(
 				"calligraphy", null,
@@ -240,8 +246,7 @@ public class LibraryShowcaseBaseIT {
 				null,
 				0, 10
 		);
-		// Should only include content from suburb1 or university with "calligraphy" in it
-		// TODO HSEARCH-3103 check results are sorted by distance once we do sort them (see the query implementation)
+		// Should only include content from suburb1 or university with "calligraphy" in it.
 		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				CALLIGRAPHY_ID
 		);
@@ -253,8 +258,7 @@ public class LibraryShowcaseBaseIT {
 				null,
 				0, 10
 		);
-		// Should only include content from university
-		// TODO HSEARCH-3103 check results are sorted by distance once we do sort them (see the query implementation)
+		// Should only include content from university.
 		assertThat( documents ).extracting( Document::getId ).containsExactlyInAnyOrder(
 				INDONESIAN_ECONOMY_ID,
 				JAVA_FOR_DUMMIES_ID,
