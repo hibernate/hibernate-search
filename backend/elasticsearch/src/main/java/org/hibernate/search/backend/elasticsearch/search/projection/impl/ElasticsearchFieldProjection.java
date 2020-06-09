@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -15,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -43,19 +43,19 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 	private final String absoluteFieldPath;
 	private final String[] absoluteFieldPathComponents;
 
-	private final ElasticsearchFieldCodec<F> codec;
+	private final Function<JsonElement, F> decodeFunction;
 	private final ProjectionConverter<? super F, V> converter;
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath, String[] absoluteFieldPathComponents,
-			ElasticsearchFieldCodec<F> codec, ProjectionConverter<? super F, V> converter,
+			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, V> converter,
 			ProjectionAccumulator<F, V, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
-		this.accumulator = accumulator;
+		this.decodeFunction = decodeFunction;
 		this.converter = converter;
-		this.codec = codec;
+		this.accumulator = accumulator;
 	}
 
 	@Override
@@ -107,13 +107,13 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 			}
 			else if ( child.isJsonArray() ) {
 				for ( JsonElement childElement : child.getAsJsonArray() ) {
-					F decoded = codec.decode( childElement );
+					F decoded = decodeFunction.apply( childElement );
 					accumulated = accumulator.accumulate( accumulated, decoded );
 				}
 				return accumulated;
 			}
 			else {
-				F decoded = codec.decode( child );
+				F decoded = decodeFunction.apply( child );
 				return accumulator.accumulate( accumulated, decoded );
 			}
 		}

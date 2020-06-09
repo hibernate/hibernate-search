@@ -51,6 +51,6 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 					EventContexts.fromIndexNames( indexNames ) );
 		}
 		return new ElasticsearchFieldProjection<>( indexNames, absoluteFieldPath, absoluteFieldPathComponents,
-				codec, converter, accumulatorProvider.get() );
+				codec::decode, converter, accumulatorProvider.get() );
 	}
 }
