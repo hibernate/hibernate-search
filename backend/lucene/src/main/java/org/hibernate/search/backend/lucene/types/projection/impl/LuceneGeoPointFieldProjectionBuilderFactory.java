@@ -24,10 +24,10 @@ public class LuceneGeoPointFieldProjectionBuilderFactory extends AbstractLuceneF
 
 	@Override
 	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames,
-			String absoluteFieldPath, String nestedDocumentPath,
-			GeoPoint center) {
+			String absoluteFieldPath, String nestedDocumentPath, boolean multiValuedFieldInRoot, GeoPoint center) {
 		checkProjectable( absoluteFieldPath );
 
-		return new LuceneDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedDocumentPath, center );
+		return new LuceneDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedDocumentPath,
+				multiValuedFieldInRoot, codec, center );
 	}
 }
