@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexObjectFieldCardinality;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 
 /**
@@ -27,19 +28,34 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	public static final String DISCRIMINATOR_VALUE_INCLUDED = "included";
 	public static final String DISCRIMINATOR_VALUE_EXCLUDED = "excluded";
 
+	public static SingleFieldIndexBinding create(IndexSchemaElement root,
+			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+		return new SingleFieldIndexBinding( root, supportedFieldTypes, additionalConfiguration,
+				IndexObjectFieldCardinality.MULTI_VALUED );
+	}
+
+	public static SingleFieldIndexBinding createWithSingleValuedNestedFields(IndexSchemaElement root,
+			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+		return new SingleFieldIndexBinding( root, supportedFieldTypes, additionalConfiguration,
+				IndexObjectFieldCardinality.SINGLE_VALUED );
+	}
+
 	public final FirstLevelObjectBinding flattenedObject;
 	public final FirstLevelObjectBinding nestedObject;
 
-	public SingleFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+	private SingleFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
+			IndexObjectFieldCardinality nestedFieldCardinality) {
 		super( root, supportedFieldTypes, additionalConfiguration );
 		flattenedObject = FirstLevelObjectBinding.create(
-				root, "flattenedObject", ObjectFieldStorage.FLATTENED, false,
-				supportedFieldTypes, additionalConfiguration
+				root, "flattenedObject", ObjectFieldStorage.FLATTENED,
+				supportedFieldTypes, additionalConfiguration, nestedFieldCardinality
 		);
 		nestedObject = FirstLevelObjectBinding.create(
-				root, "nestedObject", ObjectFieldStorage.NESTED, true,
-				supportedFieldTypes, additionalConfiguration
+				root, "nestedObject", ObjectFieldStorage.NESTED,
+				supportedFieldTypes, additionalConfiguration, nestedFieldCardinality
 		);
 	}
 
@@ -101,9 +117,9 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 						nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 						value
 				);
-				DocumentElement nestedObject1 = document.addObject( nestedObject.self );
-				nestedObject1.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
 				if ( includeGarbageValueInNested ) {
+					DocumentElement nestedObject1 = document.addObject( nestedObject.self );
+					nestedObject1.addValue( nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
 					nestedObject1.addValue(
 							nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 							garbageValue
@@ -118,9 +134,9 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 						nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 						value
 				);
-				DocumentElement nestedNestedObject1 = nestedObjectFirstLevel.addObject( nestedObject.nestedObject.self );
-				nestedNestedObject1.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
 				if ( includeGarbageValueInNested ) {
+					DocumentElement nestedNestedObject1 = nestedObjectFirstLevel.addObject( nestedObject.nestedObject.self );
+					nestedNestedObject1.addValue( nestedObject.nestedObject.discriminator, DISCRIMINATOR_VALUE_EXCLUDED );
 					nestedNestedObject1.addValue(
 							nestedObject.nestedObject.fieldWithSingleValueModels.get( fieldType ).reference,
 							garbageValue

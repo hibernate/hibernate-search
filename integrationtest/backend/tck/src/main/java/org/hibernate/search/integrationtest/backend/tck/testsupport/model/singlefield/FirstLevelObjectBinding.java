@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexObjectFieldCardinality;
 
 public class FirstLevelObjectBinding extends AbstractObjectBinding {
 	public final String relativeFieldName;
@@ -26,27 +27,29 @@ public class FirstLevelObjectBinding extends AbstractObjectBinding {
 	public final SecondLevelObjectBinding nestedObject;
 
 	public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
-			ObjectFieldStorage storage, boolean multiValued,
-			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			ObjectFieldStorage storage, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
+			IndexObjectFieldCardinality nestedFieldCardinality) {
 		IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-		if ( multiValued ) {
+		if ( ObjectFieldStorage.NESTED.equals( storage )
+				&& IndexObjectFieldCardinality.MULTI_VALUED.equals( nestedFieldCardinality ) ) {
 			objectField.multiValued();
 		}
-		return new FirstLevelObjectBinding( relativeFieldName, objectField,
-				supportedFieldTypes, additionalConfiguration );
+		return new FirstLevelObjectBinding( relativeFieldName, objectField, supportedFieldTypes,
+				additionalConfiguration, nestedFieldCardinality );
 	}
 
 	FirstLevelObjectBinding(String relativeFieldName, IndexSchemaObjectField objectField,
 			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
+			IndexObjectFieldCardinality nestedFieldCardinality) {
 		super( objectField, supportedFieldTypes, additionalConfiguration );
 		this.relativeFieldName = relativeFieldName;
 		self = objectField.toReference();
 		discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 		nestedObject = SecondLevelObjectBinding.create(
-				objectField, "nestedObject", ObjectFieldStorage.NESTED,
-				supportedFieldTypes, additionalConfiguration
+				objectField, "nestedObject", ObjectFieldStorage.NESTED, supportedFieldTypes,
+				additionalConfiguration, nestedFieldCardinality
 		);
 	}
 }

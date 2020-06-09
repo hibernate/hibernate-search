@@ -65,7 +65,8 @@ public class FieldSearchProjectionSingleValuedBaseIT<F> {
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> new SingleFieldIndexBinding( root, supportedFieldTypes, c -> c.projectable( Projectable.YES ) );
+			root -> SingleFieldIndexBinding.createWithSingleValuedNestedFields( root, supportedFieldTypes,
+					c -> c.projectable( Projectable.YES ) );
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
 

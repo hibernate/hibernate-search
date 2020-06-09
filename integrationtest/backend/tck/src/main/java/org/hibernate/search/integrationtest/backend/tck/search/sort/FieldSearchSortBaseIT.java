@@ -103,7 +103,7 @@ public class FieldSearchSortBaseIT<F> {
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> new SingleFieldIndexBinding( root, supportedFieldTypes, c -> c.sortable( Sortable.YES ) );
+			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.sortable( Sortable.YES ) );
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> index = SimpleMappedIndex.of( bindingFactory );
 

@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexObjectFieldCardinality;
 
 public class SecondLevelObjectBinding extends AbstractObjectBinding {
 	public final String relativeFieldName;
@@ -25,9 +26,13 @@ public class SecondLevelObjectBinding extends AbstractObjectBinding {
 
 	public static SecondLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
 			ObjectFieldStorage storage, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
+			IndexObjectFieldCardinality nestedFieldCardinality) {
 		IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-		objectField.multiValued();
+		if ( ObjectFieldStorage.NESTED.equals( storage )
+				&& IndexObjectFieldCardinality.MULTI_VALUED.equals( nestedFieldCardinality ) ) {
+			objectField.multiValued();
+		}
 		return new SecondLevelObjectBinding( relativeFieldName, objectField,
 				supportedFieldTypes, additionalConfiguration );
 	}
