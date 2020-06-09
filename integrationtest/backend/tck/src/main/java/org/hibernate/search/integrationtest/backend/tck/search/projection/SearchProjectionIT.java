@@ -55,7 +55,7 @@ import org.assertj.core.api.Assertions;
 import org.easymock.EasyMockSupport;
 
 /**
- * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldSearchProjectionBaseIT}.
+ * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldSearchProjectionSingleValuedBaseIT}.
  */
 public class SearchProjectionIT extends EasyMockSupport {
 

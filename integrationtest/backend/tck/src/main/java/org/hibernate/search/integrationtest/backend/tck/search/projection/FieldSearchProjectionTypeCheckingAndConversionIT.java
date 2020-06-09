@@ -335,7 +335,6 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
-
 	private String getFieldPath() {
 		return mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 	}
@@ -394,9 +393,13 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithConverterModels;
 		final SimpleFieldModelsByType fieldWithProjectionDisabledModels;
+		final SimpleFieldModelsByType fieldWithMultipleValuesModels;
 
 		final ObjectBinding flattenedObject;
 		final ObjectBinding nestedObject;
+
+		final ObjectBinding flattenedObjectWithMultipleValues;
+		final ObjectBinding nestedObjectWithMultipleValues;
 
 		IndexBinding(IndexSchemaElement root) {
 			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
@@ -407,9 +410,16 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ) );
 			fieldWithProjectionDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonProjectable_", c -> c.projectable( Projectable.NO ) );
+			fieldWithMultipleValuesModels = SimpleFieldModelsByType.mapAllMultiValued( supportedFieldTypes, root,
+					"multiValued_", c -> c.projectable( Projectable.YES ) );
 
-			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED );
+			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED, false );
+			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED, false );
+
+			flattenedObjectWithMultipleValues = new ObjectBinding( root, "multiValued_flattenedObject",
+					ObjectFieldStorage.FLATTENED, true );
+			nestedObjectWithMultipleValues = new ObjectBinding( root, "multiValued_nestedObject",
+					ObjectFieldStorage.NESTED, true );
 		}
 	}
 
@@ -418,9 +428,13 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		final IndexObjectFieldReference self;
 		final SimpleFieldModelsByType fieldModels;
 
-		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
+		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage,
+				boolean multiValued) {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
 			self = objectField.toReference();
 			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, objectField,
 					"", c -> c.projectable( Projectable.YES ) );
@@ -466,7 +480,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 			 * If we try to project a field within this object,
 			 * this will have to lead to an inconsistency exception.
 			 */
-			flattenedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.FLATTENED );
+			flattenedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.FLATTENED, false );
 		}
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
