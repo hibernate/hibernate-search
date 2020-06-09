@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDista
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -21,6 +22,9 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.util.SloppyMath;
 
 /**
  * A projection on the distance from a given center to the GeoPoint defined in an index field.
@@ -39,6 +43,9 @@ class LuceneDistanceToFieldProjection<E, P>
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
+	private final boolean multiValued;
+
+	private final LuceneFieldCodec<GeoPoint> codec;
 
 	private final GeoPoint center;
 	private final DistanceUnit unit;
@@ -48,11 +55,14 @@ class LuceneDistanceToFieldProjection<E, P>
 	private final DistanceCollectorKey collectorKey;
 
 	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
+			boolean multiValued, LuceneFieldCodec<GeoPoint> codec,
 			GeoPoint center, DistanceUnit unit,
 			ProjectionAccumulator<Double, Double, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
+		this.multiValued = multiValued;
+		this.codec = codec;
 		this.center = center;
 		this.unit = unit;
 		this.accumulator = accumulator;
@@ -77,17 +87,37 @@ class LuceneDistanceToFieldProjection<E, P>
 
 	@Override
 	public void request(SearchProjectionRequestContext context) {
-		context.requireCollector( this );
+		if ( multiValued ) {
+			// For multi-valued fields, use storage, because we need order to be preserved.
+			context.requireStoredField( absoluteFieldPath, nestedDocumentPath );
+		}
+		else {
+			// For single-valued fields, we can use the docvalues.
+			context.requireCollector( this );
+		}
 	}
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
 		E accumulated = accumulator.createInitial();
-		Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
-		if ( distanceOrNull != null ) {
-			accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+		if ( multiValued ) {
+			for ( IndexableField field : documentResult.getDocument().getFields() ) {
+				if ( field.name().equals( absoluteFieldPath ) ) {
+					GeoPoint decoded = codec.decode( field );
+					double distanceInMeters = SloppyMath.haversinMeters( center.latitude(), center.longitude(),
+							decoded.latitude(), decoded.longitude() );
+					double distance = unit.fromMeters( distanceInMeters );
+					accumulated = accumulator.accumulate( accumulated, distance );
+				}
+			}
+		}
+		else {
+			GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
+			Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
+			if ( distanceOrNull != null ) {
+				accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+			}
 		}
 		return accumulated;
 	}

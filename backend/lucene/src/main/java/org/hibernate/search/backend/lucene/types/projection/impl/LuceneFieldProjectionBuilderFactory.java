@@ -31,8 +31,8 @@ public interface LuceneFieldProjectionBuilderFactory {
 			String nestedDocumentPath, boolean multiValuedFieldInRoot,
 			Class<U> expectedType, ValueConvert convert);
 
-	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
-			GeoPoint center);
+	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+			String nestedDocumentPath, boolean multiValuedFieldInRoot, GeoPoint center);
 
 	boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory other);
 

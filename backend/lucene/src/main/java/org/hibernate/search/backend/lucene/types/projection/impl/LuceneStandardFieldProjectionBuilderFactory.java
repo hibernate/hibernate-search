@@ -27,8 +27,8 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> extends AbstractLuce
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			String nestedDocumentPath, GeoPoint center) {
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames,
+			String absoluteFieldPath, String nestedDocumentPath, boolean multiValuedFieldInRoot, GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
