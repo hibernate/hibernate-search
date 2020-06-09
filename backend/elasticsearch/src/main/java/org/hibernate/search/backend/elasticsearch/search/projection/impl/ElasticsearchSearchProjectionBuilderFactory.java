@@ -110,9 +110,14 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		// checking relative nested document paths multi index compatibility:
+		String nestedPath = scopeModel.getNestedDocumentPath( absoluteFieldPath );
+
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceProjectionBuilder( scopeModel.getHibernateSearchIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ), center );
+				.getComponent().createDistanceProjectionBuilder( scopeModel.getHibernateSearchIndexNames(),
+						absoluteFieldPath, nestedPath != null, center
+				);
 	}
 
 	@Override

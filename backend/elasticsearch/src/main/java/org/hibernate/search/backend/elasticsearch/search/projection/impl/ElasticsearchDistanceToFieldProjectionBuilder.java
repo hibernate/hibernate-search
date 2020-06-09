@@ -19,17 +19,19 @@ public class ElasticsearchDistanceToFieldProjectionBuilder implements DistanceTo
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final String nestedPath;
+	private final String[] absoluteFieldPathComponents;
+	private boolean nested;
 
 	private final GeoPoint center;
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
 	public ElasticsearchDistanceToFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			String nestedPath, GeoPoint center) {
+			String[] absoluteFieldPathComponents, boolean nested, GeoPoint center) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedPath = nestedPath;
+		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
+		this.nested = nested;
 		this.center = center;
 	}
 
@@ -41,7 +43,7 @@ public class ElasticsearchDistanceToFieldProjectionBuilder implements DistanceTo
 
 	@Override
 	public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-		return new ElasticsearchDistanceToFieldProjection<>( indexNames, absoluteFieldPath, nestedPath, center, unit,
-				accumulatorProvider.get() );
+		return new ElasticsearchDistanceToFieldProjection<>( indexNames, absoluteFieldPath, absoluteFieldPathComponents,
+				nested, !accumulatorProvider.isSingleValued(), center, unit, accumulatorProvider.get() );
 	}
 }

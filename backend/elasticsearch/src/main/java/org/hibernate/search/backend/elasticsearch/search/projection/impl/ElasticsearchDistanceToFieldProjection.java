@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -36,6 +37,7 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
 	private static final JsonArrayAccessor SORT_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
+	private static final ElasticsearchGeoPointFieldCodec CODEC = ElasticsearchGeoPointFieldCodec.INSTANCE;
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER = new ProjectionConverter<>(
 			Double.class,
@@ -46,24 +48,15 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 
 	private static final String DISTANCE_PROJECTION_SCRIPT =
 		// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
-		" Object result;" +
 		" if (doc[params.fieldPath].size() != 0) {" +
-			" result = doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
+			" return doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
 		" } else {" +
-			// At the moment it seems that there is no way to apply #arcDistance on a nested object field.
-			// To workaround this limit we extract the geo point JSON source
-			// and we will compute the distance on client side.
-			" String nestedPath = params.nestedPath;" +
-			" String relativeFieldPath = params.relativeFieldPath;" +
-			" if (params['_source'][nestedPath] == null) return result;" +
-			" if (params['_source'][nestedPath][relativeFieldPath] == null) return result;" +
-			" return params['_source'][nestedPath][relativeFieldPath]" +
-		" }" +
-		" return result;";
+			" return null;" +
+		" }";
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
-	private final String nestedPath;
+	private final boolean multiValued;
 
 	private final GeoPoint center;
 	private final DistanceUnit unit;
@@ -71,17 +64,33 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 	private final ProjectionAccumulator<Double, Double, E, P> accumulator;
 
 	private final String scriptFieldName;
+	private final ElasticsearchFieldProjection<E, P, ?, Double> sourceProjection;
 
-	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
+	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath,
+			String[] absoluteFieldPathComponents, boolean nested, boolean multiValued,
 			GeoPoint center, DistanceUnit unit,
 			ProjectionAccumulator<Double, Double, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedPath = nestedPath;
+		this.multiValued = multiValued;
 		this.center = center;
 		this.unit = unit;
 		this.accumulator = accumulator;
-		this.scriptFieldName = createScriptFieldName( absoluteFieldPath, center, unit );
+		if ( !multiValued && !nested ) {
+			// Rely on docValues when there is no sort to extract the distance from.
+			scriptFieldName = createScriptFieldName( absoluteFieldPath, center, unit );
+			sourceProjection = null;
+		}
+		else {
+			// Rely on _source when there is no sort to extract the distance from.
+			scriptFieldName = null;
+			this.sourceProjection = new ElasticsearchFieldProjection<>(
+					indexNames, absoluteFieldPath, absoluteFieldPathComponents,
+					this::computeDistanceWithUnit,
+					NO_OP_DOUBLE_CONVERTER,
+					accumulator
+			);
+		}
 	}
 
 	@Override
@@ -103,29 +112,40 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		if ( context.getDistanceSortIndex( absoluteFieldPath, center ) == null ) {
+		if ( !multiValued && context.getDistanceSortIndex( absoluteFieldPath, center ) != null ) {
+			// Nothing to do, we'll rely on the sort key
+		}
+		else if ( scriptFieldName != null ) {
 			// we rely on a script to compute the distance
 			SCRIPT_FIELDS_ACCESSOR
 					.property( scriptFieldName ).asObject()
 					.property( "script" ).asObject()
-					.set( requestBody, createScript( absoluteFieldPath, nestedPath, center ) );
+					.set( requestBody, createScript( absoluteFieldPath, center ) );
+		}
+		else {
+			// we rely on the _source to compute the distance
+			sourceProjection.request( requestBody, context );
 		}
 	}
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		E accumulated = accumulator.createInitial();
-		Integer distanceSortIndex = context.getDistanceSortIndex( absoluteFieldPath, center );
+		Integer distanceSortIndex = multiValued ? null : context.getDistanceSortIndex( absoluteFieldPath, center );
 
-		if ( distanceSortIndex == null ) {
+		if ( distanceSortIndex != null ) {
+			E accumulated = accumulator.createInitial();
+			accumulated = accumulator.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
+			return accumulated;
+		}
+		else if ( scriptFieldName != null ) {
+			E accumulated = accumulator.createInitial();
 			accumulated = accumulator.accumulate( accumulated, extractDistanceFromScriptField( hit ) );
+			return accumulated;
 		}
 		else {
-			accumulated = accumulator.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
+			return sourceProjection.extract( projectionHitMapper, hit, context );
 		}
-
-		return accumulated;
 	}
 
 	@Override
@@ -141,17 +161,13 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 			return null;
 		}
 
-		double distanceInMeters;
 		if ( projectedFieldElement.get().isJsonPrimitive() ) {
-			distanceInMeters = projectedFieldElement.get().getAsDouble();
+			return unit.fromMeters( projectedFieldElement.get().getAsDouble() );
 		}
 		else {
 			JsonObject geoPoint = projectedFieldElement.get().getAsJsonObject();
-			distanceInMeters = SloppyMath.haversinMeters( center.latitude(), center.longitude(),
-					geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
+			return computeDistanceWithUnit( geoPoint );
 		}
-
-		return unit.fromMeters( distanceInMeters );
 	}
 
 	private Double extractDistanceFromSortKey(JsonObject hit, int distanceSortIndex) {
@@ -172,6 +188,18 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 		return unit.fromMeters( distanceInMeters );
 	}
 
+	private Double computeDistanceWithUnit(JsonElement geoPoint) {
+		GeoPoint decoded = CODEC.decode( geoPoint );
+		if ( decoded == null ) {
+			return null;
+		}
+		double distanceInMeters = SloppyMath.haversinMeters(
+				center.latitude(), center.longitude(),
+				decoded.latitude(), decoded.longitude()
+		);
+		return unit.fromMeters( distanceInMeters );
+	}
+
 	private static String createScriptFieldName(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
 		StringBuilder sb = new StringBuilder();
 		sb.append( "distance_" )
@@ -185,16 +213,11 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 		return sb.toString();
 	}
 
-	private static JsonObject createScript(String absoluteFieldPath, String nestedPath, GeoPoint center) {
-		String relativeFieldPath = ( nestedPath != null && absoluteFieldPath.startsWith( nestedPath ) ) ?
-			absoluteFieldPath.substring( nestedPath.length() + 1 ) : null;
-
+	private static JsonObject createScript(String absoluteFieldPath, GeoPoint center) {
 		JsonObject params = new JsonObject();
 		params.addProperty( "lat", center.latitude() );
 		params.addProperty( "lon", center.longitude() );
 		params.addProperty( "fieldPath", absoluteFieldPath );
-		params.addProperty( "nestedPath", nestedPath );
-		params.addProperty( "relativeFieldPath", relativeFieldPath );
 
 		JsonObject scriptContent = new JsonObject();
 		scriptContent.addProperty( "lang", "painless" );

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -24,10 +25,14 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
-			GeoPoint center) {
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames,
+			String absoluteFieldPath, boolean nested, GeoPoint center) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		return new ElasticsearchDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath, nestedPath, center );
+		// FIXME HSEARCH-3945 ideally this should be done at bootstrap
+		String[] absoluteFieldPathComponents = FieldPaths.split( absoluteFieldPath );
+
+		return new ElasticsearchDistanceToFieldProjectionBuilder( indexNames, absoluteFieldPath,
+				absoluteFieldPathComponents, nested, center );
 	}
 }
