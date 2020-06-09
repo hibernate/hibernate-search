@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
@@ -32,21 +33,29 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
-	public IndexingExpectations<GeoPoint> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				GeoPoint.of( 0.0, 0.0 ),
-				// Negative 0 is a thing with doubles.
-				GeoPoint.of( 0.0, -0.0 ),
-				GeoPoint.of( -0.0, 0.0 ),
-				GeoPoint.of( -0.0, -0.0 ),
-				GeoPoint.of( 90.0, 0.0 ),
-				GeoPoint.of( 90.0, 180.0 ),
-				GeoPoint.of( 90.0, -180.0 ),
-				GeoPoint.of( -90.0, 0.0 ),
-				GeoPoint.of( -90.0, 180.0 ),
-				GeoPoint.of( -90.0, -180.0 ),
-				GeoPoint.of( 42.0, -42.0 )
-		);
+	protected IndexableValues<GeoPoint> createIndexableValues() {
+		return new IndexableValues<GeoPoint>() {
+			@Override
+			protected List<GeoPoint> create() {
+				return Arrays.asList(
+						GeoPoint.of( 0.0, 0.0 ),
+						// Negative 0 is a thing with doubles.
+						GeoPoint.of( 0.0, -0.0 ),
+						GeoPoint.of( -0.0, 0.0 ),
+						GeoPoint.of( -0.0, -0.0 ),
+						GeoPoint.of( 90.0, 0.0 ),
+						GeoPoint.of( 90.0, 180.0 ),
+						GeoPoint.of( 90.0, -180.0 ),
+						GeoPoint.of( -90.0, 0.0 ),
+						GeoPoint.of( -90.0, 180.0 ),
+						GeoPoint.of( -90.0, -180.0 ),
+						GeoPoint.of( 42.0, -42.0 ),
+						GeoPoint.of( 40, 70 ),
+						GeoPoint.of( 40, 75 ),
+						GeoPoint.of( 40, 80 )
+				);
+			}
+		};
 	}
 
 	@Override
@@ -90,15 +99,6 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	@Override
 	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
 		return ExpectationsAlternative.unsupported( this );
-	}
-
-	@Override
-	public FieldProjectionExpectations<GeoPoint> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				GeoPoint.of( 40, 70 ),
-				GeoPoint.of( 40, 75 ),
-				GeoPoint.of( 40, 80 )
-		);
 	}
 
 	@Override

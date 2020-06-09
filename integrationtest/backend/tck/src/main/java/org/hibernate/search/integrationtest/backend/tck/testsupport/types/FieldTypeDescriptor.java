@@ -14,12 +14,11 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public abstract class FieldTypeDescriptor<F> {
@@ -70,6 +69,8 @@ public abstract class FieldTypeDescriptor<F> {
 	private final String uniqueName;
 
 	private final AscendingUniqueTermValues<F> ascendingUniqueTermValues = createAscendingUniqueTermValues();
+
+	private final IndexableValues<F> indexableValues = createIndexableValues();
 
 	protected FieldTypeDescriptor(Class<F> javaType) {
 		this( javaType, javaType.getSimpleName() );
@@ -122,7 +123,14 @@ public abstract class FieldTypeDescriptor<F> {
 
 	protected abstract AscendingUniqueTermValues<F> createAscendingUniqueTermValues();
 
-	public abstract IndexingExpectations<F> getIndexingExpectations();
+	/**
+	 * @return A set of indexables values, not necessarily unique.
+	 */
+	public final IndexableValues<F> getIndexableValues() {
+		return indexableValues;
+	}
+
+	protected abstract IndexableValues<F> createIndexableValues();
 
 	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
 
@@ -134,8 +142,6 @@ public abstract class FieldTypeDescriptor<F> {
 		// Assume supported by default: this way, we'll get test failures if we forget to override this method.
 		return ExpectationsAlternative.supported( this );
 	}
-
-	public abstract FieldProjectionExpectations<F> getFieldProjectionExpectations();
 
 	public abstract Optional<IndexNullAsMatchPredicateExpectactions<F>> getIndexNullAsMatchPredicateExpectations();
 }

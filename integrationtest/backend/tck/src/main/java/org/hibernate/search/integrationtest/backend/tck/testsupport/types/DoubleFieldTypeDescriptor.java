@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 
@@ -56,19 +55,25 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	}
 
 	@Override
-	public IndexingExpectations<Double> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				Double.MIN_VALUE, Double.MAX_VALUE,
-				- Double.MIN_VALUE, - Double.MAX_VALUE,
-				// Elasticsearch doesn't support these: it fails when parsing them
-				//Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NaN,
-				0.0,
-				-0.0, // Negative 0 is a different double
-				Math.nextDown( 0.0 ),
-				Math.nextUp( 0.0 ),
-				42.42,
-				1584514514.000000184
-		);
+	protected IndexableValues<Double> createIndexableValues() {
+		return new IndexableValues<Double>() {
+			@Override
+			protected List<Double> create() {
+				return Arrays.asList(
+						Double.MIN_VALUE, Double.MAX_VALUE,
+						- Double.MIN_VALUE, - Double.MAX_VALUE,
+						// Elasticsearch doesn't support these: it fails when parsing them
+						//Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NaN,
+						0.0,
+						-0.0, // Negative 0 is a different double
+						Math.nextDown( 0.0 ),
+						Math.nextUp( 0.0 ),
+						42.42,
+						1584514514.000000184,
+						-1.001, 3.0, 5.1
+				);
+			}
+		};
 	}
 
 	@Override
@@ -90,13 +95,6 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	public ExistsPredicateExpectations<Double> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				0.0, 42.1
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Double> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				-1.001, 3.0, 5.1
 		);
 	}
 

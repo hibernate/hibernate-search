@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 
@@ -56,19 +55,25 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	}
 
 	@Override
-	public IndexingExpectations<Float> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				Float.MIN_VALUE, Float.MAX_VALUE,
-				- Float.MIN_VALUE, - Float.MAX_VALUE,
-				// Elasticsearch doesn't support these: it fails when parsing them
-				//Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NaN,
-				0.0f,
-				-0.0f, // Negative 0 is a different float
-				Math.nextDown( 0.0f ),
-				Math.nextUp( 0.0f ),
-				42.42f,
-				1584514514.000000184f
-		);
+	protected IndexableValues<Float> createIndexableValues() {
+		return new IndexableValues<Float>() {
+			@Override
+			protected List<Float> create() {
+				return Arrays.asList(
+						Float.MIN_VALUE, Float.MAX_VALUE,
+						- Float.MIN_VALUE, - Float.MAX_VALUE,
+						// Elasticsearch doesn't support these: it fails when parsing them
+						//Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NaN,
+						0.0f,
+						-0.0f, // Negative 0 is a different float
+						Math.nextDown( 0.0f ),
+						Math.nextUp( 0.0f ),
+						42.42f,
+						1584514514.000000184f,
+						-1.001f, 3.0f, 5.1f
+				);
+			}
+		};
 	}
 
 	@Override
@@ -90,13 +95,6 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	public ExistsPredicateExpectations<Float> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				0.0f, 67.0f
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Float> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				-1.001f, 3.0f, 5.1f
 		);
 	}
 

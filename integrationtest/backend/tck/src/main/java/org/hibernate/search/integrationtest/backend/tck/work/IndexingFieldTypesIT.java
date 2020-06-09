@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -55,11 +54,9 @@ public class IndexingFieldTypesIT<F> {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private final FieldTypeDescriptor<F> typeDescriptor;
-	private final IndexingExpectations<F> expectations;
 
 	public IndexingFieldTypesIT(FieldTypeDescriptor<F> typeDescriptor) {
 		this.typeDescriptor = typeDescriptor;
-		this.expectations = typeDescriptor.getIndexingExpectations();
 	}
 
 	@Before
@@ -69,7 +66,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@Test
 	public void withReference() {
-		List<F> values = new ArrayList<>( expectations.getValues() );
+		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().get() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -109,7 +106,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@Test
 	public void withPath() {
-		List<F> values = new ArrayList<>( expectations.getValues() );
+		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().get() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
@@ -155,7 +152,7 @@ public class IndexingFieldTypesIT<F> {
 						.supportsValuesForDynamicField( typeDescriptor.getJavaType() )
 		);
 
-		List<F> values = new ArrayList<>( expectations.getValues() );
+		List<F> values = new ArrayList<>( this.typeDescriptor.getIndexableValues().get() );
 		values.add( null ); // Also test null
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 

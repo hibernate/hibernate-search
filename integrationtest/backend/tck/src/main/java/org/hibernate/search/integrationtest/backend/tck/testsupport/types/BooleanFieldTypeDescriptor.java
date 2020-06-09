@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
@@ -53,11 +52,17 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
-	public IndexingExpectations<Boolean> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				true,
-				false
-		);
+	protected IndexableValues<Boolean> createIndexableValues() {
+		return new IndexableValues<Boolean>() {
+			@Override
+			protected List<Boolean> create() {
+				return Arrays.asList(
+						true,
+						false,
+						true
+				);
+			}
+		};
 	}
 
 	@Override
@@ -83,13 +88,6 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	@Override
 	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
 		return ExpectationsAlternative.unsupported( this );
-	}
-
-	@Override
-	public FieldProjectionExpectations<Boolean> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				true, false, true
-		);
 	}
 
 	@Override

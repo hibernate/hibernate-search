@@ -15,12 +15,11 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecimal> {
 
@@ -68,20 +67,25 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	}
 
 	@Override
-	public IndexingExpectations<BigDecimal> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				BigDecimal.ZERO,
-				BigDecimal.ONE,
-				BigDecimal.TEN,
-				nextUp( BigDecimal.ONE ) ,
-				nextDown( BigDecimal.ONE ),
-				BigDecimal.valueOf( 42.42 ),
-				BigDecimal.valueOf( 1584514514.000000184 ),
-				scaled( Long.MAX_VALUE ),
-				scaled( Long.MIN_VALUE ),
-				new BigDecimal( "-0.00000000012" ),
-				BigDecimal.valueOf( 0.0000000001 )
-		);
+	protected IndexableValues<BigDecimal> createIndexableValues() {
+		return new IndexableValues<BigDecimal>() {
+			@Override
+			protected List<BigDecimal> create() {
+				return Arrays.asList(
+						BigDecimal.ZERO,
+						BigDecimal.ONE,
+						BigDecimal.TEN,
+						nextUp( BigDecimal.ONE ) ,
+						nextDown( BigDecimal.ONE ),
+						BigDecimal.valueOf( 42.42 ),
+						BigDecimal.valueOf( 1584514514.000000184 ),
+						scaled( Long.MAX_VALUE ),
+						scaled( Long.MIN_VALUE ),
+						new BigDecimal( "-0.00000000012" ),
+						BigDecimal.valueOf( 0.0000000001 )
+				);
+			}
+		};
 	}
 
 	@Override
@@ -103,13 +107,6 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	public ExistsPredicateExpectations<BigDecimal> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				BigDecimal.ZERO, new BigDecimal( 42.1 )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<BigDecimal> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				BigDecimal.valueOf( -1001 ), BigDecimal.valueOf( 3 ), BigDecimal.valueOf( 51 )
 		);
 	}
 

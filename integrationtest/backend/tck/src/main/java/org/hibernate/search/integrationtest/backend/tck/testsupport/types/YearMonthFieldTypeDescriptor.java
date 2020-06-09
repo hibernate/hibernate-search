@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -15,12 +16,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth> {
 
@@ -60,14 +60,19 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
-	public IndexingExpectations<YearMonth> getIndexingExpectations() {
-		List<YearMonth> values = new ArrayList<>();
-		YearFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( year -> {
-			Arrays.stream( Month.values() ).forEach( month -> {
-				values.add( year.atMonth( month ) );
-			} );
-		} );
-		return new IndexingExpectations<>( values );
+	protected IndexableValues<YearMonth> createIndexableValues() {
+		return new IndexableValues<YearMonth>() {
+			@Override
+			protected List<YearMonth> create() {
+				List<YearMonth> values = new ArrayList<>();
+				for ( Year year : YearFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+					for ( Month month : Month.values() ) {
+						values.add( year.atMonth( month ) );
+					}
+				}
+				return values;
+			}
+		};
 	}
 
 	@Override
@@ -92,13 +97,6 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 		return new ExistsPredicateExpectations<>(
 				YearMonth.of( 0, Month.JANUARY ),
 				YearMonth.of( 2017, Month.NOVEMBER )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<YearMonth> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-			YearMonth.of( -320, Month.NOVEMBER ), YearMonth.of( 1984, Month.JANUARY ), YearMonth.of( 6001, Month.NOVEMBER )
 		);
 	}
 

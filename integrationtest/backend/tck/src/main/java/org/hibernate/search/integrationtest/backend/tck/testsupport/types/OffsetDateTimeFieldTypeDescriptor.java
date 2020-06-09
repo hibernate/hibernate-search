@@ -16,27 +16,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetDateTime> {
-
-	static List<ZoneOffset> getOffsetsForIndexingExpectations() {
-		return Arrays.asList(
-				ZoneOffset.UTC,
-				ZoneOffset.ofHoursMinutes( -8, 0 ),
-				ZoneOffset.ofHoursMinutes( -2, -30 ),
-				ZoneOffset.ofHoursMinutes( -2, 0 ),
-				ZoneOffset.ofHoursMinutes( 2, 0 ),
-				ZoneOffset.ofHoursMinutes( 2, 30 ),
-				ZoneOffset.ofHoursMinutes( 10, 0 ),
-				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
-		);
-	}
 
 	public static final OffsetDateTimeFieldTypeDescriptor INSTANCE = new OffsetDateTimeFieldTypeDescriptor();
 
@@ -81,14 +67,32 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	}
 
 	@Override
-	public IndexingExpectations<OffsetDateTime> getIndexingExpectations() {
-		List<OffsetDateTime> values = new ArrayList<>();
-		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
-			getOffsetsForIndexingExpectations().forEach( offset -> {
-				values.add( localDateTime.atOffset( offset ) );
-			} );
-		} );
-		return new IndexingExpectations<>( values );
+	protected IndexableValues<OffsetDateTime> createIndexableValues() {
+		return new IndexableValues<OffsetDateTime>() {
+			@Override
+			protected List<OffsetDateTime> create() {
+				List<OffsetDateTime> values = new ArrayList<>();
+				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+					for ( ZoneOffset offset : createIndexableOffsetList() ) {
+						values.add( localDateTime.atOffset( offset ) );
+					}
+				}
+				return values;
+			}
+		};
+	}
+
+	List<ZoneOffset> createIndexableOffsetList() {
+		return Arrays.asList(
+				ZoneOffset.UTC,
+				ZoneOffset.ofHoursMinutes( -8, 0 ),
+				ZoneOffset.ofHoursMinutes( -2, -30 ),
+				ZoneOffset.ofHoursMinutes( -2, 0 ),
+				ZoneOffset.ofHoursMinutes( 2, 0 ),
+				ZoneOffset.ofHoursMinutes( 2, 30 ),
+				ZoneOffset.ofHoursMinutes( 10, 0 ),
+				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
+		);
 	}
 
 	@Override
@@ -117,15 +121,6 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 		return new ExistsPredicateExpectations<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atOffset( ZoneOffset.UTC ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<OffsetDateTime> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				LocalDateTime.of( 2018, 2, 1, 16, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 1, 23, 59, 59 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atOffset( ZoneOffset.UTC )
 		);
 	}
 

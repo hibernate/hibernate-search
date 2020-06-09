@@ -18,29 +18,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 
 public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedDateTime> {
-
-	private static List<ZoneId> getZoneIdsForIndexingExpectations() {
-		return Arrays.asList(
-				ZoneId.of( "UTC" ),
-				ZoneId.of( "Europe/Paris" ),
-				ZoneId.of( "Europe/Amsterdam" ),
-				ZoneId.of( "America/Los_Angeles" ),
-				// HSEARCH-3548: also test ZoneOffsets used as ZoneIds
-				ZoneOffset.UTC, // Strangely, this is not the same as ZoneId.of( "UTC" )
-				ZoneOffset.ofHoursMinutes( -2, 0 ),
-				ZoneOffset.ofHoursMinutes( 2, 30 ),
-				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
-		);
-	}
 
 	public static final ZonedDateTimeFieldTypeDescriptor INSTANCE = new ZonedDateTimeFieldTypeDescriptor();
 
@@ -105,22 +90,41 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 	}
 
 	@Override
-	public IndexingExpectations<ZonedDateTime> getIndexingExpectations() {
-		List<ZonedDateTime> values = new ArrayList<>();
-		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
-			getZoneIdsForIndexingExpectations().forEach( zoneId -> {
-				values.add( localDateTime.atZone( zoneId ) );
-			} );
-		} );
-		// HSEARCH-3557: Two date/times that could be ambiguous due to a daylight saving time switch
-		Collections.addAll(
-				values,
-				LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
-						.withEarlierOffsetAtOverlap(),
-				LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
-						.withLaterOffsetAtOverlap()
+	protected IndexableValues<ZonedDateTime> createIndexableValues() {
+		return new IndexableValues<ZonedDateTime>() {
+			@Override
+			protected List<ZonedDateTime> create() {
+				List<ZonedDateTime> values = new ArrayList<>();
+				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+					for ( ZoneId zoneId : createIndexableZoneIdList() ) {
+						values.add( localDateTime.atZone( zoneId ) );
+					}
+				}
+				// HSEARCH-3557: Two date/times that could be ambiguous due to a daylight saving time switch
+				Collections.addAll(
+						values,
+						LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+								.withEarlierOffsetAtOverlap(),
+						LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+								.withLaterOffsetAtOverlap()
+				);
+				return values;
+			}
+		};
+	}
+
+	private List<ZoneId> createIndexableZoneIdList() {
+		return Arrays.asList(
+				ZoneId.of( "UTC" ),
+				ZoneId.of( "Europe/Paris" ),
+				ZoneId.of( "Europe/Amsterdam" ),
+				ZoneId.of( "America/Los_Angeles" ),
+				// HSEARCH-3548: also test ZoneOffsets used as ZoneIds
+				ZoneOffset.UTC, // Strangely, this is not the same as ZoneId.of( "UTC" )
+				ZoneOffset.ofHoursMinutes( -2, 0 ),
+				ZoneOffset.ofHoursMinutes( 2, 30 ),
+				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
 		);
-		return new IndexingExpectations<>( values );
 	}
 
 	@Override
@@ -149,15 +153,6 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 		return new ExistsPredicateExpectations<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atZone( ZoneId.of( "Europe/Paris" ) )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<ZonedDateTime> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				LocalDateTime.of( 2018, 2, 1, 23, 0, 0, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 23, 59, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) )
 		);
 	}
 

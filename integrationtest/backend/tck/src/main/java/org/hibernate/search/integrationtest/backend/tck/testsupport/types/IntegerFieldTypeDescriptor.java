@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
@@ -56,11 +55,16 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	}
 
 	@Override
-	public IndexingExpectations<Integer> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				Integer.MIN_VALUE, Integer.MAX_VALUE,
-				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
-		);
+	protected IndexableValues<Integer> createIndexableValues() {
+		return new IndexableValues<Integer>() {
+			@Override
+			protected List<Integer> create() {
+				return Arrays.asList(
+						Integer.MIN_VALUE, Integer.MAX_VALUE,
+						-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
+				);
+			}
+		};
 	}
 
 	@Override
@@ -82,13 +86,6 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	public ExistsPredicateExpectations<Integer> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				0, 12
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Integer> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				1, 3, 5
 		);
 	}
 

@@ -13,23 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime> {
-
-	static List<LocalTime> getValuesForIndexingExpectations() {
-		return Arrays.asList(
-				LocalTime.of( 0, 0, 0, 0 ),
-				LocalTime.of( 10, 15, 30, 0 ),
-				LocalTime.of( 11, 15, 30, 555_000_000 ),
-				LocalTime.of( 23, 59, 59, 999_000_000 )
-		);
-	}
 
 	public static final LocalTimeFieldTypeDescriptor INSTANCE = new LocalTimeFieldTypeDescriptor();
 
@@ -68,8 +58,21 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 	}
 
 	@Override
-	public IndexingExpectations<LocalTime> getIndexingExpectations() {
-		return new IndexingExpectations<>( getValuesForIndexingExpectations() );
+	protected IndexableValues<LocalTime> createIndexableValues() {
+		return new IndexableValues<LocalTime>() {
+			@Override
+			protected List<LocalTime> create() {
+				return Arrays.asList(
+						LocalTime.of( 0, 0, 0, 0 ),
+						LocalTime.of( 10, 15, 30, 0 ),
+						LocalTime.of( 11, 15, 30, 555_000_000 ),
+						LocalTime.of( 23, 59, 59, 999_000_000 ),
+						LocalTime.of( 10, 10, 10, 123_000_000 ),
+						LocalTime.of( 11, 10, 10, 123_450_000 ),
+						LocalTime.of( 12, 10, 10, 123_456_789 )
+				);
+			}
+		};
 	}
 
 	@Override
@@ -98,15 +101,6 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 		return new ExistsPredicateExpectations<>(
 				LocalTime.of( 0, 0, 0 ),
 				LocalTime.of( 12, 14, 52 )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<LocalTime> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				LocalTime.of( 10, 10, 10, 123_000_000 ),
-				LocalTime.of( 11, 10, 10, 123_450_000 ),
-				LocalTime.of( 12, 10, 10, 123_456_789 )
 		);
 	}
 

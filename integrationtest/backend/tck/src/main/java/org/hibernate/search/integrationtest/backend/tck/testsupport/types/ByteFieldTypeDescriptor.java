@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 
@@ -63,11 +62,16 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	}
 
 	@Override
-	public IndexingExpectations<Byte> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				Byte.MIN_VALUE, Byte.MAX_VALUE,
-				(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42
-		);
+	protected IndexableValues<Byte> createIndexableValues() {
+		return new IndexableValues<Byte>() {
+			@Override
+			protected List<Byte> create() {
+				return Arrays.asList(
+						Byte.MIN_VALUE, Byte.MAX_VALUE,
+						(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42
+				);
+			}
+		};
 	}
 
 	@Override
@@ -89,13 +93,6 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	public ExistsPredicateExpectations<Byte> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				(byte) 0, (byte) 42
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Byte> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				(byte) 1, (byte) 3, (byte) 5
 		);
 	}
 
