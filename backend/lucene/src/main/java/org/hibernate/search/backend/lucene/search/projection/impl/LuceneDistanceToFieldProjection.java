@@ -14,30 +14,48 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDista
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class LuceneDistanceToFieldProjection
-		implements LuceneSearchProjection<Double, Double>, CollectorFactory<GeoPointDistanceCollector> {
+/**
+ * A projection on the distance from a given center to the GeoPoint defined in an index field.
+ *
+ * @param <E> The type of aggregated values extracted from the backend response (before conversion).
+ * @param <P> The type of aggregated values returned by the projection (after conversion).
+ */
+class LuceneDistanceToFieldProjection<E, P>
+		implements LuceneSearchProjection<E, P>, CollectorFactory<GeoPointDistanceCollector> {
+
+	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER = new ProjectionConverter<>(
+			Double.class,
+			(value, context) -> value
+	);
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 
 	private final GeoPoint center;
-
 	private final DistanceUnit unit;
+
+	private final ProjectionAccumulator<Double, Double, E, P> accumulator;
 
 	private final DistanceCollectorKey collectorKey;
 
-	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath, GeoPoint center, DistanceUnit unit) {
+	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
+			GeoPoint center, DistanceUnit unit,
+			ProjectionAccumulator<Double, Double, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
 		this.center = center;
 		this.unit = unit;
+		this.accumulator = accumulator;
 		this.collectorKey = new DistanceCollectorKey( absoluteFieldPath, center );
 	}
 
@@ -47,6 +65,7 @@ class LuceneDistanceToFieldProjection
 				.append( "[" )
 				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
 				.append( ", center=" ).append( center )
+				.append( ", accumulator=" ).append( accumulator )
 				.append( "]" );
 		return sb.toString();
 	}
@@ -62,18 +81,22 @@ class LuceneDistanceToFieldProjection
 	}
 
 	@Override
-	public Double extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
 		GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
-		return unit.fromMeters( distanceCollector.getDistance(
-				documentResult.getDocId()
-		) );
+		E accumulated = accumulator.createInitial();
+		Double distanceOrNull = distanceCollector.getDistance( documentResult.getDocId() );
+		if ( distanceOrNull != null ) {
+			accumulated = accumulator.accumulate( accumulated, unit.fromMeters( distanceOrNull ) );
+		}
+		return accumulated;
 	}
 
 	@Override
-	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
+	public P transform(LoadingResult<?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
-		return extractedData;
+		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
+		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
 	}
 
 	@Override

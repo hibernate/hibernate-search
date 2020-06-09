@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -39,6 +40,7 @@ public class ElasticsearchDistanceToFieldProjectionBuilder implements DistanceTo
 
 	@Override
 	public SearchProjection<Double> build() {
-		return new ElasticsearchDistanceToFieldProjection( indexNames, absoluteFieldPath, nestedPath, center, unit );
+		return new ElasticsearchDistanceToFieldProjection<>( indexNames, absoluteFieldPath, nestedPath, center, unit,
+				SingleValuedProjectionAccumulator.<Double>provider().get() );
 	}
 }
