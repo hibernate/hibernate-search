@@ -173,8 +173,13 @@ public class LuceneScopeModel {
 				selectedSchemaNode = schemaNode;
 				indexModelForSelectedSchemaNode = indexModel;
 				scopedIndexFieldComponent.setComponent( component );
+				scopedIndexFieldComponent.setMultiValuedFieldInRoot( schemaNode.multiValuedInRoot() );
 				continue;
 			}
+
+			scopedIndexFieldComponent.setMultiValuedFieldInRoot(
+					scopedIndexFieldComponent.isMultiValuedFieldInRoot() || schemaNode.multiValued()
+			);
 
 			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
 				throw componentRetrievalStrategy.createCompatibilityException(

@@ -44,7 +44,8 @@ public abstract class AbstractLuceneFieldProjectionBuilderFactory<F> implements 
 
 	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
+	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames,
+			String absoluteFieldPath, String nestedDocumentPath, boolean multiValuedFieldInRoot,
 			Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath );
 
@@ -55,7 +56,8 @@ public abstract class AbstractLuceneFieldProjectionBuilderFactory<F> implements 
 		}
 
 		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>(
-				indexNames, absoluteFieldPath, nestedDocumentPath, requestConverter, codec
+				indexNames, absoluteFieldPath, nestedDocumentPath, multiValuedFieldInRoot,
+				requestConverter, codec
 		);
 	}
 
