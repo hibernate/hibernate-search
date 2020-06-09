@@ -361,7 +361,7 @@
         <profile>
             <id>elasticsearch-6.7</id>
             <properties>
-                <test.elasticsearch.connection.version>6.8.1</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>6.8.9</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
