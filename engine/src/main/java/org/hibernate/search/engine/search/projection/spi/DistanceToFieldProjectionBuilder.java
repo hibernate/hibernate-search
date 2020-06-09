@@ -6,10 +6,18 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 
 public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilder<Double> {
 
 	DistanceToFieldProjectionBuilder unit(DistanceUnit unit);
+
+	@Override
+	default SearchProjection<Double> build() {
+		return build( SingleValuedProjectionAccumulator.provider() );
+	}
+
+	<P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider);
 
 }

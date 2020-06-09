@@ -101,8 +101,14 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 			}
 
 			@Override
-			public SearchProjection<Double> build() {
-				return StubDefaultSearchProjection.get();
+			@SuppressWarnings("unchecked")
+			public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
+				if ( accumulatorProvider == SingleValuedProjectionAccumulator.<Double>provider() ) {
+					return (SearchProjection<P>) build();
+				}
+				else {
+					throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
+				}
 			}
 		};
 	}
