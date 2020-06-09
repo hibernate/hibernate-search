@@ -291,12 +291,29 @@ public class ProjectionDslIT {
 			SearchResult<Double> result = searchSession.search( Author.class )
 					.select( f -> f.distance( "placeOfBirth", center ) )
 					.where( f -> f.matchAll() )
-					.fetch( 20 ); // <3>
+					.fetch( 20 );
 			// end::distance[]
 			assertThat( result.hits() )
 					.hasSize( 2 )
 					.allSatisfy(
 							distance -> assertThat( distance ).isBetween( 1_000_000.0, 10_000_000.0 )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::distance-multiValued[]
+			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
+			SearchResult<List<Double>> result = searchSession.search( Book.class )
+					.select( f -> f.distance( "authors.placeOfBirth", center ).multi() )
+					.where( f -> f.matchAll() )
+					.fetch( 20 );
+			// end::distance-multiValued[]
+			assertThat( result.hits() )
+					.hasSize( 4 )
+					.allSatisfy(
+							distances -> assertThat( distances ).isNotEmpty().allSatisfy(
+									distance -> assertThat( distance ).isBetween( 1_000_000.0, 10_000_000.0 )
+							)
 					);
 		} );
 
@@ -307,7 +324,7 @@ public class ProjectionDslIT {
 					.select( f -> f.distance( "placeOfBirth", center )
 							.unit( DistanceUnit.KILOMETERS ) )
 					.where( f -> f.matchAll() )
-					.fetch( 20 ); // <3>
+					.fetch( 20 );
 			// end::distance-unit[]
 			assertThat( result.hits() )
 					.hasSize( 2 )

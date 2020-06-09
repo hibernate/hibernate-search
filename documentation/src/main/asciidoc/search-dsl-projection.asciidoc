@@ -153,6 +153,14 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+.Returning the distance to a point, for multi-valued fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-multiValued]
+----
+====
+
 .Returning the distance to a point with a given distance unit
 ====
 [source, JAVA, indent=0, subs="+callouts"]
