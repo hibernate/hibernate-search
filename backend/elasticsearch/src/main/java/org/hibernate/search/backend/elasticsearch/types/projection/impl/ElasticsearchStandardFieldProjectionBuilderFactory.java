@@ -49,7 +49,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 	@Override
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			Class<T> expectedType, ValueConvert convert) {
+			boolean multiValuedFieldInRoot, Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath, projectable );
 
 		ProjectionConverter<? super F, ?> requestConverter = getConverter( convert );
@@ -62,7 +62,8 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 		String[] absoluteFieldPathComponents = FieldPaths.split( absoluteFieldPath );
 
 		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>(
-				indexNames, absoluteFieldPath, absoluteFieldPathComponents, requestConverter, codec );
+				indexNames, absoluteFieldPath, absoluteFieldPathComponents, multiValuedFieldInRoot,
+				requestConverter, codec );
 	}
 
 	@Override

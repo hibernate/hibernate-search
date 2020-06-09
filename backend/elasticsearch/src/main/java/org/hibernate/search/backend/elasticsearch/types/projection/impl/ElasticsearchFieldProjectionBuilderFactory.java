@@ -28,7 +28,7 @@ public interface ElasticsearchFieldProjectionBuilderFactory {
 	boolean isProjectable();
 
 	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			Class<T> expectedType, ValueConvert convert);
+			boolean multiValuedFieldInRoot, Class<T> expectedType, ValueConvert convert);
 
 	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
 			GeoPoint center);

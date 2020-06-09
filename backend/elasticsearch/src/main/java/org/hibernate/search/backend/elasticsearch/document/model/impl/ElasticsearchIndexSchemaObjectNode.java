@@ -26,4 +26,6 @@ public interface ElasticsearchIndexSchemaObjectNode extends IndexCompositeElemen
 	@Override
 	Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren();
 
+	boolean multiValuedInRoot();
+
 }

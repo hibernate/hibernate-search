@@ -82,7 +82,8 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 		return fieldComponent.getComponent()
 				.createFieldValueProjectionBuilder(
-						scopeModel.getHibernateSearchIndexNames(), absoluteFieldPath, expectedType, convert
+						scopeModel.getHibernateSearchIndexNames(), absoluteFieldPath,
+						fieldComponent.isMultiValuedFieldInRoot(), expectedType, convert
 				);
 	}
 
