@@ -64,10 +64,11 @@ class LuceneFieldProjection<E, P, F, V> implements LuceneSearchProjection<E, P> 
 	public E extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
 		E extracted = accumulator.createInitial();
-		IndexableField field = documentResult.getDocument().getField( absoluteFieldPath );
-		if ( field != null ) {
-			F decoded = codec.decode( field );
-			extracted = accumulator.accumulate( extracted, decoded );
+		for ( IndexableField field : documentResult.getDocument().getFields() ) {
+			if ( field.name().equals( absoluteFieldPath ) ) {
+				F decoded = codec.decode( field );
+				extracted = accumulator.accumulate( extracted, decoded );
+			}
 		}
 		return extracted;
 	}
