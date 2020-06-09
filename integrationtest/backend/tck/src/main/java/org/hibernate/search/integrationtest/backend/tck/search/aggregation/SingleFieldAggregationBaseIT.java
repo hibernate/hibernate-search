@@ -84,7 +84,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private static final Function<IndexSchemaElement, SingleFieldIndexBinding> bindingFactory =
-			root -> new SingleFieldIndexBinding( root, supportedFieldTypes, c -> c.aggregable( Aggregable.YES ) );
+			root -> SingleFieldIndexBinding.create( root, supportedFieldTypes, c -> c.aggregable( Aggregable.YES ) );
 
 	private static final SimpleMappedIndex<SingleFieldIndexBinding> mainIndex =
 			SimpleMappedIndex.of( bindingFactory ).name( "Main" );
