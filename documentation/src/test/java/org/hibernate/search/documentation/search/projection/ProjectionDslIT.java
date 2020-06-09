@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
@@ -202,6 +203,30 @@ public class ProjectionDslIT {
 					session.getReference( Book.class, BOOK2_ID ).getGenre(),
 					session.getReference( Book.class, BOOK3_ID ).getGenre(),
 					session.getReference( Book.class, BOOK4_ID ).getGenre()
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::field-multiValued[]
+			List<List<String>> hits = searchSession.search( Book.class )
+					.select( f -> f.field( "authors.lastName", String.class ).multi() )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::field-multiValued[]
+			Session session = searchSession.toOrmSession();
+			assertThat( hits ).containsExactlyInAnyOrder(
+					session.getReference( Book.class, BOOK1_ID ).getAuthors().stream()
+							.map( Author::getLastName )
+							.collect( Collectors.toList() ),
+					session.getReference( Book.class, BOOK2_ID ).getAuthors().stream()
+							.map( Author::getLastName )
+							.collect( Collectors.toList() ),
+					session.getReference( Book.class, BOOK3_ID ).getAuthors().stream()
+							.map( Author::getLastName )
+							.collect( Collectors.toList() ),
+					session.getReference( Book.class, BOOK4_ID ).getAuthors().stream()
+							.map( Author::getLastName )
+							.collect( Collectors.toList() )
 			);
 		} );
 

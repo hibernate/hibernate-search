@@ -107,6 +107,14 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+.Returning field values from matched documents, for multi-valued fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-multiValued]
+----
+====
+
 .Returning field values from matched documents, without specifying the field type
 ====
 [source, JAVA, indent=0, subs="+callouts"]
