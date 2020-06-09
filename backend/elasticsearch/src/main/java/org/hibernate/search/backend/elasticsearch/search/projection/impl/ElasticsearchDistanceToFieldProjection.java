@@ -52,12 +52,12 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	private final String nestedPath;
 
 	private final GeoPoint center;
-
 	private final DistanceUnit unit;
 
 	private final String scriptFieldName;
 
-	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedPath, GeoPoint center, DistanceUnit unit) {
+	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
+			GeoPoint center, DistanceUnit unit) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedPath = nestedPath;
@@ -96,32 +96,17 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		Optional<Double> distance;
+		Double distance;
 		Integer distanceSortIndex = context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex == null ) {
-			// we extract the value from the fields computed by the script_fields
 			distance = extractDistanceFromScriptField( hit );
 		}
 		else {
-			// we extract the value from the sort key
-			Optional<JsonElement> sortKeyDistanceElement = SORT_ACCESSOR.element( distanceSortIndex ).get( hit );
-
-			if ( !sortKeyDistanceElement.isPresent() ) {
-				distance = Optional.empty();
-			}
-			else if ( !sortKeyDistanceElement.get().getAsJsonPrimitive().isNumber() ) {
-				// Elasticsearch will return "Infinity" if the distance has not been computed.
-				// Usually, it's because the indexed object doesn't have a location defined for this field.
-				distance = Optional.empty();
-			}
-			else {
-				distance = Optional.of( sortKeyDistanceElement.get().getAsJsonPrimitive().getAsDouble() );
-			}
+			distance = extractDistanceFromSortKey( hit, distanceSortIndex );
 		}
 
-		return distance.isPresent() && Double.isFinite( distance.get() ) ?
-				unit.fromMeters( distance.get() ) : null;
+		return distance != null ? unit.fromMeters( distance ) : null;
 	}
 
 	@Override
@@ -130,21 +115,38 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		return extractedData;
 	}
 
-	private Optional<Double> extractDistanceFromScriptField(JsonObject hit) {
+	private Double extractDistanceFromScriptField(JsonObject hit) {
 		Optional<JsonElement> projectedFieldElement = FIELDS_ACCESSOR.property( scriptFieldName ).asArray().element( 0 ).get( hit );
 		if ( !projectedFieldElement.isPresent() || projectedFieldElement.get().isJsonNull() ) {
-			return Optional.empty();
+			return null;
 		}
 
 		if ( projectedFieldElement.get().isJsonPrimitive() ) {
-			return Optional.of( projectedFieldElement.get().getAsDouble() );
+			return projectedFieldElement.get().getAsDouble();
 		}
 
 		JsonObject geoPoint = projectedFieldElement.get().getAsJsonObject();
 		double distanceInMeters = SloppyMath.haversinMeters(
 				center.latitude(), center.longitude(), geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
 
-		return Optional.of( unit.fromMeters( distanceInMeters ) );
+		return unit.fromMeters( distanceInMeters );
+	}
+
+	private Double extractDistanceFromSortKey(JsonObject hit, int distanceSortIndex) {
+		// we extract the value from the sort key
+		Optional<JsonElement> sortKeyDistanceElement = SORT_ACCESSOR.element( distanceSortIndex ).get( hit );
+
+		if ( !sortKeyDistanceElement.isPresent() ) {
+			return null;
+		}
+		else if ( !sortKeyDistanceElement.get().getAsJsonPrimitive().isNumber() ) {
+			// Elasticsearch will return "Infinity" if the distance has not been computed.
+			// Usually, it's because the indexed object doesn't have a location defined for this field.
+			return null;
+		}
+		else {
+			return sortKeyDistanceElement.get().getAsJsonPrimitive().getAsDouble();
+		}
 	}
 
 	private static String createScriptFieldName(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
