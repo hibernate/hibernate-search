@@ -58,4 +58,8 @@ public class TckBackendFeatures {
 	public boolean supportsValuesForDynamicField(Class<?> javaType) {
 		return true;
 	}
+
+	public boolean projectionPreservesNulls() {
+		return true;
+	}
 }

@@ -21,4 +21,9 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		// See https://hibernate.atlassian.net/browse/HSEARCH-3905
 		return false;
 	}
+
+	@Override
+	public boolean projectionPreservesNulls() {
+		return false;
+	}
 }

@@ -28,7 +28,7 @@ import org.junit.Test;
  * for projections on field value.
  * <p>
  * Behavior that is specific to the field type is tested elsewhere,
- * e.g. {@link FieldSearchProjectionBaseIT} and {@link FieldSearchProjectionTypeCheckingAndConversionIT}.
+ * e.g. {@link FieldSearchProjectionSingleValuedBaseIT} and {@link FieldSearchProjectionTypeCheckingAndConversionIT}.
  */
 public class FieldSearchProjectionTypeIndependentIT {
 
