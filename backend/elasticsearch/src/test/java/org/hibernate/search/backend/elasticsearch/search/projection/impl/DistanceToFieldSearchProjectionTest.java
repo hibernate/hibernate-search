@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -29,8 +30,10 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
 	@Test
 	public void projection_script() {
-		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
-				LOCATION, DistanceUnit.METERS );
+		ElasticsearchDistanceToFieldProjection<?, Double> projection = new ElasticsearchDistanceToFieldProjection<>(
+				INDEX_NAMES, FIELD, null, LOCATION, DistanceUnit.METERS,
+				SingleValuedProjectionAccumulator.<Double>provider().get()
+		);
 
 		SearchProjectionRequestContext requestContext = createMock( SearchProjectionRequestContext.class );
 
@@ -47,8 +50,10 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
 	@Test
 	public void projection_sort() {
-		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( INDEX_NAMES, FIELD, null,
-				LOCATION, DistanceUnit.METERS );
+		ElasticsearchDistanceToFieldProjection<?, Double> projection = new ElasticsearchDistanceToFieldProjection<>(
+				INDEX_NAMES, FIELD, null, LOCATION, DistanceUnit.METERS,
+				SingleValuedProjectionAccumulator.<Double>provider().get()
+		);
 
 		SearchProjectionRequestContext requestContext = createMock( SearchProjectionRequestContext.class );
 

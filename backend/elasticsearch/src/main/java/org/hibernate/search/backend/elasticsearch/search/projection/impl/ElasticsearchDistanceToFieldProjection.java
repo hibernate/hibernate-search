@@ -14,19 +14,33 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProjection<Double, Double> {
+/**
+ * A projection on the distance from a given center to the GeoPoint defined in an index field.
+ *
+ * @param <E> The type of aggregated values extracted from the backend response (before conversion).
+ * @param <P> The type of aggregated values returned by the projection (after conversion).
+ */
+class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearchProjection<E, P> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
 	private static final JsonArrayAccessor SORT_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
+
+	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER = new ProjectionConverter<>(
+			Double.class,
+			(value, context) -> value
+	);
 
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
@@ -54,15 +68,19 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	private final GeoPoint center;
 	private final DistanceUnit unit;
 
+	private final ProjectionAccumulator<Double, Double, E, P> accumulator;
+
 	private final String scriptFieldName;
 
 	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedPath,
-			GeoPoint center, DistanceUnit unit) {
+			GeoPoint center, DistanceUnit unit,
+			ProjectionAccumulator<Double, Double, E, P> accumulator) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedPath = nestedPath;
 		this.center = center;
 		this.unit = unit;
+		this.accumulator = accumulator;
 		this.scriptFieldName = createScriptFieldName( absoluteFieldPath, center, unit );
 	}
 
@@ -73,6 +91,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
 				.append( ", center=" ).append( center )
 				.append( ", unit=" ).append( unit )
+				.append( ", accumulator=" ).append( accumulator )
 				.append( "]" );
 		return sb.toString();
 	}
@@ -94,25 +113,26 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	}
 
 	@Override
-	public Double extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		Double distance;
+		E accumulated = accumulator.createInitial();
 		Integer distanceSortIndex = context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex == null ) {
-			distance = extractDistanceFromScriptField( hit );
+			accumulated = accumulator.accumulate( accumulated, extractDistanceFromScriptField( hit ) );
 		}
 		else {
-			distance = extractDistanceFromSortKey( hit, distanceSortIndex );
+			accumulated = accumulator.accumulate( accumulated, extractDistanceFromSortKey( hit, distanceSortIndex ) );
 		}
 
-		return distance;
+		return accumulated;
 	}
 
 	@Override
-	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
+	public P transform(LoadingResult<?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
-		return extractedData;
+		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
+		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
 	}
 
 	private Double extractDistanceFromScriptField(JsonObject hit) {
