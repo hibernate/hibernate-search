@@ -195,8 +195,10 @@ stage('Configure') {
 			esLocal: [
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
 							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
+					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
 					new EsLocalBuildEnvironment(versionRange: '[6.0,6.2)', mavenProfile: 'elasticsearch-6.0',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
 					// ES 6.3 has a bug that prevents IndexingIT from passing. See https://github.com/elastic/elasticsearch/issues/32395
 					new EsLocalBuildEnvironment(versionRange: '[6.3,6.4)', mavenProfile: 'elasticsearch-6.3',
 							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
