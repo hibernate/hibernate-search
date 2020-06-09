@@ -78,7 +78,7 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 		this.accumulator = accumulator;
 		if ( !multiValued && !nested ) {
 			// Rely on docValues when there is no sort to extract the distance from.
-			scriptFieldName = createScriptFieldName( absoluteFieldPath, center, unit );
+			scriptFieldName = createScriptFieldName( absoluteFieldPath, center );
 			sourceProjection = null;
 		}
 		else {
@@ -200,16 +200,14 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 		return unit.fromMeters( distanceInMeters );
 	}
 
-	private static String createScriptFieldName(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+	private static String createScriptFieldName(String absoluteFieldPath, GeoPoint center) {
 		StringBuilder sb = new StringBuilder();
 		sb.append( "distance_" )
 				.append( absoluteFieldPath )
 				.append( "_" )
 				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.latitude() ) ).replaceAll( "_" ) )
 				.append( "_" )
-				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.longitude() ) ).replaceAll( "_" ) )
-				.append( "_" )
-				.append( unit.name() );
+				.append( NON_DIGITS_PATTERN.matcher( Double.toString( center.longitude() ) ).replaceAll( "_" ) );
 		return sb.toString();
 	}
 
