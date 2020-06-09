@@ -67,6 +67,22 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	}
 
 	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
+				.append( ", center=" ).append( center )
+				.append( ", unit=" ).append( unit )
+				.append( "]" );
+		return sb.toString();
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
+	}
+
+	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 		if ( context.getDistanceSortIndex( absoluteFieldPath, center ) == null ) {
 			// we rely on a script to compute the distance
@@ -85,7 +101,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 		if ( distanceSortIndex == null ) {
 			// we extract the value from the fields computed by the script_fields
-			distance = extractDistance( hit );
+			distance = extractDistanceFromScriptField( hit );
 		}
 		else {
 			// we extract the value from the sort key
@@ -108,7 +124,13 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 				unit.fromMeters( distance.get() ) : null;
 	}
 
-	public Optional<Double> extractDistance(JsonObject hit) {
+	@Override
+	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
+			SearchProjectionTransformContext context) {
+		return extractedData;
+	}
+
+	private Optional<Double> extractDistanceFromScriptField(JsonObject hit) {
 		Optional<JsonElement> projectedFieldElement = FIELDS_ACCESSOR.property( scriptFieldName ).asArray().element( 0 ).get( hit );
 		if ( !projectedFieldElement.isPresent() || projectedFieldElement.get().isJsonNull() ) {
 			return Optional.empty();
@@ -123,28 +145,6 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 				center.latitude(), center.longitude(), geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
 
 		return Optional.of( unit.fromMeters( distanceInMeters ) );
-	}
-
-	@Override
-	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
-			SearchProjectionTransformContext context) {
-		return extractedData;
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
-				.append( ", center=" ).append( center )
-				.append( ", unit=" ).append( unit )
-				.append( "]" );
-		return sb.toString();
 	}
 
 	private static String createScriptFieldName(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
