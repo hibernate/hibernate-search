@@ -42,6 +42,21 @@ class LuceneDistanceToFieldProjection
 	}
 
 	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
+				.append( ", center=" ).append( center )
+				.append( "]" );
+		return sb.toString();
+	}
+
+	@Override
+	public Set<String> getIndexNames() {
+		return indexNames;
+	}
+
+	@Override
 	public void request(SearchProjectionRequestContext context) {
 		context.requireCollector( this );
 	}
@@ -59,21 +74,6 @@ class LuceneDistanceToFieldProjection
 	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
-				.append( ", center=" ).append( center )
-				.append( "]" );
-		return sb.toString();
 	}
 
 	@Override
