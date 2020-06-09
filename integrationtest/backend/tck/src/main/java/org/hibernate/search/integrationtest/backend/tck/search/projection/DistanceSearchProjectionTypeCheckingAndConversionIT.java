@@ -31,6 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.TestCompa
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -84,6 +85,59 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.hasMessageContaining( fieldPath );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3391")
+	public void multiValuedField_singleValuedProjection() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = mainIndex.binding().fieldWithMultipleValuesModel.relativeFieldName;
+
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Projection on field '" + fieldPath + "' cannot be single-valued",
+						"this field is multi-valued",
+						"Make sure to call '.multi()' when you create the projection"
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3391")
+	public void singleValuedFieldInMultiValuedObjectField_flattened_singleValuedProjection() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = mainIndex.binding().flattenedObjectWithMultipleValues.relativeFieldName
+				+ "." + mainIndex.binding().flattenedObjectWithMultipleValues.fieldModel.relativeFieldName;
+
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Projection on field '" + fieldPath + "' cannot be single-valued",
+						"this field is multi-valued",
+						"Make sure to call '.multi()' when you create the projection"
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3391")
+	public void singleValuedFieldInMultiValuedObjectField_nested_singleValuedProjection() {
+		StubMappingScope scope = mainIndex.createScope();
+
+		String fieldPath = mainIndex.binding().nestedObjectWithMultipleValues.relativeFieldName
+				+ "." + mainIndex.binding().nestedObjectWithMultipleValues.fieldModel.relativeFieldName;
+
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Projection on field '" + fieldPath + "' cannot be single-valued",
+						"this field is multi-valued",
+						"Make sure to call '.multi()' when you create the projection"
+				);
 	}
 
 	@Test
@@ -232,9 +286,13 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 		final SimpleFieldModel<GeoPoint> fieldModel;
 		final SimpleFieldModel<GeoPoint> fieldWithConverterModel;
 		final SimpleFieldModel<GeoPoint> fieldWithProjectionDisabledModel;
+		final SimpleFieldModel<GeoPoint> fieldWithMultipleValuesModel;
 
 		final ObjectBinding flattenedObject;
 		final ObjectBinding nestedObject;
+
+		final ObjectBinding flattenedObjectWithMultipleValues;
+		final ObjectBinding nestedObjectWithMultipleValues;
 
 		IndexBinding(IndexSchemaElement root) {
 			fieldModel = SimpleFieldModel.mapper( fieldType )
@@ -245,9 +303,16 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ) );
 			fieldWithProjectionDisabledModel = SimpleFieldModel.mapper( fieldType )
 					.map( root, "nonProjectable", c -> c.projectable( Projectable.NO ) );
+			fieldWithMultipleValuesModel = SimpleFieldModel.mapper( fieldType )
+					.mapMultiValued( root, "multiValued", c -> c.projectable( Projectable.YES ) );
 
-			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED );
+			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED, false );
+			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED, false );
+
+			flattenedObjectWithMultipleValues = new ObjectBinding( root, "multiValued_flattenedObject",
+					ObjectFieldStorage.FLATTENED, true );
+			nestedObjectWithMultipleValues = new ObjectBinding( root, "multiValued_nestedObject",
+					ObjectFieldStorage.NESTED, true );
 		}
 	}
 
@@ -256,9 +321,13 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 		final IndexObjectFieldReference self;
 		final SimpleFieldModel<GeoPoint> fieldModel;
 
-		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
+		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage,
+				boolean multiValued) {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
 			self = objectField.toReference();
 			fieldModel = SimpleFieldModel.mapper( fieldType )
 					.map( objectField, "unconverted", c -> c.projectable( Projectable.YES ) );
@@ -305,7 +374,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 			 * If we try to project a field within this object,
 			 * this will have to lead to an inconsistency exception.
 			 */
-			flattenedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.FLATTENED );
+			flattenedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.FLATTENED, false );
 		}
 	}
 }
