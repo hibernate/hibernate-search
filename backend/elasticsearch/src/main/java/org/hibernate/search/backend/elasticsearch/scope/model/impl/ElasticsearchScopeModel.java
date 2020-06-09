@@ -121,6 +121,7 @@ public class ElasticsearchScopeModel {
 				selectedSchemaNode = schemaNode;
 				indexModelForSelectedSchemaNode = indexModel;
 				scopedIndexFieldComponent.setComponent( component );
+				scopedIndexFieldComponent.setMultiValuedFieldInRoot( schemaNode.multiValuedInRoot() );
 				continue;
 			}
 
@@ -135,6 +136,9 @@ public class ElasticsearchScopeModel {
 						)
 				);
 			}
+			scopedIndexFieldComponent.setMultiValuedFieldInRoot(
+					scopedIndexFieldComponent.isMultiValuedFieldInRoot() || schemaNode.multiValued()
+			);
 			ElasticsearchFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingFieldCompatibilityChecker<>(
 					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
 					indexModelForSelectedSchemaNode.hibernateSearchName(), indexModel.hibernateSearchName()

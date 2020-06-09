@@ -74,4 +74,8 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 		return staticChildren;
 	}
 
+	@Override
+	public boolean multiValuedInRoot() {
+		return false;
+	}
 }

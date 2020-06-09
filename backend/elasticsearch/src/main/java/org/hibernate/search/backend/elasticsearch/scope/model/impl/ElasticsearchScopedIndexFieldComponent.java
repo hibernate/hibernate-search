@@ -9,11 +9,16 @@ package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 public class ElasticsearchScopedIndexFieldComponent<T> {
 
 	private T component;
+	private boolean multiValuedFieldInRoot;
 	private ElasticsearchCompatibilityChecker converterCompatibilityChecker = new ElasticsearchSucceedingCompatibilityChecker();
 	private ElasticsearchCompatibilityChecker analyzerCompatibilityChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
 	public T getComponent() {
 		return component;
+	}
+
+	public boolean isMultiValuedFieldInRoot() {
+		return multiValuedFieldInRoot;
 	}
 
 	public ElasticsearchCompatibilityChecker getConverterCompatibilityChecker() {
@@ -26,6 +31,10 @@ public class ElasticsearchScopedIndexFieldComponent<T> {
 
 	void setComponent(T component) {
 		this.component = component;
+	}
+
+	public void setMultiValuedFieldInRoot(boolean multiValuedFieldInRoot) {
+		this.multiValuedFieldInRoot = multiValuedFieldInRoot;
 	}
 
 	void setConverterCompatibilityChecker(ElasticsearchCompatibilityChecker converterCompatibilityChecker) {

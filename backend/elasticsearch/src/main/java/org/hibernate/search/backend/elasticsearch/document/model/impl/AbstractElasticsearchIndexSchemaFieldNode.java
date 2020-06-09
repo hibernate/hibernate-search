@@ -26,6 +26,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 
 	protected final IndexFieldInclusion inclusion;
 	protected final boolean multiValued;
+	protected final boolean multiValuedInRoot;
 
 	public AbstractElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent,
 			String relativeFieldName,
@@ -36,6 +37,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
 		this.inclusion = inclusion;
 		this.multiValued = multiValued;
+		this.multiValuedInRoot = multiValued || parent.multiValuedInRoot();
 	}
 
 	@Override
@@ -71,4 +73,9 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 	public boolean multiValued() {
 		return multiValued;
 	}
+
+	public boolean multiValuedInRoot() {
+		return multiValuedInRoot;
+	}
+
 }
