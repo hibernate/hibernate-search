@@ -13,34 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
-
-	static List<Year> getValuesForIndexingExpectations() {
-		return Arrays.asList(
-				Year.of( -25435 ), Year.of( -42 ), Year.of( -1 ),
-				Year.of( 0 ),
-				Year.of( 1 ), Year.of( 3 ), Year.of( 42 ), Year.of( 18353 ),
-				Year.of( 1989 ),
-				Year.of( 1999 ),
-				Year.of( 2000 ),
-				Year.of( 2019 ),
-				Year.of( 2050 ),
-				/*
-				 * Minimum and maximum years that can be represented as number of millisecond since the epoch in a long.
-				 * The minimum and maximum dates that can be represented are slightly before/after,
-				 * but there's no point telling users these years are supported if not all months are supported.
-				 */
-				Year.of( -292_275_054 ),
-				Year.of( 292_278_993 )
-		);
-	}
 
 	public static final YearFieldTypeDescriptor INSTANCE = new YearFieldTypeDescriptor();
 
@@ -78,8 +57,29 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	}
 
 	@Override
-	public IndexingExpectations<Year> getIndexingExpectations() {
-		return new IndexingExpectations<>( getValuesForIndexingExpectations() );
+	protected IndexableValues<Year> createIndexableValues() {
+		return new IndexableValues<Year>() {
+			@Override
+			protected List<Year> create() {
+				return Arrays.asList(
+						Year.of( -25435 ), Year.of( -42 ), Year.of( -1 ),
+						Year.of( 0 ),
+						Year.of( 1 ), Year.of( 3 ), Year.of( 42 ), Year.of( 18353 ),
+						Year.of( 1989 ),
+						Year.of( 1999 ),
+						Year.of( 2000 ),
+						Year.of( 2019 ),
+						Year.of( 2050 ),
+						/*
+						 * Minimum and maximum years that can be represented as number of millisecond since the epoch in a long.
+						 * The minimum and maximum dates that can be represented are slightly before/after,
+						 * but there's no point telling users these years are supported if not all months are supported.
+						 */
+						Year.of( -292_275_054 ),
+						Year.of( 292_278_993 )
+				);
+			}
+		};
 	}
 
 	@Override
@@ -103,13 +103,6 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	public ExistsPredicateExpectations<Year> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				Year.of( 1980 ), Year.of( 4302 )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Year> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				Year.of( -1200 ), Year.of( 1797 ), Year.of( 1979 )
 		);
 	}
 

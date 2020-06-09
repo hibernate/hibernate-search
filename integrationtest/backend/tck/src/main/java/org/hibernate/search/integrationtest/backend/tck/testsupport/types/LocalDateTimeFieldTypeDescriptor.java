@@ -13,37 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalDateTime> {
-
-	static List<LocalDateTime> getValuesForIndexingExpectations() {
-		return Arrays.asList(
-				LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 1985, 5, 13, 10, 15, 30, 0 ),
-				LocalDateTime.of( 2017, 7, 7, 11, 15, 30, 555_000_000 ),
-				LocalDateTime.of( 1980, 10, 5, 12, 0, 0, 0 ),
-				LocalDateTime.of( 1980, 12, 31, 23, 59, 59, 999_000_000 ),
-				LocalDateTime.of( 2004, 2, 29, 1, 0, 0, 0 ),
-				LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
-				LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
-				LocalDateTime.of( 22500, 10, 11, 17, 44, 0, 0 ),
-				/*
-				 * Minimum and maximum years that can be represented as number of millisecond since the epoch in a long.
-				 * The minimum and maximum dates that can be represented are slightly before/after,
-				 * but there's no point telling users these years are supported if not all months are supported.
-				 */
-				LocalDateTime.of( -292_275_054, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 292_278_993, 12, 31, 23, 59, 59, 999_000_000 )
-		);
-	}
 
 	public static final LocalDateTimeFieldTypeDescriptor INSTANCE = new LocalDateTimeFieldTypeDescriptor();
 
@@ -82,8 +58,37 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	}
 
 	@Override
-	public IndexingExpectations<LocalDateTime> getIndexingExpectations() {
-		return new IndexingExpectations<>( getValuesForIndexingExpectations() );
+	protected IndexableValues<LocalDateTime> createIndexableValues() {
+		return new IndexableValues<LocalDateTime>() {
+			@Override
+			protected List<LocalDateTime> create() {
+				return Arrays.asList(
+						LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 1985, 5, 13, 10, 15, 30, 0 ),
+						LocalDateTime.of( 2017, 7, 7, 11, 15, 30, 555_000_000 ),
+						LocalDateTime.of( 1980, 10, 5, 12, 0, 0, 0 ),
+						LocalDateTime.of( 1980, 12, 31, 23, 59, 59, 999_000_000 ),
+						LocalDateTime.of( 2004, 2, 29, 1, 0, 0, 0 ),
+						LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
+						LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
+						LocalDateTime.of( 22500, 10, 11, 17, 44, 0, 0 ),
+
+						LocalDateTime.of( 2018, 2, 1, 14, 0, 15, 1 ),
+						LocalDateTime.of( 2018, 3, 1, 0, 59 ),
+						LocalDateTime.of( 2018, 4, 1, 23, 0 ),
+
+						/*
+						 * Minimum and maximum years that can be represented as number of millisecond since the epoch in a long.
+						 * The minimum and maximum dates that can be represented are slightly before/after,
+						 * but there's no point telling users these years are supported if not all months are supported.
+						 */
+						LocalDateTime.of( -292_275_054, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 292_278_993, 12, 31, 23, 59, 59, 999_000_000 )
+				);
+			}
+		};
 	}
 
 	@Override
@@ -112,15 +117,6 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 		return new ExistsPredicateExpectations<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),
 				LocalDateTime.of( 1984, 10, 7, 12, 14, 52 )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<LocalDateTime> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				LocalDateTime.of( 2018, 2, 1, 14, 0, 15, 1 ),
-				LocalDateTime.of( 2018, 3, 1, 0, 59 ),
-				LocalDateTime.of( 2018, 4, 1, 23, 0 )
 		);
 	}
 

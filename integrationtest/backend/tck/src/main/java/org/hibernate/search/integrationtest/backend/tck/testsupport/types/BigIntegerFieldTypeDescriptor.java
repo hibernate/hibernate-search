@@ -14,12 +14,11 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigInteger> {
 
@@ -67,23 +66,28 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
-	public IndexingExpectations<BigInteger> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
-				BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
-				BigInteger.valueOf( Long.MIN_VALUE ),
-				BigInteger.valueOf( Long.MAX_VALUE ),
-				BigInteger.valueOf( Integer.MIN_VALUE ),
-				BigInteger.valueOf( Integer.MAX_VALUE ),
-				BigInteger.valueOf( -251_484_254 ),
-				BigInteger.valueOf( -42 ),
-				BigInteger.valueOf( -1 ),
-				BigInteger.ZERO,
-				BigInteger.ONE,
-				BigInteger.TEN,
-				new BigInteger( "42" ),
-				BigInteger.valueOf( 151_484_254L )
-		);
+	protected IndexableValues<BigInteger> createIndexableValues() {
+		return new IndexableValues<BigInteger>() {
+			@Override
+			protected List<BigInteger> create() {
+				return Arrays.asList(
+						BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
+						BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.valueOf( 100 ) ),
+						BigInteger.valueOf( Long.MIN_VALUE ),
+						BigInteger.valueOf( Long.MAX_VALUE ),
+						BigInteger.valueOf( Integer.MIN_VALUE ),
+						BigInteger.valueOf( Integer.MAX_VALUE ),
+						BigInteger.valueOf( -251_484_254 ),
+						BigInteger.valueOf( -42 ),
+						BigInteger.valueOf( -1 ),
+						BigInteger.ZERO,
+						BigInteger.ONE,
+						BigInteger.TEN,
+						new BigInteger( "42" ),
+						BigInteger.valueOf( 151_484_254L )
+				);
+			}
+		};
 	}
 
 	@Override
@@ -105,13 +109,6 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	public ExistsPredicateExpectations<BigInteger> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				BigInteger.ZERO, BigInteger.valueOf( 6700L )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<BigInteger> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				BigInteger.ONE, BigInteger.valueOf( 300 ), BigInteger.valueOf( 500 )
 		);
 	}
 

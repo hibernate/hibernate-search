@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -200,17 +199,7 @@ public class FieldSearchProjectionBaseIT<F> {
 		}
 
 		private F getFieldValue(int documentNumber) {
-			FieldProjectionExpectations<F> expectations = fieldType.getFieldProjectionExpectations();
-			switch ( documentNumber ) {
-				case 1:
-					return expectations.getDocument1Value();
-				case 2:
-					return expectations.getDocument2Value();
-				case 3:
-					return expectations.getDocument3Value();
-				default:
-					throw new IllegalArgumentException();
-			}
+			return fieldType.getIndexableValues().get().get( documentNumber - 1 );
 		}
 	}
 }

@@ -22,7 +22,6 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -354,17 +353,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 	}
 
 	private static <F> F getFieldValue(FieldTypeDescriptor<F> fieldType, int documentNumber) {
-		FieldProjectionExpectations<F> expectations = fieldType.getFieldProjectionExpectations();
-		switch ( documentNumber ) {
-			case 1:
-				return expectations.getDocument1Value();
-			case 2:
-				return expectations.getDocument2Value();
-			case 3:
-				return expectations.getDocument3Value();
-			default:
-				throw new IllegalArgumentException();
-		}
+		return fieldType.getIndexableValues().get().get( documentNumber - 1 );
 	}
 
 	private static <F> void initDocument(IndexBinding binding, DocumentElement document, int documentNumber) {

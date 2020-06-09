@@ -15,12 +15,11 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
@@ -75,15 +74,20 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 	}
 
 	@Override
-	public IndexingExpectations<String> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				"several tokens",
-				"onetoken",
-				"to the", // Only stopwords
-				"    trailingspaces   ",
-				"      ",
-				""
-		);
+	protected IndexableValues<String> createIndexableValues() {
+		return new IndexableValues<String>() {
+			@Override
+			protected List<String> create() {
+				return Arrays.asList(
+						"several tokens",
+						"onetoken",
+						"to the", // Only stopwords
+						"    trailingspaces   ",
+						"      ",
+						""
+				);
+			}
+		};
 	}
 
 	@Override
@@ -107,13 +111,6 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 		return new ExistsPredicateExpectations<>(
 				"", // No token, but still non-null: should be considered as existing
 				"Aaron"
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<String> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				"Aaron", "george", "Zach"
 		);
 	}
 

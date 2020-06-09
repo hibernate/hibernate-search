@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 
@@ -63,11 +62,16 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	}
 
 	@Override
-	public IndexingExpectations<Short> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				Short.MIN_VALUE, Short.MAX_VALUE,
-				(short) -25435, (short) -42, (short) -1, (short) 0, (short) 1, (short) 3, (short) 42, (short) 18353
-		);
+	protected IndexableValues<Short> createIndexableValues() {
+		return new IndexableValues<Short>() {
+			@Override
+			protected List<Short> create() {
+				return Arrays.asList(
+						Short.MIN_VALUE, Short.MAX_VALUE,
+						(short) -25435, (short) -42, (short) -1, (short) 0, (short) 1, (short) 3, (short) 42, (short) 18353
+				);
+			}
+		};
 	}
 
 	@Override
@@ -89,13 +93,6 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	public ExistsPredicateExpectations<Short> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				(short) 0, (short) 67
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Short> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				(short) 1, (short) 3, (short) 5
 		);
 	}
 

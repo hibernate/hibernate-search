@@ -14,12 +14,11 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
@@ -70,15 +69,24 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
-	public IndexingExpectations<String> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				"several tokens",
-				"onetoken",
-				"to the", // Only stopwords
-				"    trailingspaces   ",
-				"      ",
-				""
-		);
+	protected IndexableValues<String> createIndexableValues() {
+		return new IndexableValues<String>() {
+			@Override
+			protected List<String> create() {
+				return Arrays.asList(
+						"several tokens",
+						"onetoken",
+						"to the", // Only stopwords
+						"    trailingspaces   ",
+						"      ",
+						"",
+						// Mix capitalized and non-capitalized text on purpose
+						"Aaron",
+						"george",
+						"Zach"
+				);
+			}
+		};
 	}
 
 	@Override
@@ -106,14 +114,6 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	@Override
 	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
 		return ExpectationsAlternative.unsupported( this );
-	}
-
-	@Override
-	public FieldProjectionExpectations<String> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				// Mix capitalized and non-capitalized text on purpose
-				"Aaron", "george", "Zach"
-		);
 	}
 
 	@Override

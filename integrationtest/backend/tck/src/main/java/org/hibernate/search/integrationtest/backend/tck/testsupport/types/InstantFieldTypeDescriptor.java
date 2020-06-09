@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -15,12 +16,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 
@@ -61,13 +61,18 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	}
 
 	@Override
-	public IndexingExpectations<Instant> getIndexingExpectations() {
-		List<Instant> values = new ArrayList<>();
-		LocalDateTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localDateTime -> {
-			values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
-		} );
-		values.add( Instant.EPOCH );
-		return new IndexingExpectations<>( values );
+	protected IndexableValues<Instant> createIndexableValues() {
+		return new IndexableValues<Instant>() {
+			@Override
+			protected List<Instant> create() {
+				List<Instant> values = new ArrayList<>();
+				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+					values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
+				}
+				values.add( Instant.EPOCH );
+				return values;
+			}
+		};
 	}
 
 	@Override
@@ -95,15 +100,6 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	public ExistsPredicateExpectations<Instant> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				Instant.EPOCH, Instant.parse( "2018-02-01T10:15:30.00Z" )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Instant> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				Instant.parse( "2018-02-01T10:15:30.00Z" ),
-				Instant.parse( "2018-03-01T10:15:30.00Z" ),
-				Instant.parse( "2018-04-01T10:15:30.00Z" )
 		);
 	}
 

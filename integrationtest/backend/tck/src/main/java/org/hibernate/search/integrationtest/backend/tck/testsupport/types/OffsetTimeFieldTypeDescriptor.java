@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTime> {
 
@@ -67,14 +66,19 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 	}
 
 	@Override
-	public IndexingExpectations<OffsetTime> getIndexingExpectations() {
-		List<OffsetTime> values = new ArrayList<>();
-		LocalTimeFieldTypeDescriptor.getValuesForIndexingExpectations().forEach( localTime -> {
-			OffsetDateTimeFieldTypeDescriptor.getOffsetsForIndexingExpectations().forEach( offset -> {
-				values.add( localTime.atOffset( offset ) );
-			} );
-		} );
-		return new IndexingExpectations<>( values );
+	protected IndexableValues<OffsetTime> createIndexableValues() {
+		return new IndexableValues<OffsetTime>() {
+			@Override
+			protected List<OffsetTime> create() {
+				List<OffsetTime> values = new ArrayList<>();
+				for ( LocalTime localTime : LocalTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().get() ) {
+					for ( ZoneOffset offset : OffsetDateTimeFieldTypeDescriptor.INSTANCE.createIndexableOffsetList() ) {
+						values.add( localTime.atOffset( offset ) );
+					}
+				}
+				return values;
+			}
+		};
 	}
 
 	@Override
@@ -103,15 +107,6 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 		return new ExistsPredicateExpectations<>(
 				LocalTime.of( 0, 0, 0 ).atOffset( ZoneOffset.UTC ),
 				LocalTime.of( 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<OffsetTime> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				LocalTime.of( 10, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalTime.of( 10, 0, 1, 1 ).atOffset( ZoneOffset.UTC ),
-				LocalTime.of( 18, 2, 0, 1 ).atOffset( ZoneOffset.ofHours( -6 ) )
 		);
 	}
 

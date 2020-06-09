@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
 public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
@@ -56,12 +55,17 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	}
 
 	@Override
-	public IndexingExpectations<Long> getIndexingExpectations() {
-		return new IndexingExpectations<>(
-				Long.MIN_VALUE, Long.MAX_VALUE,
-				(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
-				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
-		);
+	protected IndexableValues<Long> createIndexableValues() {
+		return new IndexableValues<Long>() {
+			@Override
+			protected List<Long> create() {
+				return Arrays.asList(
+						Long.MIN_VALUE, Long.MAX_VALUE,
+						(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
+						-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
+				);
+			}
+		};
 	}
 
 	@Override
@@ -83,13 +87,6 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	public ExistsPredicateExpectations<Long> getExistsPredicateExpectations() {
 		return new ExistsPredicateExpectations<>(
 				0L, 67L
-		);
-	}
-
-	@Override
-	public FieldProjectionExpectations<Long> getFieldProjectionExpectations() {
-		return new FieldProjectionExpectations<>(
-				1L, 3L, 5L
 		);
 	}
 
