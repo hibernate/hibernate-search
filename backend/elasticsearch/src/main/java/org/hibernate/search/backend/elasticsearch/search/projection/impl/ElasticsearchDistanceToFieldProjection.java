@@ -106,7 +106,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			distance = extractDistanceFromSortKey( hit, distanceSortIndex );
 		}
 
-		return distance != null ? unit.fromMeters( distance ) : null;
+		return distance;
 	}
 
 	@Override
@@ -121,13 +121,15 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			return null;
 		}
 
+		double distanceInMeters;
 		if ( projectedFieldElement.get().isJsonPrimitive() ) {
-			return projectedFieldElement.get().getAsDouble();
+			distanceInMeters = projectedFieldElement.get().getAsDouble();
 		}
-
-		JsonObject geoPoint = projectedFieldElement.get().getAsJsonObject();
-		double distanceInMeters = SloppyMath.haversinMeters(
-				center.latitude(), center.longitude(), geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
+		else {
+			JsonObject geoPoint = projectedFieldElement.get().getAsJsonObject();
+			distanceInMeters = SloppyMath.haversinMeters( center.latitude(), center.longitude(),
+					geoPoint.get( "lat" ).getAsDouble(), geoPoint.get( "lon" ).getAsDouble() );
+		}
 
 		return unit.fromMeters( distanceInMeters );
 	}
@@ -144,9 +146,10 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			// Usually, it's because the indexed object doesn't have a location defined for this field.
 			return null;
 		}
-		else {
-			return sortKeyDistanceElement.get().getAsJsonPrimitive().getAsDouble();
-		}
+
+		double distanceInMeters = sortKeyDistanceElement.get().getAsJsonPrimitive().getAsDouble();
+
+		return unit.fromMeters( distanceInMeters );
 	}
 
 	private static String createScriptFieldName(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
