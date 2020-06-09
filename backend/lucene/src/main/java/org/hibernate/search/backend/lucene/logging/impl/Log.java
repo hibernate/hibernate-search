@@ -697,4 +697,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 130,
 			value = "Invalid type: '%1$s' is an object field, not a value field.")
 	SearchException invalidIndexElementTypeObjectFieldIsNotValueField(String absolutePath);
+
+	@Message(id = ID_OFFSET_2 + 131,
+			value = "Projection on field '%1$s' cannot be single-valued, because this field is multi-valued."
+					+ " Make sure to call '.multi()' when you create the projection.")
+	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
+
 }

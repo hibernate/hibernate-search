@@ -73,4 +73,8 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 		return staticChildren;
 	}
 
+	@Override
+	public boolean multiValuedInRoot() {
+		return false;
+	}
 }

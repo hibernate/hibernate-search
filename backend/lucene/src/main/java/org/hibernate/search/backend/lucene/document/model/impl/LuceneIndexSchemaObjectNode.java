@@ -26,4 +26,6 @@ public interface LuceneIndexSchemaObjectNode extends IndexCompositeElementDescri
 	@Override
 	Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren();
 
+	boolean multiValuedInRoot();
+
 }

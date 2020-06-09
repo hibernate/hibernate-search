@@ -21,6 +21,7 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 	protected final String relativeName;
 	protected final IndexFieldInclusion inclusion;
 	protected final boolean multiValued;
+	protected final boolean multiValuedInRoot;
 
 	public AbstractLuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, boolean multiValued) {
@@ -29,6 +30,7 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 		this.relativeName = relativeName;
 		this.inclusion = parent.getInclusion().compose( inclusion );
 		this.multiValued = multiValued;
+		this.multiValuedInRoot = multiValued || parent.multiValuedInRoot();
 	}
 
 	@Override
@@ -61,4 +63,7 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 		return multiValued;
 	}
 
+	public boolean multiValuedInRoot() {
+		return multiValuedInRoot;
+	}
 }

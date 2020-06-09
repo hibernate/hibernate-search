@@ -27,7 +27,8 @@ public interface LuceneFieldProjectionBuilderFactory {
 
 	boolean isProjectable();
 
-	<U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
+	<U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+			String nestedDocumentPath, boolean multiValuedFieldInRoot,
 			Class<U> expectedType, ValueConvert convert);
 
 	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,

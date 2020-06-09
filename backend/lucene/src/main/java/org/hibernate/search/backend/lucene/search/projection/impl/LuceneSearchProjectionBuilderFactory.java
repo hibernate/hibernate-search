@@ -70,7 +70,9 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ),
+				.createFieldValueProjectionBuilder( scopeModel.getIndexNames(), absoluteFieldPath,
+						scopeModel.getNestedDocumentPath( absoluteFieldPath ),
+						fieldComponent.isMultiValuedFieldInRoot(),
 						expectedType, convert );
 	}
 

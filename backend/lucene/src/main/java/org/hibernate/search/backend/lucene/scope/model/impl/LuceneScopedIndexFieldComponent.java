@@ -9,11 +9,16 @@ package org.hibernate.search.backend.lucene.scope.model.impl;
 public class LuceneScopedIndexFieldComponent<T> {
 
 	private T component;
+	private boolean multiValuedFieldInRoot;
 	private LuceneCompatibilityChecker converterCompatibilityChecker = new LuceneSucceedingCompatibilityChecker();
 	private LuceneCompatibilityChecker analyzerCompatibilityChecker = new LuceneSucceedingCompatibilityChecker();
 
 	public T getComponent() {
 		return component;
+	}
+
+	public boolean isMultiValuedFieldInRoot() {
+		return multiValuedFieldInRoot;
 	}
 
 	public LuceneCompatibilityChecker getConverterCompatibilityChecker() {
@@ -26,6 +31,10 @@ public class LuceneScopedIndexFieldComponent<T> {
 
 	void setComponent(T component) {
 		this.component = component;
+	}
+
+	public void setMultiValuedFieldInRoot(boolean multiValuedFieldInRoot) {
+		this.multiValuedFieldInRoot = multiValuedFieldInRoot;
 	}
 
 	void setConverterCompatibilityChecker(LuceneCompatibilityChecker converterCompatibilityChecker) {
