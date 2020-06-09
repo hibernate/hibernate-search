@@ -125,6 +125,7 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 							garbageValue
 					);
 				}
+				break;
 			case IN_NESTED_TWICE:
 				// Same as for IN_NESTED, but one level deeper
 				DocumentElement nestedObjectFirstLevel = document.addObject( nestedObject.self );
