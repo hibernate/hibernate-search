@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -38,8 +38,8 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 	}
 
 	@Override
-	public SearchProjection<Double> build() {
+	public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
 		return new LuceneDistanceToFieldProjection<>( indexNames, absoluteFieldPath, nestedDocumentPath, center, unit,
-				SingleValuedProjectionAccumulator.<Double>provider().get() );
+				accumulatorProvider.get() );
 	}
 }

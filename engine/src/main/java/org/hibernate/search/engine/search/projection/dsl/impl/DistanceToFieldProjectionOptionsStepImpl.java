@@ -9,21 +9,24 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.util.common.impl.Contracts;
 
+public class DistanceToFieldProjectionOptionsStepImpl<P>
+		implements DistanceToFieldProjectionOptionsStep<DistanceToFieldProjectionOptionsStepImpl<P>, P> {
 
-public class DistanceToFieldProjectionOptionsStepImpl
-		implements DistanceToFieldProjectionOptionsStep<DistanceToFieldProjectionOptionsStepImpl, Double> {
+	protected final DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder;
+	private final ProjectionAccumulator.Provider<Double, P> accumulatorProvider;
 
-	private final DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder;
-
-	DistanceToFieldProjectionOptionsStepImpl(DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder) {
+	DistanceToFieldProjectionOptionsStepImpl(DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder,
+			ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
 		this.distanceFieldProjectionBuilder = distanceFieldProjectionBuilder;
+		this.accumulatorProvider = accumulatorProvider;
 	}
 
 	@Override
-	public DistanceToFieldProjectionOptionsStepImpl unit(DistanceUnit unit) {
+	public DistanceToFieldProjectionOptionsStepImpl<P> unit(DistanceUnit unit) {
 		Contracts.assertNotNull( unit, "unit" );
 
 		distanceFieldProjectionBuilder.unit( unit );
@@ -31,8 +34,8 @@ public class DistanceToFieldProjectionOptionsStepImpl
 	}
 
 	@Override
-	public SearchProjection<Double> toProjection() {
-		return distanceFieldProjectionBuilder.build();
+	public SearchProjection<P> toProjection() {
+		return distanceFieldProjectionBuilder.build( accumulatorProvider );
 	}
 
 }
