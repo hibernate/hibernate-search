@@ -45,6 +45,9 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	private static final JsonAccessor<Boolean> TIMED_OUT_ACCESSOR =
 			JsonAccessor.root().property( "timed_out" ).asBoolean();
 
+	private static final JsonAccessor<String> SCROLL_ID_ACCESSOR =
+			JsonAccessor.root().property( "_scroll_id" ).asString();
+
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
@@ -73,6 +76,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
 				Collections.emptyMap() : extractAggregations( extractContext, responseBody );
 
+		String scrollId = extractScrollId( responseBody );
+
 		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
 		Boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
 
@@ -82,7 +87,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				hitCount,
 				extractedHits,
 				extractedAggregations,
-				took, timedOut
+				took, timedOut, scrollId
 		);
 	}
 
@@ -125,5 +130,9 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		}
 
 		return extractedMap;
+	}
+
+	protected String extractScrollId(JsonObject responseBody) {
+		return SCROLL_ID_ACCESSOR.get( responseBody ).orElse( null );
 	}
 }

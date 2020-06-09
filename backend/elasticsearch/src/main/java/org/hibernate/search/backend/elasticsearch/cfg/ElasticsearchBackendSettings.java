@@ -243,6 +243,17 @@ public final class ElasticsearchBackendSettings {
 	public static final String THREAD_POOL_SIZE = "thread_pool.size";
 
 	/**
+	 * Property for specifying the maximum duration a {@code Scroll} will be usable if no
+	 * other results are fetched from Elasticsearch.
+	 * <p>
+	 * Expects a positive Integer value in seconds, such as 60,
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#SCROLL_TIMEOUT}.
+	 */
+	public static final String SCROLL_TIMEOUT = "scroll_timeout";
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -263,5 +274,6 @@ public final class ElasticsearchBackendSettings {
 		public static final boolean VERSION_CHECK_ENABLED = true;
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.DISCRIMINATOR;
+		public static final int SCROLL_TIMEOUT = 60;
 	}
 }

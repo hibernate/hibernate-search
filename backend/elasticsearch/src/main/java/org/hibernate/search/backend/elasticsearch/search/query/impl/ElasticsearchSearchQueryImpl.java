@@ -62,6 +62,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final JsonObject payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
+	private final Integer scrollTimeout;
 
 	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
@@ -76,7 +77,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
+			Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout, Integer scrollTimeout) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
@@ -89,6 +90,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.timeoutValue = timeoutValue;
 		this.timeoutUnit = timeoutUnit;
 		this.exceptionOnTimeout = exceptionOnTimeout;
+		this.scrollTimeout = scrollTimeout;
 	}
 
 	@Override
@@ -158,7 +160,18 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public SearchScroll<H> scroll(Integer pageSize) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		String scrollTimeoutString = this.scrollTimeout + "s";
+
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = workFactory.search( payload, searchResultExtractor )
+				.routingKeys( routingKeys )
+				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
+				.requestTransformer(
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+				)
+				.scrolling( pageSize, scrollTimeoutString )
+				.build();
+
+		return new ElasticsearchSearchScroll<>( queryOrchestrator, workFactory, searchResultExtractor, scrollTimeoutString, firstScroll );
 	}
 
 	@Override

@@ -20,15 +20,21 @@ class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements ElasticsearchSearchResult<H> {
 
 	private final JsonObject responseBody;
+	private final String scrollId;
 
 	ElasticsearchSearchResultImpl(JsonObject responseBody,
-			long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut) {
+			long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut, String scrollId) {
 		super( hitCount, hits, aggregationResults, ( took == null ) ? null : Duration.ofMillis( took ), timedOut );
 		this.responseBody = responseBody;
+		this.scrollId = scrollId;
 	}
 
 	@Override
 	public JsonObject responseBody() {
 		return responseBody;
+	}
+
+	public String scrollId() {
+		return scrollId;
 	}
 }
