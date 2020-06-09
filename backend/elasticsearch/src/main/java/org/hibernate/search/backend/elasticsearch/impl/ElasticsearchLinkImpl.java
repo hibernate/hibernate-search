@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import com.google.gson.GsonBuilder;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
@@ -22,6 +23,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.El
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -34,6 +36,12 @@ import java.util.Optional;
 
 class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final ConfigurationProperty<Integer> SCROLL_TIMEOUT =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.SCROLL_TIMEOUT )
+					.asInteger()
+					.withDefault( ElasticsearchBackendSettings.Defaults.SCROLL_TIMEOUT )
+					.build();
 
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
 	private final BackendThreads threads;
@@ -50,6 +58,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private ElasticsearchSearchSyntax searchSyntax;
 	private ElasticsearchWorkBuilderFactory workBuilderFactory;
 	private ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
+	private Integer scrollTimeout;
 
 	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
 			BackendThreads threads, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
@@ -101,6 +110,12 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 		return searchResultExtractorFactory;
 	}
 
+	@Override
+	public Integer getScrollTimeout() {
+		checkStarted();
+		return scrollTimeout;
+	}
+
 	ElasticsearchVersion getElasticsearchVersion() {
 		checkStarted();
 		return elasticsearchVersion;
@@ -133,6 +148,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			searchSyntax = protocolDialect.createSearchSyntax();
 			workBuilderFactory = protocolDialect.createWorkBuilderFactory( gsonProvider );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
+			scrollTimeout = SCROLL_TIMEOUT.get( propertySource );
 		}
 	}
 

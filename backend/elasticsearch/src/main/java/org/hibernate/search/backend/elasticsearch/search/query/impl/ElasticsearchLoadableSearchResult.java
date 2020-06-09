@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 
@@ -38,13 +37,15 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
 	private final Integer took;
 	private final Boolean timedOut;
+	private final boolean hasHits;
+	private final String scrollId;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			long hitCount,
 			List<Object> extractedHits,
 			Map<AggregationKey<?>, ?> extractedAggregations,
-			Integer took, Boolean timedOut) {
+			Integer took, Boolean timedOut, String scrollId) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
@@ -52,9 +53,11 @@ public class ElasticsearchLoadableSearchResult<H> {
 		this.extractedAggregations = extractedAggregations;
 		this.took = took;
 		this.timedOut = timedOut;
+		this.hasHits = !extractedHits.isEmpty();
+		this.scrollId = scrollId;
 	}
 
-	ElasticsearchSearchResult<H> loadBlocking() {
+	ElasticsearchSearchResultImpl<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
 		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
@@ -90,7 +93,11 @@ public class ElasticsearchLoadableSearchResult<H> {
 
 		return new ElasticsearchSearchResultImpl<>(
 				extractContext.getResponseBody(),
-				hitCount, loadedHits, extractedAggregations
-		, took, timedOut );
+				hitCount, loadedHits, extractedAggregations,
+				took, timedOut, scrollId );
+	}
+
+	boolean hasHits() {
+		return hasHits;
 	}
 }

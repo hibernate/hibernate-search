@@ -154,7 +154,8 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return new ElasticsearchSearchQueryBuilder<>(
 				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
 				generalPurposeOrchestrator,
-				searchContext, sessionContext, loadingContextBuilder, rootProjection
+				searchContext, sessionContext, loadingContextBuilder, rootProjection,
+				link.getScrollTimeout()
 		);
 	}
 

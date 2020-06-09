@@ -33,4 +33,6 @@ public interface ElasticsearchLink {
 
 	ElasticsearchSearchResultExtractorFactory getSearchResultExtractorFactory();
 
+	Integer getScrollTimeout();
+
 }

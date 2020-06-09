@@ -61,6 +61,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final PredicateRequestContext rootPredicateContext;
 	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
+	private final Integer scrollTimeout;
 
 	private final Set<String> routingKeys;
 	private JsonObject jsonPredicate;
@@ -79,7 +80,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
-			ElasticsearchSearchProjection<?, H> rootProjection) {
+			ElasticsearchSearchProjection<?, H> rootProjection,
+			Integer scrollTimeout) {
 		this.workFactory = workFactory;
 		this.searchResultExtractorFactory = searchResultExtractorFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -91,6 +93,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.rootPredicateContext = new PredicateRequestContext( sessionContext );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
+		this.scrollTimeout = scrollTimeout;
 	}
 
 	@Override
@@ -221,7 +224,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 				searchContext, sessionContext, loadingContext, routingKeys,
 				payload, requestTransformer,
 				searchResultExtractor,
-				timeoutValue, timeoutUnit, exceptionOnTimeout
+				timeoutValue, timeoutUnit, exceptionOnTimeout,
+				scrollTimeout
 		);
 	}
 }
