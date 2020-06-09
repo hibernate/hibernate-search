@@ -30,7 +30,7 @@ import org.junit.Test;
  * for distance projections.
  * <p>
  * Behavior that is specific to the field type is tested elsewhere,
- * e.g. {@link DistanceSearchProjectionBaseIT} and {@link DistanceSearchProjectionTypeCheckingAndConversionIT}.
+ * e.g. {@link DistanceSearchProjectionSingleValuedBaseIT} and {@link DistanceSearchProjectionTypeCheckingAndConversionIT}.
  */
 public class DistanceSearchProjectionTypeIndependentIT {
 

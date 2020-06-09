@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceSearchProjectionBaseIT;
+import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceSearchProjectionSingleValuedBaseIT;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -27,7 +27,7 @@ public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithi
 	private static final Comparator<? super Double> APPROX_KM_COMPARATOR = TestComparators.approximateDouble( 0.010 );
 
 	/**
-	 * See also {@link DistanceSearchProjectionBaseIT#several()}.
+	 * See also {@link DistanceSearchProjectionSingleValuedBaseIT#several()}.
 	 * <p>
 	 * The main difference is that we're targeting multiple fields here.
 	 */
@@ -74,7 +74,7 @@ public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithi
 	}
 
 	/**
-	 * See also {@link DistanceSearchProjectionBaseIT#sortable_withSort()}.
+	 * See also {@link DistanceSearchProjectionSingleValuedBaseIT#sortable_withSort()}.
 	 * <p>
 	 * The main difference is that we're composing multiple sorts here.
 	 */

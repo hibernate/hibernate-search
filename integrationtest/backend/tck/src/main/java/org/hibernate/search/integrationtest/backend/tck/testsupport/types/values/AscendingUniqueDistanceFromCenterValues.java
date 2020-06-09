@@ -8,9 +8,11 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types.value
 
 import static java.util.Arrays.asList;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTermValues<GeoPoint> {
@@ -19,13 +21,21 @@ public class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTerm
 	public static final AscendingUniqueDistanceFromCenterValues INSTANCE = new AscendingUniqueDistanceFromCenterValues();
 
 	private final List<Double> singleDistancesFromCenterPoint;
+	private final List<List<Double>> multiDistancesFromCenterPointForMinDataset;
 
 	private AscendingUniqueDistanceFromCenterValues() {
 		this.singleDistancesFromCenterPoint = Collections.unmodifiableList( createDistancesFromCenterPoint() );
+		this.multiDistancesFromCenterPointForMinDataset = Collections.unmodifiableList(
+				makeMultiDistances( getMultiResultingInSingle( SortMode.MIN ) )
+		);
 	}
 
 	public List<Double> getSingleDistancesFromCenterPoint() {
 		return singleDistancesFromCenterPoint;
+	}
+
+	public List<List<Double>> getMultiDistancesFromCenterPointForMinDataset() {
+		return multiDistancesFromCenterPointForMinDataset;
 	}
 
 	@Override
@@ -72,5 +82,18 @@ public class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTerm
 				13_914.5,
 				16_998.3
 		);
+	}
+
+	private List<List<Double>> makeMultiDistances(List<List<GeoPoint>> multiPoints) {
+		List<List<Double>> result = new ArrayList<>();
+		for ( List<GeoPoint> multiPoint : multiPoints ) {
+			List<Double> multiDistance = new ArrayList<>();
+			result.add( multiDistance );
+			for ( GeoPoint geoPoint : multiPoint ) {
+				int index = getSingle().indexOf( geoPoint );
+				multiDistance.add( singleDistancesFromCenterPoint.get( index ) );
+			}
+		}
+		return result;
 	}
 }
