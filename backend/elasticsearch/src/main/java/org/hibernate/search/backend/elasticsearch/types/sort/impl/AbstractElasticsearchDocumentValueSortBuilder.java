@@ -12,22 +12,21 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractElasticsearchSearchSortBuilder {
+abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends AbstractElasticsearchSearchSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -46,23 +45,23 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
 	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
-	protected final String absoluteFieldPath;
+	protected final ElasticsearchSearchFieldContext<F> field;
 	protected final List<String> nestedPathHierarchy;
 	private final ElasticsearchSearchSyntax searchSyntax;
 
 	private JsonPrimitive mode;
 	private ElasticsearchSearchPredicateBuilder filterBuilder;
 
-	AbstractElasticsearchDocumentValueSortBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
+	AbstractElasticsearchDocumentValueSortBuilder(ElasticsearchSearchFieldContext<F> field,
 			ElasticsearchSearchSyntax searchSyntax) {
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedPathHierarchy = nestedPathHierarchy;
+		this.field = field;
+		this.nestedPathHierarchy = field.nestedPathHierarchy();
 		this.searchSyntax = searchSyntax;
 	}
 
 	public void mode(SortMode mode) {
 		if ( !nestedPathHierarchy.isEmpty() && SortMode.MEDIAN.equals( mode ) ) {
-			throw log.cannotComputeMedianAcrossNested( getEventContext() );
+			throw log.cannotComputeMedianAcrossNested( field.eventContext() );
 		}
 		if ( mode != null ) {
 			switch ( mode ) {
@@ -89,7 +88,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 
 	public void filter(SearchPredicate filter) {
 		if ( nestedPathHierarchy.isEmpty() ) {
-			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
+			throw log.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
 		}
 		ElasticsearchSearchPredicateBuilder builder = (ElasticsearchSearchPredicateBuilder) filter;
 		builder.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
@@ -139,9 +138,5 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 
 	private JsonObject getJsonFilter(ElasticsearchSearchPredicateContext filterContext) {
 		return filterBuilder.build( filterContext );
-	}
-
-	protected final EventContext getEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
 	}
 }

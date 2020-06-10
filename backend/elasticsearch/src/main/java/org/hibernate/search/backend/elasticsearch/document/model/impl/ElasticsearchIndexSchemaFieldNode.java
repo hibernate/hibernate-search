@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
@@ -16,7 +17,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchIndexSchemaFieldNode
-		implements IndexValueFieldDescriptor {
+		implements IndexValueFieldDescriptor, ElasticsearchSearchFieldContext<F> {
 
 	private final List<String> nestedPathHierarchy;
 
@@ -49,12 +50,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 		return this;
 	}
 
-	public String nestedPath() {
-		return ( nestedPathHierarchy.isEmpty() ) ? null :
-				// nested path is the LAST element on the path hierarchy
-				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
-	}
-
+	@Override
 	public List<String> nestedPathHierarchy() {
 		return nestedPathHierarchy;
 	}
@@ -64,10 +60,15 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 		return type;
 	}
 
+	@Override
+	public EventContext eventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> ElasticsearchIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
-		if ( !type.valueType().isAssignableFrom( expectedSubType ) ) {
-			throw log.invalidFieldValueType( type.valueType(), expectedSubType,
+		if ( !type.valueClass().isAssignableFrom( expectedSubType ) ) {
+			throw log.invalidFieldValueType( type.valueClass(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (ElasticsearchIndexSchemaFieldNode<? super T>) this;

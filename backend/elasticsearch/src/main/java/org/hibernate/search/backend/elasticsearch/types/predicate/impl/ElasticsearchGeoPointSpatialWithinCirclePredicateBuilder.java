@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.util.List;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
@@ -21,8 +20,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends
-		AbstractElasticsearchSingleFieldPredicateBuilder
+class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder
+		extends AbstractElasticsearchSingleFieldPredicateBuilder
 		implements SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "geo_distance" ).asObject();
@@ -34,9 +33,9 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends
 	private double distanceInMeters;
 	private JsonElement center;
 
-	ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
+	ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder(ElasticsearchSearchFieldContext<GeoPoint> field,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+		super( field );
 		this.codec = codec;
 	}
 

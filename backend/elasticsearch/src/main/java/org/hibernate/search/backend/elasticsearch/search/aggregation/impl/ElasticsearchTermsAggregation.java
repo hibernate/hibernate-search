@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -39,7 +39,7 @@ public class ElasticsearchTermsAggregation<F, K>
 
 	private ElasticsearchTermsAggregation(Builder<F, K> builder) {
 		super( builder );
-		this.absoluteFieldPath = builder.absoluteFieldPath;
+		this.absoluteFieldPath = builder.field.absolutePath();
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
 		this.codec = builder.codec;
 		this.order = builder.order;
@@ -87,11 +87,10 @@ public class ElasticsearchTermsAggregation<F, K>
 		private int minDocCount = 1;
 		private int size = 100;
 
-		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				List<String> nestedPathHierarchy,
+		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
-			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
+			super( searchContext, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 			this.codec = codec;
 		}

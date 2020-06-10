@@ -7,14 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -33,46 +31,35 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other) {
-		return getClass().equals( other.getClass() );
-	}
-
-	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchCompatibilityChecker analyzerChecker) {
-		throw log.directValueLookupNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		throw log.directValueLookupNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchCompatibilityChecker converterChecker) {
-		throw log.rangesNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		throw log.rangesNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, codec );
+			ElasticsearchSearchFieldContext<GeoPoint> field) {
+		checkSearchable( field );
+		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( field, codec );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
+			ElasticsearchSearchFieldContext<GeoPoint> field) {
+		checkSearchable( field );
+		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( field );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, nestedPathHierarchy, codec );
+			ElasticsearchSearchFieldContext<GeoPoint> field) {
+		checkSearchable( field );
+		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( field, codec );
 	}
 }

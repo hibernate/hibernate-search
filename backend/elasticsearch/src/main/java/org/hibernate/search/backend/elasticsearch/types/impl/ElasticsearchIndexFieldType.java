@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
@@ -19,49 +20,58 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
-public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescriptor, IndexFieldType<F> {
+public class ElasticsearchIndexFieldType<F>
+		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchFieldTypeContext<F> {
 	private final Class<F> valueType;
-	private final DslConverter<?, ? extends F> dslConverter;
-	private final ProjectionConverter<? super F, ?> projectionConverter;
 	private final ElasticsearchFieldCodec<F> codec;
-	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
-	private final ElasticsearchFieldSortBuilderFactory sortBuilderFactory;
-	private final ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory;
-	private final ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory;
+	private final DslConverter<?, ? extends F> dslConverter;
+	private final DslConverter<F, ? extends F> rawDslConverter;
+	private final ProjectionConverter<? super F, ?> projectionConverter;
+	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
+	private final ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
+	private final ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
+	private final ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
 	private final PropertyMapping mapping;
 	private final String analyzerName;
 	private final String searchAnalyzerName;
 	private final String normalizerName;
 
 	public ElasticsearchIndexFieldType(Class<F> valueType,
-			DslConverter<?, ? extends F> dslConverter,
-			ProjectionConverter<? super F, ?> projectionConverter,
 			ElasticsearchFieldCodec<F> codec,
-			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
-			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
-			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory,
-			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory,
+			DslConverter<?, ? extends F> dslConverter,
+			DslConverter<F, ? extends F> rawDslConverter,
+			ProjectionConverter<? super F, ?> projectionConverter,
+			ProjectionConverter<? super F, F> rawProjectionConverter,
+			ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory,
+			ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory,
+			ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory,
+			ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory,
 			PropertyMapping mapping) {
-		this( valueType, dslConverter, projectionConverter,
-				codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
+		this( valueType, codec, dslConverter, rawDslConverter, projectionConverter, rawProjectionConverter,
+				predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
 				aggregationBuilderFactory,
 				mapping, null, null, null );
 	}
 
 	public ElasticsearchIndexFieldType(Class<F> valueType,
-			DslConverter<?, ? extends F> dslConverter,
-			ProjectionConverter<? super F, ?> projectionConverter,
 			ElasticsearchFieldCodec<F> codec,
-			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
-			ElasticsearchFieldSortBuilderFactory sortBuilderFactory,
-			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory,
-			ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory,
+			DslConverter<?, ? extends F> dslConverter,
+			DslConverter<F, ? extends F> rawDslConverter,
+			ProjectionConverter<? super F, ?> projectionConverter,
+			ProjectionConverter<? super F, F> rawProjectionConverter,
+			ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory,
+			ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory,
+			ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory,
+			ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory,
 			PropertyMapping mapping,
 			String analyzerName, String searchAnalyzerName, String normalizerName) {
 		this.valueType = valueType;
-		this.dslConverter = dslConverter;
-		this.projectionConverter = projectionConverter;
 		this.codec = codec;
+		this.dslConverter = dslConverter;
+		this.rawDslConverter = rawDslConverter;
+		this.projectionConverter = projectionConverter;
+		this.rawProjectionConverter = rawProjectionConverter;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
@@ -75,6 +85,15 @@ public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescri
 	@Override
 	public String toString() {
 		return mapping.toString();
+	}
+
+	@Override
+	public Class<F> valueClass() {
+		return valueType;
+	}
+
+	public ElasticsearchFieldCodec<F> codec() {
+		return codec;
 	}
 
 	@Override
@@ -103,13 +122,28 @@ public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescri
 	}
 
 	@Override
+	public DslConverter<?, ? extends F> dslConverter() {
+		return dslConverter;
+	}
+
+	@Override
+	public DslConverter<F, ? extends F> rawDslConverter() {
+		return rawDslConverter;
+	}
+
+	@Override
 	public Class<?> projectedValueClass() {
 		return projectionConverter.valueType();
 	}
 
 	@Override
-	public Class<?> valueClass() {
-		return valueType;
+	public ProjectionConverter<? super F, ?> projectionConverter() {
+		return projectionConverter;
+	}
+
+	@Override
+	public ProjectionConverter<? super F, F> rawProjectionConverter() {
+		return rawProjectionConverter;
 	}
 
 	@Override
@@ -127,27 +161,23 @@ public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescri
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
-	public Class<F> valueType() {
-		return valueType;
-	}
-
-	public ElasticsearchFieldCodec<F> codec() {
-		return codec;
-	}
-
-	public ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory() {
+	@Override
+	public ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
 		return predicateBuilderFactory;
 	}
 
-	public ElasticsearchFieldSortBuilderFactory sortBuilderFactory() {
+	@Override
+	public ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory() {
 		return sortBuilderFactory;
 	}
 
-	public ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory() {
+	@Override
+	public ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory() {
 		return projectionBuilderFactory;
 	}
 
-	public ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory() {
+	@Override
+	public ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory() {
 		return aggregationBuilderFactory;
 	}
 

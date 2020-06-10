@@ -7,14 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -41,24 +40,16 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	private static final JsonAccessor<JsonElement> LTE_ACCESSOR = JsonAccessor.root().property( "lte" );
 
 	private final ElasticsearchSearchContext searchContext;
-
-	private final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
-	private final ElasticsearchCompatibilityChecker converterChecker;
-
+	private final ElasticsearchSearchFieldContext<F> field;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private Range<JsonElement> range;
 
 	public ElasticsearchRangePredicateBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
+		super( field );
 		this.searchContext = searchContext;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.converterChecker = converterChecker;
+		this.field = field;
 		this.codec = codec;
 	}
 
@@ -99,7 +90,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 			return null;
 		}
 		Object value = valueOptional.get();
-		DslConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 		try {
 			F converted = toFieldValueConverter.convertUnknown(
 					value, searchContext.toDocumentFieldValueConvertContext()
@@ -110,17 +101,6 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 			throw log.cannotConvertDslParameter(
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
-		}
-	}
-
-	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				converterChecker.failIfNotCompatible();
-				return converter;
 		}
 	}
 }

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
-
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -17,21 +17,20 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class ElasticsearchDistanceToFieldProjectionBuilder implements DistanceToFieldProjectionBuilder {
 
-	private final Set<String> indexNames;
-	private final String absoluteFieldPath;
+	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchFieldContext<GeoPoint> field;
 	private final String[] absoluteFieldPathComponents;
-	private boolean nested;
 
 	private final GeoPoint center;
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public ElasticsearchDistanceToFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			String[] absoluteFieldPathComponents, boolean nested, GeoPoint center) {
-		this.indexNames = indexNames;
-		this.absoluteFieldPath = absoluteFieldPath;
+	public ElasticsearchDistanceToFieldProjectionBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<GeoPoint> field, String[] absoluteFieldPathComponents,
+			GeoPoint center) {
+		this.searchContext = searchContext;
+		this.field = field;
 		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
-		this.nested = nested;
 		this.center = center;
 	}
 
@@ -43,7 +42,8 @@ public class ElasticsearchDistanceToFieldProjectionBuilder implements DistanceTo
 
 	@Override
 	public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-		return new ElasticsearchDistanceToFieldProjection<>( indexNames, absoluteFieldPath, absoluteFieldPathComponents,
-				nested, !accumulatorProvider.isSingleValued(), center, unit, accumulatorProvider.get() );
+		return new ElasticsearchDistanceToFieldProjection<>( searchContext.indexes().hibernateSearchIndexNames(),
+				field.absolutePath(), absoluteFieldPathComponents, !field.nestedPathHierarchy().isEmpty(),
+				!accumulatorProvider.isSingleValued(), center, unit, accumulatorProvider.get() );
 	}
 }

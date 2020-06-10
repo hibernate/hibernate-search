@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
-import java.util.List;
-
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -26,24 +23,16 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
-			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker converterChecker) {
-		throw log.traditionalSortNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		throw log.traditionalSortNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
-	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy, GeoPoint center) {
-		checkSortable( absoluteFieldPath );
-
-		return new ElasticsearchDistanceSortBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy, center );
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory obj) {
-		return true;
+	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field,
+			GeoPoint center) {
+		checkSortable( field );
+		return new ElasticsearchDistanceSortBuilder( searchContext, field, center );
 	}
 
 }

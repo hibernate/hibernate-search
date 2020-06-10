@@ -35,7 +35,7 @@ public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 	}
 
 	public ElasticsearchDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = indexes.nestedPathHierarchyForField( incomingFieldPath );
+		List<String> incomingNestedPathHierarchy = indexes.field( incomingFieldPath ).nestedPathHierarchy();
 		if ( fieldPath == null ) {
 			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( indexes, incomingFieldPath,
 					incomingNestedPathHierarchy );

@@ -6,15 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.util.List;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -30,16 +28,14 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSingl
 	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
-	private final ElasticsearchCompatibilityChecker analyzerChecker;
-
+	private final ElasticsearchSearchFieldContext<String> field;
 	private Integer slop;
 	private JsonElement phrase;
 	private String analyzer;
 
-	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchCompatibilityChecker analyzerChecker) {
-		super( absoluteFieldPath, nestedPathHierarchy );
-		this.analyzerChecker = analyzerChecker;
+	ElasticsearchTextPhrasePredicateBuilder(ElasticsearchSearchFieldContext<String> field) {
+		super( field );
+		this.field = field;
 	}
 
 	@Override
@@ -66,7 +62,9 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSingl
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		if ( analyzer == null ) {
-			analyzerChecker.failIfNotCompatible();
+			// Check analyzer compatibility for multi-index search
+			field.type().searchAnalyzerName();
+			field.type().normalizerName();
 		}
 
 		QUERY_ACCESSOR.set( innerObject, phrase );

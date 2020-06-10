@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -22,6 +23,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -106,59 +109,47 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	public <T> ElasticsearchScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
-		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
-		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
-		ElasticsearchScopedIndexFieldComponent<T> scopedIndexFieldComponent = new ElasticsearchScopedIndexFieldComponent<>();
+	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
+	public ElasticsearchSearchFieldContext<?> field(String absoluteFieldPath) {
+		ElasticsearchSearchFieldContext<?> resultOrNull = null;
+		if ( indexModels.size() == 1 ) {
+			// Single-index search
+			resultOrNull = indexModels.iterator().next().getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+		}
+		else {
+			// Multi-index search
+			Class<?> fieldValueTypeForAllIndexes = null;
+			List<ElasticsearchSearchFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaFieldNode<?> schemaNode =
-					indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-			if ( schemaNode == null ) {
-				continue;
+			for ( ElasticsearchIndexModel indexModel : indexModels ) {
+				ElasticsearchIndexSchemaFieldNode<?> fieldForCurrentIndex =
+						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+				if ( fieldForCurrentIndex == null ) {
+					continue;
+				}
+				Class<?> fieldValueTypeForCurrentIndex = fieldForCurrentIndex.type().valueClass();
+				if ( fieldValueTypeForAllIndexes == null ) {
+					fieldValueTypeForAllIndexes = fieldValueTypeForCurrentIndex;
+				}
+				else {
+					if ( !fieldValueTypeForAllIndexes.equals( fieldValueTypeForCurrentIndex ) ) {
+						throw log.conflictingFieldTypesForSearch( absoluteFieldPath, "valueType",
+								fieldValueTypeForAllIndexes, fieldValueTypeForCurrentIndex, indexesEventContext() );
+					}
+				}
+				fieldForEachIndex.add( fieldForCurrentIndex );
 			}
 
-			T component = componentRetrievalStrategy.extractComponent( schemaNode );
-			if ( selectedSchemaNode == null ) {
-				selectedSchemaNode = schemaNode;
-				indexModelForSelectedSchemaNode = indexModel;
-				scopedIndexFieldComponent.setComponent( component );
-				scopedIndexFieldComponent.setMultiValuedFieldInRoot( schemaNode.multiValuedInRoot() );
-				continue;
-			}
-
-			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
-				throw componentRetrievalStrategy.createCompatibilityException(
-						absoluteFieldPath,
-						scopedIndexFieldComponent.getComponent(),
-						component,
-						EventContexts.fromIndexNames(
-								indexModelForSelectedSchemaNode.hibernateSearchName(),
-								indexModel.hibernateSearchName()
-						)
+			if ( !fieldForEachIndex.isEmpty() ) {
+				resultOrNull = new ElasticsearchMultiIndexSearchFieldContext<>(
+						hibernateSearchIndexNames(), absoluteFieldPath, (List) fieldForEachIndex
 				);
 			}
-			scopedIndexFieldComponent.setMultiValuedFieldInRoot(
-					scopedIndexFieldComponent.isMultiValuedFieldInRoot() || schemaNode.multiValued()
-			);
-			ElasticsearchFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingFieldCompatibilityChecker<>(
-					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
-					indexModelForSelectedSchemaNode.hibernateSearchName(), indexModel.hibernateSearchName()
-			), componentRetrievalStrategy );
-
-			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {
-				scopedIndexFieldComponent.setConverterCompatibilityChecker( failingCompatibilityChecker );
-			}
-			if ( !componentRetrievalStrategy.hasCompatibleAnalyzer( scopedIndexFieldComponent.getComponent(), component ) ) {
-				scopedIndexFieldComponent.setAnalyzerCompatibilityChecker( failingCompatibilityChecker );
-			}
 		}
-		if ( selectedSchemaNode == null ) {
+		if ( resultOrNull == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
-
-		return scopedIndexFieldComponent;
+		return resultOrNull;
 	}
 
 	@Override
@@ -205,45 +196,6 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 			}
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
-	}
-
-	@Override
-	public String nestedDocumentPath(String absoluteFieldPath) {
-		Optional<String> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
-				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.nestedPath() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
-
-					throw log.conflictingFieldTypesForSearch( absoluteFieldPath,
-							nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ),
-							indexesEventContext() );
-				} )
-				.orElse( Optional.empty() );
-
-		return nestedDocumentPath.orElse( null );
-	}
-
-	@Override
-	public List<String> nestedPathHierarchyForField(String absoluteFieldPath) {
-		Optional<List<String>> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
-				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
-
-					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
-				} )
-				.orElse( Optional.empty() );
-
-		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
 	@Override

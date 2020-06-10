@@ -7,14 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.types.aggregation.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -27,25 +24,19 @@ public class ElasticsearchGeoPointFieldAggregationBuilderFactory
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchGeoPointFieldAggregationBuilderFactory(boolean aggregable,
-			DslConverter<?, ? extends GeoPoint> toFieldValueConverter,
-			ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
-		super( aggregable, toFieldValueConverter, fromFieldValueConverter, codec );
+		super( aggregable, codec );
 	}
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy, Class<K> expectedType, ValueConvert convert) {
-		throw log.directValueLookupNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<GeoPoint> field, Class<K> expectedType, ValueConvert convert) {
+		throw log.directValueLookupNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy, Class<K> expectedType, ValueConvert convert) {
-		throw log.rangesNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<GeoPoint> field, Class<K> expectedType, ValueConvert convert) {
+		throw log.rangesNotSupportedByGeoPoint( field.eventContext() );
 	}
 }

@@ -7,13 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
@@ -38,24 +37,16 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
 
 	private final ElasticsearchSearchContext searchContext;
-
-	private final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
-	private final ElasticsearchCompatibilityChecker converterChecker;
-
+	protected final ElasticsearchSearchFieldContext<F> field;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement value;
 
 	ElasticsearchStandardMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
+		super( field );
 		this.searchContext = searchContext;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.converterChecker = converterChecker;
+		this.field = field;
 		this.codec = codec;
 	}
 
@@ -76,7 +67,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	@Override
 	public void value(Object value, ValueConvert convert) {
-		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
@@ -98,16 +89,5 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 		MATCH_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
-	}
-
-	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				converterChecker.failIfNotCompatible();
-				return converter;
-		}
 	}
 }

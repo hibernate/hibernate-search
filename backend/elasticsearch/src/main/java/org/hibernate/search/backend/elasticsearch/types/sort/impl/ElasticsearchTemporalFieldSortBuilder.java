@@ -8,13 +8,11 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -24,15 +22,8 @@ public class ElasticsearchTemporalFieldSortBuilder<F extends TemporalAccessor>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchTemporalFieldSortBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			ElasticsearchCompatibilityChecker converterChecker,
-			ElasticsearchFieldCodec<F> codec) {
-		super(
-				searchContext, absoluteFieldPath, nestedPathHierarchy,
-				converter, rawConverter, converterChecker,
-				codec
-		);
+			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
+		super( searchContext, field, codec );
 	}
 
 	@Override
@@ -46,7 +37,7 @@ public class ElasticsearchTemporalFieldSortBuilder<F extends TemporalAccessor>
 				break;
 			case SUM:
 			default:
-				throw log.cannotComputeSumForTemporalField( getEventContext() );
+				throw log.cannotComputeSumForTemporalField( field.eventContext() );
 		}
 	}
 }

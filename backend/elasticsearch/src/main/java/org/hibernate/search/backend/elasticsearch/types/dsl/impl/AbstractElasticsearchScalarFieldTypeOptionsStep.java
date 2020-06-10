@@ -14,8 +14,6 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends AbstractElasticsearchScalarFieldTypeOptionsStep<?, F>, F>
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
@@ -29,59 +27,27 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 	protected final ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping) {
 		ElasticsearchFieldCodec<F> codec = complete( mapping );
 
-		DslConverter<?, ? extends F> dslConverter = createDslConverter();
-		DslConverter<F, ? extends F> rawDslConverter = createRawDslConverter();
-		ProjectionConverter<? super F, ?> projectionConverter = createProjectionConverter();
-		ProjectionConverter<? super F, F> rawProjectionConverter = createRawProjectionConverter();
-
 		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), dslConverter, projectionConverter,
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>(
-						resolvedSearchable, dslConverter, rawDslConverter, codec
-				),
-				createFieldSortBuilderFactory(
-						resolvedSortable, dslConverter, rawDslConverter, codec
-				),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
-						resolvedProjectable, projectionConverter, rawProjectionConverter, codec
-				),
-				createAggregationBuilderFactory(
-						resolvedAggregable,
-						dslConverter, rawDslConverter,
-						projectionConverter, rawProjectionConverter,
-						codec
-				),
+				getFieldType(), codec,
+				createDslConverter(), createRawDslConverter(),
+				createProjectionConverter(), createRawProjectionConverter(),
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( resolvedSearchable, codec ),
+				createFieldSortBuilderFactory( resolvedSortable, codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ),
+				createAggregationBuilderFactory( resolvedAggregable, codec ),
 				mapping
 		);
 	}
 
 	protected ElasticsearchStandardFieldSortBuilderFactory<F> createFieldSortBuilderFactory(
-			boolean resolvedAggregable,
-			DslConverter<?,? extends F> dslToIndexConverter,
-			DslConverter<F,? extends F> rawDslToIndexConverter,
-			ElasticsearchFieldCodec<F> codec) {
-		return new ElasticsearchStandardFieldSortBuilderFactory<>(
-				resolvedAggregable,
-				dslToIndexConverter,
-				rawDslToIndexConverter,
-				codec
-		);
+			boolean resolvedAggregable, ElasticsearchFieldCodec<F> codec) {
+		return new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedAggregable, codec );
 	}
 
-	protected ElasticsearchFieldAggregationBuilderFactory createAggregationBuilderFactory(
-			boolean resolvedAggregable,
-			DslConverter<?,? extends F> dslToIndexConverter,
-			DslConverter<F,? extends F> rawDslToIndexConverter,
-			ProjectionConverter<? super F,?> indexToProjectionConverter,
-			ProjectionConverter<? super F,F> rawIndexToProjectionConverter,
-			ElasticsearchFieldCodec<F> codec) {
+	protected ElasticsearchFieldAggregationBuilderFactory<F> createAggregationBuilderFactory(
+			boolean resolvedAggregable, ElasticsearchFieldCodec<F> codec) {
 		return new ElasticsearchStandardFieldAggregationBuilderFactory<>(
 				resolvedAggregable,
-				dslToIndexConverter,
-				rawDslToIndexConverter,
-				indexToProjectionConverter,
-				rawIndexToProjectionConverter,
 				codec
 		);
 	}

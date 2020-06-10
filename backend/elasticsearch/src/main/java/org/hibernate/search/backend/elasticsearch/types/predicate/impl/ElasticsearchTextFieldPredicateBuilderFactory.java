@@ -6,15 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -23,57 +19,38 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 		extends ElasticsearchStandardFieldPredicateBuilderFactory<String> {
 
 	private final String type;
-	private final String analyzer;
-	private final String normalizer;
 
-	public ElasticsearchTextFieldPredicateBuilderFactory( boolean searchable,
-			DslConverter<?, ? extends String> converter,
-			DslConverter<String, ? extends String> rawConverter,
+	public ElasticsearchTextFieldPredicateBuilderFactory(boolean searchable,
 			ElasticsearchFieldCodec<String> codec, PropertyMapping mapping) {
-		super( searchable, converter, rawConverter, codec );
+		super( searchable, codec );
 		this.type = mapping.getType();
-		this.analyzer = ( mapping.getSearchAnalyzer() != null ) ?
-				mapping.getSearchAnalyzer() : mapping.getAnalyzer();
-		this.normalizer = mapping.getNormalizer();
-	}
-
-	@Override
-	public boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-
-		ElasticsearchTextFieldPredicateBuilderFactory castedOther = (ElasticsearchTextFieldPredicateBuilderFactory) other;
-		return Objects.equals( analyzer, castedOther.analyzer ) && Objects.equals( normalizer, castedOther.normalizer );
 	}
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchCompatibilityChecker analyzerChecker) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter,
-				converterChecker, codec, type, analyzerChecker );
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field) {
+		checkSearchable( field );
+		return new ElasticsearchTextMatchPredicateBuilder( searchContext, field, codec, type );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, analyzerChecker );
+			ElasticsearchSearchFieldContext<String> field) {
+		checkSearchable( field );
+		return new ElasticsearchTextPhrasePredicateBuilder( field );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
+			ElasticsearchSearchFieldContext<String> field) {
+		checkSearchable( field );
+		return new ElasticsearchTextWildcardPredicateBuilder( field );
 	}
 
 	@Override
-	public ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
-			String absoluteFieldPath) {
-		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( absoluteFieldPath );
+	public ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
+			ElasticsearchSearchFieldContext<String> field) {
+		checkSearchable( field );
+		return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( field );
 	}
 }

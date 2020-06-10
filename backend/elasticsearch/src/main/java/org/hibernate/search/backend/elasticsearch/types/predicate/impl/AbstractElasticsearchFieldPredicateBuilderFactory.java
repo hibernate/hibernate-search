@@ -7,13 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -22,7 +20,7 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
-		implements ElasticsearchFieldPredicateBuilderFactory {
+		implements ElasticsearchFieldPredicateBuilderFactory<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -41,7 +39,7 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
+	public boolean isCompatibleWith(ElasticsearchFieldPredicateBuilderFactory<?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
@@ -51,62 +49,44 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory other) {
-		// analyzers are not involved in a non-text field predicate clause
-		return true;
-	}
-
-	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<F> field) {
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<F> field) {
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
-			String absoluteFieldPath) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+	public ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
+			ElasticsearchSearchFieldContext<F> field) {
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.spatialPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<F> field) {
+		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.spatialPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<F> field) {
+		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.spatialPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			ElasticsearchSearchFieldContext<F> field) {
+		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
-	protected void checkSearchable(String absoluteFieldPath) {
+	protected void checkSearchable(ElasticsearchSearchFieldContext<?> field) {
 		if ( !searchable ) {
-			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.nonSearchableField( field.absolutePath(), field.eventContext() );
 		}
 	}
 }

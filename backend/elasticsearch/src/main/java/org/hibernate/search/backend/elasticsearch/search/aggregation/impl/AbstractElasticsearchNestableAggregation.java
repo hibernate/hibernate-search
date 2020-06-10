@@ -13,12 +13,11 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 
@@ -118,20 +117,19 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	public abstract static class AbstractBuilder<A> extends AbstractElasticsearchAggregation.AbstractBuilder<A> {
 
-		protected final String absoluteFieldPath;
+		protected final ElasticsearchSearchFieldContext<?> field;
 		protected final List<String> nestedPathHierarchy;
 		private ElasticsearchSearchPredicateBuilder filterBuilder;
 
-		public AbstractBuilder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				List<String> nestedPathHierarchy) {
+		public AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<?> field) {
 			super( searchContext );
-			this.absoluteFieldPath = absoluteFieldPath;
-			this.nestedPathHierarchy = nestedPathHierarchy;
+			this.field = field;
+			this.nestedPathHierarchy = field.nestedPathHierarchy();
 		}
 
 		public void filter(SearchPredicate filter) {
 			if ( nestedPathHierarchy.isEmpty() ) {
-				throw log.cannotFilterAggregationOnRootDocumentField( absoluteFieldPath, getEventContext() );
+				throw log.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
 			ElasticsearchSearchPredicateBuilder builder = (ElasticsearchSearchPredicateBuilder) filter;
 			builder.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
@@ -140,9 +138,5 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 		@Override
 		public abstract ElasticsearchSearchAggregation<A> build();
-
-		protected final EventContext getEventContext() {
-			return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
-		}
 	}
 }

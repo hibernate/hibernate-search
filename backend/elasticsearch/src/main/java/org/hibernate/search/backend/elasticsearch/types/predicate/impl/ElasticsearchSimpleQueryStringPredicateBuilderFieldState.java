@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonPrimitive;
@@ -14,11 +15,11 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 		implements SimpleQueryStringPredicateBuilder.FieldState {
 	private static final String BOOST_OPERATOR = "^";
 
-	private final String absoluteFieldPath;
+	private final ElasticsearchSearchFieldContext<String> field;
 	private Float boost;
 
-	ElasticsearchSimpleQueryStringPredicateBuilderFieldState(String absoluteFieldPath) {
-		this.absoluteFieldPath = absoluteFieldPath;
+	ElasticsearchSimpleQueryStringPredicateBuilderFieldState(ElasticsearchSearchFieldContext<String> field) {
+		this.field = field;
 	}
 
 	@Override
@@ -26,8 +27,13 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 		this.boost = boost;
 	}
 
+	public void checkAnalyzerOrNormalizerCompatibleAcrossIndexes() {
+		field.type().searchAnalyzerName();
+		field.type().normalizerName();
+	}
+
 	public JsonPrimitive build() {
-		StringBuilder sb = new StringBuilder( absoluteFieldPath );
+		StringBuilder sb = new StringBuilder( field.absolutePath() );
 		if ( boost != null ) {
 			sb.append( BOOST_OPERATOR ).append( boost );
 		}

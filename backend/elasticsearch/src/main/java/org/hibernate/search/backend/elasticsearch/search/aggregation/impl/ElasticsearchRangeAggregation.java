@@ -15,9 +15,9 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
@@ -45,7 +45,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 	private ElasticsearchRangeAggregation(Builder<F, K> builder) {
 		super( builder );
-		this.absoluteFieldPath = builder.absoluteFieldPath;
+		this.absoluteFieldPath = builder.field.absolutePath();
 		this.rangesInOrder = builder.rangesInOrder;
 		this.rangesJson = builder.rangesJson;
 	}
@@ -81,11 +81,10 @@ public class ElasticsearchRangeAggregation<F, K>
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
-		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				List<String> nestedPathHierarchy,
+		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
 				DslConverter<?, ? extends F> toFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
-			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
+			super( searchContext, field );
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}
@@ -125,9 +124,7 @@ public class ElasticsearchRangeAggregation<F, K>
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-				);
+				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 			}
 		}
 	}

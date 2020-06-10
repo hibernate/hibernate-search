@@ -9,10 +9,16 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+
 public abstract class AbstractElasticsearchSingleFieldPredicateBuilder extends AbstractElasticsearchNestablePredicateBuilder {
 
 	protected final String absoluteFieldPath;
 	private final List<String> nestedPathHierarchy;
+
+	public AbstractElasticsearchSingleFieldPredicateBuilder(ElasticsearchSearchFieldContext<?> field) {
+		this( field.absolutePath(), field.nestedPathHierarchy() );
+	}
 
 	public AbstractElasticsearchSingleFieldPredicateBuilder(String absoluteFieldPath,
 			List<String> nestedPathHierarchy) {

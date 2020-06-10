@@ -9,12 +9,12 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchFieldSortBuilderFactory<F>
-		implements ElasticsearchFieldSortBuilderFactory {
+		implements ElasticsearchFieldSortBuilderFactory<F> {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final boolean sortable;
@@ -31,22 +31,21 @@ public abstract class AbstractElasticsearchFieldSortBuilderFactory<F>
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory obj) {
-		if ( this == obj ) {
+	public boolean isCompatibleWith(ElasticsearchFieldSortBuilderFactory<?> other) {
+		if ( this == other ) {
 			return true;
 		}
-		if ( obj.getClass() != getClass() ) {
+		if ( other.getClass() != getClass() ) {
 			return false;
 		}
 
-		AbstractElasticsearchFieldSortBuilderFactory<?> other = (AbstractElasticsearchFieldSortBuilderFactory<?>) obj;
-		return sortable == other.sortable && codec.isCompatibleWith( other.codec );
+		AbstractElasticsearchFieldSortBuilderFactory<?> castedOther = (AbstractElasticsearchFieldSortBuilderFactory<?>) other;
+		return sortable == castedOther.sortable && codec.isCompatibleWith( castedOther.codec );
 	}
 
-	protected void checkSortable(String absoluteFieldPath) {
+	protected void checkSortable(ElasticsearchSearchFieldContext<?> field) {
 		if ( !sortable ) {
-			throw log.unsortableField( absoluteFieldPath,
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.unsortableField( field.absolutePath(), field.eventContext() );
 		}
 	}
 }

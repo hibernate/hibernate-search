@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -23,34 +23,32 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-	private final String absoluteFieldPath;
+	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchFieldContext<F> field;
 	private final String[] absoluteFieldPathComponents;
-	private final boolean multiValuedFieldInRoot;
 
 	private final ProjectionConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
-	public ElasticsearchFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
+	public ElasticsearchFieldProjectionBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field,
 			String[] absoluteFieldPathComponents,
-			boolean multiValuedFieldInRoot,
 			ProjectionConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
-		this.indexNames = indexNames;
-		this.absoluteFieldPath = absoluteFieldPath;
+		this.searchContext = searchContext;
+		this.field = field;
 		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
-		this.multiValuedFieldInRoot = multiValuedFieldInRoot;
 		this.converter = converter;
 		this.codec = codec;
 	}
 
 	@Override
 	public <R> SearchProjection<R> build(ProjectionAccumulator.Provider<V, R> accumulatorProvider) {
-		if ( accumulatorProvider.isSingleValued() && multiValuedFieldInRoot ) {
-			throw log.invalidSingleValuedProjectionOnMultiValuedField( absoluteFieldPath,
-					EventContexts.fromIndexNames( indexNames ) );
+		if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+			throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 		}
-		return new ElasticsearchFieldProjection<>( indexNames, absoluteFieldPath, absoluteFieldPathComponents,
+		return new ElasticsearchFieldProjection<>( searchContext.indexes().hibernateSearchIndexNames(),
+				field.absolutePath(), absoluteFieldPathComponents,
 				codec::decode, converter, accumulatorProvider.get() );
 	}
 }

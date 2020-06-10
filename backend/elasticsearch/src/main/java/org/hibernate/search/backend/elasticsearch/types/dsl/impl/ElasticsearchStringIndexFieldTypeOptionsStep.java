@@ -24,8 +24,6 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -164,31 +162,17 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
 		}
 
-		DslConverter<?, ? extends String> dslConverter = createDslConverter();
-		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();
-		ProjectionConverter<? super String, ?> projectionConverter = createProjectionConverter();
-		ProjectionConverter<? super String, String> rawProjectionConverter = createRawProjectionConverter();
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 
 		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), dslConverter, projectionConverter,
-				codec,
-				new ElasticsearchTextFieldPredicateBuilderFactory(
-						resolvedSearchable, dslConverter, rawDslConverter, codec, mapping
-				),
-				new ElasticsearchTextFieldSortBuilderFactory(
-						resolvedSortable, dslConverter, rawDslConverter, codec
-				),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
-						resolvedProjectable, projectionConverter, rawProjectionConverter, codec
-				),
-				new ElasticsearchTextFieldAggregationBuilderFactory(
-						resolvedAggregable,
-						dslConverter, rawDslConverter,
-						projectionConverter, rawProjectionConverter,
-						codec,
-						analyzerName != null
-				),
+				getFieldType(), codec,
+				createDslConverter(), createRawDslConverter(),
+				createProjectionConverter(), createRawProjectionConverter(),
+				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, codec, mapping ),
+				new ElasticsearchTextFieldSortBuilderFactory( resolvedSortable, codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ),
+				new ElasticsearchTextFieldAggregationBuilderFactory( resolvedAggregable, codec,
+						analyzerName != null ),
 				mapping,
 				analyzerName, searchAnalyzerName != null ? searchAnalyzerName : analyzerName,
 				normalizerName

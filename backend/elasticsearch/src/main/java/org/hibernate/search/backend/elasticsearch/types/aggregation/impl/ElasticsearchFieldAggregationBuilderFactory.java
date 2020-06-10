@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.aggregation.impl;
 
-import java.util.List;
-
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -23,20 +22,16 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  * when users try to create a aggregation that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface ElasticsearchFieldAggregationBuilderFactory {
+public interface ElasticsearchFieldAggregationBuilderFactory<F> {
 
 	boolean isAggregable();
 
+	boolean isCompatibleWith(ElasticsearchFieldAggregationBuilderFactory<?> other);
+
 	<K> TermsAggregationBuilder<K> createTermsAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			Class<K> expectedType, ValueConvert convert);
+			ElasticsearchSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert);
 
 	<K> RangeAggregationBuilder<K> createRangeAggregationBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			Class<K> expectedType, ValueConvert convert);
-
-	boolean hasCompatibleCodec(ElasticsearchFieldAggregationBuilderFactory other);
-
-	boolean hasCompatibleConverter(ElasticsearchFieldAggregationBuilderFactory other);
+			ElasticsearchSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert);
 
 }

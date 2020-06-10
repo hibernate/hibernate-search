@@ -14,8 +14,6 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
@@ -43,26 +41,16 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 	public IndexFieldType<JsonElement> toIndexFieldType() {
 		Gson gson = getBuildContext().getUserFacingGson();
 
-		DslConverter<?, ? extends JsonElement> dslConverter = createDslConverter();
-		DslConverter<JsonElement, ? extends JsonElement> rawDslConverter = createRawDslConverter();
-		ProjectionConverter<? super JsonElement, ?> projectionConverter = createProjectionConverter();
-		ProjectionConverter<? super JsonElement, JsonElement> rawProjectionConverter = createRawProjectionConverter();
 		ElasticsearchJsonElementFieldCodec codec = new ElasticsearchJsonElementFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), dslConverter, projectionConverter,
-				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, dslConverter, rawDslConverter, codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslConverter, rawDslConverter, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
-						true, projectionConverter, rawProjectionConverter, codec
-				),
-				new ElasticsearchStandardFieldAggregationBuilderFactory<>(
-						true,
-						dslConverter, rawDslConverter,
-						projectionConverter, rawProjectionConverter,
-						codec
-				),
+				getFieldType(), codec,
+				createDslConverter(), createRawDslConverter(),
+				createProjectionConverter(), createRawProjectionConverter(),
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, codec ),
+				new ElasticsearchStandardFieldSortBuilderFactory<>( true, codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, codec ),
+				new ElasticsearchStandardFieldAggregationBuilderFactory<>( true, codec ),
 				mapping
 		);
 	}

@@ -12,27 +12,22 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -42,14 +37,13 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
-			new ProjectionBuilderFactoryRetrievalStrategy();
-
+	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchIndexesContext indexes;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
 			ElasticsearchSearchContext searchContext) {
+		this.searchContext = searchContext;
 		this.indexes = searchContext.indexes();
 		this.documentReferenceExtractionHelper =
 				searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
@@ -65,24 +59,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		// checking relative nested document paths multi index compatibility:
-		indexes.nestedDocumentPath( absoluteFieldPath );
-
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldProjectionBuilderFactory> fieldComponent =
-				indexes.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		switch ( convert ) {
-			case NO:
-				break;
-			case YES:
-			default:
-				fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
-				break;
-		}
-		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder(
-						indexes.hibernateSearchIndexNames(), absoluteFieldPath,
-						fieldComponent.isMultiValuedFieldInRoot(), expectedType, convert
-				);
+		ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
+		// Check the compatibility of nested structure in the case of multi-index search.
+		field.nestedPathHierarchy();
+		return indexes.field( absoluteFieldPath ).createFieldValueProjectionBuilder( searchContext,
+				expectedType, convert );
 	}
 
 	@Override
@@ -108,14 +89,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		// checking relative nested document paths multi index compatibility:
-		String nestedPath = indexes.nestedDocumentPath( absoluteFieldPath );
-
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceProjectionBuilder( indexes.hibernateSearchIndexNames(),
-						absoluteFieldPath, nestedPath != null, center
-				);
+		ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
+		// Check the compatibility of nested structure in the case of multi-index search.
+		field.nestedPathHierarchy();
+		return field.createDistanceProjectionBuilder( searchContext, center );
 	}
 
 	@Override
@@ -169,7 +146,6 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		return new ElasticsearchJsonHitProjectionBuilder( indexes.hibernateSearchIndexNames() );
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
@@ -179,38 +155,5 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), indexes.hibernateSearchIndexNames() );
 		}
 		return casted;
-	}
-
-	private static class ProjectionBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<ElasticsearchFieldProjectionBuilderFactory> {
-
-		@Override
-		public ElasticsearchFieldProjectionBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().projectionBuilderFactory();
-		}
-
-		@Override
-		public boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
-			return component1.hasCompatibleCodec( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
-			return component1.hasCompatibleConverter( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleAnalyzer(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
-			// analyzers are not involved in a projection clause
-			return true;
-		}
-
-		@Override
-		public SearchException createCompatibilityException(String absoluteFieldPath,
-				ElasticsearchFieldProjectionBuilderFactory component1,
-				ElasticsearchFieldProjectionBuilderFactory component2,
-				EventContext context) {
-			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
-		}
 	}
 }

@@ -7,12 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -25,7 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsearchDocumentValueSortBuilder
+public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsearchDocumentValueSortBuilder<F>
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -35,24 +34,14 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
 	private final ElasticsearchSearchContext searchContext;
-
-	private final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
-	private final ElasticsearchCompatibilityChecker converterChecker;
-
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement missing;
 
 	public ElasticsearchStandardFieldSortBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( absoluteFieldPath, nestedPathHierarchy, searchContext.searchSyntax() );
+			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
+		super( field, searchContext.searchSyntax() );
 		this.searchContext = searchContext;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.converterChecker = converterChecker;
 		this.codec = codec;
 	}
 
@@ -68,13 +57,13 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 
 	@Override
 	public void missingAs(Object value, ValueConvert convert) {
-		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			this.missing = codec.encodeForMissing( converted );
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter( e.getMessage(), e, getEventContext() );
+			throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 		}
 	}
 
@@ -85,23 +74,12 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 		}
 
 		if ( innerObject.size() == 0 ) {
-			collector.collectSort( new JsonPrimitive( absoluteFieldPath ) );
+			collector.collectSort( new JsonPrimitive( field.absolutePath() ) );
 		}
 		else {
 			JsonObject outerObject = new JsonObject();
-			outerObject.add( absoluteFieldPath, innerObject );
+			outerObject.add( field.absolutePath(), innerObject );
 			collector.collectSort( outerObject );
-		}
-	}
-
-	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				converterChecker.failIfNotCompatible();
-				return converter;
 		}
 	}
 }

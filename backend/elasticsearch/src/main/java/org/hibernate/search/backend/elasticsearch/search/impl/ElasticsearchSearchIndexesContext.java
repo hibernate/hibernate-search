@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexRootComponent;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 
@@ -33,16 +31,11 @@ public interface ElasticsearchSearchIndexesContext {
 
 	ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter();
 
-	<T> ElasticsearchScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy);
+	ElasticsearchSearchFieldContext<?> field(String absoluteFieldPath);
 
 	boolean hasSchemaObjectNodeComponent(String absoluteFieldPath);
 
 	void checkNestedField(String absoluteFieldPath);
-
-	String nestedDocumentPath(String absoluteFieldPath);
-
-	List<String> nestedPathHierarchyForField(String absoluteFieldPath);
 
 	List<String> nestedPathHierarchyForObject(String absoluteObjectPath);
 }

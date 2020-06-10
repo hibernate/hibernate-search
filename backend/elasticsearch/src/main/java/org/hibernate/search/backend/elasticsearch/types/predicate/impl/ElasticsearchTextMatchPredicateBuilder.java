@@ -7,17 +7,15 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -32,21 +30,15 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
 	private final String type;
-	private final ElasticsearchCompatibilityChecker analyzerChecker;
 
 	private Integer fuzziness;
 	private Integer prefixLength;
 	private String analyzer;
 
-	ElasticsearchTextMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends String> converter, DslConverter<String, ? extends String> rawConverter,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
-			String type, ElasticsearchCompatibilityChecker analyzerChecker) {
-		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+	ElasticsearchTextMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<String> field, ElasticsearchFieldCodec<String> codec, String type) {
+		super( searchContext, field, codec );
 		this.type = type;
-		this.analyzerChecker = analyzerChecker;
 	}
 
 	@Override
@@ -73,7 +65,9 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context, JsonObject outerObject,
 			JsonObject innerObject) {
 		if ( analyzer == null ) {
-			analyzerChecker.failIfNotCompatible();
+			// Check analyzer compatibility for multi-index search
+			field.type().searchAnalyzerName();
+			field.type().normalizerName();
 		}
 
 		if ( fuzziness != null ) {

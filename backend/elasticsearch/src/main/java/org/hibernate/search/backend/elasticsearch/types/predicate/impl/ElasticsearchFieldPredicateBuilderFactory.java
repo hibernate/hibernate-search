@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.util.List;
-
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -37,38 +35,33 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
  * when users try to create a predicate that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface ElasticsearchFieldPredicateBuilderFactory {
+public interface ElasticsearchFieldPredicateBuilderFactory<F> {
 
 	boolean isSearchable();
 
-	boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other);
-
-	boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other);
-
-	boolean hasCompatibleAnalyzer(ElasticsearchFieldPredicateBuilderFactory other);
+	boolean isCompatibleWith(ElasticsearchFieldPredicateBuilderFactory<?> other);
 
 	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchCompatibilityChecker analyzerChecker);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
 
 	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchCompatibilityChecker converterChecker);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
 
 	PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker);
+			ElasticsearchSearchFieldContext<F> field);
 
 	WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			ElasticsearchSearchFieldContext<F> field);
 
-	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
+	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
+			ElasticsearchSearchFieldContext<F> field);
 
 	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			ElasticsearchSearchFieldContext<F> field);
 
 	SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			ElasticsearchSearchFieldContext<F> field);
 
 	SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			ElasticsearchSearchFieldContext<F> field);
 }

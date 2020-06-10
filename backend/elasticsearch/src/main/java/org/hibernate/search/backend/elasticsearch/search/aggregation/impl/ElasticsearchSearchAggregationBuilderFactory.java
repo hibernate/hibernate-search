@@ -8,13 +8,9 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
@@ -22,9 +18,7 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 
@@ -32,9 +26,6 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory<ElasticsearchSearchAggregationCollector> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final AggregationBuilderFactoryRetrievalStrategy AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
-			new AggregationBuilderFactoryRetrievalStrategy();
 
 	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchIndexesContext indexes;
@@ -64,27 +55,13 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent =
-				indexes.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		checkConverterCompatibility( fieldComponent, convert );
-		return fieldComponent.getComponent().createTermsAggregationBuilder(
-				searchContext, absoluteFieldPath,
-				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
-				expectedType, convert
-		);
+		return indexes.field( absoluteFieldPath ).createTermsAggregationBuilder( searchContext, expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent =
-				indexes.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		checkConverterCompatibility( fieldComponent, convert );
-		return fieldComponent.getComponent().createRangeAggregationBuilder(
-				searchContext, absoluteFieldPath,
-				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
-				expectedType, convert
-		);
+		return indexes.field( absoluteFieldPath ).createRangeAggregationBuilder( searchContext, expectedType, convert );
 	}
 
 	public SearchAggregationBuilder<JsonObject> fromJson(JsonObject jsonObject) {
@@ -93,51 +70,5 @@ public class ElasticsearchSearchAggregationBuilderFactory
 
 	public SearchAggregationBuilder<JsonObject> fromJson(String jsonString) {
 		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
-	}
-
-	private void checkConverterCompatibility(
-			ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent,
-			ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				break;
-			case YES:
-			default:
-				fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
-				break;
-		}
-	}
-
-	private static class AggregationBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<ElasticsearchFieldAggregationBuilderFactory> {
-
-		@Override
-		public ElasticsearchFieldAggregationBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().aggregationBuilderFactory();
-		}
-
-		@Override
-		public boolean hasCompatibleCodec(ElasticsearchFieldAggregationBuilderFactory component1, ElasticsearchFieldAggregationBuilderFactory component2) {
-			return component1.hasCompatibleCodec( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleConverter(ElasticsearchFieldAggregationBuilderFactory component1, ElasticsearchFieldAggregationBuilderFactory component2) {
-			return component1.hasCompatibleConverter( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleAnalyzer(ElasticsearchFieldAggregationBuilderFactory component1, ElasticsearchFieldAggregationBuilderFactory component2) {
-			// analyzers are not involved in a aggregation clause
-			return true;
-		}
-
-		@Override
-		public SearchException createCompatibilityException(String absoluteFieldPath,
-				ElasticsearchFieldAggregationBuilderFactory component1,
-				ElasticsearchFieldAggregationBuilderFactory component2,
-				EventContext context) {
-			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
-		}
 	}
 }

@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchTemporalFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 				S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<?, F>, F extends TemporalAccessor
@@ -42,11 +41,8 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 
 	@Override
 	protected ElasticsearchStandardFieldSortBuilderFactory<F> createFieldSortBuilderFactory(boolean resolvedAggregable,
-			DslConverter<?, ? extends F> dslToIndexConverter, DslConverter<F, ? extends F> rawDslToIndexConverter,
 			ElasticsearchFieldCodec<F> codec) {
-		return new ElasticsearchTemporalFieldSortBuilderFactory<>(
-				resolvedAggregable, dslToIndexConverter, rawDslToIndexConverter, codec
-		);
+		return new ElasticsearchTemporalFieldSortBuilderFactory<>( resolvedAggregable, codec );
 	}
 
 	protected abstract ElasticsearchFieldCodec<F> createCodec(DateTimeFormatter formatter);

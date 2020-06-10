@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
-import java.util.Set;
-
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -23,18 +23,16 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * when users try to create a projection that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface ElasticsearchFieldProjectionBuilderFactory {
+public interface ElasticsearchFieldProjectionBuilderFactory<F> {
 
 	boolean isProjectable();
 
-	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			boolean multiValuedFieldInRoot, Class<T> expectedType, ValueConvert convert);
+	boolean isCompatibleWith(ElasticsearchFieldProjectionBuilderFactory<?> other);
 
-	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			boolean nested, GeoPoint center);
+	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert);
 
-	boolean hasCompatibleCodec(ElasticsearchFieldProjectionBuilderFactory other);
-
-	boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory other);
+	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field, GeoPoint center);
 
 }

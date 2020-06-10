@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
-import java.util.List;
-
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -32,17 +30,16 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * when users try to create a sort that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface ElasticsearchFieldSortBuilderFactory {
+public interface ElasticsearchFieldSortBuilderFactory<F> {
 
 	boolean isSortable();
 
-	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker converterChecker);
+	boolean isCompatibleWith(ElasticsearchFieldSortBuilderFactory<?> other);
+
+	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field);
 
 	DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy, GeoPoint center);
+			ElasticsearchSearchFieldContext<F> field, GeoPoint center);
 
-	boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory other);
-
-	boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory other);
 }
