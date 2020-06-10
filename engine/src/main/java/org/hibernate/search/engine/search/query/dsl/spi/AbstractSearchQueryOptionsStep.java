@@ -121,7 +121,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 		SearchPredicateBuilderFactory<? super C> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
 		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory( predicateBuilderFactory );
 		SearchSortFactory factory = new DefaultSearchSortFactory(
-				SearchSortDslContextImpl.root( builderFactory, predicateFactory, predicateBuilderFactory )
+				SearchSortDslContextImpl.root( builderFactory, predicateFactory )
 		);
 		SearchSort sort = sortContributor.apply( extendSortFactory( factory ) ).toSort();
 		contribute( builderFactory, sort );
@@ -141,7 +141,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 		SearchPredicateBuilderFactory<? super C> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
 		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory( predicateBuilderFactory );
 		AF factory = extendAggregationFactory( new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( builderFactory, predicateFactory, predicateBuilderFactory )
+				SearchAggregationDslContextImpl.root( builderFactory, predicateFactory )
 		) );
 		SearchAggregation<A> aggregation = aggregationContributor.apply( factory ).toAggregation();
 		contribute( builderFactory, key, aggregation );
