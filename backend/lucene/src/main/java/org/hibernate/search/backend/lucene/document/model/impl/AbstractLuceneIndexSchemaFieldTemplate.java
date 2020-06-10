@@ -22,7 +22,7 @@ public abstract class AbstractLuceneIndexSchemaFieldTemplate<N> {
 
 	AbstractLuceneIndexSchemaFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
-		this.inclusion = declaringParent.getInclusion().compose( inclusion );
+		this.inclusion = declaringParent.inclusion().compose( inclusion );
 		this.absolutePathGlob = absolutePathGlob;
 		this.multiValued = multiValued;
 	}

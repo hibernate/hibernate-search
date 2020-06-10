@@ -114,7 +114,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		private E convertAndEncode(K value) {
 			try {
-				F converted = toFieldValueConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

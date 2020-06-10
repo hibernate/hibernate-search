@@ -70,7 +70,7 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 		ToDocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
 				getDslToDocumentIdentifierConverter( valueConvert );
 		ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
-				searchContext.getToDocumentIdentifierValueConvertContext();
+				searchContext.toDocumentIdentifierValueConvertContext();
 		values.add( dslToDocumentIdConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
 	}
 

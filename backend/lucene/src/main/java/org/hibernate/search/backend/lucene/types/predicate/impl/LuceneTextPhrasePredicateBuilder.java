@@ -53,7 +53,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSingleFieldPredicat
 		this.codec = codec;
 		this.analyzer = analyzerOrNormalizer;
 		this.analyzerChecker = analyzerChecker;
-		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
+		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 	}
 
 	@Override

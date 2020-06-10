@@ -64,10 +64,10 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodes );
 		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
 		objectFieldNodes.values().stream()
-				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
 		fieldNodes.values().stream()
-				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
 		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
 		this.indexingAnalyzer = new IndexingScopedAnalyzer();
@@ -120,13 +120,13 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	public LuceneIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
 		LuceneIndexSchemaObjectFieldNode node =
 				getNode( objectFieldNodes, objectFieldTemplates, dynamicObjectFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.getInclusion() );
+		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
 		LuceneIndexSchemaFieldNode<?> node =
 				getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.getInclusion() );
+		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	public Analyzer getIndexingAnalyzer() {
@@ -191,7 +191,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
 
-			Analyzer analyzer = field.type().getIndexingAnalyzerOrNormalizer();
+			Analyzer analyzer = field.type().indexingAnalyzerOrNormalizer();
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
@@ -217,7 +217,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
 
-			Analyzer analyzer = field.type().getSearchAnalyzerOrNormalizer();
+			Analyzer analyzer = field.type().searchAnalyzerOrNormalizer();
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}

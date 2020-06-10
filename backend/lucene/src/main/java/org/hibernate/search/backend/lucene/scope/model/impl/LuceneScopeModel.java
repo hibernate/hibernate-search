@@ -51,23 +51,23 @@ public class LuceneScopeModel {
 		}
 	}
 
-	public Set<String> getTypeNames() {
+	public Set<String> typeNames() {
 		return typeNames;
 	}
 
-	public Set<String> getIndexNames() {
+	public Set<String> indexNames() {
 		return indexNames;
 	}
 
-	public EventContext getIndexesEventContext() {
+	public EventContext indexesEventContext() {
 		return EventContexts.fromIndexNames( indexNames );
 	}
 
-	public Set<LuceneScopeIndexManagerContext> getIndexManagerContexts() {
+	public Set<LuceneScopeIndexManagerContext> indexManagerContexts() {
 		return indexManagerContexts;
 	}
 
-	public LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> getIdDslConverter() {
+	public LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter() {
 		Iterator<LuceneIndexModel> iterator = indexModels.iterator();
 		LuceneIndexModel indexModelForSelectedIdConverter = null;
 		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
@@ -101,7 +101,7 @@ public class LuceneScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
-	public LuceneObjectPredicateBuilderFactory getObjectPredicateBuilderFactory(String absoluteFieldPath) {
+	public LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath) {
 		LuceneObjectPredicateBuilderFactory result = null;
 
 		LuceneIndexSchemaObjectFieldNode objectNode = null;
@@ -155,7 +155,7 @@ public class LuceneScopeModel {
 		return result;
 	}
 
-	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> LuceneScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
@@ -206,7 +206,7 @@ public class LuceneScopeModel {
 			}
 		}
 		if ( selectedSchemaNode == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 		return scopedIndexFieldComponent;
 	}
@@ -219,7 +219,7 @@ public class LuceneScopeModel {
 					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
 				found = true;
-				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
+				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.storage() ) ) {
 					throw log.nonNestedFieldForNestedQuery(
 							absoluteFieldPath, indexModel.getEventContext()
 					);
@@ -236,58 +236,58 @@ public class LuceneScopeModel {
 					);
 				}
 			}
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 	}
 
-	public String getNestedDocumentPath(String absoluteFieldPath) {
+	public String nestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedDocumentPath() ) )
+				.map( fieldNode -> Optional.ofNullable( fieldNode.nestedDocumentPath() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
 					throw log.conflictingNestedDocumentPaths(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( null );
 	}
 
-	public List<String> getNestedPathHierarchyForField(String absoluteFieldPath) {
+	public List<String> nestedPathHierarchyForField(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
 					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
-	public List<String> getNestedPathHierarchyForObject(String absoluteFieldPath) {
+	public List<String> nestedPathHierarchyForObject(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
 					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 

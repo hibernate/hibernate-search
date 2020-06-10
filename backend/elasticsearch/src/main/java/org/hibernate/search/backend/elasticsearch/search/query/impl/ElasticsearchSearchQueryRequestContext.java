@@ -69,7 +69,7 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 
 	@Override
 	public ElasticsearchSearchSyntax getSearchSyntax() {
-		return searchContext.getSearchSyntax();
+		return searchContext.searchSyntax();
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

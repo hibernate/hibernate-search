@@ -170,7 +170,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		JsonObject payload = new JsonObject();
 
 		JsonArray filters = new JsonArray();
-		JsonObject filter = searchContext.getFilterOrNull( sessionContext.tenantIdentifier() );
+		JsonObject filter = searchContext.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
 			filters.add( filter );
 		}

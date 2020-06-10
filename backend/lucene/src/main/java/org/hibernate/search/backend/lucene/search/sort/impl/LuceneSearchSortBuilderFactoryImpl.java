@@ -46,7 +46,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public SearchSort toSearchSort(List<LuceneSearchSortBuilder> builders) {
-		return new LuceneSearchSort( scopeModel.getIndexNames(), builders );
+		return new LuceneSearchSort( scopeModel.indexNames(), builders );
 	}
 
 	@Override
@@ -55,8 +55,8 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
 		LuceneSearchSort casted = (LuceneSearchSort) sort;
-		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.getIndexNames() );
+		if ( !scopeModel.indexNames().equals( casted.getIndexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.indexNames() );
 		}
 		return casted;
 	}
@@ -74,16 +74,16 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
 		LuceneScopedIndexFieldComponent<LuceneFieldSortBuilderFactory> fieldComponent = scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ),
+				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, scopeModel.nestedDocumentPath( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ), location );
+				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createDistanceSortBuilder( absoluteFieldPath, scopeModel.nestedDocumentPath( absoluteFieldPath ), location );
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 		@Override
 		public LuceneFieldSortBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().getSortBuilderFactory();
+			return schemaNode.type().sortBuilderFactory();
 		}
 
 		@Override

@@ -30,7 +30,7 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexFieldType<F> type) {
 		super( parent, relativeName, inclusion, multiValued );
-		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
+		this.nestedPathHierarchy = parent.nestedPathHierarchy();
 		this.type = type;
 	}
 
@@ -59,13 +59,13 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 		return this;
 	}
 
-	public String getNestedDocumentPath() {
+	public String nestedDocumentPath() {
 		return ( nestedPathHierarchy.isEmpty() ) ? null :
 				// nested path is the LAST element on the path hierarchy
 				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 	}
 
-	public List<String> getNestedPathHierarchy() {
+	public List<String> nestedPathHierarchy() {
 		return nestedPathHierarchy;
 	}
 
@@ -76,8 +76,8 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 
 	@SuppressWarnings("unchecked")
 	public <T> LuceneIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
-		if ( !type.getValueType().isAssignableFrom( expectedSubType ) ) {
-			throw log.invalidFieldValueType( type.getValueType(), expectedSubType,
+		if ( !type.valueType().isAssignableFrom( expectedSubType ) ) {
+			throw log.invalidFieldValueType( type.valueType(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (LuceneIndexSchemaFieldNode<? super T>) this;

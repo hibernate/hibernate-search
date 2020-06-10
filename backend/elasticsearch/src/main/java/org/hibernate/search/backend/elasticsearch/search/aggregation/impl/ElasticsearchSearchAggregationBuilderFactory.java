@@ -53,9 +53,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		}
 
 		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
-		if ( !scopeModel.getHibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !scopeModel.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.getIndexNames(), scopeModel.getHibernateSearchIndexNames()
+					aggregation, casted.getIndexNames(), scopeModel.hibernateSearchIndexNames()
 			);
 		}
 
@@ -66,11 +66,11 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 		return fieldComponent.getComponent().createTermsAggregationBuilder(
 				searchContext, absoluteFieldPath,
-				scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+				scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
 				expectedType, convert
 		);
 	}
@@ -79,11 +79,11 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
 				searchContext, absoluteFieldPath,
-				scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+				scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
 				expectedType, convert
 		);
 	}
@@ -93,7 +93,7 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	}
 
 	public SearchAggregationBuilder<JsonObject> fromJson(String jsonString) {
-		return fromJson( searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class ) );
+		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private void checkConverterCompatibility(
@@ -114,7 +114,7 @@ public class ElasticsearchSearchAggregationBuilderFactory
 
 		@Override
 		public ElasticsearchFieldAggregationBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().getAggregationBuilderFactory();
+			return schemaNode.type().aggregationBuilderFactory();
 		}
 
 		@Override

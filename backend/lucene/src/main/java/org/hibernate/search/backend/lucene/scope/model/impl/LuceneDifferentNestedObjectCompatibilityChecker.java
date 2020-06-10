@@ -32,7 +32,7 @@ public class LuceneDifferentNestedObjectCompatibilityChecker {
 	}
 
 	public LuceneDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( incomingFieldPath );
+		List<String> incomingNestedPathHierarchy = scopeModel.nestedPathHierarchyForField( incomingFieldPath );
 		if ( fieldPath == null ) {
 			return new LuceneDifferentNestedObjectCompatibilityChecker( scopeModel, incomingFieldPath, incomingNestedPathHierarchy );
 		}

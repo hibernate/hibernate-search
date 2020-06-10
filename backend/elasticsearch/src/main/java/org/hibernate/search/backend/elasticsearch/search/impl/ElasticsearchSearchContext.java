@@ -49,19 +49,19 @@ public final class ElasticsearchSearchContext {
 		this.scopeModel = scopeModel;
 	}
 
-	public ToDocumentIdentifierValueConvertContext getToDocumentIdentifierValueConvertContext() {
+	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
 		return toDocumentIdentifierValueConvertContext;
 	}
 
-	public ToDocumentFieldValueConvertContext getToDocumentFieldValueConvertContext() {
+	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
 		return toDocumentFieldValueConvertContext;
 	}
 
-	public Gson getUserFacingGson() {
+	public Gson userFacingGson() {
 		return userFacingGson;
 	}
 
-	public ElasticsearchSearchSyntax getSearchSyntax() {
+	public ElasticsearchSearchSyntax searchSyntax() {
 		return searchSyntax;
 	}
 
@@ -69,23 +69,23 @@ public final class ElasticsearchSearchContext {
 		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
 	}
 
-	public Set<String> getMappedTypeNames() {
-		return scopeModel.getMappedTypeNames();
+	public Set<String> mappedTypeNames() {
+		return scopeModel.mappedTypeNames();
 	}
 
-	public Set<String> getHibernateSearchIndexNames() {
-		return scopeModel.getHibernateSearchIndexNames();
+	public Set<String> hibernateSearchIndexNames() {
+		return scopeModel.hibernateSearchIndexNames();
 	}
 
-	public Collection<URLEncodedString> getElasticsearchIndexNames() {
-		return scopeModel.getElasticsearchIndexNames();
+	public Collection<URLEncodedString> elasticsearchIndexNames() {
+		return scopeModel.elasticsearchIndexNames();
 	}
 
-	public Map<String, URLEncodedString> getMappedTypeToElasticsearchIndexNames() {
-		return scopeModel.getMappedTypeToElasticsearchIndexNames();
+	public Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames() {
+		return scopeModel.mappedTypeToElasticsearchIndexNames();
 	}
 
-	public JsonObject getFilterOrNull(String tenantId) {
+	public JsonObject filterOrNull(String tenantId) {
 		return multiTenancyStrategy.getFilterOrNull( tenantId );
 	}
 }

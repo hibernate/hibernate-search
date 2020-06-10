@@ -60,12 +60,12 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
-	public IndexFieldInclusion getInclusion() {
+	public IndexFieldInclusion inclusion() {
 		return IndexFieldInclusion.INCLUDED;
 	}
 
 	@Override
-	public List<String> getNestedPathHierarchy() {
+	public List<String> nestedPathHierarchy() {
 		return Collections.emptyList();
 	}
 

@@ -53,7 +53,7 @@ public class ElasticsearchIndexScope
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( model.getHibernateSearchIndexNames() )
+				.append( "indexNames=" ).append( model.hibernateSearchIndexNames() )
 				.append( "]" )
 				.toString();
 	}

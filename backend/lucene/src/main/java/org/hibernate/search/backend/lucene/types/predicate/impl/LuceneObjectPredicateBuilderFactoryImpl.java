@@ -25,7 +25,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexSchemaObjectFieldNode objectNode) {
 		absoluteFieldPath = objectNode.absolutePath();
-		nestedPathHierarchy = objectNode.getNestedPathHierarchy();
+		nestedPathHierarchy = objectNode.nestedPathHierarchy();
 		addLeafFields( objectNode );
 	}
 
@@ -70,7 +70,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 			else if ( child.isValueField() ) {
 				leafFields.put(
 						child.absolutePath(),
-						( (LuceneIndexSchemaFieldNode<?>) child ).type().getPredicateBuilderFactory()
+						( (LuceneIndexSchemaFieldNode<?>) child ).type().predicateBuilderFactory()
 				);
 			}
 		}

@@ -50,9 +50,9 @@ public class LuceneSearchAggregationBuilderFactory
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !scopeModel.indexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-				aggregation, casted.getIndexNames(), scopeModel.getIndexNames()
+				aggregation, casted.getIndexNames(), scopeModel.indexNames()
 			);
 		}
 
@@ -63,10 +63,10 @@ public class LuceneSearchAggregationBuilderFactory
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		LuceneScopedIndexFieldComponent<LuceneFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 
-		String nestedDocumentPath = scopeModel.getNestedDocumentPath( absoluteFieldPath );
+		String nestedDocumentPath = scopeModel.nestedDocumentPath( absoluteFieldPath );
 
 		return fieldComponent.getComponent().createTermsAggregationBuilder(
 				searchContext, nestedDocumentPath, absoluteFieldPath, expectedType, convert
@@ -77,10 +77,10 @@ public class LuceneSearchAggregationBuilderFactory
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		LuceneScopedIndexFieldComponent<LuceneFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 
-		String nestedDocumentPath = scopeModel.getNestedDocumentPath( absoluteFieldPath );
+		String nestedDocumentPath = scopeModel.nestedDocumentPath( absoluteFieldPath );
 
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
 				searchContext, nestedDocumentPath, absoluteFieldPath, expectedType, convert
@@ -105,7 +105,7 @@ public class LuceneSearchAggregationBuilderFactory
 
 		@Override
 		public LuceneFieldAggregationBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().getAggregationBuilderFactory();
+			return schemaNode.type().aggregationBuilderFactory();
 		}
 
 		@Override

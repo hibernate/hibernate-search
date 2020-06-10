@@ -61,11 +61,11 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 		return relativeName;
 	}
 
-	public JsonAccessor<JsonElement> getRelativeAccessor() {
+	public JsonAccessor<JsonElement> relativeAccessor() {
 		return relativeAccessor;
 	}
 
-	public IndexFieldInclusion getInclusion() {
+	public IndexFieldInclusion inclusion() {
 		return inclusion;
 	}
 

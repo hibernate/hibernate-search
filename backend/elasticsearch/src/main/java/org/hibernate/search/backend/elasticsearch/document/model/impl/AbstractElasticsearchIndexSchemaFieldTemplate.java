@@ -23,7 +23,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N> {
 			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
 			boolean multiValued) {
 		this.absolutePathGlob = absolutePathGlob;
-		this.inclusion = declaringParent.getInclusion().compose( inclusion );
+		this.inclusion = declaringParent.inclusion().compose( inclusion );
 		this.multiValued = multiValued;
 	}
 

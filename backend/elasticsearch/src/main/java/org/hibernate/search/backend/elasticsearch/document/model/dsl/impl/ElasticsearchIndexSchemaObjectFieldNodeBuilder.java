@@ -101,7 +101,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		PropertyMapping mapping = createPropertyMapping( storage, dynamicType );
 
-		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.getInclusion() ) ) {
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
 			parentMapping.addProperty( relativeFieldName, mapping );
 		}
 

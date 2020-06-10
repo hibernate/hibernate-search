@@ -67,10 +67,10 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 		this.fieldNodes = fieldNodes;
 		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
 		objectFieldNodes.values().stream()
-				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
 		fieldNodes.values().stream()
-				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.getInclusion() ) )
+				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
 		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
 		this.objectFieldTemplates = objectFieldTemplates;
@@ -120,13 +120,13 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 	public ElasticsearchIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
 		ElasticsearchIndexSchemaObjectFieldNode node =
 				getNode( objectFieldNodes, objectFieldTemplates, dynamicObjectFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.getInclusion() );
+		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	public ElasticsearchIndexSchemaFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
 		ElasticsearchIndexSchemaFieldNode<?> node =
 				getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.getInclusion() );
+		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {

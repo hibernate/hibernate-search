@@ -102,7 +102,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 		DslConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = toFieldValueConverter.convertUnknown(
-					value, searchContext.getToDocumentFieldValueConvertContext()
+					value, searchContext.toDocumentFieldValueConvertContext()
 			);
 			return codec.encode( converted );
 		}

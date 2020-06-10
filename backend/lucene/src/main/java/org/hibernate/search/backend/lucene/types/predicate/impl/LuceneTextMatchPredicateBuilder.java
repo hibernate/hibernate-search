@@ -52,7 +52,7 @@ class LuceneTextMatchPredicateBuilder<F>
 		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 		this.analyzerChecker = analyzerChecker;
-		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
+		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchDocum
 
 	public ElasticsearchDistanceSortBuilder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
 			List<String> nestedPathHierarchy, GeoPoint location) {
-		super( absoluteFieldPath, nestedPathHierarchy, searchContext.getSearchSyntax() );
+		super( absoluteFieldPath, nestedPathHierarchy, searchContext.searchSyntax() );
 		this.location = location;
 	}
 

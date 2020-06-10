@@ -52,31 +52,31 @@ public final class LuceneSearchContext {
 		this.scopeModel = scopeModel;
 	}
 
-	public ToDocumentIdentifierValueConvertContext getToDocumentIdentifierValueConvertContext() {
+	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
 		return toDocumentIdentifierValueConvertContext;
 	}
 
-	public ToDocumentFieldValueConvertContext getToDocumentFieldValueConvertContext() {
+	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
 		return toDocumentFieldValueConvertContext;
 	}
 
-	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
+	public LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry() {
 		return analysisDefinitionRegistry;
 	}
 
-	public Set<String> getTypeNames() {
-		return scopeModel.getTypeNames();
+	public Set<String> typeNames() {
+		return scopeModel.typeNames();
 	}
 
-	public Set<String> getIndexNames() {
-		return scopeModel.getIndexNames();
+	public Set<String> indexNames() {
+		return scopeModel.indexNames();
 	}
 
-	public Set<? extends ReadIndexManagerContext> getIndexManagerContexts() {
-		return scopeModel.getIndexManagerContexts();
+	public Set<? extends ReadIndexManagerContext> indexManagerContexts() {
+		return scopeModel.indexManagerContexts();
 	}
 
-	public Query getFilterOrNull(String tenantId) {
+	public Query filterOrNull(String tenantId) {
 		return multiTenancyStrategy.getFilterOrNull( tenantId );
 	}
 

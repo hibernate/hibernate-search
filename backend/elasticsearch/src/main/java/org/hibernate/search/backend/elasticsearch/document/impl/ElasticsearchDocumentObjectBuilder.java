@@ -124,17 +124,17 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		if ( IndexFieldInclusion.EXCLUDED.equals( node.getInclusion() ) ) {
+		if ( IndexFieldInclusion.EXCLUDED.equals( node.inclusion() ) ) {
 			return;
 		}
 
-		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
+		JsonAccessor<JsonElement> accessor = node.relativeAccessor();
 		ElasticsearchIndexFieldType<F> type = node.type();
 
 		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
-		accessor.add( content, type.getCodec().encode( value ) );
+		accessor.add( content, type.codec().encode( value ) );
 	}
 
 	@SuppressWarnings("unchecked") // We check types explicitly using reflection
@@ -154,11 +154,11 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		if ( IndexFieldInclusion.EXCLUDED.equals( node.getInclusion() ) ) {
+		if ( IndexFieldInclusion.EXCLUDED.equals( node.inclusion() ) ) {
 			return NoOpDocumentElement.get();
 		}
 
-		JsonAccessor<JsonElement> accessor = node.getRelativeAccessor();
+		JsonAccessor<JsonElement> accessor = node.relativeAccessor();
 
 		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );

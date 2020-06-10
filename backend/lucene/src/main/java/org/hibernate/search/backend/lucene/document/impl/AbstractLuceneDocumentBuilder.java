@@ -163,7 +163,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 			checkNoValueYetForSingleValued( absolutePath );
 		}
 
-		type.getCodec().encode( this, absolutePath, value );
+		type.codec().encode( this, absolutePath, value );
 	}
 
 	private DocumentElement addObject(LuceneIndexSchemaObjectFieldNode node, boolean nullObject) {
@@ -180,7 +180,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 			return NoOpDocumentElement.get();
 		}
 
-		switch ( node.getStorage() ) {
+		switch ( node.storage() ) {
 			case NESTED:
 				LuceneNestedObjectDocumentBuilder nestedDocumentBuilder =
 						new LuceneNestedObjectDocumentBuilder( model, node );

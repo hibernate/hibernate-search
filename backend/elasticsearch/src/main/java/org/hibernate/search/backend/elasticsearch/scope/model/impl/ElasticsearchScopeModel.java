@@ -49,27 +49,27 @@ public class ElasticsearchScopeModel {
 		}
 	}
 
-	public Set<String> getMappedTypeNames() {
+	public Set<String> mappedTypeNames() {
 		return mappedTypeToElasticsearchIndexNames.keySet();
 	}
 
-	public Set<String> getHibernateSearchIndexNames() {
+	public Set<String> hibernateSearchIndexNames() {
 		return hibernateSearchIndexNames;
 	}
 
-	public Collection<URLEncodedString> getElasticsearchIndexNames() {
+	public Collection<URLEncodedString> elasticsearchIndexNames() {
 		return mappedTypeToElasticsearchIndexNames.values();
 	}
 
-	public Map<String, URLEncodedString> getMappedTypeToElasticsearchIndexNames() {
+	public Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames() {
 		return mappedTypeToElasticsearchIndexNames;
 	}
 
-	public EventContext getIndexesEventContext() {
-		return EventContexts.fromIndexNames( getHibernateSearchIndexNames() );
+	public EventContext indexesEventContext() {
+		return EventContexts.fromIndexNames( hibernateSearchIndexNames() );
 	}
 
-	public ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> getIdDslConverter() {
+	public ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter() {
 		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
 		ElasticsearchIndexModel indexModelForSelectedIdConverter = null;
 		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
@@ -103,7 +103,7 @@ public class ElasticsearchScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
-	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> ElasticsearchScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
@@ -152,7 +152,7 @@ public class ElasticsearchScopeModel {
 			}
 		}
 		if ( selectedSchemaNode == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 
 		return scopedIndexFieldComponent;
@@ -181,7 +181,7 @@ public class ElasticsearchScopeModel {
 					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
 				found = true;
-				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
+				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.storage() ) ) {
 					throw log.nonNestedFieldForNestedQuery(
 							absoluteFieldPath, indexModel.getEventContext()
 					);
@@ -198,58 +198,58 @@ public class ElasticsearchScopeModel {
 					);
 				}
 			}
-			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 	}
 
-	public String getNestedDocumentPath(String absoluteFieldPath) {
+	public String nestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPath() ) )
+				.map( fieldNode -> Optional.ofNullable( fieldNode.nestedPath() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
 					throw log.conflictingNestedDocumentPaths(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( null );
 	}
 
-	public List<String> getNestedPathHierarchyForField(String absoluteFieldPath) {
+	public List<String> nestedPathHierarchyForField(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
 					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
-	public List<String> getNestedPathHierarchyForObject(String absoluteObjectPath) {
+	public List<String> nestedPathHierarchyForObject(String absoluteObjectPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getObjectFieldNode( absoluteObjectPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
 					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteObjectPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+							absoluteObjectPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 

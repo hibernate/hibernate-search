@@ -48,7 +48,7 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( absoluteFieldPath, nestedPathHierarchy, searchContext.getSearchSyntax() );
+		super( absoluteFieldPath, nestedPathHierarchy, searchContext.searchSyntax() );
 		this.searchContext = searchContext;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
@@ -70,7 +70,7 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 	public void missingAs(Object value, ValueConvert convert) {
 		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			this.missing = codec.encodeForMissing( converted );
 		}
 		catch (RuntimeException e) {

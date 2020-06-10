@@ -88,8 +88,8 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 		staticChildrenForParent.add( fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );
 
-		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.getInclusion() ) ) {
-			parentMapping.addProperty( relativeFieldName, type.getMapping() );
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
+			parentMapping.addProperty( relativeFieldName, type.mapping() );
 		}
 
 		reference.setSchemaNode( fieldNode );

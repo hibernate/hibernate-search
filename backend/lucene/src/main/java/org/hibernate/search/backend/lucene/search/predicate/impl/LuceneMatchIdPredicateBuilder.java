@@ -49,7 +49,7 @@ public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicate
 		ToDocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
 				getDslToDocumentIdentifierConverter( valueConvert );
 		ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
-				searchContext.getToDocumentIdentifierValueConvertContext();
+				searchContext.toDocumentIdentifierValueConvertContext();
 		values.add( dslToDocumentIdConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
 	}
 

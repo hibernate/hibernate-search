@@ -78,7 +78,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	public void value(Object value, ValueConvert convert) {
 		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
 		}
 		catch (RuntimeException e) {

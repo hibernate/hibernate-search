@@ -127,31 +127,31 @@ public class ElasticsearchIndexFieldType<F> implements IndexValueFieldTypeDescri
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
-	public Class<F> getValueType() {
+	public Class<F> valueType() {
 		return valueType;
 	}
 
-	public ElasticsearchFieldCodec<F> getCodec() {
+	public ElasticsearchFieldCodec<F> codec() {
 		return codec;
 	}
 
-	public ElasticsearchFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+	public ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory() {
 		return predicateBuilderFactory;
 	}
 
-	public ElasticsearchFieldSortBuilderFactory getSortBuilderFactory() {
+	public ElasticsearchFieldSortBuilderFactory sortBuilderFactory() {
 		return sortBuilderFactory;
 	}
 
-	public ElasticsearchFieldProjectionBuilderFactory getProjectionBuilderFactory() {
+	public ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory() {
 		return projectionBuilderFactory;
 	}
 
-	public ElasticsearchFieldAggregationBuilderFactory getAggregationBuilderFactory() {
+	public ElasticsearchFieldAggregationBuilderFactory aggregationBuilderFactory() {
 		return aggregationBuilderFactory;
 	}
 
-	public PropertyMapping getMapping() {
+	public PropertyMapping mapping() {
 		return mapping;
 	}
 }

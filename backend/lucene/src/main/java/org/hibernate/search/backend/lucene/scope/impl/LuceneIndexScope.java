@@ -46,7 +46,7 @@ public class LuceneIndexScope
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( model.getIndexNames() )
+				.append( "indexNames=" ).append( model.indexNames() )
 				.append( "]" )
 				.toString();
 	}

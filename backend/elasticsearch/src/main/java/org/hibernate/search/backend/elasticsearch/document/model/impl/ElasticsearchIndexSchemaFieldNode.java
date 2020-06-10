@@ -25,7 +25,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexFieldType<F> type) {
 		super( parent, relativeFieldName, inclusion, multiValued );
-		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
+		this.nestedPathHierarchy = parent.nestedPathHierarchy();
 		this.type = type;
 	}
 
@@ -49,13 +49,13 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 		return this;
 	}
 
-	public String getNestedPath() {
+	public String nestedPath() {
 		return ( nestedPathHierarchy.isEmpty() ) ? null :
 				// nested path is the LAST element on the path hierarchy
 				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 	}
 
-	public List<String> getNestedPathHierarchy() {
+	public List<String> nestedPathHierarchy() {
 		return nestedPathHierarchy;
 	}
 
@@ -66,8 +66,8 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 
 	@SuppressWarnings("unchecked")
 	public <T> ElasticsearchIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
-		if ( !type.getValueType().isAssignableFrom( expectedSubType ) ) {
-			throw log.invalidFieldValueType( type.getValueType(), expectedSubType,
+		if ( !type.valueType().isAssignableFrom( expectedSubType ) ) {
+			throw log.invalidFieldValueType( type.valueType(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (ElasticsearchIndexSchemaFieldNode<? super T>) this;

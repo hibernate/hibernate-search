@@ -19,9 +19,9 @@ public interface LuceneIndexSchemaObjectNode extends IndexCompositeElementDescri
 
 	String absolutePath(String relativeFieldName);
 
-	IndexFieldInclusion getInclusion();
+	IndexFieldInclusion inclusion();
 
-	List<String> getNestedPathHierarchy();
+	List<String> nestedPathHierarchy();
 
 	@Override
 	Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren();

@@ -59,12 +59,12 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 	}
 
 	@Override
-	public IndexFieldInclusion getInclusion() {
+	public IndexFieldInclusion inclusion() {
 		return IndexFieldInclusion.INCLUDED;
 	}
 
 	@Override
-	public List<String> getNestedPathHierarchy() {
+	public List<String> nestedPathHierarchy() {
 		return Collections.emptyList();
 	}
 

@@ -31,7 +31,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
 			List<AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeName, inclusion, multiValued );
-		List<String> theNestedPathHierarchy = parent.getNestedPathHierarchy();
+		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
 		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy
 			theNestedPathHierarchy = new ArrayList<>( theNestedPathHierarchy );
@@ -79,7 +79,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
-	public List<String> getNestedPathHierarchy() {
+	public List<String> nestedPathHierarchy() {
 		return nestedPathHierarchy;
 	}
 
@@ -99,7 +99,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		return ObjectFieldStorage.NESTED.equals( storage );
 	}
 
-	public ObjectFieldStorage getStorage() {
+	public ObjectFieldStorage storage() {
 		return storage;
 	}
 }

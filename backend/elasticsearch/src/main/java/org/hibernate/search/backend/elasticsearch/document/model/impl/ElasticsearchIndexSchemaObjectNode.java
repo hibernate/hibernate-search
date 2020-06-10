@@ -19,9 +19,9 @@ public interface ElasticsearchIndexSchemaObjectNode extends IndexCompositeElemen
 
 	String absolutePath(String relativeFieldName);
 
-	IndexFieldInclusion getInclusion();
+	IndexFieldInclusion inclusion();
 
-	List<String> getNestedPathHierarchy();
+	List<String> nestedPathHierarchy();
 
 	@Override
 	Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren();

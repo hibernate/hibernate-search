@@ -56,7 +56,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
-		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
+		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 		this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( scopeModel );
 	}
 
@@ -81,7 +81,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	public FieldState field(String absoluteFieldPath) {
 		LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
 					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
@@ -100,7 +100,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	public void analyzer(String analyzerName) {
 		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 		if ( overrideAnalyzer == null ) {
-			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( scopeModel.getIndexNames() ) );
+			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( scopeModel.indexNames() ) );
 		}
 	}
 

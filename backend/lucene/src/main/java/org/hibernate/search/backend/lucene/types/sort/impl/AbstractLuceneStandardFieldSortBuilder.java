@@ -72,7 +72,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	public void missingAs(Object value, ValueConvert convert) {
 		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			missingValue = encodeMissingAs( converted );
 		}
 		catch (RuntimeException e) {

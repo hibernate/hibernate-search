@@ -174,7 +174,7 @@ public class LuceneSearchQueryBuilder<H>
 			luceneQueryBuilder.add( routingKeysQuery, Occur.FILTER );
 		}
 
-		Query filter = searchContext.getFilterOrNull( sessionContext.tenantIdentifier() );
+		Query filter = searchContext.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
 			luceneQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
 		}

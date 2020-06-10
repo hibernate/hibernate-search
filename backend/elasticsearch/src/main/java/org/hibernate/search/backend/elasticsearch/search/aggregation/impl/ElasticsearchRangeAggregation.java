@@ -121,7 +121,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private JsonElement convertToFieldValue(K value) {
 			try {
-				F converted = toFieldValueConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

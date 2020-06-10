@@ -82,7 +82,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	public FieldState field(String absoluteFieldPath) {
 		ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+			ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
 					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );

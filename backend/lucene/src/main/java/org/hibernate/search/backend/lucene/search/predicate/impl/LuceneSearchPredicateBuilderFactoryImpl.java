@@ -57,7 +57,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public SearchPredicate toSearchPredicate(LuceneSearchPredicateBuilder builder) {
-		return new LuceneSearchPredicate( scopeModel.getIndexNames(), builder );
+		return new LuceneSearchPredicate( scopeModel.indexNames(), builder );
 	}
 
 	@Override
@@ -66,8 +66,8 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
 		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
-		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.getIndexNames(), scopeModel.getIndexNames() );
+		if ( !scopeModel.indexNames().equals( casted.getIndexNames() ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.getIndexNames(), scopeModel.indexNames() );
 		}
 		return casted;
 	}
@@ -85,7 +85,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
-		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = scopeModel.getIdDslConverter();
+		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = scopeModel.idDslConverter();
 		return new LuceneMatchIdPredicateBuilder(
 				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
 		);
@@ -98,33 +98,33 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker(), fieldComponent.getAnalyzerCompatibilityChecker() );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+		return fieldComponent.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> phrase(String absoluteFieldPath) {
 		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createPhrasePredicateBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		return fieldComponent.getComponent().createPhrasePredicateBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getAnalyzerCompatibilityChecker() );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -135,42 +135,42 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> exists(String absoluteFieldPath) {
 		// trying object node first
-		LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory = scopeModel.getObjectPredicateBuilderFactory( absoluteFieldPath );
+		LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory = scopeModel.objectPredicateBuilderFactory( absoluteFieldPath );
 		if ( objectPredicateBuilderFactory != null ) {
 			return objectPredicateBuilderFactory.createExistsPredicateBuilder();
 		}
 
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createExistsPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createExistsPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinCircle(String absoluteFieldPath) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinPolygon(String absoluteFieldPath) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public NestedPredicateBuilder<LuceneSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		scopeModel.checkNestedField( absoluteFieldPath );
-		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
+		List<String> nestedPathHierarchy = scopeModel.nestedPathHierarchyForObject( absoluteFieldPath );
 		return new LuceneNestedPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
@@ -184,7 +184,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 		@Override
 		public LuceneFieldPredicateBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().getPredicateBuilderFactory();
+			return schemaNode.type().predicateBuilderFactory();
 		}
 
 		@Override

@@ -134,35 +134,35 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
-	public Class<F> getValueType() {
+	public Class<F> valueType() {
 		return valueType;
 	}
 
-	public LuceneFieldCodec<F> getCodec() {
+	public LuceneFieldCodec<F> codec() {
 		return codec;
 	}
 
-	public LuceneFieldPredicateBuilderFactory getPredicateBuilderFactory() {
+	public LuceneFieldPredicateBuilderFactory predicateBuilderFactory() {
 		return predicateBuilderFactory;
 	}
 
-	public LuceneFieldSortBuilderFactory getSortBuilderFactory() {
+	public LuceneFieldSortBuilderFactory sortBuilderFactory() {
 		return sortBuilderFactory;
 	}
 
-	public LuceneFieldProjectionBuilderFactory getProjectionBuilderFactory() {
+	public LuceneFieldProjectionBuilderFactory projectionBuilderFactory() {
 		return projectionBuilderFactory;
 	}
 
-	public LuceneFieldAggregationBuilderFactory getAggregationBuilderFactory() {
+	public LuceneFieldAggregationBuilderFactory aggregationBuilderFactory() {
 		return aggregationBuilderFactory;
 	}
 
-	public Analyzer getIndexingAnalyzerOrNormalizer() {
+	public Analyzer indexingAnalyzerOrNormalizer() {
 		return indexingAnalyzerOrNormalizer;
 	}
 
-	public Analyzer getSearchAnalyzerOrNormalizer() {
+	public Analyzer searchAnalyzerOrNormalizer() {
 		return searchAnalyzerOrNormalizer;
 	}
 }

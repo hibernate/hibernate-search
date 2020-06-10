@@ -46,7 +46,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public SearchSort toSearchSort(List<ElasticsearchSearchSortBuilder> builders) {
-		return new ElasticsearchSearchSort( builders, scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchSearchSort( builders, scopeModel.hibernateSearchIndexNames() );
 	}
 
 	@Override
@@ -55,8 +55,8 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
 		ElasticsearchSearchSort casted = (ElasticsearchSearchSort) sort;
-		if ( !scopeModel.getHibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.getHibernateSearchIndexNames() );
+		if ( !scopeModel.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}
@@ -74,16 +74,16 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldSortBuilderFactory> fieldComponent = scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
+				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ), location );
+				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createDistanceSortBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ), location );
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public ElasticsearchSearchSortBuilder fromJson(String jsonString) {
-		return fromJson( searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class ) );
+		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private static class SortBuilderFactoryRetrievalStrategy
@@ -106,7 +106,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 		@Override
 		public ElasticsearchFieldSortBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().getSortBuilderFactory();
+			return schemaNode.type().sortBuilderFactory();
 		}
 
 		@Override

@@ -32,7 +32,7 @@ public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 	}
 
 	public ElasticsearchDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( incomingFieldPath );
+		List<String> incomingNestedPathHierarchy = scopeModel.nestedPathHierarchyForField( incomingFieldPath );
 		if ( fieldPath == null ) {
 			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, incomingFieldPath, incomingNestedPathHierarchy );
 		}
