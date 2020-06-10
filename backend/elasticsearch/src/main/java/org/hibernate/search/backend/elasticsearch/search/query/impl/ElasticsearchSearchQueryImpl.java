@@ -107,7 +107,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
-				.indexes( searchContext.elasticsearchIndexNames() )
+				.indexes( searchContext.indexes().elasticsearchIndexNames() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -135,7 +135,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		NonBulkableWork<Long> work = workFactory.count( searchContext.elasticsearchIndexNames() )
+		NonBulkableWork<Long> work = workFactory.count( searchContext.indexes().elasticsearchIndexNames() )
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -150,9 +150,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public JsonObject explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Collection<URLEncodedString> targetedIndexNames = searchContext.elasticsearchIndexNames();
+		Collection<URLEncodedString> targetedIndexNames = searchContext.indexes().elasticsearchIndexNames();
 		if ( targetedIndexNames.size() != 1 ) {
-			throw log.explainRequiresIndexName( searchContext.hibernateSearchIndexNames() );
+			throw log.explainRequiresIndexName( searchContext.indexes().hibernateSearchIndexNames() );
 		}
 
 		return doExplain( targetedIndexNames.iterator().next(), id );
@@ -164,7 +164,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( id, "id" );
 
 
-		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames = searchContext.mappedTypeToElasticsearchIndexNames();
+		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames = searchContext.indexes().mappedTypeToElasticsearchIndexNames();
 		if ( !mappedTypeNamesToIndexReadNames.containsKey( typeName ) ) {
 			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNamesToIndexReadNames.keySet(), typeName );
 		}

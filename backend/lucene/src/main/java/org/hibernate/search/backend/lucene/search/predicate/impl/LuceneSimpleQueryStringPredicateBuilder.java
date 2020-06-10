@@ -20,8 +20,8 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneDifferentNestedObjectCompatibilityChecker;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -42,7 +42,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneScopeModel scopeModel;
+	private final LuceneSearchIndexesContext indexes;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
@@ -54,10 +54,10 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
 	private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
-	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
-		this.scopeModel = scopeModel;
+	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchIndexesContext indexes) {
+		this.indexes = indexes;
 		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
-		this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( scopeModel );
+		this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( indexes );
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	public FieldState field(String absoluteFieldPath) {
 		LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
+			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = indexes.schemaNodeComponent(
 					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
@@ -100,7 +100,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	public void analyzer(String analyzerName) {
 		this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 		if ( overrideAnalyzer == null ) {
-			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( scopeModel.indexNames() ) );
+			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( indexes.indexNames() ) );
 		}
 	}
 

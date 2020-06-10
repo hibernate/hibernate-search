@@ -28,7 +28,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchedWorkP
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
@@ -153,11 +153,11 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public LuceneSearchContext createSearchContext(BackendMappingContext mappingContext,
-			LuceneScopeModel scopeModel) {
+			LuceneSearchIndexesContext indexes) {
 		return new LuceneSearchContext(
 				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy,
 				timingSource,
-				scopeModel
+				indexes
 		);
 	}
 

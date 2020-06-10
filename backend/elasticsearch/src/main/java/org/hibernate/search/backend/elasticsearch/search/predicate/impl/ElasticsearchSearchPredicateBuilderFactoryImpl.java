@@ -11,11 +11,11 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexRootComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -46,18 +46,16 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			new PredicateBuilderFactoryRetrievalStrategy();
 
 	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexesContext indexes;
 
-	private final ElasticsearchScopeModel scopeModel;
-
-	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
-			ElasticsearchScopeModel scopeModel) {
+	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.scopeModel = scopeModel;
+		this.indexes = searchContext.indexes();
 	}
 
 	@Override
 	public SearchPredicate toSearchPredicate(ElasticsearchSearchPredicateBuilder builder) {
-		return new ElasticsearchSearchPredicate( builder, scopeModel.hibernateSearchIndexNames() );
+		return new ElasticsearchSearchPredicate( builder, indexes.hibernateSearchIndexNames() );
 	}
 
 	@Override
@@ -67,8 +65,9 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		}
 
 		ElasticsearchSearchPredicate casted = (ElasticsearchSearchPredicate) predicate;
-		if ( !scopeModel.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.getIndexNames(), scopeModel.hibernateSearchIndexNames() );
+		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.getIndexNames(),
+					indexes.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}
@@ -86,7 +85,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> id() {
-		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = scopeModel.idDslConverter();
+		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = indexes.idDslConverter();
 		return new ElasticsearchMatchIdPredicateBuilder(
 				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
 		);
@@ -99,55 +98,57 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath) {
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
-				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = indexes
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 
 		return fieldComponent.getComponent().createMatchPredicateBuilder(
-				searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
+				searchContext, absoluteFieldPath,
+				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker(), fieldComponent.getAnalyzerCompatibilityChecker()
 		);
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath) {
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.schemaNodeComponent(
-				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = indexes
+				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		return fieldComponent.getComponent().createRangePredicateBuilder(
-				searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
+				searchContext, absoluteFieldPath, indexes.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> phrase(String absoluteFieldPath) {
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = indexes
 				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createPhrasePredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
+		return fieldComponent.getComponent().createPhrasePredicateBuilder( absoluteFieldPath,
+				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getAnalyzerCompatibilityChecker() );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
-		return scopeModel
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath,
+						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> simpleQueryString() {
-		return new ElasticsearchSimpleQueryStringPredicateBuilder( scopeModel );
+		return new ElasticsearchSimpleQueryStringPredicateBuilder( indexes );
 	}
 
 	@Override
 	public ExistsPredicateBuilder<ElasticsearchSearchPredicateBuilder> exists(String absoluteFieldPath) {
 		List<String> nestedPathHierarchy;
-		if ( scopeModel.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
-			nestedPathHierarchy = scopeModel.nestedPathHierarchyForObject( absoluteFieldPath );
+		if ( indexes.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
+			nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
 		}
 		else {
-			nestedPathHierarchy = scopeModel.nestedPathHierarchyForField( absoluteFieldPath );
+			nestedPathHierarchy = indexes.nestedPathHierarchyForField( absoluteFieldPath );
 			// Make sure to fail for fields with different type or for unknown fields
 			// We may be able to relax this constraint, but that would require more extensive testing
-			scopeModel.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+			indexes.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		}
 		return new ElasticsearchExistsPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
@@ -155,31 +156,31 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinCircle(
 			String absoluteFieldPath) {
-		return scopeModel
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath,
+						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinPolygon(
 			String absoluteFieldPath) {
-		return scopeModel
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath,
+						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
-		return scopeModel
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath,
+						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
 	public NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> nested(String absoluteFieldPath) {
-		scopeModel.checkNestedField( absoluteFieldPath );
-		List<String> nestedPathHierarchy = scopeModel.nestedPathHierarchyForObject( absoluteFieldPath );
+		indexes.checkNestedField( absoluteFieldPath );
+		List<String> nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
 		return new ElasticsearchNestedPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 

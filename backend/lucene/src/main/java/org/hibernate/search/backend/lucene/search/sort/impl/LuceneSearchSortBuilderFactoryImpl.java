@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -36,17 +36,16 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 			new SortBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneScopeModel scopeModel;
+	private final LuceneSearchIndexesContext indexes;
 
-	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext,
-			LuceneScopeModel scopeModel) {
+	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.scopeModel = scopeModel;
+		this.indexes = searchContext.indexes();
 	}
 
 	@Override
 	public SearchSort toSearchSort(List<LuceneSearchSortBuilder> builders) {
-		return new LuceneSearchSort( scopeModel.indexNames(), builders );
+		return new LuceneSearchSort( indexes.indexNames(), builders );
 	}
 
 	@Override
@@ -55,8 +54,8 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
 		LuceneSearchSort casted = (LuceneSearchSort) sort;
-		if ( !scopeModel.indexNames().equals( casted.getIndexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.indexNames() );
+		if ( !indexes.indexNames().equals( casted.getIndexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), indexes.indexNames() );
 		}
 		return casted;
 	}
@@ -73,17 +72,19 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldSortBuilderFactory> fieldComponent = scopeModel
+		LuceneScopedIndexFieldComponent<LuceneFieldSortBuilderFactory> fieldComponent = indexes
 				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, scopeModel.nestedDocumentPath( absoluteFieldPath ),
+		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath,
+				indexes.nestedDocumentPath( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return scopeModel
+		return indexes
 				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( absoluteFieldPath, scopeModel.nestedDocumentPath( absoluteFieldPath ), location );
+				.getComponent().createDistanceSortBuilder( absoluteFieldPath,
+						indexes.nestedDocumentPath( absoluteFieldPath ), location );
 	}
 
 	@Override

@@ -71,7 +71,7 @@ public class LuceneSearchQueryBuilderFactory
 			children.add( searchProjectionFactory.toImplementation( projection ) );
 		}
 
-		return new LuceneCompositeListProjection<>( searchContext.indexNames(), Function.identity(), children );
+		return new LuceneCompositeListProjection<>( searchContext.indexes().indexNames(), Function.identity(), children );
 	}
 
 	private <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(

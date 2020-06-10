@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -28,7 +29,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class LuceneScopeModel {
+public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,7 +38,7 @@ public class LuceneScopeModel {
 	private final Set<String> indexNames;
 	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
 
-	public LuceneScopeModel(Set<LuceneIndexModel> indexModels,
+	public LuceneScopeSearchIndexesContext(Set<LuceneIndexModel> indexModels,
 			Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
 		this.indexModels = indexModels;
 		// Use LinkedHashSet to ensure stable order when generating requests
@@ -51,22 +52,22 @@ public class LuceneScopeModel {
 		}
 	}
 
+	@Override
 	public Set<String> typeNames() {
 		return typeNames;
 	}
 
+	@Override
 	public Set<String> indexNames() {
 		return indexNames;
 	}
 
-	public EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( indexNames );
-	}
-
+	@Override
 	public Set<LuceneScopeIndexManagerContext> indexManagerContexts() {
 		return indexManagerContexts;
 	}
 
+	@Override
 	public LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter() {
 		Iterator<LuceneIndexModel> iterator = indexModels.iterator();
 		LuceneIndexModel indexModelForSelectedIdConverter = null;
@@ -101,6 +102,7 @@ public class LuceneScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
+	@Override
 	public LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath) {
 		LuceneObjectPredicateBuilderFactory result = null;
 
@@ -155,6 +157,7 @@ public class LuceneScopeModel {
 		return result;
 	}
 
+	@Override
 	public <T> LuceneScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
@@ -211,6 +214,7 @@ public class LuceneScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
+	@Override
 	public void checkNestedField(String absoluteFieldPath) {
 		boolean found = false;
 
@@ -240,6 +244,7 @@ public class LuceneScopeModel {
 		}
 	}
 
+	@Override
 	public String nestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
@@ -258,6 +263,7 @@ public class LuceneScopeModel {
 		return nestedDocumentPath.orElse( null );
 	}
 
+	@Override
 	public List<String> nestedPathHierarchyForField(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
@@ -276,6 +282,7 @@ public class LuceneScopeModel {
 		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
+	@Override
 	public List<String> nestedPathHierarchyForObject(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
@@ -292,5 +299,9 @@ public class LuceneScopeModel {
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( Collections.emptyList() );
+	}
+
+	private EventContext indexesEventContext() {
+		return EventContexts.fromIndexNames( indexNames );
 	}
 }

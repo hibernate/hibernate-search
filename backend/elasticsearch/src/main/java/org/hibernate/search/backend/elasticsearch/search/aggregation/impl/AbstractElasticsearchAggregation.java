@@ -16,7 +16,7 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 	private final Set<String> indexNames;
 
 	AbstractElasticsearchAggregation(AbstractBuilder<A> builder) {
-		this.indexNames = builder.searchContext.hibernateSearchIndexNames();
+		this.indexNames = builder.searchContext.indexes().hibernateSearchIndexNames();
 	}
 
 	@Override

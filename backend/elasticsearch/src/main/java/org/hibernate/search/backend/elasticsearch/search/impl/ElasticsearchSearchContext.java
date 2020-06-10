@@ -6,14 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
@@ -35,18 +29,18 @@ public final class ElasticsearchSearchContext {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	// Targeted indexes
-	private final ElasticsearchScopeModel scopeModel;
+	private final ElasticsearchSearchIndexesContext indexes;
 
 	public ElasticsearchSearchContext(BackendMappingContext mappingContext,
 			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
 			MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchScopeModel scopeModel) {
+			ElasticsearchSearchIndexesContext indexes) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.userFacingGson = userFacingGson;
 		this.searchSyntax = searchSyntax;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.scopeModel = scopeModel;
+		this.indexes = indexes;
 	}
 
 	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
@@ -69,20 +63,8 @@ public final class ElasticsearchSearchContext {
 		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
 	}
 
-	public Set<String> mappedTypeNames() {
-		return scopeModel.mappedTypeNames();
-	}
-
-	public Set<String> hibernateSearchIndexNames() {
-		return scopeModel.hibernateSearchIndexNames();
-	}
-
-	public Collection<URLEncodedString> elasticsearchIndexNames() {
-		return scopeModel.elasticsearchIndexNames();
-	}
-
-	public Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames() {
-		return scopeModel.mappedTypeToElasticsearchIndexNames();
+	public ElasticsearchSearchIndexesContext indexes() {
+		return indexes;
 	}
 
 	public JsonObject filterOrNull(String tenantId) {

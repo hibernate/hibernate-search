@@ -11,34 +11,39 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 
-	public static ElasticsearchDifferentNestedObjectCompatibilityChecker empty(ElasticsearchScopeModel scopeModel) {
-		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, null, Collections.emptyList() );
+	public static ElasticsearchDifferentNestedObjectCompatibilityChecker empty(
+			ElasticsearchSearchIndexesContext indexes) {
+		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( indexes, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchScopeModel scopeModel;
+	private final ElasticsearchSearchIndexesContext indexes;
 	private final String fieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchScopeModel scopeModel, String fieldPath, List<String> nestedPathHierarchy) {
-		this.scopeModel = scopeModel;
+	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchSearchIndexesContext indexes,
+			String fieldPath, List<String> nestedPathHierarchy) {
+		this.indexes = indexes;
 		this.fieldPath = fieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
 	public ElasticsearchDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = scopeModel.nestedPathHierarchyForField( incomingFieldPath );
+		List<String> incomingNestedPathHierarchy = indexes.nestedPathHierarchyForField( incomingFieldPath );
 		if ( fieldPath == null ) {
-			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, incomingFieldPath, incomingNestedPathHierarchy );
+			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( indexes, incomingFieldPath,
+					incomingNestedPathHierarchy );
 		}
 
 		if ( !nestedPathHierarchy.equals( incomingNestedPathHierarchy ) ) {
-			throw log.simpleQueryStringSpanningMultipleNestedPaths( fieldPath, getLastPath( nestedPathHierarchy ), incomingFieldPath, getLastPath( incomingNestedPathHierarchy ) );
+			throw log.simpleQueryStringSpanningMultipleNestedPaths( fieldPath, getLastPath( nestedPathHierarchy ),
+					incomingFieldPath, getLastPath( incomingNestedPathHierarchy ) );
 		}
 		return this;
 	}

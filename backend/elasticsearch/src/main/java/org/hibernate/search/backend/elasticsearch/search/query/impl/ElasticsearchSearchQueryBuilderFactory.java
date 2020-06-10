@@ -78,7 +78,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			children.add( searchProjectionFactory.toImplementation( projection ) );
 		}
 
-		return new ElasticsearchCompositeListProjection<>( searchContext.hibernateSearchIndexNames(), Function.identity(), children );
+		return new ElasticsearchCompositeListProjection<>( searchContext.indexes().hibernateSearchIndexNames(), Function.identity(), children );
 	}
 
 	private <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(

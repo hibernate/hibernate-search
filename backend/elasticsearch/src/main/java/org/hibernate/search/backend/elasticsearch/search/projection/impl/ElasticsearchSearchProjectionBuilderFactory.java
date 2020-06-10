@@ -15,9 +15,9 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -45,14 +45,12 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new ProjectionBuilderFactoryRetrievalStrategy();
 
-	private final ElasticsearchScopeModel scopeModel;
-
+	private final ElasticsearchSearchIndexesContext indexes;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
-			ElasticsearchSearchContext searchContext,
-			ElasticsearchScopeModel scopeModel) {
-		this.scopeModel = scopeModel;
+			ElasticsearchSearchContext searchContext) {
+		this.indexes = searchContext.indexes();
 		this.documentReferenceExtractionHelper =
 				searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
 	}
@@ -60,7 +58,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
 		return new ElasticsearchDocumentReferenceProjectionBuilder(
-				scopeModel.hibernateSearchIndexNames(),
+				indexes.hibernateSearchIndexNames(),
 				documentReferenceExtractionHelper
 		);
 	}
@@ -68,10 +66,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
 		// checking relative nested document paths multi index compatibility:
-		scopeModel.nestedDocumentPath( absoluteFieldPath );
+		indexes.nestedDocumentPath( absoluteFieldPath );
 
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldProjectionBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				indexes.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		switch ( convert ) {
 			case NO:
 				break;
@@ -82,7 +80,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 		return fieldComponent.getComponent()
 				.createFieldValueProjectionBuilder(
-						scopeModel.hibernateSearchIndexNames(), absoluteFieldPath,
+						indexes.hibernateSearchIndexNames(), absoluteFieldPath,
 						fieldComponent.isMultiValuedFieldInRoot(), expectedType, convert
 				);
 	}
@@ -90,7 +88,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
 		return new ElasticsearchEntityProjectionBuilder<>(
-				scopeModel.hibernateSearchIndexNames(),
+				indexes.hibernateSearchIndexNames(),
 				documentReferenceExtractionHelper
 		);
 	}
@@ -98,24 +96,24 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
 		return new ElasticsearchEntityReferenceProjectionBuilder<>(
-				scopeModel.hibernateSearchIndexNames(),
+				indexes.hibernateSearchIndexNames(),
 				documentReferenceExtractionHelper
 		);
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new ElasticsearchScoreProjectionBuilder( scopeModel.hibernateSearchIndexNames() );
+		return new ElasticsearchScoreProjectionBuilder( indexes.hibernateSearchIndexNames() );
 	}
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		// checking relative nested document paths multi index compatibility:
-		String nestedPath = scopeModel.nestedDocumentPath( absoluteFieldPath );
+		String nestedPath = indexes.nestedDocumentPath( absoluteFieldPath );
 
-		return scopeModel
+		return indexes
 				.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceProjectionBuilder( scopeModel.hibernateSearchIndexNames(),
+				.getComponent().createDistanceProjectionBuilder( indexes.hibernateSearchIndexNames(),
 						absoluteFieldPath, nestedPath != null, center
 				);
 	}
@@ -129,7 +127,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 
 		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeListProjection<>( scopeModel.hibernateSearchIndexNames(), transformer, typedProjections )
+				new ElasticsearchCompositeListProjection<>( indexes.hibernateSearchIndexNames(), transformer, typedProjections )
 		);
 	}
 
@@ -137,7 +135,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
 		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeFunctionProjection<>( scopeModel.hibernateSearchIndexNames(), transformer, toImplementation( projection ) )
+				new ElasticsearchCompositeFunctionProjection<>( indexes.hibernateSearchIndexNames(), transformer, toImplementation( projection ) )
 		);
 	}
 
@@ -145,7 +143,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeBiFunctionProjection<>( scopeModel.hibernateSearchIndexNames(), transformer, toImplementation( projection1 ),
+				new ElasticsearchCompositeBiFunctionProjection<>( indexes.hibernateSearchIndexNames(), transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -154,21 +152,21 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeTriFunctionProjection<>( scopeModel.hibernateSearchIndexNames(), transformer, toImplementation( projection1 ),
+				new ElasticsearchCompositeTriFunctionProjection<>( indexes.hibernateSearchIndexNames(), transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}
 
 	public SearchProjectionBuilder<JsonObject> source() {
-		return new ElasticsearchSourceProjectionBuilder( scopeModel.hibernateSearchIndexNames() );
+		return new ElasticsearchSourceProjectionBuilder( indexes.hibernateSearchIndexNames() );
 	}
 
 	public SearchProjectionBuilder<JsonObject> explanation() {
-		return new ElasticsearchExplanationProjectionBuilder( scopeModel.hibernateSearchIndexNames() );
+		return new ElasticsearchExplanationProjectionBuilder( indexes.hibernateSearchIndexNames() );
 	}
 
 	public SearchProjectionBuilder<JsonObject> jsonHit() {
-		return new ElasticsearchJsonHitProjectionBuilder( scopeModel.hibernateSearchIndexNames() );
+		return new ElasticsearchJsonHitProjectionBuilder( indexes.hibernateSearchIndexNames() );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -177,8 +175,8 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
 		}
 		ElasticsearchSearchProjection<?, T> casted = (ElasticsearchSearchProjection<?, T>) projection;
-		if ( !scopeModel.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), scopeModel.hibernateSearchIndexNames() );
+		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), indexes.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

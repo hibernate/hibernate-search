@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 public interface SearchBackendContext {
 
 	LuceneSearchContext createSearchContext(BackendMappingContext mappingContext,
-			LuceneScopeModel scopeModel);
+			LuceneSearchIndexesContext indexes);
 
 	<H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			LuceneSearchContext searchContext,

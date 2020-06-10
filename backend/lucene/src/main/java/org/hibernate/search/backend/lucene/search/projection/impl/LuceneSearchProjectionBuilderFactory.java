@@ -15,8 +15,9 @@ import java.util.function.Function;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -45,21 +46,21 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new ProjectionBuilderFactoryRetrievalStrategy();
 
-	private final LuceneScopeModel scopeModel;
+	private final LuceneSearchIndexesContext indexes;
 
-	public LuceneSearchProjectionBuilderFactory(LuceneScopeModel scopeModel) {
-		this.scopeModel = scopeModel;
+	public LuceneSearchProjectionBuilderFactory(LuceneSearchContext searchContext) {
+		this.indexes = searchContext.indexes();
 	}
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return new LuceneDocumentReferenceProjectionBuilder( scopeModel.indexNames() );
+		return new LuceneDocumentReferenceProjectionBuilder( indexes.indexNames() );
 	}
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
 		LuceneScopedIndexFieldComponent<LuceneFieldProjectionBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				indexes.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		switch ( convert ) {
 			case NO:
 				break;
@@ -70,33 +71,33 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( scopeModel.indexNames(), absoluteFieldPath,
-						scopeModel.nestedDocumentPath( absoluteFieldPath ),
+				.createFieldValueProjectionBuilder( indexes.indexNames(), absoluteFieldPath,
+						indexes.nestedDocumentPath( absoluteFieldPath ),
 						fieldComponent.isMultiValuedFieldInRoot(),
 						expectedType, convert );
 	}
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new LuceneEntityProjectionBuilder<>( scopeModel.indexNames() );
+		return new LuceneEntityProjectionBuilder<>( indexes.indexNames() );
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new LuceneEntityReferenceProjectionBuilder<>( scopeModel.indexNames() );
+		return new LuceneEntityReferenceProjectionBuilder<>( indexes.indexNames() );
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new LuceneScoreProjectionBuilder( scopeModel.indexNames() );
+		return new LuceneScoreProjectionBuilder( indexes.indexNames() );
 	}
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		LuceneScopedIndexFieldComponent<LuceneFieldProjectionBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createDistanceProjectionBuilder( scopeModel.indexNames(),
-				absoluteFieldPath, scopeModel.nestedDocumentPath( absoluteFieldPath ),
+				indexes.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		return fieldComponent.getComponent().createDistanceProjectionBuilder( indexes.indexNames(),
+				absoluteFieldPath, indexes.nestedDocumentPath( absoluteFieldPath ),
 				fieldComponent.isMultiValuedFieldInRoot(), center );
 	}
 
@@ -109,7 +110,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeListProjection<>( scopeModel.indexNames(), transformer, typedProjections )
+				new LuceneCompositeListProjection<>( indexes.indexNames(), transformer, typedProjections )
 		);
 	}
 
@@ -117,7 +118,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeFunctionProjection<>( scopeModel.indexNames(), transformer, toImplementation( projection ) )
+				new LuceneCompositeFunctionProjection<>( indexes.indexNames(), transformer, toImplementation( projection ) )
 		);
 	}
 
@@ -125,7 +126,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeBiFunctionProjection<>( scopeModel.indexNames(), transformer, toImplementation( projection1 ),
+				new LuceneCompositeBiFunctionProjection<>( indexes.indexNames(), transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -134,7 +135,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeTriFunctionProjection<>( scopeModel.indexNames(), transformer, toImplementation( projection1 ),
+				new LuceneCompositeTriFunctionProjection<>( indexes.indexNames(), transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}
@@ -145,18 +146,18 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
 		LuceneSearchProjection<?, T> casted = (LuceneSearchProjection<?, T>) projection;
-		if ( !scopeModel.indexNames().equals( casted.getIndexNames() ) ) {
-			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), scopeModel.indexNames() );
+		if ( !indexes.indexNames().equals( casted.getIndexNames() ) ) {
+			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), indexes.indexNames() );
 		}
 		return casted;
 	}
 
 	public SearchProjectionBuilder<Document> document() {
-		return new LuceneDocumentProjectionBuilder( scopeModel.indexNames() );
+		return new LuceneDocumentProjectionBuilder( indexes.indexNames() );
 	}
 
 	public SearchProjectionBuilder<Explanation> explanation() {
-		return new LuceneExplanationProjectionBuilder( scopeModel.indexNames() );
+		return new LuceneExplanationProjectionBuilder( indexes.indexNames() );
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

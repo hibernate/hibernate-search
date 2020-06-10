@@ -11,30 +11,32 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneDifferentNestedObjectCompatibilityChecker {
 
-	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneScopeModel scopeModel) {
-		return new LuceneDifferentNestedObjectCompatibilityChecker( scopeModel, null, Collections.emptyList() );
+	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneSearchIndexesContext indexes) {
+		return new LuceneDifferentNestedObjectCompatibilityChecker( indexes, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneScopeModel scopeModel;
+	private final LuceneSearchIndexesContext indexes;
 	private final String fieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneScopeModel scopeModel, String fieldPath, List<String> nestedPathHierarchy) {
-		this.scopeModel = scopeModel;
+	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneSearchIndexesContext indexes, String fieldPath,
+			List<String> nestedPathHierarchy) {
+		this.indexes = indexes;
 		this.fieldPath = fieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
 	public LuceneDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = scopeModel.nestedPathHierarchyForField( incomingFieldPath );
+		List<String> incomingNestedPathHierarchy = indexes.nestedPathHierarchyForField( incomingFieldPath );
 		if ( fieldPath == null ) {
-			return new LuceneDifferentNestedObjectCompatibilityChecker( scopeModel, incomingFieldPath, incomingNestedPathHierarchy );
+			return new LuceneDifferentNestedObjectCompatibilityChecker( indexes, incomingFieldPath, incomingNestedPathHierarchy );
 		}
 
 		if ( !nestedPathHierarchy.equals( incomingNestedPathHierarchy ) ) {

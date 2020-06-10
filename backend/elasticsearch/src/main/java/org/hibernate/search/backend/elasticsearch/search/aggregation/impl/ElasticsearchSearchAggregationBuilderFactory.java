@@ -10,10 +10,10 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -37,12 +37,11 @@ public class ElasticsearchSearchAggregationBuilderFactory
 			new AggregationBuilderFactoryRetrievalStrategy();
 
 	private final ElasticsearchSearchContext searchContext;
-	private final ElasticsearchScopeModel scopeModel;
+	private final ElasticsearchSearchIndexesContext indexes;
 
-	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchContext searchContext,
-			ElasticsearchScopeModel scopeModel) {
+	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.scopeModel = scopeModel;
+		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -53,9 +52,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		}
 
 		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
-		if ( !scopeModel.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.getIndexNames(), scopeModel.hibernateSearchIndexNames()
+					aggregation, casted.getIndexNames(), indexes.hibernateSearchIndexNames()
 			);
 		}
 
@@ -66,11 +65,11 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				indexes.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 		return fieldComponent.getComponent().createTermsAggregationBuilder(
 				searchContext, absoluteFieldPath,
-				scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
+				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
 				expectedType, convert
 		);
 	}
@@ -79,11 +78,11 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				indexes.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
 				searchContext, absoluteFieldPath,
-				scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
+				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
 				expectedType, convert
 		);
 	}

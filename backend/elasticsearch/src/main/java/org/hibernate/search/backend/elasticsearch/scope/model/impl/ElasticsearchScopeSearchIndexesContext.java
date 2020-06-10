@@ -22,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -30,7 +31,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class ElasticsearchScopeModel {
+public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSearchIndexesContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -38,7 +39,7 @@ public class ElasticsearchScopeModel {
 	private final Set<String> hibernateSearchIndexNames;
 	private final Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames;
 
-	public ElasticsearchScopeModel(Set<ElasticsearchIndexModel> indexModels) {
+	public ElasticsearchScopeSearchIndexesContext(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNames = new LinkedHashSet<>();
@@ -49,26 +50,27 @@ public class ElasticsearchScopeModel {
 		}
 	}
 
+	@Override
 	public Set<String> mappedTypeNames() {
 		return mappedTypeToElasticsearchIndexNames.keySet();
 	}
 
+	@Override
 	public Set<String> hibernateSearchIndexNames() {
 		return hibernateSearchIndexNames;
 	}
 
+	@Override
 	public Collection<URLEncodedString> elasticsearchIndexNames() {
 		return mappedTypeToElasticsearchIndexNames.values();
 	}
 
+	@Override
 	public Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames() {
 		return mappedTypeToElasticsearchIndexNames;
 	}
 
-	public EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( hibernateSearchIndexNames() );
-	}
-
+	@Override
 	public ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter() {
 		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
 		ElasticsearchIndexModel indexModelForSelectedIdConverter = null;
@@ -103,6 +105,7 @@ public class ElasticsearchScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
+	@Override
 	public <T> ElasticsearchScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
@@ -158,6 +161,7 @@ public class ElasticsearchScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
+	@Override
 	public boolean hasSchemaObjectNodeComponent(String absoluteFieldPath) {
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaObjectFieldNode objectNode =
@@ -173,6 +177,7 @@ public class ElasticsearchScopeModel {
 		return false;
 	}
 
+	@Override
 	public void checkNestedField(String absoluteFieldPath) {
 		boolean found = false;
 
@@ -202,6 +207,7 @@ public class ElasticsearchScopeModel {
 		}
 	}
 
+	@Override
 	public String nestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
@@ -221,6 +227,7 @@ public class ElasticsearchScopeModel {
 		return nestedDocumentPath.orElse( null );
 	}
 
+	@Override
 	public List<String> nestedPathHierarchyForField(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
@@ -239,6 +246,7 @@ public class ElasticsearchScopeModel {
 		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
+	@Override
 	public List<String> nestedPathHierarchyForObject(String absoluteObjectPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getObjectFieldNode( absoluteObjectPath, IndexFieldFilter.INCLUDED_ONLY ) )
@@ -255,5 +263,9 @@ public class ElasticsearchScopeModel {
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( Collections.emptyList() );
+	}
+
+	private EventContext indexesEventContext() {
+		return EventContexts.fromIndexNames( hibernateSearchIndexNames() );
 	}
 }

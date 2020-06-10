@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
@@ -37,19 +34,19 @@ public final class LuceneSearchContext {
 	private final TimingSource timingSource;
 
 	// Targeted indexes
-	private final LuceneScopeModel scopeModel;
+	private final LuceneSearchIndexesContext indexes;
 
 	public LuceneSearchContext(BackendMappingContext mappingContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
-			LuceneScopeModel scopeModel) {
+			LuceneSearchIndexesContext indexes) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
-		this.scopeModel = scopeModel;
+		this.indexes = indexes;
 	}
 
 	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
@@ -64,16 +61,8 @@ public final class LuceneSearchContext {
 		return analysisDefinitionRegistry;
 	}
 
-	public Set<String> typeNames() {
-		return scopeModel.typeNames();
-	}
-
-	public Set<String> indexNames() {
-		return scopeModel.indexNames();
-	}
-
-	public Set<? extends ReadIndexManagerContext> indexManagerContexts() {
-		return scopeModel.indexManagerContexts();
+	public LuceneSearchIndexesContext indexes() {
+		return indexes;
 	}
 
 	public Query filterOrNull(String tenantId) {

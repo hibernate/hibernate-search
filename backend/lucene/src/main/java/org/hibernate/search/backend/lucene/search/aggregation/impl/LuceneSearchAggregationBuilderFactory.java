@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -34,12 +34,11 @@ public class LuceneSearchAggregationBuilderFactory
 			new AggregationBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneScopeModel scopeModel;
+	private final LuceneSearchIndexesContext indexes;
 
-	public LuceneSearchAggregationBuilderFactory(LuceneSearchContext searchContext,
-			LuceneScopeModel scopeModel) {
+	public LuceneSearchAggregationBuilderFactory(LuceneSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.scopeModel = scopeModel;
+		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -50,9 +49,9 @@ public class LuceneSearchAggregationBuilderFactory
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !scopeModel.indexNames().equals( casted.getIndexNames() ) ) {
+		if ( !indexes.indexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-				aggregation, casted.getIndexNames(), scopeModel.indexNames()
+				aggregation, casted.getIndexNames(), indexes.indexNames()
 			);
 		}
 
@@ -63,10 +62,10 @@ public class LuceneSearchAggregationBuilderFactory
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		LuceneScopedIndexFieldComponent<LuceneFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				indexes.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 
-		String nestedDocumentPath = scopeModel.nestedDocumentPath( absoluteFieldPath );
+		String nestedDocumentPath = indexes.nestedDocumentPath( absoluteFieldPath );
 
 		return fieldComponent.getComponent().createTermsAggregationBuilder(
 				searchContext, nestedDocumentPath, absoluteFieldPath, expectedType, convert
@@ -77,10 +76,10 @@ public class LuceneSearchAggregationBuilderFactory
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
 		LuceneScopedIndexFieldComponent<LuceneFieldAggregationBuilderFactory> fieldComponent =
-				scopeModel.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				indexes.schemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
 
-		String nestedDocumentPath = scopeModel.nestedDocumentPath( absoluteFieldPath );
+		String nestedDocumentPath = indexes.nestedDocumentPath( absoluteFieldPath );
 
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
 				searchContext, nestedDocumentPath, absoluteFieldPath, expectedType, convert

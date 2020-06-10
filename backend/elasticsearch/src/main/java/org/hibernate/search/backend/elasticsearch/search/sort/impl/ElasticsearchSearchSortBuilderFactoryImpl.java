@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -35,18 +35,16 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 			new SortBuilderFactoryRetrievalStrategy();
 
 	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexesContext indexes;
 
-	private final ElasticsearchScopeModel scopeModel;
-
-	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
-			ElasticsearchScopeModel scopeModel) {
+	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.scopeModel = scopeModel;
+		this.indexes = searchContext.indexes();
 	}
 
 	@Override
 	public SearchSort toSearchSort(List<ElasticsearchSearchSortBuilder> builders) {
-		return new ElasticsearchSearchSort( builders, scopeModel.hibernateSearchIndexNames() );
+		return new ElasticsearchSearchSort( builders, indexes.hibernateSearchIndexNames() );
 	}
 
 	@Override
@@ -55,8 +53,8 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
 		ElasticsearchSearchSort casted = (ElasticsearchSearchSort) sort;
-		if ( !scopeModel.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), scopeModel.hibernateSearchIndexNames() );
+		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.getIndexNames(), indexes.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}
@@ -73,17 +71,17 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
-		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldSortBuilderFactory> fieldComponent = scopeModel
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldSortBuilderFactory> fieldComponent = indexes
 				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ),
+		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath, indexes.nestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return scopeModel
-				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( searchContext, absoluteFieldPath, scopeModel.nestedPathHierarchyForField( absoluteFieldPath ), location );
+		return indexes.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getComponent().createDistanceSortBuilder( searchContext, absoluteFieldPath,
+						indexes.nestedPathHierarchyForField( absoluteFieldPath ), location );
 	}
 
 	@Override
