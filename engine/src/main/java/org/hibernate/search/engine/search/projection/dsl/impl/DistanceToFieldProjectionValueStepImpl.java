@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ListProjectionAccumulator;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -19,9 +19,10 @@ public class DistanceToFieldProjectionValueStepImpl
 		extends DistanceToFieldProjectionOptionsStepImpl<Double>
 		implements DistanceToFieldProjectionValueStep<DistanceToFieldProjectionOptionsStepImpl<Double>, Double> {
 
-	DistanceToFieldProjectionValueStepImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath,
+	DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
 			GeoPoint center) {
-		super( factory.distance( absoluteFieldPath, center ), SingleValuedProjectionAccumulator.provider() );
+		super( dslContext.builderFactory().distance( absoluteFieldPath, center ),
+				SingleValuedProjectionAccumulator.provider() );
 	}
 
 	@Override

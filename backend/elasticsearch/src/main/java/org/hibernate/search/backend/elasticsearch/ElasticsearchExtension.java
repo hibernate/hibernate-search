@@ -41,7 +41,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -186,11 +186,13 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchProjectionFactory<R, E>> extendOptional(
-			SearchProjectionFactory<R, E> original, SearchProjectionBuilderFactory factory) {
-		if ( factory instanceof ElasticsearchSearchProjectionBuilderFactory ) {
+	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchProjectionBuilderFactory, the cast is safe
+	public Optional<ElasticsearchSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
+			SearchProjectionDslContext<?> dslContext) {
+		if ( dslContext.builderFactory() instanceof ElasticsearchSearchProjectionBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchProjectionFactoryImpl<>(
-					original, (ElasticsearchSearchProjectionBuilderFactory) factory
+					original,
+					(SearchProjectionDslContext<ElasticsearchSearchProjectionBuilderFactory>) dslContext
 			) );
 		}
 		else {

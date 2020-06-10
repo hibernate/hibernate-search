@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredic
 import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionDslContextImpl;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -64,7 +65,9 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public SearchProjectionFactory<R, E> projection() {
-		return new DefaultSearchProjectionFactory<>( delegate.searchProjectionFactory() );
+		return new DefaultSearchProjectionFactory<>(
+				SearchProjectionDslContextImpl.root( delegate.searchProjectionFactory() )
+		);
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionDslContextImpl;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -39,7 +40,9 @@ public abstract class AbstractSearchQuerySelectStep<
 	}
 
 	protected final SearchProjectionFactory<R, E> createDefaultProjectionFactory() {
-		return new DefaultSearchProjectionFactory<>( indexScope().searchProjectionFactory() );
+		return new DefaultSearchProjectionFactory<>(
+				SearchProjectionDslContextImpl.root( indexScope().searchProjectionFactory() )
+		);
 	}
 
 	protected abstract IndexScope<C> indexScope();

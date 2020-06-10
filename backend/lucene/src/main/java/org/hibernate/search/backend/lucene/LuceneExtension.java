@@ -38,6 +38,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -46,7 +47,6 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -186,11 +186,13 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchProjectionFactory<R, E>> extendOptional(
-			SearchProjectionFactory<R, E> original, SearchProjectionBuilderFactory factory) {
-		if ( factory instanceof LuceneSearchProjectionBuilderFactory ) {
+	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchProjectionBuilderFactory, the cast is safe
+	public Optional<LuceneSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
+			SearchProjectionDslContext<?> dslContext) {
+		if ( dslContext.builderFactory() instanceof LuceneSearchProjectionBuilderFactory ) {
 			return Optional.of( new LuceneSearchProjectionFactoryImpl<>(
-					original, (LuceneSearchProjectionBuilderFactory) factory
+					original,
+					(SearchProjectionDslContext<LuceneSearchProjectionBuilderFactory>) dslContext
 			) );
 		}
 		else {

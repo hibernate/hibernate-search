@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class ScoreProjectionOptionsStepImpl
@@ -17,8 +17,8 @@ public class ScoreProjectionOptionsStepImpl
 
 	private final ScoreProjectionBuilder scoreProjectionBuilder;
 
-	ScoreProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory) {
-		this.scoreProjectionBuilder = factory.score();
+	ScoreProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
+		this.scoreProjectionBuilder = dslContext.builderFactory().score();
 	}
 
 	@Override

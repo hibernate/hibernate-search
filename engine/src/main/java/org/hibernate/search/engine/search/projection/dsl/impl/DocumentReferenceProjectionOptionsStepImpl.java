@@ -9,8 +9,8 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class DocumentReferenceProjectionOptionsStepImpl
@@ -18,8 +18,8 @@ public class DocumentReferenceProjectionOptionsStepImpl
 
 	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
-	DocumentReferenceProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory) {
-		this.documentReferenceProjectionBuilder = factory.documentReference();
+	DocumentReferenceProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
+		this.documentReferenceProjectionBuilder = dslContext.builderFactory().documentReference();
 	}
 
 	@Override
