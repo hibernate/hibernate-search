@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class EntityProjectionOptionsStepImpl<E>
@@ -17,8 +17,8 @@ public class EntityProjectionOptionsStepImpl<E>
 
 	private final EntityProjectionBuilder<E> entityProjectionBuilder;
 
-	EntityProjectionOptionsStepImpl(SearchProjectionBuilderFactory factory) {
-		this.entityProjectionBuilder = factory.entity();
+	EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
+		this.entityProjectionBuilder = dslContext.builderFactory().entity();
 	}
 
 	@Override

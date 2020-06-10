@@ -13,27 +13,27 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedMoreStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
 public class SearchProjectionFactoryExtensionStep<P, R, E> implements
 		SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> {
 
 	private final SearchProjectionFactory<R, E> parent;
-	private final SearchProjectionBuilderFactory factory;
+	private final SearchProjectionDslContext<?> dslContext;
 
 	private final DslExtensionState<ProjectionFinalStep<P>> state = new DslExtensionState<>();
 
 	SearchProjectionFactoryExtensionStep(SearchProjectionFactory<R, E> parent,
-			SearchProjectionBuilderFactory factory) {
+			SearchProjectionDslContext<?> dslContext) {
 		this.parent = parent;
-		this.factory = factory;
+		this.dslContext = dslContext;
 	}
 
 	@Override
 	public <T> SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> ifSupported(
 			SearchProjectionFactoryExtension<T, R, E> extension,
 			Function<T, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		state.ifSupported( extension, extension.extendOptional( parent, factory ), projectionContributor );
+		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), projectionContributor );
 		return this;
 	}
 

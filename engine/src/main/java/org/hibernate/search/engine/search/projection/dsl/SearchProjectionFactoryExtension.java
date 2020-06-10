@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.projection.dsl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
 /**
  * An extension to the search projection DSL, allowing the use of non-standard projections in a query.
@@ -36,11 +36,11 @@ public interface SearchProjectionFactoryExtension<T, R, E> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchProjectionFactory}.
-	 * @param factory A {@link SearchProjectionBuilderFactory}.
+	 * @param dslContext A {@link SearchProjectionDslContext}.
 	 * @return An optional containing the extended projection factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(SearchProjectionFactory<R, E> original,
-			SearchProjectionBuilderFactory factory);
+			SearchProjectionDslContext<?> dslContext);
 
 }

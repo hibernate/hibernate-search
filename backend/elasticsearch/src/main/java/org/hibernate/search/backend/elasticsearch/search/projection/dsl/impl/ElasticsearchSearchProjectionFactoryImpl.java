@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFinalStep;
 
 import com.google.gson.JsonObject;
@@ -19,26 +20,26 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 		extends DelegatingSearchProjectionFactory<R, E>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
 
-	private final ElasticsearchSearchProjectionBuilderFactory factory;
+	private final SearchProjectionDslContext<ElasticsearchSearchProjectionBuilderFactory> dslContext;
 
 	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			ElasticsearchSearchProjectionBuilderFactory factory) {
+			SearchProjectionDslContext<ElasticsearchSearchProjectionBuilderFactory> dslContext) {
 		super( delegate );
-		this.factory = factory;
+		this.dslContext = dslContext;
 	}
 
 	@Override
 	public ProjectionFinalStep<JsonObject> source() {
-		return new StaticProjectionFinalStep<>( factory.source() );
+		return new StaticProjectionFinalStep<>( dslContext.builderFactory().source() );
 	}
 
 	@Override
 	public ProjectionFinalStep<JsonObject> explanation() {
-		return new StaticProjectionFinalStep<>( factory.explanation() );
+		return new StaticProjectionFinalStep<>( dslContext.builderFactory().explanation() );
 	}
 
 	@Override
 	public ProjectionFinalStep<JsonObject> jsonHit() {
-		return new StaticProjectionFinalStep<>( factory.jsonHit() );
+		return new StaticProjectionFinalStep<>( dslContext.builderFactory().jsonHit() );
 	}
 }

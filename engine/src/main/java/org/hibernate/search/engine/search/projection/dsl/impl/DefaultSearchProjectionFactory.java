@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -31,22 +31,21 @@ import org.hibernate.search.util.common.impl.Contracts;
 
 public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFactory<R, E> {
 
-	private final SearchProjectionBuilderFactory factory;
+	private final SearchProjectionDslContext<?> dslContext;
 
-	public DefaultSearchProjectionFactory(SearchProjectionBuilderFactory factory) {
-		this.factory = factory;
+	public DefaultSearchProjectionFactory(SearchProjectionDslContext<?> dslContext) {
+		this.dslContext = dslContext;
 	}
 
 	@Override
 	public DocumentReferenceProjectionOptionsStep<?> documentReference() {
-		return new DocumentReferenceProjectionOptionsStepImpl( factory );
+		return new DocumentReferenceProjectionOptionsStepImpl( dslContext );
 	}
 
 	@Override
 	public <T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
 		Contracts.assertNotNull( clazz, "clazz" );
-
-		return new FieldProjectionValueStepImpl<>( factory, absoluteFieldPath, clazz, convert );
+		return new FieldProjectionValueStepImpl<>( dslContext, absoluteFieldPath, clazz, convert );
 	}
 
 	@Override
@@ -56,24 +55,23 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 
 	@Override
 	public EntityReferenceProjectionOptionsStep<?, R> entityReference() {
-		return new EntityReferenceProjectionOptionsStepImpl<>( factory );
+		return new EntityReferenceProjectionOptionsStepImpl<>( dslContext );
 	}
 
 	@Override
 	public EntityProjectionOptionsStep<?, E> entity() {
-		return new EntityProjectionOptionsStepImpl<>( factory );
+		return new EntityProjectionOptionsStepImpl<>( dslContext );
 	}
 
 	@Override
 	public ScoreProjectionOptionsStep<?> score() {
-		return new ScoreProjectionOptionsStepImpl( factory );
+		return new ScoreProjectionOptionsStepImpl( dslContext );
 	}
 
 	@Override
 	public DistanceToFieldProjectionValueStep<?, Double> distance(String absoluteFieldPath, GeoPoint center) {
 		Contracts.assertNotNull( center, "center" );
-
-		return new DistanceToFieldProjectionValueStepImpl( factory, absoluteFieldPath, center );
+		return new DistanceToFieldProjectionValueStepImpl( dslContext, absoluteFieldPath, center );
 	}
 
 	@Override
@@ -82,7 +80,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNullNorEmpty( projections, "projections" );
 
-		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projections );
+		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projections );
 	}
 
 	@Override
@@ -90,7 +88,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection, "projection" );
 
-		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projection );
+		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projection );
 	}
 
 	@Override
@@ -100,7 +98,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 		Contracts.assertNotNull( projection1, "projection1" );
 		Contracts.assertNotNull( projection2, "projection2" );
 
-		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projection1, projection2 );
+		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projection1, projection2 );
 	}
 
 	@Override
@@ -111,18 +109,18 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 		Contracts.assertNotNull( projection2, "projection2" );
 		Contracts.assertNotNull( projection3, "projection3" );
 
-		return new CompositeProjectionOptionsStepImpl<>( factory, transformer, projection1, projection2, projection3 );
+		return new CompositeProjectionOptionsStepImpl<>( dslContext, transformer, projection1, projection2, projection3 );
 	}
 
 	@Override
 	public <T> T extension(SearchProjectionFactoryExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, factory )
+				extension, extension.extendOptional( this, dslContext )
 		);
 	}
 
 	@Override
 	public <T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension() {
-		return new SearchProjectionFactoryExtensionStep<>( this, factory );
+		return new SearchProjectionFactoryExtensionStep<>( this, dslContext );
 	}
 }

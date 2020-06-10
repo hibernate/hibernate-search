@@ -27,12 +27,12 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
@@ -668,9 +668,9 @@ public class SearchProjectionIT extends EasyMockSupport {
 			implements SearchProjectionFactoryExtension<MyExtendedFactory<R, E>, R, E> {
 		@Override
 		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
-				SearchProjectionBuilderFactory factory) {
+				SearchProjectionDslContext<?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( factory ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
@@ -679,9 +679,9 @@ public class SearchProjectionIT extends EasyMockSupport {
 			implements SearchProjectionFactoryExtension<MyExtendedFactory<R, E>, R, E> {
 		@Override
 		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
-				SearchProjectionBuilderFactory factory) {
+				SearchProjectionDslContext<?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( factory ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}
