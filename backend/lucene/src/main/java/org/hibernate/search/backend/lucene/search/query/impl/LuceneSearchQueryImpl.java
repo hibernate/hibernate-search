@@ -12,23 +12,24 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
-import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -119,7 +120,10 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public SearchScroll<H> scroll(Integer pageSize) {
-		throw new UnsupportedOperationException( "Not yet implemented" );
+		Set<String> indexNames = searchContext.indexes().indexNames();
+		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
+				indexNames, searchContext.indexes().elements(), routingKeys );
+		return new LuceneSearchScroll<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager, searcher, indexReader, pageSize );
 	}
 
 	@Override

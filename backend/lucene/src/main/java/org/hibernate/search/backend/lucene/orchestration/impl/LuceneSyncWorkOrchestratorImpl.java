@@ -44,9 +44,10 @@ public class LuceneSyncWorkOrchestratorImpl
 
 	@Override
 	public <T> T submit(Set<String> indexNames, Collection<? extends ReadIndexManagerContext> indexManagerContexts,
-			Set<String> routingKeys, ReadWork<T> work) {
+			Set<String> routingKeys, ReadWork<T> work,
+			HibernateSearchMultiReader indexReader) {
 		WorkExecution<T> workExecution = new WorkExecution<>(
-				similarity, indexNames, indexManagerContexts, routingKeys, work
+				similarity, indexNames, indexManagerContexts, routingKeys, work, indexReader
 		);
 		Throwable throwable = null;
 		try {
@@ -97,16 +98,26 @@ public class LuceneSyncWorkOrchestratorImpl
 		private final Set<String> indexNames;
 		private final HibernateSearchMultiReader indexReader;
 		private final ReadWork<T> work;
+		private final boolean closeIndexReader;
 
 		private T result;
 
 		WorkExecution(Similarity similarity, Set<String> indexNames,
 				Collection<? extends ReadIndexManagerContext> indexManagerContexts,
-				Set<String> routingKeys, ReadWork<T> work) {
+				Set<String> routingKeys, ReadWork<T> work,
+				HibernateSearchMultiReader indexReader) {
 			this.similarity = similarity;
 			this.indexNames = indexNames;
-			this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 			this.work = work;
+
+			if ( indexReader == null ) {
+				this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
+				this.closeIndexReader = true;
+			}
+			else {
+				this.indexReader = indexReader;
+				this.closeIndexReader = false;
+			}
 		}
 
 		@Override
@@ -136,6 +147,10 @@ public class LuceneSyncWorkOrchestratorImpl
 
 		@Override
 		public void close() {
+			if ( !closeIndexReader ) {
+				return;
+			}
+
 			try {
 				indexReader.close();
 			}
