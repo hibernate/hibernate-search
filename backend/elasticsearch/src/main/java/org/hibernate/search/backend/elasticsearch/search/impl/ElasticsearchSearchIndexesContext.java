@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexRootComponent;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * Information about indexes targeted by search,
@@ -29,7 +29,7 @@ public interface ElasticsearchSearchIndexesContext {
 
 	Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames();
 
-	ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter();
+	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	ElasticsearchSearchFieldContext<?> field(String absoluteFieldPath);
 

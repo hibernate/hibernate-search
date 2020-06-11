@@ -416,7 +416,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 49,
 			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
-	SearchException conflictingIdentifierTypesForPredicate(ToDocumentIdentifierValueConverter<?> component1,
+	SearchException conflictingIdentifierTypesForSearch(ToDocumentIdentifierValueConverter<?> component1,
 			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 50, value = "Failed to shut down the Elasticsearch index manager with name '%1$s'.")

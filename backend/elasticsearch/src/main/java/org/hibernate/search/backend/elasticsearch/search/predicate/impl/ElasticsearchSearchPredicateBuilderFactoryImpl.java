@@ -10,11 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexRootComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -77,10 +75,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> id() {
-		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = indexes.idDslConverter();
-		return new ElasticsearchMatchIdPredicateBuilder(
-				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
-		);
+		return new ElasticsearchMatchIdPredicateBuilder( searchContext );
 	}
 
 	@Override

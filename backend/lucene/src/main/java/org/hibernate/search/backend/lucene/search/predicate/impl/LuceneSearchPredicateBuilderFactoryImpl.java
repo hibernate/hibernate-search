@@ -74,10 +74,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
-		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = indexes.idDslConverter();
-		return new LuceneMatchIdPredicateBuilder(
-				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
-		);
+		return new LuceneMatchIdPredicateBuilder( searchContext );
 	}
 
 	@Override

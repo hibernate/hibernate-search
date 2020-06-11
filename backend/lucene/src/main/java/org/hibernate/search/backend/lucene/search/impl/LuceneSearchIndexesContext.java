@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexRootComponent;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 public interface LuceneSearchIndexesContext {
 
@@ -22,7 +22,7 @@ public interface LuceneSearchIndexesContext {
 
 	Set<? extends ReadIndexManagerContext> indexManagerContexts();
 
-	LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter();
+	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath);
 

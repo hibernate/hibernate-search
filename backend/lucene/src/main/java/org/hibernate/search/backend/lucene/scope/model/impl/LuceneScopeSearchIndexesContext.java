@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.scope.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -27,14 +26,19 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPred
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final StringToDocumentIdentifierValueConverter RAW_ID_CONVERTER =
+			new StringToDocumentIdentifierValueConverter();
 
 	private final Set<LuceneIndexModel> indexModels;
 	private final Set<String> typeNames;
@@ -71,38 +75,21 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter() {
-		Iterator<LuceneIndexModel> iterator = indexModels.iterator();
-		LuceneIndexModel indexModelForSelectedIdConverter = null;
-		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
-		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> scopedIndexFieldComponent =
-				new LuceneScopedIndexRootComponent<>();
-
-		while ( iterator.hasNext() ) {
-			LuceneIndexModel indexModel = iterator.next();
-			ToDocumentIdentifierValueConverter<?> idConverter = indexModel.getIdDslConverter();
-
-			if ( selectedIdConverter == null ) {
-				indexModelForSelectedIdConverter = indexModel;
-				selectedIdConverter = idConverter;
-				scopedIndexFieldComponent.setComponent( selectedIdConverter );
-				continue;
+	public ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
+		if ( ValueConvert.NO.equals( valueConvert ) ) {
+			return RAW_ID_CONVERTER;
+		}
+		ToDocumentIdentifierValueConverter<?> converter = null;
+		for ( LuceneIndexModel indexModel : indexModels ) {
+			ToDocumentIdentifierValueConverter<?> converterForIndex = indexModel.getIdDslConverter();
+			if ( converter == null ) {
+				converter = converterForIndex;
 			}
-
-			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
-				LuceneFailingIdCompatibilityChecker failingCompatibilityChecker =
-						new LuceneFailingIdCompatibilityChecker(
-								selectedIdConverter, idConverter,
-								EventContexts.fromIndexNames(
-										indexModelForSelectedIdConverter.hibernateSearchName(),
-										indexModel.hibernateSearchName()
-								)
-						);
-				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
+			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
+				throw log.conflictingIdentifierTypesForSearch( converter, converterForIndex, indexesEventContext() );
 			}
 		}
-
-		return scopedIndexFieldComponent;
+		return converter;
 	}
 
 	@Override

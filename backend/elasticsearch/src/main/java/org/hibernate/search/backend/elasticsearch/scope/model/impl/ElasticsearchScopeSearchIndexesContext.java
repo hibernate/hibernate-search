@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,15 +27,20 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSearchIndexesContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final StringToDocumentIdentifierValueConverter RAW_ID_CONVERTER =
+			new StringToDocumentIdentifierValueConverter();
 
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Set<String> hibernateSearchIndexNames;
@@ -74,38 +78,21 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	public ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> idDslConverter() {
-		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
-		ElasticsearchIndexModel indexModelForSelectedIdConverter = null;
-		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
-		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> scopedIndexFieldComponent =
-				new ElasticsearchScopedIndexRootComponent<>();
-
-		while ( iterator.hasNext() ) {
-			ElasticsearchIndexModel indexModel = iterator.next();
-			ToDocumentIdentifierValueConverter<?> idConverter = indexModel.getIdDslConverter();
-
-			if ( selectedIdConverter == null ) {
-				indexModelForSelectedIdConverter = indexModel;
-				selectedIdConverter = idConverter;
-				scopedIndexFieldComponent.setComponent( selectedIdConverter );
-				continue;
+	public ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
+		if ( ValueConvert.NO.equals( valueConvert ) ) {
+			return RAW_ID_CONVERTER;
+		}
+		ToDocumentIdentifierValueConverter<?> converter = null;
+		for ( ElasticsearchIndexModel indexModel : indexModels ) {
+			ToDocumentIdentifierValueConverter<?> converterForIndex = indexModel.getIdDslConverter();
+			if ( converter == null ) {
+				converter = converterForIndex;
 			}
-
-			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
-				ElasticsearchFailingIdCompatibilityChecker failingCompatibilityChecker =
-						new ElasticsearchFailingIdCompatibilityChecker(
-								selectedIdConverter, idConverter,
-								EventContexts.fromIndexNames(
-										indexModelForSelectedIdConverter.hibernateSearchName(),
-										indexModel.hibernateSearchName()
-								)
-						);
-				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
+			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
+				throw log.conflictingIdentifierTypesForSearch( converter, converterForIndex, indexesEventContext() );
 			}
 		}
-
-		return scopedIndexFieldComponent;
+		return converter;
 	}
 
 	@Override
