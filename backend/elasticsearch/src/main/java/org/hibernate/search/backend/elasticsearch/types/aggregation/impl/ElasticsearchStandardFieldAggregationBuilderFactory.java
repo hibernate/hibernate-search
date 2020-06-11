@@ -46,12 +46,6 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 		DslConverter<?, ? extends F> toFieldValueConverter = getToFieldValueConverter(
 				field, expectedType, convert
 		);
-		// TODO HSEARCH-3945 This is legacy behavior to trigger a failure when the projection converter is different.
-		//   It's not strictly necessary but is expected in tests.
-		//   Maybe relax the constraint?
-		if ( ValueConvert.YES.equals( convert ) ) {
-			field.type().projectionConverter();
-		}
 
 		return new ElasticsearchRangeAggregation.Builder<>(
 				searchContext, field, toFieldValueConverter, codec

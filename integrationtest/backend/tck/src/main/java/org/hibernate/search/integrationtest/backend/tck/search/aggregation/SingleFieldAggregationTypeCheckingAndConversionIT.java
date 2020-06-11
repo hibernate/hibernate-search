@@ -22,7 +22,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -634,8 +636,17 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			 */
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
-							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, new IncompatibleDslConverter<>() )
 							.projectionConverter( ValueWrapper.class, new IncompatibleProjectionConverter() ) );
+		}
+
+		@SuppressWarnings("rawtypes")
+		private static class IncompatibleDslConverter<F>
+				implements ToDocumentFieldValueConverter<ValueWrapper, F> {
+			@Override
+			public F convert(ValueWrapper value, ToDocumentFieldValueConvertContext context) {
+				return null;
+			}
 		}
 
 		@SuppressWarnings("rawtypes")
