@@ -863,7 +863,7 @@ public class RangeSearchPredicateIT {
 					}
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldModel.relativeFieldName + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )
@@ -902,7 +902,7 @@ public class RangeSearchPredicateIT {
 					() -> scope.predicate().range().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
@@ -921,7 +921,7 @@ public class RangeSearchPredicateIT {
 					() -> scope.predicate().range().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
@@ -942,7 +942,7 @@ public class RangeSearchPredicateIT {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )
@@ -960,7 +960,7 @@ public class RangeSearchPredicateIT {
 					() -> scope.predicate().range().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )

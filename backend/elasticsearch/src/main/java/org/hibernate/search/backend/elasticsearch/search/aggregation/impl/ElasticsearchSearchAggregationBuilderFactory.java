@@ -138,7 +138,7 @@ public class ElasticsearchSearchAggregationBuilderFactory
 				ElasticsearchFieldAggregationBuilderFactory component1,
 				ElasticsearchFieldAggregationBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForAggregation( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

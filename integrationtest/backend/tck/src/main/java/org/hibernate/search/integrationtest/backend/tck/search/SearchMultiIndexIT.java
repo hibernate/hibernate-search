@@ -226,21 +226,21 @@ public class SearchMultiIndexIT {
 				"predicate on field with different type among the targeted indexes"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate for field 'differentTypesField'" );
+				.hasMessageContainingAll( "Multiple conflicting types", "'differentTypesField'" );
 
 		Assertions.assertThatThrownBy(
 				() -> scope.projection().field( "differentTypesField" ).toProjection(),
 				"projection on field with different type among the targeted indexes"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a projection for field 'differentTypesField'" );
+				.hasMessageContainingAll( "Multiple conflicting types", "'differentTypesField'" );
 
 		Assertions.assertThatThrownBy(
 				() -> scope.sort().field( "differentTypesField" ),
 				"sort on field with different type among the targeted indexes"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a sort for field 'differentTypesField'" );
+				.hasMessageContaining( "Multiple conflicting types", "'differentTypesField'" );
 	}
 
 	@Test

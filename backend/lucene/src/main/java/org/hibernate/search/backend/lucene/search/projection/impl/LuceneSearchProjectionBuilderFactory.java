@@ -187,7 +187,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForProjection( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

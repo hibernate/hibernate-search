@@ -129,7 +129,7 @@ public class LuceneSearchAggregationBuilderFactory
 				LuceneFieldAggregationBuilderFactory component1,
 				LuceneFieldAggregationBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForAggregation( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

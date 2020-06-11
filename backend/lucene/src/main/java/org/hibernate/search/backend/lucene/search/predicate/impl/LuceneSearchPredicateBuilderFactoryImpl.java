@@ -206,7 +206,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForPredicate( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

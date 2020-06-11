@@ -344,7 +344,7 @@ public class ExistsSearchPredicateIT {
 					() -> scope.predicate().exists().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )

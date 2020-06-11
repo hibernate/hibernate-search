@@ -326,7 +326,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a projection" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
@@ -357,7 +357,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a projection" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
@@ -369,7 +369,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a projection" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
@@ -380,12 +380,9 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
 				+ mainIndex.binding().nestedObject.fieldModels.get( fieldType ).relativeFieldName;
 
-		assertThatThrownBy(
-				() -> scope.projection().field( fieldPath, ValueConvert.NO ),
-				"projection on multiple indexes with incompatible types for field " + fieldPath
-		)
+		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple index conflicting models on nested document paths" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 

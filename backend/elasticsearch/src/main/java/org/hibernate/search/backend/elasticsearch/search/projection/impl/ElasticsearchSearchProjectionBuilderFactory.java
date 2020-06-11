@@ -212,7 +212,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 				ElasticsearchFieldProjectionBuilderFactory component1,
 				ElasticsearchFieldProjectionBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForProjection( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

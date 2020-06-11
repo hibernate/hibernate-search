@@ -428,7 +428,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().spatial().within().field( "geoPoint" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "geoPoint" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )

@@ -662,7 +662,7 @@ public class PhraseSearchPredicateIT {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( absoluteFieldPath )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleAnalyzerIndex.name() )
@@ -724,7 +724,7 @@ public class PhraseSearchPredicateIT {
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().phrase().field( absoluteFieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( absoluteFieldPath )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )

@@ -410,7 +410,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "geoPoint" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )

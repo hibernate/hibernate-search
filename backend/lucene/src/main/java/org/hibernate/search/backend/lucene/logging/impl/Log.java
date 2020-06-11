@@ -24,10 +24,6 @@ import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
@@ -389,21 +385,8 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 58,
-			value = "Multiple conflicting types to build a predicate for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForPredicate(String absoluteFieldPath,
-			LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 59,
-			value = "Multiple conflicting types to build a sort for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForSort(String absoluteFieldPath,
-			LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 60,
-			value = "Multiple conflicting types to build a projection for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForProjection(String absoluteFieldPath,
-			LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
+			value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, Object component1, Object component2,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Failed to shut down the Lucene index manager.")
@@ -528,9 +511,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid routing key: '%1$s'. Valid keys are: %2$s.")
 	SearchException invalidRoutingKeyForExplicitShardingStrategy(String invalidKey, Collection<String> validKeys);
 
-	@Message(id = ID_OFFSET_2 + 93, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPaths(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 94,
 			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
 					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
@@ -544,13 +524,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 96, value = "Invalid type '%2$s' for aggregation on field '%1$s'.")
 	SearchException invalidAggregationInvalidType(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> type,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 97,
-			value = "Multiple conflicting types to build an aggregation for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForAggregation(String absoluteFieldPath,
-			LuceneFieldAggregationBuilderFactory component1,
-			LuceneFieldAggregationBuilderFactory component2,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 98,

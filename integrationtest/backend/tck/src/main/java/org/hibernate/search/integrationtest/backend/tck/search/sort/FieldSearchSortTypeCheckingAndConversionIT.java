@@ -254,7 +254,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a sort" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )
@@ -297,7 +297,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a sort" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
@@ -316,7 +316,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a sort" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )

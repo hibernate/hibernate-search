@@ -208,7 +208,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 		assertThatThrownBy( () -> scope.projection().distance( fieldPath, CENTER_POINT_1 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a projection" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
@@ -219,12 +219,9 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
 				+ mainIndex.binding().nestedObject.fieldModel.relativeFieldName;
 
-		assertThatThrownBy(
-				() -> scope.projection().distance( fieldPath, CENTER_POINT_1 ),
-				"projection on multiple indexes with incompatible types for field " + fieldPath
-		)
+		assertThatThrownBy( () -> scope.projection().distance( fieldPath, CENTER_POINT_1 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple index conflicting models on nested document paths" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 

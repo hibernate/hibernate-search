@@ -212,8 +212,9 @@ public class ElasticsearchScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPaths(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
+					throw log.conflictingFieldTypesForSearch( absoluteFieldPath,
+							nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ),
+							indexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 

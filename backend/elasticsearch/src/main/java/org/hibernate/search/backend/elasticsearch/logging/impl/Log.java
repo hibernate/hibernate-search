@@ -19,10 +19,6 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -400,21 +396,8 @@ public interface Log extends BasicLogger {
 	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 41,
-			value = "Multiple conflicting types to build a predicate for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForPredicate(String absoluteFieldPath,
-			ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 42,
-			value = "Multiple conflicting types to build a sort for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForSort(String absoluteFieldPath,
-			ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 43,
-			value = "Multiple conflicting types to build a projection for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForProjection(String absoluteFieldPath,
-			ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2,
+			value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, Object component1, Object component2,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 44, value = "Failed to shut down the Elasticsearch backend.")
@@ -525,9 +508,6 @@ public interface Log extends BasicLogger {
 			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET_3 + 75, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPaths(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 76,
 			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
 					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
@@ -541,13 +521,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 78, value = "Invalid type '%2$s' for aggregation on field '%1$s'.")
 	SearchException invalidAggregationInvalidType(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> type,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 79,
-			value = "Multiple conflicting types to build an aggregation for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForAggregation(String absoluteFieldPath,
-			ElasticsearchFieldAggregationBuilderFactory component1,
-			ElasticsearchFieldAggregationBuilderFactory component2,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 80,

@@ -129,7 +129,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForSort( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

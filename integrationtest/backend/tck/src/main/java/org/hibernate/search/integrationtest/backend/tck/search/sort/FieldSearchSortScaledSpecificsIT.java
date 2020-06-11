@@ -47,7 +47,7 @@ public class FieldSearchSortScaledSpecificsIT {
 						.sort( f -> f.field( "scaledBigDecimal" ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a sort" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )

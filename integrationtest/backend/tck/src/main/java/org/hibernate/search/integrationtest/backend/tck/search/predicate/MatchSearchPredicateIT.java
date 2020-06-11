@@ -1159,7 +1159,7 @@ public class MatchSearchPredicateIT {
 					}
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldModel.relativeFieldName + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )
@@ -1199,7 +1199,7 @@ public class MatchSearchPredicateIT {
 					() -> scope.predicate().match().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
@@ -1218,7 +1218,7 @@ public class MatchSearchPredicateIT {
 					() -> scope.predicate().match().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
@@ -1239,7 +1239,7 @@ public class MatchSearchPredicateIT {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'analyzedString'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleAnalyzerIndex.name() )
@@ -1306,7 +1306,7 @@ public class MatchSearchPredicateIT {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )
@@ -1324,7 +1324,7 @@ public class MatchSearchPredicateIT {
 					() -> scope.predicate().match().field( fieldPath )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "Multiple conflicting types" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )

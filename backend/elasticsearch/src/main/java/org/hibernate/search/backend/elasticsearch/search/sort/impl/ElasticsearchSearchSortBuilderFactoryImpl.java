@@ -129,7 +129,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForSort( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

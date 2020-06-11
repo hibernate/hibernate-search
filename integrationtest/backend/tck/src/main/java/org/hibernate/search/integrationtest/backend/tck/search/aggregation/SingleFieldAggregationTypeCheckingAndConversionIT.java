@@ -464,7 +464,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		Assertions.assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build an aggregation" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
@@ -490,7 +490,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		Assertions.assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build an aggregation" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 
@@ -506,7 +506,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				scope.aggregation(), fieldPath, ValueConvert.NO
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build an aggregation" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
 	}
 

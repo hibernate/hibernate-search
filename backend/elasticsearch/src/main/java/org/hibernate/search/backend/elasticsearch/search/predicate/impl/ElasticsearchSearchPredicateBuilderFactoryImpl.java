@@ -220,7 +220,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
 				EventContext context) {
-			return log.conflictingFieldTypesForPredicate( absoluteFieldPath, component1, component2, context );
+			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
 		}
 	}
 }

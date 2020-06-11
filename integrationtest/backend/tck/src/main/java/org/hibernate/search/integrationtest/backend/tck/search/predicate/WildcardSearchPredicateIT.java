@@ -467,7 +467,7 @@ public class WildcardSearchPredicateIT {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + absoluteFieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
@@ -481,7 +481,7 @@ public class WildcardSearchPredicateIT {
 
 		Assertions.assertThatThrownBy( () -> scope.predicate().wildcard().field( absoluteFieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( absoluteFieldPath )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), unsearchableFieldsIndex.name() )
