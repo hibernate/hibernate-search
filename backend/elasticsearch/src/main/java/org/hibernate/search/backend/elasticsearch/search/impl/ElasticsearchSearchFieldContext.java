@@ -38,6 +38,8 @@ public interface ElasticsearchSearchFieldContext<F> {
 
 	String absolutePath();
 
+	String[] absolutePathComponents();
+
 	List<String> nestedPathHierarchy();
 
 	boolean multiValuedInRoot();

@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -21,6 +22,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 
 	protected final ElasticsearchIndexSchemaObjectNode parent;
 	protected final String absolutePath;
+	protected final String[] absolutePathComponents;
 	protected final String relativeName;
 	protected final JsonAccessor<JsonElement> relativeAccessor;
 
@@ -33,6 +35,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 			IndexFieldInclusion inclusion, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = parent.absolutePath( relativeFieldName );
+		this.absolutePathComponents = FieldPaths.split( absolutePath );
 		this.relativeName = relativeFieldName;
 		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
 		this.inclusion = inclusion;
@@ -54,6 +57,10 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 	@Override
 	public String absolutePath() {
 		return absolutePath;
+	}
+
+	public String[] absolutePathComponents() {
+		return absolutePathComponents;
 	}
 
 	@Override

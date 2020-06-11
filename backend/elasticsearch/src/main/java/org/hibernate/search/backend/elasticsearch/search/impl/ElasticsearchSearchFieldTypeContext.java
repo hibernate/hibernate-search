@@ -63,4 +63,5 @@ public interface ElasticsearchSearchFieldTypeContext<F> {
 	ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory();
 
 	ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory();
+
 }

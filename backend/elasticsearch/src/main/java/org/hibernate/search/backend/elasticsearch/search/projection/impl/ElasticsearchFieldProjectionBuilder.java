@@ -25,19 +25,16 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 
 	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchFieldContext<F> field;
-	private final String[] absoluteFieldPathComponents;
 
 	private final ProjectionConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchFieldProjectionBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field,
-			String[] absoluteFieldPathComponents,
 			ProjectionConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.field = field;
-		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
 		this.converter = converter;
 		this.codec = codec;
 	}
@@ -48,7 +45,7 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 			throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 		}
 		return new ElasticsearchFieldProjection<>( searchContext.indexes().hibernateSearchIndexNames(),
-				field.absolutePath(), absoluteFieldPathComponents,
+				field.absolutePath(), field.absolutePathComponents(),
 				codec::decode, converter, accumulatorProvider.get() );
 	}
 }

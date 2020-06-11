@@ -46,6 +46,12 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
+	public String[] absolutePathComponents() {
+		// The path is the same for all fields, so we just pick the first one.
+		return fieldForEachIndex.get( 0 ).absolutePathComponents();
+	}
+
+	@Override
 	public List<String> nestedPathHierarchy() {
 		return getFromFieldIfCompatible( ElasticsearchSearchFieldContext::nestedPathHierarchy, Object::equals,
 				"nestedPathHierarchy" );

@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -27,10 +26,6 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory
 			ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
 		checkProjectable( field );
 
-		// FIXME HSEARCH-3945 ideally this should be done at bootstrap
-		String[] absoluteFieldPathComponents = FieldPaths.split( field.absolutePath() );
-
-		return new ElasticsearchDistanceToFieldProjectionBuilder( searchContext, field, absoluteFieldPathComponents,
-				center );
+		return new ElasticsearchDistanceToFieldProjectionBuilder( searchContext, field, center );
 	}
 }
