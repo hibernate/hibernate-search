@@ -133,9 +133,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
 			int offset, Integer limit) throws IOException {
-		// TODO HSEARCH-3323 this is very naive for now, we will probably need to implement some scrolling in the collector
-		//  as it is done in Search 5.
-		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
+		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		return extractionRequirements.createCollectors(
