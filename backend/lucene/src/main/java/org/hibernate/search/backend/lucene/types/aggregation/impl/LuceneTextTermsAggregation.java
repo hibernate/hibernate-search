@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMu
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.facet.FacetResult;
@@ -95,9 +96,9 @@ public class LuceneTextTermsAggregation<K>
 	public static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
+		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field,
 				ProjectionConverter<? super String, ? extends K> fromFieldValueConverter) {
-			super( searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter );
+			super( searchContext, field, fromFieldValueConverter );
 		}
 
 		@Override

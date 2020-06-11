@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -21,18 +22,16 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  * when users try to create a aggregation that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface LuceneFieldAggregationBuilderFactory {
+public interface LuceneFieldAggregationBuilderFactory<F> {
 
 	boolean isAggregable();
 
+	boolean isCompatibleWith(LuceneFieldAggregationBuilderFactory<?> other);
+
 	<K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
+			LuceneSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert);
 
 	<K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
-
-	boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other);
-
-	boolean hasCompatibleConverter(LuceneFieldAggregationBuilderFactory other);
+			LuceneSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert);
 
 }

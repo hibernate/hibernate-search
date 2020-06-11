@@ -385,9 +385,9 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 58,
-			value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, Object component1, Object component2,
-			@Param EventContext context);
+			value = "Multiple conflicting types for field '%1$s', attribute '%2$s' was different: '%3$s' vs. '%4$s'.")
+	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, String attributeName,
+			Object component1, Object component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Failed to shut down the Lucene index manager.")
 	SearchException failedToShutdownBackend(@Cause Exception cause, @Param EventContext context);

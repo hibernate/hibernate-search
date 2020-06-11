@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
-import java.util.Set;
-
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
@@ -23,19 +23,16 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * when users try to create a projection that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface LuceneFieldProjectionBuilderFactory {
+public interface LuceneFieldProjectionBuilderFactory<F> {
 
 	boolean isProjectable();
 
-	<U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			String nestedDocumentPath, boolean multiValuedFieldInRoot,
-			Class<U> expectedType, ValueConvert convert);
+	boolean isCompatibleWith(LuceneFieldProjectionBuilderFactory<?> other);
 
-	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			String nestedDocumentPath, boolean multiValuedFieldInRoot, GeoPoint center);
+	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert);
 
-	boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory other);
-
-	boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory other);
+	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field, GeoPoint center);
 
 }

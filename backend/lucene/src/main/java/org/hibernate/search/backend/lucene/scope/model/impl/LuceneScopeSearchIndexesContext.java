@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -19,6 +20,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
@@ -158,60 +161,47 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public <T> LuceneScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
-		LuceneIndexModel indexModelForSelectedSchemaNode = null;
-		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
-		LuceneScopedIndexFieldComponent<T> scopedIndexFieldComponent = new LuceneScopedIndexFieldComponent<>();
+	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
+	public LuceneSearchFieldContext<?> field(String absoluteFieldPath) {
+		LuceneSearchFieldContext<?> resultOrNull = null;
+		if ( indexModels.size() == 1 ) {
+			// Single-index search
+			resultOrNull = indexModels.iterator().next().getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+		}
+		else {
+			// Multi-index search
+			Class<?> fieldValueTypeForAllIndexes = null;
+			List<LuceneSearchFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
-		for ( LuceneIndexModel indexModel : indexModels ) {
-			LuceneIndexSchemaFieldNode<?> schemaNode =
-					indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-			if ( schemaNode == null ) {
-				continue;
+			for ( LuceneIndexModel indexModel : indexModels ) {
+				LuceneIndexSchemaFieldNode<?> fieldForCurrentIndex =
+						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+				if ( fieldForCurrentIndex == null ) {
+					continue;
+				}
+				Class<?> fieldValueTypeForCurrentIndex = fieldForCurrentIndex.type().valueClass();
+				if ( fieldValueTypeForAllIndexes == null ) {
+					fieldValueTypeForAllIndexes = fieldValueTypeForCurrentIndex;
+				}
+				else {
+					if ( !fieldValueTypeForAllIndexes.equals( fieldValueTypeForCurrentIndex ) ) {
+						throw log.conflictingFieldTypesForSearch( absoluteFieldPath, "valueType",
+								fieldValueTypeForAllIndexes, fieldValueTypeForCurrentIndex, indexesEventContext() );
+					}
+				}
+				fieldForEachIndex.add( fieldForCurrentIndex );
 			}
 
-			T component = componentRetrievalStrategy.extractComponent( schemaNode );
-			if ( selectedSchemaNode == null ) {
-				selectedSchemaNode = schemaNode;
-				indexModelForSelectedSchemaNode = indexModel;
-				scopedIndexFieldComponent.setComponent( component );
-				scopedIndexFieldComponent.setMultiValuedFieldInRoot( schemaNode.multiValuedInRoot() );
-				continue;
-			}
-
-			scopedIndexFieldComponent.setMultiValuedFieldInRoot(
-					scopedIndexFieldComponent.isMultiValuedFieldInRoot() || schemaNode.multiValued()
-			);
-
-			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
-				throw componentRetrievalStrategy.createCompatibilityException(
-						absoluteFieldPath,
-						scopedIndexFieldComponent.getComponent(),
-						component,
-						EventContexts.fromIndexNames(
-								indexModelForSelectedSchemaNode.hibernateSearchName(),
-								indexModel.hibernateSearchName()
-						)
+			if ( !fieldForEachIndex.isEmpty() ) {
+				resultOrNull = new LuceneMultiIndexSearchFieldContext<>(
+						indexNames, absoluteFieldPath, (List) fieldForEachIndex
 				);
 			}
-
-			LuceneFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new LuceneFailingFieldCompatibilityChecker<>(
-					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
-					indexModelForSelectedSchemaNode.hibernateSearchName(), indexModel.hibernateSearchName()
-			), componentRetrievalStrategy );
-
-			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {
-				scopedIndexFieldComponent.setConverterCompatibilityChecker( failingCompatibilityChecker );
-			}
-			if ( !componentRetrievalStrategy.hasCompatibleAnalyzer( scopedIndexFieldComponent.getComponent(), component ) ) {
-				scopedIndexFieldComponent.setAnalyzerCompatibilityChecker( failingCompatibilityChecker );
-			}
 		}
-		if ( selectedSchemaNode == null ) {
+		if ( resultOrNull == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
-		return scopedIndexFieldComponent;
+		return resultOrNull;
 	}
 
 	@Override
@@ -242,44 +232,6 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
-	}
-
-	@Override
-	public String nestedDocumentPath(String absoluteFieldPath) {
-		Optional<String> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
-				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.nestedDocumentPath() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
-
-					throw log.conflictingFieldTypesForSearch( absoluteFieldPath, nestedDocumentPath1.orElse( null ),
-							nestedDocumentPath2.orElse( null ), indexesEventContext() );
-				} )
-				.orElse( Optional.empty() );
-
-		return nestedDocumentPath.orElse( null );
-	}
-
-	@Override
-	public List<String> nestedPathHierarchyForField(String absoluteFieldPath) {
-		Optional<List<String>> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
-				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
-
-					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
-				} )
-				.orElse( Optional.empty() );
-
-		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
 	@Override

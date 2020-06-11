@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.List;
-
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
@@ -27,9 +26,9 @@ class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSingleFieldPredic
 
 	private String pattern;
 
-	LuceneTextWildcardPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy, Analyzer analyzerOrNormalizer) {
-		super( absoluteFieldPath, nestedPathHierarchy );
-		this.analyzerOrNormalizer = analyzerOrNormalizer;
+	LuceneTextWildcardPredicateBuilder(LuceneSearchFieldContext<?> field) {
+		super( field );
+		this.analyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 	}
 
 	@Override

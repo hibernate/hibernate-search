@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
@@ -19,7 +20,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFieldNode
-		implements IndexValueFieldDescriptor {
+		implements IndexValueFieldDescriptor, LuceneSearchFieldContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -59,12 +60,14 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 		return this;
 	}
 
+	@Override
 	public String nestedDocumentPath() {
 		return ( nestedPathHierarchy.isEmpty() ) ? null :
 				// nested path is the LAST element on the path hierarchy
 				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 	}
 
+	@Override
 	public List<String> nestedPathHierarchy() {
 		return nestedPathHierarchy;
 	}
@@ -74,10 +77,15 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 		return type;
 	}
 
+	@Override
+	public EventContext eventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> LuceneIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
-		if ( !type.valueType().isAssignableFrom( expectedSubType ) ) {
-			throw log.invalidFieldValueType( type.valueType(), expectedSubType,
+		if ( !type.valueClass().isAssignableFrom( expectedSubType ) ) {
+			throw log.invalidFieldValueType( type.valueClass(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (LuceneIndexSchemaFieldNode<? super T>) this;

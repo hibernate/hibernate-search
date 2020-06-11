@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.List;
-
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -37,38 +35,35 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
  * when users try to create a predicate that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface LuceneFieldPredicateBuilderFactory {
+public interface LuceneFieldPredicateBuilderFactory<F> {
 
 	boolean isSearchable();
 
-	boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other);
+	boolean isCompatibleWith(LuceneFieldPredicateBuilderFactory<?> other);
 
-	boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other);
+	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field);
 
-	boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other);
+	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field);
 
-	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder( LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker);
-
-	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker);
-
-	PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker analyzerChecker);
+	PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field);
 
 	WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			LuceneSearchFieldContext<F> field);
 
-	LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
+	LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
+			LuceneSearchFieldContext<F> field);
 
-	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy);
+	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(LuceneSearchFieldContext<F> field);
 
 	SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			LuceneSearchFieldContext<F> field);
 
 	SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			LuceneSearchFieldContext<F> field);
 
 	SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy);
+			LuceneSearchFieldContext<F> field);
 }

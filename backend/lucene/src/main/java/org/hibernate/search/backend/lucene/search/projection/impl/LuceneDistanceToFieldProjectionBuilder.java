@@ -7,11 +7,11 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -23,10 +23,8 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-	private final String absoluteFieldPath;
-	private final String nestedDocumentPath;
-	private final boolean multiValuedFieldInRoot;
+	private final LuceneSearchContext searchContext;
+	private final LuceneSearchFieldContext<GeoPoint> field;
 
 	private final LuceneFieldCodec<GeoPoint> codec;
 
@@ -34,13 +32,10 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public LuceneDistanceToFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			String nestedDocumentPath, boolean multiValuedFieldInRoot, LuceneFieldCodec<GeoPoint> codec,
-			GeoPoint center) {
-		this.indexNames = indexNames;
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPath = nestedDocumentPath;
-		this.multiValuedFieldInRoot = multiValuedFieldInRoot;
+	public LuceneDistanceToFieldProjectionBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<GeoPoint> field, LuceneFieldCodec<GeoPoint> codec, GeoPoint center) {
+		this.searchContext = searchContext;
+		this.field = field;
 		this.codec = codec;
 		this.center = center;
 	}
@@ -53,11 +48,10 @@ public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldPr
 
 	@Override
 	public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-		if ( accumulatorProvider.isSingleValued() && multiValuedFieldInRoot ) {
-			throw log.invalidSingleValuedProjectionOnMultiValuedField( absoluteFieldPath,
-					EventContexts.fromIndexNames( indexNames ) );
+		if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+			throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 		}
-		return new LuceneDistanceToFieldProjection<>( indexNames, absoluteFieldPath, nestedDocumentPath,
-				multiValuedFieldInRoot, codec, center, unit, accumulatorProvider.get() );
+		return new LuceneDistanceToFieldProjection<>( searchContext.indexes().indexNames(), field.absolutePath(),
+				field.nestedDocumentPath(), field.multiValuedInRoot(), codec, center, unit, accumulatorProvider.get() );
 	}
 }

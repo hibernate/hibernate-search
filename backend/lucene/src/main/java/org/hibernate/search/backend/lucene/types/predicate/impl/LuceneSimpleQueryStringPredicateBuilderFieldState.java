@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -13,11 +14,11 @@ import org.apache.lucene.analysis.Analyzer;
 public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 	implements SimpleQueryStringPredicateBuilder.FieldState {
 
-	private final Analyzer analyzerOrNormalizer;
+	private final LuceneSearchFieldContext<?> field;
 	private Float boost;
 
-	LuceneSimpleQueryStringPredicateBuilderFieldState(Analyzer analyzerOrNormalizer) {
-		this.analyzerOrNormalizer = analyzerOrNormalizer;
+	LuceneSimpleQueryStringPredicateBuilderFieldState(LuceneSearchFieldContext<?> field) {
+		this.field = field;
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 	}
 
 	public Analyzer getAnalyzerOrNormalizer() {
-		return analyzerOrNormalizer;
+		return field.type().searchAnalyzerOrNormalizer();
 	}
 
 	public Float getBoost() {

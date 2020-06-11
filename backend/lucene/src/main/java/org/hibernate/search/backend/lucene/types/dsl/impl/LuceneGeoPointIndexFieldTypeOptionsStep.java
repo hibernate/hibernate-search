@@ -13,8 +13,6 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFi
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
@@ -40,26 +38,18 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		DslConverter<?, ? extends GeoPoint> dslConverter = createDslConverter();
-		ProjectionConverter<? super GeoPoint, ?> projectionConverter = createProjectionConverter();
-		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter = createRawProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);
 
 		return new LuceneIndexFieldType<>(
-				getFieldType(), dslConverter, projectionConverter,
-				codec,
-				new LuceneGeoPointFieldPredicateBuilderFactory(
-						resolvedSearchable, dslConverter, codec
-				),
+				getFieldType(), codec,
+				createDslConverter(), createRawDslConverter(),
+				createProjectionConverter(), createRawProjectionConverter(),
+				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, codec ),
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable, codec ),
-				new LuceneGeoPointFieldProjectionBuilderFactory(
-						resolvedProjectable, codec, projectionConverter, rawProjectionConverter
-				),
-				new LuceneGeoPointFieldAggregationBuilderFactory(
-						resolvedAggregable, dslConverter, projectionConverter, codec
-				)
+				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ),
+				new LuceneGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec )
 		);
 	}
 

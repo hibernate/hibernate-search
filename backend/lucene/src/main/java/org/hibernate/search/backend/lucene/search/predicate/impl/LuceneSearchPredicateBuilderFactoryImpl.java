@@ -9,17 +9,10 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexRootComponent;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -34,17 +27,14 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
-import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.search.Query;
 
 
 public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	static final PredicateBuilderFactoryRetrievalStrategy PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
-			new PredicateBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchIndexesContext indexes;
@@ -97,37 +87,22 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = indexes.schemaNodeComponent(
-				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath,
-				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
-				fieldComponent.getConverterCompatibilityChecker(), fieldComponent.getAnalyzerCompatibilityChecker() );
+		return indexes.field( absoluteFieldPath ).createMatchPredicateBuilder( searchContext );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = indexes.schemaNodeComponent(
-				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath,
-				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
-				fieldComponent.getConverterCompatibilityChecker() );
+		return indexes.field( absoluteFieldPath ).createRangePredicateBuilder( searchContext );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> phrase(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = indexes
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createPhrasePredicateBuilder( searchContext, absoluteFieldPath,
-				indexes.nestedPathHierarchyForField( absoluteFieldPath ),
-				fieldComponent.getAnalyzerCompatibilityChecker() );
+		return indexes.field( absoluteFieldPath ).createPhrasePredicateBuilder( searchContext );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath,
-						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.field( absoluteFieldPath ).createWildcardPredicateBuilder();
 	}
 
 	@Override
@@ -144,35 +119,23 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			return objectPredicateBuilderFactory.createExistsPredicateBuilder();
 		}
 
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createExistsPredicateBuilder( absoluteFieldPath,
-						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.field( absoluteFieldPath ).createExistsPredicateBuilder();
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinCircle(String absoluteFieldPath) {
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath,
-						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.field( absoluteFieldPath ).createSpatialWithinCirclePredicateBuilder();
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinPolygon(String absoluteFieldPath) {
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath,
-						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.field( absoluteFieldPath ).createSpatialWithinPolygonPredicateBuilder();
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath,
-						indexes.nestedPathHierarchyForField( absoluteFieldPath ) );
+		return indexes.field( absoluteFieldPath ).createSpatialWithinBoundingBoxPredicateBuilder();
 	}
 
 	@Override
@@ -185,36 +148,5 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public LuceneSearchPredicateBuilder fromLuceneQuery(Query query) {
 		return new LuceneUserProvidedLuceneQueryPredicateBuilder( query );
-	}
-
-	private static class PredicateBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldPredicateBuilderFactory> {
-
-		@Override
-		public LuceneFieldPredicateBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().predicateBuilderFactory();
-		}
-
-		@Override
-		public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2) {
-			return component1.hasCompatibleCodec( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2) {
-			return component1.hasCompatibleConverter( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2) {
-			return component1.hasCompatibleAnalyzer( component2 );
-		}
-
-		@Override
-		public SearchException createCompatibilityException(String absoluteFieldPath,
-				LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
-				EventContext context) {
-			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
-		}
 	}
 }

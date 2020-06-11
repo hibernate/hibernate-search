@@ -11,7 +11,6 @@ import java.time.temporal.TemporalAccessor;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneTemporalFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 				S extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<S, F>,
@@ -25,10 +24,7 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 
 	@Override
 	protected LuceneNumericFieldSortBuilderFactory<F, ?> createFieldSortBuilderFactory(boolean resolvedSortable,
-			DslConverter<?, ? extends F> dslToIndexConverter, DslConverter<F, ? extends F> rawDslToIndexConverter,
 			AbstractLuceneNumericFieldCodec<F, ?> codec) {
-		return new LuceneTemporalFieldSortBuilderFactory<>(
-				resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
-		);
+		return new LuceneTemporalFieldSortBuilderFactory<>( resolvedSortable, codec );
 	}
 }

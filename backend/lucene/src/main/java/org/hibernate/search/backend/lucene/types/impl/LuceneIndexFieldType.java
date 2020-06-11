@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldTypeContext;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -20,49 +21,56 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, IndexFieldType<F> {
+public class LuceneIndexFieldType<F>
+		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, LuceneSearchFieldTypeContext<F> {
 	private final Class<F> valueType;
-	private final DslConverter<?, ? extends F> dslConverter;
-	private final ProjectionConverter<? super F, ?> projectionConverter;
 	private final LuceneFieldCodec<F> codec;
-	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
-	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
-	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
-	private final LuceneFieldAggregationBuilderFactory aggregationBuilderFactory;
+	private final DslConverter<?, ? extends F> dslConverter;
+	private final DslConverter<F, ? extends F> rawDslConverter;
+	private final ProjectionConverter<? super F, ?> projectionConverter;
+	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
+	private final LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
+	private final LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
+	private final LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
 	private final String analyzerName;
 	private final String searchAnalyzerName;
 	private final String normalizerName;
 
-	public LuceneIndexFieldType(Class<F> valueType,
+	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
 			DslConverter<?, ? extends F> dslConverter,
+			DslConverter<F, ? extends F> rawDslConverter,
 			ProjectionConverter<? super F, ?> projectionConverter,
-			LuceneFieldCodec<F> codec,
-			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
-			LuceneFieldSortBuilderFactory sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
-			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory) {
-		this( valueType, dslConverter, projectionConverter,
-				codec, predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
+			ProjectionConverter<? super F, F> rawProjectionConverter,
+			LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory,
+			LuceneFieldSortBuilderFactory<F> sortBuilderFactory,
+			LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory,
+			LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory) {
+		this( valueType, codec, dslConverter, rawDslConverter, projectionConverter, rawProjectionConverter,
+				predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
 				aggregationBuilderFactory,
 				null, null, null, null, null );
 	}
 
-	public LuceneIndexFieldType(Class<F> valueType,
+	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
 			DslConverter<?, ? extends F> dslConverter,
+			DslConverter<F, ? extends F> rawDslConverter,
 			ProjectionConverter<? super F, ?> projectionConverter,
-			LuceneFieldCodec<F> codec,
-			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
-			LuceneFieldSortBuilderFactory sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory projectionBuilderFactory,
-			LuceneFieldAggregationBuilderFactory aggregationBuilderFactory,
+			ProjectionConverter<? super F, F> rawProjectionConverter,
+			LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory,
+			LuceneFieldSortBuilderFactory<F> sortBuilderFactory,
+			LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory,
+			LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory,
 			Analyzer indexingAnalyzerOrNormalizer, Analyzer searchAnalyzerOrNormalizer,
 			String analyzerName, String searchAnalyzerName, String normalizerName) {
 		this.valueType = valueType;
-		this.dslConverter = dslConverter;
-		this.projectionConverter = projectionConverter;
 		this.codec = codec;
+		this.dslConverter = dslConverter;
+		this.rawDslConverter = rawDslConverter;
+		this.projectionConverter = projectionConverter;
+		this.rawProjectionConverter = rawProjectionConverter;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
@@ -82,6 +90,15 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 				+ ", searchAnalyzerName=" + searchAnalyzerName
 				+ ", normalizerName=" + normalizerName
 				+ "]";
+	}
+
+	@Override
+	public Class<F> valueClass() {
+		return valueType;
+	}
+
+	public LuceneFieldCodec<F> codec() {
+		return codec;
 	}
 
 	@Override
@@ -110,13 +127,28 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 	}
 
 	@Override
+	public DslConverter<?, ? extends F> dslConverter() {
+		return dslConverter;
+	}
+
+	@Override
+	public DslConverter<F, ? extends F> rawDslConverter() {
+		return rawDslConverter;
+	}
+
+	@Override
 	public Class<?> projectedValueClass() {
 		return projectionConverter.valueType();
 	}
 
 	@Override
-	public Class<?> valueClass() {
-		return valueType;
+	public ProjectionConverter<? super F, ?> projectionConverter() {
+		return projectionConverter;
+	}
+
+	@Override
+	public ProjectionConverter<? super F, F> rawProjectionConverter() {
+		return rawProjectionConverter;
 	}
 
 	@Override
@@ -134,27 +166,23 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
-	public Class<F> valueType() {
-		return valueType;
-	}
-
-	public LuceneFieldCodec<F> codec() {
-		return codec;
-	}
-
-	public LuceneFieldPredicateBuilderFactory predicateBuilderFactory() {
+	@Override
+	public LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
 		return predicateBuilderFactory;
 	}
 
-	public LuceneFieldSortBuilderFactory sortBuilderFactory() {
+	@Override
+	public LuceneFieldSortBuilderFactory<F> sortBuilderFactory() {
 		return sortBuilderFactory;
 	}
 
-	public LuceneFieldProjectionBuilderFactory projectionBuilderFactory() {
+	@Override
+	public LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory() {
 		return projectionBuilderFactory;
 	}
 
-	public LuceneFieldAggregationBuilderFactory aggregationBuilderFactory() {
+	@Override
+	public LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory() {
 		return aggregationBuilderFactory;
 	}
 
@@ -162,6 +190,7 @@ public class LuceneIndexFieldType<F> implements IndexValueFieldTypeDescriptor, I
 		return indexingAnalyzerOrNormalizer;
 	}
 
+	@Override
 	public Analyzer searchAnalyzerOrNormalizer() {
 		return searchAnalyzerOrNormalizer;
 	}

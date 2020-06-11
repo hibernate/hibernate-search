@@ -6,27 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 public class LuceneTextFieldSortBuilderFactory<F>
 		extends AbstractLuceneStandardFieldSortBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
-	public LuceneTextFieldSortBuilderFactory(boolean sortable,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneTextFieldCodec<F> codec) {
-		super( sortable, converter, rawConverter, codec );
+	public LuceneTextFieldSortBuilderFactory(boolean sortable, LuceneTextFieldCodec<F> codec) {
+		super( sortable, codec );
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath, LuceneCompatibilityChecker converterChecker) {
-		checkSortable( absoluteFieldPath );
-
-		return new LuceneTextFieldSortBuilder<>( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
+	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field) {
+		checkSortable( field );
+		return new LuceneTextFieldSortBuilder<>( searchContext, field, codec );
 	}
 }

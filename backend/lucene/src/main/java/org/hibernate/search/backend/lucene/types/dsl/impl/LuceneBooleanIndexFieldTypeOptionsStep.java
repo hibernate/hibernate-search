@@ -10,8 +10,6 @@ import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneBooleanF
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneBooleanFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 class LuceneBooleanIndexFieldTypeOptionsStep
 		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneBooleanIndexFieldTypeOptionsStep, Boolean> {
@@ -36,16 +34,7 @@ class LuceneBooleanIndexFieldTypeOptionsStep
 
 	@Override
 	protected LuceneNumericFieldAggregationBuilderFactory<Boolean> createAggregationBuilderFactory(
-			boolean resolvedAggregable, DslConverter<?, ? extends Boolean> dslToIndexConverter,
-			DslConverter<Boolean, ? extends Boolean> rawDslToIndexConverter,
-			ProjectionConverter<? super Boolean, ?> indexToProjectionConverter,
-			ProjectionConverter<? super Boolean, Boolean> rawIndexToProjectionConverter,
-			AbstractLuceneNumericFieldCodec<Boolean, ?> codec) {
-		return new LuceneBooleanFieldAggregationBuilderFactory(
-				resolvedAggregable,
-				dslToIndexConverter, rawDslToIndexConverter,
-				indexToProjectionConverter, rawIndexToProjectionConverter,
-				codec
-		);
+			boolean resolvedAggregable, AbstractLuceneNumericFieldCodec<Boolean, ?> codec) {
+		return new LuceneBooleanFieldAggregationBuilderFactory( resolvedAggregable, codec );
 	}
 }

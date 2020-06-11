@@ -6,13 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.List;
-
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 /**
@@ -24,23 +21,22 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, AbstractLuceneNumericFieldCodec<F, E>> {
 
-	public LuceneNumericFieldPredicateBuilderFactory( boolean searchable,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
+	public LuceneNumericFieldPredicateBuilderFactory(boolean searchable,
 			AbstractLuceneNumericFieldCodec<F, E> codec) {
-		super( searchable, converter, rawConverter, codec );
+		super( searchable, codec );
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
-			List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
-		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		checkSearchable( field );
+		return new LuceneNumericMatchPredicateBuilder<>( searchContext, field, codec );
 	}
 
 	@Override
 	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker) {
-		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		checkSearchable( field );
+		return new LuceneNumericRangePredicateBuilder<>( searchContext, field, codec );
 	}
 }

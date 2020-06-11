@@ -6,28 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.List;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.util.common.data.RangeBoundInclusion;
-
 class LuceneTextRangePredicateBuilder<F>
 		extends AbstractLuceneStandardRangePredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
 
-	LuceneTextRangePredicateBuilder(
-			LuceneSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec) {
-		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+	LuceneTextRangePredicateBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
+			LuceneTextFieldCodec<F> codec) {
+		super( searchContext, field, codec );
 	}
 
 	@Override

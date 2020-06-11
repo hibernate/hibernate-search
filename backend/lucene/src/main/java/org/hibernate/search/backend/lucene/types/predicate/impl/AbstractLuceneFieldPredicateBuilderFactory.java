@@ -7,15 +7,12 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -24,8 +21,8 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPred
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractLuceneFieldPredicateBuilderFactory
-		implements LuceneFieldPredicateBuilderFactory {
+abstract class AbstractLuceneFieldPredicateBuilderFactory<F>
+		implements LuceneFieldPredicateBuilderFactory<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,96 +33,67 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public boolean isSearchable() {
+	public final boolean isSearchable() {
 		return searchable;
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
+	public boolean isCompatibleWith(LuceneFieldPredicateBuilderFactory<?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		AbstractLuceneFieldPredicateBuilderFactory castedOther =
-				(AbstractLuceneFieldPredicateBuilderFactory) other;
+		AbstractLuceneFieldPredicateBuilderFactory<?> castedOther =
+				(AbstractLuceneFieldPredicateBuilderFactory<?>) other;
 		return getCodec().isCompatibleWith( castedOther.getCodec() );
 	}
 
 	@Override
-	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		AbstractLuceneFieldPredicateBuilderFactory castedOther =
-				(AbstractLuceneFieldPredicateBuilderFactory) other;
-		return getConverter().isCompatibleWith( castedOther.getConverter() );
-	}
-
-	@Override
-	public boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other) {
-		// analyzers are not involved in a non-text field predicate clause
-		return true;
-	}
-
-	@Override
-	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker analyzerChecker) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<F> field) {
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
-			String absoluteFieldPath) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+	public LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
+			LuceneSearchFieldContext<F> field) {
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.spatialPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<F> field) {
+		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.spatialPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<F> field) {
+		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw log.spatialPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<F> field) {
+		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		return new LuceneExistsPredicateBuilder( absoluteFieldPath, getCodec(), nestedPathHierarchy );
+	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(
+			LuceneSearchFieldContext<F> field) {
+		return new LuceneExistsPredicateBuilder( field, getCodec() );
 	}
 
 	protected abstract LuceneFieldCodec<?> getCodec();
 
-	protected abstract DslConverter<?, ?> getConverter();
-
-	protected void checkSearchable(String absoluteFieldPath) {
+	protected void checkSearchable(LuceneSearchFieldContext<?> field) {
 		if ( !searchable ) {
-			throw log.nonSearchableField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.nonSearchableField( field.absolutePath(), field.eventContext() );
 		}
 	}
 }

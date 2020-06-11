@@ -9,12 +9,12 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractLuceneFieldSortBuilderFactory<F, C extends LuceneFieldCodec<F>>
-		implements LuceneFieldSortBuilderFactory {
+		implements LuceneFieldSortBuilderFactory<F> {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final boolean sortable;
@@ -27,7 +27,12 @@ public abstract class AbstractLuceneFieldSortBuilderFactory<F, C extends LuceneF
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other) {
+	public final boolean isSortable() {
+		return sortable;
+	}
+
+	@Override
+	public boolean isCompatibleWith(LuceneFieldSortBuilderFactory<?> other) {
 		if ( this == other ) {
 			return true;
 		}
@@ -40,10 +45,9 @@ public abstract class AbstractLuceneFieldSortBuilderFactory<F, C extends LuceneF
 		return sortable == otherFactory.sortable && codec.isCompatibleWith( otherFactory.codec );
 	}
 
-	protected void checkSortable(String absoluteFieldPath) {
+	protected void checkSortable(LuceneSearchFieldContext<?> field) {
 		if ( !sortable ) {
-			throw log.unsortableField( absoluteFieldPath,
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.unsortableField( field.absolutePath(), field.eventContext() );
 		}
 	}
 }

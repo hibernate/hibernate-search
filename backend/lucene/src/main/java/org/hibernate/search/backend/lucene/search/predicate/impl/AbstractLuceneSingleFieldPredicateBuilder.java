@@ -9,12 +9,18 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+
 public abstract class AbstractLuceneSingleFieldPredicateBuilder extends AbstractLuceneNestablePredicateBuilder {
 
 	protected final String absoluteFieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	public AbstractLuceneSingleFieldPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+	protected AbstractLuceneSingleFieldPredicateBuilder(LuceneSearchFieldContext<?> field) {
+		this( field.absolutePath(), field.nestedPathHierarchy() );
+	}
+
+	protected AbstractLuceneSingleFieldPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}

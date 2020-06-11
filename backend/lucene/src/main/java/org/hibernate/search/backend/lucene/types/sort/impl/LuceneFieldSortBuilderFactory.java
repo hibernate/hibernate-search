@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -31,16 +31,16 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * when users try to create a sort that just cannot work on a particular field
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
-public interface LuceneFieldSortBuilderFactory {
+public interface LuceneFieldSortBuilderFactory<F> {
 
 	boolean isSortable();
 
-	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath, LuceneCompatibilityChecker converterChecker);
+	boolean isCompatibleWith(LuceneFieldSortBuilderFactory<?> other);
 
-	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath, String nestedDocumentPath, GeoPoint center);
+	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field);
 
-	boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other);
+	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchFieldContext<F> field,
+			GeoPoint center);
 
-	boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory other);
 }

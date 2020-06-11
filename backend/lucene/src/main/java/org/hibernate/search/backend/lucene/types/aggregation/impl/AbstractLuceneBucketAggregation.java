@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 
 /**
@@ -26,7 +27,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 	AbstractLuceneBucketAggregation(AbstractBuilder<K, V> builder) {
 		super( builder );
 		this.indexNames = builder.searchContext.indexes().indexNames();
-		this.absoluteFieldPath = builder.absoluteFieldPath;
+		this.absoluteFieldPath = builder.field.absolutePath();
 	}
 
 	@Override
@@ -39,8 +40,8 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 
 		protected final LuceneSearchContext searchContext;
 
-		public AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath) {
-			super( absoluteFieldPath, nestedDocumentPath );
+		public AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field) {
+			super( field );
 			this.searchContext = searchContext;
 		}
 

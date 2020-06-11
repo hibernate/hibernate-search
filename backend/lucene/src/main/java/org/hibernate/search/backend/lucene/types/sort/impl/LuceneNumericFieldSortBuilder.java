@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 import org.apache.lucene.search.SortField;
@@ -20,15 +19,8 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 	extends AbstractLuceneStandardFieldSortBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
 
 	LuceneNumericFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, String nestedDocumentPath,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, AbstractLuceneNumericFieldCodec<F, E> codec) {
-		super(
-			searchContext, absoluteFieldPath, nestedDocumentPath,
-			converter, rawConverter, converterChecker, codec,
-			codec.getDomain().getMinValue(),
-			codec.getDomain().getMaxValue()
-		);
+			LuceneSearchFieldContext<F> field, AbstractLuceneNumericFieldCodec<F, E> codec) {
+		super( searchContext, field, codec, codec.getDomain().getMinValue(), codec.getDomain().getMaxValue() );
 	}
 
 	@Override

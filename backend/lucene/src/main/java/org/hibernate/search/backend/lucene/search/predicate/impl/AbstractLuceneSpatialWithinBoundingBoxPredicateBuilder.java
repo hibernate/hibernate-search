@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.List;
-
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 
@@ -18,8 +17,8 @@ public abstract class AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder
 
 	protected GeoBoundingBox boundingBox;
 
-	protected AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	protected AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder(LuceneSearchFieldContext<?> field) {
+		super( field );
 	}
 
 	@Override

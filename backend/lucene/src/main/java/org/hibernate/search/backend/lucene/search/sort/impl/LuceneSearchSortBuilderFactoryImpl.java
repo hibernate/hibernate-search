@@ -9,31 +9,23 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 
 public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final SortBuilderFactoryRetrievalStrategy SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
-			new SortBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchIndexesContext indexes;
@@ -72,19 +64,12 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
-		LuceneScopedIndexFieldComponent<LuceneFieldSortBuilderFactory> fieldComponent = indexes
-				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createFieldSortBuilder( searchContext, absoluteFieldPath,
-				indexes.nestedDocumentPath( absoluteFieldPath ),
-				fieldComponent.getConverterCompatibilityChecker() );
+		return indexes.field( absoluteFieldPath ).createFieldSortBuilder( searchContext );
 	}
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return indexes
-				.schemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( absoluteFieldPath,
-						indexes.nestedDocumentPath( absoluteFieldPath ), location );
+		return indexes.field( absoluteFieldPath ).createDistanceSortBuilder( location );
 	}
 
 	@Override
@@ -100,37 +85,5 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	@Override
 	public LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort) {
 		return new LuceneUserProvidedLuceneSortSortBuilder( luceneSort );
-	}
-
-	private static class SortBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldSortBuilderFactory> {
-
-		@Override
-		public LuceneFieldSortBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().sortBuilderFactory();
-		}
-
-		@Override
-		public boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2) {
-			return component1.hasCompatibleCodec( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2) {
-			return component1.hasCompatibleConverter( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleAnalyzer(LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2) {
-			// analyzers are not involved in a sort clause
-			return true;
-		}
-
-		@Override
-		public SearchException createCompatibilityException(String absoluteFieldPath,
-				LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
-				EventContext context) {
-			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
-		}
 	}
 }

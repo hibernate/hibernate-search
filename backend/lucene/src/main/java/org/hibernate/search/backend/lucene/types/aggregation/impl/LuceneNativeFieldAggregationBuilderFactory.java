@@ -10,22 +10,16 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class LuceneNativeFieldAggregationBuilderFactory implements LuceneFieldAggregationBuilderFactory {
+public class LuceneNativeFieldAggregationBuilderFactory<F> implements LuceneFieldAggregationBuilderFactory<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	public static final LuceneNativeFieldAggregationBuilderFactory INSTANCE = new LuceneNativeFieldAggregationBuilderFactory();
-
-	private LuceneNativeFieldAggregationBuilderFactory() {
-		// Nothing to do
-	}
 
 	@Override
 	public boolean isAggregable() {
@@ -33,30 +27,23 @@ public class LuceneNativeFieldAggregationBuilderFactory implements LuceneFieldAg
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other) {
-		return other == INSTANCE;
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldAggregationBuilderFactory other) {
-		return other == INSTANCE;
+	public boolean isCompatibleWith(LuceneFieldAggregationBuilderFactory<?> other) {
+		return getClass().equals( other.getClass() );
 	}
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
+		throw unsupported( field );
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
+		throw unsupported( field );
 	}
 
-	private SearchException unsupported(String absoluteFieldPath) {
-		return log.unsupportedDSLAggregationsForNativeField(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+	private SearchException unsupported(LuceneSearchFieldContext<?> field) {
+		return log.unsupportedDSLAggregationsForNativeField( field.eventContext() );
 	}
 }

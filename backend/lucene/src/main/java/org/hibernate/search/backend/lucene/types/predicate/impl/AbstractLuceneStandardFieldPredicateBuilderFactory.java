@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
@@ -16,22 +15,13 @@ import org.hibernate.search.util.common.impl.Contracts;
  * @see LuceneStandardFieldCodec
  */
 abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends LuceneStandardFieldCodec<F, ?>>
-		extends AbstractLuceneFieldPredicateBuilderFactory {
-
-	protected final DslConverter<?, ? extends F> converter;
-	protected final DslConverter<F, ? extends F> rawConverter;
+		extends AbstractLuceneFieldPredicateBuilderFactory<F> {
 
 	final C codec;
 
-	AbstractLuceneStandardFieldPredicateBuilderFactory( boolean searchable,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			C codec) {
+	AbstractLuceneStandardFieldPredicateBuilderFactory(boolean searchable, C codec) {
 		super( searchable );
-		Contracts.assertNotNull( converter, "converter" );
-		Contracts.assertNotNull( rawConverter, "rawConverter" );
 		Contracts.assertNotNull( codec, "codec" );
-		this.converter = converter;
-		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 
@@ -40,8 +30,4 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 		return codec;
 	}
 
-	@Override
-	public DslConverter<?, ? extends F> getConverter() {
-		return converter;
-	}
 }

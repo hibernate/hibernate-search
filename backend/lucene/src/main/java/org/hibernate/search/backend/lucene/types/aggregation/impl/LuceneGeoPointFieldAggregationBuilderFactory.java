@@ -10,10 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -27,11 +25,8 @@ public class LuceneGeoPointFieldAggregationBuilderFactory
 
 	private final LuceneFieldCodec<GeoPoint> codec;
 
-	public LuceneGeoPointFieldAggregationBuilderFactory(boolean aggregable,
-			DslConverter<?, ? extends GeoPoint> toFieldValueConverter,
-			ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter,
-			LuceneFieldCodec<GeoPoint> codec) {
-		super( aggregable, toFieldValueConverter, fromFieldValueConverter );
+	public LuceneGeoPointFieldAggregationBuilderFactory(boolean aggregable, LuceneFieldCodec<GeoPoint> codec) {
+		super( aggregable );
 		this.codec = codec;
 	}
 
@@ -42,18 +37,14 @@ public class LuceneGeoPointFieldAggregationBuilderFactory
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
-		throw log.directValueLookupNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<GeoPoint> field, Class<K> expectedType, ValueConvert convert) {
+		throw log.directValueLookupNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
-		throw log.rangesNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<GeoPoint> field, Class<K> expectedType, ValueConvert convert) {
+		throw log.rangesNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override

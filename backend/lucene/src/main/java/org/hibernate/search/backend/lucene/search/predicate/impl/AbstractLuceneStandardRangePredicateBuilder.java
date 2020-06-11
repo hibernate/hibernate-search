@@ -7,15 +7,13 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
@@ -34,25 +32,16 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-
-	private final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
-	private final LuceneCompatibilityChecker converterChecker;
-
+	private final LuceneSearchFieldContext<F> field;
 	protected final C codec;
 
 	protected Range<E> range;
 
-	protected AbstractLuceneStandardRangePredicateBuilder(
-			LuceneSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, C codec) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	protected AbstractLuceneStandardRangePredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field, C codec) {
+		super( field );
 		this.searchContext = searchContext;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.converterChecker = converterChecker;
+		this.field = field;
 		this.codec = codec;
 	}
 
@@ -71,7 +60,7 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 			return null;
 		}
 		Object value = valueOptional.get();
-		DslConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 		try {
 			F converted = toFieldValueConverter.convertUnknown(
 					value, searchContext.toDocumentFieldValueConvertContext()
@@ -79,20 +68,7 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 			return codec.encode( converted );
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
-	}
-
-	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				converterChecker.failIfNotCompatible();
-				return converter;
+			throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 		}
 	}
 }

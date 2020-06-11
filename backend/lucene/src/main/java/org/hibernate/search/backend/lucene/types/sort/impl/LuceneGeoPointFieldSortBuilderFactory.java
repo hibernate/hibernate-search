@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -23,28 +22,16 @@ public class LuceneGeoPointFieldSortBuilderFactory
 	}
 
 	@Override
-	public boolean isSortable() {
-		return sortable;
-	}
-
-	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath, LuceneCompatibilityChecker converterChecker) {
-		throw log.traditionalSortNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
+		throw log.traditionalSortNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
-	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			String nestedDocumentPath, GeoPoint center) {
-		checkSortable( absoluteFieldPath );
-
-		return new LuceneGeoPointDistanceSortBuilder( absoluteFieldPath, nestedDocumentPath, center );
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory other) {
-		return true;
+	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+			LuceneSearchFieldContext<GeoPoint> field, GeoPoint center) {
+		checkSortable( field );
+		return new LuceneGeoPointDistanceSortBuilder( field, center );
 	}
 
 }

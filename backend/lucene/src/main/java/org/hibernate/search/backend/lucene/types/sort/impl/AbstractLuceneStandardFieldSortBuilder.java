@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -32,11 +32,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-
-	protected final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
-	private final LuceneCompatibilityChecker converterChecker;
-
+	private final LuceneSearchFieldContext<F> field;
 	protected final C codec;
 	private final Object sortMissingValueFirstPlaceholder;
 	private final Object sortMissingValueLastPlaceholder;
@@ -44,15 +40,11 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected Object missingValue = SortMissingValue.MISSING_LAST;
 
 	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, String nestedDocumentPath,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, C codec,
+			LuceneSearchFieldContext<F> field, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
-		super( absoluteFieldPath, nestedDocumentPath );
+		super( field );
 		this.searchContext = searchContext;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.converterChecker = converterChecker;
+		this.field = field;
 		this.codec = codec;
 		this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
 		this.sortMissingValueLastPlaceholder = sortMissingValueLastPlaceholder;
@@ -70,7 +62,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	@Override
 	public void missingAs(Object value, ValueConvert convert) {
-		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			missingValue = encodeMissingAs( converted );
@@ -96,17 +88,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			effectiveMissingValue = missingValue;
 		}
 		return effectiveMissingValue;
-	}
-
-	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				converterChecker.failIfNotCompatible();
-				return converter;
-		}
 	}
 
 }

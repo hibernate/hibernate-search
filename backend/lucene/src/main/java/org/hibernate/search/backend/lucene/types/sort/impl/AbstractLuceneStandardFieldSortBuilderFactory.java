@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -21,41 +20,14 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends LuceneStandardFieldCodec<F, ?>>
 		extends AbstractLuceneFieldSortBuilderFactory<F, C> {
 
-	protected final DslConverter<?, ? extends F> converter;
-	protected final DslConverter<F, ? extends F> rawConverter;
-
-	protected AbstractLuceneStandardFieldSortBuilderFactory(boolean sortable,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			C codec) {
+	protected AbstractLuceneStandardFieldSortBuilderFactory(boolean sortable, C codec) {
 		super( sortable, codec );
-		this.converter = converter;
-		this.rawConverter = rawConverter;
 	}
 
 	@Override
-	public boolean isSortable() {
-		return sortable;
-	}
-
-	@Override
-	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			String nestedDocumentPath, GeoPoint center) {
-		throw log.distanceOperationsNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory other) {
-		if ( this == other ) {
-			return true;
-		}
-		if ( other.getClass() != this.getClass() ) {
-			return false;
-		}
-
-		AbstractLuceneStandardFieldSortBuilderFactory<?, ?> otherFactory = (AbstractLuceneStandardFieldSortBuilderFactory<?, ?>) other;
-		return converter.isCompatibleWith( otherFactory.converter );
+	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchFieldContext<F> field,
+			GeoPoint center) {
+		throw log.distanceOperationsNotSupportedByFieldType( field.eventContext() );
 	}
 
 }

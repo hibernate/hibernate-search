@@ -10,10 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -22,12 +21,9 @@ public class LuceneTemporalFieldSortBuilder<F extends TemporalAccessor, E extend
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	LuceneTemporalFieldSortBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
-			String nestedDocumentPath,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker,
+	LuceneTemporalFieldSortBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
 			AbstractLuceneNumericFieldCodec<F, E> codec) {
-		super( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, field, codec );
 	}
 
 	@Override

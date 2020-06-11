@@ -18,13 +18,10 @@ import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneDifferentNestedObjectCompatibilityChecker;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSucceedingCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.BooleanOperator;
@@ -51,7 +48,6 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	private Analyzer overrideAnalyzer;
 	private boolean ignoreAnalyzer = false;
 	private EnumSet<SimpleQueryFlag> flags;
-	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
 	private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchIndexesContext indexes) {
@@ -81,10 +77,8 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	public FieldState field(String absoluteFieldPath) {
 		LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = indexes.schemaNodeComponent(
-					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
-			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
+			LuceneSearchFieldContext<?> fieldContext = indexes.field( absoluteFieldPath );
+			field = fieldContext.createSimpleQueryStringFieldState();
 			nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
@@ -111,10 +105,6 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		if ( !ignoreAnalyzer && overrideAnalyzer == null ) {
-			analyzerChecker.failIfNotCompatible();
-		}
-
 		Analyzer analyzer = buildAnalyzer();
 
 		int flag = -1;

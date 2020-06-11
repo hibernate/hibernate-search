@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
@@ -21,7 +21,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	private final String absoluteFieldPath;
 	private final List<String> nestedPathHierarchy;
-	private final Map<String, LuceneFieldPredicateBuilderFactory> leafFields = new HashMap<>();
+	private final Map<String, LuceneSearchFieldContext<?>> leafFields = new HashMap<>();
 
 	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexSchemaObjectFieldNode objectNode) {
 		absoluteFieldPath = objectNode.absolutePath();
@@ -42,7 +42,8 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		}
 
 		for ( String leafFieldPath : leafFieldPaths ) {
-			if ( !leafFields.get( leafFieldPath ).hasCompatibleCodec( casted.leafFields.get( leafFieldPath ) ) ) {
+			if ( !leafFields.get( leafFieldPath ).type().predicateBuilderFactory()
+					.isCompatibleWith( casted.leafFields.get( leafFieldPath ).type().predicateBuilderFactory() ) ) {
 				return false;
 			}
 		}
@@ -54,8 +55,9 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder(
 				absoluteFieldPath, nestedPathHierarchy
 		);
-		for ( Map.Entry<String, LuceneFieldPredicateBuilderFactory> entry : leafFields.entrySet() ) {
-			ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder = entry.getValue().createExistsPredicateBuilder( entry.getKey(), nestedPathHierarchy );
+		for ( Map.Entry<String, LuceneSearchFieldContext<?>> entry : leafFields.entrySet() ) {
+			ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder =
+					entry.getValue().createExistsPredicateBuilder();
 			objectPredicateBuilder.addChild( existsPredicateBuilder );
 		}
 		return objectPredicateBuilder;
@@ -68,10 +70,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 				addLeafFields( child.toObjectField() );
 			}
 			else if ( child.isValueField() ) {
-				leafFields.put(
-						child.absolutePath(),
-						( (LuceneIndexSchemaFieldNode<?>) child ).type().predicateBuilderFactory()
-				);
+				leafFields.put( child.absolutePath(), (LuceneSearchFieldContext<?>) child );
 			}
 		}
 	}

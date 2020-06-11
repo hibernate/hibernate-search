@@ -7,13 +7,11 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -25,16 +23,9 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class LuceneNativeFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
+public class LuceneNativeFieldPredicateBuilderFactory<F> implements LuceneFieldPredicateBuilderFactory<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	public static final LuceneNativeFieldPredicateBuilderFactory INSTANCE =
-			new LuceneNativeFieldPredicateBuilderFactory();
-
-	private LuceneNativeFieldPredicateBuilderFactory() {
-		// Nothing to do
-	}
 
 	@Override
 	public boolean isSearchable() {
@@ -42,80 +33,65 @@ public class LuceneNativeFieldPredicateBuilderFactory implements LuceneFieldPred
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
-		return other == INSTANCE;
-	}
-
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
-		return other == INSTANCE;
-	}
-
-	@Override
-	public boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other) {
-		return other == INSTANCE;
+	public boolean isCompatibleWith(LuceneFieldPredicateBuilderFactory<?> other) {
+		return getClass().equals( other.getClass() );
 	}
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			LuceneCompatibilityChecker converterChecker) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			LuceneCompatibilityChecker analyzerChecker) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
 	@Override
-	public LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(
-			String absoluteFieldPath) {
-		throw unsupported( absoluteFieldPath );
+	public LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
+			LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
 	@Override
-	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath,
-			List<String> nestedPathHierarchy) {
-		throw unsupported( absoluteFieldPath );
-	}
-
-	@Override
-	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw unsupported( absoluteFieldPath );
-	}
-
-	@Override
-	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw unsupported( absoluteFieldPath );
+	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(
+			LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		throw unsupported( absoluteFieldPath );
+			LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
 	}
 
-	private SearchException unsupported(String absoluteFieldPath) {
-		return log.unsupportedDSLPredicatesForNativeField(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+	@Override
+	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
+			LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
+	}
+
+	@Override
+	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
+			LuceneSearchFieldContext<F> field) {
+		throw unsupported( field );
+	}
+
+	private SearchException unsupported(LuceneSearchFieldContext<?> field) {
+		return log.unsupportedDSLPredicatesForNativeField( field.eventContext() );
 	}
 }

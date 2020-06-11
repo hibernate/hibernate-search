@@ -7,14 +7,12 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -32,64 +30,43 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-
-	private final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
-	private final LuceneCompatibilityChecker converterChecker;
+	protected final LuceneSearchFieldContext<F> field;
 	protected final C codec;
 
 	protected E value;
 
-	protected AbstractLuceneStandardMatchPredicateBuilder(
-			LuceneSearchContext searchContext,
-			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, C codec) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	protected AbstractLuceneStandardMatchPredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field, C codec) {
+		super( field );
 		this.searchContext = searchContext;
-		this.converter = converter;
-		this.rawConverter = rawConverter;
-		this.converterChecker = converterChecker;
+		this.field = field;
 		this.codec = codec;
 	}
 
 	@Override
 	public void fuzzy(int maxEditDistance, int exactPrefixLength) {
-		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public void analyzer(String analyzerName) {
-		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public void skipAnalysis() {
-		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
 	public void value(Object value, ValueConvert convert) {
-		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
-	}
-
-	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawConverter;
-			case YES:
-			default:
-				converterChecker.failIfNotCompatible();
-				return converter;
+			throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 		}
 	}
 }

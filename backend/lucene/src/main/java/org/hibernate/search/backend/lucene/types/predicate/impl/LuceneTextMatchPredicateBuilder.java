@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
@@ -19,15 +18,13 @@ import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class LuceneTextMatchPredicateBuilder<F>
@@ -35,23 +32,16 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneCompatibilityChecker analyzerChecker;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private Integer maxEditDistance;
 	private Integer prefixLength;
 
-	private Analyzer analyzerOrNormalizer;
-	private boolean analyzerOverridden = false;
+	private Analyzer overrideAnalyzerOrNormalizer;
 
-	LuceneTextMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
-			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
-		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
-		this.analyzerOrNormalizer = analyzerOrNormalizer;
-		this.analyzerChecker = analyzerChecker;
+	LuceneTextMatchPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
+			LuceneTextFieldCodec<F> codec) {
+		super( searchContext, field, codec );
 		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 	}
 
@@ -63,28 +53,25 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	@Override
 	public void analyzer(String analyzerName) {
-		this.analyzerOrNormalizer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
-		if ( analyzerOrNormalizer == null ) {
-			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		this.overrideAnalyzerOrNormalizer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( overrideAnalyzerOrNormalizer == null ) {
+			throw log.unknownAnalyzer( analyzerName, field.eventContext() );
 		}
-		this.analyzerOverridden = true;
 	}
 
 	@Override
 	public void skipAnalysis() {
-		this.analyzerOrNormalizer = AnalyzerConstants.KEYWORD_ANALYZER;
-		this.analyzerOverridden = true;
+		this.overrideAnalyzerOrNormalizer = AnalyzerConstants.KEYWORD_ANALYZER;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		// in case of an overridden analyzer,
-		// any analyzer incompatibility is overridden too
-		if ( !this.analyzerOverridden ) {
-			analyzerChecker.failIfNotCompatible();
+		Analyzer effectiveAnalyzerOrNormalizer = overrideAnalyzerOrNormalizer;
+		if ( effectiveAnalyzerOrNormalizer == null ) {
+			effectiveAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 		}
 
-		if ( analyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
+		if ( effectiveAnalyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
 			// Optimization when analysis is disabled
 			Term term = new Term( absoluteFieldPath, value );
 
@@ -98,10 +85,10 @@ class LuceneTextMatchPredicateBuilder<F>
 
 		QueryBuilder effectiveQueryBuilder;
 		if ( maxEditDistance != null ) {
-			effectiveQueryBuilder = new FuzzyQueryBuilder( analyzerOrNormalizer, maxEditDistance, prefixLength );
+			effectiveQueryBuilder = new FuzzyQueryBuilder( effectiveAnalyzerOrNormalizer, maxEditDistance, prefixLength );
 		}
 		else {
-			effectiveQueryBuilder = new QueryBuilder( analyzerOrNormalizer );
+			effectiveQueryBuilder = new QueryBuilder( effectiveAnalyzerOrNormalizer );
 		}
 
 		Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, value );

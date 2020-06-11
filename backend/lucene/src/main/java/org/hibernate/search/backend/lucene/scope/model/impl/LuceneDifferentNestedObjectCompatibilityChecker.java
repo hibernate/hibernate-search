@@ -34,7 +34,7 @@ public class LuceneDifferentNestedObjectCompatibilityChecker {
 	}
 
 	public LuceneDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = indexes.nestedPathHierarchyForField( incomingFieldPath );
+		List<String> incomingNestedPathHierarchy = indexes.field( incomingFieldPath ).nestedPathHierarchy();
 		if ( fieldPath == null ) {
 			return new LuceneDifferentNestedObjectCompatibilityChecker( indexes, incomingFieldPath, incomingNestedPathHierarchy );
 		}

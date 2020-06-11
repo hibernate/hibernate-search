@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.List;
-
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
@@ -18,8 +17,8 @@ public abstract class AbstractLuceneSpatialWithinPolygonPredicateBuilder
 
 	protected GeoPolygon polygon;
 
-	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(LuceneSearchFieldContext<?> field) {
+		super( field );
 	}
 
 	@Override

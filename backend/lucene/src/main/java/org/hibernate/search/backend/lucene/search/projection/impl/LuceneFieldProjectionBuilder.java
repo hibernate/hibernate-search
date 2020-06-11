@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
@@ -22,33 +22,26 @@ public class LuceneFieldProjectionBuilder<F, V> implements FieldProjectionBuilde
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-	private final String absoluteFieldPath;
-	private final String nestedDocumentPath;
-	private final boolean multiValuedFieldInRoot;
+	private final LuceneSearchContext searchContext;
+	private final LuceneSearchFieldContext<F> field;
 
 	private final ProjectionConverter<? super F, V> converter;
 	private final LuceneFieldCodec<F> codec;
 
-	public LuceneFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
-			boolean multiValuedFieldInRoot,
-			ProjectionConverter<? super F, V> converter,
-			LuceneFieldCodec<F> codec) {
-		this.indexNames = indexNames;
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPath = nestedDocumentPath;
-		this.multiValuedFieldInRoot = multiValuedFieldInRoot;
+	public LuceneFieldProjectionBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
+			ProjectionConverter<? super F, V> converter, LuceneFieldCodec<F> codec) {
+		this.searchContext = searchContext;
+		this.field = field;
 		this.converter = converter;
 		this.codec = codec;
 	}
 
 	@Override
 	public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<V, P> accumulatorProvider) {
-		if ( accumulatorProvider.isSingleValued() && multiValuedFieldInRoot ) {
-			throw log.invalidSingleValuedProjectionOnMultiValuedField( absoluteFieldPath,
-					EventContexts.fromIndexNames( indexNames ) );
+		if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+			throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
 		}
-		return new LuceneFieldProjection<>( indexNames, absoluteFieldPath, nestedDocumentPath,
-				codec, converter, accumulatorProvider.get() );
+		return new LuceneFieldProjection<>( searchContext.indexes().indexNames(), field.absolutePath(),
+				field.nestedDocumentPath(), codec, converter, accumulatorProvider.get() );
 	}
 }

@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.List;
-
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -21,8 +20,8 @@ public abstract class AbstractLuceneSpatialWithinCirclePredicateBuilder
 
 	protected double radiusInMeters;
 
-	protected AbstractLuceneSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	protected AbstractLuceneSpatialWithinCirclePredicateBuilder(LuceneSearchFieldContext<?> field) {
+		super( field );
 	}
 
 	@Override

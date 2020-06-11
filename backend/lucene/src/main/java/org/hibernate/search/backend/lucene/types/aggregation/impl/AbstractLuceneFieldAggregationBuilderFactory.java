@@ -9,27 +9,21 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractLuceneFieldAggregationBuilderFactory<F>
-		implements LuceneFieldAggregationBuilderFactory {
+		implements LuceneFieldAggregationBuilderFactory<F> {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final boolean aggregable;
 
-	protected final DslConverter<?, ? extends F> toFieldValueConverter;
-	protected final ProjectionConverter<? super F, ?> fromFieldValueConverter;
-
-	public AbstractLuceneFieldAggregationBuilderFactory(
-			boolean aggregable, DslConverter<?, ? extends F> toFieldValueConverter,
-			ProjectionConverter<? super F, ?> fromFieldValueConverter) {
+	public AbstractLuceneFieldAggregationBuilderFactory(boolean aggregable) {
 		this.aggregable = aggregable;
-		this.toFieldValueConverter = toFieldValueConverter;
-		this.fromFieldValueConverter = fromFieldValueConverter;
 	}
 
 	@Override
@@ -38,7 +32,7 @@ public abstract class AbstractLuceneFieldAggregationBuilderFactory<F>
 	}
 
 	@Override
-	public boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other) {
+	public boolean isCompatibleWith(LuceneFieldAggregationBuilderFactory<?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
@@ -47,23 +41,30 @@ public abstract class AbstractLuceneFieldAggregationBuilderFactory<F>
 		return aggregable == castedOther.aggregable && getCodec().isCompatibleWith( castedOther.getCodec() );
 	}
 
-	@Override
-	public boolean hasCompatibleConverter(LuceneFieldAggregationBuilderFactory other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		AbstractLuceneFieldAggregationBuilderFactory<?> castedOther =
-				(AbstractLuceneFieldAggregationBuilderFactory<?>) other;
-		return toFieldValueConverter.isCompatibleWith( castedOther.toFieldValueConverter )
-				&& fromFieldValueConverter.isCompatibleWith( castedOther.fromFieldValueConverter );
-	}
-
 	protected abstract LuceneFieldCodec<F> getCodec();
 
-	protected void checkAggregable(String absoluteFieldPath) {
+	protected void checkAggregable(LuceneSearchFieldContext<?> field) {
 		if ( !aggregable ) {
-			throw log.nonAggregableField( absoluteFieldPath,
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.nonAggregableField( field.absolutePath(), field.eventContext() );
 		}
+	}
+
+	protected <T> DslConverter<?, ? extends F> getToFieldValueConverter(LuceneSearchFieldContext<F> field,
+			Class<T> expectedType, ValueConvert convert) {
+		DslConverter<?, ? extends F> result = field.type().dslConverter( convert );
+		if ( !result.isValidInputType( expectedType ) ) {
+			throw log.invalidAggregationInvalidType( field.absolutePath(), expectedType, field.eventContext() );
+		}
+		return result;
+	}
+
+	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
+	protected <T> ProjectionConverter<? super F, ? extends T> getFromFieldValueConverter(
+			LuceneSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
+		ProjectionConverter<? super F, ?> result = field.type().projectionConverter( convert );
+		if ( !result.isConvertedTypeAssignableTo( expectedType ) ) {
+			throw log.invalidAggregationInvalidType( field.absolutePath(), expectedType, field.eventContext() );
+		}
+		return (ProjectionConverter<? super F, ? extends T>) result;
 	}
 }

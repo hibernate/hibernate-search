@@ -20,10 +20,10 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -93,10 +93,10 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
-		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
+		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field,
 				DslConverter<?, ? extends F> toFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext, absoluteFieldPath, nestedDocumentPath );
+			super( searchContext, field );
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}
@@ -118,9 +118,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {
-				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-				);
+				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
 			}
 		}
 	}

@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexRootComponent;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -28,14 +26,9 @@ public interface LuceneSearchIndexesContext {
 
 	LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath);
 
-	<T> LuceneScopedIndexFieldComponent<T> schemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy);
+	LuceneSearchFieldContext<?> field(String absoluteFieldPath);
 
 	void checkNestedField(String absoluteFieldPath);
-
-	String nestedDocumentPath(String absoluteFieldPath);
-
-	List<String> nestedPathHierarchyForField(String absoluteFieldPath);
 
 	List<String> nestedPathHierarchyForObject(String absoluteFieldPath);
 

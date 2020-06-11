@@ -12,13 +12,10 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
@@ -31,10 +28,8 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -43,12 +38,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
-			new ProjectionBuilderFactoryRetrievalStrategy();
-
+	private final LuceneSearchContext searchContext;
 	private final LuceneSearchIndexesContext indexes;
 
 	public LuceneSearchProjectionBuilderFactory(LuceneSearchContext searchContext) {
+		this.searchContext = searchContext;
 		this.indexes = searchContext.indexes();
 	}
 
@@ -59,22 +53,10 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		LuceneScopedIndexFieldComponent<LuceneFieldProjectionBuilderFactory> fieldComponent =
-				indexes.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		switch ( convert ) {
-			case NO:
-				break;
-			case YES:
-			default:
-				fieldComponent.getConverterCompatibilityChecker().failIfNotCompatible();
-				break;
-		}
-
-		return fieldComponent.getComponent()
-				.createFieldValueProjectionBuilder( indexes.indexNames(), absoluteFieldPath,
-						indexes.nestedDocumentPath( absoluteFieldPath ),
-						fieldComponent.isMultiValuedFieldInRoot(),
-						expectedType, convert );
+		LuceneSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
+		// Fail early if the nested structure differs in the case of multi-index search.
+		field.nestedPathHierarchy();
+		return field.createFieldValueProjectionBuilder( searchContext, expectedType, convert );
 	}
 
 	@Override
@@ -94,11 +76,10 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		LuceneScopedIndexFieldComponent<LuceneFieldProjectionBuilderFactory> fieldComponent =
-				indexes.schemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createDistanceProjectionBuilder( indexes.indexNames(),
-				absoluteFieldPath, indexes.nestedDocumentPath( absoluteFieldPath ),
-				fieldComponent.isMultiValuedFieldInRoot(), center );
+		LuceneSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
+		// Fail early if the nested structure differs in the case of multi-index search.
+		field.nestedPathHierarchy();
+		return field.createDistanceProjectionBuilder( searchContext, center );
 	}
 
 	@Override
@@ -140,7 +121,6 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> LuceneSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
@@ -158,37 +138,5 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	public SearchProjectionBuilder<Explanation> explanation() {
 		return new LuceneExplanationProjectionBuilder( indexes.indexNames() );
-	}
-
-	private static class ProjectionBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldProjectionBuilderFactory> {
-
-		@Override
-		public LuceneFieldProjectionBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
-			return schemaNode.type().projectionBuilderFactory();
-		}
-
-		@Override
-		public boolean hasCompatibleCodec(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
-			return component1.hasCompatibleCodec( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
-			return component1.hasCompatibleConverter( component2 );
-		}
-
-		@Override
-		public boolean hasCompatibleAnalyzer(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
-			// analyzers are not involved in a projection clause
-			return true;
-		}
-
-		@Override
-		public SearchException createCompatibilityException(String absoluteFieldPath,
-				LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
-				EventContext context) {
-			return log.conflictingFieldTypesForSearch( absoluteFieldPath, component1, component2, context );
-		}
 	}
 }

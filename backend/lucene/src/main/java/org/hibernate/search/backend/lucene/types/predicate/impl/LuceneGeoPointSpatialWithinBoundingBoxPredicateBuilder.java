@@ -6,18 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.List;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 
 class LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 		AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder {
 
-	LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder(LuceneSearchFieldContext<GeoPoint> field) {
+		super( field );
 	}
 
 	@Override

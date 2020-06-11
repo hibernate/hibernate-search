@@ -10,10 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -24,21 +22,13 @@ public class LuceneBooleanFieldAggregationBuilderFactory
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public LuceneBooleanFieldAggregationBuilderFactory(boolean aggregable,
-			DslConverter<?, ? extends Boolean> toFieldValueConverter,
-			DslConverter<? super Boolean, ? extends Boolean> rawToFieldValueConverter,
-			ProjectionConverter<? super Boolean, ?> fromFieldValueConverter,
-			ProjectionConverter<? super Boolean, Boolean> rawFromFieldValueConverter,
 			AbstractLuceneNumericFieldCodec<Boolean, ?> codec) {
-		super( aggregable, toFieldValueConverter, rawToFieldValueConverter, fromFieldValueConverter,
-				rawFromFieldValueConverter, codec
-		);
+		super( aggregable, codec );
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
-		throw log.rangeAggregationsNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
+			LuceneSearchFieldContext<Boolean> field, Class<K> expectedType, ValueConvert convert) {
+		throw log.rangeAggregationsNotSupportedByFieldType( field.eventContext() );
 	}
 }

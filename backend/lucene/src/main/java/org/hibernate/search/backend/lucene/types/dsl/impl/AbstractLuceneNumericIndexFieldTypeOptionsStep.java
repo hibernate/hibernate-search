@@ -13,8 +13,6 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFie
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends AbstractLuceneNumericIndexFieldTypeOptionsStep<S, F>, F>
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<S, F> {
@@ -38,10 +36,6 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		DslConverter<?, ? extends F> dslToIndexConverter = createDslConverter();
-		DslConverter<F, ? extends F> rawDslToIndexConverter = createRawDslConverter();
-		ProjectionConverter<? super F, ?> indexToProjectionConverter = createProjectionConverter();
-		ProjectionConverter<? super F, F> rawIndexToProjectionConverter = createRawProjectionConverter();
 		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec(
 				resolvedProjectable,
 				resolvedSearchable,
@@ -51,23 +45,13 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		);
 
 		return new LuceneIndexFieldType<>(
-				getFieldType(), dslToIndexConverter, indexToProjectionConverter,
-				codec,
-				new LuceneNumericFieldPredicateBuilderFactory<>(
-						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec
-				),
-				createFieldSortBuilderFactory(
-						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
-				),
-				new LuceneStandardFieldProjectionBuilderFactory<>(
-						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
-				),
-				createAggregationBuilderFactory(
-						resolvedAggregable,
-						dslToIndexConverter, rawDslToIndexConverter,
-						indexToProjectionConverter, rawIndexToProjectionConverter,
-						codec
-				)
+				getFieldType(), codec,
+				createDslConverter(), createRawDslConverter(),
+				createProjectionConverter(), createRawProjectionConverter(),
+				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ),
+				createFieldSortBuilderFactory( resolvedSortable, codec ),
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ),
+				createAggregationBuilderFactory( resolvedAggregable, codec )
 		);
 	}
 
@@ -76,25 +60,12 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 			F indexNullAsValue);
 
 	protected LuceneNumericFieldSortBuilderFactory<F, ?> createFieldSortBuilderFactory(boolean resolvedSortable,
-			DslConverter<?, ? extends F> dslToIndexConverter, DslConverter<F, ? extends F> rawDslToIndexConverter,
 			AbstractLuceneNumericFieldCodec<F, ?> codec) {
-		return new LuceneNumericFieldSortBuilderFactory<>(
-				resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
-		);
+		return new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, codec );
 	}
 
 	protected LuceneNumericFieldAggregationBuilderFactory<F> createAggregationBuilderFactory(
-			boolean resolvedAggregable,
-			DslConverter<?,? extends F> dslToIndexConverter,
-			DslConverter<F,? extends F> rawDslToIndexConverter,
-			ProjectionConverter<? super F,?> indexToProjectionConverter,
-			ProjectionConverter<? super F,F> rawIndexToProjectionConverter,
-			AbstractLuceneNumericFieldCodec<F, ?> codec) {
-		return new LuceneNumericFieldAggregationBuilderFactory<>(
-				resolvedAggregable,
-				dslToIndexConverter, rawDslToIndexConverter,
-				indexToProjectionConverter, rawIndexToProjectionConverter,
-				codec
-		);
+			boolean resolvedAggregable, AbstractLuceneNumericFieldCodec<F, ?> codec) {
+		return new LuceneNumericFieldAggregationBuilderFactory<>( resolvedAggregable, codec );
 	}
 }
