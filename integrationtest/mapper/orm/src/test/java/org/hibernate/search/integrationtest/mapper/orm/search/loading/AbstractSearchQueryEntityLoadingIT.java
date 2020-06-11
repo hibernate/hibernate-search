@@ -79,16 +79,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			hitDocumentReferencesContributor.accept( documentReferenceCollector );
 			List<DocumentReference> hitDocumentReferences = documentReferenceCollector.collected;
 
-			backendMock.expectSearchObjects(
-					targetIndexes,
-					b -> { },
-					StubSearchWorkBehavior.of(
-							hitDocumentReferences.size(),
-							hitDocumentReferences
-					)
-			);
-
-			List<T> loadedEntities = query.fetchAllHits();
+			List<T> loadedEntities = getHits( targetIndexes, query, hitDocumentReferences );
 
 			softAssertions.assertThat( loadedEntities )
 					.as(
@@ -123,6 +114,19 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 					)
 					.containsExactlyElementsOf( unproxyfiedExpectedLoadedEntities );
 		} );
+	}
+
+	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences) {
+		backendMock.expectSearchObjects(
+				targetIndexes,
+				b -> { },
+				StubSearchWorkBehavior.of(
+						hitDocumentReferences.size(),
+						hitDocumentReferences
+				)
+		);
+
+		return query.fetchAllHits();
 	}
 
 	// This cast is fine as long as T is not a proxy interface
