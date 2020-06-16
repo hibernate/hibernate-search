@@ -1,10 +1,10 @@
 # Hibernate Search
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.search/hibernate-search-mapper-orm.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.hibernate.search%22)
-[![Build Status](https://ci.hibernate.org/buildStatus/icon?job=hibernate-search/master)](https://ci.hibernate.org/job/hibernate-search/job/master)
-[![Coverage Status](https://coveralls.io/repos/github/hibernate/hibernate-search/badge.svg?branch=master)](https://coveralls.io/github/hibernate/hibernate-search?branch=master)
-[![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=org.hibernate.search%3Ahibernate-search-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
-[![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/hibernate/hibernate-search.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/hibernate/hibernate-search/context:java)
+[![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.search/hibernate-search-mapper-orm.svg?label=Maven%20Central&style=flat-square)](https://search.maven.org/search?q=g:%22org.hibernate.search%22)
+[![Build Status](https://ci.hibernate.org/buildStatus/icon?job=hibernate-search/master&style=flat-square)](https://ci.hibernate.org/job/hibernate-search/job/master)
+[![Coverage Status](https://img.shields.io/coveralls/github/hibernate/hibernate-search/master?logo=coveralls&style=flat-square)](https://coveralls.io/github/hibernate/hibernate-search?branch=master)
+[![Quality gate](https://img.shields.io/sonar/alert_status/org.hibernate.search:hibernate-search-parent?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
+[![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/hibernate/hibernate-search.svg?logo=lgtm&logoWidth=18&style=flat-square)](https://lgtm.com/projects/g/hibernate/hibernate-search/context:java)
 
 ## Description
 
