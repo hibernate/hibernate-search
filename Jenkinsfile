@@ -471,7 +471,7 @@ stage('Default build') {
 			}
 
 			dir(helper.configuration.maven.localRepositoryPath) {
-				stash name:'main-build', includes:"org/hibernate/search/**"
+				stash name:'default-build-result', includes:"org/hibernate/search/**"
 			}
 		}
 	}
@@ -829,7 +829,7 @@ void runBuildOnNode(String label, Closure body) {
 void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	if ( buildEnv.requiresDefaultBuildArtifacts() ) {
 		dir(helper.configuration.maven.localRepositoryPath) {
-			unstash name:'main-build'
+			unstash name:'default-build-result'
 		}
 	}
 
