@@ -178,11 +178,16 @@ stage('Configure') {
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-					new JdkBuildEnvironment(version: '8', tool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
-					new JdkBuildEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new JdkBuildEnvironment(version: '8', buildJdkTool: 'OpenJDK 11 Latest',
+							testJdkTarget: '1.8', testJdkTool: 'OpenJDK 8 Latest',
+							status: BuildEnvironmentStatus.SUPPORTED),
+					new JdkBuildEnvironment(version: '11', buildJdkTool: 'OpenJDK 11 Latest',
+							status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new JdkBuildEnvironment(version: '14', buildJdkTool: 'OpenJDK 14 Latest',
+							status: BuildEnvironmentStatus.SUPPORTED),
 					// Experimental because Hibernate ORM bytecode enhancement doesn't work yet
-					new JdkBuildEnvironment(version: '15', tool: 'OpenJDK 15 Latest', status: BuildEnvironmentStatus.SUPPORTED)
+					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
+							status: BuildEnvironmentStatus.SUPPORTED)
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: BuildEnvironmentStatus.SUPPORTED),
@@ -234,7 +239,7 @@ stage('Configure') {
 		configurationNodePattern QUICK_USE_NODE_PATTERN
 		file 'job-configuration.yaml'
 		jdk {
-			defaultTool environments.content.jdk.default.tool
+			defaultTool environments.content.jdk.default.buildJdkTool
 		}
 		maven {
 			defaultTool MAVEN_TOOL
@@ -410,6 +415,7 @@ stage('Default build') {
 					-Pdist -Pcoverage -Pjqassistant \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${enableDefaultBuildLegacyIT ? '-Dlegacy.skip=false' : ''} \
+					${toTestJdkArg(environments.content.jdk.default)} \
 					${toElasticsearchJdkArg(environments.content.jdk.default)} \
 			"""
 
@@ -478,7 +484,7 @@ stage('Non-default environments') {
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
-				helper.withMavenWorkspace(jdk: buildEnv.tool) {
+				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install --fail-at-end \
 					"""
@@ -654,7 +660,7 @@ abstract class BuildEnvironment {
 	boolean requiresDefaultBuildArtifacts() { true }
 
 	String getMavenJdkTool(def allEnvironments) {
-		allEnvironments.content.jdk.default.tool
+		allEnvironments.content.jdk.default.buildJdkTool
 	}
 
 	String getElasticsearchJdkTool(def allEnvironments) {
@@ -664,13 +670,16 @@ abstract class BuildEnvironment {
 
 class JdkBuildEnvironment extends BuildEnvironment {
 	String version
-	String tool
+	String buildJdkTool
+	String testJdkTool
+	String testJdkTarget
+	@Override
 	String getTag() { "jdk-$version" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { false }
 	@Override
 	String getMavenJdkTool(def allEnvironments) {
-		tool
+		buildJdkTool
 	}
 }
 
@@ -829,6 +838,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
 	sh """ \
 			mvn -Dsurefire.environment=$testSuffix \
+					${toTestJdkArg(buildEnv)} \
 					${toElasticsearchJdkArg(buildEnv)} \
 					$args \
 	"""
@@ -850,6 +860,26 @@ String toElasticsearchVersionArgs(String mavenEsProfile, String version) {
 		// and Maven would end up disabling it.
 		''
 	}
+}
+
+String toTestJdkArg(BuildEnvironment buildEnv) {
+	String args = ''
+
+	if ( ! (buildEnv instanceof JdkBuildEnvironment) ) {
+		return args;
+	}
+
+	String testJdkTool = buildEnv.testJdkTool
+	if ( testJdkTool ) {
+		def testJdkToolPath = tool(name: testJdkTool, type: 'jdk')
+		args += " -Dsurefire.jvm.java_executable=$testJdkToolPath/bin/java"
+	}
+	String testJdkTarget = buildEnv.testJdkTarget
+	if ( testJdkTarget ) {
+		args += " -Dmaven.compiler.testTarget=$testJdkTarget"
+	}
+
+	return args
 }
 
 String toElasticsearchJdkArg(BuildEnvironment buildEnv) {

@@ -109,7 +109,8 @@
                                 <head>Experimental</head>
                             </tag>
                         </tags>
-                        <additionalOptions>${javadoc.additionalOptions.java-version}</additionalOptions>
+                        <!-- Java 9+ supports HTML5 for javadoc generation -->
+                        <additionalOptions>-html5</additionalOptions>
                     </configuration>
                 </plugin>
             </plugins>
