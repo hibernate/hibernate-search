@@ -150,12 +150,20 @@ and do the work of converting between user entities and documents to be indexed.
 
 ### Basic build
 
+You will need:
+
+* Maven 3.6.2 or later.
+* JDK 11 or later.
+
 The following command will build Hibernate Search, install it in your local Maven repository,
 and run unit tests and integration tests.
 
 ```bash
 mvn clean install
 ```
+
+Note: the produced JARs are compatible with Java 8 and later,
+regardless of the JDK used to build Hibernate Search.
 
 ### Documentation
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
