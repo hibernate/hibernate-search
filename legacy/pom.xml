@@ -147,6 +147,7 @@
         <!-- Test dependencies -->
 
         <version.org.unitils>3.4.6</version.org.unitils>
+        <version.com.google.guava>20.0</version.com.google.guava>
         <version.simple-jndi>0.11.4.1</version.simple-jndi>
         <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
         <!-- Fixes dependency convergence within Wiremock, see below -->
@@ -516,6 +517,12 @@
                 <groupId>org.unitils</groupId>
                 <artifactId>unitils-easymock</artifactId>
                 <version>${version.org.unitils}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${version.com.google.guava}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>simple-jndi</groupId>
