@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
@@ -795,6 +796,57 @@ public class IndexedEmbeddedBaseIT {
 				return id;
 			}
 			@IndexedEmbedded(structure = ObjectStructure.NESTED)
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", ObjectStructure.NESTED, b2 -> b2
+						.field( "level1Property", String.class )
+				)
+		);
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Value" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "level1Property", "level1Value" )
+				)
+		);
+	}
+
+	/**
+	 * Check that the deprecated "storage" parameter is taken into account.
+	 */
+	@Test
+	public void storage() {
+		class IndexedEmbeddedLevel1 {
+			String level1Property;
+			@GenericField
+			public String getLevel1Property() {
+				return level1Property;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String level1Value) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.level1Property = level1Value;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
 			public IndexedEmbeddedLevel1 getLevel1() {
 				return level1;
 			}
