@@ -335,8 +335,8 @@
 
         <!-- Set statically: we want our code to comply with this version -->
         <java-version.baseline.major>1.8</java-version.baseline.major>
-        <!-- Updated dynamically depending on the current JDK using profiles (see further down) -->
-        <java-version.jdk.major>1.8</java-version.jdk.major>
+        <!-- 'java.specification.version' is only correct from Java 9 onwards -->
+        <java-version.jdk.major>${java.specification.version}</java-version.jdk.major>
 
         <maven.compiler.target>${java-version.baseline.major}</maven.compiler.target>
         <maven.compiler.source>${java-version.baseline.major}</maven.compiler.source>
@@ -402,6 +402,7 @@
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
+        <surefire.jvm.java_executable></surefire.jvm.java_executable>
         <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
         <!--
             Provide two sets of settings for settings specific to a java version.
@@ -1550,6 +1551,7 @@
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
                         </systemPropertyVariables>
+                        <jvm>${surefire.jvm.java_executable}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
                         <additionalClasspathElements>
@@ -1574,6 +1576,7 @@
                             <org.hibernate.search.integrationtest.backend.elasticsearch.testdialect>${test.elasticsearch.testdialect}</org.hibernate.search.integrationtest.backend.elasticsearch.testdialect>
                             <org.hibernate.search.integrationtest.backend.elasticsearch.version>${test.elasticsearch.connection.version}</org.hibernate.search.integrationtest.backend.elasticsearch.version>
                         </systemPropertyVariables>
+                        <jvm>${surefire.jvm.java_executable}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
                         <additionalClasspathElements>
@@ -1749,15 +1752,14 @@
         </profile>
 
         <profile>
-            <id>jdk11+</id>
+            <id>testWithJdk11+</id>
             <activation>
-                <jdk>[11,)</jdk>
+                <property>
+                    <name>maven.compiler.testTarget</name>
+                    <value>!1.8</value>
+                </property>
             </activation>
             <properties>
-                <!-- 'java.specification.version' is only correct from Java 9 onwards -->
-                <java-version.jdk.major>${java.specification.version}</java-version.jdk.major>
-                <!-- Java 9+ supports HTML5 for javadoc generation -->
-                <javadoc.additionalOptions.java-version>-html5</javadoc.additionalOptions.java-version>
                 <surefire.jvm.args.java-version.lenient>
                     -Djdk.attach.allowAttachSelf=true
                     -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true

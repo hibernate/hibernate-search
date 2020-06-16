@@ -27,10 +27,12 @@
 
     <profiles>
         <profile>
-            <id>jdk9+</id>
+            <id>javaModuleITs</id>
             <activation>
-                <!-- From Java 9, Java 9 doesn't identify itself as "1.9" but "9" -->
-                <jdk>[9,)</jdk>
+                <property>
+                    <name>maven.compiler.testTarget</name>
+                    <value>!1.8</value>
+                </property>
             </activation>
             <modules>
                 <module>jdk/java-modules</module>
