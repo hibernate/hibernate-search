@@ -15,15 +15,12 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.DoubleValuesSource;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.LongValues;
-import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
 
 /**
@@ -103,16 +100,6 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
 		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
 		return select( values, rootDocs, innerDocs );
-	}
-
-	/**
-	 * Convert to a LongValuesSource by encoding the double values to longs
-	 * (using either {@link Double#doubleToRawLongBits(double)} or {@link Float#floatToRawIntBits(float)}).
-	 *
-	 * @return LongValuesSource
-	 */
-	public LongValuesSource toRawValuesSource(Function<NumericDoubleValues, NumericDocValues> encoder) {
-		return new LongDoubleValuesSource( this, encoder );
 	}
 
 	protected abstract SortedNumericDoubleDocValues getSortedNumericDoubleDocValues(LeafReaderContext ctx) throws IOException;
@@ -248,73 +235,6 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 			// Numeric doc values are longs, but we want doubles
 			return decoder.apply( DocValues.getSortedNumeric( ctx.reader(), field ) );
 		}
-	}
-
-	private static class LongDoubleValuesSource extends LongValuesSource {
-
-		private final DoubleMultiValuesToSingleValuesSource inner;
-		private final Function<NumericDoubleValues, NumericDocValues> encoder;
-
-		private LongDoubleValuesSource(DoubleMultiValuesToSingleValuesSource inner,
-				Function<NumericDoubleValues, NumericDocValues> encoder) {
-			this.inner = inner;
-			this.encoder = encoder;
-		}
-
-		@Override
-		public LongValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-			NumericDoubleValues in = inner.getValues( ctx, scores );
-			NumericDocValues rawValues = encoder.apply( in );
-			return new LongValues() {
-				@Override
-				public long longValue() throws IOException {
-					return rawValues.longValue();
-				}
-
-				@Override
-				public boolean advanceExact(int doc) throws IOException {
-					return rawValues.advanceExact( doc );
-				}
-			};
-		}
-
-		@Override
-		public boolean isCacheable(LeafReaderContext ctx) {
-			return inner.isCacheable( ctx );
-		}
-
-		@Override
-		public boolean needsScores() {
-			return inner.needsScores();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-			LongDoubleValuesSource that = (LongDoubleValuesSource) o;
-			return Objects.equals( inner, that.inner );
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash( inner );
-		}
-
-		@Override
-		public String toString() {
-			return "long(" + inner.toString() + ")";
-		}
-
-		@Override
-		public LongValuesSource rewrite(IndexSearcher searcher) throws IOException {
-			return inner.rewrite( searcher ).toLongValuesSource();
-		}
-
 	}
 
 }
