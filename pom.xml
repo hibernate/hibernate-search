@@ -1749,63 +1749,15 @@
         </profile>
 
         <profile>
-            <id>jdk9</id>
+            <id>jdk11+</id>
             <activation>
-                <!-- Java 9 doesn't identify itself as "1.9" but "9" -->
-                <jdk>9</jdk>
-            </activation>
-            <properties>
-                <surefire.jvm.args.java-version.lenient>
-                    -Djdk.attach.allowAttachSelf=true
-                </surefire.jvm.args.java-version.lenient>
-                <surefire.jvm.args.java-version.strict>
-                    ${surefire.jvm.args.java-version.lenient}
-                    --illegal-access=deny
-                </surefire.jvm.args.java-version.strict>
-            </properties>
-            <modules>
-                <!-- Nothing at the moment -->
-            </modules>
-        </profile>
-
-        <profile>
-            <id>jdk9+</id>
-            <activation>
-                <jdk>[9,)</jdk>
+                <jdk>[11,)</jdk>
             </activation>
             <properties>
                 <!-- 'java.specification.version' is only correct from Java 9 onwards -->
                 <java-version.jdk.major>${java.specification.version}</java-version.jdk.major>
                 <!-- Java 9+ supports HTML5 for javadoc generation -->
                 <javadoc.additionalOptions.java-version>-html5</javadoc.additionalOptions.java-version>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>jdk10</id>
-            <activation>
-                <jdk>10</jdk>
-            </activation>
-            <properties>
-                <surefire.jvm.args.java-version.lenient>
-                    -Djdk.attach.allowAttachSelf=true
-                </surefire.jvm.args.java-version.lenient>
-                <surefire.jvm.args.java-version.strict>
-                    ${surefire.jvm.args.java-version.lenient}
-                    --illegal-access=deny
-                </surefire.jvm.args.java-version.strict>
-            </properties>
-            <modules>
-                <!-- Nothing at the moment -->
-            </modules>
-        </profile>
-
-        <profile>
-            <id>jdk11+</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <properties>
                 <surefire.jvm.args.java-version.lenient>
                     -Djdk.attach.allowAttachSelf=true
                     -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true
