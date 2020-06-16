@@ -29,7 +29,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -164,7 +164,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
 				found = true;
-				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.storage() ) ) {
+				if ( !ObjectStructure.NESTED.equals( schemaNode.structure() ) ) {
 					throw log.nonNestedFieldForNestedQuery(
 							absoluteFieldPath, indexModel.getEventContext()
 					);

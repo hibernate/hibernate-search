@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -36,18 +36,18 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		return new Builder( null, null, Type.ROOT );
 	}
 
-	public static Builder objectField(Builder parent, String relativeFieldName, ObjectFieldStorage storage) {
+	public static Builder objectField(Builder parent, String relativeFieldName, ObjectStructure structure) {
 		return new Builder( parent, relativeFieldName, Type.OBJECT_FIELD )
-				.objectFieldStorage( storage );
+				.objectStructure( structure );
 	}
 
 	public static Builder field(Builder parent, String relativeFieldName) {
 		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD );
 	}
 
-	public static Builder objectFieldTemplate(Builder parent, String templateName, ObjectFieldStorage storage) {
+	public static Builder objectFieldTemplate(Builder parent, String templateName, ObjectStructure structure) {
 		return new Builder( parent, templateName, Type.OBJECT_FIELD_TEMPLATE )
-				.objectFieldStorage( storage );
+				.objectStructure( structure );
 	}
 
 	public static Builder fieldTemplate(Builder parent, String templateName) {
@@ -103,11 +103,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder objectField(String relativeFieldName, Consumer<Builder> contributor) {
-			return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT, contributor );
+			return objectField( relativeFieldName, ObjectStructure.DEFAULT, contributor );
 		}
 
-		public Builder objectField(String relativeFieldName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.objectField( this, relativeFieldName, storage );
+		public Builder objectField(String relativeFieldName, ObjectStructure structure, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.objectField( this, relativeFieldName, structure );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -122,11 +122,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder objectFieldTemplate(String relativeFieldName, Consumer<Builder> contributor) {
-			return objectFieldTemplate( relativeFieldName, ObjectFieldStorage.DEFAULT, contributor );
+			return objectFieldTemplate( relativeFieldName, ObjectStructure.DEFAULT, contributor );
 		}
 
-		public Builder objectFieldTemplate(String relativeFieldName, ObjectFieldStorage storage, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.objectFieldTemplate( this, relativeFieldName, storage );
+		public Builder objectFieldTemplate(String relativeFieldName, ObjectStructure structure, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.objectFieldTemplate( this, relativeFieldName, structure );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -152,8 +152,8 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
-		Builder objectFieldStorage(ObjectFieldStorage objectFieldStorage) {
-			attribute( "objectFieldStorage", objectFieldStorage );
+		Builder objectStructure(ObjectStructure objectStructure) {
+			attribute( "objectStructure", objectStructure );
 			return this;
 		}
 

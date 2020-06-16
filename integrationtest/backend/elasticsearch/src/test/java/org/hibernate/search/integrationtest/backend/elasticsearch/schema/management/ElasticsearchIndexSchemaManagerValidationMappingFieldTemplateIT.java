@@ -14,7 +14,7 @@ import java.util.EnumSet;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
@@ -67,7 +67,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 					.matchingPathGlob( "*_t2" );
 			root.fieldTemplate( "myTemplate3", f -> f.asString() )
 					.matchingPathGlob( "*_t3" );
-			root.objectFieldTemplate( "myTemplate4", ObjectFieldStorage.NESTED );
+			root.objectFieldTemplate( "myTemplate4", ObjectStructure.NESTED );
 		} );
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
@@ -264,7 +264,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 	@Test
 	public void attribute_pathMatch_missing() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
 		} );
 
@@ -296,7 +296,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 	@Test
 	public void attribute_pathMatch_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_suffix" );
 		} );
 
@@ -360,7 +360,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 	@Test
 	public void attribute_matchMappingType_missing() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
+			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();
@@ -391,7 +391,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 	@Test
 	public void attribute_matchMappingType_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.objectFieldTemplate( "myTemplate", ObjectFieldStorage.NESTED );
+			root.objectFieldTemplate( "myTemplate", ObjectStructure.NESTED );
 		} );
 
 		elasticSearchClient.index( index.name() ).deleteAndCreate();

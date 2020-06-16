@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -55,7 +55,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 	@Test
 	public void rootFieldTemplates() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
-			root.objectFieldTemplate( "myTemplate1", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "myTemplate1", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_obj" );
 			root.fieldTemplate( "myTemplate2", f -> f.asString() )
 					.matchingPathGlob( "*_kw" );
@@ -101,7 +101,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingFieldTemplatesIT {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
 			IndexSchemaObjectField objectField = root.objectField( "staticObject" );
 			objectField.toReference();
-			objectField.objectFieldTemplate( "myTemplate1", ObjectFieldStorage.NESTED )
+			objectField.objectFieldTemplate( "myTemplate1", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_obj" );
 			objectField.fieldTemplate( "myTemplate2", f -> f.asString() )
 					.matchingPathGlob( "*_kw" );

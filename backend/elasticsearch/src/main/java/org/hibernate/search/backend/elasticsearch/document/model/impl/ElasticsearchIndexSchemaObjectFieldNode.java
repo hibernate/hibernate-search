@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
@@ -28,23 +28,23 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	private final List<String> nestedPathHierarchy;
 
-	private final ObjectFieldStorage storage;
+	private final ObjectStructure structure;
 
 	private final List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren;
 
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
-			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
+			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
 			List<AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeFieldName, inclusion, multiValued );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
-		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
+		if ( ObjectStructure.NESTED.equals( structure ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy
 			theNestedPathHierarchy = new ArrayList<>( theNestedPathHierarchy );
 			theNestedPathHierarchy.add( absolutePath );
 		}
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
-		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
+		this.structure = ObjectStructure.DEFAULT.equals( structure ) ? ObjectStructure.FLATTENED : structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
 	}
@@ -102,11 +102,11 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	@Override
 	public boolean nested() {
-		return ObjectFieldStorage.NESTED.equals( storage );
+		return ObjectStructure.NESTED.equals( structure );
 	}
 
-	public ObjectFieldStorage storage() {
-		return storage;
+	public ObjectStructure structure() {
+		return structure;
 	}
 
 }

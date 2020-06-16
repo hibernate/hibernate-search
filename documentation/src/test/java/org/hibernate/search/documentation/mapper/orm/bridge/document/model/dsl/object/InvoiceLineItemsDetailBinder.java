@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -37,7 +37,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 		IndexSchemaObjectField lineItemsField =
 				schemaElement.objectField( // <1>
 						"lineItems", // <2>
-						ObjectFieldStorage.NESTED // <3>
+						ObjectStructure.NESTED // <3>
 				)
 				.multiValued(); // <4>
 

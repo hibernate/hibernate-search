@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -248,23 +248,23 @@ public class DocumentElementDynamicFieldNameIT<F> {
 				root.fieldTemplate( fieldType.getUniqueName(), f -> fieldType.configure( f ) )
 						.matchingPathGlob( "*_" + fieldType.getUniqueName() );
 			} );
-			root.objectFieldTemplate( "flattenedObject_direct", ObjectFieldStorage.FLATTENED )
+			root.objectFieldTemplate( "flattenedObject_direct", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "flattenedObject" )
 					.multiValued();
-			root.objectFieldTemplate( "flattenedObject_indirect", ObjectFieldStorage.FLATTENED )
+			root.objectFieldTemplate( "flattenedObject_indirect", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "*.flattenedObject" )
 					.multiValued();
-			root.objectFieldTemplate( "nestedObject_direct", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedObject_direct", ObjectStructure.NESTED )
 					.matchingPathGlob( "nestedObject" )
 					.multiValued();
-			root.objectFieldTemplate( "nestedObject_indirect", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedObject_indirect", ObjectStructure.NESTED )
 					.matchingPathGlob( "*.nestedObject" )
 					.multiValued();
 
 			// Simulate an embedded context which excludes every subfield
 			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
 					new StubTypeModel( "embedded" ),
-					"excludingObject.", ObjectFieldStorage.FLATTENED,
+					"excludingObject.", ObjectStructure.FLATTENED,
 					null, Collections.singleton( "pathThatDoesNotMatchAnything" )
 			);
 			// Ignore the result, we'll just reference "excludingObject" by its name

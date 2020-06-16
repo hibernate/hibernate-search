@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -30,7 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class ObjectFieldStorageIT {
+public class ObjectStructureIT {
 
 	private static final String EXPECTED_NESTED_MATCH_ID = "nestedQueryShouldMatchId";
 	private static final String EXPECTED_NON_NESTED_MATCH_ID = "nonNestedQueryShouldMatchId";
@@ -233,12 +233,12 @@ public class ObjectFieldStorageIT {
 				.add( EXPECTED_NON_NESTED_MATCH_ID, document -> {
 					/*
 					 * Below, we use the same content for both the flattened object and the nested object.
-					 * This is to demonstrate the practical difference of object storage:
+					 * This is to demonstrate the practical difference of object structure:
 					 * with the same content and similar conditions, the queries on the flattened object should match,
 					 * but the queries on the nested object should not.
 					 * In short, there is content that matches each and every condition used in tests,
 					 * but this content is spread over several objects, meaning it will only match
-					 * if flattened storage is used.
+					 * if a flattened structure is used.
 					 */
 					for ( ObjectMapping objectMapping :
 							Arrays.asList( index.binding().flattenedObject, index.binding().nestedObject ) ) {
@@ -298,10 +298,10 @@ public class ObjectFieldStorageIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectStructure.FLATTENED )
 					.multiValued();
 			flattenedObject = new ObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}

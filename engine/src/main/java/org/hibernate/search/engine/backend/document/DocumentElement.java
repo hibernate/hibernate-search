@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldFinalStep;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 
 /**
  * An element of a document.
@@ -41,7 +41,7 @@ public interface DocumentElement {
 	 *
 	 * @param fieldReference A reference to the object field to add an object to.
 	 * References are returned by {@link IndexSchemaFieldFinalStep#toReference()}
-	 * in the {@link IndexSchemaElement#objectField(String, ObjectFieldStorage) field definition DSL}.
+	 * in the {@link IndexSchemaElement#objectField(String, ObjectStructure) field definition DSL}.
 	 * @return The new object, that can be populated with its own fields.
 	 * @throws org.hibernate.search.util.common.SearchException If the field is defined in a different document element.
 	 */
@@ -55,7 +55,7 @@ public interface DocumentElement {
 	 *
 	 * @param fieldReference A reference to the object field to add a {@code null} object to.
 	 * References are returned by {@link IndexSchemaFieldFinalStep#toReference()}
-	 * in the {@link IndexSchemaElement#objectField(String, ObjectFieldStorage) field definition DSL}.
+	 * in the {@link IndexSchemaElement#objectField(String, ObjectStructure) field definition DSL}.
 	 * @throws org.hibernate.search.util.common.SearchException If the field is defined in a different document element.
 	 */
 	void addNullObject(IndexObjectFieldReference fieldReference);
@@ -81,8 +81,8 @@ public interface DocumentElement {
 	 *
 	 * @param relativeFieldName The name of the object field to add a value to, relative to this document element.
 	 * The field must have been defined previously, either directly
-	 * through {@link IndexSchemaElement#objectField(String, ObjectFieldStorage)},
-	 * or indirectly through {@link IndexSchemaElement#objectFieldTemplate(String, ObjectFieldStorage)}.
+	 * through {@link IndexSchemaElement#objectField(String, ObjectStructure)},
+	 * or indirectly through {@link IndexSchemaElement#objectFieldTemplate(String, ObjectStructure)}.
 	 * @return The new object, that can be populated with its own fields.
 	 * @throws org.hibernate.search.util.common.SearchException If the field is not defined
 	 * or is not an object field.
@@ -97,8 +97,8 @@ public interface DocumentElement {
 	 *
 	 * @param relativeFieldName The name of the object field to add a value to, relative to this document element.
 	 * The field must have been defined previously, either directly
-	 * through {@link IndexSchemaElement#objectField(String, ObjectFieldStorage)},
-	 * or indirectly through {@link IndexSchemaElement#objectFieldTemplate(String, ObjectFieldStorage)}.
+	 * through {@link IndexSchemaElement#objectField(String, ObjectStructure)},
+	 * or indirectly through {@link IndexSchemaElement#objectFieldTemplate(String, ObjectStructure)}.
 	 * @throws org.hibernate.search.util.common.SearchException If the field is not defined
 	 * or is not an object field.
 	 */

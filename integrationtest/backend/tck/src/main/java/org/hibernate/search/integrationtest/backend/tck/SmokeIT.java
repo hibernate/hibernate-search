@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -165,7 +165,7 @@ public class SmokeIT {
 	public void where_nested() {
 		StubMappingScope scope = index.createScope();
 
-		// Without nested storage, we expect predicates to be able to match on different objects
+		// Without nested structure, we expect predicates to be able to match on different objects
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.bool()
 						.must( f.match().field( "flattenedObject.string" ).matching( "text 1_2" ) )
@@ -177,7 +177,7 @@ public class SmokeIT {
 				.hasTotalHitCount( 1 );
 
 //		TODO HSEARCH-3752 with implicit nested predicates, this is not true anymore:
-//		// With nested storage, we expect direct queries to never match
+//		// With nested structure, we expect direct queries to never match
 //		query = scope.query()
 //				.where( f -> f.match().field( "nestedObject.integer" ).matching( 101 ) )
 //				.toQuery();
@@ -321,10 +321,10 @@ public class SmokeIT {
 			integer = root.field( "integer", f -> f.asInteger() ).toReference();
 			localDate = root.field( "localDate", f -> f.asLocalDate() ).toReference();
 			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint() ).toReference();
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectStructure.FLATTENED )
 					.multiValued();
 			flattenedObject = new ObjectMapping( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}

@@ -14,6 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
@@ -49,7 +50,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * so Hibernate Search will <em>embed</em> this data in a {@code authors} field
  * of documents created for {@code Book} entities.
  * <p>
- * How exactly this embedding will happen depends on the configured {@link #storage() storage type}.
+ * How exactly this embedding will happen depends on the configured {@link #structure() structure}.
  * Let's consider this representation of the book "Levianthan Wakes":
  * <ul>
  *     <li>title = Levianthan Wakes</li>
@@ -71,8 +72,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *     </li>
  * </ul>
  * <p>
- * With the default {@link ObjectFieldStorage#FLATTENED flattened storage type} (more efficient),
- * the structure will be a little different from what one would expect:
+ * With the default {@link ObjectStructure#FLATTENED flattened structure} (more efficient),
+ * the document structure will be a little different from what one would expect:
  * <ul>
  *     <li>title = Levianthan Wakes</li>
  *     <li>authors.firstName =
@@ -89,7 +90,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *     </li>
  * </ul>
  * <p>
- * To get the original structure, the {@link ObjectFieldStorage#NESTED nested storage type} must be used,
+ * To get the original structure, the {@link ObjectStructure#NESTED nested structure} must be used,
  * but this has an impact on performance and how queries must be structured.
  * See the reference documentation for more information.
  */
@@ -157,9 +158,19 @@ public @interface IndexedEmbedded {
 	int maxDepth() default -1;
 
 	/**
-	 * @return The storage strategy of the object field created for this indexed-embedded.
-	 * @see ObjectFieldStorage
+	 * @return How the structure of the object field created for this indexed-embedded
+	 * is preserved upon indexing.
+	 * @see ObjectStructure
 	 */
+	ObjectStructure structure() default ObjectStructure.DEFAULT;
+
+	/**
+	 * @return How the structure of the object field created for this indexed-embedded
+	 * is preserved upon indexing.
+	 * @see ObjectFieldStorage
+	 * @deprecated Use {@link #structure()} instead.
+	 */
+	@Deprecated
 	ObjectFieldStorage storage() default ObjectFieldStorage.DEFAULT;
 
 	/**

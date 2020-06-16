@@ -275,7 +275,7 @@ public class ObjectFieldTemplateIT {
 				} )
 				.join();
 
-		// Check that dynamic fields have the correct storage type
+		// Check that dynamic fields have the correct structure
 		checkNested( "foo_nested_object" );
 		checkFlattened( "flattened_object" );
 
@@ -346,7 +346,7 @@ public class ObjectFieldTemplateIT {
 				} )
 				.join();
 
-		// Check that dynamic fields have the correct storage type
+		// Check that dynamic fields have the correct structure
 		checkNested( "staticObject.foo_nested_object" );
 		checkFlattened( "staticObject.flattened_object" );
 

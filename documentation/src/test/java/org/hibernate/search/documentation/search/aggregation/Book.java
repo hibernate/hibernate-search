@@ -15,7 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -45,7 +45,7 @@ public class Book {
 
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
 	@OrderColumn
-	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
+	@IndexedEmbedded(structure = ObjectStructure.NESTED)
 	private List<BookEdition> editions = new ArrayList<>();
 
 	public Book() {

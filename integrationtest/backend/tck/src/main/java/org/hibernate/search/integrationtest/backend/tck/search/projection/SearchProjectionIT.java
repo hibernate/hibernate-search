@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -593,19 +593,19 @@ public class SearchProjectionIT extends EasyMockSupport {
 					"scorepattern scorepattern", "scorepattern", "xxx" )
 					.map( root, "score" );
 
-			IndexSchemaObjectField nested = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectStructure.NESTED );
 			nestedObject = nested.toReference();
 
 			nestedField = FieldModel.mapper( String.class, "eee", "ooo", "zzz" )
 					.map( nested, "inner" );
 
-			IndexSchemaObjectField nestedNested = nested.objectField( "nested", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedNested = nested.objectField( "nested", ObjectStructure.NESTED );
 			nestedNestedObject = nestedNested.toReference();
 
 			nestedNestedField = FieldModel.mapper( String.class, "fff", "ppp", "aaa" )
 					.map( nestedNested, "inner" );
 
-			IndexSchemaObjectField flattened = nested.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattened = nested.objectField( "flattened", ObjectStructure.FLATTENED );
 			flattenedObject = flattened.toReference();
 
 			flattenedField = FieldModel.mapper( String.class, "ggg", "ooo", "bbb" )

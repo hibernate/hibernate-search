@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
@@ -23,29 +23,29 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	private final List<String> nestedPathHierarchy;
 
-	private final ObjectFieldStorage storage;
+	private final ObjectStructure structure;
 
 	private final List<AbstractLuceneIndexSchemaFieldNode> staticChildren;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			IndexFieldInclusion inclusion, ObjectFieldStorage storage, boolean multiValued,
+			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
 			List<AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeName, inclusion, multiValued );
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
-		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
+		if ( ObjectStructure.NESTED.equals( structure ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy
 			theNestedPathHierarchy = new ArrayList<>( theNestedPathHierarchy );
 			theNestedPathHierarchy.add( absolutePath );
 		}
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
-		this.storage = storage;
+		this.structure = structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[absolutePath=" + absolutePath + ", storage=" + storage + "]";
+		return getClass().getSimpleName() + "[absolutePath=" + absolutePath + ", structure=" + structure + "]";
 	}
 
 	@Override
@@ -96,10 +96,10 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	@Override
 	public boolean nested() {
-		return ObjectFieldStorage.NESTED.equals( storage );
+		return ObjectStructure.NESTED.equals( structure );
 	}
 
-	public ObjectFieldStorage storage() {
-		return storage;
+	public ObjectStructure structure() {
+		return structure;
 	}
 }

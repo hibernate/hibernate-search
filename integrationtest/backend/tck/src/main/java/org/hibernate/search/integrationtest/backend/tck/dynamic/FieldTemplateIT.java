@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -355,7 +355,7 @@ public class FieldTemplateIT {
 				Consumer<IndexSchemaElement> templatesBinder) {
 			this.relativeFieldName = relativeFieldName;
 
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.FLATTENED );
 			self = objectField.toReference();
 
 			if ( fieldStructure.location.equals( IndexFieldLocation.IN_FLATTENED ) ) {
@@ -376,7 +376,7 @@ public class FieldTemplateIT {
 				Consumer<IndexSchemaElement> templatesBinder) {
 			this.relativeFieldName = relativeFieldName;
 
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );
 			objectField.multiValued();
 			self = objectField.toReference();
 
@@ -401,7 +401,7 @@ public class FieldTemplateIT {
 				Consumer<IndexSchemaElement> templatesBinder) {
 			this.relativeFieldName = relativeFieldName;
 
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );
 			objectField.multiValued();
 			self = objectField.toReference();
 

@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldReference;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -34,18 +34,18 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
 	private final IndexFieldInclusion inclusion;
-	private final ObjectFieldStorage storage;
+	private final ObjectStructure structure;
 	private boolean multiValued = false;
 
 	private LuceneIndexObjectFieldReference reference;
 
 	LuceneIndexSchemaObjectFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
-			String relativeFieldName, IndexFieldInclusion inclusion, ObjectFieldStorage storage) {
+			String relativeFieldName, IndexFieldInclusion inclusion, ObjectStructure structure) {
 		this.parent = parent;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
 		this.relativeFieldName = relativeFieldName;
 		this.inclusion = inclusion;
-		this.storage = storage;
+		this.structure = structure;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 
 		List<AbstractLuceneIndexSchemaFieldNode> staticChildren = new ArrayList<>();
 		LuceneIndexSchemaObjectFieldNode node = new LuceneIndexSchemaObjectFieldNode(
-				parentNode, relativeFieldName, inclusion, storage, multiValued, staticChildren
+				parentNode, relativeFieldName, inclusion, structure, multiValued, staticChildren
 		);
 
 		staticChildrenForParent.add( node );

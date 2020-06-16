@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
@@ -53,10 +54,25 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 			cleanedUpTargetType = null;
 		}
 
+		ObjectStructure structure = annotation.structure();
+		// Support for the deprecated @IndexedEmbedded.storage
+		if ( ObjectStructure.DEFAULT.equals( structure ) ) {
+			switch ( annotation.storage() ) {
+				case DEFAULT:
+					break;
+				case FLATTENED:
+					structure = ObjectStructure.FLATTENED;
+					break;
+				case NESTED:
+					structure = ObjectStructure.NESTED;
+					break;
+			}
+		}
+
 		mappingContext.indexedEmbedded( cleanedUpName )
 				.extractors( extractorPath )
 				.prefix( cleanedUpPrefix )
-				.storage( annotation.storage() )
+				.structure( structure )
 				.maxDepth( cleanedUpMaxDepth )
 				.includePaths( cleanedUpIncludePaths )
 				.targetType( cleanedUpTargetType );

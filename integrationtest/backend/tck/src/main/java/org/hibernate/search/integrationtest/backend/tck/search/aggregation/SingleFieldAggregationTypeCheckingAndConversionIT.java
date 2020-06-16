@@ -19,7 +19,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -610,8 +610,8 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonAggregable_", c -> c.aggregable( Aggregable.NO ) );
 
-			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED );
+			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectStructure.FLATTENED );
+			nestedObject = new ObjectBinding( root, "nestedObject", ObjectStructure.NESTED );
 		}
 	}
 
@@ -619,9 +619,9 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
 
-		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
+		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectStructure structure) {
 			this.relativeFieldName = relativeFieldName;
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			self = objectField.toReference();
 		}
 	}

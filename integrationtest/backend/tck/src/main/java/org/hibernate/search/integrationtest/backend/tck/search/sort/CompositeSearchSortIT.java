@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -342,12 +342,12 @@ public class CompositeSearchSortIT {
 			string3 = MainFieldModel.mapper( f -> f.asString() )
 					.map( root, "string3" );
 
-			IndexSchemaObjectField flattened = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattened = root.objectField( "flattened", ObjectStructure.FLATTENED );
 			flattenedObject = flattened.toReference();
 			flattenedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
 					.map( flattened, "field" );
 
-			IndexSchemaObjectField nested = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nested = root.objectField( "nested", ObjectStructure.NESTED );
 			nestedObject = nested.toReference();
 			nestedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
 					.map( nested, "field" );

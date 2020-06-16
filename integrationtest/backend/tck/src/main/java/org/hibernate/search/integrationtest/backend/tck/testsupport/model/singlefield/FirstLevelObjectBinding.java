@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexObjectFieldCardinality;
@@ -27,11 +27,11 @@ public class FirstLevelObjectBinding extends AbstractObjectBinding {
 	public final SecondLevelObjectBinding nestedObject;
 
 	public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
-			ObjectFieldStorage storage, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
+			ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			IndexObjectFieldCardinality nestedFieldCardinality) {
-		IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-		if ( ObjectFieldStorage.NESTED.equals( storage )
+		IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
+		if ( ObjectStructure.NESTED.equals( structure )
 				&& IndexObjectFieldCardinality.MULTI_VALUED.equals( nestedFieldCardinality ) ) {
 			objectField.multiValued();
 		}
@@ -48,7 +48,7 @@ public class FirstLevelObjectBinding extends AbstractObjectBinding {
 		self = objectField.toReference();
 		discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 		nestedObject = SecondLevelObjectBinding.create(
-				objectField, "nestedObject", ObjectFieldStorage.NESTED, supportedFieldTypes,
+				objectField, "nestedObject", ObjectStructure.NESTED, supportedFieldTypes,
 				additionalConfiguration, nestedFieldCardinality
 		);
 	}

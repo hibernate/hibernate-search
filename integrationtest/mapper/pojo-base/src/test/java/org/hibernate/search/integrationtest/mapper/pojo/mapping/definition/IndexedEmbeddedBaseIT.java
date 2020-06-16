@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
@@ -314,24 +314,24 @@ public class IndexedEmbeddedBaseIT {
 			}
 			@IndexedEmbedded(name = "default", includePaths = {"default", "common"})
 			@IndexedEmbedded(name = "flat", includePaths = {"flat", "common"},
-					storage = ObjectFieldStorage.FLATTENED)
+					structure = ObjectStructure.FLATTENED)
 			@IndexedEmbedded(name = "nest", includePaths = {"nest", "common"},
-					storage = ObjectFieldStorage.NESTED)
+					structure = ObjectStructure.NESTED)
 			public Embedded getEmbedded() {
 				return embedded;
 			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> {
-				b.objectField( "default", ObjectFieldStorage.DEFAULT, b2 -> {
+				b.objectField( "default", ObjectStructure.DEFAULT, b2 -> {
 					b2.field( "default", String.class );
 					b2.field( "common", String.class );
 				} );
-				b.objectField( "flat", ObjectFieldStorage.FLATTENED, b2 -> {
+				b.objectField( "flat", ObjectStructure.FLATTENED, b2 -> {
 					b2.field( "flat", String.class );
 					b2.field( "common", String.class );
 				} );
-				b.objectField( "nest", ObjectFieldStorage.NESTED, b2 -> {
+				b.objectField( "nest", ObjectStructure.NESTED, b2 -> {
 					b2.field( "nest", String.class );
 					b2.field( "common", String.class );
 				} );
@@ -379,7 +379,7 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.objectField( "level1", ObjectFieldStorage.DEFAULT, b2 -> b2
+				.objectField( "level1", ObjectStructure.DEFAULT, b2 -> b2
 						.multiValued( true )
 						.field( "level1SingleValuedProperty", String.class )
 						.field( "level1MultiValuedProperty", String.class, b3 -> b3.multiValued( true ) )
@@ -471,15 +471,15 @@ public class IndexedEmbeddedBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "level1_level1Property", String.class, b2 -> b2.multiValued( true ) )
 				.field( "level1_level2NoDotInPrefix_level2Property", String.class, b2 -> b2.multiValued( true ) )
-				.objectField( "level1_level2OneDotInPrefix", ObjectFieldStorage.DEFAULT, b2 -> b2
+				.objectField( "level1_level2OneDotInPrefix", ObjectStructure.DEFAULT, b2 -> b2
 						.multiValued( true )
 						// Not a direct child of level1: should be single-valued
 						.field( "level2Property", String.class )
 				)
-				.objectField( "level1_level2TwoDotsInPrefix", ObjectFieldStorage.DEFAULT, b2 -> b2
+				.objectField( "level1_level2TwoDotsInPrefix", ObjectStructure.DEFAULT, b2 -> b2
 						.multiValued( true )
 						// Not a direct child of level1: should be single-valued
-						.objectField( "level3", ObjectFieldStorage.DEFAULT, b3 -> b3
+						.objectField( "level3", ObjectStructure.DEFAULT, b3 -> b3
 								// Not a direct child of level1: should be single-valued
 								.field( "level2Property", String.class )
 						)
@@ -768,12 +768,12 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	/**
-	 * Check that the "storage" parameter is at least taken into account.
+	 * Check that the "structure" parameter is at least taken into account.
 	 * <p>
 	 * Details of how filtering handles all corner cases is tested in the engine (see this class' javadoc).
 	 */
 	@Test
-	public void storage() {
+	public void structure() {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
 			@GenericField
@@ -794,14 +794,14 @@ public class IndexedEmbeddedBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
+			@IndexedEmbedded(structure = ObjectStructure.NESTED)
 			public IndexedEmbeddedLevel1 getLevel1() {
 				return level1;
 			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.objectField( "level1", ObjectFieldStorage.NESTED, b2 -> b2
+				.objectField( "level1", ObjectStructure.NESTED, b2 -> b2
 						.field( "level1Property", String.class )
 				)
 		);

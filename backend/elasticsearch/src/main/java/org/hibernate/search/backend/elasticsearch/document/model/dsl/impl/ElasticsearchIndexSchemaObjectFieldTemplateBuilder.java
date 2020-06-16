@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Dy
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
@@ -23,12 +23,12 @@ class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 				ElasticsearchIndexSchemaObjectFieldTemplateBuilder, ElasticsearchIndexSchemaObjectFieldTemplate
 		> {
 
-	private final ObjectFieldStorage storage;
+	private final ObjectStructure structure;
 
 	ElasticsearchIndexSchemaObjectFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String templateName, IndexFieldInclusion inclusion, ObjectFieldStorage storage, String prefix) {
+			String templateName, IndexFieldInclusion inclusion, ObjectStructure structure, String prefix) {
 		super( parent, templateName, inclusion, prefix );
-		this.storage = storage;
+		this.structure = structure;
 	}
 
 	@Override
@@ -41,11 +41,11 @@ class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 			ElasticsearchIndexSchemaObjectNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexSchemaObjectFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaObjectFieldTemplate(
-				parentNode, absolutePathGlob, inclusion, multiValued, storage
+				parentNode, absolutePathGlob, inclusion, multiValued, structure
 		);
 
 		PropertyMapping mapping =
-				ElasticsearchIndexSchemaObjectFieldNodeBuilder.createPropertyMapping( storage, DynamicType.TRUE );
+				ElasticsearchIndexSchemaObjectFieldNodeBuilder.createPropertyMapping( structure, DynamicType.TRUE );
 
 		collector.collect( fieldTemplate );
 

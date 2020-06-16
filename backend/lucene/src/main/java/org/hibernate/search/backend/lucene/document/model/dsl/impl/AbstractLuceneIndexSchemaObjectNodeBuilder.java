@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -59,9 +59,9 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
-			ObjectFieldStorage storage) {
+			ObjectStructure structure) {
 		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, storage );
+				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, structure );
 		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
@@ -80,11 +80,11 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix, IndexFieldInclusion inclusion) {
+			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexSchemaObjectFieldTemplateBuilder templateBuilder =
 				new LuceneIndexSchemaObjectFieldTemplateBuilder(
-						this, prefixedTemplateName, inclusion, storage, prefix
+						this, prefixedTemplateName, inclusion, structure, prefix
 				);
 		putTemplate( prefixedTemplateName, templateBuilder );
 		return templateBuilder;

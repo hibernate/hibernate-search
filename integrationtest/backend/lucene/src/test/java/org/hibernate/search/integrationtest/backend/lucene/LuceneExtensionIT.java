@@ -49,7 +49,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -948,7 +948,7 @@ public class LuceneExtensionIT {
 			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 
-			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
+			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectStructure.NESTED, true );
 		}
 	}
 
@@ -961,9 +961,9 @@ public class LuceneExtensionIT {
 		final IndexFieldReference<String> aggregation1;
 
 		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage,
+				ObjectStructure structure,
 				boolean multiValued) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			if ( multiValued ) {
 				objectField.multiValued();
 			}

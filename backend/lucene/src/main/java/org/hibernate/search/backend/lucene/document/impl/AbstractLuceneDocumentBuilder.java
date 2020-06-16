@@ -180,7 +180,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 			return NoOpDocumentElement.get();
 		}
 
-		switch ( node.storage() ) {
+		switch ( node.structure() ) {
 			case NESTED:
 				LuceneNestedObjectDocumentBuilder nestedDocumentBuilder =
 						new LuceneNestedObjectDocumentBuilder( model, node );

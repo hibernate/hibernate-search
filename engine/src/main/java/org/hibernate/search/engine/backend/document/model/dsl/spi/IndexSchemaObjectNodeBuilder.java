@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl.spi;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
@@ -32,11 +32,11 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 *
 	 * @param relativeFieldName The relative name of the new object field
 	 * @param inclusion Whether fields matching this template should be included, provided their parent is included.
-	 * @param storage The storage type of the new object field
+	 * @param structure The structure of the new object field
 	 * @return A builder for the new object field
 	 */
 	IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
-			ObjectFieldStorage storage);
+			ObjectStructure structure);
 
 	/**
 	 * Create a new field template and add it to the current builder.
@@ -56,13 +56,13 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * Create a new object field template and add it to the current builder.
 	 *
 	 * @param templateName The name of the new template
-	 * @param storage The storage type of the new object field template
+	 * @param structure The structure of the new object field template
 	 * @param prefix A prefix to prepend to the {@link IndexSchemaFieldTemplateOptionsStep#matchingPathGlob(String) glob pattern}
 	 * and to field paths passed to {@link org.hibernate.search.engine.backend.document.DocumentElement#addObject(String)}.
 	 * @param inclusion Whether fields matching this template should be included, provided their parent is included.
 	 * @return A DSL step where the field template can be defined in more details.
 	 */
-	IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName, ObjectFieldStorage storage,
+	IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName, ObjectStructure structure,
 			String prefix, IndexFieldInclusion inclusion);
 
 }

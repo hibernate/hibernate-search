@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
@@ -52,12 +52,13 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	PropertyMappingIndexedEmbeddedStep includePaths(Collection<String> paths);
 
 	/**
-	 * @param storage The storage strategy of the object field created for this indexed-embedded.
+	 * @param structure How the structure of the object field created for this indexed-embedded
+	 * is preserved upon indexing.
 	 * @return {@code this}, for method chaining.
-	 * @see IndexedEmbedded#storage()
-	 * @see ObjectFieldStorage
+	 * @see IndexedEmbedded#structure()
+	 * @see ObjectStructure
 	 */
-	PropertyMappingIndexedEmbeddedStep storage(ObjectFieldStorage storage);
+	PropertyMappingIndexedEmbeddedStep structure(ObjectStructure structure);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.

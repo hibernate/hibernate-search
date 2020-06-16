@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -664,10 +664,10 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 			)
 					.toReference();
 			IndexSchemaObjectField flattenedObjectField =
-					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+					root.objectField( "flattenedObject", ObjectStructure.FLATTENED );
 			flattenedObject = new ObjectMapping( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField =
-					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+					root.objectField( "nestedObject", ObjectStructure.NESTED );
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}

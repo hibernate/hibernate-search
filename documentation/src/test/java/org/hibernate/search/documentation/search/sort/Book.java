@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -39,7 +39,7 @@ public class Book {
 	private Genre genre;
 
 	@ManyToMany
-	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED, maxDepth = 1)
+	@IndexedEmbedded(structure = ObjectStructure.NESTED, maxDepth = 1)
 	private List<Author> authors = new ArrayList<>();
 
 	public Book() {
