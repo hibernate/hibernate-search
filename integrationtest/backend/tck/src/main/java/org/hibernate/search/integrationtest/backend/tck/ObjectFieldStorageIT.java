@@ -173,7 +173,8 @@ public class ObjectFieldStorageIT {
 			scope.predicate().nested().objectField( "flattenedObject" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "'flattenedObject'", "is not stored as nested" );
+				.hasMessageContainingAll( "'flattenedObject'", "is flattened",
+						"its structure was lost upon indexing and 'nested' features are not available" );
 	}
 
 	@Test
