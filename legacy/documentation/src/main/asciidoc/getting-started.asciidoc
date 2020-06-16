@@ -89,16 +89,6 @@ to combine this with downloads from the other projects, for example the
 http://sourceforge.net/projects/hibernate/files/hibernate-orm/{hibernateVersion}/[Hibernate ORM distribution on Sourceforge]
 also provides the modules to enable caching or use a connection pool.
 
-=== Deploying on WildFly
-
-If you are creating an application to be deployed on WildFly you're lucky:
-Hibernate Search is included in the application server.
-This means that you don't need to package it along with your application, unless you want to use a different version
-than the one included.
-Since WildFly version 10 the embedded version of Hibernate Search is automatically activated when your application uses it. See <<search-configuration-deploy-on-wildfly>> for details.
-
-If you want to use another version than the one included in WildFly, have a look at <<search-configuration-deploy-on-wildfly>>.
-
 === Configuration
 
 Once you have added all required dependencies to your application you have to add a couple of

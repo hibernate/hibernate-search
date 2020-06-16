@@ -10,19 +10,16 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -36,8 +33,6 @@ import org.hibernate.search.testsupport.TestConstants;
 
 import static org.apache.commons.lang.StringUtils.leftPad;
 import static org.apache.commons.lang.StringUtils.rightPad;
-import static org.hibernate.search.test.performance.TestRunnerArquillian.RUNNER_PROPERTIES;
-import static org.hibernate.search.test.performance.TestRunnerArquillian.TARGET_DIR_KEY;
 import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
 /**
@@ -209,20 +204,7 @@ public class TestReporter {
 	}
 
 	private static Path getTargetDir() {
-		InputStream runnerPropertiesStream = TestReporter.class.getResourceAsStream( "/" + RUNNER_PROPERTIES );
-		if ( runnerPropertiesStream != null ) {
-			Properties runnerProperties = new Properties();
-			try {
-				runnerProperties.load( runnerPropertiesStream );
-			}
-			catch (IOException e) {
-				throw new RuntimeException( e );
-			}
-			return Paths.get( runnerProperties.getProperty( TARGET_DIR_KEY ) );
-		}
-		else {
-			return TargetDirHelper.getTargetDir();
-		}
+		return TargetDirHelper.getTargetDir();
 	}
 
 }

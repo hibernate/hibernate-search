@@ -180,7 +180,6 @@
                         <elasticsearchClientVersion>${version.org.elasticsearch.client}</elasticsearchClientVersion>
                         <gsonVersion>${version.com.google.code.gson}</gsonVersion>
                         <awsV4SignerJavaVersion>${version.uk.co.lucasweb.aws-v4-signer-java}</awsV4SignerJavaVersion>
-                        <wildflyVersion>${version.wildfly}</wildflyVersion>
                     </attributes>
                 </configuration>
             </plugin>

@@ -32,11 +32,8 @@
         <module>jsr352</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>jbossmodules</module>
         <module>integrationtest/elasticsearch</module>
-        <module>integrationtest/wildfly</module>
         <module>integrationtest/jms</module>
-        <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/osgi/karaf-it</module>
@@ -88,7 +85,6 @@
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
-        <!-- in line with the version used in WildFly 13 -->
         <version.org.jberet>1.2.4.Final</version.org.jberet>
 
         <!-- >>> Apache dependencies -->
@@ -106,8 +102,6 @@
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
         <version.javax.inject>1</version.javax.inject>
         <version.javax.enterprise>2.0</version.javax.enterprise>
-        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
-        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
 
         <!-- >>> Tika -->
         <version.org.apache.tika>1.4</version.org.apache.tika>
@@ -116,9 +110,6 @@
 
         <!-- >>> Infinispan -->
         <version.org.infinispan>9.2.2.Final</version.org.infinispan>
-
-        <!-- >>> JBoss modules -->
-        <version.wildfly>13.0.0.Final</version.wildfly>
 
         <!-- >>> JMS -->
         <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
@@ -158,14 +149,6 @@
 
         <!-- >>> ORM ITs-->
         <version.com.h2database>1.4.178</version.com.h2database>
-
-        <!-- >>> WildFly ITs-->
-        <version.org.arquillian.universe>1.5.0.0</version.org.arquillian.universe>
-        <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
-        <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.1.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
-        <version.org.jboss.ejb3.ext-api>2.2.0.Final</version.org.jboss.ejb3.ext-api>
-        <version.org.jboss.narayana>5.8.1.Final</version.org.jboss.narayana>
-        <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
 
         <!-- >>> Spring ITs-->
         <version.org.springframework.boot>1.5.3.RELEASE</version.org.springframework.boot>
@@ -469,11 +452,6 @@
                 <version>${version.org.jgroups}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.spec.javax.annotation</groupId>
-                <artifactId>jboss-annotations-api_1.2_spec</artifactId>
-                <version>${version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec}</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.batch</groupId>
                 <artifactId>javax.batch-api</artifactId>
                 <version>${version.javax.batch}</version>
@@ -620,11 +598,6 @@
                 <version>${version.org.jboss.byteman}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.narayana.jta</groupId>
-                <artifactId>narayana-jta</artifactId>
-                <version>${version.org.jboss.narayana}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.spec.javax.transaction</groupId>
                 <artifactId>jboss-transaction-api_1.2_spec</artifactId>
                 <version>${version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec}</version>
@@ -659,73 +632,6 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${version.com.h2database}</version>
-            </dependency>
-
-            <!-- External WildFly feature packs (to build our own feature packs) -->
-            <dependency>
-                <groupId>org.wildfly</groupId>
-                <artifactId>wildfly-feature-pack</artifactId>
-                <type>zip</type>
-                <version>${version.wildfly}</version>
-                <!-- We just need the ZIP, not the dependencies -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.lucene-jbossmodules</groupId>
-                <artifactId>lucene-jbossmodules</artifactId>
-                <type>zip</type>
-                <version>${version.feature-pack.org.apache.lucene}</version>
-                <!-- We just need the ZIP, not the dependencies -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.elasticsearch-client-jbossmodules</groupId>
-                <artifactId>elasticsearch-client-jbossmodules</artifactId>
-                <type>zip</type>
-                <version>${version.feature-pack.org.elasticsearch.client}</version>
-                <!-- We just need the ZIP, not the dependencies -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.gson-jbossmodules</groupId>
-                <artifactId>gson-jbossmodules</artifactId>
-                <type>zip</type>
-                <version>${version.feature-pack.com.google.code.gson}</version>
-                <!-- We just need the ZIP, not the dependencies -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.aws-v4-signer-java-jbossmodules</groupId>
-                <artifactId>aws-v4-signer-java-jbossmodules</artifactId>
-                <type>zip</type>
-                <version>${version.feature-pack.uk.co.lucasweb.aws-v4-signer-java}</version>
-                <!-- We just need the ZIP, not the dependencies -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -870,8 +776,6 @@
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
                 <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-                <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
-                <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
         </profile>
         <profile>
@@ -884,8 +788,6 @@
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
                 <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-                <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
-                <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
         </profile>
 

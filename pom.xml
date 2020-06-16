@@ -215,7 +215,6 @@
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
-        <!-- in line with the version used in WildFly 13 -->
         <version.org.jberet>1.2.4.Final</version.org.jberet>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
@@ -285,7 +284,6 @@
         <version.surefire.plugin>2.22.2</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>7.3.1</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
-        <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
         <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
@@ -439,20 +437,6 @@
             Allows to distinguish between multiple executions of the same test in test reports.
          -->
         <surefire.environment>default</surefire.environment>
-
-        <arquillian.wildfly.jvm.args.java-version></arquillian.wildfly.jvm.args.java-version>
-        <arquillian.wildfly.jvm.args.jacoco></arquillian.wildfly.jvm.args.jacoco>
-        <!--
-          The arguments below are JBoss modules settings taken from
-          https://github.com/jboss-modules/jboss-modules/blob/5b4744e74f35cbab23536e3e52c0724fdbbedcb7/src/main/java/org/jboss/modules/maven/MavenSettings.java#L264
-          - remote.maven.repo: necessary for the WF provisioning to work when the JBoss Nexus is not in the user's settings
-          - maven.repo.local: necessary for the WF provisioning to work when using a non-default local repository
-         -->
-        <arquillian.wildfly.jvm.args.jbossmodules>
-            -Dremote.maven.repo=${jboss.public.repo.url}
-            -Dmaven.repo.local=${settings.localRepository}
-        </arquillian.wildfly.jvm.args.jbossmodules>
-        <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.java-version} ${arquillian.wildfly.jvm.args.jacoco} ${arquillian.wildfly.jvm.args.jbossmodules}</arquillian.wildfly.jvm.args>
 
         <pax-exam.jvm.args.java-version></pax-exam.jvm.args.java-version>
         <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
@@ -671,66 +655,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-engine</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jbossmodules-elasticsearch</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jbossmodules-elasticsearch-aws</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-jbossmodules-testing</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -1265,11 +1189,6 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.wildfly.build</groupId>
-                    <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
-                    <version>${version.org.wildfly.build-tools}</version>
-                </plugin>
-                <plugin>
                     <groupId>com.github.marschall</groupId>
                     <artifactId>jdeps-maven-plugin</artifactId>
                     <version>${version.jdeps.plugin}</version>
@@ -1673,11 +1592,6 @@
                     <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.wildfly.build</groupId>
-                    <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                    <version>${version.org.wildfly.build-tools}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${version.jacoco.plugin}</version>
@@ -1840,9 +1754,6 @@
                     ${surefire.jvm.args.java-version.lenient}
                     --illegal-access=deny
                 </surefire.jvm.args.java-version.strict>
-                <arquillian.wildfly.jvm.args.java-version>
-                    -Djdk.attach.allowAttachSelf=true
-                </arquillian.wildfly.jvm.args.java-version>
                 <pax-exam.jvm.args.java-version>
                     --add-modules=java.xml.bind
                 </pax-exam.jvm.args.java-version>
@@ -1878,9 +1789,6 @@
                     ${surefire.jvm.args.java-version.lenient}
                     --illegal-access=deny
                 </surefire.jvm.args.java-version.strict>
-                <arquillian.wildfly.jvm.args.java-version>
-                    -Djdk.attach.allowAttachSelf=true
-                </arquillian.wildfly.jvm.args.java-version>
                 <pax-exam.jvm.args.java-version>
                     --add-modules=java.xml.bind
                 </pax-exam.jvm.args.java-version>
@@ -1913,9 +1821,6 @@
                     --illegal-access=deny
                     --add-opens java.base/java.lang=ALL-UNNAMED
                 </surefire.jvm.args.java-version.strict>
-                <arquillian.wildfly.jvm.args.java-version>
-                    -Djdk.attach.allowAttachSelf=true
-                </arquillian.wildfly.jvm.args.java-version>
             </properties>
             <modules>
                 <!-- Nothing at the moment -->
@@ -2155,19 +2060,6 @@
                                         </pluginExecution>
                                         <pluginExecution>
                                             <pluginExecutionFilter>
-                                                <groupId>org.wildfly.build</groupId>
-                                                <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                                                <versionRange>[1.2.6.Final,)</versionRange>
-                                                <goals>
-                                                    <goal>build</goal>
-                                                </goals>
-                                            </pluginExecutionFilter>
-                                            <action>
-                                                <ignore />
-                                            </action>
-                                        </pluginExecution>
-                                        <pluginExecution>
-                                            <pluginExecutionFilter>
                                                 <groupId>org.jboss.bridger</groupId>
                                                 <artifactId>bridger</artifactId>
                                                 <versionRange>[1.5.Final,)</versionRange>
@@ -2259,7 +2151,6 @@
                     because these properties are evaluated by the maven-resource-plugin,
                     which doesn't understand the @{...} syntax but somehow manages to always use late evaluation.
                  -->
-                <arquillian.wildfly.jvm.args.jacoco>${failsafe.jvm.args.jacoco.lateEval}</arquillian.wildfly.jvm.args.jacoco>
                 <pax-exam.jvm.args.jacoco>${failsafe.jvm.args.jacoco.lateEval}</pax-exam.jvm.args.jacoco>
             </properties>
             <build>

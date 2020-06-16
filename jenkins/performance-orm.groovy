@@ -30,7 +30,7 @@ node ('Performance') {
 					" -pl :hibernate-search-performance-orm" +
 					" -Pperf" +
 					" -P${env.DB_PROFILE ?: 'ci-postgresql'}" +
-					" -Dtest=${env.RUNNER ?: 'TestRunnerArquillian'}" +
+					" -Dtest=TestRunnerStandalone" +
 					" -Dscenario=${scenario}"
 		}
 	}

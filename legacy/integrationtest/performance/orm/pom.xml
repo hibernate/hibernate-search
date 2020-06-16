@@ -21,51 +21,15 @@
     <description>Hibernate Search ORM Performance Tests</description>
 
     <properties>
-        <!--
-        Disable the dependency convergence rule, because the dependencies of WildFly feature packs do not converge
-        -->
-        <enforcer.dependencyconvergence.skip>true</enforcer.dependencyconvergence.skip>
         <scenario></scenario>
-        <serverName>wildfly-${version.wildfly}</serverName>
         <jbosshome>${project.build.directory}/${serverName}/</jbosshome>
-
-        <!--
-            Relax the JVM restrictions on the client side of Arquillian:
-            strict restrictions wouldn't work and it's not what we want to check.
-         -->
-        <surefire.jvm.args.java-version>${surefire.jvm.args.java-version.lenient}</surefire.jvm.args.java-version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Imports compatible versions for each Arquillian module -->
-            <dependency>
-                <groupId>org.arquillian.universe</groupId>
-                <artifactId>arquillian-core</artifactId>
-                <version>${version.org.arquillian.universe}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
             <version>${version.org.hibernate}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-integrationtest-wildfly</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.transaction</groupId>
-            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -79,52 +43,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.shrinkwrap.resolver</groupId>
-            <artifactId>shrinkwrap-resolver-depchain</artifactId>
-            <scope>test</scope>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.arquillian</groupId>
-            <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>${version.org.wildfly.arquillian}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.logmanager</groupId>
-                    <artifactId>jboss-logmanager</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.logmanager</groupId>
-                    <artifactId>log4j-jboss-logmanager</artifactId>
-                </exclusion>
-                <!-- This exclusion is needed to be able to setup the project in Windows:
-                     it otherwise includes transitive dependency to the JDK JConsole -->
-                <exclusion>
-                    <artifactId>wildfly-patching</artifactId>
-                    <groupId>org.wildfly</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <!-- This exclusion is needed to be able to setup the project in Windows:
-                     it otherwise includes transitive dependency to the JDK JConsole -->
-                <exclusion>
-                    <artifactId>wildfly-patching</artifactId>
-                    <groupId>org.wildfly</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -208,69 +126,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.wildfly.build</groupId>
-                <artifactId>wildfly-server-provisioning-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>server-provisioning</id>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                        <phase>generate-test-resources</phase>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <config-file>server-provisioning.xml</config-file>
-                            <server-name>${serverName}</server-name>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <!--
-                          This allows to run mvn clean install -am -pl :thismodule
-                          and have Maven re-build WildFly modules automatically.
-                          Otherwise the plugin would simply try to fetch the
-                          version in the local repository.
-                     -->
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-jbossmodules-engine</artifactId>
-                        <type>zip</type>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-search-jbossmodules-orm</artifactId>
-                        <type>zip</type>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-drivers</id>
-                        <!-- Must execute after "generate-test-resources", during which we create the WildFly directory -->
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipWildFlyPreparation}</skip>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${jdbc.driver.groupId}</groupId>
-                                    <artifactId>${jdbc.driver.artifactId}</artifactId>
-                                    <version>${jdbc.driver.version}</version>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${jbosshome}/standalone/deployments</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
     </build>
@@ -305,62 +160,4 @@
             </properties>
         </profile>
     </profiles>
-
-    <!--
-        Enable a hard-coded JBoss repository configuration in WildFly-related tests.
-        This allows us to run a CI job with default Maven settings,
-        checking that any other module only relies on dependencies available in Maven Central.
-     -->
-    <repositories>
-        <!-- Use Central first -->
-        <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>jboss-public-repository-group</id>
-            <name>JBoss Public Maven Repository Group</name>
-            <url>${jboss.public.repo.url}</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <!-- Use Central first -->
-        <pluginRepository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>jboss-public-repository-group</id>
-            <name>JBoss Public Maven Repository Group</name>
-            <url>${jboss.public.repo.url}</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 </project>

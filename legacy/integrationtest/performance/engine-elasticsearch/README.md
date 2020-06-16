@@ -64,6 +64,5 @@ So the "run it from your IDE" approach is just meant for development of new test
 - include Infinispan Directory test, also in clustered modes
 - cleanup the on-disk stored indexes automatically?
 - use the word producer utility to feed larger, semi-random but reproducible text
-- find out how to use JMH within a WildFly deployment without including the overhead from Arquillian in the measurements
 - gradually replace the other performance tests to use JMH
 

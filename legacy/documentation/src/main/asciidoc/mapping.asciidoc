@@ -1755,11 +1755,6 @@ metadata.
 <<example-tika-mapping>>) need to explicitly enable the option ignoreFieldBridge().
 ====
 
-[TIP]
-====
-To use the `@TikaBridge` in combination with WildFly modules, make sure to package your Tika extensions as described in <<modules-tika>>.
-====
-
 [[section-custom-bridges]]
 ==== Custom bridges
 

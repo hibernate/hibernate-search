@@ -3,9 +3,6 @@ Hibernate Search Performance Tests
 
 ## Description
 
-The performance tests can be run in two modes, standalone via `TestRunnerStandalone` or in container
-via `TestRunnerArquillian`.
-
 The test is controlled by the class `TestScenario` or more precisely by one of its subclasses,
 which need to be specified via system property `-Dscenario`.
 The test scenario defines the used hibernate configuration, number of threads and test cycles and
@@ -68,39 +65,6 @@ username and password.
   with a large dataset and with metrics enabled
 
         mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerStandalone \
-        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemReadWriteTestScenario \
-        -Djdbc.url=jdbc:mysql://hostname:3306/hibperf \
-        -Djdbc.user=foo \
-        -Djdbc.pass=foo
-
-### In container against a data source
-
-The tests will create the datasource automatically.
-Just provide the parameters as you would do in standalone mode.
-
-- run tests in container mode against in-memory database,
-  **with a small dataset and with metrics disabled**
-  (otherwise you will probably run out of memory)
-
-        mvn clean test -Dtest=TestRunnerArquillian \
-        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemReadWriteTestScenario
-
-Note: For the following scenarios, the test database needs to be created first with appropriate
-username and password.
-
-- run tests in container mode against a PostgreSQL database,
-  with a large dataset and with metrics enabled
-
-        mvn clean test -Pperf -Ppostgresql84 -Dtest=TestRunnerArquillian \
-        -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemReadWriteTestScenario \
-        -Djdbc.url=jdbc:postgresql://localhost:5432/hibperf \
-        -Djdbc.user=foo \
-        -Djdbc.pass=foo
-
-- run tests in container mode against a MariaDB database,
-  with a large dataset and with metrics enabled
-
-        mvn clean test -Pperf -Pmysql51 -Dtest=TestRunnerArquillian \
         -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemReadWriteTestScenario \
         -Djdbc.url=jdbc:mysql://hostname:3306/hibperf \
         -Djdbc.user=foo \
