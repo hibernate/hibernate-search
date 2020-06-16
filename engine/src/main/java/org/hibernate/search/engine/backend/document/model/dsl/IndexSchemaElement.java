@@ -10,6 +10,7 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -63,7 +64,7 @@ public interface IndexSchemaElement {
 			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
 
 	/**
-	 * Add an object field to this index schema element with the default storage type.
+	 * Add an object field to this index schema element with the default structure.
 	 *
 	 * @param relativeFieldName The relative name of the field.
 	 * @return An {@link IndexSchemaObjectField}, where the field can be defined in more details,
@@ -71,20 +72,20 @@ public interface IndexSchemaElement {
 	 * and where ultimately a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
 	default IndexSchemaObjectField objectField(String relativeFieldName) {
-		return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT );
+		return objectField( relativeFieldName, ObjectStructure.DEFAULT );
 	}
 
 	/**
-	 * Add an object field to this index schema element with the given storage type.
+	 * Add an object field to this index schema element with the given structure.
 	 *
 	 * @param relativeFieldName The relative name of the field.
-	 * @param storage The storage type.
+	 * @param structure The structure of the object field.
 	 * @return An {@link IndexSchemaObjectField}, where the field can be defined in more details,
 	 * in particular by adding new child fields to it,
 	 * and where ultimately a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
-	 * @see ObjectFieldStorage
+	 * @see ObjectStructure
 	 */
-	IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage);
+	IndexSchemaObjectField objectField(String relativeFieldName, ObjectStructure structure);
 
 	/**
 	 * Add a field template to this index schema element with the given type.
@@ -127,7 +128,7 @@ public interface IndexSchemaElement {
 			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<?>> typeContributor);
 
 	/**
-	 * Add an object field template to this index schema element with the default storage type.
+	 * Add an object field template to this index schema element with the default structure.
 	 *
 	 * @param templateName The name of the template. Must be non-null and non-empty.
 	 * Must be unique for this index schema element.
@@ -135,19 +136,19 @@ public interface IndexSchemaElement {
 	 * @return A DSL step where the field template can be defined in more details.
 	 */
 	default IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName) {
-		return objectFieldTemplate( templateName, ObjectFieldStorage.DEFAULT );
+		return objectFieldTemplate( templateName, ObjectStructure.DEFAULT );
 	}
 
 	/**
-	 * Add an object field template to this index schema element with the given storage type.
+	 * Add an object field template to this index schema element with the given structure.
 	 *
 	 * @param templateName The name of the template. Must be non-null and non-empty.
 	 * Must be unique for this index schema element.
 	 * Must not contain the dot ('.') character.
-	 * @param storage The storage type.
+	 * @param structure The structure of object fields created by this template.
 	 * @return A DSL step where the field template can be defined in more details.
-	 * @see ObjectFieldStorage
+	 * @see ObjectStructure
 	 */
-	IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectFieldStorage storage);
+	IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectStructure structure);
 
 }

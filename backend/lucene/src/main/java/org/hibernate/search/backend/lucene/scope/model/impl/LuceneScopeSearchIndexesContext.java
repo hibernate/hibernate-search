@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -200,7 +200,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
 				found = true;
-				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.storage() ) ) {
+				if ( !ObjectStructure.NESTED.equals( schemaNode.structure() ) ) {
 					throw log.nonNestedFieldForNestedQuery(
 							absoluteFieldPath, indexModel.getEventContext()
 					);

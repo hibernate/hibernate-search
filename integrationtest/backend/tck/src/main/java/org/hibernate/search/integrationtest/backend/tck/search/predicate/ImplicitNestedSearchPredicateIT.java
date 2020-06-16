@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -367,23 +367,23 @@ public class ImplicitNestedSearchPredicateIT {
 		IndexBinding(IndexSchemaElement root) {
 			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).toReference();
 
-			IndexSchemaObjectField nestedObject = root.objectField( NESTED_1, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObject = root.objectField( NESTED_1, ObjectStructure.NESTED );
 			this.nested = nestedObject.toReference();
 			this.nestedString = nestedObject.field( "string", f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES ) ).toReference();
 			this.nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
 			this.nestedText = nestedObject.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).toReference();
 			this.nestedGeo = nestedObject.field( "geo", f -> f.asGeoPoint() ).toReference();
 
-			IndexSchemaObjectField nestedObjectX2 = nestedObject.objectField( NESTED_2, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectX2 = nestedObject.objectField( NESTED_2, ObjectStructure.NESTED );
 			this.nestedX2 = nestedObjectX2.toReference();
 			this.nestedX2Numeric = nestedObjectX2.field( "numeric", f -> f.asInteger() ).toReference();
 
-			IndexSchemaObjectField nestedObjectX3 = nestedObjectX2.objectField( NESTED_3, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObjectX3 = nestedObjectX2.objectField( NESTED_3, ObjectStructure.NESTED );
 			this.nestedX3 = nestedObjectX3.toReference();
 			this.nestedX3String = nestedObjectX3.field( "string", f -> f.asString() ).toReference();
 			this.nestedX3Text = nestedObjectX3.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).toReference();
 
-			IndexSchemaObjectField nestFlatObject = nestedObject.objectField( FLATTENED, ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField nestFlatObject = nestedObject.objectField( FLATTENED, ObjectStructure.FLATTENED );
 			this.nestFlat = nestFlatObject.toReference();
 
 			IndexSchemaObjectField nestFlatNestObject = nestFlatObject.objectField( NESTED_2 );

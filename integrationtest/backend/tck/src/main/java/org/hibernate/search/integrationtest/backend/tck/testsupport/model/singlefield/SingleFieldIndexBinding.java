@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
@@ -50,11 +50,11 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 			IndexObjectFieldCardinality nestedFieldCardinality) {
 		super( root, supportedFieldTypes, additionalConfiguration );
 		flattenedObject = FirstLevelObjectBinding.create(
-				root, "flattenedObject", ObjectFieldStorage.FLATTENED,
+				root, "flattenedObject", ObjectStructure.FLATTENED,
 				supportedFieldTypes, additionalConfiguration, nestedFieldCardinality
 		);
 		nestedObject = FirstLevelObjectBinding.create(
-				root, "nestedObject", ObjectFieldStorage.NESTED,
+				root, "nestedObject", ObjectStructure.NESTED,
 				supportedFieldTypes, additionalConfiguration, nestedFieldCardinality
 		);
 	}

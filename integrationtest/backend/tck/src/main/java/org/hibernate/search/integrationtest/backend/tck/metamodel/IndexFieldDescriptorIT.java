@@ -16,7 +16,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
@@ -281,7 +281,7 @@ public class IndexFieldDescriptorIT {
 
 	private static class FlattenedObjectBinding extends AbstractObjectBinding {
 		public static FlattenedObjectBinding create(IndexSchemaElement parent, String relativeFieldName) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );
 			return new FlattenedObjectBinding( objectField, relativeFieldName );
 		}
 
@@ -297,7 +297,7 @@ public class IndexFieldDescriptorIT {
 
 	private static class NestedObjectBinding extends AbstractObjectBinding {
 		public static NestedObjectBinding create(IndexSchemaElement parent, String relativeFieldName) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );
 			objectField.multiValued();
 			return new NestedObjectBinding( objectField, relativeFieldName );
 		}
@@ -317,7 +317,7 @@ public class IndexFieldDescriptorIT {
 
 	private static class SecondLevelNestedObjectBinding extends AbstractObjectBinding {
 		public static SecondLevelNestedObjectBinding create(IndexSchemaElement parent, String relativeFieldName) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.NESTED );
 			objectField.multiValued();
 			return new SecondLevelNestedObjectBinding( objectField, relativeFieldName );
 		}

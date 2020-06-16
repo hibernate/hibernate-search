@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -303,13 +303,13 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 			fieldWithMultipleValuesModel = SimpleFieldModel.mapper( fieldType )
 					.mapMultiValued( root, "multiValued", c -> c.projectable( Projectable.YES ) );
 
-			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED, false );
-			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED, false );
+			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectStructure.FLATTENED, false );
+			nestedObject = new ObjectBinding( root, "nestedObject", ObjectStructure.NESTED, false );
 
 			flattenedObjectWithMultipleValues = new ObjectBinding( root, "multiValued_flattenedObject",
-					ObjectFieldStorage.FLATTENED, true );
+					ObjectStructure.FLATTENED, true );
 			nestedObjectWithMultipleValues = new ObjectBinding( root, "multiValued_nestedObject",
-					ObjectFieldStorage.NESTED, true );
+					ObjectStructure.NESTED, true );
 		}
 	}
 
@@ -318,10 +318,10 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 		final IndexObjectFieldReference self;
 		final SimpleFieldModel<GeoPoint> fieldModel;
 
-		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage,
+		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectStructure structure,
 				boolean multiValued) {
 			this.relativeFieldName = relativeFieldName;
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			if ( multiValued ) {
 				objectField.multiValued();
 			}
@@ -367,11 +367,11 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 			/*
 			 * Add an object with the same name of nestedObject of IndexBinding,
-			 * but we're using here a ObjectFieldStorage.FLATTENED for it.
-			 * If we try to project a field within this object,
-			 * this will have to lead to an inconsistency exception.
+			 * but we're using here a flattened structure.
+			 * If we try to project on a field within this object,
+			 * it will lead to an inconsistency exception.
 			 */
-			flattenedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.FLATTENED, false );
+			flattenedObject = new ObjectBinding( root, "nestedObject", ObjectStructure.FLATTENED, false );
 		}
 	}
 }

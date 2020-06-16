@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -157,7 +157,7 @@ public class LuceneIndexingNestedIT {
 
 		IndexBinding(IndexSchemaElement root) {
 			IndexSchemaObjectField nestedObjectField =
-					root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+					root.objectField( "nestedObject", ObjectStructure.NESTED )
 							.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
 		}

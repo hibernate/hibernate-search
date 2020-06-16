@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
@@ -82,7 +82,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	@Override
 	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
-			ObjectFieldStorage storage,
+			ObjectStructure structure,
 			Integer maxDepth, Set<String> includePaths,
 			Class<?> targetType) {
 		String defaultedRelativePrefix = relativePrefix;
@@ -91,7 +91,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		}
 
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				definingTypeModel, defaultedRelativePrefix, storage,
+				definingTypeModel, defaultedRelativePrefix, structure,
 				maxDepth, includePaths
 		);
 

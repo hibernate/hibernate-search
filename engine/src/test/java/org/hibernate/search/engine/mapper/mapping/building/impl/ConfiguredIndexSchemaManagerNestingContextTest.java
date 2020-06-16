@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
@@ -101,7 +101,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		replayAll();
 		assertThatThrownBy( () -> {
 				IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-						typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
+						typeModel1Mock, "level1.prefix1_", ObjectStructure.DEFAULT,
 						null, null
 				);
 				level1Context.addIndexedEmbeddedIfIncluded(
@@ -137,7 +137,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		replayAll();
 		assertThatThrownBy( () -> {
 			IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-					typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
+					typeModel1Mock, "level1.prefix1_", ObjectStructure.DEFAULT,
 					null, null
 			);
 			level2Context.addIndexedEmbeddedIfIncluded(
@@ -173,7 +173,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 				.andReturn( expectedReturn );
 		replayAll();
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.level2.level3.prefix1_", ObjectFieldStorage.DEFAULT,
+				typeModel1Mock, "level1.level2.level3.prefix1_", ObjectStructure.DEFAULT,
 				null, null
 		);
 		actualReturn = rootContext.addIndexedEmbeddedIfIncluded(
@@ -290,7 +290,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		includePaths.add( "level2IndexedEmbedded.notEncountered" );
 		includePaths.add( "level2IndexedEmbedded.excludedBecauseOfLevel2" );
 		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectFieldStorage.DEFAULT, null, includePaths
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, null, includePaths
 		);
 		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -379,7 +379,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		includePaths.add( "notEncountered" );
 		includePaths.add( "excludedBecauseOfLevel1" );
 		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2IndexedEmbedded.", ObjectFieldStorage.DEFAULT,
+				typeModel2Mock, "level2IndexedEmbedded.", ObjectStructure.DEFAULT,
 				null, includePaths
 		);
 		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
@@ -697,7 +697,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		includePaths.add( "level2.level3.included" );
 		includePaths.add( "level2.level3.notEncountered" );
 		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-				typeModel1Mock, "level1.", ObjectFieldStorage.DEFAULT, 1, includePaths
+				typeModel1Mock, "level1.", ObjectStructure.DEFAULT, 1, includePaths
 		);
 		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
@@ -733,14 +733,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 
 		// Encounter a nested indexedEmbedded
 		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level2.", ObjectFieldStorage.DEFAULT, null, null
+				typeModel2Mock, "level2.", ObjectStructure.DEFAULT, null, null
 		);
 		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, level2Definition, level2PathTracker
 		);
 		IndexedEmbeddedDefinition level3Definition = new IndexedEmbeddedDefinition(
-				typeModel2Mock, "level3.", ObjectFieldStorage.DEFAULT, null, null
+				typeModel2Mock, "level3.", ObjectStructure.DEFAULT, null, null
 		);
 		IndexedEmbeddedPathTracker level3PathTracker = new IndexedEmbeddedPathTracker( level3Definition );
 		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
@@ -1001,7 +1001,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 			ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				typeModel, relativePrefix, ObjectFieldStorage.DEFAULT,
+				typeModel, relativePrefix, ObjectStructure.DEFAULT,
 				depth, includePaths
 		);
 		return checkSimpleIndexedEmbeddedIncluded(
@@ -1034,7 +1034,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
-				typeModel, relativePrefix, ObjectFieldStorage.DEFAULT,
+				typeModel, relativePrefix, ObjectStructure.DEFAULT,
 				depth, includePaths
 		);
 		checkSimpleIndexedEmbeddedExcluded(

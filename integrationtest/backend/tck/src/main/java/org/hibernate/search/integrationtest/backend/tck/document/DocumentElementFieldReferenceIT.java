@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
@@ -242,17 +242,17 @@ public class DocumentElementFieldReferenceIT<F> {
 		IndexBinding(IndexedEntityBindingContext ctx) {
 			super( ctx.schemaElement() );
 			IndexSchemaElement root = ctx.schemaElement();
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectStructure.FLATTENED )
 					.multiValued();
 			flattenedObject = new FirstLevelObjectBinding( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject = new FirstLevelObjectBinding( nestedObjectField );
 
 			// Simulate an embedded context which excludes every subfield
 			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
 					new StubTypeModel( "embedded" ),
-					"excludingObject.", ObjectFieldStorage.FLATTENED,
+					"excludingObject.", ObjectStructure.FLATTENED,
 					null, Collections.singleton( "pathThatDoesNotMatchAnything" )
 			);
 			IndexedEmbeddedBindingContext excludingEmbeddedContext =
@@ -277,10 +277,10 @@ public class DocumentElementFieldReferenceIT<F> {
 		FirstLevelObjectBinding(IndexSchemaElement objectField, IndexObjectFieldReference objectFieldReference) {
 			super( objectField );
 			self = objectFieldReference;
-			IndexSchemaObjectField flattenedObjectField = objectField.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED )
+			IndexSchemaObjectField flattenedObjectField = objectField.objectField( "flattenedObject", ObjectStructure.FLATTENED )
 					.multiValued();
 			flattenedObject = new SecondLevelObjectBinding( flattenedObjectField );
-			IndexSchemaObjectField nestedObjectField = objectField.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+			IndexSchemaObjectField nestedObjectField = objectField.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject = new SecondLevelObjectBinding( nestedObjectField );
 		}

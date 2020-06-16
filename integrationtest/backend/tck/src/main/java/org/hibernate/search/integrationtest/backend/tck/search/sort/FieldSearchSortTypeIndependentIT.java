@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -102,8 +102,8 @@ public class FieldSearchSortTypeIndependentIT {
 		final ObjectMapping nestedObject;
 
 		IndexBinding(IndexSchemaElement root) {
-			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
+			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectStructure.FLATTENED );
+			nestedObject = new ObjectMapping( root, "nestedObject", ObjectStructure.NESTED );
 		}
 	}
 
@@ -111,9 +111,9 @@ public class FieldSearchSortTypeIndependentIT {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
 
-		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
+		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectStructure structure) {
 			this.relativeFieldName = relativeFieldName;
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			self = objectField.toReference();
 		}
 	}

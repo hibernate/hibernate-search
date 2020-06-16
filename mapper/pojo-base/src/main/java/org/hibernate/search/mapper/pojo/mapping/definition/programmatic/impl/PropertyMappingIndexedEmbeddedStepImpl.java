@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
@@ -35,7 +35,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private String prefix;
 
-	private ObjectFieldStorage storage = ObjectFieldStorage.DEFAULT;
+	private ObjectStructure structure = ObjectStructure.DEFAULT;
 
 	private Integer maxDepth;
 
@@ -70,7 +70,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			actualPrefix = prefix;
 		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, actualPrefix, storage, maxDepth, includePaths, targetType
+				definingTypeModel, actualPrefix, structure, maxDepth, includePaths, targetType
 		);
 	}
 
@@ -85,8 +85,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	}
 
 	@Override
-	public PropertyMappingIndexedEmbeddedStep storage(ObjectFieldStorage storage) {
-		this.storage = storage;
+	public PropertyMappingIndexedEmbeddedStep structure(ObjectStructure structure) {
+		this.structure = structure;
 		return this;
 	}
 

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -59,9 +59,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
-			ObjectFieldStorage storage) {
+			ObjectStructure structure) {
 		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, storage );
+				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, structure );
 		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
@@ -80,11 +80,11 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix, IndexFieldInclusion inclusion) {
+			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexSchemaObjectFieldTemplateBuilder templateBuilder =
 				new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
-						this, prefixedTemplateName, inclusion, storage, prefix
+						this, prefixedTemplateName, inclusion, structure, prefix
 				);
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			putTemplate( prefixedTemplateName, templateBuilder );

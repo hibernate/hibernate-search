@@ -11,30 +11,30 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 public final class IndexedEmbeddedDefinition {
 
 	private final MappableTypeModel definingTypeModel;
 	private final String relativePrefix;
-	private final ObjectFieldStorage storage;
+	private final ObjectStructure structure;
 	private final Set<String> includePaths;
 	private final Integer maxDepth;
 
 	/**
 	 * @param definingTypeModel The model representing the type on which the indexed-embedded was defined.
 	 * @param relativePrefix The prefix to apply to all index fields created in the context of the indexed-embedded.
-	 * @param storage The storage type to use for all object fields created as part of the {@code relativePrefix}.
+	 * @param structure The structure of all object fields created as part of the {@code relativePrefix}.
 	 * @param maxDepth The maximum depth beyond which all created fields will be ignored. {@code null} for no limit.
 	 * @param includePaths The exhaustive list of paths of fields that are to be included. {@code null} for no limit.
 	 */
 	public IndexedEmbeddedDefinition(MappableTypeModel definingTypeModel, String relativePrefix,
-			ObjectFieldStorage storage, Integer maxDepth,
+			ObjectStructure structure, Integer maxDepth,
 			Set<String> includePaths) {
 		this.definingTypeModel = definingTypeModel;
 		this.relativePrefix = relativePrefix;
-		this.storage = storage;
+		this.structure = structure;
 		this.includePaths = includePaths == null ? Collections.emptySet() : new LinkedHashSet<>( includePaths );
 		if ( maxDepth == null && !this.includePaths.isEmpty() ) {
 			/*
@@ -78,8 +78,8 @@ public final class IndexedEmbeddedDefinition {
 		return relativePrefix;
 	}
 
-	public ObjectFieldStorage storage() {
-		return storage;
+	public ObjectStructure structure() {
+		return structure;
 	}
 
 	public Set<String> includePaths() {

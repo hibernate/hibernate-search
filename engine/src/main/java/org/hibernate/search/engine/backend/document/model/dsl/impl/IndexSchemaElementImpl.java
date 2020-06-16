@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -75,13 +75,13 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
+	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectStructure structure) {
 		checkRelativeFieldName( relativeFieldName );
 		IndexSchemaObjectField objectField = nestingContext.nest(
 				relativeFieldName,
 				(prefixedName, inclusion, nestedNestingContext) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-							this.objectNodeBuilder.addObjectField( prefixedName, inclusion, storage );
+							this.objectNodeBuilder.addObjectField( prefixedName, inclusion, structure );
 					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder,
 							nestedNestingContext, false );
 				}
@@ -114,12 +114,12 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectFieldStorage storage) {
+	public IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectStructure structure) {
 		checkFieldTemplateName( templateName );
 		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
 				nestingContext.nestTemplate(
 						(inclusion, prefix) -> objectNodeBuilder.addObjectFieldTemplate(
-								templateName, storage, prefix, inclusion
+								templateName, structure, prefix, inclusion
 						)
 				);
 		if ( directChildrenAreMultiValuedByDefault ) {

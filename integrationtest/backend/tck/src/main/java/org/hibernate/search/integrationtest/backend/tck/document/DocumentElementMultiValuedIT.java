@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -346,17 +346,17 @@ public class DocumentElementMultiValuedIT<F> {
 			super( root );
 
 			singleValuedFlattenedObject = new FirstLevelObjectBinding(
-					root.objectField( "singleValuedFlattenedObject", ObjectFieldStorage.FLATTENED )
+					root.objectField( "singleValuedFlattenedObject", ObjectStructure.FLATTENED )
 			);
 			multiValuedFlattenedObject = new FirstLevelObjectBinding(
-					root.objectField( "multiValuedFlattenedObject", ObjectFieldStorage.FLATTENED )
+					root.objectField( "multiValuedFlattenedObject", ObjectStructure.FLATTENED )
 							.multiValued()
 			);
 			singleValuedNestedObject = new FirstLevelObjectBinding(
-					root.objectField( "singleValuedNestedObject", ObjectFieldStorage.NESTED )
+					root.objectField( "singleValuedNestedObject", ObjectStructure.NESTED )
 			);
 			multiValuedNestedObject = new FirstLevelObjectBinding(
-					root.objectField( "multiValuedNestedObject", ObjectFieldStorage.NESTED )
+					root.objectField( "multiValuedNestedObject", ObjectStructure.NESTED )
 							.multiValued()
 			);
 		}

@@ -137,13 +137,13 @@ and get a reference to that object.
 Note we're calling `addValue` on the object we just added, not on `target`.
 ====
 
-== Object field storage
+== Object structure
 
 By default, object fields are flattened,
 meaning that the tree structure is not preserved.
-See <<mapper-orm-indexedembedded-storage-flattened>> for more information.
+See <<mapper-orm-indexedembedded-structure-flattened>> for more information.
 
-It is possible to switch to <<mapper-orm-indexedembedded-storage-nested,nested storage>>
+It is possible to switch to <<mapper-orm-indexedembedded-structure-nested,a nested structure>>
 by passing an argument to the `objectField` method, as shown below.
 Each value of the object field will then transparently be indexed as a separate nested document,
 without any change to the `write` method of the bridge.
@@ -155,9 +155,9 @@ without any change to the `write` method of the bridge.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/document/model/dsl/object/InvoiceLineItemsDetailBinder.java[tags=bind]
 ----
 <1> Declare an object field with `objectField`.
-<2> Pass the name of the object field.
-<3> Pass the storage type of the object field, here `NESTED`.
-<4> Declare the object field as multi-valued.
+<2> Define the name of the object field.
+<3> Define the structure of the object field, here `NESTED`.
+<4> Define the object field as multi-valued.
 <5> Get a reference to the declared object field
 and pass it to the bridge for later use.
 <6> Create sub-fields, get references to these fields

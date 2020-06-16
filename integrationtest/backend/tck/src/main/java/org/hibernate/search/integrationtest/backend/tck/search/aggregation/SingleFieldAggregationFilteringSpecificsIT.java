@@ -18,7 +18,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
@@ -157,11 +157,11 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 
 		IndexBinding(IndexSchemaElement root) {
 			super( root );
-			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
+			flattenedObject = FirstLevelObjectBinding.create( root, "flattenedObject", ObjectStructure.FLATTENED );
 			nestedObject1 = FirstLevelObjectBinding.create( root, "nestedObject1",
-					ObjectFieldStorage.NESTED );
+					ObjectStructure.NESTED );
 			nestedObject2 = FirstLevelObjectBinding.create( root, "nestedObject2",
-					ObjectFieldStorage.NESTED );
+					ObjectStructure.NESTED );
 		}
 	}
 
@@ -170,8 +170,8 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 		final IndexObjectFieldReference self;
 
 		public static FirstLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+				ObjectStructure structure) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			return new FirstLevelObjectBinding( relativeFieldName, objectField );
 		}
 

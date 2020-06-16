@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -43,9 +43,9 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
-			ObjectFieldStorage storage) {
+			ObjectStructure structure) {
 		StubIndexSchemaNode.Builder childBuilder =
-				StubIndexSchemaNode.objectField( builder, relativeFieldName, storage );
+				StubIndexSchemaNode.objectField( builder, relativeFieldName, structure );
 		getRootNodeBuilder().getBackendBehavior().onAddField(
 				getRootNodeBuilder().getIndexName(),
 				childBuilder.getAbsolutePath()
@@ -71,9 +71,9 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 
 	@Override
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
-			ObjectFieldStorage storage, String prefix, IndexFieldInclusion inclusion) {
+			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
 		StubIndexSchemaNode.Builder childBuilder =
-				StubIndexSchemaNode.objectFieldTemplate( builder, templateName, storage );
+				StubIndexSchemaNode.objectFieldTemplate( builder, templateName, structure );
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			builder.child( childBuilder );
 		}

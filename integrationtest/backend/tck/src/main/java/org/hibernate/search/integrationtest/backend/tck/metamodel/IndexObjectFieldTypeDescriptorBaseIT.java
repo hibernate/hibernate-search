@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.metamodel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
@@ -60,8 +60,8 @@ public class IndexObjectFieldTypeDescriptorBaseIT {
 		IndexBinding(IndexSchemaElement root) {
 			root.objectField( "default" ).toReference();
 
-			root.objectField( "flattened", ObjectFieldStorage.FLATTENED ).toReference();
-			root.objectField( "nested", ObjectFieldStorage.NESTED ).toReference();
+			root.objectField( "flattened", ObjectStructure.FLATTENED ).toReference();
+			root.objectField( "nested", ObjectStructure.NESTED ).toReference();
 		}
 	}
 }

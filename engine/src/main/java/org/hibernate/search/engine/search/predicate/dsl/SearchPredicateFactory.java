@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.util.common.SearchException;
 
@@ -98,9 +99,7 @@ public interface SearchPredicateFactory {
 	WildcardPredicateFieldStep<?> wildcard();
 
 	/**
-	 * Match documents where a
-	 * {@link org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage#NESTED nested object}
-	 * matches a given predicate.
+	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches a given predicate.
 	 *
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.
 	 * @see NestedPredicateFieldStep

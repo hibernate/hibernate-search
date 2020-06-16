@@ -127,7 +127,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
 					currentNodeBuilder.addObjectField( objectName, IndexFieldInclusion.INCLUDED,
-							definition.storage()
+							definition.structure()
 					);
 			if ( multiValued ) {
 				// Only mark the first object as multi-valued

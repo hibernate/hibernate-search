@@ -1040,12 +1040,14 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedd
 ----
 ====
 
+[[mapper-orm-indexedembedded-structure]]
+=== Structuring embedded elements as nested documents using `structure`
+// Anchor backward compatibility
 [[mapper-orm-indexedembedded-storage]]
-=== Storing embedded elements in nested documents using `storage`
 
-Indexed-embedded fields can be stored in one of two ways,
-configured through the `storage` attribute of the `@IndexedEmbedded` annotation.
-To illustrate storage options, let's consider the following object tree,
+Indexed-embedded fields can be structured in one of two ways,
+configured through the `structure` attribute of the `@IndexedEmbedded` annotation.
+To illustrate structure options, let's consider the following object tree,
 assuming the class `Book` is annotated with `@Indexed`
 and its `authors` property is annotated with  `@IndexedEmbedded`:
 
@@ -1059,8 +1061,10 @@ and its `authors` property is annotated with  `@IndexedEmbedded`:
 **** firstName = Ty
 **** lastName = Frank
 
+[[mapper-orm-indexedembedded-structure-flattened]]
+==== `DEFAULT` or `FLATTENED` structure
+// Anchor backward compatibility
 [[mapper-orm-indexedembedded-storage-flattened]]
-==== `DEFAULT` or `FLATTENED` storage
 
 By default, indexed-embedded fields are "flattened",
 meaning that the tree structure is not preserved.
@@ -1076,29 +1080,31 @@ The `authors.firstName` and `authors.lastName` fields were "flattened"
 and now each has two values;
 the knowledge of which last name corresponds to which first name has been lost.
 
-This is more efficient for storage and querying,
+This is more efficient for indexing and querying,
 but can cause unexpected behavior when querying the index
 on both the author's first name and the author's last name.
 The book given in example
 would show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
 even though "Ty Abraham" is not one of this book's authors.
 
+[[mapper-orm-indexedembedded-structure-nested]]
+==== `NESTED` structure
+// Anchor backward compatibility
 [[mapper-orm-indexedembedded-storage-nested]]
-==== `NESTED` storage
 
 When indexed-embedded elements are "nested",
 the tree structure is preserved by transparently creating one separate "nested" document
-for every indexed-embedded element.
+for each indexed-embedded element.
 
 The book instance mentioned above would be indexed with a structure roughly similar to this:
 
  * Book document
  ** title = Levianthan Wakes
  ** Nested documents
- *** Nested documents for "authors"
+ *** Nested document #1 for "authors"
  **** authors.firstName = Daniel
  **** authors.lastName = Abraham
- *** Nested documents for "authors"
+ *** Nested document #2 for "authors"
  **** authors.firstName = Ty
  **** authors.lastName = Frank
 

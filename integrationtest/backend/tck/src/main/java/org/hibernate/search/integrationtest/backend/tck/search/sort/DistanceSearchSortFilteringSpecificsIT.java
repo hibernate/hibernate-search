@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -127,11 +127,11 @@ public class DistanceSearchSortFilteringSpecificsIT {
 			super( root );
 
 			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
-					ObjectFieldStorage.FLATTENED );
+					ObjectStructure.FLATTENED );
 			nestedObject1 = FirstLevelObjectMapping.create( root, "nestedObject1",
-					ObjectFieldStorage.NESTED );
+					ObjectStructure.NESTED );
 			nestedObject2 = FirstLevelObjectMapping.create( root, "nestedObject2",
-					ObjectFieldStorage.NESTED );
+					ObjectStructure.NESTED );
 		}
 	}
 
@@ -140,14 +140,14 @@ public class DistanceSearchSortFilteringSpecificsIT {
 		final IndexObjectFieldReference self;
 
 		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage) {
-			return create( parent, relativeFieldName, storage, false );
+				ObjectStructure structure) {
+			return create( parent, relativeFieldName, structure, false );
 		}
 
 		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
-				ObjectFieldStorage storage,
+				ObjectStructure structure,
 				boolean multiValued) {
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			if ( multiValued ) {
 				objectField.multiValued();
 			}

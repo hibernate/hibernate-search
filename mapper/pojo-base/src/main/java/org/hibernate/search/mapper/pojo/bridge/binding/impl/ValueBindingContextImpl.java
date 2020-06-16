@@ -169,7 +169,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 				expectedValueType, new PojoValueBridgeFromDocumentFieldValueConverter<>( bridge )
 		);
 
-		// Then give the mapping a chance to override some of the model (add storage, ...)
+		// Then give the mapping a chance to override some of the model (make projectable, ...)
 		contributor.contribute(
 				new FieldModelContributorContextImpl<>( bridge, fieldTypeOptionsStep )
 		);

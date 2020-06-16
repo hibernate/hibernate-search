@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -98,7 +98,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
+		// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
@@ -122,7 +122,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
+		// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
@@ -151,12 +151,12 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
+		// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
-	public void nested_multiIndexes_wrongStorageType() {
+	public void nested_multiIndexes_wrongStructure() {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = mainIndex.createScope( invertedIndex );
 
@@ -270,7 +270,7 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	@Test
-	public void flattened_multiIndexes_wrongStorageType() {
+	public void flattened_multiIndexes_wrongStructure() {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = invertedIndex.createScope( mainIndex );
 
@@ -392,27 +392,27 @@ public class ObjectExistsSearchPredicateIT {
 			this.string = root.field( "string", f -> f.asString() ).toReference();
 			this.numeric = root.field( "numeric", f -> f.asInteger() ).toReference();
 
-			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
 			this.nested = nestedObject.toReference();
 			this.nestedString = nestedObject.field( "string", f -> f.asString() ).toReference();
 			this.nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
 
-			IndexSchemaObjectField nestedX2Object = nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedX2Object = nestedObject.objectField( "nestedX2", ObjectStructure.NESTED );
 			this.nestedX2 = nestedX2Object.toReference();
 			this.nestedX2String = nestedX2Object.field( "string", f -> f.asString() ).toReference();
 
-			this.nestedNoChild = root.objectField( "nestedNoChild", ObjectFieldStorage.NESTED ).toReference();
+			this.nestedNoChild = root.objectField( "nestedNoChild", ObjectStructure.NESTED ).toReference();
 
-			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectStructure.FLATTENED );
 			this.flattened = flattenedObject.toReference();
 			this.flattenedString = flattenedObject.field( "string", f -> f.asString() ).toReference();
 			this.flattenedNumeric = flattenedObject.field( "numeric", f -> f.asInteger() ).toReference();
 
-			IndexSchemaObjectField flattenedX2Object = flattenedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedX2Object = flattenedObject.objectField( "flattenedX2", ObjectStructure.FLATTENED );
 			this.flattenedX2 = flattenedX2Object.toReference();
 			this.flattenedX2String = flattenedX2Object.field( "string", f -> f.asString() ).toReference();
 
-			this.flattenedNoChild = root.objectField( "flattenedNoChild", ObjectFieldStorage.FLATTENED ).toReference();
+			this.flattenedNoChild = root.objectField( "flattenedNoChild", ObjectStructure.FLATTENED ).toReference();
 		}
 	}
 
@@ -429,16 +429,16 @@ public class ObjectExistsSearchPredicateIT {
 	private static class InvertedIndexBinding {
 		InvertedIndexBinding(IndexSchemaElement root) {
 			// Use FLATTENED for nested
-			root.objectField( "nested", ObjectFieldStorage.FLATTENED ).toReference();
+			root.objectField( "nested", ObjectStructure.FLATTENED ).toReference();
 
 			// Use NESTED for flattened
-			root.objectField( "flattened", ObjectFieldStorage.NESTED ).toReference();
+			root.objectField( "flattened", ObjectStructure.NESTED ).toReference();
 		}
 	}
 
 	private static class DifferentFieldsIndexBinding {
 		DifferentFieldsIndexBinding(IndexSchemaElement root) {
-			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
 			nestedObject.toReference();
 
 			// change field string into stringDifferentName
@@ -446,9 +446,9 @@ public class ObjectExistsSearchPredicateIT {
 			// change field numeric into numericDifferentName
 			nestedObject.field( "numericDifferentName", f -> f.asInteger() ).toReference();
 
-			nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED ).toReference();
+			nestedObject.objectField( "nestedX2", ObjectStructure.NESTED ).toReference();
 
-			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectStructure.FLATTENED );
 			flattenedObject.toReference();
 
 			// change field string into stringDifferentName
@@ -456,29 +456,29 @@ public class ObjectExistsSearchPredicateIT {
 			// change field numeric into numericDifferentName
 			flattenedObject.field( "numericDifferentName", f -> f.asInteger() ).toReference();
 
-			nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
+			nestedObject.objectField( "flattenedX2", ObjectStructure.FLATTENED ).toReference();
 		}
 	}
 
 	private static class IncompatibleFieldsIndexBinding {
 		IncompatibleFieldsIndexBinding(IndexSchemaElement root) {
-			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
 			nestedObject.toReference();
 
 			// field has same name, but with an incompatible exists predicates: string vs BigDecimal
 			nestedObject.field( "string", f -> f.asBigDecimal().decimalScale( 3 ) ).toReference();
 			nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
 
-			nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED ).toReference();
+			nestedObject.objectField( "nestedX2", ObjectStructure.NESTED ).toReference();
 
-			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectStructure.FLATTENED );
 			flattenedObject.toReference();
 
 			flattenedObject.field( "string", f -> f.asString() ).toReference();
 			// field has same name, but with an incompatible exists predicates: unSortable vs Sortable
 			flattenedObject.field( "numeric", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
 
-			nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
+			nestedObject.objectField( "flattenedX2", ObjectStructure.FLATTENED ).toReference();
 		}
 	}
 }

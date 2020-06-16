@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 
 /**
  * The initial step in a "nested" predicate definition, where the target field can be set.
@@ -19,7 +19,7 @@ public interface NestedPredicateFieldStep<N extends NestedPredicateNestStep<?>> 
 	/**
 	 * Set the object field to "nest" on.
 	 * <p>
-	 * The selected field must be stored as {@link ObjectFieldStorage#NESTED} in the targeted indexes.
+	 * The selected field must have a {@link ObjectStructure#NESTED nested structure} in the targeted indexes.
 	 *
 	 * @param absoluteFieldPath The path to the object.
 	 * @return The next step.

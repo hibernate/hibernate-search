@@ -15,7 +15,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
@@ -63,7 +63,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private String tags;
 
 	@OneToMany(mappedBy = "document", targetEntity = DocumentCopy.class)
-	@IndexedEmbedded(includePaths = {"medium", "library.location", "library.services"}, storage = ObjectFieldStorage.NESTED)
+	@IndexedEmbedded(includePaths = {"medium", "library.location", "library.services"}, structure = ObjectStructure.NESTED)
 	private List<C> copies = new ArrayList<>();
 
 	public Document() {

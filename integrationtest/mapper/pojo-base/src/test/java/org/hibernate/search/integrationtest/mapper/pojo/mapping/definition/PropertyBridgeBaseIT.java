@@ -13,7 +13,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomPropertyMappingAnnotationBaseIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -877,7 +877,7 @@ public class PropertyBridgeBaseIT {
 				.objectField( "stringFromBridge", b2 -> b2
 						.field( "value", String.class )
 				)
-				.objectField( "listFromBridge", ObjectFieldStorage.NESTED, b2 -> b2
+				.objectField( "listFromBridge", ObjectStructure.NESTED, b2 -> b2
 						.multiValued( true )
 						.field( "value", Integer.class )
 				)
@@ -895,7 +895,7 @@ public class PropertyBridgeBaseIT {
 									.toReference();
 							// Multi-valued field
 							IndexSchemaObjectField listObjectField = context.indexSchemaElement()
-									.objectField( "listFromBridge", ObjectFieldStorage.NESTED )
+									.objectField( "listFromBridge", ObjectStructure.NESTED )
 									.multiValued();
 							listObjectField.toReference();
 							listObjectField.field( "value", f -> f.asInteger() )
@@ -986,7 +986,7 @@ public class PropertyBridgeBaseIT {
 				.fieldTemplate( "stringFromBridge_value", String.class, b2 -> b2
 						.matchingPathGlob( "*_string.value" )
 				)
-				.objectFieldTemplate( "listFromBridge", ObjectFieldStorage.NESTED, b2 -> b2
+				.objectFieldTemplate( "listFromBridge", ObjectStructure.NESTED, b2 -> b2
 						.multiValued( true )
 						.matchingPathGlob( "*_list" )
 				)
@@ -1008,7 +1008,7 @@ public class PropertyBridgeBaseIT {
 									.matchingPathGlob( "*_string.value" );
 							// Multi-valued field
 							context.indexSchemaElement()
-									.objectFieldTemplate( "listFromBridge", ObjectFieldStorage.NESTED )
+									.objectFieldTemplate( "listFromBridge", ObjectStructure.NESTED )
 									.matchingPathGlob( "*_list" )
 									.multiValued();
 							context.indexSchemaElement()

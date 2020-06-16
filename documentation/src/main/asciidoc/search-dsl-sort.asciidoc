@@ -329,7 +329,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [[search-dsl-sort-common-filter]]
 === Filter for fields in nested objects
 
-When the sort field is located in a <<mapper-orm-indexedembedded-storage-nested,nested object>>,
+When the sort field is located in a <<mapper-orm-indexedembedded-structure-nested,nested object>>,
 by default all nested objects will be considered for the sort
 and their values will be combined using the configured <<search-dsl-sort-common-multi-value-mode,sort mode>>.
 

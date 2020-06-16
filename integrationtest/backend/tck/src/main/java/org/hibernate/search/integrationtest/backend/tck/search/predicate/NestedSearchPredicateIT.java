@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -389,10 +389,10 @@ public class NestedSearchPredicateIT {
 		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
 
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED )
+			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject = new ObjectMapping( nestedObjectField );
-			IndexSchemaObjectField nestedObject2Field = root.objectField( "nestedObject2", ObjectFieldStorage.NESTED )
+			IndexSchemaObjectField nestedObject2Field = root.objectField( "nestedObject2", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject2 = new ObjectMapping( nestedObject2Field );
 		}
@@ -408,7 +408,7 @@ public class NestedSearchPredicateIT {
 			string = objectField.field( "string", f -> f.asString() ).toReference();
 			IndexSchemaObjectField nestedObjectField = objectField.objectField(
 					"nestedObject",
-					ObjectFieldStorage.NESTED
+					ObjectStructure.NESTED
 			)
 					.multiValued();
 			nestedObject = new SecondLevelObjectMapping( nestedObjectField );
