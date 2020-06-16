@@ -14,11 +14,11 @@
     <packaging>jar</packaging>
 
     <name>Hibernate Search Integration Tests - JDK - Java modules</name>
-    <description>Hibernate Search integration tests for (JDK 9+) Java modules</description>
+    <description>Hibernate Search integration tests for (JDK 11+) Java modules</description>
 
     <properties>
-        <maven.compiler.target>9</maven.compiler.target>
-        <maven.compiler.source>9</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
     <dependencies>

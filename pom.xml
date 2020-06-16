@@ -383,8 +383,8 @@
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.10.3.Final</previous.stable>
 
-        <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
-        <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
+        <!-- JDK version required for the build; we target 8 but require at least 11 for the build -->
+        <jdk.min.version>11</jdk.min.version>
 
         <!-- Maven version required for the build -->
         <!--
