@@ -132,9 +132,7 @@ public interface IndexSchemaElement {
 	 * @param templateName The name of the template. Must be non-null and non-empty.
 	 * Must be unique for this index schema element.
 	 * Must not contain the dot ('.') character.
-	 * @return An {@link IndexSchemaObjectField}, where the field can be defined in more details,
-	 * in particular by adding new child fields to it,
-	 * and where ultimately a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
+	 * @return A DSL step where the field template can be defined in more details.
 	 */
 	default IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName) {
 		return objectFieldTemplate( templateName, ObjectFieldStorage.DEFAULT );
@@ -147,9 +145,7 @@ public interface IndexSchemaElement {
 	 * Must be unique for this index schema element.
 	 * Must not contain the dot ('.') character.
 	 * @param storage The storage type.
-	 * @return An {@link IndexSchemaObjectField}, where the field can be defined in more details,
-	 * in particular by adding new child fields to it,
-	 * and where ultimately a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
+	 * @return A DSL step where the field template can be defined in more details.
 	 * @see ObjectFieldStorage
 	 */
 	IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectFieldStorage storage);
