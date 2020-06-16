@@ -727,36 +727,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>jdk8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <modules>
-                <!-- Nothing at the moment -->
-            </modules>
-        </profile>
-
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <!-- Java 9 doesn't identify itself as "1.9" but "9" -->
-                <jdk>9</jdk>
-            </activation>
-            <modules>
-                <module>integrationtest/jdk9-modules</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>jdk10</id>
-            <activation>
-                <jdk>10</jdk>
-            </activation>
-            <modules>
-                <module>integrationtest/jdk9-modules</module>
-            </modules>
-        </profile>
         <!-- The profiles `skippingAllTests` and `skippingIntegrationTests` are currently duplicates,
             as one can't trigger the profile activation on either/or property -->
         <profile>
