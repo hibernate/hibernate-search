@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -63,7 +63,7 @@ public class ObjectFieldTemplateIT {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			root.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.multiValued();
 		};
 
@@ -111,7 +111,7 @@ public class ObjectFieldTemplateIT {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			root.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.multiValued();
 		};
 
@@ -160,10 +160,10 @@ public class ObjectFieldTemplateIT {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			root.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_nested" )
 					.multiValued();
-			root.objectFieldTemplate( "flattenedTemplate", ObjectFieldStorage.FLATTENED )
+			root.objectFieldTemplate( "flattenedTemplate", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "*_flattened" )
 					.multiValued();
 		};
@@ -225,13 +225,13 @@ public class ObjectFieldTemplateIT {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			root.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_nested_object" )
 					.multiValued();
-			root.objectFieldTemplate( "flattenedTemplate", ObjectFieldStorage.FLATTENED )
+			root.objectFieldTemplate( "flattenedTemplate", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "*_object" )
 					.multiValued();
-			root.objectFieldTemplate( "ignoredTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "ignoredTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_object" );
 			root.fieldTemplate( "ignoredFieldTemplate", f -> f.asString() )
 					.matchingPathGlob( "*_object" );
@@ -294,12 +294,12 @@ public class ObjectFieldTemplateIT {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			root.objectFieldTemplate( "flattenedTemplate", ObjectFieldStorage.FLATTENED )
+			root.objectFieldTemplate( "flattenedTemplate", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "*_object" )
 					.multiValued();
 		};
 		Consumer<IndexSchemaElement> staticObjectTemplatesBinder = staticObject -> {
-			staticObject.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			staticObject.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_nested_object" )
 					.multiValued();
 		};
@@ -372,10 +372,10 @@ public class ObjectFieldTemplateIT {
 			staticObject.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			staticObject.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			staticObject.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_nested" )
 					.multiValued();
-			staticObject.objectFieldTemplate( "flattenedTemplate", ObjectFieldStorage.FLATTENED )
+			staticObject.objectFieldTemplate( "flattenedTemplate", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "*_flattened" )
 					.multiValued();
 		};
@@ -436,10 +436,10 @@ public class ObjectFieldTemplateIT {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
 
-			root.objectFieldTemplate( "nestedTemplate", ObjectFieldStorage.NESTED )
+			root.objectFieldTemplate( "nestedTemplate", ObjectStructure.NESTED )
 					.matchingPathGlob( "*_nested" )
 					.multiValued();
-			root.objectFieldTemplate( "flattenedTemplate", ObjectFieldStorage.FLATTENED )
+			root.objectFieldTemplate( "flattenedTemplate", ObjectStructure.FLATTENED )
 					.matchingPathGlob( "*_flattened" )
 					.multiValued();
 		};
@@ -524,7 +524,8 @@ public class ObjectFieldTemplateIT {
 										.matching( LASTNAME_1 ) )
 						)
 		) )
-				.hasMessageContaining( "is not stored as nested" );
+				.hasMessageContainingAll( "is flattened",
+						"its structure was lost upon indexing and 'nested' features are not available" );
 		SearchResultAssert.assertThat( query(
 				f -> f.bool()
 						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
@@ -570,7 +571,7 @@ public class ObjectFieldTemplateIT {
 				Consumer<IndexSchemaElement> templatesBinder) {
 			this.relativeFieldName = relativeFieldName;
 
-			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectFieldStorage.FLATTENED );
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, ObjectStructure.FLATTENED );
 			self = objectField.toReference();
 
 			templatesBinder.accept( objectField );

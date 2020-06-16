@@ -270,7 +270,7 @@ public interface Log extends BasicLogger {
 	SearchException nonObjectFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 10,
-			value = "Object field '%1$s' is not stored as nested.")
+			value = "Object field '%1$s' is flattened: its structure was lost upon indexing and 'nested' features are not available.")
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 11,
