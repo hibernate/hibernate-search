@@ -438,10 +438,6 @@
          -->
         <surefire.environment>default</surefire.environment>
 
-        <pax-exam.jvm.args.java-version></pax-exam.jvm.args.java-version>
-        <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
-        <pax-exam.jvm.args>${pax-exam.jvm.args.java-version} ${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
-
         <!-- Elasticsearch tests properties -->
 
         <!-- Control how an Elasticsearch instance is run automatically during tests -->
@@ -1754,9 +1750,6 @@
                     ${surefire.jvm.args.java-version.lenient}
                     --illegal-access=deny
                 </surefire.jvm.args.java-version.strict>
-                <pax-exam.jvm.args.java-version>
-                    --add-modules=java.xml.bind
-                </pax-exam.jvm.args.java-version>
             </properties>
             <modules>
                 <!-- Nothing at the moment -->
@@ -1789,9 +1782,6 @@
                     ${surefire.jvm.args.java-version.lenient}
                     --illegal-access=deny
                 </surefire.jvm.args.java-version.strict>
-                <pax-exam.jvm.args.java-version>
-                    --add-modules=java.xml.bind
-                </pax-exam.jvm.args.java-version>
             </properties>
             <modules>
                 <!-- Nothing at the moment -->
@@ -2146,12 +2136,6 @@
                  -->
                 <surefire.jvm.args.jacoco>@{surefire.jvm.args.jacoco.lateEval}</surefire.jvm.args.jacoco>
                 <failsafe.jvm.args.jacoco>@{failsafe.jvm.args.jacoco.lateEval}</failsafe.jvm.args.jacoco>
-                <!--
-                    We don't use @{...} for late property evaluation here,
-                    because these properties are evaluated by the maven-resource-plugin,
-                    which doesn't understand the @{...} syntax but somehow manages to always use late evaluation.
-                 -->
-                <pax-exam.jvm.args.jacoco>${failsafe.jvm.args.jacoco.lateEval}</pax-exam.jvm.args.jacoco>
             </properties>
             <build>
                 <plugins>

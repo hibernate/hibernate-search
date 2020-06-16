@@ -35,8 +35,6 @@
         <module>integrationtest/elasticsearch</module>
         <module>integrationtest/jms</module>
         <module>integrationtest/spring</module>
-        <module>integrationtest/osgi/karaf-features</module>
-        <module>integrationtest/osgi/karaf-it</module>
         <module>integrationtest/jsr352</module>
         <module>integrationtest/performance/orm</module>
         <module>integrationtest/performance/sandbox</module>
@@ -152,11 +150,6 @@
 
         <!-- >>> Spring ITs-->
         <version.org.springframework.boot>1.5.3.RELEASE</version.org.springframework.boot>
-
-        <!-- >>> OSGi ITs with Karaf-->
-        <version.org.apache.karaf>4.2.1</version.org.apache.karaf>
-        <version.org.ops4j.pax.exam>4.12.0</version.org.ops4j.pax.exam>
-        <version.org.ops4j.pax.url>2.5.4</version.org.ops4j.pax.url>
 
         <!-- >>> JSR-352 ITs -->
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
