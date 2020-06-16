@@ -485,9 +485,11 @@ stage('Non-default environments') {
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
 				helper.withMavenWorkspace(jdk: buildEnv.buildJdkTool) {
+					// Re-run integration tests against the JARs produced by the default build,
+					// but using a different JDK to build and run the tests.
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install --fail-at-end \
-					"""
+					""", 'integrationtest'
 				}
 			}
 		})
@@ -676,8 +678,6 @@ class JdkBuildEnvironment extends BuildEnvironment {
 	@Override
 	String getTag() { "jdk-$version" }
 	@Override
-	boolean requiresDefaultBuildArtifacts() { false }
-	@Override
 	String getMavenJdkTool(def allEnvironments) {
 		buildJdkTool
 	}
@@ -826,7 +826,7 @@ void runBuildOnNode(String label, Closure body) {
 	}
 }
 
-void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
+void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String projectPath = '.') {
 	if ( buildEnv.requiresDefaultBuildArtifacts() ) {
 		dir(helper.configuration.maven.localRepositoryPath) {
 			unstash name:'default-build-result'
@@ -836,12 +836,15 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
-	sh """ \
-			mvn -Dsurefire.environment=$testSuffix \
-					${toTestJdkArg(buildEnv)} \
-					${toElasticsearchJdkArg(buildEnv)} \
-					$args \
-	"""
+
+	dir(projectPath) {
+		sh """ \
+				mvn -Dsurefire.environment=$testSuffix \
+						${toTestJdkArg(buildEnv)} \
+						${toElasticsearchJdkArg(buildEnv)} \
+						$args \
+		"""
+	}
 }
 
 String toElasticsearchVersionArgs(String mavenEsProfile, String version) {
