@@ -358,8 +358,8 @@
                 Note the version of ECJ is overridden because the one bundled with the latest plexus-compiler version
                 is outdated and leads to compilation errors.
          -->
-        <version.org.codehaus.plexus.plexus-compiler-eclipse>2.8.5</version.org.codehaus.plexus.plexus-compiler-eclipse>
-        <version.org.eclipse.jdt.ecj>3.19.0.v20190826-1051</version.org.eclipse.jdt.ecj>
+        <version.org.codehaus.plexus.plexus-compiler-eclipse>2.8.6</version.org.codehaus.plexus.plexus-compiler-eclipse>
+        <version.org.eclipse.jdt.ecj>3.21.0</version.org.eclipse.jdt.ecj>
 
         <!--
             The absolute path to the root project directory.
@@ -1866,9 +1866,8 @@
             <pluginRepositories>
                 <!--
                      This is needed to access pre-release versions of ECJ,
-                     where bugs that affect us are fixed.
-                     See in particular https://bugs.eclipse.org/bugs/show_bug.cgi?id=547807,
-                     not fixed in 3.18.0, the latest ECJ release at the moment.
+                     when bugs that affect us are fixed but not yet released.
+                     It's been used in particular to get a fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=547807.
                      This configuration *MUST STAY IN A SPECIFIC PROFILE*,
                      otherwise it would "taint" projects that depend on Hibernate Search.
                  -->
