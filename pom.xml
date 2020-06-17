@@ -334,23 +334,25 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Set statically: we want our code to comply with this version -->
-        <java-version.baseline.major>1.8</java-version.baseline.major>
+        <java-version.baseline.major>8</java-version.baseline.major>
         <!-- 'java.specification.version' is only correct from Java 9 onwards -->
         <java-version.jdk.major>${java.specification.version}</java-version.jdk.major>
 
-        <maven.compiler.target>${java-version.baseline.major}</maven.compiler.target>
-        <maven.compiler.source>${java-version.baseline.major}</maven.compiler.source>
+        <maven.compiler.release>${java-version.baseline.major}</maven.compiler.release>
         <!-- Generate Java 13/14 bytecode for tests when building with JDK13/14 -->
-        <maven.compiler.testTarget>${java-version.jdk.major}</maven.compiler.testTarget>
-        <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
+        <maven.compiler.testRelease>${java-version.jdk.major}</maven.compiler.testRelease>
         <!--
                 Options to override the compiler arguments directly on the compiler argument line to separate between what
                 the IDE understands as the source level and what the Maven compiler actually use.
         -->
-        <maven.compiler.argument.target>${maven.compiler.target}</maven.compiler.argument.target>
-        <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
-        <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
-        <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
+        <maven.compiler.argument.release>${maven.compiler.release}</maven.compiler.argument.release>
+        <maven.compiler.argument.testRelease>${maven.compiler.testRelease}</maven.compiler.argument.testRelease>
+
+        <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
+        <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
+        <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
+        <maven.compiler.testSource>${maven.compiler.testRelease}</maven.compiler.testSource>
+        <maven.compiler.testTarget>${maven.compiler.testRelease}</maven.compiler.testTarget>
 
         <!--
                 Options to compile with the Eclipse compiler when building with maven (not with the IDE).
@@ -962,10 +964,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <source>${maven.compiler.argument.source}</source>
-                    <target>${maven.compiler.argument.target}</target>
-                    <testSource>${maven.compiler.argument.testSource}</testSource>
-                    <testTarget>${maven.compiler.argument.testTarget}</testTarget>
+                    <release>${maven.compiler.argument.release}</release>
+                    <testRelease>${maven.compiler.argument.testRelease}</testRelease>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -1238,7 +1238,7 @@
                                 </processors>
                                 <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
                                 <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
-                                <compilerArguments>-source ${maven.compiler.argument.source} -target ${maven.compiler.argument.target} -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
+                                <compilerArguments>-release ${maven.compiler.argument.release} -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
@@ -1431,7 +1431,7 @@
                         <execution>
                             <id>verify-forbidden-test-apis</id>
                             <configuration>
-                                <targetVersion>${maven.compiler.argument.testTarget}</targetVersion>
+                                <targetVersion>${maven.compiler.argument.testRelease}</targetVersion>
                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
@@ -1755,8 +1755,8 @@
             <id>testWithJdk11+</id>
             <activation>
                 <property>
-                    <name>maven.compiler.testTarget</name>
-                    <value>!1.8</value>
+                    <name>maven.compiler.argument.testRelease</name>
+                    <value>!8</value>
                 </property>
             </activation>
             <properties>
@@ -1846,6 +1846,10 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
                                 <compilerId>eclipse</compilerId>
+                                <!-- ECJ doesn't seem to understand the "release" argument -->
+                                <release></release>
+                                <source>${maven.compiler.release}</source>
+                                <target>${maven.compiler.release}</target>
                             </configuration>
                             <dependencies>
                                 <dependency>

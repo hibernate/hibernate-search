@@ -17,8 +17,7 @@
     <description>Hibernate Search integration tests for (JDK 11+) Java modules</description>
 
     <properties>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.release>11</maven.compiler.release>
     </properties>
 
     <dependencies>

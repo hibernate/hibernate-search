@@ -30,8 +30,8 @@
             <id>javaModuleITs</id>
             <activation>
                 <property>
-                    <name>maven.compiler.testTarget</name>
-                    <value>!1.8</value>
+                    <name>maven.compiler.argument.testRelease</name>
+                    <value>!8</value>
                 </property>
             </activation>
             <modules>

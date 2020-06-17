@@ -53,7 +53,7 @@
                         <verbose>false</verbose>
                         <failOnWarnings>true</failOnWarnings>
                         <failOnError>true</failOnError>
-                        <source>${maven.compiler.source}</source>
+                        <release>${maven.compiler.release}</release>
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <!--
