@@ -341,12 +341,6 @@
         <maven.compiler.release>${java-version.baseline.major}</maven.compiler.release>
         <!-- Generate Java 13/14 bytecode for tests when building with JDK13/14 -->
         <maven.compiler.testRelease>${java-version.jdk.major}</maven.compiler.testRelease>
-        <!--
-                Options to override the compiler arguments directly on the compiler argument line to separate between what
-                the IDE understands as the source level and what the Maven compiler actually use.
-        -->
-        <maven.compiler.argument.release>${maven.compiler.release}</maven.compiler.argument.release>
-        <maven.compiler.argument.testRelease>${maven.compiler.testRelease}</maven.compiler.argument.testRelease>
 
         <!-- Also set source/target, because several other plugins rely on this and don't understand release -->
         <maven.compiler.source>${maven.compiler.release}</maven.compiler.source>
@@ -964,8 +958,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <release>${maven.compiler.argument.release}</release>
-                    <testRelease>${maven.compiler.argument.testRelease}</testRelease>
+                    <release>${maven.compiler.release}</release>
+                    <testRelease>${maven.compiler.testRelease}</testRelease>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -1233,12 +1227,13 @@
                             </goals>
                             <phase>generate-sources</phase>
                             <configuration>
+                                <releaseVersion>${maven.compiler.release}</releaseVersion>
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
                                 <!-- Disable usage of the @Generated annotation: too much trouble as requirements are different across JDK8 vs JDK9 -->
                                 <!-- See also: https://github.com/jboss-logging/jboss-logging-tools/pull/60#issuecomment-293088198 -->
-                                <compilerArguments>-release ${maven.compiler.argument.release} -Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
+                                <compilerArguments>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
@@ -1431,7 +1426,7 @@
                         <execution>
                             <id>verify-forbidden-test-apis</id>
                             <configuration>
-                                <targetVersion>${maven.compiler.argument.testRelease}</targetVersion>
+                                <targetVersion>${maven.compiler.testRelease}</targetVersion>
                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
@@ -1755,7 +1750,7 @@
             <id>testWithJdk11+</id>
             <activation>
                 <property>
-                    <name>maven.compiler.argument.testRelease</name>
+                    <name>maven.compiler.testRelease</name>
                     <value>!8</value>
                 </property>
             </activation>
