@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 /**
  * An aggregation collector for Lucene.
  *
- * @see LuceneSearchAggregationBuilderFactory#contribute(Object, AggregationKey, SearchAggregation)
+ * @see LuceneSearchAggregationBuilderFactory#contribute(LuceneSearchAggregationCollector, AggregationKey, SearchAggregation)
  */
 public interface LuceneSearchAggregationCollector {
 

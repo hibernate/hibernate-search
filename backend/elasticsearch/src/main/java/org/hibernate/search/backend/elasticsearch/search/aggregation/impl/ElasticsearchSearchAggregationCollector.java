@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 /**
  * An aggregation collector for Elasticsearch.
  *
- * @see ElasticsearchSearchAggregationBuilderFactory#contribute(Object, AggregationKey, SearchAggregation)
+ * @see ElasticsearchSearchAggregationBuilderFactory#contribute(ElasticsearchSearchAggregationCollector, AggregationKey, SearchAggregation)}
  */
 public interface ElasticsearchSearchAggregationCollector {
 
