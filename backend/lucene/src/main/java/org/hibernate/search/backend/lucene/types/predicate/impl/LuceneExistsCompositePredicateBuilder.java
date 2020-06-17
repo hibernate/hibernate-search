@@ -9,36 +9,38 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 public class LuceneExistsCompositePredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements ExistsPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements ExistsPredicateBuilder {
 
-	private final List<LuceneSearchPredicateBuilder> children = new ArrayList<>();
+	private final List<LuceneSearchPredicate> children = new ArrayList<>();
 
-	public LuceneExistsCompositePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( absoluteFieldPath, nestedPathHierarchy );
+	public LuceneExistsCompositePredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+			List<String> nestedPathHierarchy) {
+		super( searchContext, absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		// if exists at least one not-null field, exists on object field should match
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
-		for ( LuceneSearchPredicateBuilder child : children ) {
-			builder.add( child.build( context ), BooleanClause.Occur.SHOULD );
+		for ( LuceneSearchPredicate child : children ) {
+			builder.add( child.toQuery( context ), BooleanClause.Occur.SHOULD );
 		}
 		return builder.build();
 	}
 
-	public void addChild(SearchPredicateBuilder<LuceneSearchPredicateBuilder> childBuilder) {
-		children.add( childBuilder.toImplementation() );
+	public void addChild(SearchPredicate child) {
+		children.add( LuceneSearchPredicate.from( searchContext, child ) );
 	}
 }

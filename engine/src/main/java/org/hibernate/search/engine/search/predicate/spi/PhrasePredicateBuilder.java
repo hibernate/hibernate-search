@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface PhrasePredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface PhrasePredicateBuilder extends SearchPredicateBuilder {
 
 	void slop(int slop);
 

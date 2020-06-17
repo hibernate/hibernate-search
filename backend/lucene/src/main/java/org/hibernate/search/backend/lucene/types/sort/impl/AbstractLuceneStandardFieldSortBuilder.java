@@ -31,7 +31,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchContext searchContext;
 	private final LuceneSearchFieldContext<F> field;
 	protected final C codec;
 	private final Object sortMissingValueFirstPlaceholder;
@@ -42,8 +41,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
-		super( field );
-		this.searchContext = searchContext;
+		super( searchContext, field );
 		this.field = field;
 		this.codec = codec;
 		this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;

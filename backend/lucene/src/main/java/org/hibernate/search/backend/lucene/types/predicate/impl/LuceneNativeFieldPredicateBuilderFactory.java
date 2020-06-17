@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -38,25 +37,25 @@ public class LuceneNativeFieldPredicateBuilderFactory<F> implements LuceneFieldP
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
+	public MatchPredicateBuilder createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
+	public RangePredicateBuilder createRangePredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
+	public PhrasePredicateBuilder createPhrasePredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
+	public WildcardPredicateBuilder createWildcardPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
@@ -68,26 +67,26 @@ public class LuceneNativeFieldPredicateBuilderFactory<F> implements LuceneFieldP
 	}
 
 	@Override
-	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(
+	public ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			LuceneSearchFieldContext<F> field) {
+	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			LuceneSearchFieldContext<F> field) {
+	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			LuceneSearchFieldContext<F> field) {
+	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 

@@ -13,17 +13,17 @@ import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMo
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class WildcardPredicateFieldStepImpl<B>
+class WildcardPredicateFieldStepImpl
 		implements WildcardPredicateFieldStep<WildcardPredicateFieldMoreStep<?, ?>> {
 
-	private final WildcardPredicateFieldMoreStepImpl.CommonState<B> commonState;
+	private final WildcardPredicateFieldMoreStepImpl.CommonState commonState;
 
-	WildcardPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
-		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
+	WildcardPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
+		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState( builderFactory );
 	}
 
 	@Override
 	public WildcardPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

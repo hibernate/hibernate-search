@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -29,24 +28,24 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+	public RangePredicateBuilder createRangePredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
 		return new LuceneTextRangePredicateBuilder<>( searchContext, field, codec );
 	}
 
 	@Override
-	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
-			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+	public PhrasePredicateBuilder createPhrasePredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
 		return new LuceneTextPhrasePredicateBuilder( searchContext, field, codec );
 	}
 
 	@Override
-	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
+	public WildcardPredicateBuilder createWildcardPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextWildcardPredicateBuilder( field );
+		return new LuceneTextWildcardPredicateBuilder( searchContext, field );
 	}
 
 	@Override

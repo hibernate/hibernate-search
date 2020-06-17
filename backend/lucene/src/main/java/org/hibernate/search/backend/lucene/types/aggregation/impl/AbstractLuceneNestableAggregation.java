@@ -12,9 +12,10 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,11 +44,13 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
+		protected final LuceneSearchContext searchContext;
 		protected final LuceneSearchFieldContext<?> field;
 		private final String nestedDocumentPath;
 		private Query nestedFilter;
 
-		public AbstractBuilder(LuceneSearchFieldContext<?> field) {
+		public AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field) {
+			this.searchContext = searchContext;
 			this.field = field;
 			this.nestedDocumentPath = field.nestedDocumentPath();
 		}
@@ -56,10 +59,10 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 			if ( nestedDocumentPath == null ) {
 				throw log.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
-			LuceneSearchPredicateBuilder builder = (LuceneSearchPredicateBuilder) filter;
-			builder.checkNestableWithin( nestedDocumentPath );
-			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
-			this.nestedFilter = builder.build( filterContext );
+			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( searchContext, filter );
+			luceneFilter.checkNestableWithin( nestedDocumentPath );
+			PredicateRequestContext filterContext = new PredicateRequestContext( nestedDocumentPath );
+			this.nestedFilter = luceneFilter.toQuery( filterContext );
 		}
 
 		@Override

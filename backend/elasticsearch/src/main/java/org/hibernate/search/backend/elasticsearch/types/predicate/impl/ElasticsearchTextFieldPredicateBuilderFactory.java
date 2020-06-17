@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -27,24 +26,24 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field) {
+	public MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<String> field) {
 		checkSearchable( field );
 		return new ElasticsearchTextMatchPredicateBuilder( searchContext, field, codec, type );
 	}
 
 	@Override
-	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
+	public PhrasePredicateBuilder createPhrasePredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<String> field) {
 		checkSearchable( field );
-		return new ElasticsearchTextPhrasePredicateBuilder( field );
+		return new ElasticsearchTextPhrasePredicateBuilder( searchContext, field );
 	}
 
 	@Override
-	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
+	public WildcardPredicateBuilder createWildcardPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<String> field) {
 		checkSearchable( field );
-		return new ElasticsearchTextWildcardPredicateBuilder( field );
+		return new ElasticsearchTextWildcardPredicateBuilder( searchContext, field );
 	}
 
 	@Override

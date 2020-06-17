@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.A
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -62,7 +62,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context, JsonObject outerObject,
+	protected JsonObject doBuild(PredicateRequestContext context, JsonObject outerObject,
 			JsonObject innerObject) {
 		if ( analyzer == null ) {
 			// Check analyzer compatibility for multi-index search

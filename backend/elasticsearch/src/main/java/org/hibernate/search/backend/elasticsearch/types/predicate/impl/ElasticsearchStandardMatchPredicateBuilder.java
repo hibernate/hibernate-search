@@ -14,8 +14,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -28,7 +27,7 @@ import com.google.gson.JsonObject;
 
 
 class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearchSingleFieldPredicateBuilder
-		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements MatchPredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,7 +35,6 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
 
-	private final ElasticsearchSearchContext searchContext;
 	protected final ElasticsearchSearchFieldContext<F> field;
 	private final ElasticsearchFieldCodec<F> codec;
 
@@ -44,8 +42,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	ElasticsearchStandardMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
-		super( field );
-		this.searchContext = searchContext;
+		super( searchContext, field );
 		this.field = field;
 		this.codec = codec;
 	}
@@ -80,7 +77,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		QUERY_ACCESSOR.set( innerObject, value );
 

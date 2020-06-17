@@ -28,10 +28,10 @@ public class LuceneGeoPointFieldSortBuilderFactory
 	}
 
 	@Override
-	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<GeoPoint> field, GeoPoint center) {
 		checkSortable( field );
-		return new LuceneGeoPointDistanceSortBuilder( field, center );
+		return new LuceneGeoPointDistanceSortBuilder( searchContext, field, center );
 	}
 
 }

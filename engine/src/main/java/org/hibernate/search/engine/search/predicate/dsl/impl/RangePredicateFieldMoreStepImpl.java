@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -23,36 +24,36 @@ import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class RangePredicateFieldMoreStepImpl<B>
-		implements RangePredicateFieldMoreStep<RangePredicateFieldMoreStepImpl<B>, RangePredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+class RangePredicateFieldMoreStepImpl
+		implements RangePredicateFieldMoreStep<RangePredicateFieldMoreStepImpl, RangePredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<B> commonState;
+	private final CommonState commonState;
 
 	private final List<String> absoluteFieldPaths;
-	private final List<RangePredicateBuilder<B>> predicateBuilders = new ArrayList<>();
+	private final List<RangePredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	RangePredicateFieldMoreStepImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	RangePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
+		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.range( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
-	public RangePredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
-		return new RangePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public RangePredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
+		return new RangePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public RangePredicateFieldMoreStepImpl<B> boost(float boost) {
+	public RangePredicateFieldMoreStepImpl boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -68,30 +69,30 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<B> collector) {
-		for ( RangePredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+	public void contributePredicates(Consumer<SearchPredicate> collector) {
+		for ( RangePredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
 			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
 
-			collector.accept( predicateBuilder.toImplementation() );
+			collector.accept( predicateBuilder.build() );
 		}
 	}
 
-	static class CommonState<B>
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldMoreStepImpl<B>>
-			implements RangePredicateOptionsStep<CommonState<B>> {
+	static class CommonState
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, RangePredicateFieldMoreStepImpl>
+			implements RangePredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
 			super( builderFactory );
 		}
 
-		CommonState<B> range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+		CommonState range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
 			Contracts.assertNotNull( range, "range" );
 			if ( !range.lowerBoundValue().isPresent() && !range.upperBoundValue().isPresent() ) {
 				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
 			}
-			for ( RangePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( RangePredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+			for ( RangePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( RangePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.range( range, lowerBoundConvert, upperBoundConvert );
 				}
 			}
@@ -99,12 +100,7 @@ class RangePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		protected B toImplementation() {
-			return super.toImplementation();
-		}
-
-		@Override
-		protected CommonState<B> thisAsS() {
+		protected CommonState thisAsS() {
 			return this;
 		}
 	}

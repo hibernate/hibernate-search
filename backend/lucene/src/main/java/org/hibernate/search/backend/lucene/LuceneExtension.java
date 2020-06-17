@@ -151,7 +151,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	 */
 	@Override
 	public <C, B> Optional<LuceneSearchPredicateFactory> extendOptional(
-			SearchPredicateFactory original, SearchPredicateBuilderFactory<C, B> factory) {
+			SearchPredicateFactory original, SearchPredicateBuilderFactory<C> factory) {
 		if ( factory instanceof LuceneSearchPredicateBuilderFactory ) {
 			return Optional.of( new LuceneSearchPredicateFactoryImpl(
 					original, (LuceneSearchPredicateBuilderFactory) factory

@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-public class LuceneSearchPredicateContext {
+public class PredicateRequestContext {
 
-	private static final LuceneSearchPredicateContext ROOT = new LuceneSearchPredicateContext( null );
+	private static final PredicateRequestContext ROOT = new PredicateRequestContext( null );
 
 	private final String nestedPath;
 
-	public LuceneSearchPredicateContext(String nestedPath) {
+	public PredicateRequestContext(String nestedPath) {
 		this.nestedPath = nestedPath;
 	}
 
@@ -20,7 +20,7 @@ public class LuceneSearchPredicateContext {
 		return nestedPath;
 	}
 
-	public static LuceneSearchPredicateContext root() {
+	public static PredicateRequestContext root() {
 		return ROOT;
 	}
 }

@@ -64,15 +64,15 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	@Override
 	public S where(SearchPredicate predicate) {
-		SearchPredicateBuilderFactory<? super C, ?> factory = indexScope.searchPredicateBuilderFactory();
+		SearchPredicateBuilderFactory<? super C> factory = indexScope.searchPredicateBuilderFactory();
 		contribute( factory, predicate );
 		return thisAsS();
 	}
 
 	@Override
 	public S where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
-		SearchPredicateBuilderFactory<? super C, ?> builderFactory = indexScope.searchPredicateBuilderFactory();
-		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( builderFactory );
+		SearchPredicateBuilderFactory<? super C> builderFactory = indexScope.searchPredicateBuilderFactory();
+		SearchPredicateFactory factory = new DefaultSearchPredicateFactory( builderFactory );
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
 		contribute( builderFactory, predicate );
 		return thisAsS();
@@ -118,8 +118,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	@Override
 	public S sort(Function<? super SF, ? extends SortFinalStep> sortContributor) {
 		SearchSortBuilderFactory<? super C, ?> builderFactory = indexScope.searchSortBuilderFactory();
-		SearchPredicateBuilderFactory<? super C, ?> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
-		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
+		SearchPredicateBuilderFactory<? super C> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
+		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory( predicateBuilderFactory );
 		SearchSortFactory factory = new DefaultSearchSortFactory<>(
 				SearchSortDslContextImpl.root( builderFactory, predicateFactory, predicateBuilderFactory )
 		);
@@ -138,8 +138,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	@Override
 	public <A> S aggregation(AggregationKey<A> key, Function<? super AF, ? extends AggregationFinalStep<A>> aggregationContributor) {
 		SearchAggregationBuilderFactory<? super C> builderFactory = indexScope.searchAggregationFactory();
-		SearchPredicateBuilderFactory<? super C, ?> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
-		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
+		SearchPredicateBuilderFactory<? super C> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
+		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory( predicateBuilderFactory );
 		AF factory = extendAggregationFactory( new DefaultSearchAggregationFactory(
 				SearchAggregationDslContextImpl.root( builderFactory, predicateFactory, predicateBuilderFactory )
 		) );
@@ -193,8 +193,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 		return toQuery().fetchTotalHitCount();
 	}
 
-	private <B> void contribute(SearchPredicateBuilderFactory<? super C, B> factory, SearchPredicate predicate) {
-		factory.contribute( searchQueryBuilder.toQueryElementCollector(), factory.toImplementation( predicate ) );
+	private void contribute(SearchPredicateBuilderFactory<? super C> factory, SearchPredicate predicate) {
+		factory.contribute( searchQueryBuilder.toQueryElementCollector(), predicate );
 	}
 
 	private <B> void contribute(SearchSortBuilderFactory<? super C, B> factory, SearchSort sort) {

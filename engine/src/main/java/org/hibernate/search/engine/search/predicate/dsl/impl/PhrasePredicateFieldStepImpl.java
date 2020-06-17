@@ -13,16 +13,16 @@ import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldMore
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class PhrasePredicateFieldStepImpl<B> implements PhrasePredicateFieldStep<PhrasePredicateFieldMoreStep<?, ?>> {
+class PhrasePredicateFieldStepImpl implements PhrasePredicateFieldStep<PhrasePredicateFieldMoreStep<?, ?>> {
 
-	private final PhrasePredicateFieldMoreStepImpl.CommonState<B> commonState;
+	private final PhrasePredicateFieldMoreStepImpl.CommonState commonState;
 
-	PhrasePredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
-		this.commonState = new PhrasePredicateFieldMoreStepImpl.CommonState<>( builderFactory );
+	PhrasePredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
+		this.commonState = new PhrasePredicateFieldMoreStepImpl.CommonState( builderFactory );
 	}
 
 	@Override
 	public PhrasePredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

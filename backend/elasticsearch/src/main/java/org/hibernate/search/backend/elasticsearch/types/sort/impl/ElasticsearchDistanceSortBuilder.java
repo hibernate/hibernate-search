@@ -34,7 +34,7 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchDocum
 
 	public ElasticsearchDistanceSortBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
-		super( field, searchContext.searchSyntax() );
+		super( searchContext, field );
 		this.center = center;
 	}
 

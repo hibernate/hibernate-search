@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
@@ -24,20 +25,20 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class SimpleQueryStringPredicateFieldMoreStepImpl<B>
+class SimpleQueryStringPredicateFieldMoreStepImpl
 		implements SimpleQueryStringPredicateFieldMoreStep<
-				SimpleQueryStringPredicateFieldMoreStepImpl<B>,
+				SimpleQueryStringPredicateFieldMoreStepImpl,
 				SimpleQueryStringPredicateOptionsStep<?>
 		> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<B> commonState;
+	private final CommonState commonState;
 
 	private final List<String> absoluteFieldPaths;
 	private final List<SimpleQueryStringPredicateBuilder.FieldState> fieldStates = new ArrayList<>();
 
-	SimpleQueryStringPredicateFieldMoreStepImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	SimpleQueryStringPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
@@ -47,12 +48,12 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
-		return new SimpleQueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public SimpleQueryStringPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
+		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStepImpl<B> boost(float boost) {
+	public SimpleQueryStringPredicateFieldMoreStepImpl boost(float boost) {
 		fieldStates.forEach( c -> c.boost( boost ) );
 		return this;
 	}
@@ -62,24 +63,24 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 		return commonState.matching( simpleQueryString );
 	}
 
-	static class CommonState<B> extends AbstractPredicateFinalStep<B>
-			implements SimpleQueryStringPredicateOptionsStep<CommonState<B>> {
+	static class CommonState extends AbstractPredicateFinalStep
+			implements SimpleQueryStringPredicateOptionsStep<CommonState> {
 
-		private final SimpleQueryStringPredicateBuilder<B> builder;
+		private final SimpleQueryStringPredicateBuilder builder;
 
-		private final List<SimpleQueryStringPredicateFieldMoreStepImpl<B>> fieldSetStates = new ArrayList<>();
+		private final List<SimpleQueryStringPredicateFieldMoreStepImpl> fieldSetStates = new ArrayList<>();
 
-		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
 			super( builderFactory );
 			this.builder = builderFactory.simpleQueryString();
 		}
 
 		@Override
-		protected B toImplementation() {
-			return builder.toImplementation();
+		protected SearchPredicate build() {
+			return builder.build();
 		}
 
-		void add(SimpleQueryStringPredicateFieldMoreStepImpl<B> fieldSetState) {
+		void add(SimpleQueryStringPredicateFieldMoreStepImpl fieldSetState) {
 			fieldSetStates.add( fieldSetState );
 		}
 
@@ -96,31 +97,31 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> constantScore() {
+		public CommonState constantScore() {
 			builder.constantScore();
 			return this;
 		}
 
 		@Override
-		public CommonState<B> boost(float boost) {
+		public CommonState boost(float boost) {
 			builder.boost( boost );
 			return this;
 		}
 
 		@Override
-		public CommonState<B> defaultOperator(BooleanOperator operator) {
+		public CommonState defaultOperator(BooleanOperator operator) {
 			builder.defaultOperator( operator );
 			return this;
 		}
 
 		@Override
-		public CommonState<B> analyzer(String analyzerName) {
+		public CommonState analyzer(String analyzerName) {
 			builder.analyzer( analyzerName );
 			return this;
 		}
 
 		@Override
-		public CommonState<B> skipAnalysis() {
+		public CommonState skipAnalysis() {
 			builder.skipAnalysis();
 			return this;
 		}
@@ -131,7 +132,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> flags(Set<SimpleQueryFlag> flags) {
+		public CommonState flags(Set<SimpleQueryFlag> flags) {
 			builder.flags( flags );
 			return this;
 		}

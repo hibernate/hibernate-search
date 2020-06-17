@@ -6,12 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchPredicateBuilder {
 
+	SearchPredicate build();
+
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should have one SearchPredicate implementation per type of predicate,
+	//  and move this method there.
 	void checkNestableWithin(String expectedParentNestedPath);
 
-	JsonObject build(ElasticsearchSearchPredicateContext context);
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should have one SearchPredicate implementation per type of predicate,
+	//  and move this method there.
+	JsonObject toJsonQuery(PredicateRequestContext context);
 
 }

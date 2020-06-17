@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -23,15 +22,15 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+	public MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field) {
 		checkSearchable( field );
 		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, field, codec );
 	}
 
 	@Override
-	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+	public RangePredicateBuilder createRangePredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field) {
 		checkSearchable( field );
 		return new ElasticsearchRangePredicateBuilder<>( searchContext, field, codec );
 	}

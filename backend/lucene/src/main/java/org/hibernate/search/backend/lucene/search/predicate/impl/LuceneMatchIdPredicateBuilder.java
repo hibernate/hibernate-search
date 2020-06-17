@@ -24,12 +24,13 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements MatchIdPredicateBuilder {
 
 	private final List<String> values = new ArrayList<>();
 	private final LuceneSearchContext searchContext;
 
 	LuceneMatchIdPredicateBuilder(LuceneSearchContext searchContext) {
+		super( searchContext );
 		this.searchContext = searchContext;
 	}
 
@@ -48,7 +49,7 @@ public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicate
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		Builder builder = new BooleanQuery.Builder();
 		for ( String value : values ) {
 			builder.add( termQuery( value ), Occur.SHOULD );

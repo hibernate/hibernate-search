@@ -15,6 +15,8 @@ import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -23,7 +25,7 @@ import com.google.gson.JsonObject;
 
 
 class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
-		implements BooleanPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements BooleanPredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -35,43 +37,47 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
 			JsonAccessor.root().property( "minimum_should_match" ).asString();
 
-	private List<ElasticsearchSearchPredicateBuilder> mustClauseBuilders;
-	private List<ElasticsearchSearchPredicateBuilder> mustNotClauseBuilders;
-	private List<ElasticsearchSearchPredicateBuilder> shouldClauseBuilders;
-	private List<ElasticsearchSearchPredicateBuilder> filterClauseBuilders;
+	private List<ElasticsearchSearchPredicate> mustClauses;
+	private List<ElasticsearchSearchPredicate> mustNotClauses;
+	private List<ElasticsearchSearchPredicate> shouldClauses;
+	private List<ElasticsearchSearchPredicate> filterClauses;
 
 	private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-	@Override
-	public void must(ElasticsearchSearchPredicateBuilder clauseBuilder) {
-		if ( mustClauseBuilders == null ) {
-			mustClauseBuilders = new ArrayList<>();
-		}
-		mustClauseBuilders.add( clauseBuilder );
+	ElasticsearchBooleanPredicateBuilder(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
 	}
 
 	@Override
-	public void mustNot(ElasticsearchSearchPredicateBuilder clauseBuilder) {
-		if ( mustNotClauseBuilders == null ) {
-			mustNotClauseBuilders = new ArrayList<>();
+	public void must(SearchPredicate clause) {
+		if ( mustClauses == null ) {
+			mustClauses = new ArrayList<>();
 		}
-		mustNotClauseBuilders.add( clauseBuilder );
+		mustClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
 	}
 
 	@Override
-	public void should(ElasticsearchSearchPredicateBuilder clauseBuilder) {
-		if ( shouldClauseBuilders == null ) {
-			shouldClauseBuilders = new ArrayList<>();
+	public void mustNot(SearchPredicate clause) {
+		if ( mustNotClauses == null ) {
+			mustNotClauses = new ArrayList<>();
 		}
-		shouldClauseBuilders.add( clauseBuilder );
+		mustNotClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
 	}
 
 	@Override
-	public void filter(ElasticsearchSearchPredicateBuilder clauseBuilder) {
-		if ( filterClauseBuilders == null ) {
-			filterClauseBuilders = new ArrayList<>();
+	public void should(SearchPredicate clause) {
+		if ( shouldClauses == null ) {
+			shouldClauses = new ArrayList<>();
 		}
-		filterClauseBuilders.add( clauseBuilder );
+		shouldClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+	}
+
+	@Override
+	public void filter(SearchPredicate clause) {
+		if ( filterClauses == null ) {
+			filterClauses = new ArrayList<>();
+		}
+		filterClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
 	}
 
 	@Override
@@ -104,19 +110,19 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 
 	@Override
 	public void checkNestableWithin(String expectedParentNestedPath) {
-		checkNestableWithin( expectedParentNestedPath, mustClauseBuilders );
-		checkNestableWithin( expectedParentNestedPath, shouldClauseBuilders );
-		checkNestableWithin( expectedParentNestedPath, filterClauseBuilders );
-		checkNestableWithin( expectedParentNestedPath, mustNotClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, mustClauses );
+		checkNestableWithin( expectedParentNestedPath, shouldClauses );
+		checkNestableWithin( expectedParentNestedPath, filterClauses );
+		checkNestableWithin( expectedParentNestedPath, mustNotClauses );
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		contributeClauses( context, innerObject, MUST_ACCESSOR, mustClauseBuilders );
-		contributeClauses( context, innerObject, MUST_NOT_ACCESSOR, mustNotClauseBuilders );
-		contributeClauses( context, innerObject, SHOULD_ACCESSOR, shouldClauseBuilders );
-		contributeClauses( context, innerObject, FILTER_ACCESSOR, filterClauseBuilders );
+		contributeClauses( context, innerObject, MUST_ACCESSOR, mustClauses );
+		contributeClauses( context, innerObject, MUST_NOT_ACCESSOR, mustNotClauses );
+		contributeClauses( context, innerObject, SHOULD_ACCESSOR, shouldClauses );
+		contributeClauses( context, innerObject, FILTER_ACCESSOR, filterClauses );
 
 		// Forcing to the Lucene's defaults. See HSEARCH-3534
 		if ( minimumShouldMatchConstraints == null && hasAtLeastOneMustOrFilterPredicate() ) {
@@ -136,27 +142,26 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 	}
 
 	private boolean hasAtLeastOneMustOrFilterPredicate() {
-		return mustClauseBuilders != null || filterClauseBuilders != null;
+		return mustClauses != null || filterClauses != null;
 	}
 
-	private void contributeClauses(ElasticsearchSearchPredicateContext context, JsonObject innerObject,
-			JsonAccessor<JsonObject> occurAccessor,
-			List<ElasticsearchSearchPredicateBuilder> clauseBuilders) {
-		if ( clauseBuilders == null ) {
+	private void contributeClauses(PredicateRequestContext context, JsonObject innerObject,
+			JsonAccessor<JsonObject> occurAccessor, List<ElasticsearchSearchPredicate> clauses) {
+		if ( clauses == null ) {
 			return;
 		}
 
-		for ( ElasticsearchSearchPredicateBuilder clauseBuilder : clauseBuilders ) {
-			occurAccessor.add( innerObject, clauseBuilder.build( context ) );
+		for ( ElasticsearchSearchPredicate clause : clauses ) {
+			occurAccessor.add( innerObject, clause.toJsonQuery( context ) );
 		}
 	}
 
-	private void checkNestableWithin(String expectedParentNestedPath, List<ElasticsearchSearchPredicateBuilder> clauseBuilders) {
-		if ( clauseBuilders == null ) {
+	private void checkNestableWithin(String expectedParentNestedPath, List<ElasticsearchSearchPredicate> clauses) {
+		if ( clauses == null ) {
 			return;
 		}
-		for ( ElasticsearchSearchPredicateBuilder builder : clauseBuilders ) {
-			builder.checkNestableWithin( expectedParentNestedPath );
+		for ( ElasticsearchSearchPredicate clause : clauses ) {
+			clause.checkNestableWithin( expectedParentNestedPath );
 		}
 	}
 

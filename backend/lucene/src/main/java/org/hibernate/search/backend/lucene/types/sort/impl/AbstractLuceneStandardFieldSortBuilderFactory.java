@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
@@ -25,7 +26,9 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 	}
 
 	@Override
-	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchFieldContext<F> field,
+	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+			LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field,
 			GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType( field.eventContext() );
 	}

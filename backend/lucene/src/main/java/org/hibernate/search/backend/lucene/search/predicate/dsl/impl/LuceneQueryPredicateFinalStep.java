@@ -8,13 +8,14 @@ package org.hibernate.search.backend.lucene.search.predicate.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 
 import org.apache.lucene.search.Query;
 
 final class LuceneQueryPredicateFinalStep
-		extends AbstractPredicateFinalStep<LuceneSearchPredicateBuilder>
+		extends AbstractPredicateFinalStep
 		implements PredicateFinalStep {
 	private final LuceneSearchPredicateBuilder builder;
 
@@ -24,7 +25,7 @@ final class LuceneQueryPredicateFinalStep
 	}
 
 	@Override
-	protected LuceneSearchPredicateBuilder toImplementation() {
-		return builder;
+	protected SearchPredicate build() {
+		return builder.build();
 	}
 }

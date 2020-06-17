@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
@@ -28,8 +29,9 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneDocumentVal
 
 	private final GeoPoint location;
 
-	LuceneGeoPointDistanceSortBuilder(LuceneSearchFieldContext<GeoPoint> field, GeoPoint location) {
-		super( field );
+	LuceneGeoPointDistanceSortBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field,
+			GeoPoint location) {
+		super( searchContext, field );
 		this.location = location;
 	}
 
@@ -51,7 +53,7 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneDocumentVal
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		LuceneGeoPointDistanceComparatorSource fieldComparatorSource = new LuceneGeoPointDistanceComparatorSource(
-				nestedDocumentPath, location, getMultiValueMode(), getLuceneFilter() );
+				nestedDocumentPath, location, getMultiValueMode(), getNestedFilter() );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 		collector.collectSortField( sortField, ( nestedDocumentPath == null ) ? null : fieldComparatorSource );
 	}

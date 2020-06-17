@@ -40,7 +40,7 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 
 	public ElasticsearchStandardFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
-		super( field, searchContext.searchSyntax() );
+		super( searchContext, field );
 		this.searchContext = searchContext;
 		this.codec = codec;
 	}

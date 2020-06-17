@@ -35,7 +35,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
 
 public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNestablePredicateBuilder
-		implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements SimpleQueryStringPredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -51,6 +51,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchIndexesContext indexes) {
+		super( searchContext );
 		this.indexes = indexes;
 		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 		this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( indexes );
@@ -104,7 +105,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNesta
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		Analyzer analyzer = buildAnalyzer();
 
 		int flag = -1;

@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 public interface LuceneObjectPredicateBuilderFactory {
 
 	boolean isCompatibleWith(LuceneObjectPredicateBuilderFactory other);
 
-	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder();
+	ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext);
 }

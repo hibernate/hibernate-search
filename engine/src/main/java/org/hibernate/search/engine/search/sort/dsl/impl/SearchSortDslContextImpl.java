@@ -31,7 +31,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 
 	public static <F extends SearchSortBuilderFactory<?, B>, B, PDF extends SearchPredicateFactory>
 			SearchSortDslContext<F, B, ?> root(F factory, PDF predicateFactory,
-					SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory) {
+					SearchPredicateBuilderFactory<?> predicateBuilderFactory) {
 		return new SearchSortDslContextImpl<>( factory, null, null,
 				predicateFactory, predicateBuilderFactory );
 	}
@@ -40,12 +40,12 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	private final SearchSortDslContextImpl<F, B, ?> parent;
 	private final B builder;
 	private final PDF predicateFactory;
-	private final SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory;
+	private final SearchPredicateBuilderFactory<?> predicateBuilderFactory;
 
 	private SearchSort sortResult;
 
 	private SearchSortDslContextImpl(F factory, SearchSortDslContextImpl<F, B, ?> parent, B builder,
-			PDF predicateFactory, SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory) {
+			PDF predicateFactory, SearchPredicateBuilderFactory<?> predicateBuilderFactory) {
 		this.factory = factory;
 		this.parent = parent;
 		this.builder = builder;

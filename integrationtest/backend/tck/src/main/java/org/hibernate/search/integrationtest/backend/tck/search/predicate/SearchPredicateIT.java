@@ -359,7 +359,7 @@ public class SearchPredicateIT {
 	private static class SupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
 		public <C, B> Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
-				SearchPredicateBuilderFactory<C, B> factory) {
+				SearchPredicateBuilderFactory<C> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
@@ -369,7 +369,7 @@ public class SearchPredicateIT {
 	private static class UnSupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
 		public <C, B> Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
-				SearchPredicateBuilderFactory<C, B> factory) {
+				SearchPredicateBuilderFactory<C> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			return Optional.empty();

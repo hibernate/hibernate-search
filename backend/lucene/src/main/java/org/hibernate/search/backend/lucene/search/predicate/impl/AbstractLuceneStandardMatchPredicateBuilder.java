@@ -25,11 +25,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 		extends AbstractLuceneSingleFieldPredicateBuilder
-		implements MatchPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements MatchPredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchContext searchContext;
 	protected final LuceneSearchFieldContext<F> field;
 	protected final C codec;
 
@@ -37,8 +36,7 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 
 	protected AbstractLuceneStandardMatchPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field, C codec) {
-		super( field );
-		this.searchContext = searchContext;
+		super( searchContext, field );
 		this.field = field;
 		this.codec = codec;
 	}

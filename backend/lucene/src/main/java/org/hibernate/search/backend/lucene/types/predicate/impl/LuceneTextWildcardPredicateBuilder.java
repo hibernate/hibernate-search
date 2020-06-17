@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
@@ -20,14 +20,14 @@ import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.BytesRef;
 
 class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements WildcardPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements WildcardPredicateBuilder {
 
 	private final Analyzer analyzerOrNormalizer;
 
 	private String pattern;
 
-	LuceneTextWildcardPredicateBuilder(LuceneSearchFieldContext<?> field) {
-		super( field );
+	LuceneTextWildcardPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field) {
+		super( searchContext, field );
 		this.analyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 	}
 
@@ -37,7 +37,7 @@ class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSingleFieldPredic
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
 		return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );
 	}

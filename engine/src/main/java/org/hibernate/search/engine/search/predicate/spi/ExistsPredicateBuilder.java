@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface ExistsPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface ExistsPredicateBuilder extends SearchPredicateBuilder {
 
 }

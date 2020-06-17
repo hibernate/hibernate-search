@@ -6,35 +6,29 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateNestStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class NestedPredicateFieldStepImpl<B>
-		extends AbstractPredicateFinalStep<B>
+class NestedPredicateFieldStepImpl
+		extends AbstractPredicateFinalStep
 		implements NestedPredicateFieldStep<NestedPredicateNestStep<?>>,
 				NestedPredicateNestStep<NestedPredicateOptionsStep<?>>,
 				NestedPredicateOptionsStep<NestedPredicateOptionsStep<?>> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final SearchPredicateFactory factory;
-	private NestedPredicateBuilder<B> builder;
-	private B childPredicateBuilder;
+	private NestedPredicateBuilder builder;
 
-	NestedPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory, SearchPredicateFactory factory) {
+	NestedPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory, SearchPredicateFactory factory) {
 		super( builderFactory );
 		this.factory = factory;
 	}
@@ -47,11 +41,7 @@ class NestedPredicateFieldStepImpl<B>
 
 	@Override
 	public NestedPredicateOptionsStep<?> nest(SearchPredicate searchPredicate) {
-		if ( this.childPredicateBuilder != null ) {
-			throw log.cannotAddMultiplePredicatesToNestedPredicate();
-		}
-		this.childPredicateBuilder = builderFactory.toImplementation( searchPredicate );
-		builder.nested( childPredicateBuilder );
+		builder.nested( searchPredicate );
 		return this;
 	}
 
@@ -62,8 +52,8 @@ class NestedPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	protected B toImplementation() {
-		return builder.toImplementation();
+	protected SearchPredicate build() {
+		return builder.build();
 	}
 
 }

@@ -69,7 +69,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return indexes.field( absoluteFieldPath ).createDistanceSortBuilder( location );
+		return indexes.field( absoluteFieldPath ).createDistanceSortBuilder( searchContext, location );
 	}
 
 	@Override

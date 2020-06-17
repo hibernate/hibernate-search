@@ -8,13 +8,14 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 
 import com.google.gson.JsonObject;
 
 final class ElasticsearchJsonPredicateFinalStep
-		extends AbstractPredicateFinalStep<ElasticsearchSearchPredicateBuilder>
+		extends AbstractPredicateFinalStep
 		implements PredicateFinalStep {
 	private final ElasticsearchSearchPredicateBuilder builder;
 
@@ -29,7 +30,7 @@ final class ElasticsearchJsonPredicateFinalStep
 	}
 
 	@Override
-	protected ElasticsearchSearchPredicateBuilder toImplementation() {
-		return builder;
+	protected SearchPredicate build() {
+		return builder.build();
 	}
 }

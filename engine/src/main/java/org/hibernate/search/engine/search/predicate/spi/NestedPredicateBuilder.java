@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface NestedPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
-	void nested(B nestedBuilder);
+public interface NestedPredicateBuilder extends SearchPredicateBuilder {
+
+	void nested(SearchPredicate nestedPredicate);
 
 }

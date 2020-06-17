@@ -28,7 +28,7 @@ import com.google.gson.JsonObject;
 
 
 public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSingleFieldPredicateBuilder
-		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements RangePredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -39,7 +39,6 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	private static final JsonAccessor<JsonElement> LT_ACCESSOR = JsonAccessor.root().property( "lt" );
 	private static final JsonAccessor<JsonElement> LTE_ACCESSOR = JsonAccessor.root().property( "lte" );
 
-	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchFieldContext<F> field;
 	private final ElasticsearchFieldCodec<F> codec;
 
@@ -47,8 +46,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 
 	public ElasticsearchRangePredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
-		super( field );
-		this.searchContext = searchContext;
+		super( searchContext, field );
 		this.field = field;
 		this.codec = codec;
 	}
@@ -64,7 +62,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonAccessor<JsonElement> accessor;
 		Optional<JsonElement> lowerBoundValue = range.lowerBoundValue();

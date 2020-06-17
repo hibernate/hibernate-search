@@ -12,6 +12,7 @@ import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -21,6 +22,10 @@ public abstract class AbstractElasticsearchNestablePredicateBuilder extends Abst
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final JsonAccessor<String> PATH_ACCESSOR = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asObject();
+
+	AbstractElasticsearchNestablePredicateBuilder(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
+	}
 
 	@Override
 	public void checkNestableWithin(String expectedParentNestedPath) {
@@ -35,7 +40,7 @@ public abstract class AbstractElasticsearchNestablePredicateBuilder extends Abst
 	}
 
 	@Override
-	public JsonObject build(ElasticsearchSearchPredicateContext context) {
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		checkNestableWithin( context.getNestedPath() );
 
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
@@ -44,16 +49,16 @@ public abstract class AbstractElasticsearchNestablePredicateBuilder extends Abst
 
 		if ( Objects.equals( context.getNestedPath(), expectedNestedPath ) ) {
 			// Implicit nesting is not necessary
-			return super.build( context );
+			return super.toJsonQuery( context );
 		}
 
 		// The context we expect this predicate to be built in.
 		// We'll make sure to wrap it in nested predicates as appropriate in the next few lines,
 		// so that the predicate is actually executed in this context.
-		ElasticsearchSearchPredicateContext contextAfterImplicitNesting =
+		PredicateRequestContext contextAfterImplicitNesting =
 				context.withNestedPath( expectedNestedPath );
 
-		JsonObject result = super.build( contextAfterImplicitNesting );
+		JsonObject result = super.toJsonQuery( contextAfterImplicitNesting );
 
 		// traversing the nestedPathHierarchy in the inverted order
 		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;

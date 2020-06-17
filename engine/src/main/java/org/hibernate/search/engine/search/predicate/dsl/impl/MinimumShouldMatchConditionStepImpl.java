@@ -15,11 +15,11 @@ import org.hibernate.search.util.common.impl.Contracts;
 final class MinimumShouldMatchConditionStepImpl<N> implements MinimumShouldMatchConditionStep<N>,
 		MinimumShouldMatchRequireStep<N>, MinimumShouldMatchMoreStep<N> {
 
-	private final BooleanPredicateBuilder<?> builder;
+	private final BooleanPredicateBuilder builder;
 	private final N nextStep;
 	private int ignoreConstraintCeiling = 0;
 
-	MinimumShouldMatchConditionStepImpl(BooleanPredicateBuilder<?> builder, N nextStep) {
+	MinimumShouldMatchConditionStepImpl(BooleanPredicateBuilder builder, N nextStep) {
 		this.builder = builder;
 		this.nextStep = nextStep;
 	}

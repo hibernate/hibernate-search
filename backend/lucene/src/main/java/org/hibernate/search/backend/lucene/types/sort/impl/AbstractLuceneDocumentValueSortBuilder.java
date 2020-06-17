@@ -7,13 +7,13 @@
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
-import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -23,21 +23,27 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import org.apache.lucene.search.Query;
+
 public abstract class AbstractLuceneDocumentValueSortBuilder
 		extends AbstractLuceneSearchSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	protected final LuceneSearchContext searchContext;
 	protected final String absoluteFieldPath;
 	protected final String nestedDocumentPath;
 	private SortMode mode;
-	private LuceneSearchPredicateBuilder filterBuilder;
+	protected Query nestedFilter;
 
-	protected AbstractLuceneDocumentValueSortBuilder(LuceneSearchFieldContext<?> field) {
-		this( field.absolutePath(), field.nestedDocumentPath() );
+	protected AbstractLuceneDocumentValueSortBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<?> field) {
+		this( searchContext, field.absolutePath(), field.nestedDocumentPath() );
 	}
 
-	protected AbstractLuceneDocumentValueSortBuilder(String absoluteFieldPath, String nestedDocumentPath) {
+	protected AbstractLuceneDocumentValueSortBuilder(LuceneSearchContext searchContext,
+			String absoluteFieldPath, String nestedDocumentPath) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
 	}
@@ -53,9 +59,10 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 		if ( nestedDocumentPath == null ) {
 			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
 		}
-		LuceneSearchPredicateBuilder builder = (LuceneSearchPredicateBuilder) filter;
-		builder.checkNestableWithin( nestedDocumentPath );
-		this.filterBuilder = builder;
+		LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( searchContext, filter );
+		luceneFilter.checkNestableWithin( nestedDocumentPath );
+		PredicateRequestContext filterContext = new PredicateRequestContext( nestedDocumentPath );
+		this.nestedFilter = luceneFilter.toQuery( filterContext );
 	}
 
 	protected final MultiValueMode getMultiValueMode() {
@@ -87,13 +94,8 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 		return multiValueMode;
 	}
 
-	protected Query getLuceneFilter() {
-		if ( filterBuilder == null ) {
-			return null;
-		}
-
-		LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
-		return filterBuilder.build( filterContext );
+	protected Query getNestedFilter() {
+		return nestedFilter;
 	}
 
 	protected final EventContext getEventContext() {

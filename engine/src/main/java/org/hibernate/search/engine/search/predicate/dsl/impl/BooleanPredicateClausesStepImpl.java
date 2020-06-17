@@ -19,17 +19,17 @@ import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class BooleanPredicateClausesStepImpl<B>
-		extends AbstractPredicateFinalStep<B>
+class BooleanPredicateClausesStepImpl
+		extends AbstractPredicateFinalStep
 		implements BooleanPredicateClausesStep<BooleanPredicateClausesStep<?>> {
 
 	private final SearchPredicateFactory factory;
 
-	private final BooleanPredicateBuilder<B> builder;
+	private final BooleanPredicateBuilder builder;
 
 	private final MinimumShouldMatchConditionStepImpl<BooleanPredicateClausesStep<?>> minimumShouldMatchStep;
 
-	BooleanPredicateClausesStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory,
+	BooleanPredicateClausesStepImpl(SearchPredicateBuilderFactory<?> builderFactory,
 			SearchPredicateFactory factory) {
 		super( builderFactory );
 		this.factory = factory;
@@ -51,25 +51,25 @@ class BooleanPredicateClausesStepImpl<B>
 
 	@Override
 	public BooleanPredicateClausesStep<?> must(SearchPredicate searchPredicate) {
-		builder.must( builderFactory.toImplementation( searchPredicate ) );
+		builder.must( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep<?> mustNot(SearchPredicate searchPredicate) {
-		builder.mustNot( builderFactory.toImplementation( searchPredicate ) );
+		builder.mustNot( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep<?> should(SearchPredicate searchPredicate) {
-		builder.should( builderFactory.toImplementation( searchPredicate ) );
+		builder.should( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public BooleanPredicateClausesStep<?> filter(SearchPredicate searchPredicate) {
-		builder.filter( builderFactory.toImplementation( searchPredicate ) );
+		builder.filter( searchPredicate );
 		return this;
 	}
 
@@ -114,8 +114,8 @@ class BooleanPredicateClausesStepImpl<B>
 	}
 
 	@Override
-	protected B toImplementation() {
-		return builder.toImplementation();
+	protected SearchPredicate build() {
+		return builder.build();
 	}
 
 }

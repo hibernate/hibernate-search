@@ -6,15 +6,25 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 import com.google.gson.JsonObject;
 
 
 class ElasticsearchUserProvidedJsonPredicateBuilder implements ElasticsearchSearchPredicateBuilder {
 
+	private final ElasticsearchSearchContext searchContext;
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonPredicateBuilder(JsonObject json) {
+	ElasticsearchUserProvidedJsonPredicateBuilder(ElasticsearchSearchContext searchContext, JsonObject json) {
+		this.searchContext = searchContext;
 		this.json = json;
+	}
+
+	@Override
+	public SearchPredicate build() {
+		return ElasticsearchSearchPredicate.of( searchContext, this );
 	}
 
 	@Override
@@ -23,8 +33,7 @@ class ElasticsearchUserProvidedJsonPredicateBuilder implements ElasticsearchSear
 	}
 
 	@Override
-	public JsonObject build(
-			ElasticsearchSearchPredicateContext context) {
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		return json;
 	}
 

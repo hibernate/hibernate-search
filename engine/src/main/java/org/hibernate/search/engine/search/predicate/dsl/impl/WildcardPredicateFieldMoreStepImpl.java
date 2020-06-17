@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -20,36 +21,36 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class WildcardPredicateFieldMoreStepImpl<B>
-		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl<B>, WildcardPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+class WildcardPredicateFieldMoreStepImpl
+		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl, WildcardPredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<B> commonState;
+	private final CommonState commonState;
 
 	private final List<String> absoluteFieldPaths;
-	private final List<WildcardPredicateBuilder<B>> predicateBuilders = new ArrayList<>();
+	private final List<WildcardPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	WildcardPredicateFieldMoreStepImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	WildcardPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
+		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.wildcard( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
-		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public WildcardPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
+		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStepImpl<B> boost(float boost) {
+	public WildcardPredicateFieldMoreStepImpl boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -65,20 +66,20 @@ class WildcardPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<B> collector) {
-		for ( WildcardPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+	public void contributePredicates(Consumer<SearchPredicate> collector) {
+		for ( WildcardPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
 			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
 
-			collector.accept( predicateBuilder.toImplementation() );
+			collector.accept( predicateBuilder.build() );
 		}
 	}
 
-	static class CommonState<B>
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, WildcardPredicateFieldMoreStepImpl<B>>
-			implements WildcardPredicateOptionsStep<CommonState<B>> {
+	static class CommonState
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, WildcardPredicateFieldMoreStepImpl>
+			implements WildcardPredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
 			super( builderFactory );
 		}
 
@@ -86,8 +87,8 @@ class WildcardPredicateFieldMoreStepImpl<B>
 			if ( wildcardPattern == null ) {
 				throw log.wildcardPredicateCannotMatchNullPattern( getEventContext() );
 			}
-			for ( WildcardPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( WildcardPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+			for ( WildcardPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( WildcardPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.pattern( wildcardPattern );
 				}
 			}
@@ -95,7 +96,7 @@ class WildcardPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		protected CommonState<B> thisAsS() {
+		protected CommonState thisAsS() {
 			return this;
 		}
 	}

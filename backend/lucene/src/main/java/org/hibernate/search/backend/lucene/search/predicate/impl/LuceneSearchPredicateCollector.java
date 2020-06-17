@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 import org.apache.lucene.search.Query;
 
 
@@ -14,7 +16,7 @@ import org.apache.lucene.search.Query;
  * <p>
  * Used by Lucene-specific predicate contributors.
  *
- * @see LuceneSearchPredicateBuilderFactoryImpl#contribute(LuceneSearchPredicateCollector, LuceneSearchPredicateBuilder)
+ * @see LuceneSearchPredicateBuilderFactoryImpl#contribute(LuceneSearchPredicateCollector, SearchPredicate)
  * @see LuceneSearchPredicateBuilder
  */
 public interface LuceneSearchPredicateCollector {

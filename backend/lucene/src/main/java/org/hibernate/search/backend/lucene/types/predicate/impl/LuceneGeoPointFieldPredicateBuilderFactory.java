@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -35,36 +34,36 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
+	public MatchPredicateBuilder createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		throw log.directValueLookupNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
+	public RangePredicateBuilder createRangePredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		throw log.rangesNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			LuceneSearchFieldContext<GeoPoint> field) {
+	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( field );
+		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( searchContext, field );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			LuceneSearchFieldContext<GeoPoint> field) {
+	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( field );
+		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( searchContext, field );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			LuceneSearchFieldContext<GeoPoint> field) {
+	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( field );
+		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( searchContext, field );
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -21,36 +22,36 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class MatchPredicateFieldMoreStepImpl<B>
-		implements MatchPredicateFieldMoreStep<MatchPredicateFieldMoreStepImpl<B>, MatchPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+class MatchPredicateFieldMoreStepImpl
+		implements MatchPredicateFieldMoreStep<MatchPredicateFieldMoreStepImpl, MatchPredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<B> commonState;
+	private final CommonState commonState;
 
 	private final List<String> absoluteFieldPaths;
-	private final List<MatchPredicateBuilder<B>> predicateBuilders = new ArrayList<>();
+	private final List<MatchPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	MatchPredicateFieldMoreStepImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	MatchPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
+		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.match( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
-		return new MatchPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public MatchPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
+		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStepImpl<B> boost(float boost) {
+	public MatchPredicateFieldMoreStepImpl boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -66,19 +67,19 @@ class MatchPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<B> collector) {
-		for ( MatchPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+	public void contributePredicates(Consumer<SearchPredicate> collector) {
+		for ( MatchPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
 			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
 
-			collector.accept( predicateBuilder.toImplementation() );
+			collector.accept( predicateBuilder.build() );
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, MatchPredicateFieldMoreStepImpl<B>>
-			implements MatchPredicateOptionsStep<CommonState<B>> {
+	static class CommonState extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, MatchPredicateFieldMoreStepImpl>
+			implements MatchPredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
 			super( builderFactory );
 		}
 
@@ -87,8 +88,8 @@ class MatchPredicateFieldMoreStepImpl<B>
 				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
 			}
 
-			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.value( value, convert );
 				}
 			}
@@ -96,7 +97,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> fuzzy(int maxEditDistance, int exactPrefixLength) {
+		public CommonState fuzzy(int maxEditDistance, int exactPrefixLength) {
 			if ( maxEditDistance < 0 || 2 < maxEditDistance ) {
 				throw log.invalidFuzzyMaximumEditDistance( maxEditDistance );
 			}
@@ -104,8 +105,8 @@ class MatchPredicateFieldMoreStepImpl<B>
 				throw log.invalidExactPrefixLength( exactPrefixLength );
 			}
 
-			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.fuzzy( maxEditDistance, exactPrefixLength );
 				}
 			}
@@ -113,9 +114,9 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> analyzer(String analyzerName) {
-			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+		public CommonState analyzer(String analyzerName) {
+			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.analyzer( analyzerName );
 				}
 			}
@@ -123,9 +124,9 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> skipAnalysis() {
-			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+		public CommonState skipAnalysis() {
+			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.skipAnalysis();
 				}
 			}
@@ -133,7 +134,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		protected CommonState<B> thisAsS() {
+		protected CommonState thisAsS() {
 			return this;
 		}
 	}

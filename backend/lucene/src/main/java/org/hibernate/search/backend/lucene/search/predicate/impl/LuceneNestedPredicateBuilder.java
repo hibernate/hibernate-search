@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -19,28 +21,27 @@ import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 
 class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements NestedPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements NestedPredicateBuilder {
 
-	private LuceneSearchPredicateBuilder nestedBuilder;
+	private LuceneSearchPredicate nestedPredicate;
 
-	LuceneNestedPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super(
-				absoluteFieldPath,
-				// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
-				nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 )
-		);
+	LuceneNestedPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+			List<String> nestedPathHierarchy) {
+		// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
+		super( searchContext, absoluteFieldPath, nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 ) );
 	}
 
 	@Override
-	public void nested(LuceneSearchPredicateBuilder nestedBuilder) {
-		nestedBuilder.checkNestableWithin( absoluteFieldPath );
-		this.nestedBuilder = nestedBuilder;
+	public void nested(SearchPredicate nestedPredicate) {
+		LuceneSearchPredicate luceneNestedPredicate = LuceneSearchPredicate.from( searchContext, nestedPredicate );
+		luceneNestedPredicate.checkNestableWithin( absoluteFieldPath );
+		this.nestedPredicate = luceneNestedPredicate;
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
-		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( absoluteFieldPath );
-		return doBuild( context.getNestedPath(), absoluteFieldPath, nestedBuilder.build( childContext ) );
+	protected Query doBuild(PredicateRequestContext context) {
+		PredicateRequestContext childContext = new PredicateRequestContext( absoluteFieldPath );
+		return doBuild( context.getNestedPath(), absoluteFieldPath, nestedPredicate.toQuery( childContext ) );
 	}
 
 	public static Query doBuild(String parentNestedDocumentPath, String nestedDocumentPath, Query nestedQuery) {

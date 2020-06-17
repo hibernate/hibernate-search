@@ -53,7 +53,7 @@ public class LuceneTextFieldSortBuilder<F>
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		LuceneTextFieldComparatorSource fieldComparatorSource = new LuceneTextFieldComparatorSource(
-				nestedDocumentPath, missingValue, getMultiValueMode(), getLuceneFilter()
+				nestedDocumentPath, missingValue, getMultiValueMode(), getNestedFilter()
 		);
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 

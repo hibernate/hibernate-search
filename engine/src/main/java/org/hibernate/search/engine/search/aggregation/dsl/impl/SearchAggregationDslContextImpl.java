@@ -17,16 +17,16 @@ public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderF
 		implements SearchAggregationDslContext<F, PDF> {
 	public static <F extends SearchAggregationBuilderFactory<?>, PDF extends SearchPredicateFactory>
 			SearchAggregationDslContextImpl root(F builderFactory, PDF predicateFactory,
-					SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory) {
+					SearchPredicateBuilderFactory<?> predicateBuilderFactory) {
 		return new SearchAggregationDslContextImpl<>( builderFactory, predicateFactory, predicateBuilderFactory );
 	}
 
 	private final F builderFactory;
 	private final PDF predicateFactory;
-	private final SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory;
+	private final SearchPredicateBuilderFactory<?> predicateBuilderFactory;
 
 	private SearchAggregationDslContextImpl(F builderFactory, PDF predicateFactory,
-			SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory) {
+			SearchPredicateBuilderFactory<?> predicateBuilderFactory) {
 		this.builderFactory = builderFactory;
 		this.predicateFactory = predicateFactory;
 		this.predicateBuilderFactory = predicateBuilderFactory;
