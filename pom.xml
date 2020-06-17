@@ -290,6 +290,7 @@
         <version.com.buschmais.jqassistant.plugin>1.8.0</version.com.buschmais.jqassistant.plugin>
         <version.com.github.alexcojocaru.elasticsearch.plugin>6.15</version.com.github.alexcojocaru.elasticsearch.plugin>
         <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
+        <version.sonar.plugin>3.7.0.1746</version.sonar.plugin>
         <!--
             Please don't change the name of this property, it may be used and
             overridden by a CI job of the Checkstyle project so that they can
@@ -1647,7 +1648,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.4.0.905</version>
+                    <version>${version.sonar.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
