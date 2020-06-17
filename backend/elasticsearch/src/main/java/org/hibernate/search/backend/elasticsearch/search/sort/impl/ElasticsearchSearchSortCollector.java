@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import java.util.List;
-
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
@@ -18,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
  * <p>
  * Used by Elasticsearch-specific sort contributors.
  *
- * @see ElasticsearchSearchSortBuilderFactoryImpl#contribute(Object, List)
+ * @see ElasticsearchSearchSortBuilderFactoryImpl#contribute(ElasticsearchSearchSortCollector, ElasticsearchSearchSortBuilder)
  * @see ElasticsearchSearchSortBuilder
  */
 public interface ElasticsearchSearchSortCollector {
