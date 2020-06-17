@@ -179,7 +179,7 @@ stage('Configure') {
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkBuildEnvironment(version: '8', buildJdkTool: 'OpenJDK 11 Latest',
-							testJdkTarget: '1.8', testJdkTool: 'OpenJDK 8 Latest',
+							testJdkRelease: '8', testJdkTool: 'OpenJDK 8 Latest',
 							status: BuildEnvironmentStatus.SUPPORTED),
 					new JdkBuildEnvironment(version: '11', buildJdkTool: 'OpenJDK 11 Latest',
 							status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
@@ -674,7 +674,7 @@ class JdkBuildEnvironment extends BuildEnvironment {
 	String version
 	String buildJdkTool
 	String testJdkTool
-	String testJdkTarget
+	String testJdkRelease
 	@Override
 	String getTag() { "jdk-$version" }
 	@Override
@@ -877,9 +877,9 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 		def testJdkToolPath = tool(name: testJdkTool, type: 'jdk')
 		args += " -Dsurefire.jvm.java_executable=$testJdkToolPath/bin/java"
 	}
-	String testJdkTarget = buildEnv.testJdkTarget
-	if ( testJdkTarget ) {
-		args += " -Dmaven.compiler.testTarget=$testJdkTarget"
+	String testJdkRelease = buildEnv.testJdkRelease
+	if ( testJdkRelease ) {
+		args += " -Dmaven.compiler.testRelease=$testJdkRelease"
 	}
 
 	return args

@@ -18,9 +18,8 @@
         <!-- Skip javadoc generation (forced by releases) -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <!-- Apply the test source/target settings to all code in integration tests, even code in src/main -->
-        <maven.compiler.argument.source>${maven.compiler.argument.testSource}</maven.compiler.argument.source>
-        <maven.compiler.argument.target>${maven.compiler.argument.testTarget}</maven.compiler.argument.target>
+        <!-- Apply the test JDK release settings to all code in integration tests, even code in src/main -->
+        <maven.compiler.release>${maven.compiler.argument.testRelease}</maven.compiler.release>
         <!--
              Pass these properties as system properties to be able to switch to
              a different database without re-compiling the hibernate.properties file
