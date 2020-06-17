@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
@@ -20,7 +20,7 @@ public interface TckBackendSetupStrategy {
 
 	TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider);
 
-	ConfigurationPropertySource createBackendConfigurationPropertySource(TestConfigurationProvider configurationProvider);
+	Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider);
 
 	SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper);
 
