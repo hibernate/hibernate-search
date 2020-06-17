@@ -640,18 +640,17 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	private ElasticsearchClientImplementor createClient(Consumer<BiConsumer<String, Object>> additionalProperties) {
-		ConfigurationPropertySource defaultBackendProperties =
+		Map<String, ?> defaultBackendProperties =
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
-						.createBackendConfigurationPropertySource( testConfigurationProvider );
+						.createBackendConfigurationProperties( testConfigurationProvider );
 
-		Map<String, Object> configurationOverride = new HashMap<>();
+		Map<String, Object> clientProperties = new HashMap<>( defaultBackendProperties );
 		// Redirect requests to Wiremock (rule 1 only by default)
-		configurationOverride.put( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-		configurationOverride.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
+		clientProperties.put( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
+		clientProperties.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
 		// Per-test overrides
-		additionalProperties.accept( configurationOverride::put );
-		ConfigurationPropertySource backendProperties =
-				defaultBackendProperties.withOverride( ConfigurationPropertySource.fromMap( configurationOverride ) );
+		additionalProperties.accept( clientProperties::put );
+		ConfigurationPropertySource clientPropertySource = ConfigurationPropertySource.fromMap( clientProperties );
 
 		Map<String, Object> beanResolverConfiguration = new HashMap<>();
 		// Accept Wiremock's self-signed SSL certificates
@@ -667,7 +666,7 @@ public class ElasticsearchClientFactoryImplIT {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
-					backendProperties,
+					clientPropertySource,
 					threadPoolProvider.threadProvider(), "Client",
 					timeoutExecutorService,
 					GsonProvider.create( GsonBuilder::new, true )

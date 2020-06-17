@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.DefaultITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -45,11 +44,8 @@ class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 	}
 
 	@Override
-	public ConfigurationPropertySource createBackendConfigurationPropertySource(
-			TestConfigurationProvider configurationProvider) {
-		return ConfigurationPropertySource.fromMap(
-				configurationProvider.interpolateProperties( properties )
-		);
+	public Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider) {
+		return configurationProvider.interpolateProperties( properties );
 	}
 
 	@Override

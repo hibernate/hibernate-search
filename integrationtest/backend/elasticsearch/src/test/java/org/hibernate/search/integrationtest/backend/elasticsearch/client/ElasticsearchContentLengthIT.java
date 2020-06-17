@@ -186,22 +186,22 @@ public class ElasticsearchContentLengthIT {
 	}
 
 	private ElasticsearchClientImplementor createClient() {
-		ConfigurationPropertySource defaultBackendProperties =
+		Map<String, ?> defaultBackendProperties =
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
-						.createBackendConfigurationPropertySource( testConfigurationProvider );
+						.createBackendConfigurationProperties( testConfigurationProvider );
 
 		// Redirect requests to Wiremock
-		Map<String, Object> configurationOverride = new HashMap<>();
-		configurationOverride.put( ElasticsearchBackendSettings.HOSTS, hostAndPortFor( wireMockRule ) );
-		configurationOverride.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
-		ConfigurationPropertySource backendProperties =
-				defaultBackendProperties.withOverride( ConfigurationPropertySource.fromMap( configurationOverride ) );
+		Map<String, Object> clientProperties = new HashMap<>( defaultBackendProperties );
+		// Redirect requests to Wiremock (rule 1 only by default)
+		clientProperties.put( ElasticsearchBackendSettings.HOSTS, hostAndPortFor( wireMockRule ) );
+		clientProperties.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
+		ConfigurationPropertySource clientPropertySource = ConfigurationPropertySource.fromMap( clientProperties );
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
-					backendProperties,
+					clientPropertySource,
 					threadPoolProvider.threadProvider(), "Client",
 					timeoutExecutorService,
 					GsonProvider.create( GsonBuilder::new, true )

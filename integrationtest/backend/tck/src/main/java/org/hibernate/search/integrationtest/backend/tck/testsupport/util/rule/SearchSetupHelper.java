@@ -19,6 +19,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -74,11 +75,15 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	public SetupContext start(String backendName) {
-		ConfigurationPropertySource propertySource = setupStrategy.createBackendConfigurationPropertySource( configurationProvider )
-				.withPrefix( EngineSettings.BACKENDS + "." + backendName );
+		Map<String, ?> backendRelativeProperties =
+				setupStrategy.createBackendConfigurationProperties( configurationProvider );
+		String backendPrefix = EngineSettings.BACKENDS + "." + backendName + ".";
+		Map<String, Object> properties = new LinkedHashMap<>();
+		for ( Map.Entry<String, ?> entry : backendRelativeProperties.entrySet() ) {
+			properties.put( backendPrefix + entry.getKey(), entry.getValue() );
+		}
 
-		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
-		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
+		AllAwareConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap( properties );
 
 		SetupContext setupContext = new SetupContext( backendName, propertySource )
 				.withProperty( EngineSettings.DEFAULT_BACKEND, backendName );
@@ -150,10 +155,11 @@ public class SearchSetupHelper implements TestRule {
 		private boolean multiTenancyEnabled = false;
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
-		SetupContext(String defaultBackendName, ConfigurationPropertySource basePropertySource) {
+		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
 			this.defaultBackendName = defaultBackendName;
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
-			this.propertySource = basePropertySource.withOverride( ConfigurationPropertySource.fromMap( overriddenProperties ) );
+			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
+					.withOverride( unusedPropertyChecker.wrap( ConfigurationPropertySource.fromMap( overriddenProperties ) ) );
 		}
 
 		public SetupContext withProperty(String key, Object value) {
