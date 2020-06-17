@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.apache.lucene.search.Query;
 
 public interface LuceneSearchPredicateBuilderFactory
-		extends SearchPredicateBuilderFactory<LuceneSearchPredicateCollector, LuceneSearchPredicateBuilder> {
+		extends SearchPredicateBuilderFactory<LuceneSearchPredicateCollector> {
 
 	LuceneSearchPredicateBuilder fromLuceneQuery(Query luceneQuery);
 

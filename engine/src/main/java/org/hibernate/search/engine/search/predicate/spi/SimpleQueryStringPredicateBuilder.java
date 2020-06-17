@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
-public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface SimpleQueryStringPredicateBuilder extends SearchPredicateBuilder {
 
 	FieldState field(String absoluteFieldPath);
 

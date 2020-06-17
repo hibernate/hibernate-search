@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
@@ -26,19 +27,19 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-class SpatialWithinPredicateFieldMoreStepImpl<B>
-		implements SpatialWithinPredicateFieldMoreStep<SpatialWithinPredicateFieldMoreStepImpl<B>, SpatialWithinPredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+class SpatialWithinPredicateFieldMoreStepImpl
+		implements SpatialWithinPredicateFieldMoreStep<SpatialWithinPredicateFieldMoreStepImpl, SpatialWithinPredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
-	private final CommonState<B> commonState;
+	private final CommonState commonState;
 
 	private final List<String> absoluteFieldPaths;
 
-	private final List<SearchPredicateBuilder<B>> predicateBuilders;
+	private final List<SearchPredicateBuilder> predicateBuilders;
 
 	private Float fieldSetBoost;
 
-	SpatialWithinPredicateFieldMoreStepImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	SpatialWithinPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = CollectionHelper.toImmutableList( absoluteFieldPaths );
@@ -46,12 +47,12 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
-		return new SpatialWithinPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public SpatialWithinPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
+		return new SpatialWithinPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldMoreStepImpl<B> boost(float boost) {
+	public SpatialWithinPredicateFieldMoreStepImpl boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -85,18 +86,18 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<B> collector) {
-		for ( SearchPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+	public void contributePredicates(Consumer<SearchPredicate> collector) {
+		for ( SearchPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
 			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
 
-			collector.accept( predicateBuilder.toImplementation() );
+			collector.accept( predicateBuilder.build() );
 		}
 	}
 
 	private void generateWithinCircleQueryBuilders(GeoPoint center, double radius, DistanceUnit unit) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinCirclePredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
+			SpatialWithinCirclePredicateBuilder predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
 			predicateBuilder.circle( center, radius, unit );
 			predicateBuilders.add( predicateBuilder );
 		}
@@ -104,7 +105,7 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 
 	private void generateWithinPolygonQueryBuilders(GeoPolygon polygon) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinPolygonPredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
+			SpatialWithinPolygonPredicateBuilder predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
 			predicateBuilder.polygon( polygon );
 			predicateBuilders.add( predicateBuilder );
 		}
@@ -112,22 +113,22 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 
 	private void generateWithinBoundingBoxQueryBuilders(GeoBoundingBox boundingBox) {
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinBoundingBoxPredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
+			SpatialWithinBoundingBoxPredicateBuilder predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
 			predicateBuilder.boundingBox( boundingBox );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
 
-	static class CommonState<B>
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, SpatialWithinPredicateFieldMoreStepImpl<B>>
-			implements SpatialWithinPredicateOptionsStep<CommonState<B>> {
+	static class CommonState
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, SpatialWithinPredicateFieldMoreStepImpl>
+			implements SpatialWithinPredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
 			super( builderFactory );
 		}
 
 		SpatialWithinPredicateOptionsStep<?> circle(GeoPoint center, double radius, DistanceUnit unit) {
-			for ( SpatialWithinPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
+			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				fieldSetState.generateWithinCircleQueryBuilders( center, radius, unit );
 			}
 
@@ -135,7 +136,7 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 		}
 
 		SpatialWithinPredicateOptionsStep<?> polygon(GeoPolygon polygon) {
-			for ( SpatialWithinPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
+			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				fieldSetState.generateWithinPolygonQueryBuilders( polygon );
 			}
 
@@ -143,7 +144,7 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 		}
 
 		SpatialWithinPredicateOptionsStep<?> boundingBox(GeoBoundingBox boundingBox) {
-			for ( SpatialWithinPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
+			for ( SpatialWithinPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				fieldSetState.generateWithinBoundingBoxQueryBuilders( boundingBox );
 			}
 
@@ -151,7 +152,7 @@ class SpatialWithinPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		protected CommonState<B> thisAsS() {
+		protected CommonState thisAsS() {
 			return this;
 		}
 	}

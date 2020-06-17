@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 import com.google.gson.JsonObject;
 
 
@@ -14,12 +16,12 @@ import com.google.gson.JsonObject;
  * <p>
  * Used by Elasticsearch-specific predicate contributors.
  *
- * @see ElasticsearchSearchPredicateBuilderFactoryImpl#contribute(ElasticsearchSearchPredicateCollector, ElasticsearchSearchPredicateBuilder)
+ * @see ElasticsearchSearchPredicateBuilderFactoryImpl#contribute(ElasticsearchSearchPredicateCollector, SearchPredicate)
  * @see ElasticsearchSearchPredicateBuilder
  */
 public interface ElasticsearchSearchPredicateCollector {
 
-	ElasticsearchSearchPredicateContext getRootPredicateContext();
+	PredicateRequestContext getRootPredicateContext();
 
 	void collectPredicate(JsonObject jsonQuery);
 

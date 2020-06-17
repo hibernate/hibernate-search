@@ -12,16 +12,16 @@ import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-class RangePredicateFieldStepImpl<B> implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {
+class RangePredicateFieldStepImpl implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {
 
-	private final RangePredicateFieldMoreStepImpl.CommonState<B> commonState;
+	private final RangePredicateFieldMoreStepImpl.CommonState commonState;
 
-	RangePredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
-		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState<>( builderFactory );
+	RangePredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
+		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState( builderFactory );
 	}
 
 	@Override
 	public RangePredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new RangePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new RangePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

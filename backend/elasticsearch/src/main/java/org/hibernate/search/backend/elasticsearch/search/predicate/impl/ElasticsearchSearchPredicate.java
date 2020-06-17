@@ -6,34 +6,53 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchSearchPredicate
-		implements SearchPredicate, ElasticsearchSearchPredicateBuilder {
+public class ElasticsearchSearchPredicate implements SearchPredicate {
 
-	private final ElasticsearchSearchPredicateBuilder delegate;
-	private final Set<String> indexNames;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	ElasticsearchSearchPredicate(ElasticsearchSearchPredicateBuilder delegate, Set<String> indexNames) {
-		this.delegate = delegate;
-		this.indexNames = indexNames;
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should move to one SearchPredicate implementation per type of predicate.
+	public static ElasticsearchSearchPredicate of(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchPredicateBuilder builder) {
+		return new ElasticsearchSearchPredicate( searchContext.indexes().hibernateSearchIndexNames(), builder );
 	}
 
-	@Override
+	public static ElasticsearchSearchPredicate from(ElasticsearchSearchContext searchContext, SearchPredicate predicate) {
+		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
+			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
+		}
+		ElasticsearchSearchPredicate casted = (ElasticsearchSearchPredicate) predicate;
+		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames,
+					searchContext.indexes().hibernateSearchIndexNames() );
+		}
+		return casted;
+	}
+
+	private final Set<String> indexNames;
+	private final ElasticsearchSearchPredicateBuilder delegate;
+
+	ElasticsearchSearchPredicate(Set<String> indexNames, ElasticsearchSearchPredicateBuilder delegate) {
+		this.indexNames = indexNames;
+		this.delegate = delegate;
+	}
+
 	public void checkNestableWithin(String expectedParentNestedPath) {
 		delegate.checkNestableWithin( expectedParentNestedPath );
 	}
 
-	@Override
-	public JsonObject build(ElasticsearchSearchPredicateContext context) {
-		return delegate.build( context );
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
+		return delegate.toJsonQuery( context );
 	}
 
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
 }

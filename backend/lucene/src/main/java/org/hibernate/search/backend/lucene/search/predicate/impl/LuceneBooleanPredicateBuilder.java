@@ -14,6 +14,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -25,47 +27,51 @@ import org.apache.lucene.search.Query;
 
 
 class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements BooleanPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements BooleanPredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private List<LuceneSearchPredicateBuilder> mustClauseBuilders;
-	private List<LuceneSearchPredicateBuilder> mustNotClauseBuilders;
-	private List<LuceneSearchPredicateBuilder> shouldClauseBuilders;
-	private List<LuceneSearchPredicateBuilder> filterClauseBuilders;
+	private List<LuceneSearchPredicate> mustClauses;
+	private List<LuceneSearchPredicate> mustNotClauses;
+	private List<LuceneSearchPredicate> shouldClauses;
+	private List<LuceneSearchPredicate> filterClauses;
 
 	private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-	@Override
-	public void must(LuceneSearchPredicateBuilder clauseBuilder) {
-		if ( mustClauseBuilders == null ) {
-			mustClauseBuilders = new ArrayList<>();
-		}
-		mustClauseBuilders.add( clauseBuilder );
+	LuceneBooleanPredicateBuilder(LuceneSearchContext searchContext) {
+		super( searchContext );
 	}
 
 	@Override
-	public void mustNot(LuceneSearchPredicateBuilder clauseBuilder) {
-		if ( mustNotClauseBuilders == null ) {
-			mustNotClauseBuilders = new ArrayList<>();
+	public void must(SearchPredicate clause) {
+		if ( mustClauses == null ) {
+			mustClauses = new ArrayList<>();
 		}
-		mustNotClauseBuilders.add( clauseBuilder );
+		mustClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
 	}
 
 	@Override
-	public void should(LuceneSearchPredicateBuilder clauseBuilder) {
-		if ( shouldClauseBuilders == null ) {
-			shouldClauseBuilders = new ArrayList<>();
+	public void mustNot(SearchPredicate clause) {
+		if ( mustNotClauses == null ) {
+			mustNotClauses = new ArrayList<>();
 		}
-		shouldClauseBuilders.add( clauseBuilder );
+		mustNotClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
 	}
 
 	@Override
-	public void filter(LuceneSearchPredicateBuilder clauseBuilder) {
-		if ( filterClauseBuilders == null ) {
-			filterClauseBuilders = new ArrayList<>();
+	public void should(SearchPredicate clause) {
+		if ( shouldClauses == null ) {
+			shouldClauses = new ArrayList<>();
 		}
-		filterClauseBuilders.add( clauseBuilder );
+		shouldClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+	}
+
+	@Override
+	public void filter(SearchPredicate clause) {
+		if ( filterClauses == null ) {
+			filterClauses = new ArrayList<>();
+		}
+		filterClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
 	}
 
 	@Override
@@ -98,34 +104,34 @@ class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 
 	@Override
 	public void checkNestableWithin(String expectedParentNestedPath) {
-		checkNestableWithin( expectedParentNestedPath, mustClauseBuilders );
-		checkNestableWithin( expectedParentNestedPath, shouldClauseBuilders );
-		checkNestableWithin( expectedParentNestedPath, filterClauseBuilders );
-		checkNestableWithin( expectedParentNestedPath, mustNotClauseBuilders );
+		checkNestableWithin( expectedParentNestedPath, mustClauses );
+		checkNestableWithin( expectedParentNestedPath, shouldClauses );
+		checkNestableWithin( expectedParentNestedPath, filterClauses );
+		checkNestableWithin( expectedParentNestedPath, mustNotClauses );
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
-		contributeQueries( context, booleanQueryBuilder, mustClauseBuilders, Occur.MUST );
-		contributeQueries( context, booleanQueryBuilder, mustNotClauseBuilders, Occur.MUST_NOT );
-		contributeQueries( context, booleanQueryBuilder, shouldClauseBuilders, Occur.SHOULD );
-		contributeQueries( context, booleanQueryBuilder, filterClauseBuilders, Occur.FILTER );
+		contributeQueries( context, booleanQueryBuilder, mustClauses, Occur.MUST );
+		contributeQueries( context, booleanQueryBuilder, mustNotClauses, Occur.MUST_NOT );
+		contributeQueries( context, booleanQueryBuilder, shouldClauses, Occur.SHOULD );
+		contributeQueries( context, booleanQueryBuilder, filterClauses, Occur.FILTER );
 
 		if ( isOnlyMustNot() ) {
 			booleanQueryBuilder.add( new MatchAllDocsQuery(), Occur.FILTER );
 		}
 
-		if ( minimumShouldMatchConstraints != null && shouldClauseBuilders != null ) {
+		if ( minimumShouldMatchConstraints != null && shouldClauses != null ) {
 			int minimumShouldMatch;
 			Map.Entry<Integer, MinimumShouldMatchConstraint> entry =
-					minimumShouldMatchConstraints.lowerEntry( shouldClauseBuilders.size() );
+					minimumShouldMatchConstraints.lowerEntry( shouldClauses.size() );
 			if ( entry != null ) {
-				minimumShouldMatch = entry.getValue().toMinimum( shouldClauseBuilders.size() );
+				minimumShouldMatch = entry.getValue().toMinimum( shouldClauses.size() );
 			}
 			else {
-				minimumShouldMatch = shouldClauseBuilders.size();
+				minimumShouldMatch = shouldClauses.size();
 			}
 			booleanQueryBuilder.setMinimumNumberShouldMatch( minimumShouldMatch );
 		}
@@ -133,33 +139,31 @@ class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		return booleanQueryBuilder.build();
 	}
 
-	private void contributeQueries(LuceneSearchPredicateContext context,
-			BooleanQuery.Builder booleanQueryBuilder,
-			List<LuceneSearchPredicateBuilder> clauseBuilders,
-			Occur occur) {
-		if ( clauseBuilders == null ) {
+	private void contributeQueries(PredicateRequestContext context, BooleanQuery.Builder booleanQueryBuilder,
+			List<LuceneSearchPredicate> clauses, Occur occur) {
+		if ( clauses == null ) {
 			return;
 		}
 
-		for ( LuceneSearchPredicateBuilder clauseBuilder : clauseBuilders ) {
-			booleanQueryBuilder.add( clauseBuilder.build( context ), occur );
+		for ( LuceneSearchPredicate clause : clauses ) {
+			booleanQueryBuilder.add( clause.toQuery( context ), occur );
 		}
 	}
 
-	private void checkNestableWithin(String expectedParentNestedPath, List<LuceneSearchPredicateBuilder> clauseBuilders) {
-		if ( clauseBuilders == null ) {
+	private void checkNestableWithin(String expectedParentNestedPath, List<LuceneSearchPredicate> clauses) {
+		if ( clauses == null ) {
 			return;
 		}
-		for ( LuceneSearchPredicateBuilder builder : clauseBuilders ) {
-			builder.checkNestableWithin( expectedParentNestedPath );
+		for ( LuceneSearchPredicate clause : clauses ) {
+			clause.checkNestableWithin( expectedParentNestedPath );
 		}
 	}
 
 	private boolean isOnlyMustNot() {
-		return mustNotClauseBuilders != null && !mustNotClauseBuilders.isEmpty()
-				&& ( mustClauseBuilders == null || mustClauseBuilders.isEmpty() )
-				&& ( shouldClauseBuilders == null || shouldClauseBuilders.isEmpty() )
-				&& ( filterClauseBuilders == null || filterClauseBuilders.isEmpty() );
+		return mustNotClauses != null && !mustNotClauses.isEmpty()
+				&& ( mustClauses == null || mustClauses.isEmpty() )
+				&& ( shouldClauses == null || shouldClauses.isEmpty() )
+				&& ( filterClauses == null || filterClauses.isEmpty() );
 	}
 
 	private static final class MinimumShouldMatchConstraint {

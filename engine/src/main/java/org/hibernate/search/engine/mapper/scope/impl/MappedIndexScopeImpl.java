@@ -49,7 +49,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public SearchPredicateFactory predicate() {
-		return new DefaultSearchPredicateFactory<>( delegate.searchPredicateBuilderFactory() );
+		return new DefaultSearchPredicateFactory( delegate.searchPredicateBuilderFactory() );
 	}
 
 	@Override

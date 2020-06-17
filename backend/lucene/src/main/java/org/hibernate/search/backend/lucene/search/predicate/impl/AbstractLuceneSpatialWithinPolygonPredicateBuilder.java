@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPolygon;
@@ -13,12 +14,13 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 
 public abstract class AbstractLuceneSpatialWithinPolygonPredicateBuilder
 		extends AbstractLuceneSingleFieldPredicateBuilder
-		implements SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements SpatialWithinPolygonPredicateBuilder {
 
 	protected GeoPolygon polygon;
 
-	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(LuceneSearchFieldContext<?> field) {
-		super( field );
+	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<?> field) {
+		super( searchContext, field );
 	}
 
 	@Override

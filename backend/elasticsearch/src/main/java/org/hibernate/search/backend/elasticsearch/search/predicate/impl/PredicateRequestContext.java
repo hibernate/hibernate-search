@@ -8,17 +8,17 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
-public class ElasticsearchSearchPredicateContext {
+public class PredicateRequestContext {
 
 	private final BackendSessionContext sessionContext;
 	private final String nestedPath;
 
-	public ElasticsearchSearchPredicateContext(BackendSessionContext sessionContext) {
+	public PredicateRequestContext(BackendSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 		this.nestedPath = null;
 	}
 
-	private ElasticsearchSearchPredicateContext(BackendSessionContext sessionContext, String nestedPath) {
+	private PredicateRequestContext(BackendSessionContext sessionContext, String nestedPath) {
 		this.sessionContext = sessionContext;
 		this.nestedPath = nestedPath;
 	}
@@ -27,8 +27,8 @@ public class ElasticsearchSearchPredicateContext {
 		return sessionContext.tenantIdentifier();
 	}
 
-	public ElasticsearchSearchPredicateContext withNestedPath(String path) {
-		return new ElasticsearchSearchPredicateContext( sessionContext, path );
+	public PredicateRequestContext withNestedPath(String path) {
+		return new PredicateRequestContext( sessionContext, path );
 	}
 
 	public String getNestedPath() {

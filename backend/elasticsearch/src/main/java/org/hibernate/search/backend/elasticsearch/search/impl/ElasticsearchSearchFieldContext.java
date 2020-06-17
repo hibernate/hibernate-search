@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
@@ -50,38 +49,39 @@ public interface ElasticsearchSearchFieldContext<F> {
 
 	// Predicates
 
-	default MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext) {
+	default MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext) {
 		return type().predicateBuilderFactory().createMatchPredicateBuilder( searchContext, this );
 	}
 
-	default RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext) {
+	default RangePredicateBuilder createRangePredicateBuilder(ElasticsearchSearchContext searchContext) {
 		return type().predicateBuilderFactory().createRangePredicateBuilder( searchContext, this );
 	}
 
-	default PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder() {
-		return type().predicateBuilderFactory().createPhrasePredicateBuilder( this );
+	default PhrasePredicateBuilder createPhrasePredicateBuilder(ElasticsearchSearchContext searchContext) {
+		return type().predicateBuilderFactory().createPhrasePredicateBuilder( searchContext, this );
 	}
 
-	default WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder() {
-		return type().predicateBuilderFactory().createWildcardPredicateBuilder( this );
+	default WildcardPredicateBuilder createWildcardPredicateBuilder(ElasticsearchSearchContext searchContext) {
+		return type().predicateBuilderFactory().createWildcardPredicateBuilder( searchContext, this );
 	}
 
 	default ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState() {
 		return type().predicateBuilderFactory().createSimpleQueryStringFieldState( this );
 	}
 
-	default SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder() {
-		return type().predicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( this );
+	default SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			ElasticsearchSearchContext searchContext) {
+		return type().predicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( searchContext, this );
 	}
 
-	default SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder() {
-		return type().predicateBuilderFactory().createSpatialWithinPolygonPredicateBuilder( this );
+	default SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			ElasticsearchSearchContext searchContext) {
+		return type().predicateBuilderFactory().createSpatialWithinPolygonPredicateBuilder( searchContext, this );
 	}
 
-	default SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder() {
-		return type().predicateBuilderFactory().createSpatialWithinBoundingBoxPredicateBuilder( this );
+	default SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			ElasticsearchSearchContext searchContext) {
+		return type().predicateBuilderFactory().createSpatialWithinBoundingBoxPredicateBuilder( searchContext, this );
 	}
 
 	// Sorts

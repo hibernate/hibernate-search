@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -41,27 +40,27 @@ public interface ElasticsearchFieldPredicateBuilderFactory<F> {
 
 	boolean isCompatibleWith(ElasticsearchFieldPredicateBuilderFactory<?> other);
 
-	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
-
-	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
-
-	PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
+	MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field);
 
-	WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
+	RangePredicateBuilder createRangePredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field);
+
+	PhrasePredicateBuilder createPhrasePredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field);
+
+	WildcardPredicateBuilder createWildcardPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field);
 
 	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
 			ElasticsearchSearchFieldContext<F> field);
 
-	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			ElasticsearchSearchFieldContext<F> field);
+	SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
 
-	SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			ElasticsearchSearchFieldContext<F> field);
+	SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
 
-	SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			ElasticsearchSearchFieldContext<F> field);
+	SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
 }

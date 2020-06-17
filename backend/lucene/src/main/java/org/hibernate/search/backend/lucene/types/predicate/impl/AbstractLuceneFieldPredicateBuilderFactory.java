@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -48,13 +47,13 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
+	public PhrasePredicateBuilder createPhrasePredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
+	public WildcardPredicateBuilder createWildcardPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
@@ -66,27 +65,27 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			LuceneSearchFieldContext<F> field) {
+	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			LuceneSearchFieldContext<F> field) {
+	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			LuceneSearchFieldContext<F> field) {
+	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(
+	public ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
-		return new LuceneExistsPredicateBuilder( field, getCodec() );
+		return new LuceneExistsPredicateBuilder( searchContext, field, getCodec() );
 	}
 
 	protected abstract LuceneFieldCodec<?> getCodec();

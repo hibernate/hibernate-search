@@ -10,16 +10,16 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialS
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-class SpatialPredicateInitialStepImpl<B> implements SpatialPredicateInitialStep {
+class SpatialPredicateInitialStepImpl implements SpatialPredicateInitialStep {
 
-	private final SearchPredicateBuilderFactory<?, B> factory;
+	private final SearchPredicateBuilderFactory<?> factory;
 
-	SpatialPredicateInitialStepImpl(SearchPredicateBuilderFactory<?, B> factory) {
+	SpatialPredicateInitialStepImpl(SearchPredicateBuilderFactory<?> factory) {
 		this.factory = factory;
 	}
 
 	@Override
 	public SpatialWithinPredicateFieldStep<?> within() {
-		return new SpatialWithinPredicateFieldStepImpl<>( factory );
+		return new SpatialWithinPredicateFieldStepImpl( factory );
 	}
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
@@ -13,14 +14,14 @@ import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-final class ExistsPredicateFieldStepImpl<B>
-		extends AbstractPredicateFinalStep<B>
+final class ExistsPredicateFieldStepImpl
+		extends AbstractPredicateFinalStep
 		implements ExistsPredicateFieldStep<ExistsPredicateOptionsStep<?>>,
 				ExistsPredicateOptionsStep<ExistsPredicateOptionsStep<?>> {
 
-	private ExistsPredicateBuilder<B> builder;
+	private ExistsPredicateBuilder builder;
 
-	ExistsPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
+	ExistsPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
 		super( builderFactory );
 	}
 
@@ -37,7 +38,7 @@ final class ExistsPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	protected B toImplementation() {
-		return builder.toImplementation();
+	protected SearchPredicate build() {
+		return builder.build();
 	}
 }

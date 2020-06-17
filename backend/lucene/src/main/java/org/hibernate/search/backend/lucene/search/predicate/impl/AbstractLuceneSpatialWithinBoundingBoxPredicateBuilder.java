@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -13,12 +14,13 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 
 public abstract class AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder
 		extends AbstractLuceneSingleFieldPredicateBuilder
-		implements SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements SpatialWithinBoundingBoxPredicateBuilder {
 
 	protected GeoBoundingBox boundingBox;
 
-	protected AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder(LuceneSearchFieldContext<?> field) {
-		super( field );
+	protected AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder(LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<?> field) {
+		super( searchContext, field );
 	}
 
 	@Override

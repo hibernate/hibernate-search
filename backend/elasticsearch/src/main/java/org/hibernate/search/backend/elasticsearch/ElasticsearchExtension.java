@@ -151,7 +151,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 */
 	@Override
 	public <C, B> Optional<ElasticsearchSearchPredicateFactory> extendOptional(
-			SearchPredicateFactory original, SearchPredicateBuilderFactory<C, B> factory) {
+			SearchPredicateFactory original, SearchPredicateBuilderFactory<C> factory) {
 		if ( factory instanceof ElasticsearchSearchPredicateBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchPredicateFactoryImpl(
 					original, (ElasticsearchSearchPredicateBuilderFactory) factory

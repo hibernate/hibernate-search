@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -31,35 +30,35 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
+	public MatchPredicateBuilder createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		throw log.directValueLookupNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
-	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
+	public RangePredicateBuilder createRangePredicateBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		throw log.rangesNotSupportedByGeoPoint( field.eventContext() );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			ElasticsearchSearchFieldContext<GeoPoint> field) {
+	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( field, codec );
+		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( searchContext, field, codec );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			ElasticsearchSearchFieldContext<GeoPoint> field) {
+	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( field );
+		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( searchContext, field );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			ElasticsearchSearchFieldContext<GeoPoint> field) {
+	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( field, codec );
+		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( searchContext, field, codec );
 	}
 }

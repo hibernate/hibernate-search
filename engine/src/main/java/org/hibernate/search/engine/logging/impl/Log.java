@@ -99,10 +99,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid multi value: expected either a Collection or a String.")
 	SearchException invalidMultiPropertyValue();
 
-	@Message(id = ID_OFFSET_2 + 9,
-			value = "Cannot add multiple predicates to a nested predicate; use an explicit boolean predicate instead.")
-	SearchException cannotAddMultiplePredicatesToNestedPredicate();
-
 	@Message(id = ID_OFFSET_2 + 11,
 			value = "Invalid value: the value to match in match predicates must be non-null.")
 	SearchException matchPredicateCannotMatchNullValue(@Param EventContext context);

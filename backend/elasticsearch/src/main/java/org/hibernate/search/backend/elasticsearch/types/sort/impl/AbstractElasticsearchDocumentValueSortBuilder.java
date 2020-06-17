@@ -11,10 +11,10 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -45,18 +45,18 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
 	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
+	private final ElasticsearchSearchContext searchContext;
 	protected final ElasticsearchSearchFieldContext<F> field;
 	protected final List<String> nestedPathHierarchy;
-	private final ElasticsearchSearchSyntax searchSyntax;
 
 	private JsonPrimitive mode;
-	private ElasticsearchSearchPredicateBuilder filterBuilder;
+	private ElasticsearchSearchPredicate filter;
 
-	AbstractElasticsearchDocumentValueSortBuilder(ElasticsearchSearchFieldContext<F> field,
-			ElasticsearchSearchSyntax searchSyntax) {
+	AbstractElasticsearchDocumentValueSortBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<F> field) {
+		this.searchContext = searchContext;
 		this.field = field;
 		this.nestedPathHierarchy = field.nestedPathHierarchy();
-		this.searchSyntax = searchSyntax;
 	}
 
 	public void mode(SortMode mode) {
@@ -90,21 +90,21 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 		if ( nestedPathHierarchy.isEmpty() ) {
 			throw log.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
 		}
-		ElasticsearchSearchPredicateBuilder builder = (ElasticsearchSearchPredicateBuilder) filter;
-		builder.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
-		this.filterBuilder = builder;
+		ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( searchContext, filter );
+		elasticsearchFilter.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
+		this.filter = elasticsearchFilter;
 	}
 
 	@Override
 	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( !nestedPathHierarchy.isEmpty() ) {
-			if ( searchSyntax.useOldSortNestedApi() ) {
+			if ( searchContext.searchSyntax().useOldSortNestedApi() ) {
 				// the old api requires only the last path ( the deepest one )
 				String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
 				NESTED_PATH_ACCESSOR.set( innerObject, new JsonPrimitive( lastNestedPath ) );
-				if ( filterBuilder != null ) {
-					ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext()
+				if ( filter != null ) {
+					PredicateRequestContext filterContext = collector.getRootPredicateContext()
 							.withNestedPath( lastNestedPath );
 					JsonObject jsonFilter = getJsonFilter( filterContext );
 					NESTED_FILTER_ACCESSOR.set( innerObject, jsonFilter );
@@ -118,8 +118,8 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 					JsonObject nestedObject = new JsonObject();
 					PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
 					NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
-					if ( i == (nestedPathHierarchy.size() - 1) && filterBuilder != null ) {
-						ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext()
+					if ( i == (nestedPathHierarchy.size() - 1) && filter != null ) {
+						PredicateRequestContext filterContext = collector.getRootPredicateContext()
 								.withNestedPath( nestedPath );
 						JsonObject jsonFilter = getJsonFilter( filterContext );
 						FILTER_ACCESSOR.set( nestedObject, jsonFilter );
@@ -136,7 +136,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 		}
 	}
 
-	private JsonObject getJsonFilter(ElasticsearchSearchPredicateContext filterContext) {
-		return filterBuilder.build( filterContext );
+	private JsonObject getJsonFilter(PredicateRequestContext filterContext) {
+		return filter.toJsonQuery( filterContext );
 	}
 }

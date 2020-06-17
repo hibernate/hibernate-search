@@ -41,6 +41,6 @@ public interface SearchPredicateFactoryExtension<T> {
 	 * of success, or an empty optional otherwise.
 	 */
 	<C, B> Optional<T> extendOptional(SearchPredicateFactory original,
-			SearchPredicateBuilderFactory<C, B> factory);
+			SearchPredicateBuilderFactory<C> factory);
 
 }

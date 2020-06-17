@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -20,16 +18,16 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class MatchAllPredicateOptionsStepImpl<B>
-		extends AbstractPredicateFinalStep<B>
+class MatchAllPredicateOptionsStepImpl
+		extends AbstractPredicateFinalStep
 		implements MatchAllPredicateOptionsStep<MatchAllPredicateOptionsStep<?>> {
 
 	private final SearchPredicateFactory factory;
 
-	private final MatchAllPredicateBuilder<B> matchAllBuilder;
+	private final MatchAllPredicateBuilder matchAllBuilder;
 	private MatchAllExceptState exceptState;
 
-	MatchAllPredicateOptionsStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory,
+	MatchAllPredicateOptionsStepImpl(SearchPredicateBuilderFactory<?> builderFactory,
 			SearchPredicateFactory factory) {
 		super( builderFactory );
 		this.factory = factory;
@@ -56,12 +54,12 @@ class MatchAllPredicateOptionsStepImpl<B>
 	}
 
 	@Override
-	protected B toImplementation() {
+	protected SearchPredicate build() {
 		if ( exceptState != null ) {
-			return exceptState.toImplementation( matchAllBuilder.toImplementation() );
+			return exceptState.build( matchAllBuilder.build() );
 		}
 		else {
-			return matchAllBuilder.toImplementation();
+			return matchAllBuilder.build();
 		}
 	}
 
@@ -74,8 +72,7 @@ class MatchAllPredicateOptionsStepImpl<B>
 
 	private class MatchAllExceptState {
 
-		private final BooleanPredicateBuilder<B> booleanBuilder;
-		private final List<B> clauseBuilders = new ArrayList<>();
+		private final BooleanPredicateBuilder booleanBuilder;
 
 		MatchAllExceptState() {
 			this.booleanBuilder = MatchAllPredicateOptionsStepImpl.this.builderFactory.bool();
@@ -86,15 +83,12 @@ class MatchAllPredicateOptionsStepImpl<B>
 		}
 
 		void addClause(SearchPredicate predicate) {
-			clauseBuilders.add( builderFactory.toImplementation( predicate ) );
+			booleanBuilder.mustNot( predicate );
 		}
 
-		B toImplementation(B matchAllBuilder) {
-			booleanBuilder.must( matchAllBuilder );
-			for ( B builder : clauseBuilders ) {
-				booleanBuilder.mustNot( builder );
-			}
-			return booleanBuilder.toImplementation();
+		SearchPredicate build(SearchPredicate matchAll) {
+			booleanBuilder.must( matchAll );
+			return booleanBuilder.build();
 		}
 
 	}

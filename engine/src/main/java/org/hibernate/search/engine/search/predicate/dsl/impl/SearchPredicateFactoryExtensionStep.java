@@ -17,17 +17,17 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-final class SearchPredicateFactoryExtensionStep<B>
+final class SearchPredicateFactoryExtensionStep
 		implements SearchPredicateFactoryExtensionIfSupportedStep,
 		SearchPredicateFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchPredicateFactory parent;
-	private final SearchPredicateBuilderFactory<?, B> factory;
+	private final SearchPredicateBuilderFactory<?> factory;
 
 	private final DslExtensionState<PredicateFinalStep> state = new DslExtensionState<>();
 
 	SearchPredicateFactoryExtensionStep(SearchPredicateFactory parent,
-			SearchPredicateBuilderFactory<?, B> factory) {
+			SearchPredicateBuilderFactory<?> factory) {
 		this.parent = parent;
 		this.factory = factory;
 	}

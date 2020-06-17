@@ -6,15 +6,25 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 import org.apache.lucene.search.Query;
 
 
 class LuceneUserProvidedLuceneQueryPredicateBuilder implements LuceneSearchPredicateBuilder {
 
+	private final LuceneSearchContext searchContext;
 	private final Query luceneQuery;
 
-	LuceneUserProvidedLuceneQueryPredicateBuilder(Query luceneQuery) {
+	LuceneUserProvidedLuceneQueryPredicateBuilder(LuceneSearchContext searchContext, Query luceneQuery) {
+		this.searchContext = searchContext;
 		this.luceneQuery = luceneQuery;
+	}
+
+	@Override
+	public SearchPredicate build() {
+		return LuceneSearchPredicate.of( searchContext, this );
 	}
 
 	@Override
@@ -23,7 +33,7 @@ class LuceneUserProvidedLuceneQueryPredicateBuilder implements LuceneSearchPredi
 	}
 
 	@Override
-	public Query build(LuceneSearchPredicateContext context) {
+	public Query toQuery(PredicateRequestContext context) {
 		return luceneQuery;
 	}
 }

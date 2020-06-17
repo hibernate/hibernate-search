@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -22,7 +22,7 @@ import com.google.gson.JsonObject;
 
 class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 		AbstractElasticsearchSingleFieldPredicateBuilder
-		implements SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements SpatialWithinBoundingBoxPredicateBuilder {
 
 	private static final JsonObjectAccessor GEO_BOUNDING_BOX_ACCESSOR = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
 
@@ -35,9 +35,9 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 	private JsonElement topLeft;
 	private JsonElement bottomRight;
 
-	ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder(ElasticsearchSearchFieldContext<GeoPoint> field,
-			ElasticsearchFieldCodec<GeoPoint> codec) {
-		super( field );
+	ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<GeoPoint> field, ElasticsearchFieldCodec<GeoPoint> codec) {
+		super( searchContext, field );
 		this.codec = codec;
 	}
 
@@ -49,7 +49,7 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 
 	@Override
 	protected JsonObject doBuild(
-			ElasticsearchSearchPredicateContext context,
+			PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonObject boundingBoxObject = new JsonObject();
 		boundingBoxObject.add( TOP_LEFT_PROPERTY_NAME, topLeft );

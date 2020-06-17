@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
@@ -31,15 +32,13 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * like the simple query string predicate.
  *
  * @param <S> The "self" type returned by DSL methods.
- * @param <B> The implementation type of builders.
  * @param <F> The type of field set states.
  */
 abstract class AbstractBooleanMultiFieldPredicateCommonState<
-		S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?, ?>,
-		B,
-		F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B>
+				S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?>,
+				F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetState
 		>
-		extends AbstractPredicateFinalStep<B> {
+		extends AbstractPredicateFinalStep {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -47,11 +46,11 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 	private Float predicateLevelBoost;
 	private boolean withConstantScore = false;
 
-	AbstractBooleanMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
+	AbstractBooleanMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?> factory) {
 		super( factory );
 	}
 
-	public SearchPredicateBuilderFactory<?, B> getFactory() {
+	public SearchPredicateBuilderFactory<?> getFactory() {
 		return builderFactory;
 	}
 
@@ -74,26 +73,26 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 	}
 
 	@Override
-	protected B toImplementation() {
-		List<B> predicateBuilders = new ArrayList<>();
+	protected SearchPredicate build() {
+		List<SearchPredicate> predicates = new ArrayList<>();
 		for ( F fieldSetState : fieldSetStates ) {
-			fieldSetState.contributePredicateBuilders( predicateBuilders::add );
+			fieldSetState.contributePredicates( predicates::add );
 		}
-		if ( predicateBuilders.size() > 1 ) {
-			BooleanPredicateBuilder<B> boolBuilder = builderFactory.bool();
-			for ( B predicateBuilder : predicateBuilders ) {
-				boolBuilder.should( predicateBuilder );
+		if ( predicates.size() > 1 ) {
+			BooleanPredicateBuilder boolBuilder = builderFactory.bool();
+			for ( SearchPredicate predicate : predicates ) {
+				boolBuilder.should( predicate );
 			}
-			return boolBuilder.toImplementation();
+			return boolBuilder.build();
 		}
 		else {
-			return predicateBuilders.get( 0 );
+			return predicates.get( 0 );
 		}
 	}
 
 	protected abstract S thisAsS();
 
-	final void applyBoostAndConstantScore(Float fieldSetBoost, SearchPredicateBuilder<?> predicateBuilder) {
+	final void applyBoostAndConstantScore(Float fieldSetBoost, SearchPredicateBuilder predicateBuilder) {
 		if ( fieldSetBoost != null && withConstantScore ) {
 			// another good option would be the one to simply ignore the fieldSetBoost
 			// when the option withConstantScore is defined
@@ -121,8 +120,8 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		);
 	}
 
-	public interface FieldSetState<B> {
+	public interface FieldSetState {
 		List<String> getAbsoluteFieldPaths();
-		void contributePredicateBuilders(Consumer<B> collector);
+		void contributePredicates(Consumer<SearchPredicate> collector);
 	}
 }

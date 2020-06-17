@@ -14,6 +14,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchDifferentNestedObjectCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
@@ -30,7 +31,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.util.common.AssertionFailure;
 
 public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchNestablePredicateBuilder
-		implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements SimpleQueryStringPredicateBuilder {
 
 	private static final JsonObjectAccessor SIMPLE_QUERY_STRING_ACCESSOR = JsonAccessor.root().property( "simple_query_string" ).asObject();
 	private static final JsonAccessor<String> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asString();
@@ -51,8 +52,9 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private EnumSet<SimpleQueryFlag> flags;
 	private ElasticsearchDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
-	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchIndexesContext indexes) {
-		this.indexes = indexes;
+	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
+		this.indexes = searchContext.indexes();
 		this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( indexes );
 	}
 
@@ -100,7 +102,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		if ( analyzer == null ) {
 			for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState field : fields.values() ) {

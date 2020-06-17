@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
 import com.google.gson.JsonElement;
@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSingleFieldPredicateBuilder
-		implements PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements PhrasePredicateBuilder {
 
 	private static final JsonObjectAccessor MATCH_PHRASE_ACCESSOR = JsonAccessor.root().property( "match_phrase" ).asObject();
 
@@ -33,8 +33,9 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSingl
 	private JsonElement phrase;
 	private String analyzer;
 
-	ElasticsearchTextPhrasePredicateBuilder(ElasticsearchSearchFieldContext<String> field) {
-		super( field );
+	ElasticsearchTextPhrasePredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<String> field) {
+		super( searchContext, field );
 		this.field = field;
 	}
 
@@ -59,7 +60,7 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSingl
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		if ( analyzer == null ) {
 			// Check analyzer compatibility for multi-index search

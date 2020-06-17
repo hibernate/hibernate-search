@@ -22,7 +22,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -58,7 +58,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
 
-	private final ElasticsearchSearchPredicateContext rootPredicateContext;
+	private final PredicateRequestContext rootPredicateContext;
 	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
@@ -88,7 +88,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.rootPredicateContext = new ElasticsearchSearchPredicateContext( sessionContext );
+		this.rootPredicateContext = new PredicateRequestContext( sessionContext );
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
@@ -120,7 +120,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateContext getRootPredicateContext() {
+	public PredicateRequestContext getRootPredicateContext() {
 		return rootPredicateContext;
 	}
 

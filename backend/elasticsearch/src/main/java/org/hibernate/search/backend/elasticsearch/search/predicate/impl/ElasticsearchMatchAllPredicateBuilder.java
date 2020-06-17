@@ -8,15 +8,20 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
 
 class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
-		implements MatchAllPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements MatchAllPredicateBuilder {
 
 	private static final JsonObjectAccessor MATCH_ALL_ACCESSOR = JsonAccessor.root().property( "match_all" ).asObject();
+
+	ElasticsearchMatchAllPredicateBuilder(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
+	}
 
 	@Override
 	public void checkNestableWithin(String expectedParentNestedPath) {
@@ -24,7 +29,7 @@ class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchP
 	}
 
 	@Override
-	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		MATCH_ALL_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;

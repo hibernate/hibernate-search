@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 /**
  * A search predicate builder, i.e. an object responsible for collecting parameters
  * and then building a search predicate.
- *
- * @param <B> The implementation type of the builder, which should expose a {@code build()} method.
- * This type is backend-specific, as the parameters to the build method may vary from one backend to another.
  */
-public interface SearchPredicateBuilder<B> {
+public interface SearchPredicateBuilder {
 
 	void boost(float boost);
 
@@ -23,5 +22,6 @@ public interface SearchPredicateBuilder<B> {
 	 * @return An implementation-specific view of this builder,
 	 * allowing the backend to call a {@code build()} method in particular.
 	 */
-	B toImplementation();
+	SearchPredicate build();
+
 }

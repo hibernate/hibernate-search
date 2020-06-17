@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
-public interface MatchAllPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface MatchAllPredicateBuilder extends SearchPredicateBuilder {
 
 }

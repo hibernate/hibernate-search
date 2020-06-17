@@ -13,16 +13,16 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreS
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class MatchPredicateFieldStepImpl<B> implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
+class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
 
-	private final MatchPredicateFieldMoreStepImpl.CommonState<B> commonState;
+	private final MatchPredicateFieldMoreStepImpl.CommonState commonState;
 
-	MatchPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
-		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
+	MatchPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
+		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState( builderFactory );
 	}
 
 	@Override
 	public MatchPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new MatchPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

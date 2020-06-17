@@ -9,14 +9,12 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 public class StubSearchPredicate implements SearchPredicate {
-	private final StubPredicateBuilder builder;
 
-	StubSearchPredicate(
-			StubPredicateBuilder builder) {
-		this.builder = builder;
+	public static StubSearchPredicate from(SearchPredicate predicate) {
+		return (StubSearchPredicate) predicate;
 	}
 
-	StubPredicateBuilder get() {
-		return builder;
+	void simulateBuild() {
+		// No-op, just simulates a call on this object
 	}
 }

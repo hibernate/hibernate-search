@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
@@ -65,7 +65,7 @@ class LuceneTextMatchPredicateBuilder<F>
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		Analyzer effectiveAnalyzerOrNormalizer = overrideAnalyzerOrNormalizer;
 		if ( effectiveAnalyzerOrNormalizer == null ) {
 			effectiveAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();

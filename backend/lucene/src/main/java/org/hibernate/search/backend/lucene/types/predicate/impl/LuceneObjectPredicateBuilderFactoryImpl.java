@@ -13,8 +13,8 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPredicateBuilderFactory {
@@ -51,14 +51,14 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 	}
 
 	@Override
-	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder() {
+	public ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext) {
 		LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder(
-				absoluteFieldPath, nestedPathHierarchy
+				searchContext, absoluteFieldPath, nestedPathHierarchy
 		);
 		for ( Map.Entry<String, LuceneSearchFieldContext<?>> entry : leafFields.entrySet() ) {
-			ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder =
-					entry.getValue().createExistsPredicateBuilder();
-			objectPredicateBuilder.addChild( existsPredicateBuilder );
+			ExistsPredicateBuilder existsPredicateBuilder =
+					entry.getValue().createExistsPredicateBuilder( searchContext );
+			objectPredicateBuilder.addChild( existsPredicateBuilder.build() );
 		}
 		return objectPredicateBuilder;
 	}

@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.data.Range;
 
-public interface RangePredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface RangePredicateBuilder extends SearchPredicateBuilder {
 
 	void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound);
 

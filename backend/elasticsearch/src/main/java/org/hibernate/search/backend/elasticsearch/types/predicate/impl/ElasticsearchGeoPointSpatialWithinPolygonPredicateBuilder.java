@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 
 class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends
 		AbstractElasticsearchSingleFieldPredicateBuilder
-		implements SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements SpatialWithinPolygonPredicateBuilder {
 
 	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR = JsonAccessor.root().property( "geo_polygon" ).asObject();
 
@@ -29,8 +29,9 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends
 
 	private JsonArray pointsArray;
 
-	ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder(ElasticsearchSearchFieldContext<GeoPoint> field) {
-		super( field );
+	ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<GeoPoint> field) {
+		super( searchContext, field );
 	}
 
 	@Override
@@ -46,7 +47,7 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends
 
 	@Override
 	protected JsonObject doBuild(
-			ElasticsearchSearchPredicateContext context,
+			PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonObject pointsObject = new JsonObject();
 		pointsObject.add( POINTS_PROPERTY_NAME, pointsArray );

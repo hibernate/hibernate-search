@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -13,7 +14,11 @@ import org.apache.lucene.search.Query;
 
 
 class LuceneMatchAllPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements MatchAllPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements MatchAllPredicateBuilder {
+
+	LuceneMatchAllPredicateBuilder(LuceneSearchContext searchContext) {
+		super( searchContext );
+	}
 
 	@Override
 	public void checkNestableWithin(String expectedParentNestedPath) {
@@ -21,7 +26,7 @@ class LuceneMatchAllPredicateBuilder extends AbstractLuceneSearchPredicateBuilde
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		return new MatchAllDocsQuery();
 	}
 }

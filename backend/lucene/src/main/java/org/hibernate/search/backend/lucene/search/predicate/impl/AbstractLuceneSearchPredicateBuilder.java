@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import org.apache.lucene.search.BoostQuery;
@@ -13,11 +15,17 @@ import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 
 
-public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateBuilder>,
+public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBuilder,
 		LuceneSearchPredicateBuilder {
+
+	protected final LuceneSearchContext searchContext;
 
 	private Float boost;
 	private boolean constantScore;
+
+	protected AbstractLuceneSearchPredicateBuilder(LuceneSearchContext searchContext) {
+		this.searchContext = searchContext;
+	}
 
 	@Override
 	public void boost(float boost) {
@@ -30,12 +38,14 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 	}
 
 	@Override
-	public LuceneSearchPredicateBuilder toImplementation() {
-		return this;
+	public SearchPredicate build() {
+		// TODO HSEARCH-3476 this is just a temporary hack:
+		//  we should move to one SearchPredicate implementation per type of predicate.
+		return LuceneSearchPredicate.of( searchContext, this );
 	}
 
 	@Override
-	public Query build(LuceneSearchPredicateContext context) {
+	public Query toQuery(PredicateRequestContext context) {
 		Query query = doBuild( context );
 
 		// the boost should be applied on top of the constant score,
@@ -50,6 +60,6 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 		return query;
 	}
 
-	protected abstract Query doBuild(LuceneSearchPredicateContext context);
+	protected abstract Query doBuild(PredicateRequestContext context);
 
 }

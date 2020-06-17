@@ -27,27 +27,27 @@ import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldSt
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-public class DefaultSearchPredicateFactory<B> implements SearchPredicateFactory {
+public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 
-	private final SearchPredicateBuilderFactory<?, B> builderFactory;
+	private final SearchPredicateBuilderFactory<?> builderFactory;
 
-	public DefaultSearchPredicateFactory(SearchPredicateBuilderFactory<?, B> builderFactory) {
+	public DefaultSearchPredicateFactory(SearchPredicateBuilderFactory<?> builderFactory) {
 		this.builderFactory = builderFactory;
 	}
 
 	@Override
 	public MatchAllPredicateOptionsStep<?> matchAll() {
-		return new MatchAllPredicateOptionsStepImpl<>( builderFactory, this );
+		return new MatchAllPredicateOptionsStepImpl( builderFactory, this );
 	}
 
 	@Override
 	public MatchIdPredicateMatchingStep<?> id() {
-		return new MatchIdPredicateMatchingStepImpl<>( builderFactory );
+		return new MatchIdPredicateMatchingStepImpl( builderFactory );
 	}
 
 	@Override
 	public BooleanPredicateClausesStep<?> bool() {
-		return new BooleanPredicateClausesStepImpl<>( builderFactory, this );
+		return new BooleanPredicateClausesStepImpl( builderFactory, this );
 	}
 
 	@Override
@@ -59,42 +59,42 @@ public class DefaultSearchPredicateFactory<B> implements SearchPredicateFactory 
 
 	@Override
 	public MatchPredicateFieldStep<?> match() {
-		return new MatchPredicateFieldStepImpl<>( builderFactory );
+		return new MatchPredicateFieldStepImpl( builderFactory );
 	}
 
 	@Override
 	public RangePredicateFieldStep<?> range() {
-		return new RangePredicateFieldStepImpl<>( builderFactory );
+		return new RangePredicateFieldStepImpl( builderFactory );
 	}
 
 	@Override
 	public PhrasePredicateFieldStep<?> phrase() {
-		return new PhrasePredicateFieldStepImpl<>( builderFactory );
+		return new PhrasePredicateFieldStepImpl( builderFactory );
 	}
 
 	@Override
 	public WildcardPredicateFieldStep<?> wildcard() {
-		return new WildcardPredicateFieldStepImpl<>( builderFactory );
+		return new WildcardPredicateFieldStepImpl( builderFactory );
 	}
 
 	@Override
 	public NestedPredicateFieldStep<?> nested() {
-		return new NestedPredicateFieldStepImpl<>( builderFactory, this );
+		return new NestedPredicateFieldStepImpl( builderFactory, this );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateFieldStep<?> simpleQueryString() {
-		return new SimpleQueryStringPredicateFieldStepImpl<>( builderFactory );
+		return new SimpleQueryStringPredicateFieldStepImpl( builderFactory );
 	}
 
 	@Override
 	public ExistsPredicateFieldStep<?> exists() {
-		return new ExistsPredicateFieldStepImpl<>( builderFactory );
+		return new ExistsPredicateFieldStepImpl( builderFactory );
 	}
 
 	@Override
 	public SpatialPredicateInitialStep spatial() {
-		return new SpatialPredicateInitialStepImpl<>( builderFactory );
+		return new SpatialPredicateInitialStepImpl( builderFactory );
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class DefaultSearchPredicateFactory<B> implements SearchPredicateFactory 
 
 	@Override
 	public SearchPredicateFactoryExtensionIfSupportedStep extension() {
-		return new SearchPredicateFactoryExtensionStep<>( this, builderFactory );
+		return new SearchPredicateFactoryExtensionStep( this, builderFactory );
 	}
 
 }

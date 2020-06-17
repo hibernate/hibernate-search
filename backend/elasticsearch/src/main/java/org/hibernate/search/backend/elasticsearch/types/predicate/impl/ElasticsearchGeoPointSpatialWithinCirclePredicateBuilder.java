@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -22,7 +22,7 @@ import com.google.gson.JsonObject;
 
 class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder
 		extends AbstractElasticsearchSingleFieldPredicateBuilder
-		implements SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+		implements SpatialWithinCirclePredicateBuilder {
 
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "geo_distance" ).asObject();
 
@@ -33,9 +33,9 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder
 	private double distanceInMeters;
 	private JsonElement center;
 
-	ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder(ElasticsearchSearchFieldContext<GeoPoint> field,
-			ElasticsearchFieldCodec<GeoPoint> codec) {
-		super( field );
+	ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchFieldContext<GeoPoint> field, ElasticsearchFieldCodec<GeoPoint> codec) {
+		super( searchContext, field );
 		this.codec = codec;
 	}
 
@@ -47,7 +47,7 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder
 
 	@Override
 	protected JsonObject doBuild(
-			ElasticsearchSearchPredicateContext context,
+			PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		DISTANCE_ACCESSOR.set( innerObject, distanceInMeters );
 		innerObject.add( absoluteFieldPath, center );

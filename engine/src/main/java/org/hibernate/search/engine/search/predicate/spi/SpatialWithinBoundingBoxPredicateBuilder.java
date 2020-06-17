@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 
-public interface SpatialWithinBoundingBoxPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface SpatialWithinBoundingBoxPredicateBuilder extends SearchPredicateBuilder {
 
 	void boundingBox(GeoBoundingBox boundingBox);
 

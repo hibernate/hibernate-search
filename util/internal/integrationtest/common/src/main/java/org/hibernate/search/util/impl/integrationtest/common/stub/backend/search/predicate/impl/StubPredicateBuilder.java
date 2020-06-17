@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -29,44 +30,48 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.common.data.Range;
 
-public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredicateBuilder>,
-		BooleanPredicateBuilder<StubPredicateBuilder>,
-		MatchIdPredicateBuilder<StubPredicateBuilder>,
-		MatchPredicateBuilder<StubPredicateBuilder>,
-		RangePredicateBuilder<StubPredicateBuilder>,
-		PhrasePredicateBuilder<StubPredicateBuilder>,
-		WildcardPredicateBuilder<StubPredicateBuilder>,
-		SimpleQueryStringPredicateBuilder<StubPredicateBuilder>,
-		NestedPredicateBuilder<StubPredicateBuilder>,
-		ExistsPredicateBuilder<StubPredicateBuilder>,
-		SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
-		SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder>,
-		SpatialWithinBoundingBoxPredicateBuilder<StubPredicateBuilder> {
+public class StubPredicateBuilder implements MatchAllPredicateBuilder,
+		BooleanPredicateBuilder,
+		MatchIdPredicateBuilder,
+		MatchPredicateBuilder,
+		RangePredicateBuilder,
+		PhrasePredicateBuilder,
+		WildcardPredicateBuilder,
+		SimpleQueryStringPredicateBuilder,
+		NestedPredicateBuilder,
+		ExistsPredicateBuilder,
+		SpatialWithinCirclePredicateBuilder,
+		SpatialWithinPolygonPredicateBuilder,
+		SpatialWithinBoundingBoxPredicateBuilder {
 
 	@Override
-	public StubPredicateBuilder toImplementation() {
-		return this;
+	public SearchPredicate build() {
+		return new StubSearchPredicate();
 	}
 
 	@Override
-	public void must(StubPredicateBuilder clauseBuilder) {
-		// No-op
+	public void must(SearchPredicate clause) {
+		// No-op, just check the type
+		StubSearchPredicate.from( clause );
 	}
 
 	@Override
-	public void mustNot(StubPredicateBuilder clauseBuilder) {
-		// No-op
+	public void mustNot(SearchPredicate clause) {
+		// No-op, just check the type
+		StubSearchPredicate.from( clause );
 	}
 
 	@Override
-	public void should(StubPredicateBuilder clauseBuilder) {
-		// No-op
+	public void should(SearchPredicate clause) {
+		// No-op, just check the type
+		StubSearchPredicate.from( clause );
 
 	}
 
 	@Override
-	public void filter(StubPredicateBuilder clauseBuilder) {
-		// No-op
+	public void filter(SearchPredicate clause) {
+		// No-op, just check the type
+		StubSearchPredicate.from( clause );
 	}
 
 	@Override
@@ -160,12 +165,9 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void nested(StubPredicateBuilder clauseBuilder) {
-		// No-op
-	}
-
-	void simulateBuild() {
-		// No-op, just simulates a call on this object
+	public void nested(SearchPredicate nestedPredicate) {
+		// No-op, just check the type
+		StubSearchPredicate.from( nestedPredicate );
 	}
 
 	@Override

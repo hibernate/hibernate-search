@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -49,13 +49,13 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
+	public PhrasePredicateBuilder createPhrasePredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field) {
 		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
+	public WildcardPredicateBuilder createWildcardPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field) {
 		throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
@@ -67,20 +67,20 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			ElasticsearchSearchFieldContext<F> field) {
+	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			ElasticsearchSearchFieldContext<F> field) {
+	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			ElasticsearchSearchFieldContext<F> field) {
+	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		throw log.spatialPredicatesNotSupportedByFieldType( field.eventContext() );
 	}
 

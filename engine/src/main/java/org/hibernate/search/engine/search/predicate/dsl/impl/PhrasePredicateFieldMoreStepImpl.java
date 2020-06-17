@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -20,36 +21,36 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-class PhrasePredicateFieldMoreStepImpl<B>
-		implements PhrasePredicateFieldMoreStep<PhrasePredicateFieldMoreStepImpl<B>, PhrasePredicateOptionsStep<?>>,
-				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+class PhrasePredicateFieldMoreStepImpl
+		implements PhrasePredicateFieldMoreStep<PhrasePredicateFieldMoreStepImpl, PhrasePredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<B> commonState;
+	private final CommonState commonState;
 
 	private final List<String> absoluteFieldPaths;
-	private final List<PhrasePredicateBuilder<B>> predicateBuilders = new ArrayList<>();
+	private final List<PhrasePredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	PhrasePredicateFieldMoreStepImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
+		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.phrase( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public PhrasePredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
+		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStepImpl<B> boost(float boost) {
+	public PhrasePredicateFieldMoreStepImpl boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -65,20 +66,20 @@ class PhrasePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public void contributePredicateBuilders(Consumer<B> collector) {
-		for ( PhrasePredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+	public void contributePredicates(Consumer<SearchPredicate> collector) {
+		for ( PhrasePredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Fieldset states won't be accessed anymore, it's time to apply their options
 			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
 
-			collector.accept( predicateBuilder.toImplementation() );
+			collector.accept( predicateBuilder.build() );
 		}
 	}
 
-	static class CommonState<B>
-			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, PhrasePredicateFieldMoreStepImpl<B>>
-			implements PhrasePredicateOptionsStep<CommonState<B>> {
+	static class CommonState
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, PhrasePredicateFieldMoreStepImpl>
+			implements PhrasePredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
+		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
 			super( builderFactory );
 		}
 
@@ -87,8 +88,8 @@ class PhrasePredicateFieldMoreStepImpl<B>
 				throw log.phrasePredicateCannotMatchNullPhrase( getEventContext() );
 			}
 
-			for ( PhrasePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.phrase( phrase );
 				}
 			}
@@ -96,13 +97,13 @@ class PhrasePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> slop(int slop) {
+		public CommonState slop(int slop) {
 			if ( slop < 0 ) {
 				throw log.invalidPhrasePredicateSlop( slop );
 			}
 
-			for ( PhrasePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.slop( slop );
 				}
 			}
@@ -110,9 +111,9 @@ class PhrasePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> analyzer(String analyzerName) {
-			for ( PhrasePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+		public CommonState analyzer(String analyzerName) {
+			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.analyzer( analyzerName );
 				}
 			}
@@ -120,9 +121,9 @@ class PhrasePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public CommonState<B> skipAnalysis() {
-			for ( PhrasePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
-				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+		public CommonState skipAnalysis() {
+			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
+				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.skipAnalysis();
 				}
 			}
@@ -130,7 +131,7 @@ class PhrasePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		protected CommonState<B> thisAsS() {
+		protected CommonState thisAsS() {
 			return this;
 		}
 	}

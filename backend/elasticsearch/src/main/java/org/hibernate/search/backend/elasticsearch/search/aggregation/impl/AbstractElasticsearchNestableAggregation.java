@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -43,12 +43,12 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 			JsonAccessor.root().property( FILTERED_NAME ).asObject();
 
 	private final List<String> nestedPathHierarchy;
-	private final ElasticsearchSearchPredicateBuilder filterBuilder;
+	private final ElasticsearchSearchPredicate filter;
 
 	AbstractElasticsearchNestableAggregation(AbstractBuilder<A> builder) {
 		super( builder );
 		nestedPathHierarchy = builder.nestedPathHierarchy;
-		filterBuilder = builder.filterBuilder;
+		filter = builder.filter;
 	}
 
 	@Override
@@ -60,10 +60,10 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 			return result;
 		}
 
-		if ( filterBuilder != null ) {
-			ElasticsearchSearchPredicateContext filterContext = context.getRootPredicateContext()
+		if ( filter != null ) {
+			PredicateRequestContext filterContext = context.getRootPredicateContext()
 					.withNestedPath( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
-			JsonObject jsonFilter = filterBuilder.build( filterContext );
+			JsonObject jsonFilter = filter.toJsonQuery( filterContext );
 
 			JsonObject object = new JsonObject();
 
@@ -101,7 +101,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 					.orElseThrow( log::elasticsearchResponseMissingData );
 		}
 
-		if ( filterBuilder != null ) {
+		if ( filter != null ) {
 			actualAggregationResult = RESPONSE_FILTERED_ACCESSOR.get( actualAggregationResult )
 					.orElseThrow( log::elasticsearchResponseMissingData );
 		}
@@ -119,7 +119,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 		protected final ElasticsearchSearchFieldContext<?> field;
 		protected final List<String> nestedPathHierarchy;
-		private ElasticsearchSearchPredicateBuilder filterBuilder;
+		private ElasticsearchSearchPredicate filter;
 
 		public AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<?> field) {
 			super( searchContext );
@@ -131,9 +131,9 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 			if ( nestedPathHierarchy.isEmpty() ) {
 				throw log.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
-			ElasticsearchSearchPredicateBuilder builder = (ElasticsearchSearchPredicateBuilder) filter;
-			builder.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
-			this.filterBuilder = builder;
+			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( searchContext, filter );
+			elasticsearchFilter.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
+			this.filter = elasticsearchFilter;
 		}
 
 		@Override

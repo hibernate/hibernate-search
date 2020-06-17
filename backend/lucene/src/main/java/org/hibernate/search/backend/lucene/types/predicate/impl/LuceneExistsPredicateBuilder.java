@@ -6,29 +6,30 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 import org.apache.lucene.search.Query;
 
 public class LuceneExistsPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements ExistsPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements ExistsPredicateBuilder {
 
 	private final LuceneFieldCodec<?> codec;
 
-	LuceneExistsPredicateBuilder(LuceneSearchFieldContext<?> field, LuceneFieldCodec<?> codec) {
-		super( field );
+	LuceneExistsPredicateBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field,
+			LuceneFieldCodec<?> codec) {
+		super( searchContext, field );
 		this.codec = codec;
 		// Score is always constant for this query
 		constantScore();
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		return codec.createExistsQuery( absoluteFieldPath );
 	}
 

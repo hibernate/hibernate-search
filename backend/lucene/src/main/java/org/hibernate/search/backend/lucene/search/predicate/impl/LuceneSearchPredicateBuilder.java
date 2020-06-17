@@ -6,12 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+
 import org.apache.lucene.search.Query;
 
 public interface LuceneSearchPredicateBuilder {
 
+	SearchPredicate build();
+
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should have one SearchPredicate implementation per type of predicate,
+	//  and move this method there.
 	void checkNestableWithin(String expectedParentNestedPath);
 
-	Query build(LuceneSearchPredicateContext context);
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should have one SearchPredicate implementation per type of predicate,
+	//  and move this method there.
+	Query toQuery(PredicateRequestContext context);
 
 }

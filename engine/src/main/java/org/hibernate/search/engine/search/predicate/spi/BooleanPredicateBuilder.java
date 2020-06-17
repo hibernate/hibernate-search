@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 
-public interface BooleanPredicateBuilder<B> extends SearchPredicateBuilder<B> {
+public interface BooleanPredicateBuilder extends SearchPredicateBuilder {
 
-	void must(B clauseBuilder);
+	void must(SearchPredicate clause);
 
-	void should(B clauseBuilder);
+	void should(SearchPredicate clause);
 
-	void mustNot(B clauseBuilder);
+	void mustNot(SearchPredicate clause);
 
-	void filter(B clauseBuilder);
+	void filter(SearchPredicate clause);
 
 	/**
 	 * See {@link BooleanPredicateClausesStep#minimumShouldMatch()}.

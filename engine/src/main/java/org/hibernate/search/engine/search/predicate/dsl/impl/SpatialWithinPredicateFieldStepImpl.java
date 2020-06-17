@@ -13,17 +13,17 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFi
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class SpatialWithinPredicateFieldStepImpl<B>
+class SpatialWithinPredicateFieldStepImpl
 		implements SpatialWithinPredicateFieldStep<SpatialWithinPredicateFieldMoreStep<?, ?>> {
 
-	private final SpatialWithinPredicateFieldMoreStepImpl.CommonState<B> commonState;
+	private final SpatialWithinPredicateFieldMoreStepImpl.CommonState commonState;
 
-	SpatialWithinPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
-		this.commonState = new SpatialWithinPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
+	SpatialWithinPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
+		this.commonState = new SpatialWithinPredicateFieldMoreStepImpl.CommonState( builderFactory );
 	}
 
 	@Override
 	public SpatialWithinPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new SpatialWithinPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new SpatialWithinPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

@@ -38,11 +38,8 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 	public abstract static class AbstractBuilder<K, V> extends AbstractLuceneNestableAggregation.AbstractBuilder<Map<K, V>>
 			implements SearchAggregationBuilder<Map<K, V>> {
 
-		protected final LuceneSearchContext searchContext;
-
 		public AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field) {
-			super( field );
-			this.searchContext = searchContext;
+			super( searchContext, field );
 		}
 
 		@Override

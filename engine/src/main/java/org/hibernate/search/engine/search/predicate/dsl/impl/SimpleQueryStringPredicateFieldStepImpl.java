@@ -13,17 +13,17 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class SimpleQueryStringPredicateFieldStepImpl<B>
+class SimpleQueryStringPredicateFieldStepImpl
 		implements SimpleQueryStringPredicateFieldStep<SimpleQueryStringPredicateFieldMoreStep<?, ?>> {
 
-	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState<B> commonState;
+	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState commonState;
 
-	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory) {
-		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState<>( builderFactory );
+	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
+		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState( builderFactory );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new SimpleQueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

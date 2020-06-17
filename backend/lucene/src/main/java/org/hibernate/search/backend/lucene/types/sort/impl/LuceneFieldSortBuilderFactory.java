@@ -40,7 +40,9 @@ public interface LuceneFieldSortBuilderFactory<F> {
 	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field);
 
-	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchFieldContext<F> field,
+	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+			LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field,
 			GeoPoint center);
 
 }

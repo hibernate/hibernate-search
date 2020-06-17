@@ -39,7 +39,9 @@ public class LuceneNativeFieldSortBuilderFactory<F> implements LuceneFieldSortBu
 	}
 
 	@Override
-	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchFieldContext<F> field,
+	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+			LuceneSearchContext searchContext,
+			LuceneSearchFieldContext<F> field,
 			GeoPoint center) {
 		throw unsupported( field );
 	}

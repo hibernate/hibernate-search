@@ -7,19 +7,27 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
 
 public abstract class AbstractElasticsearchSearchPredicateBuilder
-		implements SearchPredicateBuilder<ElasticsearchSearchPredicateBuilder>,
+		implements SearchPredicateBuilder,
 		ElasticsearchSearchPredicateBuilder {
 
 	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
+	protected final ElasticsearchSearchContext searchContext;
+
 	private Float boost;
 	private boolean withConstantScore = false;
+
+	AbstractElasticsearchSearchPredicateBuilder(ElasticsearchSearchContext searchContext) {
+		this.searchContext = searchContext;
+	}
 
 	@Override
 	public void boost(float boost) {
@@ -32,12 +40,14 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateBuilder toImplementation() {
-		return this;
+	public SearchPredicate build() {
+		// TODO HSEARCH-3476 this is just a temporary hack:
+		//  we should move to one SearchPredicate implementation per type of predicate.
+		return ElasticsearchSearchPredicate.of( searchContext, this );
 	}
 
 	@Override
-	public JsonObject build(ElasticsearchSearchPredicateContext context) {
+	public JsonObject toJsonQuery(PredicateRequestContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -50,7 +60,7 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 		return ( withConstantScore ) ? applyConstantScore( result ) : result;
 	}
 
-	protected abstract JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+	protected abstract JsonObject doBuild(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject);
 
 	private JsonObject applyConstantScore(JsonObject filter) {

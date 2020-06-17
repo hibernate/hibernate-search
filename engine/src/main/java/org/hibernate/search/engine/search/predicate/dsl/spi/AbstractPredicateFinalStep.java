@@ -8,32 +8,28 @@ package org.hibernate.search.engine.search.predicate.dsl.spi;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 /**
  * An abstract base for {@link PredicateFinalStep} implementations.
- *
- * @param <B> The implementation type of builders
- * This type is backend-specific. See {@link SearchPredicateBuilder#toImplementation()}
  */
-public abstract class AbstractPredicateFinalStep<B> implements PredicateFinalStep {
+public abstract class AbstractPredicateFinalStep implements PredicateFinalStep {
 
-	protected final SearchPredicateBuilderFactory<?, B> builderFactory;
+	protected final SearchPredicateBuilderFactory<?> builderFactory;
 
 	private SearchPredicate predicateResult;
 
-	public AbstractPredicateFinalStep(SearchPredicateBuilderFactory<?, B> builderFactory) {
+	public AbstractPredicateFinalStep(SearchPredicateBuilderFactory<?> builderFactory) {
 		this.builderFactory = builderFactory;
 	}
 
 	@Override
 	public SearchPredicate toPredicate() {
 		if ( predicateResult == null ) {
-			predicateResult = builderFactory.toSearchPredicate( toImplementation() );
+			predicateResult = build();
 		}
 		return predicateResult;
 	}
 
-	protected abstract B toImplementation();
+	protected abstract SearchPredicate build();
 }

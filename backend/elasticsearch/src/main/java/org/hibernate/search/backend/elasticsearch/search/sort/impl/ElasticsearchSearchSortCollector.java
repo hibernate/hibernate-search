@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 
 /**
  * A sort collector for Elasticsearch, using JSON to represent sorts.
@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
  */
 public interface ElasticsearchSearchSortCollector {
 
-	ElasticsearchSearchPredicateContext getRootPredicateContext();
+	PredicateRequestContext getRootPredicateContext();
 
 	void collectSort(JsonElement sort);
 

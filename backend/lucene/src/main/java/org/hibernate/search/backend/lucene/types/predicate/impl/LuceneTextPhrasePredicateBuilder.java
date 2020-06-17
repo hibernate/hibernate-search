@@ -14,8 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstant
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -29,7 +28,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
 class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements PhrasePredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements PhrasePredicateBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -45,7 +44,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSingleFieldPredicat
 
 	LuceneTextPhrasePredicateBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field,
 			LuceneTextFieldCodec<?> codec) {
-		super( field );
+		super( searchContext, field );
 		this.field = field;
 		this.codec = codec;
 		this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
@@ -75,7 +74,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSingleFieldPredicat
 	}
 
 	@Override
-	protected Query doBuild(LuceneSearchPredicateContext context) {
+	protected Query doBuild(PredicateRequestContext context) {
 		Analyzer effectiveAnalyzerOrNormalizer = overrideAnalyzer;
 		if ( effectiveAnalyzerOrNormalizer == null ) {
 			effectiveAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
