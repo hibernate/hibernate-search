@@ -323,4 +323,11 @@ public interface Log extends BasicLogger {
 			value = "Found multiple values while projecting on a supposedly single-valued field: [%1$s, %2$s].")
 	SearchException unexpectedMultiValuedField(Object value1, Object value2);
 
+	@Message(id = ID_OFFSET_2 + 73,
+			value = "Some properties in the given Hibernate Search configuration were only valid in Hibernate Search 5"
+					+ " and are now obsolete: configuration properties changed in Hibernate Search 6."
+					+ " Check out the reference documentation and upgrade your configuration."
+					+ " Obsolete properties: %1$s.")
+	SearchException obsoleteConfigurationPropertiesFromSearch5(Set<String> propertyKeys);
+
 }
