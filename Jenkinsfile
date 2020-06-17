@@ -503,7 +503,7 @@ stage('Non-default environments') {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install --fail-at-end \
 							-DskipTests \
-							-P${buildEnv.mavenProfile} \
+							-P${buildEnv.mavenProfile},!javaModuleITs \
 					"""
 				}
 			}
