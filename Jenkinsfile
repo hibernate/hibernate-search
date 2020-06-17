@@ -216,7 +216,9 @@ stage('Configure') {
 			esAws: [
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
+					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
+					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
+					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.EXPERIMENTAL),
 					// ES 6.3 has a bug that prevents IndexingIT from passing. See https://github.com/elastic/elasticsearch/issues/32395
 					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.3', status: BuildEnvironmentStatus.EXPERIMENTAL),
 					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.4', status: BuildEnvironmentStatus.SUPPORTED),
