@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * by wrapping a {@link ConfigurationPropertySource}
  * and requiring special hooks to be called before and after bootstrap.
  */
-public class ConfigurationPropertyChecker {
+public final class ConfigurationPropertyChecker {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -76,9 +76,27 @@ public class ConfigurationPropertyChecker {
 		if ( !warn ) {
 			log.configurationPropertyTrackingDisabled();
 		}
+
+		checkHibernateSearch5Properties();
 	}
 
 	public void afterBoot(ConfigurationPropertyChecker firstPhaseChecker) {
+		checkUnconsumedProperties( firstPhaseChecker );
+	}
+
+	private void checkHibernateSearch5Properties() {
+		Set<String> obsoleteKeys = new LinkedHashSet<>();
+		for ( String propertyKey : availablePropertyKeys ) {
+			if ( HibernateSearch5Properties.isSearch5PropertyKey( propertyKey ) ) {
+				obsoleteKeys.add( propertyKey );
+			}
+		}
+		if ( !obsoleteKeys.isEmpty() ) {
+			throw log.obsoleteConfigurationPropertiesFromSearch5( obsoleteKeys );
+		}
+	}
+
+	private void checkUnconsumedProperties(ConfigurationPropertyChecker firstPhaseChecker) {
 		if ( !warn ) {
 			return;
 		}
