@@ -328,7 +328,11 @@ it will name the index `myindex-000001` and will automatically create the write 
 This layout is a bit more complex than it could be, but it follows the best practices.
 
 Using aliases has a significant advantage over directly targeting the index:
-it makes full reindexing on a live application possible.
+it makes full reindexing on a live application possible without downtime,
+which is useful in particular when <<mapper-orm-indexing-automatic,automatic indexing>> is disabled
+(<<mapper-orm-indexing-automatic-configuration,completely>> or <<mapper-orm-reindexing-reindexonupdate,partially>>)
+and you need to fully reindex periodically (for example on a daily basis).
+
 With aliases, you just need to direct the read alias (used by search queries) to an old copy of the index,
 while the write alias (used by document writes) is redirected to a new copy of the index.
 
@@ -344,6 +348,11 @@ The basic sequence of actions is the following:
 3. Reindex, for example using the <<mapper-orm-indexing-massindexer,mass indexer>>.
 4. Switch the read alias, `myindex-read`, from `myindex-000001` to `myindex-000002`.
 5. Delete `myindex-000001`.
+
+Note this will only work if the Hibernate Search mapping did not change;
+a zero-downtime upgrade with a changing schema would be considerably more complex.
+You will find discussions on this topic in https://hibernate.atlassian.net/browse/HSEARCH-2861[HSEARCH-2861]
+and https://hibernate.atlassian.net/browse/HSEARCH-3499[HSEARCH-3499].
 ====
 
 If the default names and aliases used by Hibernate Search do not match your needs,
