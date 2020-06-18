@@ -11,17 +11,16 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
-abstract class AbstractLuceneNestablePredicateBuilder extends AbstractLuceneSearchPredicateBuilder {
+abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	AbstractLuceneNestablePredicateBuilder(LuceneSearchContext searchContext) {
-		super( searchContext );
+	AbstractLuceneNestablePredicate(AbstractBuilder builder) {
+		super( builder );
 	}
 
 	@Override
@@ -68,7 +67,7 @@ abstract class AbstractLuceneNestablePredicateBuilder extends AbstractLuceneSear
 
 			String parentNestedDocumentPath = ( i == 0 ) ? null // The parent document is the root document
 					: nestedPathHierarchy.get( i - 1 ); // The parent document is a nested document one level higher
-			result = LuceneNestedPredicateBuilder.doBuild( parentNestedDocumentPath, path, result );
+			result = LuceneNestedPredicate.createNestedQuery( parentNestedDocumentPath, path, result );
 		}
 
 		return result;

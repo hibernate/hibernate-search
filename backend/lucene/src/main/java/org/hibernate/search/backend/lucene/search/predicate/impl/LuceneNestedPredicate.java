@@ -20,31 +20,22 @@ import org.apache.lucene.search.join.BitSetProducer;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 
-class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements NestedPredicateBuilder {
+class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 
-	private LuceneSearchPredicate nestedPredicate;
+	private final LuceneSearchPredicate nestedPredicate;
 
-	LuceneNestedPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
-			List<String> nestedPathHierarchy) {
-		// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
-		super( searchContext, absoluteFieldPath, nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 ) );
+	private LuceneNestedPredicate(Builder builder) {
+		super( builder );
+		nestedPredicate = builder.nestedPredicate;
 	}
 
 	@Override
-	public void nested(SearchPredicate nestedPredicate) {
-		LuceneSearchPredicate luceneNestedPredicate = LuceneSearchPredicate.from( searchContext, nestedPredicate );
-		luceneNestedPredicate.checkNestableWithin( absoluteFieldPath );
-		this.nestedPredicate = luceneNestedPredicate;
-	}
-
-	@Override
-	protected Query doBuild(PredicateRequestContext context) {
+	protected Query doToQuery(PredicateRequestContext context) {
 		PredicateRequestContext childContext = new PredicateRequestContext( absoluteFieldPath );
-		return doBuild( context.getNestedPath(), absoluteFieldPath, nestedPredicate.toQuery( childContext ) );
+		return createNestedQuery( context.getNestedPath(), absoluteFieldPath, nestedPredicate.toQuery( childContext ) );
 	}
 
-	public static Query doBuild(String parentNestedDocumentPath, String nestedDocumentPath, Query nestedQuery) {
+	public static Query createNestedQuery(String parentNestedDocumentPath, String nestedDocumentPath, Query nestedQuery) {
 		if ( nestedDocumentPath.equals( parentNestedDocumentPath ) ) {
 			return nestedQuery;
 		}
@@ -61,5 +52,27 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBui
 
 		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode
 		return new ToParentBlockJoinQuery( childQueryBuilder.build(), parentFilter, ScoreMode.Avg );
+	}
+
+	static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
+		private LuceneSearchPredicate nestedPredicate;
+
+		Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
+				List<String> nestedPathHierarchy) {
+			// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
+			super( searchContext, absoluteFieldPath, nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 ) );
+		}
+
+		@Override
+		public void nested(SearchPredicate nestedPredicate) {
+			LuceneSearchPredicate luceneNestedPredicate = LuceneSearchPredicate.from( searchContext, nestedPredicate );
+			luceneNestedPredicate.checkNestableWithin( absoluteFieldPath );
+			this.nestedPredicate = luceneNestedPredicate;
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new LuceneNestedPredicate( this );
+		}
 	}
 }

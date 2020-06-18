@@ -13,6 +13,6 @@ import org.apache.lucene.search.Query;
 public interface LuceneSearchPredicateBuilderFactory
 		extends SearchPredicateBuilderFactory<LuceneSearchPredicateCollector> {
 
-	LuceneSearchPredicateBuilder fromLuceneQuery(Query luceneQuery);
+	LuceneSearchPredicate fromLuceneQuery(Query luceneQuery);
 
 }

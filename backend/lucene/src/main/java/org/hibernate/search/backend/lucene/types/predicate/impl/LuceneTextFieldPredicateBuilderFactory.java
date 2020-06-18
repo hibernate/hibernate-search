@@ -21,31 +21,31 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(LuceneSearchContext searchContext,
+	public LuceneTextMatchPredicate.Builder<?> createMatchPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextMatchPredicateBuilder<>( searchContext, field, codec );
+		return new LuceneTextMatchPredicate.Builder<>( searchContext, field, codec );
 	}
 
 	@Override
 	public RangePredicateBuilder createRangePredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextRangePredicateBuilder<>( searchContext, field, codec );
+		return new LuceneTextRangePredicate.Builder<>( searchContext, field, codec );
 	}
 
 	@Override
 	public PhrasePredicateBuilder createPhrasePredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextPhrasePredicateBuilder( searchContext, field, codec );
+		return new LuceneTextPhrasePredicate.Builder( searchContext, field, codec );
 	}
 
 	@Override
 	public WildcardPredicateBuilder createWildcardPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextWildcardPredicateBuilder( searchContext, field );
+		return new LuceneTextWildcardPredicate.Builder( searchContext, field );
 	}
 
 	@Override

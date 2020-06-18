@@ -47,17 +47,17 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchAllPredicateBuilder matchAll() {
-		return new LuceneMatchAllPredicateBuilder( searchContext );
+		return new LuceneMatchAllPredicate.Builder( searchContext );
 	}
 
 	@Override
 	public MatchIdPredicateBuilder id() {
-		return new LuceneMatchIdPredicateBuilder( searchContext );
+		return new LuceneMatchIdPredicate.Builder( searchContext );
 	}
 
 	@Override
 	public BooleanPredicateBuilder bool() {
-		return new LuceneBooleanPredicateBuilder( searchContext );
+		return new LuceneBooleanPredicate.Builder( searchContext );
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public SimpleQueryStringPredicateBuilder simpleQueryString() {
-		return new LuceneSimpleQueryStringPredicateBuilder( searchContext, indexes );
+		return new LuceneSimpleQueryStringPredicate.Builder( searchContext, indexes );
 	}
 
 	@Override
@@ -117,11 +117,11 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
 		indexes.checkNestedField( absoluteFieldPath );
 		List<String> nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
-		return new LuceneNestedPredicateBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		return new LuceneNestedPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
-	public LuceneSearchPredicateBuilder fromLuceneQuery(Query query) {
-		return new LuceneUserProvidedLuceneQueryPredicateBuilder( searchContext, query );
+	public LuceneSearchPredicate fromLuceneQuery(Query query) {
+		return new LuceneUserProvidedLuceneQueryPredicate( searchContext, query );
 	}
 }

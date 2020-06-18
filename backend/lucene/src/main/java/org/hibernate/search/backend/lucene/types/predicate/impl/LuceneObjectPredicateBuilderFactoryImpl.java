@@ -52,15 +52,15 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	@Override
 	public ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext) {
-		LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder(
+		LuceneObjectExistsPredicate.Builder builder = new LuceneObjectExistsPredicate.Builder(
 				searchContext, absoluteFieldPath, nestedPathHierarchy
 		);
 		for ( Map.Entry<String, LuceneSearchFieldContext<?>> entry : leafFields.entrySet() ) {
 			ExistsPredicateBuilder existsPredicateBuilder =
 					entry.getValue().createExistsPredicateBuilder( searchContext );
-			objectPredicateBuilder.addChild( existsPredicateBuilder.build() );
+			builder.addChild( existsPredicateBuilder.build() );
 		}
-		return objectPredicateBuilder;
+		return builder;
 	}
 
 	private void addLeafFields(LuceneIndexSchemaObjectFieldNode objectNode) {

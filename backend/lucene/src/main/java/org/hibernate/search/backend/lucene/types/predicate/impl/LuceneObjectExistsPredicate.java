@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -20,18 +20,19 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
-public class LuceneExistsCompositePredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
-		implements ExistsPredicateBuilder {
+public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredicate {
 
-	private final List<LuceneSearchPredicate> children = new ArrayList<>();
+	private final List<LuceneSearchPredicate> children;
 
-	public LuceneExistsCompositePredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
-			List<String> nestedPathHierarchy) {
-		super( searchContext, absoluteFieldPath, nestedPathHierarchy );
+	private LuceneObjectExistsPredicate(Builder builder) {
+		super( builder );
+		children = builder.children;
+		// Ensure illegal attempts to mutate the predicate will fail
+		builder.children = null;
 	}
 
 	@Override
-	protected Query doBuild(PredicateRequestContext context) {
+	protected Query doToQuery(PredicateRequestContext context) {
 		// if exists at least one not-null field, exists on object field should match
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		for ( LuceneSearchPredicate child : children ) {
@@ -40,7 +41,21 @@ public class LuceneExistsCompositePredicateBuilder extends AbstractLuceneSingleF
 		return builder.build();
 	}
 
-	public void addChild(SearchPredicate child) {
-		children.add( LuceneSearchPredicate.from( searchContext, child ) );
+	public static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
+		private List<LuceneSearchPredicate> children = new ArrayList<>();
+
+		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
+				List<String> nestedPathHierarchy) {
+			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		}
+
+		public void addChild(SearchPredicate child) {
+			children.add( LuceneSearchPredicate.from( searchContext, child ) );
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new LuceneObjectExistsPredicate( this );
+		}
 	}
 }

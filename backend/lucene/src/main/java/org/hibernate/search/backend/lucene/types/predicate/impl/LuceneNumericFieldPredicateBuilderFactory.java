@@ -29,13 +29,13 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 	public MatchPredicateBuilder createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, field, codec );
+		return new LuceneNumericMatchPredicate.Builder<>( searchContext, field, codec );
 	}
 
 	@Override
-	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
+	public LuceneNumericRangePredicate.Builder<F, E> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneNumericRangePredicateBuilder<>( searchContext, field, codec );
+		return new LuceneNumericRangePredicate.Builder<>( searchContext, field, codec );
 	}
 }

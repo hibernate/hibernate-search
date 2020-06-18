@@ -16,41 +16,26 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
-public class LuceneSearchPredicate implements SearchPredicate {
+public interface LuceneSearchPredicate extends SearchPredicate {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	// TODO HSEARCH-3476 this is just a temporary hack:
-	//  we should move to one SearchPredicate implementation per type of predicate.
-	public static LuceneSearchPredicate of(LuceneSearchContext searchContext, LuceneSearchPredicateBuilder builder) {
-		return new LuceneSearchPredicate( searchContext.indexes().indexNames(), builder );
-	}
+	Set<String> indexNames();
 
-	public static LuceneSearchPredicate from(LuceneSearchContext searchContext, SearchPredicate predicate) {
+	void checkNestableWithin(String expectedParentNestedPath);
+
+	Query toQuery(PredicateRequestContext context);
+
+	static LuceneSearchPredicate from(LuceneSearchContext searchContext, SearchPredicate predicate) {
 		if ( !( predicate instanceof LuceneSearchPredicate ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
 		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
-		if ( !searchContext.indexes().indexNames().equals( casted.indexNames ) ) {
-			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames, searchContext.indexes().indexNames() );
+		if ( !searchContext.indexes().indexNames().equals( casted.indexNames() ) ) {
+			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
+					searchContext.indexes().indexNames() );
 		}
 		return casted;
-	}
-
-	private final Set<String> indexNames;
-	private final LuceneSearchPredicateBuilder delegate;
-
-	private LuceneSearchPredicate(Set<String> indexNames, LuceneSearchPredicateBuilder delegate) {
-		this.indexNames = indexNames;
-		this.delegate = delegate;
-	}
-
-	public void checkNestableWithin(String expectedParentNestedPath) {
-		delegate.checkNestableWithin( expectedParentNestedPath );
-	}
-
-	public Query toQuery(PredicateRequestContext context) {
-		return delegate.toQuery( context );
 	}
 
 }

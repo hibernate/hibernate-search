@@ -49,21 +49,21 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( searchContext, field );
+		return new LuceneGeoPointSpatialWithinCirclePredicate.Builder( searchContext, field );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( searchContext, field );
+		return new LuceneGeoPointSpatialWithinPolygonPredicate.Builder( searchContext, field );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
 			LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( searchContext, field );
+		return new LuceneGeoPointSpatialWithinBoundingBoxPredicate.Builder( searchContext, field );
 	}
 
 	@Override
