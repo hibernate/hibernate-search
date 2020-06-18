@@ -11,11 +11,11 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchUserProvidedJsonSortBuilder extends AbstractElasticsearchSortBuilder {
+class ElasticsearchUserProvidedJsonSort extends AbstractElasticsearchSort {
 
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonSortBuilder(ElasticsearchSearchContext searchContext, JsonObject json) {
+	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchContext searchContext, JsonObject json) {
 		super( searchContext );
 		this.json = json;
 	}

@@ -7,19 +7,19 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchScoreSortBuilder extends AbstractElasticsearchReversibleSortBuilder
-		implements ScoreSortBuilder {
+class ElasticsearchScoreSort extends AbstractElasticsearchReversibleSort {
 
 	private static final String SCORE_SORT_KEYWORD = "_score";
 	private static final JsonPrimitive SCORE_SORT_KEYWORD_JSON = new JsonPrimitive( SCORE_SORT_KEYWORD );
 
-	ElasticsearchScoreSortBuilder(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	ElasticsearchScoreSort(Builder builder) {
+		super( builder );
 	}
 
 	@Override
@@ -31,6 +31,18 @@ class ElasticsearchScoreSortBuilder extends AbstractElasticsearchReversibleSortB
 			JsonObject outerObject = new JsonObject();
 			outerObject.add( SCORE_SORT_KEYWORD, innerObject );
 			collector.collectSort( outerObject );
+		}
+	}
+
+	static class Builder extends AbstractBuilder implements ScoreSortBuilder {
+
+		Builder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public SearchSort build() {
+			return new ElasticsearchScoreSort( this );
 		}
 	}
 }

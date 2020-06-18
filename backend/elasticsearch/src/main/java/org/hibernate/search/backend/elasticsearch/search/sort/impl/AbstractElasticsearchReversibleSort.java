@@ -14,20 +14,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public abstract class AbstractElasticsearchReversibleSortBuilder extends AbstractElasticsearchSortBuilder {
+public abstract class AbstractElasticsearchReversibleSort extends AbstractElasticsearchSort {
 
 	private static final JsonAccessor<JsonElement> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
 	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
 
-	private SortOrder order;
+	private final SortOrder order;
 
-	protected AbstractElasticsearchReversibleSortBuilder(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
-	}
-
-	public void order(SortOrder order) {
-		this.order = order;
+	protected AbstractElasticsearchReversibleSort(AbstractBuilder builder) {
+		super( builder );
+		order = builder.order;
 	}
 
 	@Override
@@ -53,4 +50,17 @@ public abstract class AbstractElasticsearchReversibleSortBuilder extends Abstrac
 
 	protected abstract void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject);
 
+	public abstract static class AbstractBuilder extends AbstractElasticsearchSort.AbstractBuilder {
+
+		private SortOrder order;
+
+		protected AbstractBuilder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		public void order(SortOrder order) {
+			this.order = order;
+		}
+
+	}
 }

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSort;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -41,7 +41,7 @@ public class ElasticsearchSearchSortFactoryImpl
 		return staticThenStep( dslContext.builderFactory().fromJson( jsonString ) );
 	}
 
-	private SortThenStep staticThenStep(ElasticsearchSearchSortBuilder builder) {
-		return new StaticSortThenStep( dslContext, builder.build() );
+	private SortThenStep staticThenStep(ElasticsearchSearchSort sort) {
+		return new StaticSortThenStep( dslContext, sort );
 	}
 }

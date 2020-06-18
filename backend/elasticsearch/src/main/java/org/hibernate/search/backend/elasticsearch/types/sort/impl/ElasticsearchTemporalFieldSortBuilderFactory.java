@@ -25,6 +25,6 @@ public class ElasticsearchTemporalFieldSortBuilderFactory<F extends TemporalAcce
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		checkSortable( field );
 
-		return new ElasticsearchTemporalFieldSortBuilder<>( searchContext, field, codec );
+		return new ElasticsearchStandardFieldSort.TemporalFieldBuilder<>( searchContext, field, codec );
 	}
 }

@@ -16,14 +16,14 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchDocumentValueSortBuilder<GeoPoint>
-		implements DistanceSortBuilder {
+public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValueSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -31,33 +31,47 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchDocum
 
 	private final GeoPoint center;
 
-	public ElasticsearchDistanceSortBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
-		super( searchContext, field );
-		this.center = center;
-	}
-
-	@Override
-	public void mode(SortMode mode) {
-		switch ( mode ) {
-			case MIN:
-			case MAX:
-			case AVG:
-			case MEDIAN:
-				super.mode( mode );
-				break;
-			case SUM:
-			default:
-				throw log.cannotComputeSumForDistanceSort( field.eventContext() );
-		}
+	public ElasticsearchDistanceSort(Builder builder) {
+		super( builder );
+		center = builder.center;
 	}
 
 	@Override
 	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
-		innerObject.add( field.absolutePath(), ElasticsearchGeoPointFieldCodec.INSTANCE.encode( center ) );
+		innerObject.add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( center ) );
 
 		JsonObject outerObject = new JsonObject();
 		GEO_DISTANCE_ACCESSOR.add( outerObject, innerObject );
-		collector.collectDistanceSort( outerObject, field.absolutePath(), center );
+		collector.collectDistanceSort( outerObject, absoluteFieldPath, center );
+	}
+
+	public static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
+		private final GeoPoint center;
+
+		public Builder(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
+			super( searchContext, field );
+			this.center = center;
+		}
+
+		@Override
+		public void mode(SortMode mode) {
+			switch ( mode ) {
+				case MIN:
+				case MAX:
+				case AVG:
+				case MEDIAN:
+					super.mode( mode );
+					break;
+				case SUM:
+				default:
+					throw log.cannotComputeSumForDistanceSort( field.eventContext() );
+			}
+		}
+
+		@Override
+		public SearchSort build() {
+			return new ElasticsearchDistanceSort( this );
+		}
 	}
 }
