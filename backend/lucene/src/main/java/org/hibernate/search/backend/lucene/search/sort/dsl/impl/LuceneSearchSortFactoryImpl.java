@@ -24,10 +24,10 @@ public class LuceneSearchSortFactoryImpl
 		extends DelegatingSearchSortFactory<LuceneSearchPredicateFactory>
 		implements LuceneSearchSortFactory {
 
-	private final SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder, ?> dslContext;
+	private final SearchSortDslContext<LuceneSearchSortBuilderFactory, ?> dslContext;
 
 	public LuceneSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder, LuceneSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
@@ -43,6 +43,6 @@ public class LuceneSearchSortFactoryImpl
 	}
 
 	private SortThenStep staticThenStep(LuceneSearchSortBuilder builder) {
-		return new StaticSortThenStep<>( dslContext, builder );
+		return new StaticSortThenStep( dslContext, builder.build() );
 	}
 }

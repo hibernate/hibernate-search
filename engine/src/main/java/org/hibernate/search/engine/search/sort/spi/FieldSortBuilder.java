@@ -9,8 +9,11 @@ package org.hibernate.search.engine.search.sort.spi;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
-public interface FieldSortBuilder<B> extends SearchSortBuilder<B> {
+public interface FieldSortBuilder extends SearchSortBuilder {
+
+	void order(SortOrder order);
 
 	void missingFirst();
 

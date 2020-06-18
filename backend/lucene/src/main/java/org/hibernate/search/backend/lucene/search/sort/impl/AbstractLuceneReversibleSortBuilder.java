@@ -6,20 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
-public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuilder<LuceneSearchSortBuilder>,
-		LuceneSearchSortBuilder {
+public abstract class AbstractLuceneReversibleSortBuilder extends AbstractLuceneSortBuilder {
 
 	protected SortOrder order;
 
-	@Override
-	public LuceneSearchSortBuilder toImplementation() {
-		return this;
+	protected AbstractLuceneReversibleSortBuilder(LuceneSearchContext searchContext) {
+		super( searchContext );
 	}
 
-	@Override
 	public void order(SortOrder order) {
 		this.order = order;
 	}

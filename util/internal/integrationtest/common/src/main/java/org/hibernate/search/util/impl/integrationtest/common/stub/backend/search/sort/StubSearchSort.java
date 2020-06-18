@@ -6,19 +6,15 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.sort.SearchSort;
 
-public class StubSearchSort extends StubSortBuilder implements SearchSort {
-	private final List<StubSortBuilder> builders;
+public class StubSearchSort implements SearchSort {
 
-	StubSearchSort(List<StubSortBuilder> builders) {
-		this.builders = builders;
+	public static StubSearchSort from(SearchSort sort) {
+		return (StubSearchSort) sort;
 	}
 
-	@Override
 	void simulateBuild() {
-		builders.forEach( StubSortBuilder::simulateBuild );
+		// No-op, just simulates a call on this object
 	}
 }

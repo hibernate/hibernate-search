@@ -28,7 +28,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.sort.dsl.impl.LuceneSearchSortFactoryImpl;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -168,11 +167,11 @@ public final class LuceneExtension<H, R, E, LOS>
 	@Override
 	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchSortBuilderFactory, the cast is safe
 	public Optional<LuceneSearchSortFactory> extendOptional(
-			SearchSortFactory original, SearchSortDslContext<?, ?, ?> dslContext) {
+			SearchSortFactory original, SearchSortDslContext<?, ?> dslContext) {
 		if ( dslContext.builderFactory() instanceof LuceneSearchSortBuilderFactory ) {
 			return Optional.of( new LuceneSearchSortFactoryImpl(
 					original,
-					((SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder, ?>) dslContext)
+					((SearchSortDslContext<LuceneSearchSortBuilderFactory, ?>) dslContext)
 							.withExtendedPredicateFactory( this )
 			) );
 		}

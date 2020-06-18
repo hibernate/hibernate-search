@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
@@ -23,17 +24,17 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfS
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DefaultSearchSortFactory<B> implements SearchSortFactory {
+public class DefaultSearchSortFactory implements SearchSortFactory {
 
-	private final SearchSortDslContext<?, B, ?> dslContext;
+	private final SearchSortDslContext<?, ?> dslContext;
 
-	public DefaultSearchSortFactory(SearchSortDslContext<?, B, ?> dslContext) {
+	public DefaultSearchSortFactory(SearchSortDslContext<?, ?> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public ScoreSortOptionsStep<?> score() {
-		return new ScoreSortOptionsStepImpl<>( dslContext );
+		return new ScoreSortOptionsStepImpl( dslContext );
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 
 	@Override
 	public CompositeSortComponentsStep<?> composite() {
-		return new CompositeSortComponentsStepImpl<>( dslContext );
+		return new CompositeSortComponentsStepImpl( dslContext );
 	}
 
 	@Override
@@ -74,11 +75,11 @@ public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 
 	@Override
 	public SearchSortFactoryExtensionIfSupportedStep extension() {
-		return new SearchSortFactoryExtensionStep<>( this, dslContext );
+		return new SearchSortFactoryExtensionStep( this, dslContext );
 	}
 
-	private SortThenStep staticThenStep(B builder) {
-		return new StaticSortThenStep<>( dslContext, builder );
+	private SortThenStep staticThenStep(SearchSort sort) {
+		return new StaticSortThenStep( dslContext, sort );
 	}
 
 }

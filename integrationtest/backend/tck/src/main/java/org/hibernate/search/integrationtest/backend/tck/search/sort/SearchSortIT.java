@@ -390,7 +390,7 @@ public class SearchSortIT {
 	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?, ?> dslContext) {
+				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			Assertions.assertThat( dslContext.builderFactory() ).isNotNull();
@@ -401,7 +401,7 @@ public class SearchSortIT {
 	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?, ?> dslContext) {
+				SearchSortDslContext<?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			Assertions.assertThat( dslContext.builderFactory() ).isNotNull();
@@ -410,7 +410,7 @@ public class SearchSortIT {
 	}
 
 	private static class MyExtendedFactory extends DelegatingSearchSortFactory<SearchPredicateFactory> {
-		MyExtendedFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?, ?> dslContext) {
+		MyExtendedFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?> dslContext) {
 			super( delegate, dslContext );
 		}
 	}

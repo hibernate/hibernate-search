@@ -30,9 +30,9 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public class DelegatingSearchSortFactory<PDF extends SearchPredicateFactory> implements ExtendedSearchSortFactory<PDF> {
 
 	private final SearchSortFactory delegate;
-	private final SearchSortDslContext<?, ?, ? extends PDF> dslContext;
+	private final SearchSortDslContext<?, ? extends PDF> dslContext;
 
-	public DelegatingSearchSortFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?, ? extends PDF> dslContext) {
+	public DelegatingSearchSortFactory(SearchSortFactory delegate, SearchSortDslContext<?, ? extends PDF> dslContext) {
 		this.delegate = delegate;
 		this.dslContext = dslContext;
 	}

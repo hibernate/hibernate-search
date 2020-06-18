@@ -21,7 +21,7 @@ public interface IndexScope<C> {
 
 	SearchPredicateBuilderFactory<? super C> searchPredicateBuilderFactory();
 
-	SearchSortBuilderFactory<? super C, ?> searchSortBuilderFactory();
+	SearchSortBuilderFactory<? super C> searchSortBuilderFactory();
 
 	SearchQueryBuilderFactory<C> searchQueryBuilderFactory();
 

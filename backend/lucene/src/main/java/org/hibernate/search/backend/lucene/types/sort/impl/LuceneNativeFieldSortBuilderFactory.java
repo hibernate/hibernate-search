@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -33,13 +32,13 @@ public class LuceneNativeFieldSortBuilderFactory<F> implements LuceneFieldSortBu
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext,
+	public FieldSortBuilder createFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		throw unsupported( field );
 	}
 
 	@Override
-	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+	public DistanceSortBuilder createDistanceSortBuilder(
 			LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field,
 			GeoPoint center) {

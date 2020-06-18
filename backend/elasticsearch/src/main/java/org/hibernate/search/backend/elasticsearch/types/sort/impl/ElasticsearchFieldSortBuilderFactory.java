@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -36,10 +35,10 @@ public interface ElasticsearchFieldSortBuilderFactory<F> {
 
 	boolean isCompatibleWith(ElasticsearchFieldSortBuilderFactory<?> other);
 
-	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(ElasticsearchSearchContext searchContext,
+	FieldSortBuilder createFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field);
 
-	DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
+	DistanceSortBuilder createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field, GeoPoint center);
 
 }

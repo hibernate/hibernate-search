@@ -8,12 +8,8 @@ package org.hibernate.search.engine.search.sort.spi;
 
 import org.hibernate.search.engine.search.sort.SearchSort;
 
-/**
- * A search sort builder, i.e. an object responsible for collecting parameters
- * and then building a search sort.
- */
-public interface SearchSortBuilder {
+public interface CompositeSortBuilder extends SearchSortBuilder {
 
-	SearchSort build();
+	void add(SearchSort sort);
 
 }

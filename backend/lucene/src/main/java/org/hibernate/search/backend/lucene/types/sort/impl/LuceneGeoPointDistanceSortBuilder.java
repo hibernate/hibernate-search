@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -23,7 +22,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.search.SortField;
 
 public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneDocumentValueSortBuilder
-		implements DistanceSortBuilder<LuceneSearchSortBuilder> {
+		implements DistanceSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -51,7 +50,7 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneDocumentVal
 	}
 
 	@Override
-	public void buildAndContribute(LuceneSearchSortCollector collector) {
+	public void toSortFields(LuceneSearchSortCollector collector) {
 		LuceneGeoPointDistanceComparatorSource fieldComparatorSource = new LuceneGeoPointDistanceComparatorSource(
 				nestedDocumentPath, location, getMultiValueMode(), getNestedFilter() );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );

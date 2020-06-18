@@ -28,7 +28,6 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.impl.Elas
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl.ElasticsearchSearchSortFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -168,11 +167,11 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	@Override
 	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchSortBuilderFactory, the cast is safe
 	public Optional<ElasticsearchSearchSortFactory> extendOptional(
-			SearchSortFactory original, SearchSortDslContext<?, ?, ?> dslContext) {
+			SearchSortFactory original, SearchSortDslContext<?, ?> dslContext) {
 		if ( dslContext.builderFactory() instanceof ElasticsearchSearchSortBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchSortFactoryImpl(
 					original,
-					((SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ?>) dslContext)
+					((SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ?>) dslContext)
 							.withExtendedPredicateFactory( this )
 			) );
 		}

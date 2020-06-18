@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -86,12 +85,12 @@ public interface ElasticsearchSearchFieldContext<F> {
 
 	// Sorts
 
-	default FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
+	default FieldSortBuilder createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext) {
 		return type().sortBuilderFactory().createFieldSortBuilder( searchContext, this );
 	}
 
-	default DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(
+	default DistanceSortBuilder createDistanceSortBuilder(
 			ElasticsearchSearchContext searchContext, GeoPoint center) {
 		return type().sortBuilderFactory().createDistanceSortBuilder( searchContext, this, center );
 	}

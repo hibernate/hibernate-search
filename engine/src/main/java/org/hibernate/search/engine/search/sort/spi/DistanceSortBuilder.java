@@ -8,8 +8,11 @@ package org.hibernate.search.engine.search.sort.spi;
 
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
-public interface DistanceSortBuilder<B> extends SearchSortBuilder<B> {
+public interface DistanceSortBuilder extends SearchSortBuilder {
+
+	void order(SortOrder order);
 
 	void mode(SortMode mode);
 

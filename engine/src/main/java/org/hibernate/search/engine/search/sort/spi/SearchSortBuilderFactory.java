@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.SearchException;
 
 /**
  * A factory for search sort builders.
@@ -19,50 +16,26 @@ import org.hibernate.search.util.common.SearchException;
  * to ask the backend to build search sorts.
  *
  * @param <C> The type of query element collector
- * @param <B> The implementation type of builders
- * This type is backend-specific. See {@link SearchSortBuilder#toImplementation()}
  */
-public interface SearchSortBuilderFactory<C, B> {
-
-	/**
-	 * Convert sort builders to a reusable {@link SearchSort} object.
-	 * <p>
-	 * Implementations may decide to just wrap the builders if they are reusable,
-	 * or to convert them to another representation if they are not reusable.
-	 *
-	 * @param builders The sort builder implementations.
-	 * @return The corresponding reusable {@link SearchSort} object.
-	 */
-	SearchSort toSearchSort(List<B> builders);
-
-	/**
-	 * Convert a {@link SearchSort} object back to a sequence of sort builders.
-	 * <p>
-	 * May be called multiple times for a given {@link SearchSort} object.
-	 *
-	 * @param sort The {@link SearchSort} object to convert.
-	 * @return The (potentially composite) sort builder implementation.
-	 * @throws SearchException If the {@link SearchSort} object was created
-	 * by a different, incompatible factory.
-	 */
-	B toImplementation(SearchSort sort);
+public interface SearchSortBuilderFactory<C> {
 
 	/**
 	 * Contribute a sort builder to a collector.
 	 * <p>
 	 * May be called multiple times per collector, if there are multiple sorts.
-	 *
-	 * @param collector The query element collector.
-	 * @param builder The sort builder implementation.
+	 *  @param collector The query element collector.
+	 * @param sort The sort builder implementation.
 	 */
-	void contribute(C collector, B builder);
+	void contribute(C collector, SearchSort sort);
 
-	ScoreSortBuilder<B> score();
+	ScoreSortBuilder score();
 
-	FieldSortBuilder<B> field(String absoluteFieldPath);
+	FieldSortBuilder field(String absoluteFieldPath);
 
-	DistanceSortBuilder<B> distance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortBuilder distance(String absoluteFieldPath, GeoPoint location);
 
-	B indexOrder();
+	SearchSort indexOrder();
+
+	CompositeSortBuilder composite();
 
 }

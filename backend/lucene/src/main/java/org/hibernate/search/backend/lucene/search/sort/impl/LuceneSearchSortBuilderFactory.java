@@ -12,7 +12,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 public interface LuceneSearchSortBuilderFactory
-		extends SearchSortBuilderFactory<LuceneSearchSortCollector, LuceneSearchSortBuilder> {
+		extends SearchSortBuilderFactory<LuceneSearchSortCollector> {
 
 	LuceneSearchSortBuilder fromLuceneSortField(SortField luceneSortField);
 

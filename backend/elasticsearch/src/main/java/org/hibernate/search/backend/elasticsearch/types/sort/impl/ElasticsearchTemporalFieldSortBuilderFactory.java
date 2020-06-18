@@ -10,7 +10,6 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
@@ -22,7 +21,7 @@ public class ElasticsearchTemporalFieldSortBuilderFactory<F extends TemporalAcce
 	}
 
 	@Override
-	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
+	public FieldSortBuilder createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		checkSortable( field );
 

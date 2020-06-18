@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.sort.dsl.impl;
 
 import java.util.function.Function;
+
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortMissingValueBehaviorStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
@@ -19,39 +21,39 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-public class FieldSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
-		extends AbstractSortThenStep<B>
-		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B, PDF>, PDF>,
-				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B, PDF>> {
+public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
+		extends AbstractSortThenStep
+		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<PDF>, PDF>,
+				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<PDF>> {
 
-	private final SearchSortDslContext<?, B, ? extends PDF> dslContext;
-	private final FieldSortBuilder<B> builder;
+	private final SearchSortDslContext<?, ? extends PDF> dslContext;
+	private final FieldSortBuilder builder;
 
-	public FieldSortOptionsStepImpl(SearchSortDslContext<?, B, ? extends PDF> dslContext, String absoluteFieldPath) {
+	public FieldSortOptionsStepImpl(SearchSortDslContext<?, ? extends PDF> dslContext, String absoluteFieldPath) {
 		super( dslContext );
 		this.dslContext = dslContext;
 		this.builder = dslContext.builderFactory().field( absoluteFieldPath );
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> order(SortOrder order) {
+	public FieldSortOptionsStepImpl<PDF> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> mode(SortMode mode) {
+	public FieldSortOptionsStepImpl<PDF> mode(SortMode mode) {
 		builder.mode( mode );
 		return this;
 	}
 
 	@Override
-	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B, PDF>> missing() {
+	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<PDF>> missing() {
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> filter(
+	public FieldSortOptionsStepImpl<PDF> filter(
 			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
 		SearchPredicate predicate = clauseContributor.apply( dslContext.predicateFactory() ).toPredicate();
 
@@ -59,32 +61,32 @@ public class FieldSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> filter(SearchPredicate searchPredicate) {
+	public FieldSortOptionsStepImpl<PDF> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> first() {
+	public FieldSortOptionsStepImpl<PDF> first() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> last() {
+	public FieldSortOptionsStepImpl<PDF> last() {
 		builder.missingLast();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B, PDF> use(Object value, ValueConvert convert) {
+	public FieldSortOptionsStepImpl<PDF> use(Object value, ValueConvert convert) {
 		builder.missingAs( value, convert );
 		return this;
 	}
 
 	@Override
-	protected B toImplementation() {
-		return builder.toImplementation();
+	protected SearchSort build() {
+		return builder.build();
 	}
 
 }

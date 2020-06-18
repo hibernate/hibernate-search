@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -37,10 +36,10 @@ public interface LuceneFieldSortBuilderFactory<F> {
 
 	boolean isCompatibleWith(LuceneFieldSortBuilderFactory<?> other);
 
-	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext,
+	FieldSortBuilder createFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field);
 
-	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(
+	DistanceSortBuilder createDistanceSortBuilder(
 			LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field,
 			GeoPoint center);

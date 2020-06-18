@@ -6,52 +6,46 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
-import java.util.List;
-
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
 public class StubSearchSortBuilderFactory
-		implements SearchSortBuilderFactory<StubQueryElementCollector, StubSortBuilder> {
+		implements SearchSortBuilderFactory<StubQueryElementCollector> {
 
 	@Override
-	public SearchSort toSearchSort(List<StubSortBuilder> builders) {
-		return new StubSearchSort( builders );
-	}
-
-	@Override
-	public StubSortBuilder toImplementation(SearchSort sort) {
-		return (StubSearchSort) sort;
-	}
-
-	@Override
-	public void contribute(StubQueryElementCollector collector, StubSortBuilder builder) {
-		builder.simulateBuild();
+	public void contribute(StubQueryElementCollector collector, SearchSort sort) {
+		( (StubSearchSort) sort ).simulateBuild();
 		collector.simulateCollectCall();
 	}
 
 	@Override
-	public ScoreSortBuilder<StubSortBuilder> score() {
+	public ScoreSortBuilder score() {
 		return new StubSortBuilder();
 	}
 
 	@Override
-	public FieldSortBuilder<StubSortBuilder> field(String absoluteFieldPath) {
+	public FieldSortBuilder field(String absoluteFieldPath) {
 		return new StubSortBuilder();
 	}
 
 	@Override
-	public StubSortBuilder indexOrder() {
+	public SearchSort indexOrder() {
+		return new StubSearchSort();
+	}
+
+	@Override
+	public DistanceSortBuilder distance(String absoluteFieldPath, GeoPoint location) {
 		return new StubSortBuilder();
 	}
 
 	@Override
-	public DistanceSortBuilder<StubSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
+	public CompositeSortBuilder composite() {
 		return new StubSortBuilder();
 	}
 }

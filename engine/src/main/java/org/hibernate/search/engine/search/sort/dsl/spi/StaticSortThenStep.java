@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.spi;
 
-public final class StaticSortThenStep<B> extends AbstractSortThenStep<B> {
-	final B builder;
+import org.hibernate.search.engine.search.sort.SearchSort;
 
-	public StaticSortThenStep(SearchSortDslContext<?, B, ?> parentDslContext,
-			B builder) {
+public final class StaticSortThenStep extends AbstractSortThenStep {
+	final SearchSort sort;
+
+	public StaticSortThenStep(SearchSortDslContext<?, ?> parentDslContext, SearchSort sort) {
 		super( parentDslContext );
-		this.builder = builder;
+		this.sort = sort;
 	}
 
 	@Override
-	protected B toImplementation() {
-		return builder;
+	protected SearchSort build() {
+		return sort;
 	}
 }

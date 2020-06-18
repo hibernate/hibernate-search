@@ -6,29 +6,43 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class ElasticsearchSearchSort implements SearchSort, ElasticsearchSearchSortBuilder {
+class ElasticsearchSearchSort implements SearchSort {
 
-	private final List<ElasticsearchSearchSortBuilder> delegates;
-	private final Set<String> indexNames;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	ElasticsearchSearchSort(List<ElasticsearchSearchSortBuilder> delegates, Set<String> indexName) {
-		this.delegates = delegates;
-		this.indexNames = indexName;
+	public static SearchSort of(ElasticsearchSearchContext searchContext, ElasticsearchSearchSortBuilder builder) {
+		return new ElasticsearchSearchSort( searchContext.indexes().hibernateSearchIndexNames(), builder );
 	}
 
-	@Override
-	public void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		for ( ElasticsearchSearchSortBuilder delegate : delegates ) {
-			delegate.buildAndAddTo( collector );
+	public static ElasticsearchSearchSort from(ElasticsearchSearchContext searchContext, SearchSort sort) {
+		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
+			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
+		ElasticsearchSearchSort casted = (ElasticsearchSearchSort) sort;
+		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames,
+					searchContext.indexes().hibernateSearchIndexNames() );
+		}
+		return casted;
 	}
 
-	public Set<String> getIndexNames() {
-		return indexNames;
+	private final Set<String> indexNames;
+	private final ElasticsearchSearchSortBuilder builder;
+
+	private ElasticsearchSearchSort(Set<String> indexName, ElasticsearchSearchSortBuilder builder) {
+		this.indexNames = indexName;
+		this.builder = builder;
+	}
+
+	public void toJsonSorts(ElasticsearchSearchSortCollector collector) {
+		builder.toJsonSorts( collector );
 	}
 }
