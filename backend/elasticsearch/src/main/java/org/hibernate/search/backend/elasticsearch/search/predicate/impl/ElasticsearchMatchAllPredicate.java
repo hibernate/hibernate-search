@@ -9,18 +9,18 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
-		implements MatchAllPredicateBuilder {
+class ElasticsearchMatchAllPredicate extends AbstractElasticsearchPredicate {
 
 	private static final JsonObjectAccessor MATCH_ALL_ACCESSOR = JsonAccessor.root().property( "match_all" ).asObject();
 
-	ElasticsearchMatchAllPredicateBuilder(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	private ElasticsearchMatchAllPredicate(Builder builder) {
+		super( builder );
 	}
 
 	@Override
@@ -29,10 +29,20 @@ class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchP
 	}
 
 	@Override
-	protected JsonObject doBuild(PredicateRequestContext context,
+	protected JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		MATCH_ALL_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 
+	static class Builder extends AbstractElasticsearchPredicate.AbstractBuilder implements MatchAllPredicateBuilder {
+		Builder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new ElasticsearchMatchAllPredicate( this );
+		}
+	}
 }

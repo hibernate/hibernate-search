@@ -29,21 +29,21 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	public MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<String> field) {
 		checkSearchable( field );
-		return new ElasticsearchTextMatchPredicateBuilder( searchContext, field, codec, type );
+		return new ElasticsearchTextMatchPredicate.Builder( searchContext, field, codec, type );
 	}
 
 	@Override
 	public PhrasePredicateBuilder createPhrasePredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<String> field) {
 		checkSearchable( field );
-		return new ElasticsearchTextPhrasePredicateBuilder( searchContext, field );
+		return new ElasticsearchTextPhrasePredicate.Builder( searchContext, field );
 	}
 
 	@Override
 	public WildcardPredicateBuilder createWildcardPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<String> field) {
 		checkSearchable( field );
-		return new ElasticsearchTextWildcardPredicateBuilder( searchContext, field );
+		return new ElasticsearchTextWildcardPredicate.Builder( searchContext, field );
 	}
 
 	@Override

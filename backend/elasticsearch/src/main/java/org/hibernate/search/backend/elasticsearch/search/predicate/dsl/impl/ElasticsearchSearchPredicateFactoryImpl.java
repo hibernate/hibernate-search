@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinalStep;
 
 import com.google.gson.JsonObject;
 
@@ -29,11 +30,11 @@ public class ElasticsearchSearchPredicateFactoryImpl
 
 	@Override
 	public PredicateFinalStep fromJson(String jsonString) {
-		return new ElasticsearchJsonPredicateFinalStep( factory, jsonString );
+		return new StaticPredicateFinalStep( factory.fromJson( jsonString ) );
 	}
 
 	@Override
 	public PredicateFinalStep fromJson(JsonObject jsonObject) {
-		return new ElasticsearchJsonPredicateFinalStep( factory, jsonObject );
+		return new StaticPredicateFinalStep( factory.fromJson( jsonObject ) );
 	}
 }

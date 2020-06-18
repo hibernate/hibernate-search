@@ -13,8 +13,8 @@ import com.google.gson.JsonObject;
 public interface ElasticsearchSearchPredicateBuilderFactory
 		extends SearchPredicateBuilderFactory<ElasticsearchSearchPredicateCollector> {
 
-	ElasticsearchSearchPredicateBuilder fromJson(JsonObject jsonObject);
+	ElasticsearchSearchPredicate fromJson(JsonObject jsonObject);
 
-	ElasticsearchSearchPredicateBuilder fromJson(String jsonString);
+	ElasticsearchSearchPredicate fromJson(String jsonString);
 
 }
