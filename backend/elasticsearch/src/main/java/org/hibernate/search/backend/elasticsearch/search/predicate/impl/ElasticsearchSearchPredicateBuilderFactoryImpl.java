@@ -46,17 +46,17 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchAllPredicateBuilder matchAll() {
-		return new ElasticsearchMatchAllPredicateBuilder( searchContext );
+		return new ElasticsearchMatchAllPredicate.Builder( searchContext );
 	}
 
 	@Override
 	public MatchIdPredicateBuilder id() {
-		return new ElasticsearchMatchIdPredicateBuilder( searchContext );
+		return new ElasticsearchMatchIdPredicate.Builder( searchContext );
 	}
 
 	@Override
 	public BooleanPredicateBuilder bool() {
-		return new ElasticsearchBooleanPredicateBuilder( searchContext );
+		return new ElasticsearchBooleanPredicate.Builder( searchContext );
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public SimpleQueryStringPredicateBuilder simpleQueryString() {
-		return new ElasticsearchSimpleQueryStringPredicateBuilder( searchContext );
+		return new ElasticsearchSimpleQueryStringPredicate.Builder( searchContext );
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			// We may be able to relax this constraint, but that would require more extensive testing
 			field.type().predicateBuilderFactory();
 		}
-		return new ElasticsearchExistsPredicateBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
@@ -122,16 +122,16 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
 		indexes.checkNestedField( absoluteFieldPath );
 		List<String> nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
-		return new ElasticsearchNestedPredicateBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		return new ElasticsearchNestedPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateBuilder fromJson(JsonObject jsonObject) {
-		return new ElasticsearchUserProvidedJsonPredicateBuilder( searchContext, jsonObject );
+	public ElasticsearchSearchPredicate fromJson(JsonObject jsonObject) {
+		return new ElasticsearchUserProvidedJsonPredicate( searchContext, jsonObject );
 	}
 
 	@Override
-	public ElasticsearchSearchPredicateBuilder fromJson(String jsonString) {
+	public ElasticsearchSearchPredicate fromJson(String jsonString) {
 		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 }

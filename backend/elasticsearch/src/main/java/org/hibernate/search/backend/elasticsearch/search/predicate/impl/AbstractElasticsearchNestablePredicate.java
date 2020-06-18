@@ -12,19 +12,18 @@ import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-public abstract class AbstractElasticsearchNestablePredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder {
+public abstract class AbstractElasticsearchNestablePredicate extends AbstractElasticsearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final JsonAccessor<String> PATH_ACCESSOR = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asObject();
 
-	AbstractElasticsearchNestablePredicateBuilder(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	AbstractElasticsearchNestablePredicate(AbstractElasticsearchPredicate.AbstractBuilder builder) {
+		super( builder );
 	}
 
 	@Override

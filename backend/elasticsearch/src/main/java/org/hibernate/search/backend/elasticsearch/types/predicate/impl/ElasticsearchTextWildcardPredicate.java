@@ -10,36 +10,31 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchTextWildcardPredicateBuilder extends AbstractElasticsearchSingleFieldPredicateBuilder
-		implements WildcardPredicateBuilder {
+public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonObjectAccessor WILDCARD_ACCESSOR = JsonAccessor.root().property( "wildcard" ).asObject();
 
 	private static final JsonAccessor<JsonElement> VALUE_ACCESSOR = JsonAccessor.root().property( "value" );
 
-	private JsonElement pattern;
+	private final JsonPrimitive pattern;
 
-	public ElasticsearchTextWildcardPredicateBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<String> field) {
-		super( searchContext, field );
+	public ElasticsearchTextWildcardPredicate(Builder builder) {
+		super( builder );
+		this.pattern = builder.pattern;
 	}
 
 	@Override
-	public void pattern(String pattern) {
-		this.pattern = new JsonPrimitive( pattern );
-	}
-
-	@Override
-	protected JsonObject doBuild(PredicateRequestContext context,
-			JsonObject outerObject, JsonObject innerObject) {
+	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
+			JsonObject innerObject) {
 		VALUE_ACCESSOR.set( innerObject, pattern );
 
 		JsonObject middleObject = new JsonObject();
@@ -49,4 +44,21 @@ public class ElasticsearchTextWildcardPredicateBuilder extends AbstractElasticse
 		return outerObject;
 	}
 
+	public static class Builder extends AbstractBuilder implements WildcardPredicateBuilder {
+		private JsonPrimitive pattern;
+
+		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field) {
+			super( searchContext, field );
+		}
+
+		@Override
+		public void pattern(String pattern) {
+			this.pattern = new JsonPrimitive( pattern );
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new ElasticsearchTextWildcardPredicate( this );
+		}
+	}
 }

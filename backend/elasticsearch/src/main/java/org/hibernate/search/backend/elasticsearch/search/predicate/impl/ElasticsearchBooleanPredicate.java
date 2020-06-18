@@ -23,9 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-
-class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
-		implements BooleanPredicateBuilder {
+class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,75 +35,26 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
 			JsonAccessor.root().property( "minimum_should_match" ).asString();
 
-	private List<ElasticsearchSearchPredicate> mustClauses;
-	private List<ElasticsearchSearchPredicate> mustNotClauses;
-	private List<ElasticsearchSearchPredicate> shouldClauses;
-	private List<ElasticsearchSearchPredicate> filterClauses;
+	private final List<ElasticsearchSearchPredicate> mustClauses;
+	private final List<ElasticsearchSearchPredicate> mustNotClauses;
+	private final List<ElasticsearchSearchPredicate> shouldClauses;
+	private final List<ElasticsearchSearchPredicate> filterClauses;
 
-	private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+	private final Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-	ElasticsearchBooleanPredicateBuilder(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
-	}
-
-	@Override
-	public void must(SearchPredicate clause) {
-		if ( mustClauses == null ) {
-			mustClauses = new ArrayList<>();
-		}
-		mustClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void mustNot(SearchPredicate clause) {
-		if ( mustNotClauses == null ) {
-			mustNotClauses = new ArrayList<>();
-		}
-		mustNotClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void should(SearchPredicate clause) {
-		if ( shouldClauses == null ) {
-			shouldClauses = new ArrayList<>();
-		}
-		shouldClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void filter(SearchPredicate clause) {
-		if ( filterClauses == null ) {
-			filterClauses = new ArrayList<>();
-		}
-		filterClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-		addMinimumShouldMatchConstraint(
-				ignoreConstraintCeiling,
-				new MinimumShouldMatchConstraint( matchingClausesNumber, null )
-		);
-	}
-
-	@Override
-	public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-		addMinimumShouldMatchConstraint(
-				ignoreConstraintCeiling,
-				new MinimumShouldMatchConstraint( null, matchingClausesPercent )
-		);
-	}
-
-	private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-			MinimumShouldMatchConstraint constraint) {
-		if ( minimumShouldMatchConstraints == null ) {
-			// We'll need to go through the data in ascending order, so use a TreeMap
-			minimumShouldMatchConstraints = new TreeMap<>();
-		}
-		Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
-		if ( previous != null ) {
-			throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
-		}
+	private ElasticsearchBooleanPredicate(Builder builder) {
+		super( builder );
+		mustClauses = builder.mustClauses;
+		mustNotClauses = builder.mustNotClauses;
+		shouldClauses = builder.shouldClauses;
+		filterClauses = builder.filterClauses;
+		minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
+		// Ensure illegal attempts to mutate the predicate will fail
+		builder.mustClauses = null;
+		builder.mustNotClauses = null;
+		builder.shouldClauses = null;
+		builder.filterClauses = null;
+		builder.minimumShouldMatchConstraints = null;
 	}
 
 	@Override
@@ -117,17 +66,12 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 	}
 
 	@Override
-	protected JsonObject doBuild(PredicateRequestContext context,
+	protected JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		contributeClauses( context, innerObject, MUST_ACCESSOR, mustClauses );
 		contributeClauses( context, innerObject, MUST_NOT_ACCESSOR, mustNotClauses );
 		contributeClauses( context, innerObject, SHOULD_ACCESSOR, shouldClauses );
 		contributeClauses( context, innerObject, FILTER_ACCESSOR, filterClauses );
-
-		// Forcing to the Lucene's defaults. See HSEARCH-3534
-		if ( minimumShouldMatchConstraints == null && hasAtLeastOneMustOrFilterPredicate() ) {
-			minimumShouldMatchNumber( 0, 0 );
-		}
 
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
@@ -139,10 +83,6 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 		outerObject.add( "bool", innerObject );
 
 		return outerObject;
-	}
-
-	private boolean hasAtLeastOneMustOrFilterPredicate() {
-		return mustClauses != null || filterClauses != null;
 	}
 
 	private void contributeClauses(PredicateRequestContext context, JsonObject innerObject,
@@ -195,6 +135,93 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 		return builder.toString();
 	}
 
+	static class Builder extends AbstractElasticsearchPredicate.AbstractBuilder implements BooleanPredicateBuilder {
+		private List<ElasticsearchSearchPredicate> mustClauses;
+		private List<ElasticsearchSearchPredicate> mustNotClauses;
+		private List<ElasticsearchSearchPredicate> shouldClauses;
+		private List<ElasticsearchSearchPredicate> filterClauses;
+
+		private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+
+		Builder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public void must(SearchPredicate clause) {
+			if ( mustClauses == null ) {
+				mustClauses = new ArrayList<>();
+			}
+			mustClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void mustNot(SearchPredicate clause) {
+			if ( mustNotClauses == null ) {
+				mustNotClauses = new ArrayList<>();
+			}
+			mustNotClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void should(SearchPredicate clause) {
+			if ( shouldClauses == null ) {
+				shouldClauses = new ArrayList<>();
+			}
+			shouldClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void filter(SearchPredicate clause) {
+			if ( filterClauses == null ) {
+				filterClauses = new ArrayList<>();
+			}
+			filterClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new MinimumShouldMatchConstraint( matchingClausesNumber, null )
+			);
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new MinimumShouldMatchConstraint( null, matchingClausesPercent )
+			);
+		}
+
+		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
+				MinimumShouldMatchConstraint constraint) {
+			if ( minimumShouldMatchConstraints == null ) {
+				// We'll need to go through the data in ascending order, so use a TreeMap
+				minimumShouldMatchConstraints = new TreeMap<>();
+			}
+			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
+			if ( previous != null ) {
+				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
+			}
+		}
+
+		@Override
+		public SearchPredicate build() {
+			// Forcing to Lucene's defaults. See HSEARCH-3534
+			if ( minimumShouldMatchConstraints == null && hasAtLeastOneMustOrFilterPredicate() ) {
+				minimumShouldMatchNumber( 0, 0 );
+			}
+
+			return new ElasticsearchBooleanPredicate( this );
+		}
+
+		private boolean hasAtLeastOneMustOrFilterPredicate() {
+			return mustClauses != null || filterClauses != null;
+		}
+	}
+
 	private static final class MinimumShouldMatchConstraint {
 		private final Integer matchingClausesNumber;
 		private final Integer matchingClausesPercent;
@@ -225,5 +252,4 @@ class ElasticsearchBooleanPredicateBuilder extends AbstractElasticsearchSearchPr
 			}
 		}
 	}
-
 }

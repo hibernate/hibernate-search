@@ -6,44 +6,31 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-
-public abstract class AbstractElasticsearchSearchPredicateBuilder
-		implements SearchPredicateBuilder,
-		ElasticsearchSearchPredicateBuilder {
+public abstract class AbstractElasticsearchPredicate implements ElasticsearchSearchPredicate {
 
 	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
-	protected final ElasticsearchSearchContext searchContext;
+	private final Set<String> indexNames;
+	private final Float boost;
+	private final boolean withConstantScore;
 
-	private Float boost;
-	private boolean withConstantScore = false;
-
-	AbstractElasticsearchSearchPredicateBuilder(ElasticsearchSearchContext searchContext) {
-		this.searchContext = searchContext;
+	protected AbstractElasticsearchPredicate(AbstractBuilder builder) {
+		indexNames = builder.searchContext.indexes().hibernateSearchIndexNames();
+		boost = builder.boost;
+		withConstantScore = builder.withConstantScore;
 	}
 
 	@Override
-	public void boost(float boost) {
-		this.boost = boost;
-	}
-
-	@Override
-	public void constantScore() {
-		this.withConstantScore = true;
-	}
-
-	@Override
-	public SearchPredicate build() {
-		// TODO HSEARCH-3476 this is just a temporary hack:
-		//  we should move to one SearchPredicate implementation per type of predicate.
-		return ElasticsearchSearchPredicate.of( searchContext, this );
+	public Set<String> indexNames() {
+		return indexNames;
 	}
 
 	@Override
@@ -56,11 +43,11 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 			BOOST_ACCESSOR.set( innerObject, boost );
 		}
 
-		JsonObject result = doBuild( context, outerObject, innerObject );
+		JsonObject result = doToJsonQuery( context, outerObject, innerObject );
 		return ( withConstantScore ) ? applyConstantScore( result ) : result;
 	}
 
-	protected abstract JsonObject doBuild(PredicateRequestContext context,
+	protected abstract JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject);
 
 	private JsonObject applyConstantScore(JsonObject filter) {
@@ -74,5 +61,27 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 		result.add( "constant_score", constantScore );
 
 		return result;
+	}
+
+	protected abstract static class AbstractBuilder implements SearchPredicateBuilder {
+		protected final ElasticsearchSearchContext searchContext;
+
+		private Float boost;
+		private boolean withConstantScore = false;
+
+		AbstractBuilder(ElasticsearchSearchContext searchContext) {
+			this.searchContext = searchContext;
+		}
+
+		@Override
+		public void boost(float boost) {
+			this.boost = boost;
+		}
+
+		@Override
+		public void constantScore() {
+			this.withConstantScore = true;
+		}
+
 	}
 }

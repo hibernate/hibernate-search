@@ -45,20 +45,20 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	public SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( searchContext, field, codec );
+		return new ElasticsearchGeoPointSpatialWithinCirclePredicate.Builder( searchContext, field, codec );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( searchContext, field );
+		return new ElasticsearchGeoPointSpatialWithinPolygonPredicate.Builder( searchContext, field );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 		checkSearchable( field );
-		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( searchContext, field, codec );
+		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate.Builder( searchContext, field, codec );
 	}
 }
