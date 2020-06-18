@@ -13,9 +13,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -28,26 +26,16 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
-class LuceneTextPhrasePredicate extends AbstractLuceneSingleFieldPredicate {
+class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Query query;
-
 	private LuceneTextPhrasePredicate(Builder builder) {
 		super( builder );
-		query = builder.buildQuery();
 	}
 
-	@Override
-	protected Query doToQuery(PredicateRequestContext context) {
-		return query;
-	}
-
-	static class Builder extends AbstractBuilder implements PhrasePredicateBuilder {
-		protected final LuceneTextFieldCodec<?> codec;
-
-		private final LuceneSearchFieldContext<?> field;
+	static class Builder<F> extends AbstractBuilder<F>
+			implements PhrasePredicateBuilder {
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 		private int slop;
@@ -55,11 +43,8 @@ class LuceneTextPhrasePredicate extends AbstractLuceneSingleFieldPredicate {
 
 		private Analyzer overrideAnalyzer;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field,
-				LuceneTextFieldCodec<?> codec) {
+		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
-			this.field = field;
-			this.codec = codec;
 			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 		}
 
@@ -91,7 +76,8 @@ class LuceneTextPhrasePredicate extends AbstractLuceneSingleFieldPredicate {
 			return new LuceneTextPhrasePredicate( this );
 		}
 
-		private Query buildQuery() {
+		@Override
+		protected Query buildQuery() {
 			Analyzer effectiveAnalyzerOrNormalizer = overrideAnalyzer;
 			if ( effectiveAnalyzerOrNormalizer == null ) {
 				effectiveAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();

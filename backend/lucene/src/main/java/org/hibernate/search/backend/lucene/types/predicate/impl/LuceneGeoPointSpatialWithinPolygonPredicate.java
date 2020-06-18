@@ -10,8 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -21,21 +20,13 @@ import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.geo.Polygon;
 import org.apache.lucene.search.Query;
 
-class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneSingleFieldPredicate {
-
-	private final Query query;
+class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneGeoPointSpatialWithinPolygonPredicate(Builder builder) {
 		super( builder );
-		query = builder.buildQuery();
 	}
 
-	@Override
-	protected Query doToQuery(PredicateRequestContext context) {
-		return query;
-	}
-
-	static class Builder extends AbstractBuilder implements SpatialWithinPolygonPredicateBuilder {
+	static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinPolygonPredicateBuilder {
 		protected GeoPolygon polygon;
 
 		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
@@ -52,7 +43,8 @@ class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneSingleFi
 			return new LuceneGeoPointSpatialWithinPolygonPredicate( this );
 		}
 
-		private Query buildQuery() {
+		@Override
+		protected Query buildQuery() {
 			List<GeoPoint> points = polygon.points();
 
 			double[] polyLats = new double[points.size()];

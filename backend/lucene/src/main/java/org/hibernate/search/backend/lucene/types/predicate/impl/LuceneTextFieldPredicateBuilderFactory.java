@@ -38,14 +38,14 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	public PhrasePredicateBuilder createPhrasePredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextPhrasePredicate.Builder( searchContext, field, codec );
+		return new LuceneTextPhrasePredicate.Builder<>( searchContext, field );
 	}
 
 	@Override
 	public WildcardPredicateBuilder createWildcardPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSearchable( field );
-		return new LuceneTextWildcardPredicate.Builder( searchContext, field );
+		return new LuceneTextWildcardPredicate.Builder<>( searchContext, field );
 	}
 
 	@Override

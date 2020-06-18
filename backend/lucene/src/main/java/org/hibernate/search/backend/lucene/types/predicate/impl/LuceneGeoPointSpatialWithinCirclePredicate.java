@@ -8,8 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -18,21 +17,13 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.search.Query;
 
-class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneSingleFieldPredicate {
-
-	private final Query query;
+class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneGeoPointSpatialWithinCirclePredicate(Builder builder) {
 		super( builder );
-		query = builder.buildQuery();
 	}
 
-	@Override
-	protected Query doToQuery(PredicateRequestContext context) {
-		return query;
-	}
-
-	static class Builder extends AbstractBuilder implements SpatialWithinCirclePredicateBuilder {
+	static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinCirclePredicateBuilder {
 		protected GeoPoint center;
 		protected double radiusInMeters;
 
@@ -51,7 +42,8 @@ class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneSingleFie
 			return new LuceneGeoPointSpatialWithinCirclePredicate( this );
 		}
 
-		private Query buildQuery() {
+		@Override
+		protected Query buildQuery() {
 			return LatLonPoint.newDistanceQuery( absoluteFieldPath, center.latitude(), center.longitude(), radiusInMeters );
 		}
 	}

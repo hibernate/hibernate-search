@@ -67,7 +67,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	protected LuceneFieldCodec<?> getCodec() {
+	protected LuceneFieldCodec<GeoPoint> getCodec() {
 		return codec;
 	}
 }

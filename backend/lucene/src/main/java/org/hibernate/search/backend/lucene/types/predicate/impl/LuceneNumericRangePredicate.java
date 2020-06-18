@@ -10,24 +10,38 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
 import org.apache.lucene.search.Query;
 
-class LuceneNumericRangePredicate extends AbstractLuceneStandardRangePredicate {
+class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneNumericRangePredicate(Builder builder) {
 		super( builder );
 	}
 
-	static class Builder<F, E extends Number> extends AbstractBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
+	static class Builder<F, E extends Number> extends AbstractBuilder<F>
+			implements RangePredicateBuilder {
+		private final AbstractLuceneNumericFieldCodec<F, E> codec;
+
+		private Range<E> range;
+
 		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext, field, codec );
+			super( searchContext, field );
+			this.codec = codec;
+		}
+
+		@Override
+		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+			this.range = convertAndEncode( codec, range, convertLowerBound, convertUpperBound );
 		}
 
 		@Override

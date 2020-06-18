@@ -15,19 +15,18 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
-public abstract class AbstractLuceneStandardRangePredicate extends AbstractLuceneSingleFieldPredicate {
+public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuceneSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Query query;
 
-	protected AbstractLuceneStandardRangePredicate(AbstractBuilder<?, ?, ?> builder) {
+	protected AbstractLuceneLeafSingleFieldPredicate(AbstractBuilder<?> builder) {
 		super( builder );
 		query = builder.buildQuery();
 	}
@@ -37,53 +36,47 @@ public abstract class AbstractLuceneStandardRangePredicate extends AbstractLucen
 		return query;
 	}
 
-	/**
-	 * @param <F> The field type exposed to the mapper.
-	 * @param <E> The encoded type.
-	 * @param <C> The codec type.
-	 * @see LuceneStandardFieldCodec
-	 */
-	public abstract static class AbstractBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
-			extends AbstractLuceneSingleFieldPredicate.AbstractBuilder
-			implements RangePredicateBuilder {
-		private final LuceneSearchFieldContext<F> field;
-		protected final C codec;
+	public abstract static class AbstractBuilder<F>
+			extends AbstractLuceneSingleFieldPredicate.AbstractBuilder {
+		protected final LuceneSearchFieldContext<F> field;
 
-		protected Range<E> range;
-
-		protected AbstractBuilder(LuceneSearchContext searchContext,
-				LuceneSearchFieldContext<F> field, C codec) {
+		protected AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.field = field;
-			this.codec = codec;
-		}
-
-		@Override
-		public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
-			this.range = Range.between(
-					convertAndEncode( range.lowerBoundValue(), convertLowerBound ),
-					range.lowerBoundInclusion(),
-					convertAndEncode( range.upperBoundValue(), convertUpperBound ),
-					range.upperBoundInclusion()
-			);
 		}
 
 		protected abstract Query buildQuery();
 
-		private E convertAndEncode(Optional<?> valueOptional, ValueConvert convert) {
-			if ( !valueOptional.isPresent() ) {
-				return null;
-			}
-			Object value = valueOptional.get();
+		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
-				F converted = toFieldValueConverter.convertUnknown(
-						value, searchContext.toDocumentFieldValueConvertContext()
-				);
+				F converted = toFieldValueConverter.convertUnknown( value,
+						searchContext.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {
 				throw log.cannotConvertDslParameter( e.getMessage(), e, field.eventContext() );
+			}
+		}
+
+		protected <E> Range<E> convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Range<?> range,
+				ValueConvert convertLowerBound,
+				ValueConvert convertUpperBound) {
+			return Range.between(
+					convertAndEncode( codec, range.lowerBoundValue(), convertLowerBound ),
+					range.lowerBoundInclusion(),
+					convertAndEncode( codec, range.upperBoundValue(), convertUpperBound ),
+					range.upperBoundInclusion()
+			);
+		}
+
+		private <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Optional<?> valueOptional,
+				ValueConvert convert) {
+			if ( !valueOptional.isPresent() ) {
+				return null;
+			}
+			else {
+				return convertAndEncode( codec, valueOptional.get(), convert );
 			}
 		}
 	}
