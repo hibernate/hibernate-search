@@ -11,24 +11,24 @@ import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
-class CompositeSortComponentsStepImpl<B>
-		implements CompositeSortComponentsStep<CompositeSortComponentsStepImpl<B>> {
+class CompositeSortComponentsStepImpl
+		implements CompositeSortComponentsStep<CompositeSortComponentsStepImpl> {
 
-	private SearchSortDslContext<?, B, ?> dslContext;
+	private SearchSortDslContext<?, ?> dslContext;
 
-	CompositeSortComponentsStepImpl(SearchSortDslContext<?, B, ?> dslContext) {
+	CompositeSortComponentsStepImpl(SearchSortDslContext<?, ?> dslContext) {
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public CompositeSortComponentsStepImpl<B> add(SearchSort searchSort) {
-		dslContext = dslContext.append( dslContext.builderFactory().toImplementation( searchSort ) );
+	public CompositeSortComponentsStepImpl add(SearchSort searchSort) {
+		dslContext = dslContext.append( searchSort );
 		return this;
 	}
 
 	@Override
 	public SearchSortFactory then() {
-		return new DefaultSearchSortFactory<>( dslContext );
+		return new DefaultSearchSortFactory( dslContext );
 	}
 
 	@Override

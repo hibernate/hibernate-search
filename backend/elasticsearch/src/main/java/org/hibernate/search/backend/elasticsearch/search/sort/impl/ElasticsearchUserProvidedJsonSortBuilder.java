@@ -6,19 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchUserProvidedJsonSortBuilder implements ElasticsearchSearchSortBuilder {
+class ElasticsearchUserProvidedJsonSortBuilder extends AbstractElasticsearchSortBuilder {
 
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonSortBuilder(JsonObject json) {
+	ElasticsearchUserProvidedJsonSortBuilder(ElasticsearchSearchContext searchContext, JsonObject json) {
+		super( searchContext );
 		this.json = json;
 	}
 
 	@Override
-	public void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
+	public void toJsonSorts(ElasticsearchSearchSortCollector collector) {
 		collector.collectSort( json );
 	}
 

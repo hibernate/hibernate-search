@@ -18,16 +18,16 @@ import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
 
-final class SearchSortFactoryExtensionStep<B>
+final class SearchSortFactoryExtensionStep
 		implements SearchSortFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchSortFactory parent;
-	private final SearchSortDslContext<?, B, ?> dslContext;
+	private final SearchSortDslContext<?, ?> dslContext;
 
 	private final DslExtensionState<SortFinalStep> state = new DslExtensionState<>();
 
 	SearchSortFactoryExtensionStep(SearchSortFactory parent,
-			SearchSortDslContext<?, B, ?> dslContext) {
+			SearchSortDslContext<?, ?> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
 	}
@@ -43,12 +43,12 @@ final class SearchSortFactoryExtensionStep<B>
 	@Override
 	public SortThenStep orElse(Function<SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		SortFinalStep result = state.orElse( parent, sortContributor );
-		return new StaticSortThenStep<>( dslContext, dslContext.builderFactory().toImplementation( result.toSort() ) );
+		return new StaticSortThenStep( dslContext, result.toSort() );
 	}
 
 	@Override
 	public SortThenStep orElseFail() {
 		SortFinalStep result = state.orElseFail();
-		return new StaticSortThenStep<>( dslContext, dslContext.builderFactory().toImplementation( result.toSort() ) );
+		return new StaticSortThenStep( dslContext, result.toSort() );
 	}
 }

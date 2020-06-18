@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
@@ -27,7 +26,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 	extends AbstractLuceneDocumentValueSortBuilder
-	implements FieldSortBuilder<LuceneSearchSortBuilder> {
+	implements FieldSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

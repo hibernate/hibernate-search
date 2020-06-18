@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -29,14 +28,14 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F>
 	}
 
 	@Override
-	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
+	public FieldSortBuilder createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		checkSortable( field );
 		return new ElasticsearchStandardFieldSortBuilder<>( searchContext, field, codec );
 	}
 
 	@Override
-	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(
+	public DistanceSortBuilder createDistanceSortBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field, GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType( field.eventContext() );
 	}

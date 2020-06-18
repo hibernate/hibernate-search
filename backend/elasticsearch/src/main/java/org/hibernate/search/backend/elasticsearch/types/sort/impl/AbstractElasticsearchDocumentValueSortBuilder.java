@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchSearchSortBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchReversibleSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -26,7 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends AbstractElasticsearchSearchSortBuilder {
+abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends AbstractElasticsearchReversibleSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -54,6 +54,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 
 	AbstractElasticsearchDocumentValueSortBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field) {
+		super( searchContext );
 		this.searchContext = searchContext;
 		this.field = field;
 		this.nestedPathHierarchy = field.nestedPathHierarchy();

@@ -23,10 +23,10 @@ public class ElasticsearchSearchSortFactoryImpl
 		extends DelegatingSearchSortFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchSortFactory {
 
-	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ?> dslContext;
+	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ?> dslContext;
 
 	public ElasticsearchSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
@@ -42,6 +42,6 @@ public class ElasticsearchSearchSortFactoryImpl
 	}
 
 	private SortThenStep staticThenStep(ElasticsearchSearchSortBuilder builder) {
-		return new StaticSortThenStep<>( dslContext, builder );
+		return new StaticSortThenStep( dslContext, builder.build() );
 	}
 }

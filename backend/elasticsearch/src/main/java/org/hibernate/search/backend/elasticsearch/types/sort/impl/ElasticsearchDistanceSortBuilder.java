@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -24,7 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchDocumentValueSortBuilder<GeoPoint>
-		implements DistanceSortBuilder<ElasticsearchSearchSortBuilder> {
+		implements DistanceSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -54,7 +53,7 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchDocum
 	}
 
 	@Override
-	protected void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+	protected void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		innerObject.add( field.absolutePath(), ElasticsearchGeoPointFieldCodec.INSTANCE.encode( center ) );
 
 		JsonObject outerObject = new JsonObject();

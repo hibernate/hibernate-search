@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -25,7 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsearchDocumentValueSortBuilder<F>
-		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
+		implements FieldSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -68,7 +67,7 @@ public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsea
 	}
 
 	@Override
-	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+	public void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( missing != null ) {
 			MISSING_ACCESSOR.set( innerObject, missing );
 		}

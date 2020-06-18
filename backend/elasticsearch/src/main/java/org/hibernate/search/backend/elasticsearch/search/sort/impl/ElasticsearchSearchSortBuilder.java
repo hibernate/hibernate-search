@@ -6,8 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
+import org.hibernate.search.engine.search.sort.SearchSort;
+
 public interface ElasticsearchSearchSortBuilder {
 
-	void buildAndAddTo(ElasticsearchSearchSortCollector collector);
+	SearchSort build();
+
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should have one SearchSort implementation per type of sort,
+	//  and move this method there.
+	void toJsonSorts(ElasticsearchSearchSortCollector collector);
 
 }

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -94,11 +93,11 @@ public interface LuceneSearchFieldContext<F> {
 
 	// Sorts
 
-	default FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext) {
+	default FieldSortBuilder createFieldSortBuilder(LuceneSearchContext searchContext) {
 		return type().sortBuilderFactory().createFieldSortBuilder( searchContext, this );
 	}
 
-	default DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(LuceneSearchContext searchContext,
+	default DistanceSortBuilder createDistanceSortBuilder(LuceneSearchContext searchContext,
 			GeoPoint center) {
 		return type().sortBuilderFactory().createDistanceSortBuilder( searchContext, this, center );
 	}

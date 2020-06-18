@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
@@ -18,6 +16,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
@@ -26,29 +25,29 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
  * or when calling {@link SearchQueryOptionsStep#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
-public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?, B>, B, PDF extends SearchPredicateFactory>
-		implements SearchSortDslContext<F, B, PDF> {
+public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?>, PDF extends SearchPredicateFactory>
+		implements SearchSortDslContext<F, PDF> {
 
-	public static <F extends SearchSortBuilderFactory<?, B>, B, PDF extends SearchPredicateFactory>
-			SearchSortDslContext<F, B, ?> root(F factory, PDF predicateFactory,
+	public static <F extends SearchSortBuilderFactory<?>, PDF extends SearchPredicateFactory>
+			SearchSortDslContext<F, ?> root(F factory, PDF predicateFactory,
 					SearchPredicateBuilderFactory<?> predicateBuilderFactory) {
 		return new SearchSortDslContextImpl<>( factory, null, null,
 				predicateFactory, predicateBuilderFactory );
 	}
 
 	private final F factory;
-	private final SearchSortDslContextImpl<F, B, ?> parent;
-	private final B builder;
+	private final SearchSortDslContextImpl<F, ?> parent;
+	private final SearchSort sort;
 	private final PDF predicateFactory;
 	private final SearchPredicateBuilderFactory<?> predicateBuilderFactory;
 
-	private SearchSort sortResult;
+	private SearchSort compositeSort;
 
-	private SearchSortDslContextImpl(F factory, SearchSortDslContextImpl<F, B, ?> parent, B builder,
+	private SearchSortDslContextImpl(F factory, SearchSortDslContextImpl<F, ?> parent, SearchSort sort,
 			PDF predicateFactory, SearchPredicateBuilderFactory<?> predicateBuilderFactory) {
 		this.factory = factory;
 		this.parent = parent;
-		this.builder = builder;
+		this.sort = sort;
 		this.predicateFactory = predicateFactory;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 	}
@@ -59,8 +58,8 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	}
 
 	@Override
-	public SearchSortDslContext<?, B, PDF> append(B builder) {
-		return new SearchSortDslContextImpl<>( factory, this, builder,
+	public SearchSortDslContext<?, PDF> append(SearchSort sort) {
+		return new SearchSortDslContextImpl<>( factory, this, sort,
 				predicateFactory, predicateBuilderFactory );
 	}
 
@@ -70,10 +69,10 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	}
 
 	@Override
-	public <PDF2 extends SearchPredicateFactory> SearchSortDslContext<F, B, PDF2> withExtendedPredicateFactory(
+	public <PDF2 extends SearchPredicateFactory> SearchSortDslContext<F, PDF2> withExtendedPredicateFactory(
 			SearchPredicateFactoryExtension<PDF2> extension) {
 		return new SearchSortDslContextImpl<>(
-				factory, parent, builder,
+				factory, parent, sort,
 				DslExtensionState.returnIfSupported(
 						extension, extension.extendOptional( predicateFactory, predicateBuilderFactory )
 				),
@@ -83,18 +82,35 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 
 	@Override
 	public SearchSort toSort() {
-		if ( sortResult == null ) {
-			List<B> builders = new ArrayList<>();
-			collectBuilders( builders );
-			sortResult = factory.toSearchSort( builders );
+		if ( compositeSort == null ) {
+			compositeSort = createCompositeSort();
 		}
-		return sortResult;
+		return compositeSort;
 	}
 
-	private void collectBuilders(List<B> builders) {
-		if ( builder != null ) { // Otherwise we've reached the root
-			parent.collectBuilders( builders );
-			builders.add( builder );
+	private SearchSort createCompositeSort() {
+		if ( parent == null ) {
+			// No sort at all; just use an empty composite sort.
+			return factory.composite().build();
 		}
+		else if ( parent.sort == null ) {
+			// Only one element
+			return sort;
+		}
+		else {
+			CompositeSortBuilder builder = factory.composite();
+			collectSorts( builder );
+			return builder.build();
+		}
+	}
+
+	private void collectSorts(CompositeSortBuilder builder) {
+		if ( sort == null ) {
+			// We've reached the root
+			return;
+		}
+
+		parent.collectSorts( builder );
+		builder.add( sort );
 	}
 }

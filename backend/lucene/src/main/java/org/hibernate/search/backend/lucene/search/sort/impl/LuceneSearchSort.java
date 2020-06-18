@@ -6,29 +6,44 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class LuceneSearchSort implements SearchSort, LuceneSearchSortBuilder {
+class LuceneSearchSort implements SearchSort {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	// TODO HSEARCH-3476 this is just a temporary hack:
+	//  we should move to one SearchSort implementation per type of sort.
+	public static SearchSort of(LuceneSearchContext searchContext, LuceneSearchSortBuilder builder) {
+		return new LuceneSearchSort( searchContext.indexes().indexNames(), builder );
+	}
+
+	public static LuceneSearchSort from(LuceneSearchContext searchContext, SearchSort sort) {
+		if ( !( sort instanceof LuceneSearchSort ) ) {
+			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
+		}
+		LuceneSearchSort casted = (LuceneSearchSort) sort;
+		if ( !searchContext.indexes().indexNames().equals( casted.indexNames ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames, searchContext.indexes().indexNames() );
+		}
+		return casted;
+	}
 
 	private final Set<String> indexNames;
-	private final List<LuceneSearchSortBuilder> builders;
+	private final LuceneSearchSortBuilder builder;
 
-	LuceneSearchSort(Set<String> indexNames, List<LuceneSearchSortBuilder> builders) {
+	LuceneSearchSort(Set<String> indexNames, LuceneSearchSortBuilder builder) {
 		this.indexNames = indexNames;
-		this.builders = builders;
+		this.builder = builder;
 	}
 
-	@Override
-	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		for ( LuceneSearchSortBuilder builder : builders ) {
-			builder.buildAndContribute( collector );
-		}
-	}
-
-	public Set<String> getIndexNames() {
-		return indexNames;
+	public void toSortFields(LuceneSearchSortCollector collector) {
+		builder.toSortFields( collector );
 	}
 }

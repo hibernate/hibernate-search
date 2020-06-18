@@ -11,18 +11,18 @@ import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
 
-public abstract class AbstractSortThenStep<B> implements SortThenStep {
-	private final SearchSortDslContext<?, ? super B, ?> parentDslContext;
+public abstract class AbstractSortThenStep implements SortThenStep {
+	private final SearchSortDslContext<?, ?> parentDslContext;
 
-	private SearchSortDslContext<?, ? super B, ?> selfDslContext;
+	private SearchSortDslContext<?, ?> selfDslContext;
 
-	public AbstractSortThenStep(SearchSortDslContext<?, ? super B, ?> parentDslContext) {
+	public AbstractSortThenStep(SearchSortDslContext<?, ?> parentDslContext) {
 		this.parentDslContext = parentDslContext;
 	}
 
 	@Override
 	public final SearchSortFactory then() {
-		return new DefaultSearchSortFactory<>( selfDslContext() );
+		return new DefaultSearchSortFactory( selfDslContext() );
 	}
 
 	@Override
@@ -30,23 +30,23 @@ public abstract class AbstractSortThenStep<B> implements SortThenStep {
 		return selfDslContext().toSort();
 	}
 
-	protected SearchSortDslContext<?, ? super B, ?> dslContext() {
+	protected SearchSortDslContext<?, ?> dslContext() {
 		return parentDslContext;
 	}
 
-	private SearchSortDslContext<?, ? super B, ?> selfDslContext() {
+	private SearchSortDslContext<?, ?> selfDslContext() {
 		/*
-		 * Postpone the call of toImplementation() as long as possible,
+		 * Postpone the call of build() as long as possible,
 		 * and make sure to only call it once,
-		 * so that "finalizing" operations may be performed in toImplementation().
-		 * See HSEARCH-3207: we must never call toImplementation() twice, because it may have side-effects.
+		 * so that "finalizing" operations may be performed in build().
+		 * See HSEARCH-3207: we must never call build() twice, because it may have side-effects.
 		 */
 		if ( selfDslContext == null ) {
-			selfDslContext = parentDslContext.append( toImplementation() );
+			selfDslContext = parentDslContext.append( build() );
 		}
 		return selfDslContext;
 	}
 
-	protected abstract B toImplementation();
+	protected abstract SearchSort build();
 
 }

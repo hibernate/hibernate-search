@@ -10,7 +10,6 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
@@ -22,7 +21,7 @@ public class LuceneTemporalFieldSortBuilderFactory<F extends TemporalAccessor, E
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(LuceneSearchContext searchContext,
+	public FieldSortBuilder createFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSortable( field );
 		return new LuceneTemporalFieldSortBuilder<>(

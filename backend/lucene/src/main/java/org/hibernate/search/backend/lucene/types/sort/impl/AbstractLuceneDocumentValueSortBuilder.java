@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
+import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneReversibleSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -26,11 +26,10 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.apache.lucene.search.Query;
 
 public abstract class AbstractLuceneDocumentValueSortBuilder
-		extends AbstractLuceneSearchSortBuilder {
+		extends AbstractLuceneReversibleSortBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final LuceneSearchContext searchContext;
 	protected final String absoluteFieldPath;
 	protected final String nestedDocumentPath;
 	private SortMode mode;
@@ -43,7 +42,7 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 
 	protected AbstractLuceneDocumentValueSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath) {
-		this.searchContext = searchContext;
+		super( searchContext );
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
 	}
