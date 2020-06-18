@@ -14,9 +14,11 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstant
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -27,7 +29,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
-class LuceneTextMatchPredicate extends AbstractLuceneStandardMatchPredicate {
+class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -35,8 +37,11 @@ class LuceneTextMatchPredicate extends AbstractLuceneStandardMatchPredicate {
 		super( builder );
 	}
 
-	static class Builder<F> extends AbstractBuilder<F, String, LuceneTextFieldCodec<F>> {
+	static class Builder<F> extends AbstractBuilder<F> implements MatchPredicateBuilder {
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+		private final LuceneTextFieldCodec<F> codec;
+
+		private String value;
 
 		private Integer maxEditDistance;
 		private Integer prefixLength;
@@ -45,8 +50,14 @@ class LuceneTextMatchPredicate extends AbstractLuceneStandardMatchPredicate {
 
 		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
 				LuceneTextFieldCodec<F> codec) {
-			super( searchContext, field, codec );
+			super( searchContext, field );
 			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
+			this.codec = codec;
+		}
+
+		@Override
+		public void value(Object value, ValueConvert convert) {
+			this.value = convertAndEncode( codec, value, convert );
 		}
 
 		@Override

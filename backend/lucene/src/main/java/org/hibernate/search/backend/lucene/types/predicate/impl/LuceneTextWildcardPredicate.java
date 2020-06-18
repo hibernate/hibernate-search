@@ -8,8 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -20,27 +19,19 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.BytesRef;
 
-class LuceneTextWildcardPredicate extends AbstractLuceneSingleFieldPredicate {
-
-	private final Query query;
+class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneTextWildcardPredicate(Builder builder) {
 		super( builder );
-		query = builder.buildQuery();
 	}
 
-	@Override
-	protected Query doToQuery(PredicateRequestContext context) {
-		return query;
-	}
-
-	static class Builder extends AbstractBuilder implements WildcardPredicateBuilder {
+	static class Builder<F> extends AbstractBuilder<F> implements WildcardPredicateBuilder {
 
 		private final Analyzer analyzerOrNormalizer;
 
 		private String pattern;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field) {
+		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.analyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 		}
@@ -55,7 +46,8 @@ class LuceneTextWildcardPredicate extends AbstractLuceneSingleFieldPredicate {
 			return new LuceneTextWildcardPredicate( this );
 		}
 
-		private Query buildQuery() {
+		@Override
+		protected Query buildQuery() {
 			BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
 			return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );
 		}
