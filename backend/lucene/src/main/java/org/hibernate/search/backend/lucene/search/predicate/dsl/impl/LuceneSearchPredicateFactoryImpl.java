@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinalStep;
 
 import org.apache.lucene.search.Query;
 
@@ -29,6 +30,6 @@ public class LuceneSearchPredicateFactoryImpl
 
 	@Override
 	public PredicateFinalStep fromLuceneQuery(Query luceneQuery) {
-		return new LuceneQueryPredicateFinalStep( factory, luceneQuery );
+		return new StaticPredicateFinalStep( factory.fromLuceneQuery( luceneQuery ) );
 	}
 }

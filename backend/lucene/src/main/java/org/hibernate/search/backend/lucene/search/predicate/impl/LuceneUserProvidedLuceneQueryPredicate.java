@@ -6,25 +6,26 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import org.apache.lucene.search.Query;
 
 
-class LuceneUserProvidedLuceneQueryPredicateBuilder implements LuceneSearchPredicateBuilder {
+class LuceneUserProvidedLuceneQueryPredicate implements LuceneSearchPredicate {
 
-	private final LuceneSearchContext searchContext;
+	private final Set<String> indexNames;
 	private final Query luceneQuery;
 
-	LuceneUserProvidedLuceneQueryPredicateBuilder(LuceneSearchContext searchContext, Query luceneQuery) {
-		this.searchContext = searchContext;
+	LuceneUserProvidedLuceneQueryPredicate(LuceneSearchContext searchContext, Query luceneQuery) {
+		this.indexNames = searchContext.indexes().indexNames();
 		this.luceneQuery = luceneQuery;
 	}
 
 	@Override
-	public SearchPredicate build() {
-		return LuceneSearchPredicate.of( searchContext, this );
+	public Set<String> indexNames() {
+		return indexNames;
 	}
 
 	@Override

@@ -7,17 +7,17 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 
-class LuceneMatchAllPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements MatchAllPredicateBuilder {
+class LuceneMatchAllPredicate extends AbstractLuceneSearchPredicate {
 
-	LuceneMatchAllPredicateBuilder(LuceneSearchContext searchContext) {
-		super( searchContext );
+	private LuceneMatchAllPredicate(Builder builder) {
+		super( builder );
 	}
 
 	@Override
@@ -26,7 +26,18 @@ class LuceneMatchAllPredicateBuilder extends AbstractLuceneSearchPredicateBuilde
 	}
 
 	@Override
-	protected Query doBuild(PredicateRequestContext context) {
+	protected Query doToQuery(PredicateRequestContext context) {
 		return new MatchAllDocsQuery();
+	}
+
+	static class Builder extends AbstractBuilder implements MatchAllPredicateBuilder {
+		Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new LuceneMatchAllPredicate( this );
+		}
 	}
 }

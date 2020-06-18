@@ -25,81 +25,30 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 
-
-class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements BooleanPredicateBuilder {
+class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private List<LuceneSearchPredicate> mustClauses;
-	private List<LuceneSearchPredicate> mustNotClauses;
-	private List<LuceneSearchPredicate> shouldClauses;
-	private List<LuceneSearchPredicate> filterClauses;
+	private final List<LuceneSearchPredicate> mustClauses;
+	private final List<LuceneSearchPredicate> mustNotClauses;
+	private final List<LuceneSearchPredicate> shouldClauses;
+	private final List<LuceneSearchPredicate> filterClauses;
 
-	private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+	private final NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-	LuceneBooleanPredicateBuilder(LuceneSearchContext searchContext) {
-		super( searchContext );
-	}
-
-	@Override
-	public void must(SearchPredicate clause) {
-		if ( mustClauses == null ) {
-			mustClauses = new ArrayList<>();
-		}
-		mustClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void mustNot(SearchPredicate clause) {
-		if ( mustNotClauses == null ) {
-			mustNotClauses = new ArrayList<>();
-		}
-		mustNotClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void should(SearchPredicate clause) {
-		if ( shouldClauses == null ) {
-			shouldClauses = new ArrayList<>();
-		}
-		shouldClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void filter(SearchPredicate clause) {
-		if ( filterClauses == null ) {
-			filterClauses = new ArrayList<>();
-		}
-		filterClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
-	}
-
-	@Override
-	public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
-		addMinimumShouldMatchConstraint(
-				ignoreConstraintCeiling,
-				new MinimumShouldMatchConstraint( matchingClausesNumber, null )
-		);
-	}
-
-	@Override
-	public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
-		addMinimumShouldMatchConstraint(
-				ignoreConstraintCeiling,
-				new MinimumShouldMatchConstraint( null, matchingClausesPercent )
-		);
-	}
-
-	private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
-			MinimumShouldMatchConstraint constraint) {
-		if ( minimumShouldMatchConstraints == null ) {
-			// We'll need to go through the data in ascending order, so use a TreeMap
-			minimumShouldMatchConstraints = new TreeMap<>();
-		}
-		Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
-		if ( previous != null ) {
-			throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
-		}
+	private LuceneBooleanPredicate(Builder builder) {
+		super( builder );
+		mustClauses = builder.mustClauses;
+		mustNotClauses = builder.mustNotClauses;
+		shouldClauses = builder.shouldClauses;
+		filterClauses = builder.filterClauses;
+		minimumShouldMatchConstraints = builder.minimumShouldMatchConstraints;
+		// Ensure illegal attempts to mutate the predicate will fail
+		builder.mustClauses = null;
+		builder.shouldClauses = null;
+		builder.mustNotClauses = null;
+		builder.filterClauses = null;
+		builder.minimumShouldMatchConstraints = null;
 	}
 
 	@Override
@@ -111,7 +60,7 @@ class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 	}
 
 	@Override
-	protected Query doBuild(PredicateRequestContext context) {
+	protected Query doToQuery(PredicateRequestContext context) {
 		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
 		contributeQueries( context, booleanQueryBuilder, mustClauses, Occur.MUST );
@@ -164,6 +113,85 @@ class LuceneBooleanPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 				&& ( mustClauses == null || mustClauses.isEmpty() )
 				&& ( shouldClauses == null || shouldClauses.isEmpty() )
 				&& ( filterClauses == null || filterClauses.isEmpty() );
+	}
+
+	static class Builder extends AbstractBuilder implements BooleanPredicateBuilder {
+		private List<LuceneSearchPredicate> mustClauses;
+		private List<LuceneSearchPredicate> mustNotClauses;
+		private List<LuceneSearchPredicate> shouldClauses;
+		private List<LuceneSearchPredicate> filterClauses;
+
+		private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
+
+		Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public void must(SearchPredicate clause) {
+			if ( mustClauses == null ) {
+				mustClauses = new ArrayList<>();
+			}
+			mustClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void mustNot(SearchPredicate clause) {
+			if ( mustNotClauses == null ) {
+				mustNotClauses = new ArrayList<>();
+			}
+			mustNotClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void should(SearchPredicate clause) {
+			if ( shouldClauses == null ) {
+				shouldClauses = new ArrayList<>();
+			}
+			shouldClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void filter(SearchPredicate clause) {
+			if ( filterClauses == null ) {
+				filterClauses = new ArrayList<>();
+			}
+			filterClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+		}
+
+		@Override
+		public void minimumShouldMatchNumber(int ignoreConstraintCeiling, int matchingClausesNumber) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new MinimumShouldMatchConstraint( matchingClausesNumber, null )
+			);
+		}
+
+		@Override
+		public void minimumShouldMatchPercent(int ignoreConstraintCeiling, int matchingClausesPercent) {
+			addMinimumShouldMatchConstraint(
+					ignoreConstraintCeiling,
+					new MinimumShouldMatchConstraint( null, matchingClausesPercent )
+			);
+		}
+
+		@Override
+		public SearchPredicate build() {
+			return new LuceneBooleanPredicate( this );
+		}
+
+
+		private void addMinimumShouldMatchConstraint(int ignoreConstraintCeiling,
+				MinimumShouldMatchConstraint constraint) {
+			if ( minimumShouldMatchConstraints == null ) {
+				// We'll need to go through the data in ascending order, so use a TreeMap
+				minimumShouldMatchConstraints = new TreeMap<>();
+			}
+			Object previous = minimumShouldMatchConstraints.put( ignoreConstraintCeiling, constraint );
+			if ( previous != null ) {
+				throw log.minimumShouldMatchConflictingConstraints( ignoreConstraintCeiling );
+			}
+		}
 	}
 
 	private static final class MinimumShouldMatchConstraint {

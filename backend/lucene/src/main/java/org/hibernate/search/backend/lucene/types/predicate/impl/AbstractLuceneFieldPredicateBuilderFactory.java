@@ -85,7 +85,7 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory<F>
 	@Override
 	public ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
-		return new LuceneExistsPredicateBuilder( searchContext, field, getCodec() );
+		return new LuceneExistsPredicate.Builder( searchContext, field, getCodec() );
 	}
 
 	protected abstract LuceneFieldCodec<?> getCodec();
