@@ -13,8 +13,8 @@ import com.google.gson.JsonObject;
 public interface ElasticsearchSearchSortBuilderFactory
 		extends SearchSortBuilderFactory<ElasticsearchSearchSortCollector> {
 
-	ElasticsearchSearchSortBuilder fromJson(JsonObject jsonObject);
+	ElasticsearchSearchSort fromJson(JsonObject jsonObject);
 
-	ElasticsearchSearchSortBuilder fromJson(String jsonString);
+	ElasticsearchSearchSort fromJson(String jsonString);
 
 }

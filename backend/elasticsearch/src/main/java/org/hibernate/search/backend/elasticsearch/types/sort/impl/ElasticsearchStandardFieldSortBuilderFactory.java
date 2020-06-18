@@ -31,7 +31,7 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F>
 	public FieldSortBuilder createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
 		checkSortable( field );
-		return new ElasticsearchStandardFieldSortBuilder<>( searchContext, field, codec );
+		return new ElasticsearchStandardFieldSort.Builder<>( searchContext, field, codec );
 	}
 
 	@Override

@@ -11,11 +11,12 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchReversibleSortBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchReversibleSort;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -26,7 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends AbstractElasticsearchReversibleSortBuilder {
+abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsearchReversibleSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -45,61 +46,26 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
 	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
-	private final ElasticsearchSearchContext searchContext;
-	protected final ElasticsearchSearchFieldContext<F> field;
+	protected final String absoluteFieldPath;
 	protected final List<String> nestedPathHierarchy;
+	private final ElasticsearchSearchSyntax searchSyntax;
 
-	private JsonPrimitive mode;
-	private ElasticsearchSearchPredicate filter;
+	private final JsonPrimitive mode;
+	private final ElasticsearchSearchPredicate filter;
 
-	AbstractElasticsearchDocumentValueSortBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<F> field) {
-		super( searchContext );
-		this.searchContext = searchContext;
-		this.field = field;
-		this.nestedPathHierarchy = field.nestedPathHierarchy();
-	}
-
-	public void mode(SortMode mode) {
-		if ( !nestedPathHierarchy.isEmpty() && SortMode.MEDIAN.equals( mode ) ) {
-			throw log.cannotComputeMedianAcrossNested( field.eventContext() );
-		}
-		if ( mode != null ) {
-			switch ( mode ) {
-				case SUM:
-					this.mode = SUM_KEYWORD_JSON;
-					break;
-				case AVG:
-					this.mode = AVG_KEYWORD_JSON;
-					break;
-				case MIN:
-					this.mode = MIN_KEYWORD_JSON;
-					break;
-				case MAX:
-					this.mode = MAX_KEYWORD_JSON;
-					break;
-				case MEDIAN:
-					this.mode = MEDIAN_KEYWORD_JSON;
-					break;
-				default:
-					throw new AssertionFailure( "Unexpected sort mode: " + mode );
-			}
-		}
-	}
-
-	public void filter(SearchPredicate filter) {
-		if ( nestedPathHierarchy.isEmpty() ) {
-			throw log.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
-		}
-		ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( searchContext, filter );
-		elasticsearchFilter.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
-		this.filter = elasticsearchFilter;
+	AbstractElasticsearchDocumentValueSort(AbstractBuilder<?> builder) {
+		super( builder );
+		absoluteFieldPath = builder.field.absolutePath();
+		nestedPathHierarchy = builder.nestedPathHierarchy;
+		searchSyntax = builder.searchSyntax;
+		mode = builder.mode;
+		filter = builder.filter;
 	}
 
 	@Override
 	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( !nestedPathHierarchy.isEmpty() ) {
-			if ( searchContext.searchSyntax().useOldSortNestedApi() ) {
+			if ( searchSyntax.useOldSortNestedApi() ) {
 				// the old api requires only the last path ( the deepest one )
 				String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
@@ -139,5 +105,57 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder<F> extends Abstract
 
 	private JsonObject getJsonFilter(PredicateRequestContext filterContext) {
 		return filter.toJsonQuery( filterContext );
+	}
+
+	abstract static class AbstractBuilder<F> extends AbstractElasticsearchReversibleSort.AbstractBuilder {
+		private final ElasticsearchSearchSyntax searchSyntax;
+		protected final ElasticsearchSearchFieldContext<F> field;
+		protected final List<String> nestedPathHierarchy;
+
+		private JsonPrimitive mode;
+		private ElasticsearchSearchPredicate filter;
+
+		AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+			super( searchContext );
+			this.searchSyntax = searchContext.searchSyntax();
+			this.field = field;
+			this.nestedPathHierarchy = field.nestedPathHierarchy();
+		}
+
+		public void mode(SortMode mode) {
+			if ( !nestedPathHierarchy.isEmpty() && SortMode.MEDIAN.equals( mode ) ) {
+				throw log.cannotComputeMedianAcrossNested( field.eventContext() );
+			}
+			if ( mode != null ) {
+				switch ( mode ) {
+					case SUM:
+						this.mode = SUM_KEYWORD_JSON;
+						break;
+					case AVG:
+						this.mode = AVG_KEYWORD_JSON;
+						break;
+					case MIN:
+						this.mode = MIN_KEYWORD_JSON;
+						break;
+					case MAX:
+						this.mode = MAX_KEYWORD_JSON;
+						break;
+					case MEDIAN:
+						this.mode = MEDIAN_KEYWORD_JSON;
+						break;
+					default:
+						throw new AssertionFailure( "Unexpected sort mode: " + mode );
+				}
+			}
+		}
+
+		public void filter(SearchPredicate filter) {
+			if ( nestedPathHierarchy.isEmpty() ) {
+				throw log.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
+			}
+			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( searchContext, filter );
+			elasticsearchFilter.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
+			this.filter = elasticsearchFilter;
+		}
 	}
 }

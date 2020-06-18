@@ -21,6 +21,6 @@ public class ElasticsearchTextFieldSortBuilderFactory extends ElasticsearchStand
 	public FieldSortBuilder createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field) {
 		checkSortable( field );
-		return new ElasticsearchTextFieldSortBuilder( searchContext, field, codec );
+		return new ElasticsearchStandardFieldSort.TextFieldBuilder( searchContext, field, codec );
 	}
 }

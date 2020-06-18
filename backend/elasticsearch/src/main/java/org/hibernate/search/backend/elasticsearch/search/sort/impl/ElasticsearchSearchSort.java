@@ -14,35 +14,23 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class ElasticsearchSearchSort implements SearchSort {
+public interface ElasticsearchSearchSort extends SearchSort {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static SearchSort of(ElasticsearchSearchContext searchContext, ElasticsearchSearchSortBuilder builder) {
-		return new ElasticsearchSearchSort( searchContext.indexes().hibernateSearchIndexNames(), builder );
-	}
+	Set<String> indexNames();
 
-	public static ElasticsearchSearchSort from(ElasticsearchSearchContext searchContext, SearchSort sort) {
+	void toJsonSorts(ElasticsearchSearchSortCollector collector);
+
+	static ElasticsearchSearchSort from(ElasticsearchSearchContext searchContext, SearchSort sort) {
 		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
 		ElasticsearchSearchSort casted = (ElasticsearchSearchSort) sort;
-		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames,
+		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(),
 					searchContext.indexes().hibernateSearchIndexNames() );
 		}
 		return casted;
-	}
-
-	private final Set<String> indexNames;
-	private final ElasticsearchSearchSortBuilder builder;
-
-	private ElasticsearchSearchSort(Set<String> indexName, ElasticsearchSearchSortBuilder builder) {
-		this.indexNames = indexName;
-		this.builder = builder;
-	}
-
-	public void toJsonSorts(ElasticsearchSearchSortCollector collector) {
-		builder.toJsonSorts( collector );
 	}
 }

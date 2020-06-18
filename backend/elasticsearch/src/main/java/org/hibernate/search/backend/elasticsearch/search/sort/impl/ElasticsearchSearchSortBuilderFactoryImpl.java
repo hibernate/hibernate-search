@@ -35,7 +35,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public ScoreSortBuilder score() {
-		return new ElasticsearchScoreSortBuilder( searchContext );
+		return new ElasticsearchScoreSort.Builder( searchContext );
 	}
 
 	@Override
@@ -50,21 +50,21 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public SearchSort indexOrder() {
-		return new ElasticsearchIndexOrderSortBuilder( searchContext ).build();
+		return new ElasticsearchIndexOrderSort( searchContext );
 	}
 
 	@Override
 	public CompositeSortBuilder composite() {
-		return new ElasticsearchCompositeSortBuilder( searchContext );
+		return new ElasticsearchCompositeSort.Builder( searchContext );
 	}
 
 	@Override
-	public ElasticsearchSearchSortBuilder fromJson(JsonObject jsonObject) {
-		return new ElasticsearchUserProvidedJsonSortBuilder( searchContext, jsonObject );
+	public ElasticsearchSearchSort fromJson(JsonObject jsonObject) {
+		return new ElasticsearchUserProvidedJsonSort( searchContext, jsonObject );
 	}
 
 	@Override
-	public ElasticsearchSearchSortBuilder fromJson(String jsonString) {
+	public ElasticsearchSearchSort fromJson(String jsonString) {
 		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 }

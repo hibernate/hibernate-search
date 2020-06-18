@@ -10,11 +10,11 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchIndexOrderSortBuilder extends AbstractElasticsearchSortBuilder {
+class ElasticsearchIndexOrderSort extends AbstractElasticsearchSort {
 
 	private static final JsonPrimitive DOC_SORT_KEYWORD_JSON = new JsonPrimitive( "_doc" );
 
-	ElasticsearchIndexOrderSortBuilder(ElasticsearchSearchContext searchContext) {
+	ElasticsearchIndexOrderSort(ElasticsearchSearchContext searchContext) {
 		super( searchContext );
 	}
 

@@ -31,7 +31,7 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory
 			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field,
 			GeoPoint center) {
 		checkSortable( field );
-		return new ElasticsearchDistanceSortBuilder( searchContext, field, center );
+		return new ElasticsearchDistanceSort.Builder( searchContext, field, center );
 	}
 
 }
