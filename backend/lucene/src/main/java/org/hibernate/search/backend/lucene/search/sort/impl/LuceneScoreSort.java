@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortField.Type;
-
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
-class LuceneScoreSortBuilder extends AbstractLuceneReversibleSortBuilder
-		implements ScoreSortBuilder {
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortField.Type;
+
+class LuceneScoreSort extends AbstractLuceneReversibleSort {
 
 	private static final SortField FIELD_SCORE_ASC = new SortField( null, Type.SCORE, true );
 
-	LuceneScoreSortBuilder(LuceneSearchContext searchContext) {
-		super( searchContext );
+	LuceneScoreSort(Builder builder) {
+		super( builder );
 	}
 
 	@Override
@@ -29,6 +29,17 @@ class LuceneScoreSortBuilder extends AbstractLuceneReversibleSortBuilder
 		}
 		else {
 			collector.collectSortField( SortField.FIELD_SCORE );
+		}
+	}
+
+	static class Builder extends AbstractBuilder implements ScoreSortBuilder {
+		Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public SearchSort build() {
+			return new LuceneScoreSort( this );
 		}
 	}
 }

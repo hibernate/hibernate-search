@@ -13,23 +13,38 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 
-class LuceneCompositeSortBuilder extends AbstractLuceneSortBuilder implements CompositeSortBuilder {
+class LuceneCompositeSort extends AbstractLuceneSort {
+	private final List<LuceneSearchSort> elements;
 
-	private final List<LuceneSearchSort> elements = new ArrayList<>();
-
-	LuceneCompositeSortBuilder(LuceneSearchContext searchContext) {
-		super( searchContext );
-	}
-
-	@Override
-	public void add(SearchSort sort) {
-		elements.add( LuceneSearchSort.from( searchContext, sort ) );
+	LuceneCompositeSort(Builder builder) {
+		super( builder );
+		elements = builder.elements;
+		// Ensure illegal attempts to mutate the sort will fail
+		builder.elements = null;
 	}
 
 	@Override
 	public void toSortFields(LuceneSearchSortCollector collector) {
 		for ( LuceneSearchSort element : elements ) {
 			element.toSortFields( collector );
+		}
+	}
+
+	static class Builder extends AbstractBuilder implements CompositeSortBuilder {
+		private List<LuceneSearchSort> elements = new ArrayList<>();
+
+		Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public void add(SearchSort sort) {
+			elements.add( LuceneSearchSort.from( searchContext, sort ) );
+		}
+
+		@Override
+		public SearchSort build() {
+			return new LuceneCompositeSort( this );
 		}
 	}
 }

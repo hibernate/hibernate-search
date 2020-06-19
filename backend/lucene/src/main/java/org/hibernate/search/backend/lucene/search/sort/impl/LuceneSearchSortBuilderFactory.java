@@ -14,8 +14,8 @@ import org.apache.lucene.search.SortField;
 public interface LuceneSearchSortBuilderFactory
 		extends SearchSortBuilderFactory<LuceneSearchSortCollector> {
 
-	LuceneSearchSortBuilder fromLuceneSortField(SortField luceneSortField);
+	LuceneSearchSort fromLuceneSortField(SortField luceneSortField);
 
-	LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort);
+	LuceneSearchSort fromLuceneSort(Sort luceneSort);
 
 }

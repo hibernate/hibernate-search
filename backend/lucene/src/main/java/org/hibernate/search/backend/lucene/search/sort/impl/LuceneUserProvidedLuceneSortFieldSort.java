@@ -8,20 +8,20 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 
-import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 
-class LuceneUserProvidedLuceneSortSortBuilder extends AbstractLuceneSortBuilder {
+class LuceneUserProvidedLuceneSortFieldSort extends AbstractLuceneSort {
 
-	private final Sort luceneSort;
+	private final SortField luceneSortField;
 
-	LuceneUserProvidedLuceneSortSortBuilder(LuceneSearchContext searchContext, Sort luceneSort) {
+	LuceneUserProvidedLuceneSortFieldSort(LuceneSearchContext searchContext, SortField luceneSortField) {
 		super( searchContext );
-		this.luceneSort = luceneSort;
+		this.luceneSortField = luceneSortField;
 	}
 
 	@Override
 	public void toSortFields(LuceneSearchSortCollector collector) {
-		collector.collectSortFields( luceneSort.getSort() );
+		collector.collectSortField( luceneSortField );
 	}
 }

@@ -10,18 +10,14 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 
 import org.apache.lucene.search.SortField;
 
+class LuceneIndexOrderSort extends AbstractLuceneSort {
 
-class LuceneUserProvidedLuceneSortFieldSortBuilder extends AbstractLuceneSortBuilder {
-
-	private final SortField luceneSortField;
-
-	LuceneUserProvidedLuceneSortFieldSortBuilder(LuceneSearchContext searchContext, SortField luceneSortField) {
+	LuceneIndexOrderSort(LuceneSearchContext searchContext) {
 		super( searchContext );
-		this.luceneSortField = luceneSortField;
 	}
 
 	@Override
 	public void toSortFields(LuceneSearchSortCollector collector) {
-		collector.collectSortField( luceneSortField );
+		collector.collectSortField( SortField.FIELD_DOC );
 	}
 }

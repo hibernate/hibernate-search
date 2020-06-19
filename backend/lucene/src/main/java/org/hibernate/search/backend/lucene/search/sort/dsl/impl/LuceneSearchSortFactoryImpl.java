@@ -11,8 +11,8 @@ import org.apache.lucene.search.SortField;
 
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
@@ -42,7 +42,7 @@ public class LuceneSearchSortFactoryImpl
 		return staticThenStep( dslContext.builderFactory().fromLuceneSort( luceneSort ) );
 	}
 
-	private SortThenStep staticThenStep(LuceneSearchSortBuilder builder) {
-		return new StaticSortThenStep( dslContext, builder.build() );
+	private SortThenStep staticThenStep(SearchSort sort) {
+		return new StaticSortThenStep( dslContext, sort );
 	}
 }

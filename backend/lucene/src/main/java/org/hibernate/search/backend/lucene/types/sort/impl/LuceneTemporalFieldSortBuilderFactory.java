@@ -24,8 +24,6 @@ public class LuceneTemporalFieldSortBuilderFactory<F extends TemporalAccessor, E
 	public FieldSortBuilder createFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSortable( field );
-		return new LuceneTemporalFieldSortBuilder<>(
-				searchContext, field, codec
-		);
+		return new LuceneStandardFieldSort.TemporalFieldBuilder<>( searchContext, field, codec );
 	}
 }
