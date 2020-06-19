@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexS
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
@@ -25,6 +26,8 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final NoMultiTenancyElasticsearchDocumentIdHelper documentIdHelper =
+			new NoMultiTenancyElasticsearchDocumentIdHelper();
 	private final NoMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper =
 			new NoMultiTenancyIdProjectionExtractionHelper();
 
@@ -40,8 +43,8 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public String toElasticsearchId(String tenantId, String id) {
-		return id;
+	public DocumentIdHelper getDocumentIdHelper() {
+		return documentIdHelper;
 	}
 
 	@Override
@@ -61,10 +64,17 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 		return idProjectionExtractionHelper;
 	}
 
-	@Override
-	public void checkTenantId(String tenantId, EventContext backendContext) {
-		if ( tenantId != null ) {
-			throw log.tenantIdProvidedButMultiTenancyDisabled( tenantId, backendContext );
+	private static final class NoMultiTenancyElasticsearchDocumentIdHelper implements DocumentIdHelper {
+		@Override
+		public void checkTenantId(String tenantId, EventContext backendContext) {
+			if ( tenantId != null ) {
+				throw log.tenantIdProvidedButMultiTenancyDisabled( tenantId, backendContext );
+			}
+		}
+
+		@Override
+		public String toElasticsearchId(String tenantId, String id) {
+			return id;
 		}
 	}
 

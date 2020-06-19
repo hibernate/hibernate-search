@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ro
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
@@ -36,15 +37,14 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final String TENANT_ID_FIELD_NAME = MetadataFields.internalFieldName( "tenant_id" );
 
-	private static final Pattern UNDERSCORE_PATTERN = Pattern.compile( "_" );
+	private final DiscriminatorMultiTenancyIndexSchemaRootContributor schemaRootContributor =
+			new DiscriminatorMultiTenancyIndexSchemaRootContributor();
 
-	private static final String ESCAPED_UNDERSCORE = "__";
+	private final DiscriminatorMultiTenancyElasticsearchDocumentIdHelper documentIdHelper =
+			new DiscriminatorMultiTenancyElasticsearchDocumentIdHelper();
 
 	private final DiscriminatorMultiTenancyDocumentMetadataContributor documentMetadataContributor =
 			new DiscriminatorMultiTenancyDocumentMetadataContributor();
-
-	private final DiscriminatorMultiTenancyIndexSchemaRootContributor schemaRootContributor =
-			new DiscriminatorMultiTenancyIndexSchemaRootContributor();
 
 	private final DiscriminatorMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper =
 			new DiscriminatorMultiTenancyIdProjectionExtractionHelper();
@@ -60,8 +60,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public String toElasticsearchId(String tenantId, String id) {
-		return UNDERSCORE_PATTERN.matcher( tenantId ).replaceAll( ESCAPED_UNDERSCORE ) + "_" + UNDERSCORE_PATTERN.matcher( id ).replaceAll( ESCAPED_UNDERSCORE );
+	public DocumentIdHelper getDocumentIdHelper() {
+		return documentIdHelper;
 	}
 
 	@Override
@@ -79,13 +79,6 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		return idProjectionExtractionHelper;
 	}
 
-	@Override
-	public void checkTenantId(String tenantId, EventContext backendContext) {
-		if ( tenantId == null ) {
-			throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
-		}
-	}
-
 	private static class DiscriminatorMultiTenancyIndexSchemaRootContributor implements IndexSchemaRootContributor {
 		@Override
 		public void contribute(RootTypeMapping rootTypeMapping) {
@@ -100,6 +93,24 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 			tenantIdPropertyMapping.setIndex( true );
 			tenantIdPropertyMapping.setDocValues( true );
 			rootTypeMapping.addProperty( TENANT_ID_FIELD_NAME, tenantIdPropertyMapping );
+		}
+	}
+
+	private static final class DiscriminatorMultiTenancyElasticsearchDocumentIdHelper implements DocumentIdHelper {
+		private static final Pattern UNDERSCORE_PATTERN = Pattern.compile( "_" );
+		private static final String ESCAPED_UNDERSCORE = "__";
+
+		@Override
+		public void checkTenantId(String tenantId, EventContext backendContext) {
+			if ( tenantId == null ) {
+				throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
+			}
+		}
+
+		@Override
+		public String toElasticsearchId(String tenantId, String id) {
+			return UNDERSCORE_PATTERN.matcher( tenantId ).replaceAll( ESCAPED_UNDERSCORE )
+					+ "_" + UNDERSCORE_PATTERN.matcher( id ).replaceAll( ESCAPED_UNDERSCORE );
 		}
 	}
 

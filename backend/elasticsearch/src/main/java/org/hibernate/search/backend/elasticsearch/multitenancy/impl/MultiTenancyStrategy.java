@@ -10,8 +10,8 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 
@@ -34,14 +34,9 @@ public interface MultiTenancyStrategy {
 	Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor();
 
 	/**
-	 * Converts the object id to an Elasticsearch id: in the case of discriminator-based multi-tenancy, the id of the
-	 * object is not unique so we need to disambiguate it.
-	 *
-	 * @param tenantId The id of the tenant. Might be null if multiTenancy is disabled.
-	 * @param id The id of the indexed object.
-	 * @return The Elasticsearch id.
+	 * @return A helper for creating predicates from tenant IDs.
 	 */
-	String toElasticsearchId(String tenantId, String id);
+	DocumentIdHelper getDocumentIdHelper();
 
 	/**
 	 * @return A metadata contributor for the required additional properties (tenant ID, ...),
@@ -61,12 +56,4 @@ public interface MultiTenancyStrategy {
 	 * @return A helper for projections that need to extract the document id from search hits.
 	 */
 	ProjectionExtractionHelper<String> getIdProjectionExtractionHelper();
-
-	/**
-	 * Check that the tenant id value is consistent with the strategy.
-	 *
-	 * @param tenantId The tenant id.
-	 * @param backendContext The backend.
-	 */
-	void checkTenantId(String tenantId, EventContext backendContext);
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
@@ -46,13 +47,12 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	private static final JsonObjectAccessor IDS_ACCESSOR = JsonAccessor.root().property( "ids" ).asObject();
 	private static final JsonAccessor<JsonElement> VALUES_ACCESSOR = JsonAccessor.root().property( "values" );
 
-	// TODO HSEARCH-3946 replace this with a new class, e.g. ElasticsearchIdConverterHelper
-	private final ElasticsearchSearchContext searchContext;
+	private final DocumentIdHelper documentIdHelper;
 	private final List<String> values;
 
 	private ElasticsearchMatchIdPredicate(Builder builder) {
 		super( builder );
-		searchContext = builder.searchContext;
+		documentIdHelper = builder.searchContext.documentIdHelper();
 		values = builder.values;
 		// Ensure illegal attempts to mutate the predicate will fail
 		builder.values = null;
@@ -77,7 +77,7 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 	private JsonArray toJsonArray(List<String> list, String tenantId) {
 		JsonArray jsonArray = new JsonArray( list.size() );
 		for ( String value : list ) {
-			jsonArray.add( searchContext.toElasticsearchId( tenantId, value ) );
+			jsonArray.add( documentIdHelper.toElasticsearchId( tenantId, value ) );
 		}
 		return jsonArray;
 	}
