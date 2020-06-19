@@ -37,7 +37,7 @@ public interface MultiTenancyStrategy {
 	 * @param tenantId The tenant id.
 	 * @return The filter, or {@code null} if no filter is necessary.
 	 */
-	Query getFilterOrNull(String tenantId);
+	Query filterOrNull(String tenantId);
 
 	/**
 	 * Check that the tenant id value is consistent with the strategy.

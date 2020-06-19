@@ -67,7 +67,7 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	@Override
 	public SingleDocumentIndexingWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry) {
-		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
+		Query filter = multiTenancyStrategy.filterOrNull( tenantId );
 		return new UpdateEntryWork( tenantId, entityTypeName, entityIdentifier,
 				documentIdentifier, filter, indexEntry );
 	}
@@ -75,14 +75,14 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	@Override
 	public SingleDocumentIndexingWork delete(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier) {
-		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
+		Query filter = multiTenancyStrategy.filterOrNull( tenantId );
 		return new DeleteEntryWork( tenantId, entityTypeName, entityIdentifier, documentIdentifier, filter );
 	}
 
 	@Override
 	public IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
 		List<Query> filters = new ArrayList<>();
-		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
+		Query filter = multiTenancyStrategy.filterOrNull( tenantId );
 		if ( filter != null ) {
 			filters.add( filter );
 		}

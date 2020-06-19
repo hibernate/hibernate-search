@@ -37,30 +37,30 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor() {
+	public Optional<IndexSchemaRootContributor> indexSchemaRootContributor() {
 		// No need to add anything to documents, Elasticsearch metadata is enough
 		return Optional.empty();
 	}
 
 	@Override
-	public DocumentIdHelper getDocumentIdHelper() {
+	public DocumentIdHelper documentIdHelper() {
 		return documentIdHelper;
 	}
 
 	@Override
-	public Optional<DocumentMetadataContributor> getDocumentMetadataContributor() {
+	public Optional<DocumentMetadataContributor> documentMetadataContributor() {
 		// No need to add anything to documents, Elasticsearch metadata is enough
 		return Optional.empty();
 	}
 
 	@Override
-	public JsonObject getFilterOrNull(String tenantId) {
+	public JsonObject filterOrNull(String tenantId) {
 		// No need for a filter
 		return null;
 	}
 
 	@Override
-	public NoMultiTenancyIdProjectionExtractionHelper getIdProjectionExtractionHelper() {
+	public NoMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper() {
 		return idProjectionExtractionHelper;
 	}
 

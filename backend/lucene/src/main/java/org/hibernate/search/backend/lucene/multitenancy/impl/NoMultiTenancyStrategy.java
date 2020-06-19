@@ -29,7 +29,7 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public Query getFilterOrNull(String tenantId) {
+	public Query filterOrNull(String tenantId) {
 		return null;
 	}
 
