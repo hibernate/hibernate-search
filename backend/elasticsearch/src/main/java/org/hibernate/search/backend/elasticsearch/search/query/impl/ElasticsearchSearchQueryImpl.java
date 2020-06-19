@@ -192,7 +192,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private JsonObject doExplain(URLEncodedString encodedIndexName, String id) {
 		URLEncodedString elasticsearchId = URLEncodedString.fromString(
-				searchContext.toElasticsearchId( sessionContext.tenantIdentifier(), id )
+				searchContext.documentIdHelper().toElasticsearchId( sessionContext.tenantIdentifier(), id )
 		);
 
 		JsonObject queryOnlyPayload = new JsonObject();

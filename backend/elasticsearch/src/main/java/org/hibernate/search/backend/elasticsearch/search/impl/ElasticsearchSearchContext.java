@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
@@ -59,8 +60,8 @@ public final class ElasticsearchSearchContext {
 		return searchSyntax;
 	}
 
-	public String toElasticsearchId(String tenantId, String id) {
-		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
+	public DocumentIdHelper documentIdHelper() {
+		return multiTenancyStrategy.getDocumentIdHelper();
 	}
 
 	public ElasticsearchSearchIndexesContext indexes() {
