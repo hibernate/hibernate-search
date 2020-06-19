@@ -61,7 +61,7 @@ public final class ElasticsearchSearchContext {
 	}
 
 	public DocumentIdHelper documentIdHelper() {
-		return multiTenancyStrategy.getDocumentIdHelper();
+		return multiTenancyStrategy.documentIdHelper();
 	}
 
 	public ElasticsearchSearchIndexesContext indexes() {
@@ -69,6 +69,6 @@ public final class ElasticsearchSearchContext {
 	}
 
 	public JsonObject filterOrNull(String tenantId) {
-		return multiTenancyStrategy.getFilterOrNull( tenantId );
+		return multiTenancyStrategy.filterOrNull( tenantId );
 	}
 }

@@ -66,7 +66,7 @@ public final class LuceneSearchContext {
 	}
 
 	public Query filterOrNull(String tenantId) {
-		return multiTenancyStrategy.getFilterOrNull( tenantId );
+		return multiTenancyStrategy.filterOrNull( tenantId );
 	}
 
 	public TimeoutManager createTimeoutManager(Query definitiveLuceneQuery,

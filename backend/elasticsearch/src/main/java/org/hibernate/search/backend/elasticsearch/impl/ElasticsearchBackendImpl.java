@@ -214,7 +214,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		typeNameMapping.getIndexSchemaRootContributor()
 				.ifPresent( builder::addSchemaRootContributor );
 
-		multiTenancyStrategy.getIndexSchemaRootContributor()
+		multiTenancyStrategy.indexSchemaRootContributor()
 				.ifPresent( builder::addSchemaRootContributor );
 
 		return builder;
@@ -224,7 +224,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		List<DocumentMetadataContributor> contributors = new ArrayList<>();
 		typeNameMapping.getDocumentMetadataContributor( mappedTypeName )
 				.ifPresent( contributors::add );
-		multiTenancyStrategy.getDocumentMetadataContributor()
+		multiTenancyStrategy.documentMetadataContributor()
 				.ifPresent( contributors::add );
 		return contributors;
 	}

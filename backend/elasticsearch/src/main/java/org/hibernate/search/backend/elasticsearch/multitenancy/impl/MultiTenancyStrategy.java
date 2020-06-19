@@ -31,18 +31,18 @@ public interface MultiTenancyStrategy {
 	 * @return A schema contributor for the required additional properties (tenant ID, ...),
 	 * or an empty optional.
 	 */
-	Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor();
+	Optional<IndexSchemaRootContributor> indexSchemaRootContributor();
 
 	/**
 	 * @return A helper for creating predicates from tenant IDs.
 	 */
-	DocumentIdHelper getDocumentIdHelper();
+	DocumentIdHelper documentIdHelper();
 
 	/**
 	 * @return A metadata contributor for the required additional properties (tenant ID, ...),
 	 * or an empty optional.
 	 */
-	Optional<DocumentMetadataContributor> getDocumentMetadataContributor();
+	Optional<DocumentMetadataContributor> documentMetadataContributor();
 
 	/**
 	 * Generate a filter for the given tenant ID, to be applied to search queries.
@@ -50,10 +50,10 @@ public interface MultiTenancyStrategy {
 	 * @param tenantId The tenant id.
 	 * @return The filter, or {@code null} if no filter is necessary.
 	 */
-	JsonObject getFilterOrNull(String tenantId);
+	JsonObject filterOrNull(String tenantId);
 
 	/**
 	 * @return A helper for projections that need to extract the document id from search hits.
 	 */
-	ProjectionExtractionHelper<String> getIdProjectionExtractionHelper();
+	ProjectionExtractionHelper<String> idProjectionExtractionHelper();
 }

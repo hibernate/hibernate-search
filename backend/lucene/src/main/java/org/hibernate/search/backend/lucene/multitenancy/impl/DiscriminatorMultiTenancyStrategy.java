@@ -32,7 +32,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public Query getFilterOrNull(String tenantId) {
+	public Query filterOrNull(String tenantId) {
 		return Queries.term( MetadataFields.tenantIdFieldName(), tenantId );
 	}
 

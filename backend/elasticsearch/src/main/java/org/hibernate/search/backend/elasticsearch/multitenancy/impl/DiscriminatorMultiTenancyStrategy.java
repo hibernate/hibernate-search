@@ -55,27 +55,27 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor() {
+	public Optional<IndexSchemaRootContributor> indexSchemaRootContributor() {
 		return Optional.of( schemaRootContributor );
 	}
 
 	@Override
-	public DocumentIdHelper getDocumentIdHelper() {
+	public DocumentIdHelper documentIdHelper() {
 		return documentIdHelper;
 	}
 
 	@Override
-	public Optional<DocumentMetadataContributor> getDocumentMetadataContributor() {
+	public Optional<DocumentMetadataContributor> documentMetadataContributor() {
 		return Optional.of( documentMetadataContributor );
 	}
 
 	@Override
-	public JsonObject getFilterOrNull(String tenantId) {
+	public JsonObject filterOrNull(String tenantId) {
 		return Queries.term( TENANT_ID_FIELD_NAME, tenantId );
 	}
 
 	@Override
-	public DiscriminatorMultiTenancyIdProjectionExtractionHelper getIdProjectionExtractionHelper() {
+	public DiscriminatorMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper() {
 		return idProjectionExtractionHelper;
 	}
 
