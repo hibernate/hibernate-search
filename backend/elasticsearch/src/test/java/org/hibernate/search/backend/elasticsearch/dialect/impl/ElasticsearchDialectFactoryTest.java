@@ -229,7 +229,7 @@ public class ElasticsearchDialectFactoryTest {
 	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es7() {
 		testSuccess(
-				"7", "7.7.0",
+				"7", "7.8.0",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}
@@ -383,6 +383,24 @@ public class ElasticsearchDialectFactoryTest {
 	public void es770() {
 		testSuccess(
 				"7.7.0", "7.7.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3956")
+	public void es78() {
+		testSuccess(
+				"7.8", "7.8.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3956")
+	public void es780() {
+		testSuccess(
+				"7.8.0", "7.8.0",
 				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
 		);
 	}
