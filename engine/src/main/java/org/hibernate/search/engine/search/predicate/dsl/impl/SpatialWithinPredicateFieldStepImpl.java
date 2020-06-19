@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
 class SpatialWithinPredicateFieldStepImpl
@@ -18,8 +18,8 @@ class SpatialWithinPredicateFieldStepImpl
 
 	private final SpatialWithinPredicateFieldMoreStepImpl.CommonState commonState;
 
-	SpatialWithinPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.commonState = new SpatialWithinPredicateFieldMoreStepImpl.CommonState( builderFactory );
+	SpatialWithinPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+		this.commonState = new SpatialWithinPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 
 	@Override

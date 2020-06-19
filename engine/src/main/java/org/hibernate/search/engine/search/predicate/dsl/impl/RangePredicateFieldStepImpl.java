@@ -10,14 +10,14 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 class RangePredicateFieldStepImpl implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {
 
 	private final RangePredicateFieldMoreStepImpl.CommonState commonState;
 
-	RangePredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState( builderFactory );
+	RangePredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 
 	@Override

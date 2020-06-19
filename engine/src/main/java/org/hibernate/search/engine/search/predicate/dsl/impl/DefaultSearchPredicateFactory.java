@@ -24,30 +24,30 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
 public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 
-	private final SearchPredicateBuilderFactory<?> builderFactory;
+	private final SearchPredicateDslContext<?> dslContext;
 
-	public DefaultSearchPredicateFactory(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.builderFactory = builderFactory;
+	public DefaultSearchPredicateFactory(SearchPredicateDslContext<?> dslContext) {
+		this.dslContext = dslContext;
 	}
 
 	@Override
 	public MatchAllPredicateOptionsStep<?> matchAll() {
-		return new MatchAllPredicateOptionsStepImpl( builderFactory, this );
+		return new MatchAllPredicateOptionsStepImpl( dslContext, this );
 	}
 
 	@Override
 	public MatchIdPredicateMatchingStep<?> id() {
-		return new MatchIdPredicateMatchingStepImpl( builderFactory );
+		return new MatchIdPredicateMatchingStepImpl( dslContext );
 	}
 
 	@Override
 	public BooleanPredicateClausesStep<?> bool() {
-		return new BooleanPredicateClausesStepImpl( builderFactory, this );
+		return new BooleanPredicateClausesStepImpl( dslContext, this );
 	}
 
 	@Override
@@ -59,54 +59,54 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 
 	@Override
 	public MatchPredicateFieldStep<?> match() {
-		return new MatchPredicateFieldStepImpl( builderFactory );
+		return new MatchPredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
 	public RangePredicateFieldStep<?> range() {
-		return new RangePredicateFieldStepImpl( builderFactory );
+		return new RangePredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
 	public PhrasePredicateFieldStep<?> phrase() {
-		return new PhrasePredicateFieldStepImpl( builderFactory );
+		return new PhrasePredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
 	public WildcardPredicateFieldStep<?> wildcard() {
-		return new WildcardPredicateFieldStepImpl( builderFactory );
+		return new WildcardPredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
 	public NestedPredicateFieldStep<?> nested() {
-		return new NestedPredicateFieldStepImpl( builderFactory, this );
+		return new NestedPredicateFieldStepImpl( dslContext, this );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateFieldStep<?> simpleQueryString() {
-		return new SimpleQueryStringPredicateFieldStepImpl( builderFactory );
+		return new SimpleQueryStringPredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
 	public ExistsPredicateFieldStep<?> exists() {
-		return new ExistsPredicateFieldStepImpl( builderFactory );
+		return new ExistsPredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
 	public SpatialPredicateInitialStep spatial() {
-		return new SpatialPredicateInitialStepImpl( builderFactory );
+		return new SpatialPredicateInitialStepImpl( dslContext );
 	}
 
 	@Override
 	public <T> T extension(SearchPredicateFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, builderFactory )
+				extension, extension.extendOptional( this, dslContext )
 		);
 	}
 
 	@Override
 	public SearchPredicateFactoryExtensionIfSupportedStep extension() {
-		return new SearchPredicateFactoryExtensionStep( this, builderFactory );
+		return new SearchPredicateFactoryExtensionStep( this, dslContext );
 	}
 
 }

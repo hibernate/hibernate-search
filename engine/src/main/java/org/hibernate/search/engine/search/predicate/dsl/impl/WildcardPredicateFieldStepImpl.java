@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMoreStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
 class WildcardPredicateFieldStepImpl
@@ -18,8 +18,8 @@ class WildcardPredicateFieldStepImpl
 
 	private final WildcardPredicateFieldMoreStepImpl.CommonState commonState;
 
-	WildcardPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState( builderFactory );
+	WildcardPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 
 	@Override

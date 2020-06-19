@@ -8,18 +8,18 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 class SpatialPredicateInitialStepImpl implements SpatialPredicateInitialStep {
 
-	private final SearchPredicateBuilderFactory<?> factory;
+	private final SearchPredicateDslContext<?> dslContext;
 
-	SpatialPredicateInitialStepImpl(SearchPredicateBuilderFactory<?> factory) {
-		this.factory = factory;
+	SpatialPredicateInitialStepImpl(SearchPredicateDslContext<?> dslContext) {
+		this.dslContext = dslContext;
 	}
 
 	@Override
 	public SpatialWithinPredicateFieldStep<?> within() {
-		return new SpatialWithinPredicateFieldStepImpl( factory );
+		return new SpatialWithinPredicateFieldStepImpl( dslContext );
 	}
 }

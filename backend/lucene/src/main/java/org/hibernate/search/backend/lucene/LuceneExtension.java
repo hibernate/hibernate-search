@@ -35,6 +35,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -45,7 +46,6 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -149,11 +149,13 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<LuceneSearchPredicateFactory> extendOptional(
-			SearchPredicateFactory original, SearchPredicateBuilderFactory<C> factory) {
-		if ( factory instanceof LuceneSearchPredicateBuilderFactory ) {
+	@SuppressWarnings("unchecked") // If the factory is an instance of LuceneSearchPredicateBuilderFactory, the cast is safe
+	public Optional<LuceneSearchPredicateFactory> extendOptional(SearchPredicateFactory original,
+			SearchPredicateDslContext<?> dslContext) {
+		if ( dslContext.builderFactory() instanceof LuceneSearchPredicateBuilderFactory ) {
 			return Optional.of( new LuceneSearchPredicateFactoryImpl(
-					original, (LuceneSearchPredicateBuilderFactory) factory
+					original,
+					(SearchPredicateDslContext<LuceneSearchPredicateBuilderFactory>) dslContext
 			) );
 		}
 		else {

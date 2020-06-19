@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchCondit
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class BooleanPredicateClausesStepImpl
@@ -29,11 +29,11 @@ class BooleanPredicateClausesStepImpl
 
 	private final MinimumShouldMatchConditionStepImpl<BooleanPredicateClausesStep<?>> minimumShouldMatchStep;
 
-	BooleanPredicateClausesStepImpl(SearchPredicateBuilderFactory<?> builderFactory,
+	BooleanPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
-		super( builderFactory );
+		super( dslContext );
 		this.factory = factory;
-		this.builder = builderFactory.bool();
+		this.builder = dslContext.builderFactory().bool();
 		this.minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( builder, this );
 	}
 

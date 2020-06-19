@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -79,8 +80,8 @@ class MatchPredicateFieldMoreStepImpl
 	static class CommonState extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, MatchPredicateFieldMoreStepImpl>
 			implements MatchPredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
-			super( builderFactory );
+		CommonState(SearchPredicateDslContext<?> dslContext) {
+			super( dslContext );
 		}
 
 		MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {

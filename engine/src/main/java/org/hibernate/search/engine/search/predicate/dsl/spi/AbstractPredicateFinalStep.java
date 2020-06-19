@@ -8,19 +8,18 @@ package org.hibernate.search.engine.search.predicate.dsl.spi;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 /**
  * An abstract base for {@link PredicateFinalStep} implementations.
  */
 public abstract class AbstractPredicateFinalStep implements PredicateFinalStep {
 
-	protected final SearchPredicateBuilderFactory<?> builderFactory;
+	protected final SearchPredicateDslContext<?> dslContext;
 
 	private SearchPredicate predicateResult;
 
-	public AbstractPredicateFinalStep(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.builderFactory = builderFactory;
+	public AbstractPredicateFinalStep(SearchPredicateDslContext<?> dslContext) {
+		this.dslContext = dslContext;
 	}
 
 	@Override

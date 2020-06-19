@@ -16,6 +16,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -79,8 +80,8 @@ class WildcardPredicateFieldMoreStepImpl
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, WildcardPredicateFieldMoreStepImpl>
 			implements WildcardPredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
-			super( builderFactory );
+		CommonState(SearchPredicateDslContext<?> dslContext) {
+			super( dslContext );
 		}
 
 		private WildcardPredicateOptionsStep<?> matching(String wildcardPattern) {

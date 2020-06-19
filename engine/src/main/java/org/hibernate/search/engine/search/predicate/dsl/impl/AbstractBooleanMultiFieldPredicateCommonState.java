@@ -16,6 +16,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -46,12 +47,12 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 	private Float predicateLevelBoost;
 	private boolean withConstantScore = false;
 
-	AbstractBooleanMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?> factory) {
-		super( factory );
+	AbstractBooleanMultiFieldPredicateCommonState(SearchPredicateDslContext<?> dslContext) {
+		super( dslContext );
 	}
 
 	public SearchPredicateBuilderFactory<?> getFactory() {
-		return builderFactory;
+		return dslContext.builderFactory();
 	}
 
 	public void add(F fieldSetState) {
@@ -79,7 +80,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 			fieldSetState.contributePredicates( predicates::add );
 		}
 		if ( predicates.size() > 1 ) {
-			BooleanPredicateBuilder boolBuilder = builderFactory.bool();
+			BooleanPredicateBuilder boolBuilder = getFactory().bool();
 			for ( SearchPredicate predicate : predicates ) {
 				boolBuilder.should( predicate );
 			}

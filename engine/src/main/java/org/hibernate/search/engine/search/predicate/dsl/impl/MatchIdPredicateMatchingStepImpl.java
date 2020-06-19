@@ -12,8 +12,8 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatching
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 class MatchIdPredicateMatchingStepImpl
 		extends AbstractPredicateFinalStep
@@ -22,9 +22,9 @@ class MatchIdPredicateMatchingStepImpl
 
 	private final MatchIdPredicateBuilder matchIdBuilder;
 
-	MatchIdPredicateMatchingStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
-		super( builderFactory );
-		this.matchIdBuilder = builderFactory.id();
+	MatchIdPredicateMatchingStepImpl(SearchPredicateDslContext<?> dslContext) {
+		super( dslContext );
+		this.matchIdBuilder = dslContext.builderFactory().id();
 	}
 
 	@Override
