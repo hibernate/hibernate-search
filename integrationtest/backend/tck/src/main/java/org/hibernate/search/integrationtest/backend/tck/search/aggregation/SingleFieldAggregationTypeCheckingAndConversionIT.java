@@ -253,32 +253,6 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	}
 
 	@Test
-	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testUnknownFieldNameThrowsException")
-	public void unknownField() {
-		String fieldPath = "unknownField";
-
-		AggregationScenario<?> scenario = expectations.simple();
-
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown field" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
-				.hasMessageContaining( mainIndex.name() );
-	}
-
-	@Test
-	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testNullFieldNameThrowsException")
-	public void nullFieldPath() {
-		// Try to pass a "null" field type
-		AggregationScenario<?> scenario = expectations.simple();
-
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), null ) )
-				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "'absoluteFieldPath'" )
-				.hasMessageContaining( "must not be null" );
-	}
-
-	@Test
 	public void nullFieldType() {
 		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 
@@ -289,32 +263,6 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'type'" )
 				.hasMessageContaining( "must not be null" );
-	}
-
-	@Test
-	public void objectField_nested() {
-		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName;
-
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( fieldType ) );
-
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown field" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
-				.hasMessageContaining( mainIndex.name() );
-	}
-
-	@Test
-	public void objectField_flattened() {
-		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName;
-
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( fieldType ) );
-
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown field" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
-				.hasMessageContaining( mainIndex.name() );
 	}
 
 	/**
@@ -377,7 +325,6 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( "Multiple aggregations with the same key: " )
 				.hasMessageContaining( "'aggregationName1'" );
 	}
-
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1748")
