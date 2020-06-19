@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 /**
  * A wrapper around {@link MappedIndexManager} providing some syntactic sugar,
@@ -154,6 +155,13 @@ public abstract class StubMappedIndex {
 
 	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
 		return delegate().createWorkspace( sessionContext );
+	}
+
+	/**
+	 * @return {@code createScope().query()}.
+	 */
+	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
+		return createScope().query();
 	}
 
 	/**

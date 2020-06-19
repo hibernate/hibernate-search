@@ -13,12 +13,21 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
 
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ObjectAssert;
 
 public class SearchResultAssert<H> {
+
+	public static <H> SearchResultAssert<H> assertThatQuery(SearchQueryFinalStep<? extends H> finalStep) {
+		return assertThatQuery( finalStep.toQuery() );
+	}
+
+	public static <H> SearchResultAssert<H> assertThatQuery(SearchQuery<? extends H> searchQuery) {
+		return SearchResultAssert.<H>assertThat( searchQuery.fetchAll() ).fromQuery( searchQuery );
+	}
 
 	public static <H> SearchResultAssert<H> assertThat(SearchQuery<? extends H> searchQuery) {
 		return SearchResultAssert.<H>assertThat( searchQuery.fetchAll() ).fromQuery( searchQuery );
