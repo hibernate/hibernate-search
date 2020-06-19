@@ -180,7 +180,7 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 	}
 
 	private boolean isAggregationSupported() {
-		return new TermsAggregationDescriptor().getSingleFieldAggregationExpectations( fieldType ).isSupported();
+		return TermsAggregationDescriptor.INSTANCE.getSingleFieldAggregationExpectations( fieldType ).isSupported();
 	}
 
 	private class IndexBinding {
