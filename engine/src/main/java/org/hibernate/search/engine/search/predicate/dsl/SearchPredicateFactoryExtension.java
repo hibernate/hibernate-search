@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 /**
  * An extension to the search predicate DSL, allowing the use of non-standard predicates in a query.
@@ -33,14 +33,11 @@ public interface SearchPredicateFactoryExtension<T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param <C> The type of query element collector for the given predicate builder factory.
-	 * @param <B> The implementation type of builders for the given predicate builder factory.
 	 * @param original The original, non-extended {@link SearchPredicateFactory}.
-	 * @param factory A {@link SearchPredicateBuilderFactory}.
+	 * @param dslContext A {@link SearchPredicateDslContext}.
 	 * @return An optional containing the extended search predicate factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	<C, B> Optional<T> extendOptional(SearchPredicateFactory original,
-			SearchPredicateBuilderFactory<C> factory);
+	Optional<T> extendOptional(SearchPredicateFactory original, SearchPredicateDslContext<?> dslContext);
 
 }

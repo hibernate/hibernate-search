@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateOptionsSt
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class NestedPredicateFieldStepImpl
@@ -28,14 +28,14 @@ class NestedPredicateFieldStepImpl
 	private final SearchPredicateFactory factory;
 	private NestedPredicateBuilder builder;
 
-	NestedPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory, SearchPredicateFactory factory) {
-		super( builderFactory );
+	NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, SearchPredicateFactory factory) {
+		super( dslContext );
 		this.factory = factory;
 	}
 
 	@Override
 	public NestedPredicateNestStep<?> objectField(String absoluteFieldPath) {
-		this.builder = builderFactory.nested( absoluteFieldPath );
+		this.builder = dslContext.builderFactory().nested( absoluteFieldPath );
 		return this;
 	}
 

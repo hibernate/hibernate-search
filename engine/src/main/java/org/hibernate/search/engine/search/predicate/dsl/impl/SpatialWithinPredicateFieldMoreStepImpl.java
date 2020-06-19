@@ -14,8 +14,8 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -123,8 +123,8 @@ class SpatialWithinPredicateFieldMoreStepImpl
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, SpatialWithinPredicateFieldMoreStepImpl>
 			implements SpatialWithinPredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
-			super( builderFactory );
+		CommonState(SearchPredicateDslContext<?> dslContext) {
+			super( dslContext );
 		}
 
 		SpatialWithinPredicateOptionsStep<?> circle(GeoPoint center, double radius, DistanceUnit unit) {

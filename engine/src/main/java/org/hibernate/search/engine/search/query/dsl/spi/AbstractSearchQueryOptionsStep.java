@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -72,7 +73,9 @@ public abstract class AbstractSearchQueryOptionsStep<
 	@Override
 	public S where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
 		SearchPredicateBuilderFactory<? super C> builderFactory = indexScope.searchPredicateBuilderFactory();
-		SearchPredicateFactory factory = new DefaultSearchPredicateFactory( builderFactory );
+		SearchPredicateFactory factory = new DefaultSearchPredicateFactory(
+				SearchPredicateDslContextImpl.root( builderFactory )
+		);
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
 		contribute( builderFactory, predicate );
 		return thisAsS();
@@ -119,7 +122,9 @@ public abstract class AbstractSearchQueryOptionsStep<
 	public S sort(Function<? super SF, ? extends SortFinalStep> sortContributor) {
 		SearchSortBuilderFactory<? super C> builderFactory = indexScope.searchSortBuilderFactory();
 		SearchPredicateBuilderFactory<? super C> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
-		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory( predicateBuilderFactory );
+		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory(
+				SearchPredicateDslContextImpl.root( predicateBuilderFactory )
+		);
 		SearchSortFactory factory = new DefaultSearchSortFactory(
 				SearchSortDslContextImpl.root( builderFactory, predicateFactory )
 		);
@@ -139,7 +144,9 @@ public abstract class AbstractSearchQueryOptionsStep<
 	public <A> S aggregation(AggregationKey<A> key, Function<? super AF, ? extends AggregationFinalStep<A>> aggregationContributor) {
 		SearchAggregationBuilderFactory<? super C> builderFactory = indexScope.searchAggregationFactory();
 		SearchPredicateBuilderFactory<? super C> predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
-		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory( predicateBuilderFactory );
+		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory(
+				SearchPredicateDslContextImpl.root( predicateBuilderFactory )
+		);
 		AF factory = extendAggregationFactory( new DefaultSearchAggregationFactory(
 				SearchAggregationDslContextImpl.root( builderFactory, predicateFactory )
 		) );

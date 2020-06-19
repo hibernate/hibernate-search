@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
 class SimpleQueryStringPredicateFieldStepImpl
@@ -18,8 +18,8 @@ class SimpleQueryStringPredicateFieldStepImpl
 
 	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState commonState;
 
-	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState( builderFactory );
+	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 
 	@Override

@@ -13,9 +13,9 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptions
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class MatchAllPredicateOptionsStepImpl
@@ -27,11 +27,11 @@ class MatchAllPredicateOptionsStepImpl
 	private final MatchAllPredicateBuilder matchAllBuilder;
 	private MatchAllExceptState exceptState;
 
-	MatchAllPredicateOptionsStepImpl(SearchPredicateBuilderFactory<?> builderFactory,
+	MatchAllPredicateOptionsStepImpl(SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
-		super( builderFactory );
+		super( dslContext );
 		this.factory = factory;
-		this.matchAllBuilder = builderFactory.matchAll();
+		this.matchAllBuilder = dslContext.builderFactory().matchAll();
 	}
 
 	@Override
@@ -75,7 +75,7 @@ class MatchAllPredicateOptionsStepImpl
 		private final BooleanPredicateBuilder booleanBuilder;
 
 		MatchAllExceptState() {
-			this.booleanBuilder = MatchAllPredicateOptionsStepImpl.this.builderFactory.bool();
+			this.booleanBuilder = dslContext.builderFactory().bool();
 		}
 
 		void addClause(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {

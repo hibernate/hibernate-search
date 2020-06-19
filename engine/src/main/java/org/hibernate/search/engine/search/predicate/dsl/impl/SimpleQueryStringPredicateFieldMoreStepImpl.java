@@ -20,8 +20,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -70,9 +70,9 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 
 		private final List<SimpleQueryStringPredicateFieldMoreStepImpl> fieldSetStates = new ArrayList<>();
 
-		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
-			super( builderFactory );
-			this.builder = builderFactory.simpleQueryString();
+		CommonState(SearchPredicateDslContext<?> dslContext) {
+			super( dslContext );
+			this.builder = dslContext.builderFactory().simpleQueryString();
 		}
 
 		@Override

@@ -10,15 +10,15 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
 class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
 
 	private final MatchPredicateFieldMoreStepImpl.CommonState commonState;
 
-	MatchPredicateFieldStepImpl(SearchPredicateBuilderFactory<?> builderFactory) {
-		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState( builderFactory );
+	MatchPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 
 	@Override

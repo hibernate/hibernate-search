@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.data.Range;
@@ -82,8 +83,8 @@ class RangePredicateFieldMoreStepImpl
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, RangePredicateFieldMoreStepImpl>
 			implements RangePredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
-			super( builderFactory );
+		CommonState(SearchPredicateDslContext<?> dslContext) {
+			super( dslContext );
 		}
 
 		CommonState range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {

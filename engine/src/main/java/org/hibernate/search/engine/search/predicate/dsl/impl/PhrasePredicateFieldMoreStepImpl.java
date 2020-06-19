@@ -16,6 +16,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -79,8 +80,8 @@ class PhrasePredicateFieldMoreStepImpl
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState, PhrasePredicateFieldMoreStepImpl>
 			implements PhrasePredicateOptionsStep<CommonState> {
 
-		CommonState(SearchPredicateBuilderFactory<?> builderFactory) {
-			super( builderFactory );
+		CommonState(SearchPredicateDslContext<?> dslContext) {
+			super( dslContext );
 		}
 
 		private PhrasePredicateOptionsStep<?> matching(String phrase) {
