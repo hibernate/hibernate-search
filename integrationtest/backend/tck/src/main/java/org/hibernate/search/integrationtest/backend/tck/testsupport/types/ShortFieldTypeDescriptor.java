@@ -66,12 +66,17 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 		return new IndexableValues<Short>() {
 			@Override
 			protected List<Short> createSingle() {
-				return Arrays.asList(
-						Short.MIN_VALUE, Short.MAX_VALUE,
-						(short) -25435, (short) -42, (short) -1, (short) 0, (short) 1, (short) 3, (short) 42, (short) 18353
-				);
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<Short> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				Short.MIN_VALUE, Short.MAX_VALUE,
+				(short) -25435, (short) -42, (short) -1, (short) 0, (short) 1, (short) 3, (short) 42, (short) 18353
+		);
 	}
 
 	@Override

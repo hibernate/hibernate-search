@@ -72,6 +72,8 @@ public abstract class FieldTypeDescriptor<F> {
 
 	private final IndexableValues<F> indexableValues = createIndexableValues();
 
+	private final List<F> uniquelyMatchableValues = Collections.unmodifiableList( createUniquelyMatchableValues() );
+
 	protected FieldTypeDescriptor(Class<F> javaType) {
 		this( javaType, javaType.getSimpleName() );
 	}
@@ -131,6 +133,17 @@ public abstract class FieldTypeDescriptor<F> {
 	}
 
 	protected abstract IndexableValues<F> createIndexableValues();
+
+	/**
+	 * @return A set of values that can be uniquely matched using predicates.
+	 * This excludes empty strings in particular.
+	 * This also means distinct values for analyzed/normalized text cannot share the same token.
+	 */
+	public final List<F> getUniquelyMatchableValues() {
+		return uniquelyMatchableValues;
+	}
+
+	protected abstract List<F> createUniquelyMatchableValues();
 
 	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
 

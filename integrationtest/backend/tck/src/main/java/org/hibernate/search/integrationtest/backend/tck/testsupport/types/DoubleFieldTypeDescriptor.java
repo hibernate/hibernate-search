@@ -59,21 +59,24 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 		return new IndexableValues<Double>() {
 			@Override
 			protected List<Double> createSingle() {
-				return Arrays.asList(
-						Double.MIN_VALUE, Double.MAX_VALUE,
-						- Double.MIN_VALUE, - Double.MAX_VALUE,
-						// Elasticsearch doesn't support these: it fails when parsing them
-						//Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NaN,
-						0.0,
-						-0.0, // Negative 0 is a different double
-						Math.nextDown( 0.0 ),
-						Math.nextUp( 0.0 ),
-						42.42,
-						1584514514.000000184,
-						-1.001, 3.0, 5.1
-				);
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<Double> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				Double.MIN_VALUE, Double.MAX_VALUE,
+				- Double.MIN_VALUE, - Double.MAX_VALUE,
+				// Elasticsearch doesn't support these: it fails when parsing them
+				//Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.NaN,
+				0.0,
+				-0.0, // Negative 0 is a different double
+				42.42,
+				1584514514.000000184,
+				-1.001, 3.0, 5.1
+		);
 	}
 
 	@Override

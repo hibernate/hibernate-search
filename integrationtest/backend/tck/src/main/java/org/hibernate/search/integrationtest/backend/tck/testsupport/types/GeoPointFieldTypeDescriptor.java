@@ -59,6 +59,17 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
+	protected List<GeoPoint> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				GeoPoint.of( 0.0, 0.0 ),
+				GeoPoint.of( 42.0, -42.0 ),
+				GeoPoint.of( 40, 70 ),
+				GeoPoint.of( 40, 75 ),
+				GeoPoint.of( 40, 80 )
+		);
+	}
+
+	@Override
 	public Optional<MatchPredicateExpectations<GeoPoint>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<GeoPoint>(
 				// The values are meaningless, we expect the match predicate to fail

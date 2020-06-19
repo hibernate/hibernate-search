@@ -62,17 +62,22 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 		return new IndexableValues<LocalTime>() {
 			@Override
 			protected List<LocalTime> createSingle() {
-				return Arrays.asList(
-						LocalTime.of( 0, 0, 0, 0 ),
-						LocalTime.of( 10, 15, 30, 0 ),
-						LocalTime.of( 11, 15, 30, 555_000_000 ),
-						LocalTime.of( 23, 59, 59, 999_000_000 ),
-						LocalTime.of( 10, 10, 10, 123_000_000 ),
-						LocalTime.of( 11, 10, 10, 123_450_000 ),
-						LocalTime.of( 12, 10, 10, 123_456_789 )
-				);
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<LocalTime> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				LocalTime.of( 0, 0, 0, 0 ),
+				LocalTime.of( 10, 15, 30, 0 ),
+				LocalTime.of( 11, 15, 30, 555_000_000 ),
+				LocalTime.of( 23, 59, 59, 999_000_000 ),
+				LocalTime.of( 10, 10, 10, 123_000_000 ),
+				LocalTime.of( 11, 10, 12, 123_450_000 ),
+				LocalTime.of( 12, 10, 11, 123_456_789 )
+		);
 	}
 
 	@Override

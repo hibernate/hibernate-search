@@ -66,6 +66,14 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
+	protected List<Boolean> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				true,
+				false
+		);
+	}
+
+	@Override
 	public Optional<MatchPredicateExpectations<Boolean>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
 				true, false

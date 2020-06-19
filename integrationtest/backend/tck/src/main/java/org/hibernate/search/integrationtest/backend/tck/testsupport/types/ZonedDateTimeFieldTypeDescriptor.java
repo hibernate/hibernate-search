@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -14,8 +15,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
@@ -111,6 +114,26 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 				return values;
 			}
 		};
+	}
+
+	@Override
+	protected List<ZonedDateTime> createUniquelyMatchableValues() {
+		List<ZonedDateTime> values = new ArrayList<>();
+		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
+			for ( ZoneId zoneId : createIndexableZoneIdList() ) {
+				values.add( localDateTime.atZone( zoneId ) );
+			}
+		}
+		// Remove duplicates when it comes to matching timestamps: all dates are converted to UTC when indexed.
+		Set<Instant> instants = new HashSet<>();
+		List<ZonedDateTime> uniqueTimestampValues = new ArrayList<>();
+		for ( ZonedDateTime value : values ) {
+			Instant instant = value.toInstant();
+			if ( instants.add( instant ) ) {
+				uniqueTimestampValues.add( value );
+			}
+		}
+		return uniqueTimestampValues;
 	}
 
 	private List<ZoneId> createIndexableZoneIdList() {

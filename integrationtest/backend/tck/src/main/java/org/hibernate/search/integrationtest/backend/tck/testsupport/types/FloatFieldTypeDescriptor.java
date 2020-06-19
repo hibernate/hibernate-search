@@ -59,21 +59,24 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 		return new IndexableValues<Float>() {
 			@Override
 			protected List<Float> createSingle() {
-				return Arrays.asList(
-						Float.MIN_VALUE, Float.MAX_VALUE,
-						- Float.MIN_VALUE, - Float.MAX_VALUE,
-						// Elasticsearch doesn't support these: it fails when parsing them
-						//Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NaN,
-						0.0f,
-						-0.0f, // Negative 0 is a different float
-						Math.nextDown( 0.0f ),
-						Math.nextUp( 0.0f ),
-						42.42f,
-						1584514514.000000184f,
-						-1.001f, 3.0f, 5.1f
-				);
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<Float> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				Float.MIN_VALUE, Float.MAX_VALUE,
+				- Float.MIN_VALUE, - Float.MAX_VALUE,
+				// Elasticsearch doesn't support these: it fails when parsing them
+				//Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NaN,
+				0.0f,
+				-0.0f, // Negative 0 is a different float
+				42.42f,
+				1584514514.000000184f,
+				-1.001f, 3.0f, 5.1f
+		);
 	}
 
 	@Override

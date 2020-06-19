@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
@@ -70,15 +74,29 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 		return new IndexableValues<OffsetTime>() {
 			@Override
 			protected List<OffsetTime> createSingle() {
-				List<OffsetTime> values = new ArrayList<>();
-				for ( LocalTime localTime : LocalTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
-					for ( ZoneOffset offset : OffsetDateTimeFieldTypeDescriptor.INSTANCE.createIndexableOffsetList() ) {
-						values.add( localTime.atOffset( offset ) );
-					}
-				}
-				return values;
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<OffsetTime> createUniquelyMatchableValues() {
+		List<OffsetTime> values = new ArrayList<>();
+		for ( LocalTime localTime : LocalTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
+			for ( ZoneOffset offset : OffsetDateTimeFieldTypeDescriptor.INSTANCE.createIndexableOffsetList() ) {
+				values.add( localTime.atOffset( offset ) );
+			}
+		}
+		// Remove duplicates when it comes to matching timestamps: all times are converted to UTC when indexed.
+		Set<Instant> instants = new HashSet<>();
+		List<OffsetTime> uniqueTimestampValues = new ArrayList<>();
+		for ( OffsetTime value : values ) {
+			Instant instant = value.atDate( LocalDate.of( 1970, 1, 1 ) ).toInstant();
+			if ( instants.add( instant ) ) {
+				uniqueTimestampValues.add( value );
+			}
+		}
+		return uniqueTimestampValues;
 	}
 
 	@Override
