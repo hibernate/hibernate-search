@@ -59,12 +59,17 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 		return new IndexableValues<Integer>() {
 			@Override
 			protected List<Integer> createSingle() {
-				return Arrays.asList(
-						Integer.MIN_VALUE, Integer.MAX_VALUE,
-						-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
-				);
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<Integer> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				Integer.MIN_VALUE, Integer.MAX_VALUE,
+				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
+		);
 	}
 
 	@Override

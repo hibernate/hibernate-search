@@ -66,23 +66,27 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 		return new IndexableValues<MonthDay>() {
 			@Override
 			protected List<MonthDay> createSingle() {
-				List<MonthDay> values = new ArrayList<>();
-				Arrays.stream( Month.values() ).forEach( month -> {
-					values.add( MonthDay.of( month, 1 ) );
-					values.add( MonthDay.of( month, 3 ) );
-					values.add( MonthDay.of( month, 14 ) );
-					values.add( MonthDay.of( month, 28 ) );
-				} );
-				Collections.addAll(
-						values,
-						MonthDay.of( Month.FEBRUARY, 28 ),
-						MonthDay.of( Month.FEBRUARY, 29 ), // HSEARCH-3549
-						MonthDay.of( Month.JUNE, 30 ),
-						MonthDay.of( Month.DECEMBER, 31 )
-				);
-				return values;
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<MonthDay> createUniquelyMatchableValues() {
+		List<MonthDay> values = new ArrayList<>();
+		Arrays.stream( Month.values() ).forEach( month -> {
+			values.add( MonthDay.of( month, 1 ) );
+			values.add( MonthDay.of( month, 3 ) );
+			values.add( MonthDay.of( month, 14 ) );
+			values.add( MonthDay.of( month, 28 ) );
+		} );
+		Collections.addAll(
+				values,
+				MonthDay.of( Month.FEBRUARY, 29 ), // HSEARCH-3549
+				MonthDay.of( Month.JUNE, 30 ),
+				MonthDay.of( Month.DECEMBER, 31 )
+		);
+		return values;
 	}
 
 	@Override

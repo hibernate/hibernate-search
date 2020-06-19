@@ -77,6 +77,15 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 	}
 
 	@Override
+	protected List<String> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				"several tokens",
+				"onetoken",
+				"    trailingspaces   "
+		);
+	}
+
+	@Override
 	public Optional<MatchPredicateExpectations<String>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
 				"Irving", "Auster"

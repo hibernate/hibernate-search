@@ -61,19 +61,24 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 		return new IndexableValues<LocalDate>() {
 			@Override
 			protected List<LocalDate> createSingle() {
-				return Arrays.asList(
-						LocalDate.of( 1970, 1, 1 ),
-						LocalDate.of( 1980, 1, 1 ),
-						LocalDate.of( 2017, 7, 7 ),
-						LocalDate.of( 1980, 12, 31 ),
-						LocalDate.of( 2004, 2, 29 ),
-						LocalDate.of( 1900, 1, 1 ),
-						LocalDate.of( 1600, 2, 28 ),
-						LocalDate.of( -52, 10, 11 ),
-						LocalDate.of( 22500, 10, 11 )
-				);
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<LocalDate> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				LocalDate.of( 1970, 1, 1 ),
+				LocalDate.of( 1980, 1, 1 ),
+				LocalDate.of( 2017, 7, 7 ),
+				LocalDate.of( 1980, 12, 31 ),
+				LocalDate.of( 2004, 2, 29 ),
+				LocalDate.of( 1900, 1, 1 ),
+				LocalDate.of( 1600, 2, 28 ),
+				LocalDate.of( -52, 10, 11 ),
+				LocalDate.of( 22500, 10, 11 )
+		);
 	}
 
 	@Override

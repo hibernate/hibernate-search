@@ -12,8 +12,10 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
@@ -65,14 +67,19 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 		return new IndexableValues<Instant>() {
 			@Override
 			protected List<Instant> createSingle() {
-				List<Instant> values = new ArrayList<>();
-				for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
-					values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
-				}
-				values.add( Instant.EPOCH );
-				return values;
+				return createUniquelyMatchableValues();
 			}
 		};
+	}
+
+	@Override
+	protected List<Instant> createUniquelyMatchableValues() {
+		Set<Instant> values = new LinkedHashSet<>();
+		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getIndexableValues().getSingle() ) {
+			values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
+		}
+		values.add( Instant.EPOCH );
+		return new ArrayList<>( values );
 	}
 
 	@Override

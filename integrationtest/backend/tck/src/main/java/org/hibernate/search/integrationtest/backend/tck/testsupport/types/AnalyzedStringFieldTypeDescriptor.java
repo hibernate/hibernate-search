@@ -90,6 +90,18 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
+	protected List<String> createUniquelyMatchableValues() {
+		return Arrays.asList(
+				"several tokens",
+				"onetoken",
+				// Mix capitalized and non-capitalized text on purpose
+				"Aaron",
+				"george",
+				"Zach"
+		);
+	}
+
+	@Override
 	public Optional<MatchPredicateExpectations<String>> getMatchPredicateExpectations() {
 		return Optional.of( new MatchPredicateExpectations<>(
 				"irving and company", "Auster",
