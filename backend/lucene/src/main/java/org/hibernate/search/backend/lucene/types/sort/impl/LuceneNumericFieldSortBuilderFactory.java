@@ -23,6 +23,6 @@ public class LuceneNumericFieldSortBuilderFactory<F, E extends Number>
 			LuceneSearchFieldContext<F> field) {
 		checkSortable( field );
 
-		return new LuceneNumericFieldSortBuilder<>( searchContext, field, codec );
+		return new LuceneStandardFieldSort.NumericFieldBuilder<>( searchContext, field, codec );
 	}
 }

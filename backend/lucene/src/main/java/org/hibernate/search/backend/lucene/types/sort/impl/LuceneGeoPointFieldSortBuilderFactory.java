@@ -30,7 +30,7 @@ public class LuceneGeoPointFieldSortBuilderFactory
 	public DistanceSortBuilder createDistanceSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<GeoPoint> field, GeoPoint center) {
 		checkSortable( field );
-		return new LuceneGeoPointDistanceSortBuilder( searchContext, field, center );
+		return new LuceneGeoPointDistanceSort.Builder( searchContext, field, center );
 	}
 
 }

@@ -22,6 +22,6 @@ public class LuceneTextFieldSortBuilderFactory<F>
 	public FieldSortBuilder createFieldSortBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field) {
 		checkSortable( field );
-		return new LuceneTextFieldSortBuilder<>( searchContext, field, codec );
+		return new LuceneStandardFieldSort.TextFieldBuilder<>( searchContext, field, codec );
 	}
 }

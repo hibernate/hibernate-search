@@ -37,7 +37,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public ScoreSortBuilder score() {
-		return new LuceneScoreSortBuilder( searchContext );
+		return new LuceneScoreSort.Builder( searchContext );
 	}
 
 	@Override
@@ -52,21 +52,21 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public SearchSort indexOrder() {
-		return new LuceneIndexOrderSortBuilder( searchContext ).build();
+		return new LuceneIndexOrderSort( searchContext );
 	}
 
 	@Override
 	public CompositeSortBuilder composite() {
-		return new LuceneCompositeSortBuilder( searchContext );
+		return new LuceneCompositeSort.Builder( searchContext );
 	}
 
 	@Override
-	public LuceneSearchSortBuilder fromLuceneSortField(SortField luceneSortField) {
-		return new LuceneUserProvidedLuceneSortFieldSortBuilder( searchContext, luceneSortField );
+	public LuceneSearchSort fromLuceneSortField(SortField luceneSortField) {
+		return new LuceneUserProvidedLuceneSortFieldSort( searchContext, luceneSortField );
 	}
 
 	@Override
-	public LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort) {
-		return new LuceneUserProvidedLuceneSortSortBuilder( searchContext, luceneSort );
+	public LuceneSearchSort fromLuceneSort(Sort luceneSort) {
+		return new LuceneUserProvidedLuceneSortSort( searchContext, luceneSort );
 	}
 }
