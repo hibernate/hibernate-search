@@ -38,7 +38,7 @@ public class MyConfigurationIT {
 				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
 				MultiTenancyStrategyName.DISCRIMINATOR.externalRepresentation()
 		);
-		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION ), "7.7" );
+		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION ), "7.8" );
 		config.put(
 				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
 		// index configuration
@@ -66,7 +66,7 @@ public class MyConfigurationIT {
 						entry( "hibernate.search.backends.myBackend.protocol", "http" ),
 						entry( "hibernate.search.backends.myBackend.type", "elasticsearch" ),
 						entry( "hibernate.search.backends.myBackend.multi_tenancy.strategy", "discriminator" ),
-						entry( "hibernate.search.backends.myBackend.version", "7.7" ),
+						entry( "hibernate.search.backends.myBackend.version", "7.8" ),
 						entry( "hibernate.search.backends.myBackend.version_check.enabled", "false" ),
 						entry( "hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status", "yellow" ),
 						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
