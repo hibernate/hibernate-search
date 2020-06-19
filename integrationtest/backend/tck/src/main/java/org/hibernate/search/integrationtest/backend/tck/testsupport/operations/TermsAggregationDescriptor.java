@@ -37,6 +37,11 @@ import org.assertj.core.api.Assertions;
 
 public class TermsAggregationDescriptor extends AggregationDescriptor {
 
+	public static TermsAggregationDescriptor INSTANCE = new TermsAggregationDescriptor();
+
+	private TermsAggregationDescriptor() {
+	}
+
 	@Override
 	public <F> ExpectationsAlternative<
 					SupportedSingleFieldAggregationExpectations<F>,

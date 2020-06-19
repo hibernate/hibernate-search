@@ -66,7 +66,7 @@ public class TermsAggregationSpecificsIT<F> {
 		supportedFieldTypes = new LinkedHashSet<>();
 		dataSets = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
-		AggregationDescriptor aggregationDescriptor = new TermsAggregationDescriptor();
+		AggregationDescriptor aggregationDescriptor = TermsAggregationDescriptor.INSTANCE;
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
 				supportedFieldTypes.add( fieldType );

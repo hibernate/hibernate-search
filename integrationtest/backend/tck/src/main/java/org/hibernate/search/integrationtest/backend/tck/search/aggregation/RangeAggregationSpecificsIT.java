@@ -67,7 +67,7 @@ public class RangeAggregationSpecificsIT<F> {
 		supportedFieldTypes = new LinkedHashSet<>();
 		dataSets = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
-		AggregationDescriptor aggregationDescriptor = new RangeAggregationDescriptor();
+		AggregationDescriptor aggregationDescriptor = RangeAggregationDescriptor.INSTANCE;
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
 			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
 				supportedFieldTypes.add( fieldType );

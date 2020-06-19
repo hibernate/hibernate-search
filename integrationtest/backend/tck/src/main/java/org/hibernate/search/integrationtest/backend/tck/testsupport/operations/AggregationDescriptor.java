@@ -22,8 +22,8 @@ public abstract class AggregationDescriptor {
 	public static List<AggregationDescriptor> getAll() {
 		if ( all == null ) {
 			all = Collections.unmodifiableList( Arrays.asList(
-					new RangeAggregationDescriptor(),
-					new TermsAggregationDescriptor()
+					RangeAggregationDescriptor.INSTANCE,
+					TermsAggregationDescriptor.INSTANCE
 			) );
 		}
 		return all;

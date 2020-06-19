@@ -35,6 +35,11 @@ import org.assertj.core.api.Assertions;
 
 public class RangeAggregationDescriptor extends AggregationDescriptor {
 
+	public static RangeAggregationDescriptor INSTANCE = new RangeAggregationDescriptor();
+
+	private RangeAggregationDescriptor() {
+	}
+
 	@Override
 	public <F> ExpectationsAlternative<
 					SupportedSingleFieldAggregationExpectations<F>,
