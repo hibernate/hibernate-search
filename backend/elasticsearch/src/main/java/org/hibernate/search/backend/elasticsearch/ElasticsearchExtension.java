@@ -52,7 +52,7 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * An extension for the Elasticsearch backend, giving access to Lucene-specific features.
+ * An extension for the Elasticsearch backend, giving access to Elasticsearch-specific features.
  * <p>
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
  * all of its methods are considered SPIs and therefore should never be called directly by users.
