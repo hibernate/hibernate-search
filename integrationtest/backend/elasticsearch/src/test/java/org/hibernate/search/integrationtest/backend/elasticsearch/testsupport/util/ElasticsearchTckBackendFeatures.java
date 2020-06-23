@@ -41,6 +41,11 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
+		return dialect.normalizesStringArgumentToWildcardPredicateForAnalyzedStringField();
+	}
+
+	@Override
 	public boolean normalizesStringArgumentToRangePredicateForAnalyzedStringField() {
 		// TODO HSEARCH-3959 Elasticsearch does not normalizes arguments passed to the range predicate
 		//   for text fields.

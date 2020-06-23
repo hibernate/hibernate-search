@@ -69,4 +69,9 @@ public class Elasticsearch73TestDialect implements ElasticsearchTestDialect {
 	public boolean supportsIsWriteIndex() {
 		return true;
 	}
+
+	@Override
+	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
+		return false;
+	}
 }

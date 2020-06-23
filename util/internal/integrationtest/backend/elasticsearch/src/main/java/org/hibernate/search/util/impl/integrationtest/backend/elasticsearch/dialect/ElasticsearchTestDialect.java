@@ -71,4 +71,8 @@ public interface ElasticsearchTestDialect {
 	default boolean hasBugForBigIntegerValuesForDynamicField() {
 		return false;
 	}
+
+	default boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
+		return true;
+	}
 }
