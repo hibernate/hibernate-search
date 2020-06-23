@@ -6,14 +6,11 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
@@ -22,7 +19,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.Contracts;
 
 
 class SimpleQueryStringPredicateFieldMoreStepImpl
@@ -31,17 +28,12 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 				SimpleQueryStringPredicateOptionsStep<?>
 		> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final CommonState commonState;
 
-	private final List<String> absoluteFieldPaths;
 	private final List<SimpleQueryStringPredicateBuilder.FieldState> fieldStates = new ArrayList<>();
 
 	SimpleQueryStringPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
-		this.commonState.add( this );
-		this.absoluteFieldPaths = absoluteFieldPaths;
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			fieldStates.add( commonState.field( absoluteFieldPath ) );
 		}
@@ -68,8 +60,6 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 
 		private final SimpleQueryStringPredicateBuilder builder;
 
-		private final List<SimpleQueryStringPredicateFieldMoreStepImpl> fieldSetStates = new ArrayList<>();
-
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
 			this.builder = dslContext.builderFactory().simpleQueryString();
@@ -80,18 +70,12 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 			return builder.build();
 		}
 
-		void add(SimpleQueryStringPredicateFieldMoreStepImpl fieldSetState) {
-			fieldSetStates.add( fieldSetState );
-		}
-
 		SimpleQueryStringPredicateBuilder.FieldState field(String absoluteFieldPath) {
 			return builder.field( absoluteFieldPath );
 		}
 
 		private SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {
-			if ( simpleQueryString == null ) {
-				throw log.simpleQueryStringCannotBeNull( collectAbsoluteFieldPaths() );
-			}
+			Contracts.assertNotNull( simpleQueryString, "simpleQueryString" );
 			builder.simpleQueryString( simpleQueryString );
 			return this;
 		}
@@ -124,11 +108,6 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 		public CommonState skipAnalysis() {
 			builder.skipAnalysis();
 			return this;
-		}
-
-		private List<String> collectAbsoluteFieldPaths() {
-			return fieldSetStates.stream().flatMap( f -> f.absoluteFieldPaths.stream() )
-					.collect( Collectors.toList() );
 		}
 
 		@Override

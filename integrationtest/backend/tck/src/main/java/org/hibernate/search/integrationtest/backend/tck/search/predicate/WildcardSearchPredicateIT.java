@@ -235,10 +235,8 @@ public class WildcardSearchPredicateIT {
 				() -> scope.predicate().wildcard().field( absoluteFieldPath ).matching( null ),
 				"wildcard() predicate with null pattern"
 		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid pattern" )
-				.hasMessageContaining( "must be non-null" )
-				.hasMessageContaining( absoluteFieldPath );
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "must not be null" );
 	}
 
 	@Test

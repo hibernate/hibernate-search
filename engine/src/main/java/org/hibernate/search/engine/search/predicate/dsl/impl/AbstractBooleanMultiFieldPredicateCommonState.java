@@ -10,10 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
@@ -21,7 +19,6 @@ import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * A common state for a multi-field predicate DSL
@@ -114,15 +111,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		}
 	}
 
-	protected final EventContext getEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePaths(
-				getFieldSetStates().stream().flatMap( f -> f.getAbsoluteFieldPaths().stream() )
-						.collect( Collectors.toList() )
-		);
-	}
-
 	public interface FieldSetState {
-		List<String> getAbsoluteFieldPaths();
 		void contributePredicates(Consumer<SearchPredicate> collector);
 	}
 }

@@ -458,10 +458,8 @@ public class SimpleQueryStringSearchPredicateIT {
 				() -> scope.predicate().simpleQueryString().field( absoluteFieldPath ).matching( null ),
 				"simpleQueryString() predicate with null value to match"
 		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid simple query string" )
-				.hasMessageContaining( "must be non-null" )
-				.hasMessageContaining( absoluteFieldPath );
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "must not be null" );
 	}
 
 	@Test

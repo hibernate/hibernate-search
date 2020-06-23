@@ -10,7 +10,6 @@ import static org.jboss.logging.Logger.Level.DEBUG;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -63,11 +62,6 @@ public interface Log extends BasicLogger {
 			value = "Hibernate Search failed to initialize component '%1$s' as class '%2$s' doesn't have a public no-arguments constructor")
 	SearchException noPublicNoArgConstructor(String componentName, @FormatWith(ClassFormatter.class) Class<?> clazz);
 
-	@Message(id = ID_OFFSET_1 + 334,
-			value = "Invalid simple query string: the string must be non-null."
-					+ " Null value was passed to simple query string predicate on fields %1$s.")
-	SearchException simpleQueryStringCannotBeNull(Collection<String> strings);
-
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
 	// -----------------------------------
@@ -98,10 +92,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 6,
 			value = "Invalid multi value: expected either a Collection or a String.")
 	SearchException invalidMultiPropertyValue();
-
-	@Message(id = ID_OFFSET_2 + 11,
-			value = "Invalid value: the value to match in match predicates must be non-null.")
-	SearchException matchPredicateCannotMatchNullValue(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 12,
 			value = "Invalid value: at least one bound in range predicates must be non-null.")
@@ -230,10 +220,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException perFieldBoostWithConstantScore();
 
-	@Message(id = ID_OFFSET_2 + 52,
-			value = "Invalid phrase: the phrase to match in phrase predicates must be non-null.")
-	SearchException phrasePredicateCannotMatchNullPhrase(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 53,
 			value = "Invalid slop: %1$d. The slop must be positive or zero.")
 	SearchException invalidPhrasePredicateSlop(int slop);
@@ -245,10 +231,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 55,
 			value = "Invalid exact prefix length: %1$d. The value must be positive or zero.")
 	SearchException invalidExactPrefixLength(int exactPrefixLength);
-
-	@Message(id = ID_OFFSET_2 + 56,
-			value = "Invalid pattern: the pattern to match in wildcard predicates must be non-null.")
-	SearchException wildcardPredicateCannotMatchNullPattern(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 57, value = "'%1$s' instance cannot be parsed from value: '%2$s', using the expected formatter: '%3$s'.")
 	SearchException unableToParseTemporal(@FormatWith(SimpleNameClassFormatter.class) Class<? extends TemporalAccessor> type, String value, DateTimeFormatter formatter,

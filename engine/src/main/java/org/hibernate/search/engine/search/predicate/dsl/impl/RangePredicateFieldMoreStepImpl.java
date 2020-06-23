@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
@@ -23,6 +25,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 class RangePredicateFieldMoreStepImpl
@@ -65,11 +68,6 @@ class RangePredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public List<String> getAbsoluteFieldPaths() {
-		return absoluteFieldPaths;
-	}
-
-	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( RangePredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -89,6 +87,8 @@ class RangePredicateFieldMoreStepImpl
 
 		CommonState range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
 			Contracts.assertNotNull( range, "range" );
+			Contracts.assertNotNull( lowerBoundConvert, "lowerBoundConvert" );
+			Contracts.assertNotNull( upperBoundConvert, "upperBoundConvert" );
 			if ( !range.lowerBoundValue().isPresent() && !range.upperBoundValue().isPresent() ) {
 				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
 			}
@@ -103,6 +103,13 @@ class RangePredicateFieldMoreStepImpl
 		@Override
 		protected CommonState thisAsS() {
 			return this;
+		}
+
+		protected final EventContext getEventContext() {
+			return EventContexts.fromIndexFieldAbsolutePaths(
+					getFieldSetStates().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
+							.collect( Collectors.toList() )
+			);
 		}
 	}
 

@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsSt
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -30,7 +31,6 @@ class PhrasePredicateFieldMoreStepImpl
 
 	private final CommonState commonState;
 
-	private final List<String> absoluteFieldPaths;
 	private final List<PhrasePredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
@@ -38,7 +38,6 @@ class PhrasePredicateFieldMoreStepImpl
 	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.phrase( absoluteFieldPath ) );
@@ -62,11 +61,6 @@ class PhrasePredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public List<String> getAbsoluteFieldPaths() {
-		return absoluteFieldPaths;
-	}
-
-	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( PhrasePredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Fieldset states won't be accessed anymore, it's time to apply their options
@@ -85,10 +79,7 @@ class PhrasePredicateFieldMoreStepImpl
 		}
 
 		private PhrasePredicateOptionsStep<?> matching(String phrase) {
-			if ( phrase == null ) {
-				throw log.phrasePredicateCannotMatchNullPhrase( getEventContext() );
-			}
-
+			Contracts.assertNotNull( phrase, "phrase" );
 			for ( PhrasePredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( PhrasePredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.phrase( phrase );

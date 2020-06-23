@@ -81,11 +81,6 @@ class SpatialWithinPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public List<String> getAbsoluteFieldPaths() {
-		return absoluteFieldPaths;
-	}
-
-	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( SearchPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
