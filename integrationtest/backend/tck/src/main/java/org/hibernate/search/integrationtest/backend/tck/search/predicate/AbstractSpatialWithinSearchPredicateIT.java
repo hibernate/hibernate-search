@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.tck.search.spatial;
+package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -88,15 +88,15 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 				.join();
 	}
 
-	protected static class IndexBinding {
-		final IndexFieldReference<GeoPoint> geoPoint;
-		final IndexFieldReference<GeoPoint> geoPoint_1;
-		final IndexFieldReference<GeoPoint> geoPoint_2;
-		final IndexFieldReference<GeoPoint> geoPoint_with_longName;
-		final IndexFieldReference<GeoPoint> nonProjectableGeoPoint;
-		final IndexFieldReference<GeoPoint> unsortableGeoPoint;
-		final IndexFieldReference<GeoPoint> projectableUnsortableGeoPoint;
-		final IndexFieldReference<String> string;
+	public static class IndexBinding {
+		public final IndexFieldReference<GeoPoint> geoPoint;
+		public final IndexFieldReference<GeoPoint> geoPoint_1;
+		public final IndexFieldReference<GeoPoint> geoPoint_2;
+		public final IndexFieldReference<GeoPoint> geoPoint_with_longName;
+		public final IndexFieldReference<GeoPoint> nonProjectableGeoPoint;
+		public final IndexFieldReference<GeoPoint> unsortableGeoPoint;
+		public final IndexFieldReference<GeoPoint> projectableUnsortableGeoPoint;
+		public final IndexFieldReference<String> string;
 
 		IndexBinding(IndexSchemaElement root) {
 			geoPoint = root.field(

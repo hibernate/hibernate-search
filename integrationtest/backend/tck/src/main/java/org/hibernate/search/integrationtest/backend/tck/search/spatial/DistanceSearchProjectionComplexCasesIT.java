@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.search.predicate.AbstractSpatialWithinSearchPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.search.projection.DistanceSearchProjectionSingleValuedBaseIT;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
