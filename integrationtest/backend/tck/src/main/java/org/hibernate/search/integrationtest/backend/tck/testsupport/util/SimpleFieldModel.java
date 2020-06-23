@@ -7,8 +7,10 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
@@ -23,6 +25,14 @@ public class SimpleFieldModel<F> {
 		return StandardFieldMapper.of(
 				typeDescriptor::configure,
 				configurationAdjustment,
+				(reference, relativeFieldName) -> new SimpleFieldModel<>( typeDescriptor, reference, relativeFieldName )
+		);
+	}
+
+	public static <F> StandardFieldMapper<F, SimpleFieldModel<F>> mapperWithOverride(FieldTypeDescriptor<F> typeDescriptor,
+			Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> initialConfiguration) {
+		return StandardFieldMapper.of(
+				initialConfiguration,
 				(reference, relativeFieldName) -> new SimpleFieldModel<>( typeDescriptor, reference, relativeFieldName )
 		);
 	}
