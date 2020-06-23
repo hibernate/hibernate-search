@@ -130,19 +130,19 @@ public abstract class AbstractPredicateAnalysisIT {
 		String absoluteFieldPath = index.binding().whitespaceLowercaseAnalyzedField.relativeFieldName;
 
 		assertThatQuery( index.query()
-				.where( f -> predicate( f, absoluteFieldPath, "world another world" ) ) )
+				.where( f -> predicate( f, absoluteFieldPath, "BRAVE" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ),
 						dataSet.docId( 1 ), dataSet.docId( 2 ) );
 
-		// ignoring the analyzer means that the parameter of match predicate will not be tokenized
+		// ignoring the analyzer means that the parameter of match predicate will not be lowercased
 		// so it will not match any token
 		assertThatQuery( index.query()
-				.where( f -> predicateWithSkipAnalysis( f, absoluteFieldPath, "world another world" ) ) )
+				.where( f -> predicateWithSkipAnalysis( f, absoluteFieldPath, "BRAVE" ) ) )
 				.hasNoHits();
 
-		// to have a match with the skipAnalysis option enabled, we have to pass the parameter as a token is
+		// to have a match with the skipAnalysis option enabled, we have to use the exact case that was indexed
 		assertThatQuery( index.query()
-				.where( f -> predicateWithSkipAnalysis( f, absoluteFieldPath, "world" ) ) )
+				.where( f -> predicateWithSkipAnalysis( f, absoluteFieldPath, "brave" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ),
 						dataSet.docId( 1 ), dataSet.docId( 2 ) );
 	}
