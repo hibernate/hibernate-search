@@ -26,6 +26,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -48,9 +49,19 @@ public abstract class AbstractPredicateAnalysisIT {
 	}
 
 	@Test
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testEmptyQueryString")
 	public void emptyStringBeforeAnalysis() {
 		assertThatQuery( index.query()
 				.where( f -> predicate( f, index.binding().analyzedStringField.relativeFieldName, "" ) ) )
+				.hasNoHits();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2700")
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testBlankQueryString")
+	public void blankStringBeforeAnalysis() {
+		assertThatQuery( index.query()
+				.where( f -> predicate( f, index.binding().analyzedStringField.relativeFieldName, "   " ) ) )
 				.hasNoHits();
 	}
 
