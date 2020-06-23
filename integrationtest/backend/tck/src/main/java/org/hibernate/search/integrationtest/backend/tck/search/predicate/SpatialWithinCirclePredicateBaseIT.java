@@ -55,7 +55,9 @@ public class SpatialWithinCirclePredicateBaseIT {
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
-						ArgumentCheckingIT.index
+						ArgumentCheckingIT.index,
+						TypeCheckingNoConversionIT.index, TypeCheckingNoConversionIT.compatibleIndex,
+						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, TypeCheckingNoConversionIT.incompatibleIndex
 				)
 				.setup();
 
@@ -68,9 +70,17 @@ public class SpatialWithinCirclePredicateBaseIT {
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( ScoreIT.index, scoreIndexer );
 
+		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
+		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		TypeCheckingNoConversionIT.dataSet.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
+				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
+				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer );
+
 		singleFieldIndexer.join(
 				multiFieldIndexer,
-				scoreIndexer
+				scoreIndexer,
+				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer
 		);
 	}
 
@@ -302,6 +312,43 @@ public class SpatialWithinCirclePredicateBaseIT {
 		@Override
 		protected void tryPredicateWithNullMatchingParam(SearchPredicateFactory f, String fieldPath) {
 			f.spatial().within().field( fieldPath ).circle( null, 10.0 );
+		}
+	}
+
+	public static class TypeCheckingNoConversionIT
+			extends AbstractPredicateTypeCheckingNoConversionIT<SpatialWithinCirclePredicateTestValues> {
+		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet = new DataSet<>( testValues() );
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "typeChecking_main" );
+		private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "typeChecking_compatible" );
+		private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
+				SimpleMappedIndex.of( root -> new RawFieldCompatibleIndexBinding( root, supportedFieldTypes ) )
+						.name( "typeChecking_rawFieldCompatible" );
+		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
+						.name( "typeChecking_incompatible" );
+
+		public TypeCheckingNoConversionIT() {
+			super( index, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.spatial().within().field( fieldPath )
+					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
+							dataSet.values.matchingRadius( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
+				int matchingDocOrdinal) {
+			return f.spatial().within().field( field0Path ).field( field1Path )
+					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
+							dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
 	}
 }
