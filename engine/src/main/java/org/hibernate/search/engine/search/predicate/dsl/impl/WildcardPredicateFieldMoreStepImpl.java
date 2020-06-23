@@ -6,31 +6,26 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.Contracts;
 
 
 class WildcardPredicateFieldMoreStepImpl
 		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl, WildcardPredicateOptionsStep<?>>,
 				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final CommonState commonState;
 
-	private final List<String> absoluteFieldPaths;
 	private final List<WildcardPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
@@ -38,7 +33,6 @@ class WildcardPredicateFieldMoreStepImpl
 	WildcardPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.wildcard( absoluteFieldPath ) );
@@ -57,13 +51,8 @@ class WildcardPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public WildcardPredicateOptionsStep<?> matching(String wildcard) {
-		return commonState.matching( wildcard );
-	}
-
-	@Override
-	public List<String> getAbsoluteFieldPaths() {
-		return absoluteFieldPaths;
+	public WildcardPredicateOptionsStep<?> matching(String wildcardPattern) {
+		return commonState.matching( wildcardPattern );
 	}
 
 	@Override
@@ -85,9 +74,7 @@ class WildcardPredicateFieldMoreStepImpl
 		}
 
 		private WildcardPredicateOptionsStep<?> matching(String wildcardPattern) {
-			if ( wildcardPattern == null ) {
-				throw log.wildcardPredicateCannotMatchNullPattern( getEventContext() );
-			}
+			Contracts.assertNotNull( wildcardPattern, "wildcardPattern" );
 			for ( WildcardPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( WildcardPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.pattern( wildcardPattern );

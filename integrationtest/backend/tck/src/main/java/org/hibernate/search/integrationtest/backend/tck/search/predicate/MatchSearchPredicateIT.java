@@ -220,11 +220,8 @@ public class MatchSearchPredicateIT {
 					() -> scope.predicate().match().field( fieldModel.relativeFieldName ).matching( null ),
 					"matching() predicate with null value to match on field " + fieldModel.relativeFieldName
 			)
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Invalid value" )
-					.hasMessageContaining( "value to match" )
-					.hasMessageContaining( "must be non-null" )
-					.hasMessageContaining( fieldModel.relativeFieldName );
+					.isInstanceOf( IllegalArgumentException.class )
+					.hasMessageContaining( "must not be null" );
 		}
 	}
 

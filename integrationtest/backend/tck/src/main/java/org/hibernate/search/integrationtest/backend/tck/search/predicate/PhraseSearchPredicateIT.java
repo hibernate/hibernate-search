@@ -321,10 +321,8 @@ public class PhraseSearchPredicateIT {
 				() -> scope.predicate().phrase().field( absoluteFieldPath ).matching( null ),
 				"phrase() predicate with null value to match"
 		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid phrase" )
-				.hasMessageContaining( "must be non-null" )
-				.hasMessageContaining( absoluteFieldPath );
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "must not be null" );
 	}
 
 	@Test

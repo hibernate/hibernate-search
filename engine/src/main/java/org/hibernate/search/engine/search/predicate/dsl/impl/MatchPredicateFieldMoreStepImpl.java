@@ -20,6 +20,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -31,7 +32,6 @@ class MatchPredicateFieldMoreStepImpl
 
 	private final CommonState commonState;
 
-	private final List<String> absoluteFieldPaths;
 	private final List<MatchPredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
@@ -39,7 +39,6 @@ class MatchPredicateFieldMoreStepImpl
 	MatchPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.match( absoluteFieldPath ) );
@@ -63,11 +62,6 @@ class MatchPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public List<String> getAbsoluteFieldPaths() {
-		return absoluteFieldPaths;
-	}
-
-	@Override
 	public void contributePredicates(Consumer<SearchPredicate> collector) {
 		for ( MatchPredicateBuilder predicateBuilder : predicateBuilders ) {
 			// Perform last-minute changes, since it's the last call that will be made on this field set state
@@ -85,9 +79,8 @@ class MatchPredicateFieldMoreStepImpl
 		}
 
 		MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
-			if ( value == null ) {
-				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
-			}
+			Contracts.assertNotNull( value, "value" );
+			Contracts.assertNotNull( convert, "convert" );
 
 			for ( MatchPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( MatchPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
