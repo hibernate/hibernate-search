@@ -13,7 +13,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
  */
 public abstract class AbstractPredicateTestValues<F> {
 
-	private final FieldTypeDescriptor<F> fieldType;
+	protected final FieldTypeDescriptor<F> fieldType;
 
 	protected AbstractPredicateTestValues(FieldTypeDescriptor<F> fieldType) {
 		this.fieldType = fieldType;

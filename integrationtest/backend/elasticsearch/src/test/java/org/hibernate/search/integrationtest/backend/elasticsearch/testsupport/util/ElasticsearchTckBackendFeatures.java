@@ -41,6 +41,13 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean normalizesStringArgumentToRangePredicateForAnalyzedStringField() {
+		// TODO HSEARCH-3959 Elasticsearch does not normalizes arguments passed to the range predicate
+		//   for text fields.
+		return false;
+	}
+
+	@Override
 	public boolean supportsManyRoutingKeys() {
 		// TODO HSEARCH-3655 AWS signing fails when using multiple routing keys
 		return ! ElasticsearchTestHostConnectionConfiguration.get().isAwsSigningEnabled();

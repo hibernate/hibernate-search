@@ -22,6 +22,10 @@ public class TckBackendFeatures {
 		return true;
 	}
 
+	public boolean normalizesStringArgumentToRangePredicateForAnalyzedStringField() {
+		return true;
+	}
+
 	public boolean supportsManyRoutingKeys() {
 		return true;
 	}
