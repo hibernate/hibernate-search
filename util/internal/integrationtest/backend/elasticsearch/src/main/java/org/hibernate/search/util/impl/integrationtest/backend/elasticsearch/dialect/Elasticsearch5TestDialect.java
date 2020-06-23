@@ -77,4 +77,9 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public boolean hasBugForBigIntegerValuesForDynamicField() {
 		return true;
 	}
+
+	@Override
+	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
+		return false;
+	}
 }

@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.search.predicate.WildcardPredicateSpecificsIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -25,7 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Extends {@link org.hibernate.search.integrationtest.backend.tck.search.predicate.WildcardSearchPredicateIT},
+ * Extends {@link WildcardPredicateSpecificsIT},
  * verifying the normalization of the terms to match in wildcard/prefix predicates,
  * when an analyzer (not just a normalizer) has been defined on the target field.
  * <p>
