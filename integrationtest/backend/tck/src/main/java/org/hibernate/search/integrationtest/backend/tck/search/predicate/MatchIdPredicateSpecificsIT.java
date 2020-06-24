@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -23,13 +23,11 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
-
-public class MatchIdSearchPredicateIT {
+public class MatchIdPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -37,19 +35,19 @@ public class MatchIdSearchPredicateIT {
 	private static final String COMPATIBLE_ID_CONVERTER_DOCUMENT_1 = "compatibleIdConverter_document1";
 	private static final String INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 = "incompatibleIdConverter_document1";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final StubMappedIndex mainIndex =
+	private static final StubMappedIndex mainIndex =
 			StubMappedIndex.withoutFields().name( "main" );
-	private final StubMappedIndex compatibleIdConverterIndex =
+	private static final StubMappedIndex compatibleIdConverterIndex =
 			StubMappedIndex.withoutFields().name( "compatibleIdConverter" );
-	private final StubMappedIndex incompatibleIdConverterIndex =
+	private static final StubMappedIndex incompatibleIdConverterIndex =
 			StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( new IncompatibleIdConverter() ) )
 					.name( "incompatibleIdConverter" );
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, compatibleIdConverterIndex, incompatibleIdConverterIndex ).setup();
 
 		initData();
@@ -57,71 +55,42 @@ public class MatchIdSearchPredicateIT {
 
 	@Test
 	public void matching() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.id().matching( DOCUMENT_1 ) )
-				.toQuery();
-
-		assertThat( query )
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.id().matching( DOCUMENT_1 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void matching_then_matching() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matching( DOCUMENT_1 )
-						.matching( DOCUMENT_3 )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matching( DOCUMENT_3 ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
 	public void matching_then_matchingAny() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
 						.matching( DOCUMENT_2 )
-						.matchingAny( Arrays.asList( DOCUMENT_1 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matchingAny( Arrays.asList( DOCUMENT_1 ) ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void matchingAny_singleElement() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
-						.matchingAny( Arrays.asList( DOCUMENT_1 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matchingAny( Arrays.asList( DOCUMENT_1 ) ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void matchingAny_multipleElements() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.id()
-						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
@@ -129,23 +98,19 @@ public class MatchIdSearchPredicateIT {
 	public void multiIndex_withCompatibleIdConverterIndexManager_dslConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIdConverterIndex );
 
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.id().matching( DOCUMENT_1 ).matching( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ) )
-				.toQuery();
-
-		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( mainIndex.typeName(), DOCUMENT_1 );
-			b.doc( compatibleIdConverterIndex.typeName(), COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
-		} );
+		assertThatQuery( scope.query()
+				.where( f -> f.id().matching( DOCUMENT_1 ).matching( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ) ) )
+				.hasDocRefHitsAnyOrder( b -> {
+					b.doc( mainIndex.typeName(), DOCUMENT_1 );
+					b.doc( compatibleIdConverterIndex.typeName(), COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
+				} );
 	}
 
 	@Test
 	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterEnabled() {
-		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
+		SearchPredicateFactory f = mainIndex.createScope( incompatibleIdConverterIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().id().matching( new Object() /* Value does not matter */ )
-		)
+		assertThatThrownBy( () -> f.id().matching( new Object() /* Value does not matter */ ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types for identifier" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -157,18 +122,16 @@ public class MatchIdSearchPredicateIT {
 	public void multiIndex_withIncompatibleIdConverterIndex_dslConverterDisabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIdConverterIndex );
 
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.NO )
-						.matching( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, ValueConvert.NO ) )
-				.toQuery();
-
-		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( mainIndex.typeName(), DOCUMENT_1 );
-			b.doc( incompatibleIdConverterIndex.typeName(), INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
-		} );
+						.matching( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, ValueConvert.NO ) ) )
+				.hasDocRefHitsAnyOrder( b -> {
+					b.doc( mainIndex.typeName(), DOCUMENT_1 );
+					b.doc( incompatibleIdConverterIndex.typeName(), INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
+				} );
 	}
 
-	private void initData() {
+	private static void initData() {
 		BulkIndexer mainIndexer = mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> { } )
 				.add( DOCUMENT_2, document -> { } )
