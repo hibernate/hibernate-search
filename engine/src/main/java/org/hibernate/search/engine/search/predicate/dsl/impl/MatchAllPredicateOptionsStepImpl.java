@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFin
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 
 class MatchAllPredicateOptionsStepImpl
@@ -26,6 +27,8 @@ class MatchAllPredicateOptionsStepImpl
 
 	private final MatchAllPredicateBuilder matchAllBuilder;
 	private MatchAllExceptState exceptState;
+	private Float boost;
+	private boolean constantScore = false;
 
 	MatchAllPredicateOptionsStepImpl(SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
@@ -36,13 +39,13 @@ class MatchAllPredicateOptionsStepImpl
 
 	@Override
 	public MatchAllPredicateOptionsStep<?> boost(float boost) {
-		this.matchAllBuilder.boost( boost );
+		this.boost = boost;
 		return this;
 	}
 
 	@Override
 	public MatchAllPredicateOptionsStep<?> constantScore() {
-		this.matchAllBuilder.constantScore();
+		this.constantScore = true;
 		return this;
 	}
 
@@ -61,12 +64,20 @@ class MatchAllPredicateOptionsStepImpl
 
 	@Override
 	protected SearchPredicate build() {
+		SearchPredicateBuilder builder;
 		if ( exceptState != null ) {
-			return exceptState.build( matchAllBuilder.build() );
+			builder = exceptState.builder( matchAllBuilder.build() );
 		}
 		else {
-			return matchAllBuilder.build();
+			builder = matchAllBuilder;
 		}
+		if ( constantScore ) {
+			builder.constantScore();
+		}
+		if ( boost != null ) {
+			builder.boost( boost );
+		}
+		return builder.build();
 	}
 
 	private MatchAllExceptState getExceptState() {
@@ -92,9 +103,9 @@ class MatchAllPredicateOptionsStepImpl
 			booleanBuilder.mustNot( predicate );
 		}
 
-		SearchPredicate build(SearchPredicate matchAll) {
+		SearchPredicateBuilder builder(SearchPredicate matchAll) {
 			booleanBuilder.must( matchAll );
-			return booleanBuilder.build();
+			return booleanBuilder;
 		}
 
 	}
