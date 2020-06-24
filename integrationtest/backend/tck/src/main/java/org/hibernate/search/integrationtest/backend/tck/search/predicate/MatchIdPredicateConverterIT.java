@@ -6,19 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
@@ -28,7 +25,7 @@ import org.junit.Test;
  * as a string with the prefix `document`. In the DSL the user will still use the integer type when
  * looking for entities matching an id.
  */
-public class MatchIdWithConverterSearchPredicateIT {
+public class MatchIdPredicateConverterIT {
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -46,13 +43,13 @@ public class MatchIdWithConverterSearchPredicateIT {
 		}
 	};
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( ID_CONVERTER ) );
+	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( ID_CONVERTER ) );
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
@@ -60,75 +57,46 @@ public class MatchIdWithConverterSearchPredicateIT {
 
 	@Test
 	public void match_id() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.id().matching( 1 ) )
-				.toQuery();
-
-		assertThat( query )
+		assertThatQuery( index.query()
+				.where( f -> f.id().matching( 1 ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void match_multiple_ids() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matching( 1 )
-						.matching( 3 )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matching( 3 ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
 	public void match_any_and_match_single_id() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.id()
 						.matching( 2 )
-						.matchingAny( Arrays.asList( 1 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matchingAny( Arrays.asList( 1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
 	public void match_any_single_id() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.id()
-						.matchingAny( Arrays.asList( 1 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matchingAny( Arrays.asList( 1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
 	public void match_any_ids() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.id()
-						.matchingAny( Arrays.asList( 1, 3 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.matchingAny( Arrays.asList( 1, 3 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
-	private void initData() {
+	private static void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> { } )
 				.add( DOCUMENT_2, document -> { } )
