@@ -11,7 +11,9 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * The step in a predicate definition where the predicate boost can be set.
  *
  * @param <S> The "self" type (the actual exposed type of this step)
+ * @deprecated Use {@link PredicateScoreStep} instead.
  */
+@Deprecated
 public interface PredicateBoostStep<S> {
 
 	/**

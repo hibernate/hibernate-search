@@ -41,6 +41,12 @@ class MatchAllPredicateOptionsStepImpl
 	}
 
 	@Override
+	public MatchAllPredicateOptionsStep<?> constantScore() {
+		this.matchAllBuilder.constantScore();
+		return this;
+	}
+
+	@Override
 	public MatchAllPredicateOptionsStep<?> except(SearchPredicate searchPredicate) {
 		getExceptState().addClause( searchPredicate );
 		return this;

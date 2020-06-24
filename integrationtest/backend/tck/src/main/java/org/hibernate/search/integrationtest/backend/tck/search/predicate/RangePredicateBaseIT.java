@@ -24,7 +24,6 @@ import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -213,7 +212,7 @@ public class RangePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal) {
-			throw scoreIsAlwaysConstant();
+			return f.range().fields( fieldPaths ).range( dataSet.values.matchingRange( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
@@ -226,7 +225,8 @@ public class RangePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost) {
-			throw scoreIsAlwaysConstant();
+			return f.range().fields( fieldPaths ).range( dataSet.values.matchingRange( matchingDocOrdinal ) )
+					.constantScore().boost( predicateBoost );
 		}
 
 		@Override
@@ -239,7 +239,8 @@ public class RangePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal) {
-			throw scoreIsAlwaysConstant();
+			return f.range().field( fieldPath ).boost( fieldBoost )
+					.range( dataSet.values.matchingRange( matchingDocOrdinal ) ).constantScore();
 		}
 
 		@Override
@@ -247,15 +248,6 @@ public class RangePredicateBaseIT {
 				String fieldPath, float fieldBoost, int matchingDocOrdinal, float predicateBoost) {
 			return f.range().field( fieldPath ).boost( fieldBoost )
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) ).boost( predicateBoost );
-		}
-
-		@Override
-		protected void assumeConstantScoreSupported() {
-			throw scoreIsAlwaysConstant();
-		}
-
-		private AssumptionViolatedException scoreIsAlwaysConstant() {
-			throw new AssumptionViolatedException( "Score is always constant for range predicates" );
 		}
 	}
 

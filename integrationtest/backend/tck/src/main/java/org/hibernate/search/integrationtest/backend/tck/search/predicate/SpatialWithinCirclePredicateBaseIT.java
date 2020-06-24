@@ -20,7 +20,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -168,7 +167,10 @@ public class SpatialWithinCirclePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, String[] fieldPaths,
 				int matchingDocOrdinal) {
-			throw scoreIsAlwaysConstant();
+			return f.spatial().within().fields( fieldPaths )
+					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
+							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.constantScore();
 		}
 
 		@Override
@@ -183,7 +185,10 @@ public class SpatialWithinCirclePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithConstantScoreAndPredicateLevelBoost(SearchPredicateFactory f,
 				String[] fieldPaths, int matchingDocOrdinal, float predicateBoost) {
-			throw scoreIsAlwaysConstant();
+			return f.spatial().within().fields( fieldPaths )
+					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
+							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.constantScore().boost( predicateBoost );
 		}
 
 		@Override
@@ -197,7 +202,10 @@ public class SpatialWithinCirclePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicateWithFieldLevelBoostAndConstantScore(SearchPredicateFactory f,
 				String fieldPath, float fieldBoost, int matchingDocOrdinal) {
-			throw scoreIsAlwaysConstant();
+			return f.spatial().within().field( fieldPath ).boost( fieldBoost )
+					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
+							dataSet.values.matchingRadius( matchingDocOrdinal ) )
+					.constantScore();
 		}
 
 		@Override
@@ -207,15 +215,6 @@ public class SpatialWithinCirclePredicateBaseIT {
 					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
 							dataSet.values.matchingRadius( matchingDocOrdinal ) )
 					.boost( predicateBoost );
-		}
-
-		@Override
-		protected void assumeConstantScoreSupported() {
-			throw scoreIsAlwaysConstant();
-		}
-
-		private AssumptionViolatedException scoreIsAlwaysConstant() {
-			throw new AssumptionViolatedException( "Score is always constant for geo-point fields" );
 		}
 	}
 

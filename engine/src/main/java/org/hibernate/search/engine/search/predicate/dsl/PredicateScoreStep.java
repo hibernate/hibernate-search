@@ -15,6 +15,16 @@ package org.hibernate.search.engine.search.predicate.dsl;
 public interface PredicateScoreStep<S> extends PredicateBoostStep<S> {
 
 	/**
+	 * Boost the weight of the predicate in score computation.
+	 *
+	 * @param boost The boost factor. Higher than 1 increases the weight in score computation,
+	 * between 0 and 1 lowers the weight. Lower than 0 is for experts only.
+	 * @return {@code this}, for method chaining.
+	 */
+	@Override
+	S boost(float boost);
+
+	/**
 	 * Force the score of the predicate to a single constant, identical for all documents.
 	 * <p>
 	 * By default, the score will be {@code 1.0f},
