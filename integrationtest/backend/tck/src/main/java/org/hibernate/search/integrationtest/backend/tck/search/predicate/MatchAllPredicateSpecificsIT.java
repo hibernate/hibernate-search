@@ -6,22 +6,20 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.query.SearchQuery;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
-public class MatchAllSearchPredicateIT {
+public class MatchAllPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String STRING_1 = "aaa";
@@ -32,13 +30,13 @@ public class MatchAllSearchPredicateIT {
 	private static final String DOCUMENT_3 = "3";
 	private static final String STRING_3 = "ccc";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
@@ -46,61 +44,43 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
-
-		assertThat( query )
+		assertThatQuery( index.query()
+				.where( f -> f.matchAll() ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
-	public void matchAll_except() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) )
-				.toQuery();
-
-		assertThat( query )
+	public void except() {
+		assertThatQuery( index.query()
+				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
-		SearchPredicate searchPredicate = scope.predicate().match().field( "string" ).matching( STRING_2 ).toPredicate();
-		query = scope.query()
-				.where( f -> f.matchAll().except( searchPredicate ) )
-				.toQuery();
-		assertThat( query )
+		SearchPredicateFactory f1 = index.createScope().predicate();
+		SearchPredicate searchPredicate = f1.match().field( "string" ).matching( STRING_2 ).toPredicate();
+
+		assertThatQuery( index.query()
+				.where( f -> f.matchAll().except( searchPredicate ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
-	public void matchAll_multipleExcepts() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+	public void multipleExcepts() {
+		assertThatQuery( index.query()
 				.where( f -> f.matchAll()
 						.except( f.match().field( "string" ).matching( STRING_1 ) )
-						.except( f.match().field( "string" ).matching( STRING_2 ) )
-				)
-				.toQuery();
-
-		assertThat( query )
+						.except( f.match().field( "string" ).matching( STRING_2 ) ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		SearchPredicate searchPredicate1 = scope.predicate().match().field( "string" ).matching( STRING_3 ).toPredicate();
-		SearchPredicate searchPredicate2 = scope.predicate().match().field( "string" ).matching( STRING_2 ).toPredicate();
+		SearchPredicateFactory f1 = index.createScope().predicate();
+		SearchPredicate searchPredicate1 = f1.match().field( "string" ).matching( STRING_3 ).toPredicate();
+		SearchPredicate searchPredicate2 = f1.match().field( "string" ).matching( STRING_2 ).toPredicate();
 
-		query = scope.query()
-				.where( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
-				.toQuery();
-
-		assertThat( query )
+		assertThatQuery( index.query()
+				.where( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
-	private void initData() {
+	private static void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> {
 					document.addValue( index.binding().string, STRING_1 );
