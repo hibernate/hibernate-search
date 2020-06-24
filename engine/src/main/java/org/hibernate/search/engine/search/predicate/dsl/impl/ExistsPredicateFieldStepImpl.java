@@ -38,6 +38,12 @@ final class ExistsPredicateFieldStepImpl
 	}
 
 	@Override
+	public ExistsPredicateOptionsStep<?> constantScore() {
+		this.builder.constantScore();
+		return this;
+	}
+
+	@Override
 	protected SearchPredicate build() {
 		return builder.build();
 	}
