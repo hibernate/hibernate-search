@@ -34,6 +34,18 @@ class MatchIdPredicateMatchingStepImpl
 	}
 
 	@Override
+	public MatchIdPredicateMatchingStepImpl boost(float boost) {
+		matchIdBuilder.boost( boost );
+		return this;
+	}
+
+	@Override
+	public MatchIdPredicateMatchingStepImpl constantScore() {
+		matchIdBuilder.constantScore();
+		return this;
+	}
+
+	@Override
 	protected SearchPredicate build() {
 		return matchIdBuilder.build();
 	}
