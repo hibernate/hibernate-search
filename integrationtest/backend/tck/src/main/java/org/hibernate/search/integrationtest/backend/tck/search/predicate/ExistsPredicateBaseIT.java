@@ -9,9 +9,11 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -37,6 +39,7 @@ public class ExistsPredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index,
+						ScoreIT.index,
 						InvalidFieldIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
 						TypeCheckingNoConversionIT.index, TypeCheckingNoConversionIT.compatibleIndex,
@@ -47,6 +50,9 @@ public class ExistsPredicateBaseIT {
 
 		final BulkIndexer singleFieldIndexer = SingleFieldIT.index.bulkIndexer();
 		SingleFieldIT.dataSets.forEach( d -> d.contribute( SingleFieldIT.index, singleFieldIndexer ) );
+
+		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
+		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
 
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
@@ -61,6 +67,7 @@ public class ExistsPredicateBaseIT {
 				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
+				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
 		);
@@ -103,6 +110,103 @@ public class ExistsPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
 			return f.exists().field( fieldPath );
+		}
+	}
+
+	@RunWith(Parameterized.class)
+	public static class ScoreIT<F> extends AbstractPredicateScoreIT {
+		private static final List<DataSet<?>> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?> dataSet = new DataSet<>( fieldType );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "score" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		protected final DataSet<F> dataSet;
+
+		public ScoreIT(DataSet<F> dataSet) {
+			super( index, dataSet );
+			this.dataSet = dataSet;
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, int matchingDocOrdinal) {
+			return f.exists().field( fieldPath( matchingDocOrdinal ) );
+		}
+
+		@Override
+		protected PredicateFinalStep predicateWithBoost(SearchPredicateFactory f, int matchingDocOrdinal,
+				float boost) {
+			return f.exists().field( fieldPath( matchingDocOrdinal ) ).boost( boost );
+		}
+
+		@Override
+		protected PredicateFinalStep predicateWithConstantScore(SearchPredicateFactory f, int matchingDocOrdinal) {
+			return f.exists().field( fieldPath( matchingDocOrdinal ) ).constantScore();
+		}
+
+		@Override
+		protected PredicateFinalStep predicateWithConstantScoreAndBoost(SearchPredicateFactory f,
+				int matchingDocOrdinal, float boost) {
+			return f.exists().field( fieldPath( matchingDocOrdinal ) ).constantScore().boost( boost );
+		}
+
+		private String fieldPath(int matchingDocOrdinal) {
+			SimpleFieldModelsByType field;
+			switch ( matchingDocOrdinal ) {
+				case 0:
+					field = index.binding().field0;
+					break;
+				case 1:
+					field = index.binding().field1;
+					break;
+				default:
+					throw new IllegalStateException( "This test only works with up to two documents" );
+			}
+			return field.get( dataSet.fieldType ).relativeFieldName;
+		}
+
+		private static class IndexBinding {
+			final SimpleFieldModelsByType field0;
+			final SimpleFieldModelsByType field1;
+
+			IndexBinding(IndexSchemaElement root) {
+				field0 = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root, "field0_" );
+				field1 = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root, "field1_" );
+			}
+		}
+
+		private static class DataSet<F> extends AbstractPerFieldTypePredicateDataSet<F, ExistsPredicateTestValues<F>> {
+			protected DataSet(FieldTypeDescriptor<F> fieldType) {
+				super( testValues( fieldType ) );
+			}
+
+			public void contribute(BulkIndexer scoreIndexer) {
+				IndexBinding binding = index.binding();
+				scoreIndexer.add( docId( 0 ), routingKey, document -> {
+					document.addValue( binding.field0.get( fieldType ).reference, values.value() );
+					document.addValue( binding.field1.get( fieldType ).reference, null );
+				} );
+				scoreIndexer.add( docId( 1 ), routingKey, document -> {
+					document.addValue( binding.field0.get( fieldType ).reference, null );
+					document.addValue( binding.field1.get( fieldType ).reference, values.value() );
+				} );
+				scoreIndexer.add( docId( 2 ), routingKey, document -> {
+					document.addValue( binding.field0.get( fieldType ).reference, null );
+					document.addValue( binding.field1.get( fieldType ).reference, null );
+				} );
+			}
 		}
 	}
 
