@@ -204,16 +204,19 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex, BulkIndexer rawFieldCompatibleIndexer) {
 			mainIndexer.add( docId( 0 ), routingKey,
 					document -> initCompatibleDocument( mainIndex, document, values.fieldValue( 0 ) ) );
-			mainIndexer.add( docId( 1 ), routingKey,
-					document -> initCompatibleDocument( mainIndex, document, values.fieldValue( 1 ) ) );
 			compatibleIndexer.add( docId( 0 ), routingKey,
 					document -> initCompatibleDocument( compatibleIndex, document, values.fieldValue( 0 ) ) );
-			compatibleIndexer.add( docId( 1 ), routingKey,
-					document -> initCompatibleDocument( compatibleIndex, document, values.fieldValue( 1 ) ) );
 			rawFieldCompatibleIndexer.add( docId( 0 ), routingKey,
 					document -> initRawFieldCompatibleDocument( rawFieldCompatibleIndex, document, values.fieldValue( 0 ) ) );
-			rawFieldCompatibleIndexer.add( docId( 1 ), routingKey,
-					document -> initRawFieldCompatibleDocument( rawFieldCompatibleIndex, document, values.fieldValue( 1 ) ) );
+
+			if ( values.size() > 1 ) {
+				mainIndexer.add( docId( 1 ), routingKey,
+						document -> initCompatibleDocument( mainIndex, document, values.fieldValue( 1 ) ) );
+				compatibleIndexer.add( docId( 1 ), routingKey,
+						document -> initCompatibleDocument( compatibleIndex, document, values.fieldValue( 1 ) ) );
+				rawFieldCompatibleIndexer.add( docId( 1 ), routingKey,
+						document -> initRawFieldCompatibleDocument( rawFieldCompatibleIndex, document, values.fieldValue( 1 ) ) );
+			}
 		}
 
 		private void initCompatibleDocument(SimpleMappedIndex<IndexBinding> index, DocumentElement document,

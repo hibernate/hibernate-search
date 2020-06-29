@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.junit.Assume.assumeFalse;
 
-import java.util.List;
-
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -20,6 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -27,13 +26,12 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
-public class ObjectExistsSearchPredicateIT {
+public class ExistsPredicateObjectsSpecificsIT {
 
 	// this document is empty
 	private static final String DOCUMENT_0 = "0";
@@ -59,26 +57,26 @@ public class ObjectExistsSearchPredicateIT {
 	public static final String ANY_STRING = "Any String";
 	public static final int ANY_INTEGER = 173173;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final SimpleMappedIndex<IndexBinding> mainIndex =
+	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
-	private final SimpleMappedIndex<IndexBinding> compatibleIndex =
+	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
-	private final StubMappedIndex emptyIndex =
+	private static final StubMappedIndex emptyIndex =
 			SimpleMappedIndex.withoutFields().name( "empty" );
-	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
-	private final SimpleMappedIndex<InvertedIndexBinding> invertedIndex =
+	private static final SimpleMappedIndex<InvertedIndexBinding> invertedIndex =
 			SimpleMappedIndex.of( InvertedIndexBinding::new ).name( "inverted" );
-	private final SimpleMappedIndex<DifferentFieldsIndexBinding> differentFieldsIndex =
+	private static final SimpleMappedIndex<DifferentFieldsIndexBinding> differentFieldsIndex =
 			SimpleMappedIndex.of( DifferentFieldsIndexBinding::new ).name( "differentFields" );
-	private final SimpleMappedIndex<IncompatibleFieldsIndexBinding> incompatibleFieldsIndex =
+	private static final SimpleMappedIndex<IncompatibleFieldsIndexBinding> incompatibleFieldsIndex =
 			SimpleMappedIndex.of( IncompatibleFieldsIndexBinding::new ).name( "incompatibleFields" );
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						mainIndex, compatibleIndex, emptyIndex,
@@ -91,49 +89,37 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void nested() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
-				.fetchAllHits();
-
-		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.exists().field( "nested" ) ) )
+				// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
+				// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
 	public void nested_noChild() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.nested().objectField( "nestedNoChild" ).nest( f -> f.exists().field( "nestedNoChild" ) ) )
-				.fetchAllHits();
-
-		assertThat( docs ).isEmpty();
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.exists().field( "nestedNoChild" ) ) )
+				.hasNoHits();
 	}
 
 	@Test
 	public void nested_multiIndexes_compatibleIndexBinding() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
-				.fetchAllHits();
-
-		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
+		assertThatQuery( scope.query()
+				.where( f -> f.exists().field( "nested" ) ) )
+				// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
+				// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
 	public void nested_multiIndexes_incompatibleIndexBinding() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
+		SearchPredicateFactory f = mainIndex.createScope( incompatibleIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
-		)
+		assertThatThrownBy( () -> f.exists().field( "nested" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for field" )
 				.hasMessageContaining( "'nested'" )
@@ -146,23 +132,19 @@ public class ObjectExistsSearchPredicateIT {
 	public void nested_multiIndexes_emptyIndexBinding() {
 		StubMappingScope scope = mainIndex.createScope( emptyIndex );
 
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
-				.fetchAllHits();
-
-		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
+		assertThatQuery( scope.query()
+				.where( f -> f.exists().field( "nested" ) ) )
+				// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
+				// DOCUMENT_4 won't be matched either, since we use a nested structure for the inner object field
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
 	public void nested_multiIndexes_wrongStructure() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = mainIndex.createScope( invertedIndex );
+		SearchPredicateFactory f = mainIndex.createScope( invertedIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().exists().field( "nested" )
-		)
+		assertThatThrownBy( () -> f.exists().field( "nested" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'nested'" )
@@ -174,11 +156,9 @@ public class ObjectExistsSearchPredicateIT {
 	@Test
 	public void nested_multiIndexes_differentFields() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = mainIndex.createScope( differentFieldsIndex );
+		SearchPredicateFactory f = mainIndex.createScope( differentFieldsIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
-		)
+		assertThatThrownBy( () -> f.exists().field( "nested" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'nested'" )
@@ -190,11 +170,9 @@ public class ObjectExistsSearchPredicateIT {
 	@Test
 	public void nested_multiIndexes_incompatibleFields() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = mainIndex.createScope( incompatibleFieldsIndex );
+		SearchPredicateFactory f = mainIndex.createScope( incompatibleFieldsIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
-		)
+		assertThatThrownBy( () -> f.exists().field( "nested" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'nested'" )
@@ -205,49 +183,35 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void flattened() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.exists().field( "flattened" ) )
-				.fetchAllHits();
-
-		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
+		assertThatQuery( mainIndex.query()
+				.where( p -> p.exists().field( "flattened" ) ) )
+				// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
+				// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void flattened_noChild() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.exists().field( "flattenedNoChild" ) )
-				.fetchAllHits();
-
-		assertThat( docs ).isEmpty();
+		assertThatQuery( mainIndex.query()
+				.where( p -> p.exists().field( "flattenedNoChild" ) ) )
+				.hasNoHits();
 	}
 
 	@Test
 	public void flattened_multiIndexes_compatibleIndexBinding() {
-		StubMappingScope scope = compatibleIndex.createScope( mainIndex );
-
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.exists().field( "flattened" ) )
-				.fetchAllHits();
-
-		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
+		assertThatQuery( mainIndex.query()
+				.where( p -> p.exists().field( "flattened" ) ) )
+				// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
+				// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void flattened_multiIndexes_incompatibleIndexBinding() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = incompatibleIndex.createScope( mainIndex );
+		SearchPredicateFactory f = incompatibleIndex.createScope( mainIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().exists().field( "flattened" )
-		)
+		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for field" )
 				.hasMessageContaining( "'flattened'" )
@@ -260,23 +224,19 @@ public class ObjectExistsSearchPredicateIT {
 	public void flattened_multiIndexes_emptyIndexBinding() {
 		StubMappingScope scope = mainIndex.createScope( emptyIndex );
 
-		List<DocumentReference> docs = scope.query().selectEntityReference()
-				.where( p -> p.exists().field( "flattened" ) )
-				.fetchAllHits();
-
-		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
-		assertThat( docs ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
+		assertThatQuery( scope.query()
+				.where( p -> p.exists().field( "flattened" ) ) )
+				// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
+				// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void flattened_multiIndexes_wrongStructure() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = invertedIndex.createScope( mainIndex );
+		SearchPredicateFactory f = invertedIndex.createScope( mainIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().exists().field( "flattened" )
-		)
+		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'flattened'" )
@@ -288,11 +248,9 @@ public class ObjectExistsSearchPredicateIT {
 	@Test
 	public void flattened_multiIndexes_differentFields() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = differentFieldsIndex.createScope( mainIndex );
+		SearchPredicateFactory f = differentFieldsIndex.createScope( mainIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().exists().field( "flattened" )
-		)
+		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'flattened'" )
@@ -304,11 +262,9 @@ public class ObjectExistsSearchPredicateIT {
 	@Test
 	public void flattened_multiIndexes_incompatibleFields() {
 		assumeFullMultiIndexCompatibilityCheck();
-		StubMappingScope scope = incompatibleFieldsIndex.createScope( mainIndex );
+		SearchPredicateFactory f = incompatibleFieldsIndex.createScope( mainIndex ).predicate();
 
-		Assertions.assertThatThrownBy(
-				() -> scope.predicate().exists().field( "flattened" )
-		)
+		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'flattened'" )
@@ -317,7 +273,7 @@ public class ObjectExistsSearchPredicateIT {
 				) );
 	}
 
-	private void initData() {
+	private static void initData() {
 		mainIndex.bulkIndexer()
 				.add( DOCUMENT_0, document -> { } )
 				.add( DOCUMENT_1, document -> {
