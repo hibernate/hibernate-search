@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -15,18 +15,17 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.query.SearchQuery;
-import org.junit.Before;
-import org.junit.Rule;
+
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
-public class NestedSearchPredicateIT {
+public class NestedPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
 	private static final String DOCUMENT_2 = "nonNestedQueryShouldMatchId";
@@ -43,13 +42,13 @@ public class NestedSearchPredicateIT {
 	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 = "secondNonMatchingWord";
 	private static final String NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 = "secondNonMatchingWord";
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
@@ -57,9 +56,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
@@ -89,18 +86,14 @@ public class NestedSearchPredicateIT {
 										)
 								)
 						)
-				)
-				.toQuery();
-		assertThat( query )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
 						.must( f.nested().objectField( "nestedObject.nestedObject" )
@@ -128,18 +121,14 @@ public class NestedSearchPredicateIT {
 										)
 								)
 						)
-				)
-				.toQuery();
-		assertThat( query )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 )
 				.hasTotalHitCount( 2 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( index.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match()
@@ -160,9 +149,7 @@ public class NestedSearchPredicateIT {
 										)
 								)
 						)
-				)
-				.toQuery();
-		assertThat( query )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 )
 				.hasTotalHitCount( 1 );
 	}
@@ -195,7 +182,7 @@ public class NestedSearchPredicateIT {
 				)
 				.toPredicate();
 
-		SearchQuery<DocumentReference> query = scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
@@ -203,21 +190,17 @@ public class NestedSearchPredicateIT {
 								// This is referred to as "condition 2" in the data initialization method
 								.must( predicate2 )
 						)
-				)
-				.toQuery();
-		assertThat( query )
+				) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void invalidNestedPath_parent() {
-		StubMappingScope scope = index.createScope();
-
 		String objectFieldPath = "nestedObject";
 		String fieldInParentPath = "string";
 
-		assertThatThrownBy( () -> scope.query()
+		assertThatThrownBy( () -> index.query()
 				.where( f -> f.nested().objectField( objectFieldPath )
 						.nest( f.bool()
 								.must( f.match()
@@ -229,8 +212,7 @@ public class NestedSearchPredicateIT {
 										.matching( "irrelevant_because_this_will_fail" )
 								)
 						)
-				)
-		)
+				) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
@@ -241,12 +223,10 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void invalidNestedPath_sibling() {
-		StubMappingScope scope = index.createScope();
-
 		String objectFieldPath = "nestedObject";
 		String fieldInSiblingPath = "nestedObject2.string";
 
-		assertThatThrownBy( () -> scope.query()
+		assertThatThrownBy( () -> index.query()
 				.where( f -> f.nested().objectField( objectFieldPath )
 						.nest( f.bool()
 								.must( f.match()
@@ -258,8 +238,7 @@ public class NestedSearchPredicateIT {
 										.matching( "irrelevant_because_this_will_fail" )
 								)
 						)
-				)
-		)
+				) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
@@ -268,7 +247,7 @@ public class NestedSearchPredicateIT {
 				);
 	}
 
-	private void initData() {
+	private static void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> {
 					ObjectMapping level1;
