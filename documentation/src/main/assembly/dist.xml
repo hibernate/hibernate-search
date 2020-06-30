@@ -17,19 +17,23 @@
     <fileSets>
         <fileSet>
             <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-            <outputDirectory>en-US/html_single/css/</outputDirectory>
+            <outputDirectory>reference/en-US/html_single/css/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-            <outputDirectory>en-US/html_single/script/</outputDirectory>
+            <outputDirectory>reference/en-US/html_single/script/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-            <outputDirectory>en-US/html_single/images/</outputDirectory>
+            <outputDirectory>reference/en-US/html_single/images/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${asciidoctor.base-output-dir}/</directory>
-            <outputDirectory>en-US/</outputDirectory>
+            <directory>${asciidoctor.base-output-dir}/reference/</directory>
+            <outputDirectory>reference/en-US/</outputDirectory>
+            <includes>
+                <include>*/*.html</include>
+                <include>*/*.pdf</include>
+            </includes>
         </fileSet>
     </fileSets>
 </assembly>
