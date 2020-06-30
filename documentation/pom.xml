@@ -20,7 +20,7 @@
     <description>Hibernate Search reference documentation</description>
 
     <properties>
-        <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>
+        <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/</asciidoctor.base-output-dir>
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
@@ -164,51 +164,6 @@
                             <overwrite>true</overwrite>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>copy-css-to-html-output</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${asciidoctor.base-output-dir}/html_single/css/</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-script-to-html-output</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${asciidoctor.base-output-dir}/html_single/script/</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-images-to-html-output</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${asciidoctor.base-output-dir}/html_single/images/</outputDirectory>
-                        </configuration>
-                    </execution>
                 </executions>
                 <configuration>
                     <nonFilteredFileExtensions>
@@ -260,6 +215,27 @@
                     </attributes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
+                    <attach>false</attach>
+                    <finalName>dist</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-dist</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -280,6 +256,7 @@
                                 <configuration>
                                     <backend>pdf</backend>
                                     <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
+                                    <outputFile>hibernate_search_reference.pdf</outputFile>
                                     <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
                                         <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
@@ -289,36 +266,6 @@
                                         <pagenums/>
                                         <idseparator>-</idseparator>
                                     </attributes>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>ch.mfrey.maven.plugin</groupId>
-                        <artifactId>copy-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <resources>
-                                        <resource>
-                                            <directory>${asciidoctor.base-output-dir}/pdf</directory>
-                                            <move>true</move>
-                                            <includes>
-                                                <include>index.pdf</include>
-                                            </includes>
-                                            <paths>
-                                                <path>
-                                                    <from>index.pdf</from>
-                                                    <to>hibernate_search_reference.pdf</to>
-                                                </path>
-                                            </paths>
-                                        </resource>
-                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>

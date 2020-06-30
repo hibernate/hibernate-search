@@ -173,10 +173,10 @@ output is enabled; to also generate the PDF output use:
 mvn clean install -Pdocumentation-pdf
 ```
 
-You can then find the freshly built documentation in the following location:
+You can then find the freshly built documentation at the following location:
 
 ```
-./documentation/target/asciidoctor/en-US
+./documentation/target/dist/
 ```
 
 ### Distribution
