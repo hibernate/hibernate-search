@@ -176,7 +176,7 @@
                 <artifactId>asciidoctor-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>output-html</id>
+                        <id>reference-output-html</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
@@ -185,6 +185,24 @@
                             <backend>html5</backend>
                             <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
                             <outputDirectory>${asciidoctor.base-output-dir}/reference/html_single</outputDirectory>
+                            <sourceHighlighter>prettify</sourceHighlighter>
+                            <attributes>
+                                <stylesdir>css</stylesdir>
+                                <iconfont-remote>false</iconfont-remote>
+                                <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                            </attributes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>internals-output-html</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>html5</backend>
+                            <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
+                            <outputDirectory>${asciidoctor.base-output-dir}/internals/html_single</outputDirectory>
                             <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
                                 <stylesdir>css</stylesdir>
@@ -249,7 +267,7 @@
                         <artifactId>asciidoctor-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>output-pdf</id>
+                                <id>reference-output-pdf</id>
                                 <phase>process-resources</phase>
                                 <goals>
                                     <goal>process-asciidoc</goal>
@@ -259,6 +277,28 @@
                                     <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
                                     <outputDirectory>${asciidoctor.base-output-dir}/reference/pdf</outputDirectory>
                                     <outputFile>hibernate_search_reference.pdf</outputFile>
+                                    <sourceHighlighter>coderay</sourceHighlighter>
+                                    <attributes>
+                                        <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
+                                        <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
+                                        <pdf-style>hibernate</pdf-style>
+                                        <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
+                                        <pagenums/>
+                                        <idseparator>-</idseparator>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>internals-output-pdf</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>pdf</backend>
+                                    <sourceDocumentName>internals/index.asciidoc</sourceDocumentName>
+                                    <outputDirectory>${asciidoctor.base-output-dir}/internals/pdf</outputDirectory>
+                                    <outputFile>hibernate_search_internals.pdf</outputFile>
                                     <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
                                         <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>

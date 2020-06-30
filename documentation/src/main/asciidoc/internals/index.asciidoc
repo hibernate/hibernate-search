@@ -1,12 +1,20 @@
-[[internals]]
 = Internals of Hibernate Search
+:doctype: book
+:revdate: {docdate}
+:sectanchors:
+:anchor:
+:toc: left
+:toclevels: 4
+:docinfodir: {docinfodir}
+:docinfo: shared,private
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
 This section is intended for new Hibernate Search contributors looking for an introduction
 to how Hibernate Search works.
 
 Knowledge of the Hibernate Search APIs and how to use them is a requirement to understand this section.
 
-[[internals-overall]]
+[[overall]]
 == General overview
 
 This section focuses on describing what the different parts of Hibernate Search are at a high level
@@ -87,7 +95,7 @@ and the other part in another cluster.
 This is currently possible, though whether there are valid uses cases for this remains to be determined,
 mainly based on the Infinispan needs.
 
-[[internals-overall-bootstrap]]
+[[overall-bootstrap]]
 === Bootstrap
 
 Bootstrap starts by creating at least two components:
@@ -189,7 +197,7 @@ we do not expect much real-life usage.
 The following sections do not address everything in the POJO mapper,
 but instead focus on the more complex parts.
 
-[[internals-pojo-metamodel]]
+[[pojo-metamodel]]
 === Representation of the POJO metamodel
 
 The bootstrapping process of the POJO mapper relies heavily on the POJO metamodel
@@ -240,9 +248,9 @@ and to allow users to get "accessors" so that they can extract information from 
 +
 NOTE: When retrieving accessors, users indirectly declare what parts of the POJO model
 they will extract and use in their bridge, and Hibernate Search actually makes use of this information
-(see <<internals-pojo-reindexingresolvers>>).
+(see <<pojo-reindexingresolvers>>).
 
-[[internals-pojo-indexingprocessors]]
+[[pojo-indexingprocessors]]
 === Indexing processors
 
 Indexing processors are the objects responsible for extracting data from a POJO and pushing it to a document.
@@ -281,7 +289,7 @@ tree that was generated for a given mapping.
 ==== Bootstrap
 
 For each indexed type, the building process consists in creating a root `PojoIndexingProcessorOriginalTypeNode` builder,
-and applying metadata contributors to this builder (see <<internals-overall-bootstrap>>),
+and applying metadata contributors to this builder (see <<overall-bootstrap>>),
 creating nested builders as the need arises (when a metadata contributor mentions a POJO property, for instance).
 Whenever an `@IndexedEmbedded` is found, the process is simply applied recursively
 on a type node created as a child of the `@IndexedEmbedded` property node.
@@ -331,7 +339,7 @@ The builder node was created when applying and interpreting metadata,
 but it turns out the node does not have any child nor any bridge.
 As a result, this node will be ignored when creating the indexing processor.
 
-[[internals-pojo-reindexingresolvers]]
+[[pojo-reindexingresolvers]]
 === Implicit reindexing resolvers
 
 Reindexing resolvers are the objects responsible for determining, whenever an entity changes,
@@ -392,7 +400,7 @@ if the indexing processor for entity `A` references entity `B` at some point,
 then you can be sure that the reindexing resolver for entity `B` will reference entity `A` at some point.
 
 As an example, let's consider the indexing processor builder tree
-from the previous section (<<internals-pojo-indexingprocessors>>):
+from the previous section (<<pojo-indexingprocessors>>):
 
 image::internals-mapper-pojo-indexingprocessor-example1-builder.svg[Indexing processor node builder tree used as an input,align="center"]
 
@@ -458,7 +466,7 @@ This path represents an association between two entity types: `EmbeddedEntityCla
 and `SecondLevelEmbeddedEntityClass` on the contained side.
 In order to complete the reindexing resolver tree, we need to *invert* this association,
 i.e. find out the inverse path from `SecondLevelEmbeddedEntityClass` to `EmbeddedEntityClass`.
-This is done in `PojoAssociationPathInverter` using the "additional metadata" mentioned in <<internals-pojo-metamodel>>.
+This is done in `PojoAssociationPathInverter` using the "additional metadata" mentioned in <<pojo-metamodel>>.
 
 Once the path is successfully inverted, the dependency collector value node can add new children
 to the reindexing resolver builder:
