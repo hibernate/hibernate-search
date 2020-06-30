@@ -38,7 +38,7 @@ public class ExistsPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index,
+						NestingIT.index, SingleFieldIT.index,
 						ScoreIT.index,
 						InvalidFieldIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -50,6 +50,9 @@ public class ExistsPredicateBaseIT {
 
 		final BulkIndexer singleFieldIndexer = SingleFieldIT.index.bulkIndexer();
 		SingleFieldIT.dataSets.forEach( d -> d.contribute( SingleFieldIT.index, singleFieldIndexer ) );
+
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
@@ -67,7 +70,7 @@ public class ExistsPredicateBaseIT {
 				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				scoreIndexer,
+				nestingIndexer, scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
 		);
@@ -207,6 +210,40 @@ public class ExistsPredicateBaseIT {
 					document.addValue( binding.field1.get( fieldType ).reference, null );
 				} );
 			}
+		}
+	}
+
+	@RunWith(Parameterized.class)
+	public static class NestingIT<F> extends AbstractPredicateFieldNestingIT<ExistsPredicateTestValues<F>> {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		public NestingIT(DataSet<F, ExistsPredicateTestValues<F>> dataSet) {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			if ( matchingDocOrdinal != 0 ) {
+				throw new IllegalStateException( "This predicate can only match the first document" );
+			}
+			return f.exists().field( fieldPath );
 		}
 	}
 

@@ -48,7 +48,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index,
+						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -64,6 +64,9 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSet.contribute( MultiFieldIT.index, multiFieldIndexer );
 
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSet.contribute( NestingIT.index, nestingIndexer );
+
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( ScoreIT.index, scoreIndexer );
 
@@ -75,7 +78,7 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer,
+				multiFieldIndexer, nestingIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer
 		);
@@ -137,6 +140,24 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 				String[] fieldPaths, int matchingDocOrdinal) {
 			return f.spatial().within().field( fieldPath ).fields( fieldPaths )
 					.boundingBox( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+	}
+
+	public static class NestingIT extends AbstractPredicateFieldNestingIT<SpatialWithinBoundingBoxPredicateTestValues> {
+		private static final DataSet<GeoPoint, SpatialWithinBoundingBoxPredicateTestValues> dataSet =
+				new DataSet<>( testValues() );
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting" );
+
+		public NestingIT() {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.spatial().within().field( fieldPath ).boundingBox( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 

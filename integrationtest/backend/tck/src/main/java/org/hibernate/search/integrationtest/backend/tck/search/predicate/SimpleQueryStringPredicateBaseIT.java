@@ -49,7 +49,7 @@ public class SimpleQueryStringPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index,
+						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
 						AnalysisIT.index, AnalysisIT.compatibleIndex, AnalysisIT.incompatibleIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
@@ -65,6 +65,9 @@ public class SimpleQueryStringPredicateBaseIT {
 
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
+
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
 
 		final BulkIndexer analysisMainIndexIndexer = AnalysisIT.index.bulkIndexer();
 		final BulkIndexer analysisCompatibleIndexIndexer = AnalysisIT.compatibleIndex.bulkIndexer();
@@ -84,7 +87,7 @@ public class SimpleQueryStringPredicateBaseIT {
 				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer ) );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer,
+				multiFieldIndexer, nestingIndexer,
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer
@@ -173,6 +176,37 @@ public class SimpleQueryStringPredicateBaseIT {
 				String[] fieldPaths, int matchingDocOrdinal) {
 			return f.simpleQueryString().field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+	}
+
+	@RunWith(Parameterized.class)
+	public static class NestingIT extends AbstractPredicateFieldNestingIT<SimpleQueryStringPredicateTestValues> {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		public NestingIT(DataSet<String, SimpleQueryStringPredicateTestValues> dataSet) {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.simpleQueryString().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 

@@ -49,7 +49,7 @@ public class SpatialWithinPolygonPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index,
+						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -65,6 +65,9 @@ public class SpatialWithinPolygonPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSet.contribute( MultiFieldIT.index, multiFieldIndexer );
 
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSet.contribute( NestingIT.index, nestingIndexer );
+
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( ScoreIT.index, scoreIndexer );
 
@@ -76,7 +79,7 @@ public class SpatialWithinPolygonPredicateBaseIT {
 				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer,
+				multiFieldIndexer, nestingIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer
 		);
@@ -142,6 +145,24 @@ public class SpatialWithinPolygonPredicateBaseIT {
 				String[] fieldPaths, int matchingDocOrdinal) {
 			return f.spatial().within().field( fieldPath ).fields( fieldPaths )
 					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+	}
+
+	public static class NestingIT extends AbstractPredicateFieldNestingIT<SpatialWithinPolygonPredicateTestValues> {
+		private static final DataSet<GeoPoint, SpatialWithinPolygonPredicateTestValues> dataSet =
+				new DataSet<>( testValues() );
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting" );
+
+		public NestingIT() {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.spatial().within().field( fieldPath ).polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 

@@ -48,7 +48,7 @@ public class WildcardPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index,
+						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -64,6 +64,9 @@ public class WildcardPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
 
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
+
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( ScoreIT.index, scoreIndexer ) );
 
@@ -75,7 +78,7 @@ public class WildcardPredicateBaseIT {
 				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer ) );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer,
+				multiFieldIndexer, nestingIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer
 		);
@@ -163,6 +166,37 @@ public class WildcardPredicateBaseIT {
 				String[] fieldPaths, int matchingDocOrdinal) {
 			return f.wildcard().field( fieldPath ).fields( fieldPaths )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+	}
+
+	@RunWith(Parameterized.class)
+	public static class NestingIT extends AbstractPredicateFieldNestingIT<WildcardPredicateTestValues> {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<String> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		public NestingIT(DataSet<String, WildcardPredicateTestValues> dataSet) {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.wildcard().field( fieldPath ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
 
