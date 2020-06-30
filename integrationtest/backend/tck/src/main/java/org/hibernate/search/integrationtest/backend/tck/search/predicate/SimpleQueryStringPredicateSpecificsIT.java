@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
 import java.util.EnumSet;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -21,6 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -418,9 +423,26 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.hasNoHits();
 	}
 
+	@Test
+	public void incompatibleNestedPaths() {
+		String fieldInRootPath = index.binding().analyzedStringField1.relativeFieldName;
+		String fieldInNestedPath = index.binding().nested.fieldPath();
+		assertThatThrownBy( () -> index.createScope()
+				.predicate().simpleQueryString().field( fieldInNestedPath ).field( fieldInRootPath ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Simple query string targets fields",
+						"spanning multiple nested paths",
+						fieldInNestedPath,
+						fieldInRootPath
+				);
+	}
+
 	private static class IndexBinding {
 		final SimpleFieldModel<String> analyzedStringField1;
 		final SimpleFieldModel<String> nonAnalyzedField;
+
+		final ObjectFieldBinding nested;
 
 		IndexBinding(IndexSchemaElement root) {
 			analyzedStringField1 = SimpleFieldModel.mapperWithOverride( AnalyzedStringFieldTypeDescriptor.INSTANCE,
@@ -430,6 +452,32 @@ public class SimpleQueryStringPredicateSpecificsIT {
 			// A field without any analyzer or normalizer
 			nonAnalyzedField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "nonAnalyzed" );
+			nested = ObjectFieldBinding.create( root, null, "nested", ObjectStructure.NESTED );
+		}
+	}
+
+	static class ObjectFieldBinding {
+		final IndexObjectFieldReference reference;
+		final String absolutePath;
+
+		final SimpleFieldModel<String> field;
+
+		static ObjectFieldBinding create(IndexSchemaElement parent, String parentAbsolutePath, String relativeFieldName,
+				ObjectStructure structure) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
+			String absolutePath = parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName;
+			return new ObjectFieldBinding( objectField, absolutePath );
+		}
+
+		ObjectFieldBinding(IndexSchemaObjectField objectField, String absolutePath) {
+			reference = objectField.toReference();
+			this.absolutePath = absolutePath;
+			field = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE )
+					.map( objectField, "field" );
+		}
+
+		String fieldPath() {
+			return absolutePath + "." + field.relativeFieldName;
 		}
 	}
 

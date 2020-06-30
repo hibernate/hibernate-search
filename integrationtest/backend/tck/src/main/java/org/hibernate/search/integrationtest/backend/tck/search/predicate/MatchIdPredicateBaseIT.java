@@ -8,8 +8,11 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.BeforeClass;
@@ -28,19 +31,53 @@ public class MatchIdPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						ScoreIT.index
+						NestingIT.index, ScoreIT.index
 				)
 				.setup();
+
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSet.contribute( nestingIndexer );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( scoreIndexer );
 
-		scoreIndexer.join();
+		nestingIndexer.join( scoreIndexer );
 	}
 
 	@Test
 	public void takariCpSuiteWorkaround() {
 		// Workaround to get Takari-CPSuite to run this test.
+	}
+
+	public static class NestingIT extends AbstractPredicateNestingIT {
+		private static final DataSet dataSet = new DataSet();
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, FieldTypeDescriptor.getAll() ) )
+						.name( "nesting" );
+
+		public NestingIT() {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+				int matchingDocOrdinal) {
+			return f.id().matching( dataSet.docId( matchingDocOrdinal ) );
+		}
+
+		private static class DataSet extends AbstractPredicateDataSet {
+			protected DataSet() {
+				super( "singleRoutingKey" );
+			}
+
+			public void contribute(BulkIndexer scoreIndexer) {
+				scoreIndexer.add( docId( 0 ), routingKey, document -> index.binding()
+						.initDocument( document, AnalyzedStringFieldTypeDescriptor.INSTANCE, "irrelevant" ) );
+				scoreIndexer.add( docId( 1 ), routingKey, document -> index.binding()
+						.initDocument( document, AnalyzedStringFieldTypeDescriptor.INSTANCE, "irrelevant" ) );
+			}
+		}
 	}
 
 	public static class ScoreIT extends AbstractPredicateScoreIT {

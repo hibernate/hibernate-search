@@ -54,7 +54,7 @@ public class RangePredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index,
+						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -70,6 +70,9 @@ public class RangePredicateBaseIT {
 
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
+
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( ScoreIT.index, scoreIndexer ) );
@@ -87,7 +90,7 @@ public class RangePredicateBaseIT {
 				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer,
+				multiFieldIndexer, nestingIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
@@ -178,6 +181,38 @@ public class RangePredicateBaseIT {
 					.range( dataSet.values.matchingRange( matchingDocOrdinal ) );
 		}
 	}
+
+	@RunWith(Parameterized.class)
+	public static class NestingIT<F> extends AbstractPredicateFieldNestingIT<RangePredicateTestValues<F>> {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		public NestingIT(DataSet<F, RangePredicateTestValues<F>> dataSet) {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.range().field( fieldPath ).range( dataSet.values.matchingRange( matchingDocOrdinal ) );
+		}
+	}
+
 
 	@RunWith(Parameterized.class)
 	public static class ScoreIT<F> extends AbstractPredicateFieldScoreIT<RangePredicateTestValues<F>> {

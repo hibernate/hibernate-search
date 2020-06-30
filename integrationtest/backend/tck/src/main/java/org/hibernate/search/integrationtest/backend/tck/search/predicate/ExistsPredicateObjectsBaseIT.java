@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,19 +47,86 @@ public class ExistsPredicateObjectsBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						ScoreIT.index
+						NestingIT.index, ScoreIT.index
 				)
 				.setup();
+
+		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( nestingIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
 
-		scoreIndexer.join();
+		nestingIndexer.join( scoreIndexer );
 	}
 
 	@Test
 	public void takariCpSuiteWorkaround() {
 		// Workaround to get Takari-CPSuite to run this test.
+	}
+
+	@RunWith(Parameterized.class)
+	public static class NestingIT extends AbstractPredicateNestingIT {
+		private static final List<DataSet> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+		static {
+			for ( ObjectStructure structure : Arrays.asList( ObjectStructure.NESTED, ObjectStructure.FLATTENED ) ) {
+				DataSet dataSet = new DataSet( structure );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, Collections.singletonList( innerFieldType ) ) )
+						.name( "nesting" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		private final DataSet dataSet;
+
+		public NestingIT(DataSet dataSet) {
+			super( index, dataSet );
+			this.dataSet = dataSet;
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+				int matchingDocOrdinal) {
+			if ( matchingDocOrdinal != 0 ) {
+				throw new IllegalStateException( "This predicate can only match the first document" );
+			}
+			return f.exists().field( fieldPath( objectFieldBinding ) );
+		}
+
+		private String fieldPath(ObjectFieldBinding objectFieldBinding) {
+			switch ( dataSet.structure ) {
+				case FLATTENED:
+					return objectFieldBinding.flattened.absolutePath;
+				case NESTED:
+					return objectFieldBinding.nested.absolutePath;
+				default:
+					throw new IllegalStateException( "Unexpected structure: " + dataSet.structure );
+			}
+		}
+
+		private static class DataSet extends AbstractPredicateDataSet {
+			final ObjectStructure structure;
+
+			protected DataSet(ObjectStructure structure) {
+				super( structure.name() );
+				this.structure = structure;
+			}
+
+			public void contribute(BulkIndexer scoreIndexer) {
+				scoreIndexer.add( docId( 0 ), routingKey, document -> index.binding()
+						.initDocument( document, innerFieldType, "irrelevant" ) );
+				scoreIndexer.add( docId( 1 ), routingKey, document -> { } );
+			}
+		}
 	}
 
 	@RunWith(Parameterized.class)
