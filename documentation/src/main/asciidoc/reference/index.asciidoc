@@ -43,8 +43,6 @@ include::monitoring.asciidoc[]
 
 include::advanced-features.asciidoc[]
 
-include::internals.asciidoc[]
-
 include::further-reading.asciidoc[]
 
 include::credits.asciidoc[]
