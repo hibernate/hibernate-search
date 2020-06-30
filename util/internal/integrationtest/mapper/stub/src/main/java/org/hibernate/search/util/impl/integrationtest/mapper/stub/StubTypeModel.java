@@ -19,6 +19,11 @@ public class StubTypeModel implements MappableTypeModel {
 		this.typeIdentifier = typeIdentifier;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + typeIdentifier + "]";
+	}
+
 	public String asString() {
 		return typeIdentifier;
 	}
