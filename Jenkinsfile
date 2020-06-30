@@ -215,7 +215,9 @@ stage('Configure') {
 					// The only difference with 7.3+ is they have a bug in their BigInteger support.
 					new EsLocalBuildEnvironment(versionRange: '[7.0,7.3)', mavenProfile: 'elasticsearch-7.0',
 							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
-					new EsLocalBuildEnvironment(versionRange: '[7.3,7.x)', mavenProfile: 'elasticsearch-7.3',
+					new EsLocalBuildEnvironment(versionRange: '[7.3,7.7)', mavenProfile: 'elasticsearch-7.3',
+							jdkTool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[7.7,7.x)', mavenProfile: 'elasticsearch-7.7',
 							jdkTool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD)
 			],
 			esAws: [
