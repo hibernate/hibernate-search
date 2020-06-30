@@ -206,7 +206,8 @@ The following profiles are available:
  * `elasticsearch-6.4` for 6.4.x to 6.6.x
  * `elasticsearch-6.7` for 6.7 and later 6.x
  * `elasticsearch-7.0` for 7.0 to 7.2
- * `elasticsearch-7.3` for 7.3+ (the default)
+ * `elasticsearch-7.3` for 7.3 to 7.6
+ * `elasticsearch-7.7` for 7.7+ (the default)
 
 A list of available versions for `test.elasticsearch.connection.version` can be found on
 [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
