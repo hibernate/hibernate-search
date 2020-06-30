@@ -303,7 +303,7 @@
         </fileSet>
         <fileSet>
             <directory>../documentation/target/dist/</directory>
-            <outputDirectory>docs/reference</outputDirectory>
+            <outputDirectory>docs/</outputDirectory>
         </fileSet>
     </fileSets>
 

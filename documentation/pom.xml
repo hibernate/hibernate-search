@@ -183,7 +183,8 @@
                         </goals>
                         <configuration>
                             <backend>html5</backend>
-                            <outputDirectory>${asciidoctor.base-output-dir}/html_single</outputDirectory>
+                            <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
+                            <outputDirectory>${asciidoctor.base-output-dir}/reference/html_single</outputDirectory>
                             <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
                                 <stylesdir>css</stylesdir>
@@ -194,7 +195,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                    <relativeBaseDir>true</relativeBaseDir>
                     <attributes>
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
                         <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
@@ -255,7 +256,8 @@
                                 </goals>
                                 <configuration>
                                     <backend>pdf</backend>
-                                    <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
+                                    <sourceDocumentName>reference/index.asciidoc</sourceDocumentName>
+                                    <outputDirectory>${asciidoctor.base-output-dir}/reference/pdf</outputDirectory>
                                     <outputFile>hibernate_search_reference.pdf</outputFile>
                                     <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
