@@ -45,6 +45,9 @@ public final class ValidationErrorCollector {
 
 	void addError(String errorMessage) {
 		if ( failureCollector != null ) {
+			if ( !hasError ) {
+				failureCollector.add( ElasticsearchValidationMessages.INSTANCE.validationFailed() );
+			}
 			appendContext( failureCollector, currentContext ).add( errorMessage );
 		}
 		hasError = true;

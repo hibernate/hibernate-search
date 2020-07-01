@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
@@ -25,7 +26,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
@@ -44,8 +44,6 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
-
-	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
@@ -86,8 +84,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.mappingAttributeContext( "dynamic" )
 						.failure( "Invalid value. Expected 'STRICT', actual is 'null'" )
 						.build() );
@@ -115,8 +112,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.mappingAttributeContext( "dynamic" )
 						.failure( "Invalid value. Expected 'STRICT', actual is 'FALSE'" )
 						.build() );
@@ -138,8 +134,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "_entity_type" )
 						.failure( "Missing property mapping" )
 						.indexFieldContext( "myField" )
@@ -164,8 +159,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "_entity_type" )
 						.failure( "Missing property mapping" )
 						.indexFieldContext( "myField" )
@@ -191,8 +185,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "type" )
 						.failure( "Invalid value. Expected 'integer', actual is 'keyword'" )
@@ -236,8 +229,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "index" )
 						.failure( "Invalid value. Expected 'true', actual is 'false'" )
@@ -304,8 +296,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
 						.failure( "The output format (the first element) is invalid." )
@@ -363,8 +354,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
 						.failure(
@@ -394,8 +384,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
 						.failure(
@@ -423,8 +412,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
 						.failure(
@@ -453,8 +441,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "analyzer" )
 						.failure( "Invalid value. Expected 'keyword', actual is 'null'" )
@@ -500,8 +487,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "analyzer" )
 						.failure( "Invalid value. Expected 'default', actual is 'keyword'" )
@@ -528,8 +514,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "search_analyzer" )
 						.failure( "Invalid value. Expected 'italian', actual is 'null'" )
@@ -578,8 +563,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "search_analyzer" )
 						.failure( "Invalid value. Expected 'italian', actual is 'english'" )
@@ -623,8 +607,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "norms" )
 						.failure( "Invalid value. Expected 'true', actual is 'false'" )
@@ -726,8 +709,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "term_vector" )
 						.failure( "Invalid value. Expected 'yes', actual is 'with_offsets'" )
@@ -770,8 +752,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "null_value" )
 						.failure( "Invalid value. Expected '739', actual is 'null'" )
@@ -796,8 +777,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "null_value" )
 						.failure( "Invalid value. Expected '739', actual is '777'" )
@@ -859,8 +839,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "doc_values" )
 						.failure( "Invalid value. Expected 'true', actual is 'false'" )
@@ -944,8 +923,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "scaling_factor" )
 						.failure( "Invalid value. Expected '100.0', actual is '2.0'" )
@@ -970,8 +948,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "normalizer" )
 						.failure( "Invalid value. Expected 'default', actual is 'null'" )
@@ -1061,8 +1038,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( Exception.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "normalizer" )
 						.failure( "Invalid value. Expected 'another-normalizer', actual is 'custom-normalizer'" )

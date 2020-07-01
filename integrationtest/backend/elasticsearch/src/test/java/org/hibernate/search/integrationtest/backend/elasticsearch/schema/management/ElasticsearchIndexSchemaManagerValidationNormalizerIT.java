@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
 import java.util.EnumSet;
@@ -16,7 +17,6 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
@@ -34,8 +34,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionValidationIT")
 public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
-
-	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
@@ -113,8 +111,7 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.normalizerContext( "custom-normalizer" )
 						.failure( "Missing normalizer" )
 						.build()
