@@ -154,6 +154,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
 

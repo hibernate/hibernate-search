@@ -162,7 +162,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 				componentTypeModel = introspector.typeModel( componentValue.getRoleName() );
 			}
 			else {
-				componentTypeModel = introspector.typeModel( componentValue.getComponentClass() );
+				componentTypeModel = introspector.typeModel( (Class<?>) componentValue.getComponentClass() );
 			}
 			/*
 			 * Different Component instances for the same component class may carry different metadata

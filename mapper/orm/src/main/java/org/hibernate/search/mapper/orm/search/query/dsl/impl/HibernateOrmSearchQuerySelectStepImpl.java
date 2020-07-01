@@ -11,11 +11,11 @@ import org.hibernate.search.engine.search.query.dsl.spi.AbstractDelegatingSearch
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 
+@SuppressWarnings("deprecation")
 public class HibernateOrmSearchQuerySelectStepImpl<E>
 		extends AbstractDelegatingSearchQuerySelectStep<EntityReference, E, SearchLoadingOptionsStep>
-		implements HibernateOrmSearchQuerySelectStep<E> {
+		implements org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<E> {
 	private final SearchLoadingOptionsStep loadingOptions;
 
 	public HibernateOrmSearchQuerySelectStepImpl(
@@ -26,13 +26,15 @@ public class HibernateOrmSearchQuerySelectStepImpl<E>
 	}
 
 	@Override
-	public HibernateOrmSearchQuerySelectStep<E> fetchSize(int fetchSize) {
+	public org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<E> fetchSize(
+			int fetchSize) {
 		loadingOptions.fetchSize( fetchSize );
 		return this;
 	}
 
 	@Override
-	public HibernateOrmSearchQuerySelectStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
+	public org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<E> cacheLookupStrategy(
+			EntityLoadingCacheLookupStrategy strategy) {
 		loadingOptions.cacheLookupStrategy( strategy );
 		return this;
 	}

@@ -19,7 +19,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
@@ -89,7 +88,7 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							PojoElementAccessor<String> pojoPropertyAccessor = context.bridgedElement()
 									.createAccessor( String.class );
 							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
@@ -168,7 +167,7 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "contained" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies().use( "stringProperty" );
 							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
 									"someField",
@@ -238,7 +237,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies().use( "doesNotExist.stringProperty" );
 									context.bridge( new UnusedPropertyBridge() );
 								} )
@@ -283,7 +282,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.use(
 													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -326,7 +325,7 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 						.property( "child" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies()
 									.fromOtherEntity( PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class, "parent" )
 									.use( "stringProperty" );
@@ -440,7 +439,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -475,7 +474,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -508,7 +507,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.fromOtherEntity(
 													ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.COLLECTION ),
@@ -545,7 +544,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -581,7 +580,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.NotEntity.class,
@@ -617,7 +616,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.dependencies()
 											.fromOtherEntity(
 													PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class,
@@ -671,7 +670,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									// Do not declare any dependency
 									context.bridge( new UnusedPropertyBridge() );
 								} )
@@ -717,7 +716,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									// Declare no dependency, but also a dependency: this is inconsistent.
 									context.dependencies()
 											.use( "stringProperty" )
@@ -741,6 +740,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
+	@SuppressWarnings("unchecked")
 	public void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -764,7 +764,7 @@ public class PropertyBridgeBaseIT {
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies().useRootOnly();
 							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement().field(
 									"someField",
@@ -834,7 +834,7 @@ public class PropertyBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies().useRootOnly();
 							// Single-valued field
 							context.indexSchemaElement()
@@ -885,7 +885,7 @@ public class PropertyBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies().useRootOnly();
 							// Single-valued field
 							IndexSchemaObjectField stringObjectField = context.indexSchemaElement()
@@ -940,7 +940,7 @@ public class PropertyBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies().useRootOnly();
 							// Single-valued field
 							context.indexSchemaElement()
@@ -997,7 +997,7 @@ public class PropertyBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
-						.binder( (PropertyBinder) context -> {
+						.binder( context -> {
 							context.dependencies().useRootOnly();
 							// Single-valued field
 							context.indexSchemaElement()
@@ -1039,7 +1039,7 @@ public class PropertyBridgeBaseIT {
 				() -> setupHelper.start()
 						.withConfiguration( b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "stringProperty" )
-								.binder( (PropertyBinder) context -> {
+								.binder( context -> {
 									context.bridgedElement().createAccessor( Integer.class );
 									context.bridge( new UnusedPropertyBridge() );
 								} )

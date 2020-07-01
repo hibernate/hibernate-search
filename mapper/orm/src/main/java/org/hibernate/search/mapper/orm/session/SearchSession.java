@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 
 public interface SearchSession {
 
@@ -35,7 +34,9 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	default <T> HibernateOrmSearchQuerySelectStep<T> search(Class<T> type) {
+	@SuppressWarnings("deprecation")
+	default <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			Class<T> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -49,7 +50,9 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> HibernateOrmSearchQuerySelectStep<T> search(Collection<? extends Class<? extends T>> types);
+	@SuppressWarnings("deprecation")
+	<T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Initiate the building of a search query.
@@ -61,7 +64,9 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> HibernateOrmSearchQuerySelectStep<T> search(SearchScope<T> scope);
+	@SuppressWarnings("deprecation")
+	<T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			SearchScope<T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.

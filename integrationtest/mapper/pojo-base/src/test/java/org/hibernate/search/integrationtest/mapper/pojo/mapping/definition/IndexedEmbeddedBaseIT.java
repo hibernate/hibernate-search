@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
@@ -825,6 +824,7 @@ public class IndexedEmbeddedBaseIT {
 	 * Check that the deprecated "storage" parameter is taken into account.
 	 */
 	@Test
+	@SuppressWarnings("deprecation")
 	public void storage() {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
@@ -846,7 +846,7 @@ public class IndexedEmbeddedBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
+			@IndexedEmbedded(storage = org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.NESTED)
 			public IndexedEmbeddedLevel1 getLevel1() {
 				return level1;
 			}

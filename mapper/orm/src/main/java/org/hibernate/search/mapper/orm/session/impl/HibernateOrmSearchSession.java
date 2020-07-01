@@ -35,7 +35,6 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
@@ -131,16 +130,22 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public <T> HibernateOrmSearchQuerySelectStep<T> search(Collection<? extends Class<? extends T>> types) {
+	@SuppressWarnings("deprecation")
+	public <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			Collection<? extends Class<? extends T>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public <T> HibernateOrmSearchQuerySelectStep<T> search(SearchScope<T> scope) {
+	@SuppressWarnings("deprecation")
+	public <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			SearchScope<T> scope) {
 		return search( (SearchScopeImpl<T>) scope );
 	}
 
-	private <T> HibernateOrmSearchQuerySelectStep<T> search(SearchScopeImpl<T> scope) {
+	@SuppressWarnings("deprecation")
+	private <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			SearchScopeImpl<T> scope) {
 		return scope.search( this );
 	}
 

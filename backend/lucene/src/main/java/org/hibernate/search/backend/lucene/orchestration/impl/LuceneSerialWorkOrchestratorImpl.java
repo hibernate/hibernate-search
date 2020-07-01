@@ -67,6 +67,7 @@ public class LuceneSerialWorkOrchestratorImpl
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // We aren't allowed to create generic arrays, so we have to use a raw type here.
 	protected void doStart(ConfigurationPropertySource propertySource) {
 		int queueCount = QUEUE_COUNT.get( propertySource );
 		int queueSize = QUEUE_SIZE.get( propertySource );
