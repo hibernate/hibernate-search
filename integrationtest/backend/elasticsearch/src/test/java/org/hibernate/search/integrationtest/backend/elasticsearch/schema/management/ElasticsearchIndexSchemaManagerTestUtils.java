@@ -10,8 +10,11 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.discriminatorMappingOmitDefaults;
 
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 
 class ElasticsearchIndexSchemaManagerTestUtils {
+
+	static final String STUB_CONTEXT_LITERAL = "Stub context";
 
 	private ElasticsearchIndexSchemaManagerTestUtils() {
 	}
@@ -67,5 +70,11 @@ class ElasticsearchIndexSchemaManagerTestUtils {
 	static String defaultMetadataMappingAndCommaForExpectations() {
 		String mapping = defaultMetadataMappingForExpectations();
 		return mapping.isEmpty() ? "" : mapping + ", ";
+	}
+
+	static FailureReportUtils.FailureReportPatternBuilder buildValidationFailureReportPattern() {
+		return FailureReportUtils.buildFailureReportPattern()
+				.contextLiteral( STUB_CONTEXT_LITERAL )
+				.failure( "Validation of the existing index in the Elasticsearch cluster failed. See below for details." );
 	}
 }

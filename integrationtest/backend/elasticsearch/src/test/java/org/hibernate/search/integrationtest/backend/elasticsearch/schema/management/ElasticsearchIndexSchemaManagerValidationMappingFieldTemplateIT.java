@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForInitialization;
 
 import java.util.EnumSet;
@@ -19,7 +20,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
@@ -37,8 +37,6 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
-
-	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
@@ -130,8 +128,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate2" )
 						.failure( "Missing dynamic field template" )
 						.build() );
@@ -174,8 +171,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "extraTemplate" )
 						.failure( "Unexpected dynamic field template" )
 						.build() );
@@ -214,8 +210,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.failure(
 								"Invalid order for dynamic field templates",
 								"Expected [myTemplate1, myTemplate2, myTemplate3]",
@@ -251,8 +246,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate1" )
 						.failure(
 								"Multiple dynamic field templates with this name",
@@ -285,8 +279,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "path_match" )
 						.failure( "Invalid value. Expected '*_suffix', actual is 'null'" )
@@ -318,8 +311,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "path_match" )
 						.failure( "Invalid value. Expected '*_suffix', actual is '*_suffix2'" )
@@ -349,8 +341,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "path_match" )
 						.failure( "Invalid value. Expected '*', actual is '*_suffix'" )
@@ -380,8 +371,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "match_mapping_type" )
 						.failure( "Invalid value. Expected 'object', actual is 'null'" )
@@ -412,8 +402,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "match_mapping_type" )
 						.failure( "Invalid value. Expected 'object', actual is 'long'" )
@@ -444,8 +433,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "match_mapping_type" )
 						.failure( "Invalid value. Expected 'null', actual is 'long'" )
@@ -476,8 +464,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "match" )
 						.failure( "Invalid value. Expected 'null', actual is '\"*_suffix\"'" )
@@ -507,8 +494,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingFieldTemplateIT {
 
 		assertThatThrownBy( () -> setupAndValidate( index ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				.hasMessageMatching( buildValidationFailureReportPattern()
 						.indexFieldTemplateContext( "myTemplate" )
 						.fieldTemplateAttributeContext( "mapping" )
 						.mappingAttributeContext( "type" )

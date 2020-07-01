@@ -6,14 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.STUB_CONTEXT_LITERAL;
+
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * Different validation operations to be executed on a schema.
@@ -38,7 +40,7 @@ enum ElasticsearchIndexSchemaManagerValidationOperation {
 	public final CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
 		RootFailureCollector failureCollector = new RootFailureCollector( "validation" );
 		ContextualFailureCollector validationFailureCollector =
-				failureCollector.withContext( EventContexts.schemaValidation() );
+				failureCollector.withContext( EventContext.create( () -> STUB_CONTEXT_LITERAL ) );
 		return apply( schemaManager, validationFailureCollector )
 				.handle( Futures.handler( (ignored, t) -> {
 					if ( t != null ) {

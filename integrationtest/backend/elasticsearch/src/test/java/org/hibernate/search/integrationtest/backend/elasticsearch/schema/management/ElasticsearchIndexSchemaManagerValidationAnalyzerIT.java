@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
 import java.util.EnumSet;
@@ -34,8 +35,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionValidationIT")
 public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
-
-	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
@@ -150,8 +149,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.build()
@@ -201,8 +199,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure(
 								"Invalid char filters. Expected '[custom-pattern-replace]',"
@@ -255,8 +252,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure(
 								"Invalid tokenizer. Expected 'custom-edgeNGram',"
@@ -309,8 +305,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure(
 								"Invalid token filters. Expected '[custom-keep-types, custom-word-delimiter]',"
@@ -348,8 +343,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.charFilterContext( "custom-pattern-replace" )
@@ -387,8 +381,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.tokenizerContext( "custom-edgeNGram" )
@@ -423,8 +416,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
 						.tokenFilterContext( "custom-keep-types" )
@@ -476,8 +468,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.charFilterContext( "custom-pattern-replace" )
 						.failure(
 								"Invalid type. Expected 'pattern_replace', actual is 'html_strip'"
@@ -529,8 +520,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.charFilterContext( "custom-pattern-replace" )
 						.analysisDefinitionParameterContext( "pattern" )
 						.failure(
@@ -637,8 +627,7 @@ public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 		putMapping();
 
 		setupAndValidateExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+				buildValidationFailureReportPattern()
 						.tokenFilterContext( "custom-word-delimiter" )
 						.analysisDefinitionParameterContext( "generate_number_parts" )
 						.failure(

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleAliasDefinition;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
@@ -22,7 +23,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.assertj.core.api.Assertions;
@@ -41,8 +41,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
-
-	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	@Parameterized.Parameters(name = "With operation {0}")
 	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
@@ -88,8 +86,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						buildValidationFailureReportPattern()
 								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.failure( "Missing alias" )
 								.build()
@@ -112,8 +109,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						buildValidationFailureReportPattern()
 								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.aliasAttributeContext( "filter" )
 								.failure( "Invalid value. Expected 'null', actual is '{\"term\":{\"user_id\":12}}'" )
@@ -135,8 +131,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						buildValidationFailureReportPattern()
 								.aliasContext( defaultWriteAlias( index.name() ).original )
 								.aliasAttributeContext( "is_write_index" )
 								.failure( "Invalid value. Expected 'true', actual is 'false'" )
@@ -155,8 +150,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						buildValidationFailureReportPattern()
 								.aliasContext( defaultReadAlias( index.name() ).original )
 								.failure( "Missing alias" )
 								.build()
@@ -176,8 +170,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 		Assertions.assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						buildValidationFailureReportPattern()
 								.aliasContext( defaultReadAlias( index.name() ).original )
 								.aliasAttributeContext( "filter" )
 								.failure( "Invalid value. Expected 'null', actual is '{\"term\":{\"user_id\":12}}'" )

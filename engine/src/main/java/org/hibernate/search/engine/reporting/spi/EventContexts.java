@@ -49,20 +49,6 @@ public class EventContexts {
 			}
 	);
 
-	private static final EventContext SCHEMA_VALIDATION = EventContext.create(
-			new EventContextElement() {
-				@Override
-				public String toString() {
-					return "EventContextElement[" + render() + "]";
-				}
-
-				@Override
-				public String render() {
-					return MESSAGES.schemaValidation();
-				}
-			}
-	);
-
 	private EventContexts() {
 	}
 
@@ -72,10 +58,6 @@ public class EventContexts {
 
 	public static EventContext indexSchemaRoot() {
 		return INDEX_SCHEMA_ROOT;
-	}
-
-	public static EventContext schemaValidation() {
-		return SCHEMA_VALIDATION;
 	}
 
 	public static EventContext fromType(MappableTypeModel typeModel) {

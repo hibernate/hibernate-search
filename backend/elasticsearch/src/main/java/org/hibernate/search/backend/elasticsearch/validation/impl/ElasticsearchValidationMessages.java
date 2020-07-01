@@ -22,6 +22,11 @@ public interface ElasticsearchValidationMessages {
 	ElasticsearchValidationMessages INSTANCE = Messages.getBundle( ElasticsearchValidationMessages.class );
 
 	@Message(
+			value = "Validation of the existing index in the Elasticsearch cluster failed. See below for details."
+	)
+	String validationFailed();
+
+	@Message(
 			value = "Missing alias"
 	)
 	String aliasMissing();
@@ -118,4 +123,5 @@ public interface ElasticsearchValidationMessages {
 			value = "Multiple dynamic field templates with this name. The names of dynamic field template must be unique."
 	)
 	String dynamicTemplateDuplicate();
+
 }
