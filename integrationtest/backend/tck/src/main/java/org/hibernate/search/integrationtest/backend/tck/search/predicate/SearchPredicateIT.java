@@ -84,6 +84,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void predicate_searchPredicate() {
 		StubMappingScope scope = mainIndex.createScope();
 
@@ -98,6 +99,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void predicate_lambda() {
 		StubMappingScope scope = mainIndex.createScope();
 

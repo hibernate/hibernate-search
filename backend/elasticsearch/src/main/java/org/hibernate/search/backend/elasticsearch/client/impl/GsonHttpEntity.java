@@ -190,6 +190,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation") // javac warns about this method being deprecated, but we have to implement it
 	public void consumeContent() {
 		//not used (and deprecated)
 	}

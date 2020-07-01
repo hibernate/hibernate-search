@@ -142,7 +142,7 @@ public class ObsoletePropertiesIT {
 					return Arrays.asList( matcher.group( 1 ).split( ", " ) );
 				} )
 				.asList()
-				.containsExactlyInAnyOrder( obsoletePropertyKeys.toArray( new String[0] ) );
+				.containsExactlyInAnyOrderElementsOf( obsoletePropertyKeys );
 	}
 
 	private void setup(Consumer<SimpleSessionFactoryBuilder> configurationContributor) {

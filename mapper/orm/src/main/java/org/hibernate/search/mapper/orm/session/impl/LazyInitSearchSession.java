@@ -16,7 +16,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
@@ -41,12 +40,16 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	public <T> HibernateOrmSearchQuerySelectStep<T> search(Collection<? extends Class<? extends T>> types) {
+	@SuppressWarnings("deprecation")
+	public <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			Collection<? extends Class<? extends T>> types) {
 		return getDelegate().search( types );
 	}
 
 	@Override
-	public <T> HibernateOrmSearchQuerySelectStep<T> search(SearchScope<T> scope) {
+	@SuppressWarnings("deprecation")
+	public <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+			SearchScope<T> scope) {
 		return getDelegate().search( scope );
 	}
 

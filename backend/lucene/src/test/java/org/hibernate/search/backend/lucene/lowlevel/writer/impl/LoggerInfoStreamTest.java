@@ -25,7 +25,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.ByteBuffersDirectory;
 
 public class LoggerInfoStreamTest {
 
@@ -52,7 +52,7 @@ public class LoggerInfoStreamTest {
 	public void testEnableInfoStream() throws Exception {
 		LoggerInfoStream infoStream = new LoggerInfoStream();
 
-		RAMDirectory directory = new RAMDirectory();
+		ByteBuffersDirectory directory = new ByteBuffersDirectory();
 		IndexWriterConfig indexWriterConfig = new IndexWriterConfig( new StandardAnalyzer() );
 		indexWriterConfig.setInfoStream( infoStream );
 

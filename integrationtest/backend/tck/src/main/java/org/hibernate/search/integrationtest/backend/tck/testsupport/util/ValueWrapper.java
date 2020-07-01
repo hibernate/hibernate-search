@@ -25,6 +25,7 @@ public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
 	public static <T> ToDocumentFieldValueConverter<ValueWrapper, T> toIndexFieldConverter() {
 		return new ToDocumentFieldValueConverter<ValueWrapper, T>() {
 			@Override
+			@SuppressWarnings("unchecked")
 			public T convert(ValueWrapper value, ToDocumentFieldValueConvertContext context) {
 				return (T) value.getValue();
 			}

@@ -13,7 +13,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
@@ -167,11 +166,13 @@ public @interface IndexedEmbedded {
 	/**
 	 * @return How the structure of the object field created for this indexed-embedded
 	 * is preserved upon indexing.
-	 * @see ObjectFieldStorage
+	 * @see org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 	 * @deprecated Use {@link #structure()} instead.
 	 */
 	@Deprecated
-	ObjectFieldStorage storage() default ObjectFieldStorage.DEFAULT;
+	@SuppressWarnings("deprecation")
+	org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage storage()
+			default org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.DEFAULT;
 
 	/**
 	 * @return A definition of container extractors to be applied to the property,

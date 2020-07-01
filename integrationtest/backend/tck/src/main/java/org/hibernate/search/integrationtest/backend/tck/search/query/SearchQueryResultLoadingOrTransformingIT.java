@@ -408,6 +408,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void asEntityReference_noReferenceTransformer() {
 		StubMappingScope scope = index.createScope();
 
@@ -420,6 +421,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void asEntity_noEntityLoading() {
 		StubMappingScope scope = index.createScope();
 
@@ -432,6 +434,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void asProjection_hitTransformer() {
 		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
 		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
