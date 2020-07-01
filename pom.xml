@@ -959,6 +959,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <failOnWarning>true</failOnWarning>
                     <release>${maven.compiler.release}</release>
                     <testRelease>${maven.compiler.testRelease}</testRelease>
                     <encoding>UTF-8</encoding>
@@ -1745,6 +1747,19 @@
             <modules>
                 <!-- Nothing at the moment -->
             </modules>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <failOnWarning>false</failOnWarning>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <profile>
