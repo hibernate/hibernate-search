@@ -74,46 +74,6 @@
         ]]></cypher>
     </concept>
 
-    <concept id="hsearch:Spi">
-        <requiresConcept refId="hsearch:Test" />
-        <description>
-            Contributes the :Spi and :Public labels to SPI types
-        </description>
-        <cypher><![CDATA[
-            MATCH
-                (type:Type)
-            WHERE
-                NOT type:Test
-                AND type.fqn =~ ".*\\.spi\\..*"
-                AND type.visibility = "public"
-            SET
-                type:Spi, type:Public
-            RETURN
-                type
-        ]]></cypher>
-    </concept>
-
-    <concept id="hsearch:Impl">
-        <requiresConcept refId="hsearch:Test" />
-        <description>
-            Contributes the :Impl label to implementation types
-        </description>
-        <cypher><![CDATA[
-            MATCH
-                (type:Type)
-            WHERE
-                NOT type:Test
-                AND type.fqn =~ ".*\\.impl\\..*"
-                // Apache HTTP Client uses an impl package, but puts public classes in there... Such as the client builder.
-                AND NOT type.fqn STARTS WITH "org.apache.http.impl."
-                OR type.visibility <> "public"
-            SET
-                type:Impl
-            RETURN
-                type
-        ]]></cypher>
-    </concept>
-
     <concept id="hsearch:Test">
         <description>
             Contributes the :Test label to :Type nodes that exist for test purposes only.
@@ -133,22 +93,94 @@
         ]]></cypher>
     </concept>
 
-    <concept id="hsearch:Api">
+    <concept id="hsearch:Main">
         <requiresConcept refId="hsearch:Test" />
-        <requiresConcept refId="hsearch:Spi" />
-        <requiresConcept refId="hsearch:Impl" />
         <description>
-            Contributes the :Api and :Public labels to API types
+            Contributes the :Main label to non-test types
         </description>
         <cypher><![CDATA[
             MATCH
                 (type:Type)
             WHERE
                 NOT type:Test
-                AND NOT type:Impl
+            SET
+                type:Main
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="hsearch:Spi">
+        <requiresConcept refId="hsearch:Main" />
+        <description>
+            Contributes the :Spi label to SPI types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type:Main)
+            WHERE
+                type.fqn =~ ".*\\.spi\\..*"
+                AND type.visibility = "public"
+            SET
+                type:Spi
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="hsearch:Impl">
+        <requiresConcept refId="hsearch:Main" />
+        <description>
+            Contributes the :Impl label to implementation types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type:Main)
+            WHERE
+                type.fqn =~ ".*\\.impl\\..*"
+                // Apache HTTP Client uses an impl package, but puts public classes in there... Such as the client builder.
+                AND NOT type.fqn STARTS WITH "org.apache.http.impl."
+                OR type.visibility <> "public"
+            SET
+                type:Impl
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="hsearch:Api">
+        <requiresConcept refId="hsearch:Main" />
+        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Impl" />
+        <description>
+            Contributes the :Api label to API types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type:Main)
+            WHERE
+                NOT type:Impl
                 AND NOT type:Spi
             SET
-                type:Api, type:Public
+                type:Api
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="hsearch:Public">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
+        <description>
+            Contributes the :Public label to API and SPI types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            WHERE
+                type:Api OR type:Spi
+            SET
+                type:Public
             RETURN
                 type
         ]]></cypher>
@@ -233,8 +265,7 @@
     </concept>
 
     <constraint id="hsearch:PublicTypesMayNotExtendInternalTypes">
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Public" />
         <requiresConcept refId="hsearch:Impl" />
         <description>API/SPI types must not extend/implement internal types.</description>
         <cypher><![CDATA[
@@ -246,8 +277,7 @@
     </constraint>
 
     <constraint id="hsearch:PublicMethodsMayNotExposeInternalTypes">
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Public" />
         <requiresConcept refId="hsearch:Impl" />
         <description>API/SPI methods must not expose internal types.</description>
         <cypher><![CDATA[
@@ -271,8 +301,7 @@
     </constraint>
 
     <constraint id="hsearch:PublicFieldsMayNotExposeInternalTypes">
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Public" />
         <requiresConcept refId="hsearch:Impl" />
         <description>API/SPI fields must not expose internal types.</description>
         <cypher><![CDATA[
@@ -289,8 +318,7 @@
         <requiresConcept refId="java:Deprecated" />
         <requiresConcept refId="hsearch:MethodOverrides" />
         <requiresConcept refId="hsearch:HibernateSearch" />
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Public" />
         <description>
             API or SPI methods must not start with "get" or "set".
             Exceptions are allowed when:
@@ -376,21 +404,20 @@
 
     <constraint id="hsearch:TypesMayNotDependOnImplementationTypeFromOtherModules">
         <requiresConcept refId="hsearch:UtilArtifacts" />
-        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:Main" />
         <requiresConcept refId="hsearch:Impl" />
         <description>
-            Types must not depend on implementation types from other modules.
+            Main (non-test) types must not depend on implementation types from other modules.
             SPIs must be used for such dependencies.
             Exceptions are allowed only when the dependency type is in a util module,
             or the depending type is a test type.
         </description>
         <cypher><![CDATA[
-            MATCH (artifact1:Maven:Artifact)-[:CONTAINS]->(type1:Type)-[:DEPENDS_ON]->
+            MATCH (artifact1:Maven:Artifact)-[:CONTAINS]->(type1:Type:Main)-[:DEPENDS_ON]->
                 (type2:Type:Impl)<-[:CONTAINS]-(artifact2:Maven:Artifact)
             WHERE
                 artifact1 <> artifact2
                 // Exceptions
-                AND NOT type1:Test
                 AND NOT artifact2:Util
             RETURN
                 artifact1, type1, artifact2, type2
@@ -399,7 +426,7 @@
 
     <constraint id="hsearch:TypesShouldUseImplSuffixWithRestraint">
         <requiresConcept refId="hsearch:TypeMetadata" />
-        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:Main" />
         <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             The 'Impl' suffix should only be used when naming classes that are the only implementation
@@ -408,19 +435,17 @@
         </description>
         <cypher><![CDATA[
             // Hibernate Search classes named "<prefix>Impl"
-            MATCH (implementingTypeEndingWithImpl:Class:HibernateSearch)
+            MATCH (implementingTypeEndingWithImpl:Class:Main:HibernateSearch)
             WHERE
                 implementingTypeEndingWithImpl.nameWithoutContainingTypeName =~ ".*Impl$"
-                AND NOT implementingTypeEndingWithImpl:Test // Ignore test types
             // The interface they implement, named "<prefix>" (if any)
             OPTIONAL MATCH (implementingTypeEndingWithImpl)-[:IMPLEMENTS|EXTENDS *]->(implementedType:Interface:HibernateSearch)
             WHERE
                 implementingTypeEndingWithImpl.nameWithoutContainingTypeName = (implementedType.nameWithoutContainingTypeName + "Impl")
             // All the implementing types that do not extend implementingTypeEndingWithImpl
-            OPTIONAL MATCH (topLevelImplementingType:Class)-[:IMPLEMENTS|EXTENDS *]->(implementedType)
+            OPTIONAL MATCH (topLevelImplementingType:Class:Main)-[:IMPLEMENTS|EXTENDS *]->(implementedType)
             WHERE
-                NOT topLevelImplementingType:Test // Ignore stubs
-                AND NOT (topLevelImplementingType)-[:EXTENDS *]->(implementingTypeEndingWithImpl)
+                NOT (topLevelImplementingType)-[:EXTENDS *]->(implementingTypeEndingWithImpl)
             WITH implementingTypeEndingWithImpl, implementedType, count(distinct topLevelImplementingType) AS topLevelImplementingTypeCount
             WHERE
                 implementedType IS NULL OR topLevelImplementingTypeCount > 1
@@ -466,22 +491,22 @@
         <requiresConcept refId="hsearch:TypeMetadata" />
         <requiresConcept refId="hsearch:Anonymous" />
         <requiresConcept refId="hsearch:Generated" />
-        <requiresConcept refId="hsearch:Test" />
+        <requiresConcept refId="hsearch:Main" />
         <requiresConcept refId="hsearch:HibernateSearch" />
         <requiresConcept refId="hsearch:ArtifactMetadata" />
         <description>
-            Types extending/implementing a Hibernate Search type from another module must have a module-specific keyword in their name,
+            Main (non-test) types extending/implementing a Hibernate Search type from another module must have a module-specific keyword in their name,
             either at the very start or just after "Abstract".
             This allows to more easily understand which module a given type comes from.
             Exceptions are allowed when:
-            - the misnamed type is an anonymous type, a generated type or a test type;
+            - the misnamed type is an anonymous type or a generated type;
             - or the misnamed type is an inner/nested type whose name ends with ".*Builder"
             and its surrounding type does use the module-specific keyword;
             - or the implemented type is in a util module,
             in which case the implemented interface may just be a detail.
         </description>
         <cypher><![CDATA[
-            MATCH (misnamedTypeArtifact:Maven:Artifact)-[:CONTAINS]->(misnamedType:Type)
+            MATCH (misnamedTypeArtifact:Maven:Artifact)-[:CONTAINS]->(misnamedType:Type:Main)
                     -[:IMPLEMENTS|EXTENDS *]->
                     (externalParentType:Type:HibernateSearch)<-[:CONTAINS]-(externalParentTypeArtifact:Maven:Artifact)
             WHERE
@@ -492,7 +517,6 @@
                 // Exceptions
                 AND NOT misnamedType:Anonymous
                 AND NOT misnamedType:Generated
-                AND NOT misnamedType:Test
                 AND NOT (
                         misnamedType.nameWithoutContainingTypeName ENDS WITH "Builder"
                         AND misnamedType.name =~ ("^(Abstract)?\\Q" + misnamedTypeArtifact.moduleSpecificKeyword + "\\E.*")
@@ -506,8 +530,7 @@
         <requiresConcept refId="java:Deprecated" />
         <requiresConcept refId="hsearch:TypeMetadata" />
         <requiresConcept refId="hsearch:HibernateSearch" />
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
+        <requiresConcept refId="hsearch:Public" />
         <requiresConcept refId="hsearch:Impl" />
         <description>
             The simple (non-qualified) name of public Hibernate Search types should be unique.
