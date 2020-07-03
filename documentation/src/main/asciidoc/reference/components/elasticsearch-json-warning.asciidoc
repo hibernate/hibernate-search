@@ -1,0 +1,11 @@
+[WARNING]
+====
+This feature requires to directly manipulate JSON in application code.
+
+The syntax of this JSON may change:
+
+* when you upgrade the underlying Elasticsearch cluster to the next version;
+* when you upgrade Hibernate Search to the next version, even for a bugfix (micro) release.
+
+If this happens, you will need to change application code to deal with the changes.
+====

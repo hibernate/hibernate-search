@@ -265,7 +265,7 @@ matches on a generic field are exact matches.
 A text field whose value is considered as multiple words.
 Only works for `String` fields.
 +
-Matches on a full-text field can be more subtle than exact matches:
+Matches on a full-text field can be <<search-dsl-predicate-match-analysis,more subtle than exact matches>>:
 match fields which contains a given word,
 match fields regardless of case,
 match fields ignoring diacritics,
@@ -283,11 +283,11 @@ Note that multiple fields can be added to the same property,
 so you can use both `@FullTextField` and `@KeywordField` if you need both
 full-text search and sorting.
 
-`@KeywordField`::
+[[mapper-orm-directfieldmapping-annotations-keywordfield]] `@KeywordField`::
 A text field whose value is considered as a single keyword.
 Only works for `String` fields.
 +
-Keyword fields allow subtle matches, similarly to full-text fields,
+Keyword fields allow <<search-dsl-predicate-match-analysis,more subtle matches>>, similarly to full-text fields,
 with the limitation that keyword fields only contain one token.
 On the other hand, this limitation allows keyword fields to be <<mapper-orm-directfieldmapping-sortable,sorted on>>.
 +
@@ -402,7 +402,7 @@ See <<concepts-analysis>> for more details about analyzers and full-text analysi
 [[mapper-orm-directfieldmapping-search-analyzer]] `searchAnalyzer`::
 An optional different analyzer, overriding the one defined with the `analyzer` attribute,
 to use only when analyzing searched terms.
-If not defined, the same `analyzer` will be used.
+If not defined, the analyzer assigned to `analyzer` will be used.
 +
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 
