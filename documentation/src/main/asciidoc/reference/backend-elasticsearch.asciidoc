@@ -3,18 +3,20 @@
 // Search 5 anchors backward compatibility
 [[elasticsearch-integration]]
 
-include::todo-placeholder.asciidoc[]
-
 [[backend-elasticsearch-compatibility]]
 == Compatibility
-
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3262 Document upgrade policy, for how long we'll support each version, etc. Maybe just a link to a dedicated section on the website?
 
 Hibernate Search expects an Elasticsearch cluster running version 5.6, 6.x or 7.x.
 The version running on your cluster will be automatically detected on startup,
 and Hibernate Search will adapt based on the detected version;
 see <<backend-elasticsearch-configuration-version>> for details.
+
+[TIP]
+====
+For information about which versions of Hibernate Search you can upgrade to,
+while retaining backward compatibility with a given version of Elasticsearch,
+refer to the https://hibernate.org/community/compatibility-policy/#compatibility-third-party-hsearch-elasticsearch[compatibility policy].
+====
 
 The targeted version is mostly transparent to Hibernate Search users,
 but there are a few differences in how Hibernate Search behaves depending

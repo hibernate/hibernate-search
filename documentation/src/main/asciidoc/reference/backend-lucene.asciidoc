@@ -314,6 +314,13 @@ but if you are also making use of Lucene bypassing Hibernate Search
 make sure to use the same value.
 ====
 
+[TIP]
+====
+For information about which versions of Hibernate Search you can upgrade to,
+while retaining backward compatibility with a given version of Lucene APIs,
+refer to the https://hibernate.org/community/compatibility-policy/#compatibility-third-party-hsearch-lucene[compatibility policy].
+====
+
 [[backend-lucene-schema]]
 == Schema
 

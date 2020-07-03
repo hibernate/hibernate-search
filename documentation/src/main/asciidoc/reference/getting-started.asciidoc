@@ -30,6 +30,14 @@ for more detailed and up-to-date information.
 |JPA *{jpaVersion}*.
 |===============
 
+[TIP]
+====
+Find more information for all versions of Hibernate Search on our
+https://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix].
+
+The https://hibernate.org/community/compatibility-policy/[compatibility policy] may also be of interest.
+====
+
 [[getting-started-migrating]]
 == Migration notes
 
