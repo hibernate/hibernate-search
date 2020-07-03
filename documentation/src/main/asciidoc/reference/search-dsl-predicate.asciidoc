@@ -3,8 +3,6 @@
 // Search 5 anchors backward compatibility
 [[query-predicate]]
 
-// TODO add more than just examples in the sub-sections
-
 [[search-dsl-predicate-concepts]]
 == Basics
 
@@ -25,7 +23,7 @@ If the field does not exist or cannot be searched on, an exception will be throw
 <3> Fetch the results, which will match the given predicate.
 ====
 
-Or alternatively, if you don't want to use lambdas:
+Alternatively, if you don't want to use lambdas:
 
 .Defining the predicate of a search query -- object-based syntax
 ====
@@ -39,17 +37,10 @@ The predicate DSL offers more predicate types, and multiple options for each typ
 To learn more about the `match` predicate, and all the other types of predicate,
 refer to the following sections.
 
-[[search-dsl-predicate-common]]
-== Options common to multiple predicate types
-// Search 5 anchors backward compatibility
-[[_query_options]]
-
-include::todo-placeholder.asciidoc[]
-
-// TODO boost, constantScore, ...
-
 [[search-dsl-predicate-match-all]]
 == `matchAll`: match all documents
+
+The `matchAll` predicate simply matches all documents.
 
 .Matching all documents
 ====
@@ -59,6 +50,11 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-match-all-except]]
+=== `except(...)`: exclude documents matching a given predicate
+
+Optionally, you can exclude a few documents from the hits:
+
 .Matching all documents except those matching a given predicate
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -67,8 +63,15 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+=== Other options
+
+* The score of a `matchAll` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted with `.boost(...)`>>.
+
 [[search-dsl-predicate-id]]
 == `id`: match a document identifier
+
+The `id` predicate matches documents by their identifier.
 
 .Matching a document with a given identifier
 ====
@@ -78,6 +81,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+You can also match multiple ids in a single predicate:
+
 .Matching all documents with an identifier among a given collection
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -86,10 +91,31 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-id-argument-type]]
+=== Expected type of arguments
+
+By default, the `id` predicate expects arguments to the `matching(...)`/`matchingAny(...)` methods
+to have the same type as the entity property corresponding to the document id.
+
+For example, if the document identifier is generated from an entity identifier of type `Long`,
+the document identifier will still be of type `String`.
+`matching(...)`/`matchingAny(...)` will expect its argument to be of type `Long` regardless.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and pass an unconverted argument (of type `String`)
+to `matching(...)`/`matchingAny(...)`, see <<search-dsl-argument-type>>.
+
+=== Other options
+
+* The score of an `id` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted with `.boost(...)`>>.
+
 [[search-dsl-predicate-match]]
 == `match`: match a value
 // Search 5 anchors backward compatibility
 [[_keyword_queries]]
+
+The `match` predicate matches documents for which a given field has a given value.
 
 .Matching a value
 ====
@@ -99,31 +125,103 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-match-argument-type]]
+=== Expected type of arguments
+
+By default, the `match` predicate expects arguments to the `matching(...)` method
+to have the same type as the entity property corresponding to the target field.
+
+For example, if an entity property is of an enum type,
+<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `String`>>.
+`.matching(...)` will expect its argument to have the enum type regardless.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and pass an unconverted argument
+(of type `String` in the example above)
+to `.matching(...)`, see <<search-dsl-argument-type>>.
+
+[[search-dsl-predicate-match-multiple-fields]]
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+[[search-dsl-predicate-match-analysis]]
+=== Analysis
+
+For most field types (number, date, ...), the match is exact.
+However, for <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text>> fields
+or <<mapper-orm-directfieldmapping-annotations-keywordfield,normalized keyword>> fields,
+the value passed to the `matching(...)` method is analyzed or normalized before being compared to the values in the index.
+This means the match is more subtle in two ways.
+
+First, the predicate will not just match documents for which a given field has the exact same value:
+it will match all documents for which this field has a value whose normalized form is identical.
+See below for an example.
+
+.Matching normalized terms
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-normalized]
+----
+<1> For analyzed/normalized fields, the value passed to `matching` will be analyzed/normalized.
+In this case, the result of analysis is a lowercase string: `asimov`.
+<2> All returned hits will have a value whose normalized form is identical.
+In this case, `Asimov` was normalized to `asimov` too, so it matched.
+====
+
+Second, for <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text>> fields,
+the value passed to the `matching(...)` method is tokenized.
+This means multiple terms may be extracted from the input value,
+and the predicate will match all documents for which the given field has a value that _contains any of those terms_,
+at any place and in any order.
+See below for an example.
+
 .Matching multiple terms
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-multipleTerms]
 ----
-<1> For full-text fields, the value passed to `matching` may be a string containing multiple terms.
-The string will be analyzed and each term identified.
+<1> For full-text fields, the value passed to `matching` will be tokenized and normalized.
+In this case, the result of analysis is the terms `robot` and `dawn` (notice they were lowercased).
 <2> All returned hits will match *at least one* term of the given string.
-Hits matching multiple terms will have a higher score.
+`The Robots of Dawn` contained both normalized terms `robot` and `dawn`, so it matched,
+but so did `I, Robot`, even though it didn't contain `dawn`: only one term is required.
+====
+
+[TIP]
+====
+Hits matching multiple terms, or matching more relevant terms, will have a higher <<search-dsl-predicate-common-score,score>>.
+Thus, if you sort by score, the most relevant hits will appear to the top of the result list.
+This usually makes up for the fact that the predicate does not require _all_ terms to be present in matched documents.
 ====
 
 // TODO HSEARCH-917 add an option to match all terms instead of any term, then document it here
+// In the meantime, we'll just provide the following tip.
 
-.Matching a value in any of multiple fields
+[TIP]
 ====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-orField]
-----
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fields]
-----
+If you need _all_ terms to be present in matched documents,
+you should be able to do so by using the <<search-dsl-predicate-simple-query-string,`simpleQueryString`>> predicate,
+in particular its ability to define a <<search-dsl-predicate-simple-query-string-boolean-operators-default,default operator>>.
+Just make sure to define which <<search-dsl-predicate-simple-query-string-flags,syntax features>>
+you want to expose to your users.
 ====
+
+[[search-dsl-predicate-match-fuzzy]]
+=== `fuzzy`: match a text value approximately
+// Search 5 anchors backward compatibility
+[[_fuzzy_queries]]
+
+The `.fuzzy()` option allows for approximate matches,
+i.e. it allows matching documents for which a given field has a value that is not exactly the value passed to `matching(...)`,
+but a close value, for example with one letter that was switched for another.
+
+NOTE: This option is only available on text fields.
 
 .Matching a text value approximately
 ====
@@ -133,30 +231,50 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO fuzzy parameters: edit distance, prefix length, ...
+Roughly speaking, the edit distance is the number of changes between two terms:
+switching characters, removing them, ...
+It defaults to `2` when fuzzy matching is enabled,
+but can also be set to `0` (fuzzy matching disabled) or `1` (only one change allowed, so "less fuzzy").
+Values higher than 2 are not allowed.
 
-.Matching a value, analyzing it with a different analyzer
+.Matching a text value approximately with explicit edit distance
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-analyzer]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fuzzy-maxEditDistance]
 ----
 ====
 
-.Matching a value without analyzing it
+Optionally, you can force the match to be exact for the first `n` characters.
+`n` is called the "exact-prefix length".
+Setting this to a non-zero value is recommended for indexes containing a large amount of distinct terms,
+for performance reasons.
+
+.Matching a text value approximately with exact prefix length
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-skipAnalysis]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fuzzy-exactPrefixLength]
 ----
 ====
 
-// TODO per-field boosts?
+=== Other options
+
+* The score of a `match` predicate is variable for text fields by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `match` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+* The `match` predicate uses the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+of targeted fields to analyze searched text by default,
+but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
 [[search-dsl-predicate-range]]
 == `range`: match a range of values
 // Search 5 anchors backward compatibility
 [[_range_queries]]
+
+The `range` predicate matches documents for which a given field has a value within a given range.
 
 .Matching a range of values
 ====
@@ -166,6 +284,17 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+The `between` method includes both bounds,
+i.e. documents whose value is exactly one of the bounds will match the `range` predicate.
+
+At least one bound must be provided.
+If a bound is `null`, it will not constrain matches.
+For example `.between( 2, null )` will match all values higher than or equal to 2.
+
+Different methods can be called instead of `between` in order to control the inclusion of the lower and upper bound:
+
+`atLeast`::
++
 .Matching values equal to or greater than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -173,7 +302,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atLeast]
 ----
 ====
-
+`greaterThan`::
++
 .Matching values strictly greater than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -181,7 +311,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-greaterThan]
 ----
 ====
-
+`atMost`::
++
 .Matching values equal to or less than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -189,7 +320,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atMost]
 ----
 ====
-
+`lessThan`::
++
 .Matching values strictly less than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -197,6 +329,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-lessThan]
 ----
 ====
+
+Alternatively, you can specify whether bounds are included or excluded explicitly:
 
 .Matching a range of values with explicit bound inclusion/exclusion
 ====
@@ -206,14 +340,45 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO multiple fields?
+[[search-dsl-predicate-range-argument-type]]
+=== Expected type of arguments
 
-// TODO per-field boosts?
+By default, the `range` predicate expects arguments to the `between(...)`/`atLeast(...)`/etc. method
+to have the same type as the entity property corresponding to the target field.
+
+For example, if an entity property is of type `java.util.Date`,
+<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>;
+`between(...)`/`atLeast(...)`/etc. will expect its arguments to have type `java.util.Date` regardless.
+Similarly, `range(...)` will expect an argument of type `Range<java.util.Date>`.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and pass an unconverted argument
+(of type `java.time.Instant` in the example above)
+to `between(...)`/`atLeast(...)`/etc., see <<search-dsl-argument-type>>.
+
+[[search-dsl-predicate-range-multiple-fields]]
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+=== Other options
+
+* The score of a `range` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.between(...)`/`atLeast(...)`/etc.
 
 [[search-dsl-predicate-phrase]]
 == `phrase`: match a sequence of words
 // Search 5 anchors backward compatibility
 [[_phrase_queries]]
+
+The `phrase` predicate matches documents for which a given field contains a given sequence of words, in the given order.
+
+NOTE: This predicate is only available on <<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text fields>>.
 
 .Matching a sequence of words
 ====
@@ -223,7 +388,21 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-.Matching a sequence of words approximately
+[[search-dsl-predicate-phrase-slop]]
+=== `slop`: match a sequence of words approximately
+
+Specifying a _slop_ allows for approximate matches,
+i.e. it allows matching documents for which a given field contains the given sequence of words,
+but in a slightly different order, or with extra words.
+
+The slop represents the number of edit operations that can be applied to the sequence of words to match,
+where each edit operation moves one word by one position.
+So `quick fox` with a slop of `1` can become `quick <word> fox`, where `<word>` can be any word.
+`quick fox` with a slop of `2` can become `quick <word> fox`, or `quick <word1> <word2> fox`
+or even `fox quick` (two operations: moved `fox` to the left and `quick` to the right).
+And similarly for higher slops and for phrases with more words.
+
+.Matching a sequence of words approximately with `slop(...)`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -231,18 +410,29 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO analyzer?
+[[search-dsl-predicate-phrase-multiple-fields]]
+=== Targeting multiple fields
 
-// TODO skipAnalysis?
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
 
-// TODO multiple fields?
+See <<search-dsl-predicate-common-multiple-fields>>.
 
-// TODO per-field boosts?
+=== Other options
+
+* The score of a `phrase` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `phrase` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+* The `phrase` predicate uses the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+of targeted fields  to analyze searched text by default,
+but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
 [[search-dsl-predicate-exists]]
 == `exists`: match fields with content
 
-The `exists` predicate, applied to a field, will match all documents for which this field has a non-null value.
+The `exists` predicate matches documents for which a given field has a non-null value.
 
 .Matching fields with content
 ====
@@ -254,13 +444,19 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 
 [TIP]
 ====
-There isn't any built-in predicate to match fields with exclusively null values,
-but you can easily create one yourself
-using an `exists` predicate in a `mustNot` clause in a <<search-dsl-predicate-boolean,boolean predicate>>.
+There isn't any built-in predicate to match documents for which a given field is null,
+but you can easily create one yourself by negating an `exists` predicate.
+
+This can be achieved by using an `exists` predicate
+in a <<search-dsl-predicate-boolean-mustNot,`mustNot` clause in a boolean predicate>>,
+or in an <<search-dsl-predicate-match-all-except,`except` clause in a `matchAll` predicate>>.
 ====
 
+[[search-dsl-predicate-exists-object-field]]
+=== Object fields
+
 The `exists` predicate can also be applied to an object field.
-In that case, it will match all documents for which at least one sub-field of the object field has a non-null value.
+In that case, it will match all documents for which at least one inner field of the given object field has a non-null value.
 
 .Matching object fields with content
 ====
@@ -272,22 +468,30 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 
 [IMPORTANT]
 ====
-Object fields need to have at least one sub-field with content in order to be considered as "existing".
+Object fields need to have at least one inner field with content in order to be considered as "existing".
 
-Let's consider the example above, and let's assume the `placeOfBirth` object field only has one sub-field: `placeOfBirth.country`:
+Let's consider the example above, and let's assume the `placeOfBirth` object field
+only has one inner field: `placeOfBirth.country`:
 
 * an author whose `placeOfBirth` is null will not match.
 * an author whose `placeOfBirth` is not null and has the `country` filled in will match.
 * an author whose `placeOfBirth` is not null but does not have the `country` filled in **will not match**.
 
 Because of this, it is preferable to use the `exists` predicate
-on object fields that are known to have at least one sub-field that is never null: an identifier, a name, ...
+on object fields that are known to have at least one inner field that is never null: an identifier, a name, ...
 ====
+
+=== Other options
+
+* The score of an `exists` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted with a call to `.boost(...)`>>.
 
 [[search-dsl-predicate-wildcard]]
 == `wildcard`: match a simple pattern
 // Search 5 anchors backward compatibility
 [[_wildcard_queries]]
+
+The `wildcard` predicate matches documents for which a given field contains a word matching the given pattern.
 
 .Matching a simple pattern
 ====
@@ -296,6 +500,14 @@ on object fields that are known to have at least one sub-field that is never nul
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=wildcard]
 ----
 ====
+
+The pattern may include the following characters:
+
+* `*` matches zero, one or multiple characters.
+* `?` matches zero or one character.
+* `\` escape the following character,
+e.g. `\?` is interpreted as a literal `?`, `\\` as a literal `\`, etc.
+* any other character is interpreted as a literal.
 
 [IMPORTANT]
 ====
@@ -320,10 +532,65 @@ When the goal is to match user-provided query strings,
 the <<search-dsl-predicate-simple-query-string,simple query string predicate>> should be preferred.
 ====
 
+[[search-dsl-predicate-wildcard-multiple-fields]]
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+=== Other options
+
+* The score of a `wildcard` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+
 [[search-dsl-predicate-boolean]]
 == `bool`: combine predicates (or/and/...)
 // Search 5 anchors backward compatibility
 [[_combining_queries]]
+
+The `bool` predicate matches documents that match one or more inner predicates, called "clauses".
+It can be used in particular to build `AND`/`OR` operators.
+
+Inner predicates are added as clauses of one of the following types:
+
+[[search-dsl-predicate-boolean-clauses-must]]`must`::
+`must` clauses are required to match: if they don't match, then the `bool` predicate will not match.
++
+Matching "must" clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
+[[search-dsl-predicate-boolean-clauses-mustNot]]`mustNot`::
+`mustNot` clauses are required to not match: if they match, then the `bool` predicate will not match.
++
+"must not" clauses are ignored during <<search-dsl-predicate-common-score,score>> computation.
+[[search-dsl-predicate-boolean-clauses-filter]]`filter`::
+`filter` clauses are required to match: if they don't match, then the boolean predicate will not match.
++
+`filter` clauses are ignored during <<search-dsl-predicate-common-score,score>> computation,
+and so are any clauses of boolean predicates contained in the filter clause (even `must` or `should` clauses).
+[[search-dsl-predicate-boolean-clauses-should]]`should`::
+`should` clauses may optionally match, and are required to match depending on the context.
++
+Matching `should` clauses are taken into account during <<search-dsl-predicate-common-score,score>> computation.
++
+The exact behavior of `should` clauses is as follows:
++
+* When there isn't any `must` clause nor any `filter` clause in the `bool` predicate
+then at least one "should" clause is required to match.
+Simply put, in this case, the "should" clauses
+behave as if there was an `OR` operator between each of them.
+* When there is at least one `must` clause or one `filter` clause in the `bool` predicate,
+then the "should" clauses are not required to match,
+and are simply used for scoring.
+* This behavior can be changed by specifying
+<<search-dsl-predicate-boolean-minimumshouldmatch,`minimumShouldMatch` constraints>>.
+
+[[search-dsl-predicate-boolean-or]]
+=== Emulating an `OR` operator
+
+A `bool` predicate with only `should` clauses will behave as an `OR` operator.
 
 .Matching a document that matches any of multiple given predicates (~`OR` operator)
 ====
@@ -340,6 +607,11 @@ they will have a `title` field matching the text `robot`
 *or* they will have a `description` field matching the text `investigation`.
 ====
 
+[[search-dsl-predicate-boolean-and]]
+=== Emulating an `AND` operator
+
+A `bool` predicate with only `must` clauses will behave as an `AND` operator.
+
 .Matching a document that matches all of multiple given predicates (~`AND` operator)
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -354,6 +626,9 @@ independently from other clauses in the same boolean predicate.
 they will have a `title` field matching the text `robot`
 *and* they will have a `description` field matching the text `crime`.
 ====
+
+[[search-dsl-predicate-boolean-mustNot]]
+=== `mustNot`: excluding documents that match a given predicate
 
 .Matching a document that does *not* match a given predicate
 ====
@@ -375,6 +650,12 @@ While it is possible to execute a boolean predicate with only "negative" clauses
 performance may be disappointing because the full power of indexes cannot be leveraged in that case.
 ======
 ====
+
+[[search-dsl-predicate-boolean-filter]]
+=== `filter`: matching documents that match a given predicate without affecting the score
+
+`filter` clauses are essentially `must` clauses with only one difference:
+they are ignored when computing the total <<search-dsl-predicate-common-score,score>> of a document.
 
 .Matching a document that matches a given predicate without affecting the score
 ====
@@ -399,6 +680,14 @@ and take this predicate into account when scoring.
 leading to fairer sorts if there are much more "crime fiction" documents than "science-fiction" documents.
 ====
 
+[[search-dsl-predicate-boolean-should-scoring]]
+=== `should` as a way to tune scoring
+
+Apart from being <<search-dsl-predicate-boolean-or,used alone to emulate an `OR` operator>>,
+`should` clauses can also be used in conjunction with `must` clauses.
+When doing so, the `should` clauses become completely optional,
+and their only purpose is to increase the score of documents that match these clauses.
+
 .Using optional `should` clauses to boost the score of some documents
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -408,15 +697,23 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 <1> The hits *must* have a `title` field matching the text `robot`,
 independently from other clauses in the same boolean predicate.
 <2> The hits *should* have a `description` field matching the text `crime`,
-but they may not, because matching the `must` clause above is enough.
+but they might not, because matching the `must` clause above is enough.
 However, matching this `should` clause will improve the score of the document.
 <3> The hits *should* have a `description` field matching the text `investigation`,
-but they may not, because matching the `must` clause above is enough.
+but they might not, because matching the `must` clause above is enough.
 However, matching this `should` clause will improve the score of the document.
 <4> All returned hits will match the `must` clause, and optionally the `should` clauses:
 they will have a `title` field matching the text `robot`,
 and the ones whose description matches either `crime` or `investigation` will have a better score.
 ====
+
+[[search-dsl-predicate-boolean-minimumshouldmatch]]
+=== `minimumShouldMatch`: fine-tuning how many `should` clauses are required to match
+
+It is possible to require that an arbitrary number of `should` clauses match
+in order for the `bool` predicate to match.
+This is the purpose of the `minimumShouldMatch*` methods,
+as demonstrated below.
 
 .Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
 ====
@@ -432,6 +729,13 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 their description will match either `robot` and `investigate`,
 `robot` and `crime`, `investigate` and `crime`, or all three of these terms.
 ====
+
+[[search-dsl-predicate-boolean-lambda]]
+=== Adding clauses dynamically with the lambda syntax
+
+It is possible to define the `bool` predicate inside a lambda expression.
+This is especially useful when clauses need to be added dynamically to the `bool` predicate,
+for example based on user input.
 
 .Easily adding clauses dynamically with the lambda syntax
 ====
@@ -450,10 +754,31 @@ In this case, we only add clauses if the relevant parameter was filled in by the
 <5> The hits will match the clauses added by the lambda expression.
 ====
 
+=== Other options
+
+* The score of a `bool` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `bool` predicate can be <<search-dsl-predicate-common-boost,boosted>>
+with a call to `.boost(...)`.
+
 [[search-dsl-predicate-simple-query-string]]
-== `simpleQueryString`: match a user-provided query
+== `simpleQueryString`: match a user-provided query string
 // Search 5 anchors backward compatibility
 [[_simple_query_string_queries]]
+
+The `simpleQueryString` predicate matches documents according to a structured query given as a string.
+
+Its syntax is quite simple, so it's especially helpful when end user expect to be able to submit text queries
+with a few syntax elements such as boolean operators, quotes, etc.
+
+[[search-dsl-predicate-simple-query-string-boolean-operators]]
+=== Boolean operators
+
+The syntax includes three boolean operators:
+
+* AND using `+`
+* OR using `|`
+* NOT using `-`
 
 .Matching a simple query string: AND/OR operators
 ====
@@ -471,6 +796,13 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-simple-query-string-boolean-operators-default]]
+=== Default boolean operator
+
+By default, the query uses the OR operator if the operator is not explicitly defined.
+If you prefer using the AND operator as default,
+you can call `.defaultOperator(...)`.
+
 .Matching a simple query string: AND as default operator
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -478,6 +810,11 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-defaultOperator-and]
 ----
 ====
+
+[[search-dsl-predicate-simple-query-string-prefix]]
+=== Prefix
+
+The syntax includes support for prefix predicates through the `*` wildcard.
 
 .Matching a simple query string: prefix
 ====
@@ -487,6 +824,16 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+NOTE: The `*` wildcard will only be understood at the end of a word.
+`rob*t` will be interpreted as a literal.
+This really is a _prefix_ predicate, not a <<search-dsl-predicate-wildcard,_wildcard_ predicate>>.
+
+[[search-dsl-predicate-simple-query-string-fuzzy]]
+=== Fuzzy
+
+The syntax includes support for the fuzzy operator `~`.
+Its behavior is similar to that of <<search-dsl-predicate-match-fuzzy,fuzzy matching in the `match` predicate>>.
+
 .Matching a simple query string: fuzzy
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -494,6 +841,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-fuzzy]
 ----
 ====
+
+[[search-dsl-predicate-simple-query-string-phrase]]
+=== Phrase
+
+The syntax includes support for <<search-dsl-predicate-phrase,`phrase` predicates>>
+using quotes around the sequence of terms to match.
 
 .Matching a simple query string: phrase
 ====
@@ -503,6 +856,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+A <<search-dsl-predicate-phrase-slop,slop>> can be assigned to a phrase predicate
+using the NEAR operator `~`.
+
 .Matching a simple query string: phrase with slop
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -510,6 +866,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase-slop]
 ----
 ====
+
+[[search-dsl-predicate-simple-query-string-flags]]
+=== `flags`: enabling only specific syntax constructs
+
+By default, all syntax features are enabled.
+You can pick the operators to enable explicitly through the `.flags(...)` method.
 
 .Matching a simple query string: enabling only specific syntax constructs
 ====
@@ -519,12 +881,36 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO multiple fields?
+[[search-dsl-predicate-simpleQueryString-multiple-fields]]
+=== Targeting multiple fields
 
-// TODO per-field boosts?
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+IMPORTANT: If targeted fields have different analyzers, an exception will be thrown.
+You can avoid this by <<search-dsl-predicate-common-overriding-analysis,picking an analyzer explicitly>>,
+but make sure you know what you're doing.
+
+=== Other options
+
+* The score of a `simpleQueryString` predicate is variable by default,
+but can be <<search-dsl-predicate-common-constantScore,made constant with `.constantScore()`>>.
+* The score of a `simpleQueryString` predicate can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+* The `simpleQueryString` predicate uses the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+of targeted fields to analyze searched text by default,
+but this can be <<search-dsl-predicate-common-overriding-analysis,overridden>>.
 
 [[search-dsl-predicate-nested]]
 == `nested`: match nested documents
+
+The `nested` predicate can be used on object fields <<mapper-orm-indexedembedded-structure,indexed as nested documents>>
+to require two or more inner predicates to match _the same object_.
+This is how you ensure that `authors.firstname:isaac AND authors.lastname:asimov`
+will not match a book whose authors are "Jane Asimov" and "Isaac Deutscher".
 
 .Matching a simple pattern
 ====
@@ -542,6 +928,13 @@ one of which has a first name matching `isaac`
 and *another* of which has a last name matching `asimov`,
 will *not* match.
 ====
+
+=== Implicit nesting
+
+Hibernate Search automatically wraps a nested predicates around other predicates when necessary.
+However, this is done for each single predicate,
+so implicit nesting will not give the same behavior as explicit nesting grouping multiple inner predicates.
+See below for an example.
 
 [[search-dsl-predicate-nested-implicit]]
 .Use the implicit nested form
@@ -566,6 +959,16 @@ will match, because we apply the nested predicate *separately* to *each match* p
 // Search 5 anchors backward compatibility
 [[spatial-queries]]
 
+The `within` predicate matches documents for which a given field is a geo-point
+contained within a given circle, bounding-box or polygon.
+
+NOTE: This predicate is only available on <<mapper-orm-geopoint,geo-point fields>>.
+
+[[search-dsl-predicate-spatial-within-circle]]
+=== Matching points within a circle (within a distance to a point)
+
+With `.circle(...)`, the matched points must be within a given distance from a given point (center).
+
 .Matching points within a circle
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -574,7 +977,24 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO alternative syntaxes?
+NOTE: Other distance units are available, in particular `METERS`, `YARDS` and `MILES`.
+When the distance unit is omitted, it defaults to meters.
+
+You can also pass the coordinates of the center as two doubles (latitude, then longitude).
+
+.Matching points within a circle: passing center coordinates as doubles
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-circle-doubles]
+----
+====
+
+[[search-dsl-predicate-spatial-within-bounding-box]]
+=== Matching points within a bounding box
+
+With `.boundingBox(...)`, the matched points must be within a given bounding box
+defined by its top-left and bottom-right corners.
 
 .Matching points within a box
 ====
@@ -584,7 +1004,21 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO alternative syntaxes?
+You can also pass the coordinates of the top-left and bottom-right corners as four doubles:
+top-left latitude, top-left longitude, bottom-right latitude, bottom-right longitude.
+
+.Matching points within a box: passing corner coordinates as doubles
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-box-doubles]
+----
+====
+
+[[search-dsl-predicate-spatial-within-polygon]]
+=== Matching points within a polygon
+
+With `.polygon(...)`, the matched points must be within a given polygon.
 
 .Matching points within a polygon
 ====
@@ -594,23 +1028,39 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-// TODO alternative syntaxes?
+[[search-dsl-predicate-spatial-within-multiple-fields]]
+=== Targeting multiple fields
 
-[[search-dsl-predicate-more-like-this]]
-== More like this
-[[search-query-querydsl-mlt]]
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
 
-include::todo-placeholder.asciidoc[]
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+=== Other options
+
+* The score of a `within` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)`
+after `.circle(...)`/`.boundingBox(...)`/`.polygon(...)`.
 
 [[search-dsl-predicate-extensions]]
 == Backend-specific extensions
 
-include::todo-placeholder.asciidoc[]
+By calling `.extension(...)` while building a query,
+it is possible to access backend-specific predicates.
 
-// TODO introduction to extensions or links to that introduction
+[NOTE]
+====
+As their name suggests, backend-specific predicates are not portable from one backend technology to the other.
+====
 
 [[search-dsl-predicate-extensions-lucene-from-lucene-query]]
 === Lucene: `fromLuceneQuery`
+
+`.fromLuceneQuery(...)` turns a native Lucene `Query` into a Hibernate Search predicate.
+
+include::components/lucene-api-warning.asciidoc[]
 
 .Matching a native `org.apache.lucene.search.Query`
 ====
@@ -618,10 +1068,17 @@ include::todo-placeholder.asciidoc[]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=lucene-fromLuceneQuery]
 ----
+<1> Build the query as usual,
+but using the Lucene extension so that Lucene-specific options are available.
+<2> Add a predicate defined by a given Lucene `Query` object.
 ====
 
 [[search-dsl-predicate-extensions-elasticsearch-from-json]]
 === Elasticsearch: `fromJson`
+
+`.fromLuceneQuery(...)` turns JSON representing an Elasticsearch query into a Hibernate Search predicate.
+
+include::components/elasticsearch-json-warning.asciidoc[]
 
 .Matching a native Elasticsearch JSON query provided as a `JsonObject`
 ====
@@ -629,6 +1086,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
+<1> Build a JSON object using link:{gsonUrl}[Gson].
+<2> Build the query as usual,
+but using the Lucene extension so that Lucene-specific options are available.
+<3> Add a predicate defined by a given `JsonObject`.
 ====
 
 .Matching a native Elasticsearch JSON query provided as a JSON-formatted string
@@ -636,5 +1097,153 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-string]
+----
+<1> Build the query as usual,
+but using the Lucene extension so that Lucene-specific options are available.
+<2> Add a predicate defined by a given JSON-formatted string.
+====
+
+[[search-dsl-predicate-common]]
+== Options common to multiple predicate types
+// Search 5 anchors backward compatibility
+[[_query_options]]
+
+[[search-dsl-predicate-common-multiple-fields]]
+=== Targeting multiple fields in one predicate
+
+Some predicates offer the ability to target multiple fields in the same predicate.
+
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
+
+.Matching a value in any of multiple fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=multipleFields-fieldOrField]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=multipleFields-fields]
+----
+====
+
+It is possible to boost the score of each field separately;
+see <<search-dsl-predicate-common-boost>>.
+
+[[search-dsl-predicate-common-score]]
+=== Tuning the score
+
+Each predicate yields a score if it matched the document.
+The more relevant a document for a given predicate, the higher the score.
+
+That score can be used when <<search-dsl-sort-score,sorting by score>> (which is the default)
+to get more relevant hits at the top of the result list.
+
+Below are a few ways to tune the score, and thus to get the most of the relevance sort.
+
+[[search-dsl-predicate-common-boost]]
+==== Boosting the score of a predicate
+
+The score of each predicate may be assigned a multiplier, called a _boost_:
+
+* if a given predicate is more relevant to your search query than other predicates,
+assigning it a <<search-dsl-predicate-common-boost,boost>> (multiplier) higher than 1
+will increase its impact on the total document score.
+* if a given predicate is less relevant to your search query than other predicates,
+assigning it a <<search-dsl-predicate-common-boost,boost>> (multiplier) lower than 1
+will decrease its impact on the total document score.
+
+NOTE: The boost should always be higher than 0.
+
+Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
+
+.Boosting on a per-predicate basis
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=score-boost]
+----
+====
+
+For predicates targeting multiple fields,
+it is also possible to assign more importance to matches on a given field (or set of fields)
+by calling `.boost(...)` after the call to `.field(...)`/`.fields(...)`.
+
+Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
+
+.Boosting on a per-field basis
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=score-boost-multipleFields]
+----
+====
+
+[[search-dsl-predicate-common-constantScore]]
+==== Variable and constant score
+
+Some predicates already have a constant score by default, because a variable score doesn't make sense for them.
+For example, the <<search-dsl-predicate-id,`id` predicate>> has a constant score by default.
+
+Predicates with a constant score have an "all-or-nothing" impact on the total document score:
+either a document matches and it will benefit from the score of this predicate
+(`1.0f` by default, but it can be <<search-dsl-predicate-common-boost,boosted>>),
+or it doesn't match and it won't benefit from the score of this predicate.
+
+Predicates with a variable score have a more subtle impact on the score.
+For example the <<search-dsl-predicate-match,`match` predicate>>, on a text field,
+will yield a higher score for documents
+
+When this "variable score" behavior is not desired,
+you can suppress it by calling `.constantScore()`.
+This may be useful if only the fact that the predicate matched is relevant,
+but not the content of the document.
+
+Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
+
+.Making the score of a predicate constant
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=score-constantScore]
+----
+====
+
+TIP: Alternatively, you can take advantage of
+the <<search-dsl-predicate-boolean-filter,filter>> clause in boolean predicates,
+which is equivalent to a `must` clause but completely suppresses the impact of the clause on the score.
+
+[[search-dsl-predicate-common-overriding-analysis]]
+=== Overriding analysis
+
+In some cases it might be necessary to use a different analyzer to analyze searched text
+than the one used to analyze indexed text.
+
+This can be achieved by calling `.analyzer(...)` and passing the name of the analyzer to use.
+
+Below is an example with the <<search-dsl-predicate-match,`match` predicate>>.
+
+TIP: If you always apply the same analyzer when searching,
+you might want to configure a <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
+on your field instead. Then you won't need to use `.analyzer(...)` when searching.
+
+.Matching a value, analyzing it with a different analyzer
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=overrideAnalysis-analyzer]
+----
+====
+
+If you need to disable analysis of searched text completely,
+call `.skipAnalysis()`.
+
+.Matching a value without analyzing it
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=overrideAnalysis-skipAnalysis]
 ----
 ====

@@ -20,47 +20,45 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * <p>
  * "must" clauses are required to match: if they don't match, then the boolean predicate will not match.
  * <p>
- * Matching "must" clauses are taken into account in score computation.
+ * Matching "must" clauses are taken into account during score computation.
  *
  * <h3 id="mustnot">"must not" clauses</h3>
  * <p>
- * "must not" clauses are required to not match: if they don't match, then the boolean predicate will not match.
+ * "must not" clauses are required to not match: if they match, then the boolean predicate will not match.
  * <p>
- * "must not" clauses are ignored from score computation.
- * <p>
- * "must not" clauses are
+ * "must not" clauses are ignored during score computation.
  *
  * <h3 id="filter">"filter" clauses</h3>
  * <p>
  * "filter" clauses are required to match: if they don't match, then the boolean predicate will not match.
  * <p>
- * "filter" clauses are ignored from score computation,
- * and so are any clauses of boolean predicates contained in the filter clause (even "match" or "should" clauses).
+ * "filter" clauses are ignored during score computation,
+ * and so are any clauses of boolean predicates contained in the filter clause (even "must" or "should" clauses).
  *
  * <h3 id="should">"should" clauses</h3>
  * <p>
  * "should" clauses may optionally match, and are required to match depending on the context.
+ * <p>
+ * Matching "should" clauses are taken into account during score computation.
+ * <p>
+ * The exact behavior of `should` clauses is as follows:
  * <ul>
  * <li>
  *     When there isn't any "must" clause nor any "filter" clause in the boolean predicate,
- *     and there is no <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>,
  *     then at least one "should" clause is required to match.
  *     Simply put, in this case, the "should" clauses
  *     <strong>behave as if there was an "OR" operator between each of them</strong>.
  * </li>
  * <li>
  *     When there is at least one "must" clause or one "filter" clause in the boolean predicate,
- *     and there is no <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>,
  *     then the "should" clauses are not required to match,
  *     and are simply used for scoring.
  * </li>
  * <li>
- *     When there is at least one <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraint</a>,
- *     then the "should" clauses are required according to the "minimumShouldMatch" constraints.
+ *     This behavior can be changed by specifying
+ *     <a href="MinimumShouldMatchConditionStep.html#minimumshouldmatch">"minimumShouldMatch" constraints</a>.
  * </li>
  * </ul>
- * <p>
- * Matching "should" clauses are taken into account in score computation.
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */

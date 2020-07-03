@@ -22,7 +22,7 @@ public interface PhrasePredicateOptionsStep<S extends PhrasePredicateOptionsStep
 	 * <p>
 	 * The slop represents the number of edit operations that can be applied to the phrase to match,
 	 * where each edit operation moves one word by one position.
-	 * So {@code quick fox} with a slop of 1 can become {@code quick * fox}, where {@code <word>} can be any word.
+	 * So {@code quick fox} with a slop of 1 can become {@code quick <word> fox}, where {@code <word>} can be any word.
 	 * {@code quick fox} with a slop of 2 can become {@code quick <word> fox}, or {@code quick <word1> <word2> fox}
 	 * or even {@code fox quick} (two operations: moved {@code fox} to the left and {@code quick} to the right).
 	 * And similarly for higher slops and for phrases with more words.

@@ -1,0 +1,10 @@
+[WARNING]
+====
+This feature implies that application code rely on Lucene APIs directly.
+
+An upgrade of Hibernate Search, even for a bugfix (micro) release,
+may require an upgrade of Lucene,
+which may lead to breaking API changes in Lucene.
+
+If this happens, you will need to change application code to deal with the changes.
+====

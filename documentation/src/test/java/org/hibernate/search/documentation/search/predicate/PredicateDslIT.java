@@ -64,9 +64,9 @@ public class PredicateDslIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper;
+	public final OrmSetupHelper setupHelper;
 
-	private BackendConfiguration backendConfiguration;
+	private final BackendConfiguration backendConfiguration;
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -119,7 +119,6 @@ public class PredicateDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 	}
-
 
 	@Test
 	public void matchAll() {
@@ -331,45 +330,37 @@ public class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
+	}
+
+	@Test
+	public void match_analysis() {
+		withinSearchSession( searchSession -> {
+			// tag::match-normalized[]
+			List<Author> hits = searchSession.search( Author.class )
+					.where( f -> f.match().field( "lastName" )
+							.matching( "ASIMOV" ) )// <1>
+					.fetchHits( 20 );
+
+			assertThat( hits ).extracting( Author::getLastName )
+					.contains( "Asimov" );// <2>
+			// end::match-normalized[]
+		} );
 
 		withinSearchSession( searchSession -> {
 			// tag::match-multipleTerms[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.match().field( "title" )
-							.matching( "robot dawn" ) ) // <1>
-					.fetchHits( 20 ); // <2>
+							.matching( "ROBOT Dawn" ) ) // <1>
+					.fetchHits( 20 );
+
+			assertThat( hits ).extracting( Book::getTitle )
+					.contains( "The Robots of Dawn", "I, Robot" ); // <2>
 			// end::match-multipleTerms[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
+	}
 
-		withinSearchSession( searchSession -> {
-			// tag::match-orField[]
-			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.match()
-							.field( "title" ).field( "description" )
-							.matching( "robot" ) )
-					.fetchHits( 20 );
-			// end::match-orField[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::match-fields[]
-			List<Book> hits = searchSession.search( Book.class )
-					.where( f -> f.match()
-							.fields( "title", "description" )
-							.matching( "robot" ) )
-					.fetchHits( 20 );
-			// end::match-fields[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
-		} );
-
+	@Test
+	public void match_fuzzy() {
 		withinSearchSession( searchSession -> {
 			// tag::match-fuzzy[]
 			List<Book> hits = searchSession.search( Book.class )
@@ -385,31 +376,145 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::match-analyzer[]
+			// tag::match-fuzzy-maxEditDistance[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.match()
-							.field( "title_autocomplete" )
-							.matching( "robo" )
-							.analyzer( "autocomplete_query" ) )
+							.field( "title" )
+							.matching( "robto" )
+							.fuzzy( 1 ) )
 					.fetchHits( 20 );
-			// end::match-analyzer[]
+			// end::match-fuzzy-maxEditDistance[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::match-skipAnalysis[]
+			// tag::match-fuzzy-exactPrefixLength[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.match()
+							.field( "title" )
+							.matching( "robto" )
+							.fuzzy( 1, 3 ) )
+					.fetchHits( 20 );
+			// end::match-fuzzy-exactPrefixLength[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void multipleFields() {
+		withinSearchSession( searchSession -> {
+			// tag::multipleFields-fieldOrField[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.match()
+							.field( "title" ).field( "description" )
+							.matching( "robot" ) )
+					.fetchHits( 20 );
+			// end::multipleFields-fieldOrField[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::multipleFields-fields[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.match()
+							.fields( "title", "description" )
+							.matching( "robot" ) )
+					.fetchHits( 20 );
+			// end::multipleFields-fields[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
+	public void overrideAnalysis() {
+		withinSearchSession( searchSession -> {
+			// tag::overrideAnalysis-analyzer[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.match()
+							.field( "title_autocomplete" )
+							.matching( "robo" )
+							.analyzer( "autocomplete_query" ) )
+					.fetchHits( 20 );
+			// end::overrideAnalysis-analyzer[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::overrideAnalysis-skipAnalysis[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" )
 							.skipAnalysis() )
 					.fetchHits( 20 );
-			// end::match-skipAnalysis[]
+			// end::overrideAnalysis-skipAnalysis[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void score() {
+		withinSearchSession( searchSession -> {
+			// tag::score-constantScore[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.bool()
+							.must( f.match()
+									.field( "genre" )
+									.matching( Genre.SCIENCE_FICTION )
+									.constantScore() )
+							.must( f.match()
+									.field( "title" )
+									.matching( "robot" )
+									.boost( 2.0f ) ) )
+					.fetchHits( 20 );
+			// end::score-constantScore[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::score-boost[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.bool()
+							.must( f.match()
+									.field( "title" )
+									.matching( "robot" )
+									.boost( 2.0f ) )
+							.must( f.match()
+									.field( "description" )
+									.matching( "self-aware" ) ) )
+					.fetchHits( 20 );
+			// end::score-boost[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::score-boost-multipleFields[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.match()
+							.field( "title" ).boost( 2.0f )
+							.field( "description" )
+							.matching( "robot" ) )
+					.fetchHits( 20 );
+			// end::score-boost-multipleFields[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
 		} );
 	}
 
@@ -715,6 +820,18 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
+			// tag::within-circle-doubles[]
+			List<Author> hits = searchSession.search( Author.class )
+					.where( f -> f.spatial().within().field( "placeOfBirth.coordinates" )
+							.circle( 53.970000, 32.150000, 50, DistanceUnit.KILOMETERS ) )
+					.fetchHits( 20 );
+			// end::within-circle-doubles[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactlyInAnyOrder( ASIMOV_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
 			// tag::within-box[]
 			GeoBoundingBox box = GeoBoundingBox.of(
 					53.99, 32.13,
@@ -725,6 +842,19 @@ public class PredicateDslIT {
 							.boundingBox( box ) )
 					.fetchHits( 20 );
 			// end::within-box[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactlyInAnyOrder( ASIMOV_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::within-box-doubles[]
+			List<Author> hits = searchSession.search( Author.class )
+					.where( f -> f.spatial().within().field( "placeOfBirth.coordinates" )
+							.boundingBox( 53.99, 32.13,
+									53.95, 32.17 ) )
+					.fetchHits( 20 );
+			// end::within-box-doubles[]
 			assertThat( hits )
 					.extracting( Author::getId )
 					.containsExactlyInAnyOrder( ASIMOV_ID );
@@ -758,8 +888,8 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::lucene-fromLuceneQuery[]
 			List<Book> hits = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() )
-					.where( f -> f.fromLuceneQuery(
+					.extension( LuceneExtension.get() ) // <1>
+					.where( f -> f.fromLuceneQuery( // <2>
 							new RegexpQuery( new Term( "description", "neighbor|neighbour" ) )
 					) )
 					.fetchHits( 20 );
@@ -787,10 +917,10 @@ public class PredicateDslIT {
 							JsonObject.class
 					)
 					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */;
+					/* ... */; // <1>
 			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.where( f -> f.fromJson( jsonObject ) )
+					.extension( ElasticsearchExtension.get() ) // <2>
+					.where( f -> f.fromJson( jsonObject ) ) // <3>
 					.fetchHits( 20 );
 			// end::elasticsearch-fromJson-jsonObject[]
 			assertThat( hits )
@@ -801,8 +931,8 @@ public class PredicateDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-fromJson-string[]
 			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.where( f -> f.fromJson( "{"
+					.extension( ElasticsearchExtension.get() ) // <1>
+					.where( f -> f.fromJson( "{" // <2>
 									+ "\"regexp\": {"
 											+ "\"description\": \"neighbor|neighbour\""
 									+ "}"
