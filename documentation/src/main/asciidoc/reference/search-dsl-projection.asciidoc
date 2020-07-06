@@ -3,8 +3,6 @@
 // Search 5 anchors backward compatibility
 [[projections]]
 
-// TODO add more than just examples in the sub-sections
-
 [[search-dsl-projection-concepts]]
 == Basics
 
@@ -27,7 +25,7 @@ If that type is not appropriate or if the field does not exist, an exception wil
 <3> Fetch the results, which will have the expected type.
 ====
 
-Or alternatively, if you don't want to use lambdas:
+Alternatively, if you don't want to use lambdas:
 
 .Using projections to extract data from the index -- object-based syntax
 ====
@@ -39,12 +37,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 
 [NOTE]
 ====
-There are a few constraints regarding field projections.
+There are a few constraints regarding `field` projections.
 In particular, in order for a field to be "projectable", it must be <<mapper-orm-directfieldmapping-projectable,marked as such in the mapping>>,
 so that it is correctly stored in the index.
 ====
 
-While field projections are certainly the most common,
+While `field` projections are certainly the most common,
 they are not the only type of projection.
 Other projections allow to
 <<search-dsl-projection-composite,compose custom beans containing extracted data>>,
@@ -56,15 +54,10 @@ or get information related to the search query itself
 To learn more about the field projection, and all the other types of projection,
 refer to the following sections.
 
-[[search-dsl-projection-common]]
-== Options common to multiple projection types
-
-include::todo-placeholder.asciidoc[]
-
-// TODO common options, if there are any?
-
 [[search-dsl-projection-documentReference]]
 == `documentReference`: return references to matched documents
+
+The `documentReference` projection returns a reference to the matched document as a `DocumentReference` object.
 
 .Returning references to matched documents
 ====
@@ -74,8 +67,14 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+NOTE: Since it's a reference to the _document_, not the entity,
+`DocumentReference` only exposes low-level concepts such as the type name and the document identifier (a `String`).
+Use the <<search-dsl-projection-reference,`entityReference`>> projection to get a reference to the entity.
+
 [[search-dsl-projection-reference]]
 == `entityReference`: return references to matched entities
+
+The `entityReference` projection returns a reference to the matched entity as an `EntityReference` object.
 
 .Returning references to matched entities
 ====
@@ -85,8 +84,16 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+NOTE: The entity does not get loaded as part of the projection.
+If you want the actual entity instance, use the <<search-dsl-projection-entity,`entity` projection>>
+
 [[search-dsl-projection-entity]]
-== `entity`: return matched entities loaded from the database
+== `entity`: return matched entities
+
+The `entityReference` projection returns the entity corresponding to the document that matched.
+
+NOTE: With the Hibernate ORM integration, returned objects are managed entities loaded from the database.
+You can use them as you would use any entity returned from traditional Hibernate ORM queries.
 
 .Returning matched entities loaded from the database
 ====
@@ -96,8 +103,25 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+NOTE: If an entity cannot be loaded (e.g. it was deleted and the index wasn't updated yet),
+the hit will be omitted and won't appear in the returned `List` at all.
+The total hit count, however, will not take this omission into account.
+
 [[search-dsl-projection-field]]
 == `field`: return field values from matched documents
+
+The `field` projection returns the value of a given field for the matched document.
+
+=== Prerequisites
+
+In order for the `field` projection to be available on a given field,
+you need to mark the field as <<mapper-orm-directfieldmapping-projectable,projectable>> in the mapping.
+
+[[search-dsl-projection-field-syntax]]
+=== Syntax
+
+By default, the `field` projection returns a single value per document,
+so the code below will be enough for a single-valued field:
 
 .Returning field values from matched documents
 ====
@@ -107,13 +131,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-.Returning field values from matched documents, for multi-valued fields
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-multiValued]
-----
-====
+NOTE: Hibernate Search will throw an exception when building the query if you do this on a multi-valued field.
+To project on multi-valued fields, see <<search-dsl-projection-field-multivalued>>.
+
+You can omit the "field type" argument, but then you will get projections of type `Object`:
 
 .Returning field values from matched documents, without specifying the field type
 ====
@@ -123,6 +144,35 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+[[search-dsl-projection-field-multivalued]]
+=== Multi-valued fields
+
+To return multiple values, and thus allow projection on multi-valued fields, use `.multi()`.
+This will change the return type of the projection to `List<T>` where `T` is what the single-valued projection
+would have returned.
+
+.Returning field values from matched documents, for multi-valued fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-multiValued]
+----
+====
+
+=== Skipping conversion
+
+By default, the values returned by the `field` projection have the same type as
+the entity property corresponding to the target field.
+
+For example, if an entity property if of an enum type,
+<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `String`>>;
+the values returned by the `field` projection will be of the enum type regardless.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and have unconverted values returned to you instead
+(of type `String` in the example above),
+you can do it this way:
+
 .Returning field values from matched documents, without converting the field value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -131,8 +181,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+See <<search-dsl-projected-value-type>> for more information.
+
 [[search-dsl-projection-score]]
 == `score`: return the score of matched documents
+
+The `field` projection returns the <<search-dsl-predicate-common-score,score>> of the matched document.
 
 .Returning the score of matched documents
 ====
@@ -142,8 +196,34 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+[WARNING]
+====
+Two scores can only be reliably compared if they were computed during the very same query execution.
+Trying to compare scores from two separate query executions will only lead to confusing results,
+in particular if the predicates are different or
+if the content of the index changed enough to alter the frequency of some terms significantly.
+
+On a related note, exposing scores to end users is generally not an easy task.
+See https://cwiki.apache.org/confluence/display/LUCENE/ScoresAsPercentages[this article] for some insight
+into what's wrong with displaying the score as a percentage, specifically.
+====
+
 [[search-dsl-projection-distance]]
 == `distance`: return the distance to a point
+
+The `distance` projection returns the distance between a given point
+and the geo-point value of a given field for the matched document.
+
+=== Prerequisites
+
+In order for the `distance` projection to be available on a given field,
+you need to mark the field as <<mapper-orm-directfieldmapping-projectable,projectable>> in the mapping.
+
+[[search-dsl-projection-distance-syntax]]
+=== Syntax
+
+By default, the `distance` projection returns a single value per document,
+so the code below will be enough for a single-valued field:
 
 .Returning the distance to a point
 ====
@@ -153,13 +233,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-.Returning the distance to a point, for multi-valued fields
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-multiValued]
-----
-====
+NOTE: Hibernate Search will throw an exception when building the query if you do this on a multi-valued field.
+To project on multi-valued fields, see <<search-dsl-projection-distance-multivalued>>.
+
+The returned distance is in meters by default, but you can pick a different unit:
 
 .Returning the distance to a point with a given distance unit
 ====
@@ -169,8 +246,33 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
+[[search-dsl-projection-distance-multivalued]]
+=== Multi-valued fields
+
+To return multiple values, and thus allow projection on multi-valued fields, use `.multi()`.
+This will change the return type of the projection to `List<Double>`.
+
+.Returning the distance to a point, for multi-valued fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-multiValued]
+----
+====
+
 [[search-dsl-projection-composite]]
 == `composite`: combine projections
+
+The `composite` projection applies multiple projections and combines their results.
+
+To preserve type-safety, you can provide a custom combining function.
+The combining function can be a `Function`, a `BiFunction`,
+or a `org.hibernate.search.util.common.function.TriFunction`.
+It will receive values returned by inner projections and return an object combining these values.
+
+Depending on the type of function,
+either one, two, or three additional arguments are expected,
+one for each inner projection.
 
 .Returning custom objects created from multiple projected values
 ====
@@ -180,11 +282,6 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 <1> Call `.composite(...)`.
 <2> Use the constructor of a custom object, `MyPair`, as the combining function.
-The combining function can be a `Function`, a `BiFunction`,
-or a `org.hibernate.search.util.common.function.TriFunction`.
-It will combine values returned by other projections and create an object returned by the composite projection.
-Depending on the type of function,
-either one, two, or three additional arguments are expected.
 <3> Define the first projection to combine as a projection on the `title` field,
 meaning the constructor of `MyPair` will be called for each matched document
 with the value of the `title` field as its first argument.
@@ -194,6 +291,9 @@ with the value of the `genre` field as its second argument.
 <5> The hits will be the result of calling the combining function for each matched document,
 in this case `MyPair` instances.
 ====
+
+If you need more inner projections, or simply if you don't mind receiving the result of inner projections as a `List<?>`,
+you can use the variant of `.composite(...)` that doesn't expect a function argument:
 
 .Returning a `List` of projected values
 ====
@@ -206,18 +306,26 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 meaning the hits will be `List` instances with the value of the `title` field of the matched document at index `0`.
 <3> Define the second projection to combine as a projection on the `genre` field,
 meaning the hits will be `List` instances with the value of the `genre` field of the matched document at index `1`.
-<4> The hits will be `List` instances holding the result of the given projections, in order for each matched document.
+<4> The hits will be `List` instances holding the result of the given projections, in the given order, for each matched document.
 ====
 
 [[search-dsl-projection-extensions]]
 == Backend-specific extensions
 
-include::todo-placeholder.asciidoc[]
+By calling `.extension(...)` while building a query,
+it is possible to access backend-specific projections.
 
-// TODO introduction to extensions or links to that introduction
+[NOTE]
+====
+As their name suggests, backend-specific projections are not portable from one backend technology to the other.
+====
 
 [[search-dsl-projection-extensions-lucene-document]]
 === Lucene: `document`
+
+The `.document()` projection returns the matched document as a native Lucene `Document`.
+
+include::components/lucene-api-warning.asciidoc[]
 
 .Returning the matched document as a native `org.apache.lucene.document.Document`
 ====
@@ -227,16 +335,33 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 ----
 ====
 
-// TODO explain limitations: not the original documents, fields reconstructed from what we find, not all fields presents, ...
+[NOTE]
+====
+The returned document is not _exactly_ the one that was indexed.
+
+In particular:
+
+* Only stored fields are present.
+* Even stored fields may not have the same `FieldType` as they originally had.
+* The document structure flattened,
+i.e. even fields from <<mapper-orm-indexedembedded-structure-nested,nested documents>>
+are all added to same returned document.
+* <<mapper-orm-bridge-index-field-dsl-dynamic,Dynamic fields>> may be missing.
+====
 
 [[search-dsl-projection-extensions-lucene-explanation]]
 === Lucene: `explanation`
+
+The `.explanation()` projection returns an <<search-dsl-projection-extensions-lucene-explanation,explanation>>
+of the match as a native Lucene `Explanation`.
 
 [WARNING]
 ====
 Explanations are rather costly performance-wise:
 only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
 ====
+
+include::components/lucene-api-warning.asciidoc[]
 
 .Returning the score explanation as a native `org.apache.lucene.search.Explanation`
 ====
@@ -249,6 +374,11 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-extensions-elasticsearch-source]]
 === Elasticsearch: `source`
 
+The `.source()` projection returns the JSON of the document as it was indexed in Elasticsearch,
+as a `JsonObject`.
+
+include::components/elasticsearch-json-warning.asciidoc[]
+
 .Returning the matched document source as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -260,11 +390,16 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-extensions-elasticsearch-explanation]]
 === Elasticsearch: `explanation`
 
+The `.explanation()` projection returns an <<search-dsl-projection-extensions-elasticsearch-explanation,explanation>>
+of the match as a `JsonObject`.
+
 [WARNING]
 ====
 Explanations are rather costly performance-wise:
 only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
 ====
+
+include::components/elasticsearch-json-warning.asciidoc[]
 
 .Returning the score explanation as a `JsonObject`
 ====
@@ -277,13 +412,15 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-extensions-elasticsearch-jsonHit]]
 === Elasticsearch: `jsonHit`
 
+The `.jsonHit()` projection returns the exact JSON returned by Elasticsearch for the hit, as a `JsonObject`.
+
 [NOTE]
 ====
 This is particularly useful when <<search-dsl-query-elasticsearch-json,customizing the request's JSON>>
 to ask for additional data within each hit.
 ====
 
-include::components/elasticsearch-request-response-warning.asciidoc[]
+include::components/elasticsearch-json-warning.asciidoc[]
 
 .Returning the Elasticsearch hit as a `JsonObject`
 ====
