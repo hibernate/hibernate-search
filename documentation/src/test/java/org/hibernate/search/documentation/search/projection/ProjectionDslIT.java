@@ -249,9 +249,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-noProjectionConverter[]
 			List<String> hits = searchSession.search( Book.class )
-					.select( f -> f.field(
-							"genre", String.class, ValueConvert.NO
-					) )
+					.select( f -> f.field( "genre", String.class, ValueConvert.NO ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field-noProjectionConverter[]
