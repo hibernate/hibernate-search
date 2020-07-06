@@ -3,8 +3,6 @@
 // Search 5 anchors backward compatibility
 [[search-configuration]]
 
-include::todo-placeholder.asciidoc[]
-
 == Configuration sources
 
 When using Hibernate Search within Hibernate ORM,
