@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 public class Book {
 
 	@Id
+	@GenericField(name = "id_sort", sortable = Sortable.YES)
 	private Integer id;
 
 	@FullTextField(analyzer = "english")

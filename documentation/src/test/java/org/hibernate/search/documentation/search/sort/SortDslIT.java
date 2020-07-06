@@ -151,6 +151,21 @@ public class SortDslIT {
 	}
 
 	@Test
+	public void stabilization() {
+		withinSearchSession( searchSession -> {
+			// tag::stabilization[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "genre_sort" ).then().field( "id_sort" ) )
+					.fetchHits( 20 );
+			// end::stabilization[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
 	public void field() {
 		withinSearchSession( searchSession -> {
 			// tag::field[]
@@ -326,9 +341,9 @@ public class SortDslIT {
 			// tag::then[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
-					.sort( f -> f.field( "genre_sort" ) // <2>
-							.then().field( "title_sort" ) ) // <3>
-					.fetchHits( 20 ); // <4>
+					.sort( f -> f.field( "genre_sort" )
+							.then().field( "title_sort" ) )
+					.fetchHits( 20 );
 			// end::then[]
 			assertThat( hits )
 					.extracting( Book::getId )
