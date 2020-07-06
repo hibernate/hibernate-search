@@ -1,8 +1,0 @@
-[[monitoring]]
-= Monitoring
-// Search 5 anchors backward compatibility
-[[search-monitoring]]
-
-include::todo-placeholder.asciidoc[]
-
-// NOTE: We may want to make this content backend-specific and move it to the backend-lucene and backend-elasticsearch sections

@@ -37,8 +37,6 @@ include::backend-lucene.asciidoc[]
 
 include::backend-elasticsearch.asciidoc[]
 
-include::monitoring.asciidoc[]
-
 include::further-reading.asciidoc[]
 
 include::credits.asciidoc[]
