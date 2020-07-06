@@ -880,6 +880,8 @@ for more information about the settings and their defaults.
 
 [[backend-lucene-io-merge]]
 === Merge settings
+// Search 5 anchors backward compatibility
+[[search-optimize]]
 
 A Lucene index is not stored in a single, continuous file.
 Instead, each flush to the index will generate a small file containing all the documents added to the index.
