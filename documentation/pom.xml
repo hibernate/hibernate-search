@@ -226,6 +226,7 @@
                         <hibernateVersion>${version.org.hibernate}</hibernateVersion>
                         <hibernateDocUrl>${documentation.org.hibernate.url}</hibernateDocUrl>
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
+                        <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
                         <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>

@@ -1,3 +1,29 @@
 = Further reading
 
-include::todo-placeholder.asciidoc[]
+== Elasticsearch
+
+link:{elasticsearchDocUrl}[Elasticsearch's reference documentation] is an excellent starting point
+to learn more about Elasticsearch.
+
+== Lucene
+
+To learn more about Lucene,
+you can get a copy to link:$$http://www.manning.com/hatcher3/$$[Lucene in Action (Second Edition)],
+though it covers an older version of Lucene.
+
+Otherwise, you can always try your luck with link:{luceneJavadocUrl}[Lucene's Javadoc].
+
+== Hibernate ORM
+
+If you want to deepen your knowledge of Hibernate ORM,
+start with the link:$$http://hibernate.org/orm/documentation/$$[online documentation] or get hold
+of a copy of link:$$http://www.manning.com/bauer3/$$[Java Persistence with Hibernate, Second Edition].
+
+== Other
+
+If you have any further questions or feedback regarding Hibernate Search,
+reach out to the https://hibernate.org/community/[Hibernate community].
+We are looking forward to hearing from you.
+
+In case you would like to report a bug use the
+link:$$https://hibernate.atlassian.net/browse/HSEARCH$$[Hibernate Search JIRA] instance.
