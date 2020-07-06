@@ -1,8 +1,0 @@
-[[advanced-features]]
-= Advanced features
-// Search 5 anchors backward compatibility
-[[search-lucene-native]]
-
-include::todo-placeholder.asciidoc[]
-
-// NOTE: We may want to move some of this content to the relevant sections.
