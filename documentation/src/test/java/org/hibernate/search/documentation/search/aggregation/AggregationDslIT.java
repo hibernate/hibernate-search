@@ -14,6 +14,8 @@ import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
@@ -140,7 +142,7 @@ public class AggregationDslIT {
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class ) ) // <1>
 					.fetch( 20 );
-			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey );
+			Map<Genre, Long> countsByGenre = result.aggregation( countsByGenreKey ); // <2>
 			// end::terms[]
 			assertThat( countsByGenre )
 					.containsExactly(
@@ -312,6 +314,36 @@ public class AggregationDslIT {
 					.fetch( 20 );
 			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
 			// end::range-objects[]
+			assertThat( countsByPrice )
+					.containsExactly(
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
+					);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-objects-collection[]
+			List<Range<Double>> ranges =
+					// end::range-objects-collection[]
+					Arrays.asList(
+							Range.canonical( 0.0, 10.0 ),
+							Range.canonical( 10.0, 20.0 ),
+							Range.atLeast( 20.0 )
+					)
+					// tag::range-objects-collection[]
+					/* ... */;
+
+			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.aggregation( countsByPriceKey, f -> f.range()
+							.field( "price", Double.class )
+							.ranges( ranges )
+					)
+					.fetch( 20 );
+			Map<Range<Double>, Long> countsByPrice = result.aggregation( countsByPriceKey );
+			// end::range-objects-collection[]
 			assertThat( countsByPrice )
 					.containsExactly(
 							entry( Range.canonical( 0.0, 10.0 ), 1L ),
