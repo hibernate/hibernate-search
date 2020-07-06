@@ -3,12 +3,10 @@
 // Search 5 anchors backward compatibility
 [[query-sorting]]
 
-// TODO add more than just examples in the sub-sections
-
 [[search-dsl-sort-concepts]]
 == Basics
 
-By default, query results are sorted by relevance.
+By default, query results are sorted by <<search-dsl-sort-score,matching score (relevance)>>.
 Other sorts, including the sort by field value, can be configured when building the search query:
 
 .Using custom sorts
@@ -24,7 +22,7 @@ If the field does not exist or cannot be sorted on, an exception will be thrown.
 <3> Fetch the results, which will be sorted according to instructions.
 ====
 
-Or alternatively, if you don't want to use lambdas:
+Alternatively, if you don't want to use lambdas:
 
 .Using custom sorts -- object-based syntax
 ====
@@ -42,11 +40,32 @@ so that the correct data structures are available in the index.
 ====
 
 The sort DSL offers more sort types, and multiple options for each type of sort.
-To learn more about the field sort, and all the other types of sort,
+To learn more about the `field` sort, and all the other types of sort,
 refer to the following sections.
 
 [[search-dsl-sort-score]]
 == `score`: sort by matching score (relevance)
+
+`score` sorts on the score of each document:
+
+* in descending order (the default), documents with a higher score appear first in the list of hits.
+* in ascending order, documents with a lower score appear first in the list of hits.
+
+The score is computed differently for each query,
+but roughly speaking you can consider that a higher score means that more <<search-dsl-predicate,predicates>>
+were matched, or they were matched better.
+Thus, the score of a given document is a representation of how relevant that document is to a particular query.
+
+[TIP]
+====
+To get the most out of a sort by score, you will need
+to <<search-dsl-predicate-common-score,assign weight to your predicates by boosting some of them>>.
+
+Advanced users may even want to change the scoring formula by specifying a different <<backend-lucene-analysis-similarity,Similarity>>.
+====
+
+Sorting by score is the default, so it's generally not necessary to ask for a sort by score explicitly,
+but below is an example of how you can do it.
 
 .Sorting by relevance
 ====
@@ -56,8 +75,19 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
+=== Options
+
+* You can sort by ascending score by <<search-dsl-sort-common-order,changing the sort order>>.
+However, this means the least relevant hits will appear first,
+which is completely pointless. This option is only provided for completeness.
+
 [[search-dsl-sort-index-order]]
 == `indexOrder`: sort according to the order of documents on storage
+
+`indexOrder` sorts on the position of documents on internal storage.
+
+This sort is not predictable, but is the most efficient.
+Use it when performance matters more than the order of hits.
 
 .Sorting according to the order of documents on storage
 ====
@@ -67,10 +97,41 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
+NOTE: `indexOrder` should *not* be used to stabilize sorts.
+That's because the index order may change when the index is updated,
+or even without any change, after index segments are <<backend-lucene-io-merge,merged>>.
+See <<search-dsl-sort-stabilize>> for a solution to unstable sorts.
+
 [[search-dsl-sort-field]]
 == `field`: sort by field values
 
-`field` will sort documents according to the value of a given field.
+`field` sorts on the value of a given field for each document.
+
+* in ascending order (the default), documents with a lower value appear first in the list of hits.
+* in descending order, documents with a higher value appear first in the list of hits.
+
+[NOTE]
+====
+For text fields, "lower" means "lower in the alphabetical order".
+====
+
+[[search-dsl-sort-field-prerequisites]]
+=== Prerequisites
+
+In order for the `field` sort to be available on a given field,
+you need to mark the field as <<mapper-orm-directfieldmapping-sortable,sortable>> in the mapping.
+
+<<mapper-orm-geopoint,Geopoint>> fields cannot be marked as sortable;
+refer to the <<search-dsl-sort-distance,distance sort>> for these fields.
+
+<<mapper-orm-directfieldmapping-annotations-fulltextfield,full-text fields>> (multi-word text fields)
+cannot be marked as sortable;
+you need to use <<mapper-orm-directfieldmapping-annotations-keywordfield,keyword fields>> for text sorts.
+Remember you can <<mapper-orm-directfieldmapping-basics,map a single property to multiple fields with different names>>,
+so you can have a full-text field for predicates along with a keyword field for sorts,
+all for the same property.
+
+=== Syntax
 
 .Sorting by field values
 ====
@@ -80,7 +141,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-Several options are available:
+=== Options
 
 * The sort order is ascending by default,
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
@@ -94,8 +155,18 @@ but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.fil
 [[search-dsl-sort-distance]]
 == `distance`: sort by distance to a point
 
-`distance` will sort documents according to the distance between a given center
-and the point specified by a given field document field.
+`distance` sorts on the distance from a given center to the geo-point value of a given field for each document.
+
+* in ascending order (the default), documents with a lower distance appear first in the list of hits.
+* in descending order, documents with a higher distance appear first in the list of hits.
+
+[[search-dsl-sort-distance-prerequisites]]
+=== Prerequisites
+
+In order for the `distance` sort to be available on a given field,
+you need to mark the field as <<mapper-orm-directfieldmapping-sortable,sortable>> in the mapping.
+
+=== Syntax
 
 .Sorting by distance to a point
 ====
@@ -105,7 +176,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-Several options are available:
+=== Options
 
 * The sort order is ascending by default,
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
@@ -117,13 +188,29 @@ but that can be <<search-dsl-sort-common-filter,controlled explicitly with `.fil
 [[search-dsl-sort-composite]]
 == `composite`: combine sorts
 
+`composite` applies multiple sorts one after the other.
+It is useful when applying incomplete sorts.
+
 .Sorting by multiple composed sorts using `composite()`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite]
 ----
+<1> Start a `composite` sort.
+<2> Add a `field` sort on the `genre_sort` field.
+Since many books share the same genre, this sort is incomplete:
+the relative order of books with the same genre is undetermined,
+and may change from one query execution to the other.
+<3> Add a `field` sort on the `title_sort` field.
+When two books have the same genre,
+their relative order will by determined by comparing their titles.
+If two books can have the same title,
+we can <<search-dsl-sort-stabilize,stabilize the sort even further by adding a last sort on the id>>.
+<4> The hits will be sorted by genre, then by title.
 ====
+
+Alternatively, you can append a sort to another simply by calling `.then()` after the first sort:
 
 .Sorting by multiple composed sorts using `then()`
 ====
@@ -132,6 +219,13 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=then]
 ----
 ====
+
+[[search-dsl-sort-composite-lambda]]
+=== Adding sorts dynamically with the lambda syntax
+
+It is possible to define the `composite` sort inside a lambda expression.
+This is especially useful when inner sorts need to be added dynamically to the `composite` sort,
+for example based on user input.
 
 .Easily composing sorts dynamically with the lambda syntax
 ====
@@ -148,15 +242,43 @@ In this case, we iterate over user-selected sorts and add sorts accordingly.
 <4> The hits will be sorted according to sorts added by the lambda expression.
 ====
 
+[[search-dsl-sort-stabilize]]
+=== Stabilizing a sort
+
+If your first sort (e.g. by <<search-dsl-sort-field,field value>>)
+results in a tie for many documents (e.g. many documents have the same field value),
+you may want to append an arbitrary sort just to stabilize your sort:
+to make sure the search hits will always be in the same order if you execute the same query.
+
+In most cases, a quick and easy solution for stabilizing a sort is
+to change your mapping to add a <<mapper-orm-directfieldmapping-sortable,sortable field>> on your entity ID,
+and to append a `field` sort by id to your unstable sort:
+
+.Stabilizing a sort
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=stabilization]
+----
+====
+
 [[search-dsl-sort-extensions]]
 == Backend-specific extensions
 
-include::todo-placeholder.asciidoc[]
+By calling `.extension(...)` while building a query,
+it is possible to access backend-specific sorts.
 
-// TODO introduction to extensions or links to that introduction
+[NOTE]
+====
+As their name suggests, backend-specific sorts are not portable from one backend technology to the other.
+====
 
 [[search-dsl-sort-extensions-lucene-from-lucene-sort]]
 === Lucene: `fromLuceneSort`
+
+`.fromLuceneSort(...)` turns a native Lucene `Sort` into a Hibernate Search sort.
+
+include::components/lucene-api-warning.asciidoc[]
 
 .Sorting by a native `org.apache.lucene.search.Sort`
 ====
@@ -171,6 +293,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 // Search 5 anchors backward compatibility
 [[_using_native_sorts_within_the_sort_dsl]]
 
+`.fromLuceneSortField(...)` turns a native Lucene `SortField` into a Hibernate Search sort.
+
+include::components/lucene-api-warning.asciidoc[]
+
 .Sorting by a native `org.apache.lucene.search.SortField`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -181,6 +307,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 
 [[search-dsl-sort-extensions-elasticsearch-from-json]]
 === Elasticsearch: `fromJson`
+
+`.fromJson(...)` turns JSON representing an Elasticsearch sort into a Hibernate Search sort.
+
+include::components/elasticsearch-json-warning.asciidoc[]
 
 .Sorting by a native Elasticsearch JSON sort provided as a `JsonObject`
 ====
@@ -276,6 +406,21 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-use]
 ----
 ====
+
+[[search-dsl-sort-common-missing-argument-type]]
+==== Expected type of arguments
+
+By default, `.use(...)` expects its argument to have the same type as
+the entity property corresponding to the target field.
+
+For example, if an entity property is of type `java.util.Date`,
+<<mapper-orm-directfieldmapping-supported-types,the corresponding field may be of type `java.time.Instant`>>.
+`.use(...)` will expect its argument to be of type `java.util.Date` regardless.
+
+This should generally be what you want,
+but if you ever need to bypass conversion and pass an unconverted argument
+(of type `java.time.Instant` in the example above)
+to `.use(...)`, see <<search-dsl-argument-type>>.
 
 [[search-dsl-sort-common-multi-value-mode]]
 === Sort mode for multi-valued fields
