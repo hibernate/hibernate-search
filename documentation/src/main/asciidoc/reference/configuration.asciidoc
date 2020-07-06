@@ -187,6 +187,8 @@ beans can only be retrieved using reflection by calling the public, no-arg const
 
 [[configuration-bean-resolution]]
 === Bean resolution
+// Search 5 anchors backward compatibility
+[[section-services]]
 
 Everywhere a custom bean reference is expected, three types of references are accepted:
 

@@ -41,8 +41,6 @@ include::index-optimization.asciidoc[]
 
 include::monitoring.asciidoc[]
 
-include::advanced-features.asciidoc[]
-
 include::further-reading.asciidoc[]
 
 include::credits.asciidoc[]

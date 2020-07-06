@@ -1,5 +1,7 @@
 [[backend-lucene]]
 = Lucene backend
+// Search 5 anchors backward compatibility
+[[search-lucene-native]]
 
 [[backend-lucene-configuration]]
 == Basic configuration
@@ -208,6 +210,8 @@ See `org.apache.lucene.store.NoLockFactory`.
 
 [[backend-lucene-configuration-sharding]]
 == Sharding
+// Search 5 anchors backward compatibility
+[[advanced-features-sharding]]
 
 include::components/sharding-intro-note.asciidoc[]
 
@@ -470,6 +474,8 @@ other annotations such as `@GenericField` will fail.
 
 [[backend-lucene-multi-tenancy]]
 === Multi-tenancy
+// Search 5 anchors backward compatibility
+[[section-multi-tenancy]]
 
 Multi-tenancy is supported and handled transparently,
 according to the tenant ID defined in the current session:
@@ -576,6 +582,8 @@ it's just that there is no documentation page for Lucene proper).
 
 [[backend-lucene-analysis-similarity]]
 === Similarity
+// Search 5 anchors backward compatibility
+[[section-custom-similarity]]
 
 When searching, scores are assigned to documents based on statistics recorded at index time, using a specific formula.
 Those statistics and the formula are defined by a single component called the similarity,
