@@ -26,7 +26,7 @@ This involves extracting data from an instance of the type, transforming the dat
 and pushing it to index fields.
 
 Below is an example of a custom type bridge that maps
-a two properties of the `Author` class, the `firstName` and `lastName`,
+two properties of the `Author` class, the `firstName` and `lastName`,
 to a single `fullName` field.
 
 // Search 5 anchors backward compatibility
@@ -162,9 +162,17 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 == Injecting beans into the binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
-Hibernate Search supports injection of beans into the `TypeMappingAnnotationProcessor`.
+Hibernate Search supports injecting beans into:
 
-The context passed to the type binder's `bind` method
+* the `TypeMappingAnnotationProcessor` if you use custom annotations and instantiate the binder yourself.
+* the `TypeBinder` if you use the `@TypeBinding` annotation and let Hibernate Search
+instantiate the binder using your dependency injection framework.
+
+NOTE: This only applies to binders instantiated by Hibernate Search itself.
+As a rule of thumb, if you need to call `new MyBinder()` at some point,
+the binder won't get auto-magically injected.
+
+The context passed to the routing key binder's `bind` method
 also exposes a `getBeanResolver` method to access the bean resolver and instantiate beans explicitly.
 
 See <<configuration-bean-injection>> for more details.
