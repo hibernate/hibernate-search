@@ -3,10 +3,169 @@
 // Search 5 anchors backward compatibility
 [[search-architecture]]
 
-include::todo-placeholder.asciidoc[]
+[[architecture-hsearch-components]]
+== Components of Hibernate Search
+// Search 5 anchors backward compatibility
+[[_overview]]
 
-////
-TODO The getting started section has a link pointing here and expects the section to
-include a description of each artifact,
-its Maven coordinates, and the corresponding path in the distribution bundle
-////
+From the user's perspective, Hibernate Search consists of two components:
+
+Mapper:: The mapper "maps" the user model to an index model,
+and provide APIs consistent with the user model to perform indexing and searching.
++
+Most applications rely on the ORM mapper,
+which offers the ability to index properties of Hibernate ORM entities.
++
+The mapper is configured partly through annotations on the domain model,
+and partly through configuration properties.
+Backend:: The backend is the abstraction over the full-text engines, where "things get done".
+It implements generic indexing and searching interfaces for use by the mapper
+through "index managers", each providing access to one index.
++
+For instance the <<backend-lucene,Lucene backend>> delegates to the Lucene library,
+and the <<backend-elasticsearch,Elasticsearch backend>> delegates to a remote Elasticsearch cluster.
++
+The backend is configured partly by the mapper,
+which tells the backend which indexes must exist and what fields they must have,
+and partly through configuration properties.
+
+The mapper and backend work together to provide three main features:
+
+Mass indexing::
+This is how Hibernate Search rebuilds indexes from zero based on the content of a database.
++
+The mapper queries the database to retrieve the identifier of every entity,
+then processes these identifiers in batches,
+loading the entities then processing them to generate documents that are sent to the backend for indexing.
+The backend puts the document in an internal queue, and will index documents in batches, in background processes,
+notifying the mapper when it's done.
++
+See <<mapper-orm-indexing-massindexer>> for details.
+Automatic indexing::
+This is how Hibernate Search keeps indexes in sync with a database.
++
+When an entity changes, the mapper detects the change and stores the information in an indexing plan.
+Upon transaction commit, entities are processed to generate documents that are sent to the backend for indexing.
+The backend puts the document in an internal queue, and will index documents in batches, in background processes,
+notifying the mapper when it's done.
++
+See <<mapper-orm-indexing-automatic>> for details.
+Searching::
+This is how Hibernate Search provides ways to query an index.
++
+The mapper exposes entry points to the search DSL, allowing selection of entity types to query.
+When one or more entity types are selected,
+the mapper delegates to the corresponding index managers to provide a Search DSL
+and ultimately create the search query.
+Upon query execution, the backend submits a list of entity references to the mapper,
+which loads the corresponding entities.
+The entities are then returned by the query.
++
+See <<search-dsl>> for details.
+
+[[architecture-examples]]
+== Examples of architectures
+// Search 5 anchors backward compatibility
+[[_backend]]
+
+[[architecture-examples-lucene]]
+=== Single-node application with the Lucene backend
+// Search 5 anchors backward compatibility
+[[_lucene]]
+
+With the <<backend-lucene,Lucene backend>>, indexes are local to a given node (JVM).
+They are accessed through direct calls to the Lucene library,
+without going through the network.
+
+image::lucene-backend.png[Lucene backend configuration]
+
+This mode is only relevant to single-node applications.
+
+Pros:
+
+* Simplicity. No external services are required, everything lives on the same server.
+* <<backend-lucene-io-refresh,Immediate (~milliseconds) visibility>> of indexes updates.
+While other backends can perform comparably well for most use cases,
+a single-node, Lucene backend is the best way to implement indexing
+if you need changes to be visible immediately after the database changes.
+
+Cons:
+
+* No horizontal scalability: there can only be one application node,
+and all indexes need to live on the same server.
+* Not so easy to extend: experienced developers can access a lot of Lucene features,
+even those that are not exposed by Hibernate Search, by providing native Lucene objects;
+however, Lucene APIs are not very easy to figure out for developers unfamiliar with Lucene.
+If you're interested, see for example <<search-dsl-predicate-extensions-lucene-from-lucene-query,`Query`-based predicates>>.
+
+To implement this architecture, use the following Maven dependencies:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-lucene</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
+[[architecture-examples-elasticsearch]]
+=== Single-node or multi-node application with the Elasticsearch backend
+// Search 5 anchors backward compatibility
+[[_elasticsearch]]
+
+With the <<backend-elasticsearch,Elasticsearch backend>>, indexes are not tied to the application.
+They are managed by a separate cluster of Elasticsearch nodes,
+and accessed through calls to REST APIs.
+
+image::elasticsearch-backend.png[Elasticsearch backend configuration]
+
+TIP: The Elasticsearch cluster may be a single node living on the same server as the application.
+
+Pros:
+
+* Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
+See link:{elasticsearchDocUrl}/scalability.html["Scalability and resilience" in the Elasticsearch documentation].
+* Horizontal scalability of the application: you can have as many instances of the application as you need.
+* Easy to extend: you can easily access most Elasticsearch features,
+even those that are not exposed by Hibernate Search, by providing your own JSON.
+See for example <<search-dsl-predicate-extensions-elasticsearch-from-json,JSON-defined predicates>>,
+or <<search-dsl-aggregation-extensions-elasticsearch-from-json,JSON-defined aggregations>>,
+or <<search-dsl-query-elasticsearch-json,leveraging advanced features with JSON manipulation>>.
+
+Cons:
+
+* Need to manage an additional service: the Elasticsearch cluster.
+* <<backend-elasticsearch-io-refresh,Delayed (~1 second) visibility>> of indexes updates (near-real-time).
+While changes can be made visible as soon as possible after the database changes,
+Elasticsearch is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] by nature,
+and won't perform very well if you need changes to be visible immediately after the database changes.
+
+[NOTE]
+====
+In multi-node applications, there is a possibility for the indexes to get out of sync in very specific scenarios
+where two transactions simultaneously trigger reindexing of the same entity instance.
++
+https://hibernate.atlassian.net/browse/HSEARCH-3281[HSEARCH-3281] will restore full support for clustered applications.
+====
+
+To implement this architecture, use the following Maven dependencies:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
