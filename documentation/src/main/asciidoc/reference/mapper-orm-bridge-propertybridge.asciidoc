@@ -182,7 +182,15 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/proper
 == Injecting beans into the binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
-Hibernate Search supports injection of beans into the `PropertyMappingAnnotationProcessor`.
+Hibernate Search supports injecting beans into:
+
+* the `PropertyMappingAnnotationProcessor` if you use custom annotations and instantiate the binder yourself.
+* the `PropertyBinder` if you use the `@PropertyBinding` annotation and let Hibernate Search
+instantiate the binder using your dependency injection framework.
+
+NOTE: This only applies to binders instantiated by Hibernate Search itself.
+As a rule of thumb, if you need to call `new MyBinder()` at some point,
+the binder won't get auto-magically injected.
 
 The context passed to the property binder's `bind` method
 also exposes a `getBeanResolver` method to access the bean resolver and instantiate beans explicitly.

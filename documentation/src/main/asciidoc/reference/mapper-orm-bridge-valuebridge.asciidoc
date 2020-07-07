@@ -360,9 +360,9 @@ The `Session` is not available here.
 == Injecting beans into the value bridge or value binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
-Hibernate Search supports injection of beans into both the `ValueBridge` and the `ValueBinder`.
+Hibernate Search supports injecting beans into both the `ValueBridge` and the `ValueBinder`.
 
-NOTE: This only applies to beans instantiated by Hibernate Search itself.
+NOTE: This only applies to bridges/binders instantiated by Hibernate Search itself.
 As a rule of thumb, if you need to call `new MyBridge()` at some point,
 the bridge won't get auto-magically injected.
 
