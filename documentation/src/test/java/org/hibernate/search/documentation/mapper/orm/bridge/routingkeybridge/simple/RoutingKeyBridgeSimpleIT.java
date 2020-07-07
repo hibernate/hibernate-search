@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.routing;
+package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.simple;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HibernateOrmRoutingIT {
+public class RoutingKeyBridgeSimpleIT {
 
 	private static final int SHARD_COUNT = 4;
 
@@ -46,7 +46,7 @@ public class HibernateOrmRoutingIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public HibernateOrmRoutingIT(BackendConfiguration backendConfiguration) {
+	public RoutingKeyBridgeSimpleIT(BackendConfiguration backendConfiguration) {
 		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 

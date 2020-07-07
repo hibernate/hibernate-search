@@ -284,7 +284,7 @@ when building the query:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/routing/HibernateOrmRoutingIT.java[tags=routing-single]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingkeybridge/simple/RoutingKeyBridgeSimpleIT.java[tags=routing-single]
 ----
 <1> Start building the query.
 <2> Define that only documents matching the given `genre` should be returned.
