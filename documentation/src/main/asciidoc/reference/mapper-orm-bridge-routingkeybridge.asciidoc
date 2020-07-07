@@ -3,27 +3,123 @@
 
 == Basics
 
-include::todo-placeholder.asciidoc[]
-//TODO HSEARCH-3709 basic example with annotation, binder, bridge, mapping
+include::components/sharding-intro-note.asciidoc[]
 
+A routing key bridge is a pluggable component that implements
+the mapping of an entity type to a routing key,
+which will determine <<concepts-sharding-routing,to which shard the corresponding indexed document will be routed to>>.
+It is applied to a type with the `@RoutingKeyBinding` annotation
+or with a <<mapper-orm-custom-annotations,custom annotation>>.
+
+Implementing a routing key bridge requires two components:
+
+. A custom implementation of `RoutingKeyBinder`, to bind the bridge to a type at bootstrap.
+This involves declaring the properties of the type that will be used
+and instantiating the type bridge.
+. A custom implementation of `RoutingKeyBridge`, to generate a routing key at runtime.
+This involves extracting data from an instance of the type, transforming the data if necessary,
+and returning the routing key.
+
+Below is an example of a custom routing key bridge that
+uses the `genre` property of the `Book` class as a routing key.
+
+.Implementing and using a `RoutingKeyBridge`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingkeybridge/simple/BookGenreRoutingKeyBinder.java[tags=binder]
+----
+<1> The binder must implement the `RoutingKeyBinder` interface.
+<2> Implement the `bind` method in the binder.
+<3> Declare the dependencies of the bridge,
+i.e. the parts of the type instances that the bridge will actually use.
+See <<mapper-orm-bridge-bridgedelement-dependencies>>
+for more information about declaring dependencies.
+<4> Call `context.bridge(...)` to define the type bridge to use,
+and pass an instance of the bridge.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingkeybridge/simple/BookGenreRoutingKeyBinder.java[tags=bridge]
+----
+<1> The bridge must implement the `RoutingKeyBridge` interface.
+Here the bridge class is nested in the binder class,
+because it is more convenient,
+but you are obviously free to implement it in a separate java file.
+<2> Implement the `toRoutingKey` method in the bridge.
+This method is called on indexing.
+<3> The bridged element is passed as an `Object`,
+so cast it to the correct type.
+<4> Extract data from the bridged element,
+and optionally transform it,
+to generate the routing key.
+<5> Return the routing key.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingkeybridge/simple/Book.java[tags=include;!getters-setters]
+----
+<1> Apply the bridge using the `@RoutingKeyBridge` annotation.
+<2> Properties used in the bridge can still be mapped as index fields.
+====
+
+See <<search-dsl-query-routing>> for an example of how to use routing in search queries, with the same mapping as above.
+
+[[mapper-orm-bridge-routingkeybridge-parameters]]
 == Passing parameters
 
-include::todo-placeholder.asciidoc[]
-//TODO HSEARCH-3709 parameterized example
+Routing key bridges are usually applied with the built-in `@RoutingKeyBinding` annotation.
+which does not accept any parameter other than the routing key binder.
+
+In some cases, it is necessary to pass parameters directly to the routing key binder.
+This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes.
+
+Refer to <<mapper-orm-bridge-typebridge-parameters,this example for `TypeBinder`>>,
+which is fairly similar to what you'll need for a `RoutingKeyBinder`.
 
 == Accessing the ORM session from the bridge
 
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3709 HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+Contexts passed to the bridge methods can be used to retrieve the Hibernate ORM session.
+
+.Retrieving the ORM session from a `RoutingKeyBridge`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingkeybridge/ormcontext/MyEntityRoutingKeyBinder.java[tags=include]
+----
+<1> Apply an extension to the context to access content specific to Hibernate ORM.
+<2> Retrieve the `Session` from the extended context.
+====
 
 == Injecting beans into the binder
 
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3709 say it's supported, give some basic information and link to <<configuration-bean-injection>>
+With <<configuration-bean-frameworks,compatible frameworks>>,
+Hibernate Search supports injecting beans into:
+
+* the `TypeMappingAnnotationProcessor` if you use custom annotations and instantiate the binder yourself.
+* the `RoutingKeyBinder` if you use the `@RoutingKeyBinding` annotation and let Hibernate Search
+instantiate the binder using your dependency injection framework.
+
+NOTE: This only applies to binders instantiated by Hibernate Search itself.
+As a rule of thumb, if you need to call `new MyBinder()` at some point,
+the binder won't get auto-magically injected.
+
+The context passed to the type binder's `bind` method
+also exposes a `getBeanResolver` method to access the bean resolver and instantiate beans explicitly.
+
+See <<configuration-bean-injection>> for more details.
 
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]
 
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3709 incubating support for reflection with bridgedElement() (advanced use, no example)
+The context passed to the routing key binder's `bind` method
+exposes a `bridgedElement()` method that gives access to metadata about the type being bound.
+
+The metadata can in particular be used to inspect the type in details:
+
+* Getting accessors to properties.
+* Detecting properties with markers.
+Markers are applied by specific annotations carrying a `@MarkerBinding` meta-annotation.
+
+See the javadoc for more information.

@@ -1,0 +1,49 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.ormcontext;
+
+import org.hibernate.Session;
+import org.hibernate.search.mapper.orm.HibernateOrmExtension;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
+
+public class MyEntityRoutingKeyBinder implements RoutingKeyBinder {
+
+	@Override
+	public void bind(RoutingKeyBindingContext context) {
+		context.dependencies()
+				.useRootOnly();
+
+		context.bridge( new Bridge() );
+	}
+
+	//tag::include[]
+	private static class Bridge implements RoutingKeyBridge {
+
+		@Override
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier,
+				Object bridgedElement, RoutingKeyBridgeToRoutingKeyContext context) {
+			Session session = context.extension( HibernateOrmExtension.get() ) // <1>
+					.session(); // <2>
+			String routingKey;
+			// ... do something with the session ...
+			//end::include[]
+			/*
+			 * I don't know what to do with the session here,
+			 * so I'm just going to extract data from it.
+			 * This is silly, but at least it allows us to check the session was successfully retrieved.
+			 */
+			MyData dataFromSession = (MyData) session.getProperties().get( "test.data.indexed" );
+			routingKey = dataFromSession.name();
+			//tag::include[]
+			return routingKey;
+		}
+	}
+	//end::include[]
+}

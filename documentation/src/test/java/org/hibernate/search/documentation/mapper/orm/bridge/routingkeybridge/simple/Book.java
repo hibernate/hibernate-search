@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.routing;
+package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.simple;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -16,9 +16,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
 
+// tag::include[]
 @Entity
 @Indexed
-@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = BookRoutingKeyBridge.Binder.class))
+@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = BookGenreRoutingKeyBinder.class)) // <1>
 public class Book {
 
 	@Id
@@ -28,12 +29,16 @@ public class Book {
 	private String title;
 
 	@Basic(optional = false)
-	@KeywordField
+	@KeywordField // <2>
 	private Genre genre;
 
 	public Book() {
 	}
 
+	// Getters and setters
+	// ...
+
+	// tag::getters-setters[]
 	public Integer getId() {
 		return id;
 	}
@@ -57,5 +62,6 @@ public class Book {
 	public void setGenre(Genre genre) {
 		this.genre = genre;
 	}
-
+// end::getters-setters[]
 }
+// end::include[]
