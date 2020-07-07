@@ -371,13 +371,9 @@ also exposes a `getBeanResolver` method to access the bean resolver and instanti
 
 See <<configuration-bean-injection>> for more details.
 
-== Experimental features
+== Incubating features
 
-[WARNING]
-====
-These features are *experimental*.
-Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
-====
+include::components/incubating-warning.asciidoc[]
 
 [[_type_aware_bridge]]
 The context passed to the value binder's `bind` method

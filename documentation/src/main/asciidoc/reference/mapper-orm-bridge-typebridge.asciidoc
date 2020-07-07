@@ -169,13 +169,9 @@ also exposes a `getBeanResolver` method to access the bean resolver and instanti
 
 See <<configuration-bean-injection>> for more details.
 
-== Experimental features
+== Incubating features
 
-[WARNING]
-====
-These features are *experimental*.
-Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
-====
+include::components/incubating-warning.asciidoc[]
 
 The context passed to the type binder's `bind` method
 exposes a `bridgedElement()` method that gives access to metadata about the type being bound.
