@@ -684,7 +684,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 [[search-dsl-query-elasticsearch-json]]
 == Elasticsearch: leveraging advanced features with JSON manipulation
 
-include::components/experimental-warning.asciidoc[]
+include::components/incubating-warning.asciidoc[]
 
 Elasticsearch ships with many features.
 It is possible that at some point, one feature you need will not be exposed by the Search DSL.

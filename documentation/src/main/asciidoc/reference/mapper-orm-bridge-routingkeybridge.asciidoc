@@ -21,7 +21,9 @@ include::todo-placeholder.asciidoc[]
 include::todo-placeholder.asciidoc[]
 // TODO HSEARCH-3709 say it's supported, give some basic information and link to <<configuration-bean-injection>>
 
-== Experimental features
+== Incubating features
+
+include::components/incubating-warning.asciidoc[]
 
 include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3709 experimental support for reflection with bridgedElement() (advanced use, no example)
+// TODO HSEARCH-3709 incubating support for reflection with bridgedElement() (advanced use, no example)

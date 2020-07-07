@@ -15,12 +15,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Marks the annotated element as incubating. Usual compatibility policies do not apply:
- * The contract of incubating elements (e.g. types, methods etc.)
- * is under active development and may be incompatibly altered - or removed - in subsequent releases.
+ * Marks the annotated element as incubating.
  * <p>
- * Usage of incubating API members is encouraged (so the development team can get feedback on these new features)
- * but you should be prepared for updating code which is using them as needed.
+ * Incubating features are still under active development.
+ * The usual <a href="https://hibernate.org/community/compatibility-policy/">compatibility policy</a> does not apply:
+ * the contract of incubating elements (e.g. types, methods etc.)
+ * may be altered in a backward-incompatible way -- or even removed -- in subsequent releases.
+ * <p>
+ * You are encouraged to use incubating features so the development team can get feedback and improve them,
+ * but you should be prepared to update code which relies on them as needed.
  *
  * @author Gunnar Morling
  */
