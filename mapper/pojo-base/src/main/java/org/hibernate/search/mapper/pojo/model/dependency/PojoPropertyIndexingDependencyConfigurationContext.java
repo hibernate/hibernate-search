@@ -76,7 +76,7 @@ public interface PojoPropertyIndexingDependencyConfigurationContext {
 	 * <p>
 	 * Every component of this path will be considered as a dependency,
 	 * so it is not necessary to call this method for every subpath.
-	 * In other words, if the path {@code "myProperty.someOtherPropety"} is declared as used,
+	 * In other words, if the path {@code "myProperty.someOtherProperty"} is declared as used,
 	 * Hibernate Search will automatically assume that {@code "myProperty"} is also used.
 	 *
 	 * @param extractorPathFromBridgedProperty A container extractor path from the bridged property.

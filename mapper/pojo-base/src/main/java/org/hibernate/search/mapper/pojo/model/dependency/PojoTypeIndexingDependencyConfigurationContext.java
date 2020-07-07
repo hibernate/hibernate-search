@@ -42,14 +42,13 @@ public interface PojoTypeIndexingDependencyConfigurationContext {
 	 * <p>
 	 * Every component of this path will be considered as a dependency,
 	 * so it is not necessary to call this method for every subpath.
-	 * In other words, if the path {@code "myProperty.someOtherPropety"} is declared as used,
+	 * In other words, if the path {@code "myProperty.someOtherProperty"} is declared as used,
 	 * Hibernate Search will automatically assume that {@code "myProperty"} is also used.
 	 *
 	 * @param pathFromBridgedTypeToUsedValue The path from the bridged type to the value used by the bridge.
 	 * @return {@code this}, for method chaining.
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the bridged type.
 	 */
-	@Incubating
 	PojoTypeIndexingDependencyConfigurationContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
 	/**
