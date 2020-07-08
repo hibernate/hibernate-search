@@ -26,7 +26,6 @@ For example `MyEntity.myEmbedded` or `MyEntity.myEmbedded.myNestedEmbedded`.
 
 However, support for "dynamic-map" entity models is limited. In particular:
 
-* The <<mapper-orm-identifiermapping,document ID>> must be mapped to the entity ID:
-it can't be mapped propery, even if it is unique.
 * <<mapper-orm-indexing-massindexer,Mass indexing>> dynamic-map entities is not supported.
+See https://hibernate.atlassian.net/browse/HSEARCH-3771[HSEARCH-3771].
 ====
