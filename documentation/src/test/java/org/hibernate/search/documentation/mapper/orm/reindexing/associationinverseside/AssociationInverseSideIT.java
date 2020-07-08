@@ -16,6 +16,9 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -29,7 +32,22 @@ public class AssociationInverseSideIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
+		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+				BackendConfigurations.simple(),
+				mapping -> {
+					//tag::programmatic[]
+					TypeMappingStep bookMapping = mapping.type( Book.class );
+					bookMapping.indexed();
+					bookMapping.property( "priceByEdition" )
+							.indexedEmbedded( "editionsForSale" )
+									.extractor( BuiltinContainerExtractors.MAP_KEY )
+							.associationInverseSide( PojoModelPath.parse( "book" ) )
+									.extractor( BuiltinContainerExtractors.MAP_KEY );
+					TypeMappingStep bookEditionMapping = mapping.type( BookEdition.class );
+					bookEditionMapping.property( "label" )
+							.fullTextField().analyzer( "english" );
+					//end::programmatic[]
+				} );
 	}
 
 	@Parameterized.Parameter

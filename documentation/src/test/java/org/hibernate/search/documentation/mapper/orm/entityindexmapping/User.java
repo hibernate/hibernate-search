@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 // tag::indexed-explicitbackend[]
@@ -23,10 +22,8 @@ public class User {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "name")
 	private String firstName;
 
-	@FullTextField(analyzer = "name")
 	private String lastName;
 
 	public User() {

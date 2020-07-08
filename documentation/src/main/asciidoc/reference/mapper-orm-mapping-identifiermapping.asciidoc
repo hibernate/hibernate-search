@@ -73,3 +73,17 @@ i.e. the value passed to the underlying backend.
 |All enum types|`name()`
 |java.util.UUID|`toString()`
 |====
+
+[[mapper-orm-identifiermapping-programmatic]]
+== Programmatic mapping
+
+You can map the document identifier through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Mapping a property to the document identifier explicitly with `.documentId()`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/identifiermapping/naturalid/IdentifierMappingNaturalIdIT.java[tags=programmatic]
+----
+====

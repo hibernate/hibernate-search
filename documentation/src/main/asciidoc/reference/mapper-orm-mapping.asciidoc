@@ -7,6 +7,8 @@
 
 include::mapper-orm-mapping-configuration.asciidoc[]
 
+include::mapper-orm-mapping-programmatic.asciidoc[]
+
 include::mapper-orm-mapping-entityindexmapping.asciidoc[]
 
 include::mapper-orm-mapping-identifiermapping.asciidoc[]
@@ -22,8 +24,6 @@ include::mapper-orm-mapping-geopoint.asciidoc[]
 include::mapper-orm-mapping-reindexing.asciidoc[]
 
 include::mapper-orm-mapping-changes.asciidoc[]
-
-include::mapper-orm-mapping-programmatic.asciidoc[]
 
 include::mapper-orm-mapping-custom-annotations.asciidoc[]
 

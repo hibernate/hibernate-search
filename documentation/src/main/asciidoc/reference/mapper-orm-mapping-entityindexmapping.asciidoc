@@ -1,6 +1,8 @@
 [[mapper-orm-entityindexmapping]]
 = Entity/index mapping
 
+== Basics
+
 In order to index an entity, it must be annotated with `@Indexed`.
 
 .Marking a class for indexing with `@Indexed`
@@ -38,6 +40,9 @@ See <<mapper-orm-identifiermapping>> for details.
 Fields must be mapped to properties explicitly.
 See <<mapper-orm-directfieldmapping>> for details.
 
+[[mapper-orm-entityindexmapping-explicit]]
+== Explicit index/backend
+
 You can change the name of the index by setting `@Indexed(index = ...)`.
 Note that index names must be unique in a given application.
 
@@ -73,5 +78,19 @@ because `Author` and `User` are indexed in different backends:
 [source, JAVA, indent=0]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/HibernateOrmIndexedIT.java[tags=cross-backend-search]
+----
+====
+
+[[mapper-orm-entityindexmapping-programmatic]]
+== Programmatic mapping
+
+You can mark an entity as indexed through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Marking a class for indexing with `.indexed()`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/HibernateOrmIndexedIT.java[tags=programmatic]
 ----
 ====

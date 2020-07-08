@@ -30,7 +30,6 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "name")
 	private String title;
 
 	@ElementCollection

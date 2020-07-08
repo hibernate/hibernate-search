@@ -18,7 +18,11 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -26,10 +30,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.Assertions;
 
+@RunWith(Parameterized.class)
 public class HibernateOrmIndexedIT {
+
 	private static final String BACKEND_1 = "backend1";
 	private static final String BACKEND_2 = "backend2";
 
@@ -48,8 +56,31 @@ public class HibernateOrmIndexedIT {
 		BACKEND_CONFIGURATIONS = map;
 	}
 
+	@Parameterized.Parameters(name = "{0}")
+	public static List<?> params() {
+		return Arrays.asList(
+				DocumentationSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS, null ),
+				DocumentationSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS,
+						new HibernateOrmSearchMappingConfigurer() {
+							@Override
+							public void configure(HibernateOrmMappingConfigurationContext context) {
+								ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
+								//tag::programmatic[]
+								TypeMappingStep bookMapping = mapping.type( Book.class );
+								bookMapping.indexed();
+								TypeMappingStep authorMapping = mapping.type( Author.class );
+								authorMapping.indexed().index( "AuthorIndex" );
+								TypeMappingStep userMapping = mapping.type( User.class );
+								userMapping.indexed().backend( "backend2" );
+								//end::programmatic[]
+							}
+						} )
+		);
+	}
+
+	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS );
+	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -84,9 +115,7 @@ public class HibernateOrmIndexedIT {
 
 					// tag::cross-backend-search[]
 					// This will fail because Author and User are indexed in different backends
-					List<Object> hits = searchSession.search(
-									Arrays.asList( Author.class, User.class )
-							)
+					searchSession.search( Arrays.asList( Author.class, User.class ) )
 							.where( f -> f.matchAll() )
 							.fetchHits( 20 );
 					// end::cross-backend-search[]

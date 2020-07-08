@@ -17,6 +17,8 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -30,7 +32,23 @@ public class ContainerExtractorIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
+		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+				BackendConfigurations.simple(),
+				mapping -> {
+					TypeMappingStep bookMapping = mapping.type( Book.class );
+					bookMapping.indexed();
+					//tag::programmatic-extractor[]
+					bookMapping.property( "priceByFormat" )
+							.genericField( "availableFormats" )
+									.extractor( BuiltinContainerExtractors.MAP_KEY );
+					//end::programmatic-extractor[]
+					//tag::programmatic-noExtractors[]
+					bookMapping.property( "authors" )
+							.genericField( "authorCount" )
+									.valueBridge( new MyCollectionSizeBridge() )
+									.noExtractors();
+					//end::programmatic-noExtractors[]
+				} );
 	}
 
 	@Parameterized.Parameter

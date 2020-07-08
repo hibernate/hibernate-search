@@ -177,6 +177,20 @@ also exposes a `getBeanResolver` method to access the bean resolver and instanti
 
 See <<configuration-bean-injection>> for more details.
 
+[[mapper-orm-bridge-typebridge-programmatic]]
+== Programmatic mapping
+
+You can apply a type bridge through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Just pass an instance of the binder. You can pass arguments either through the binder's constructor, or through setters.
+
+.Applying a `TypeBinder` with `.binder(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/TypeBridgeParameterIT.java[tags=programmatic]
+----
+====
+
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]
