@@ -29,6 +29,7 @@ and indexing requires an explicit action.
 [[mapper-orm-indexing-automatic-concepts]]
 == How automatic indexing works
 
+[[mapper-orm-indexing-automatic-concepts-changes-in-session]]
 Changes have to occur in the ORM session in order to be detected::
 Hibernate Search uses internal events of Hibernate ORM in order to detect changes:
 these events will only be triggered if you actually manipulate managed entity objects in your code,
@@ -42,6 +43,7 @@ This is because queries are executed on the database side,
 One workaround is to explicitly reindex after you run such queries,
 either using the  <<mapper-orm-indexing-massindexer,`MassIndexer`>>
 or <<mapper-orm-indexing-manual,manually>>.
+[[mapper-orm-indexing-automatic-concepts-extraction-on-flush]]
 Entity data is retrieved from entities upon session flushes::
 When a Hibernate ORM session is flushed,
 Hibernate Search will extract data from the entities
@@ -57,6 +59,24 @@ you may see this as a significant improvement:
 there is no need to call `flushToIndexes()` and update indexes in the middle of a transaction anymore,
 except for larger volumes of data (see <<mapper-orm-indexing-manual-indexingplan-process-execute>>).
 ====
+[[mapper-orm-indexing-automatic-concepts-session-consistency]]
+Entity data (especially associations) must stay consistent within the session::
+Hibernate Search reads entities _within the same session that updated the entity_.
+Thus, entity data must be consistent when the session is flushed.
+Inconsistent updates, for example associations updated on one side only,
+will lead to Hibernate Search missing pieces of information and not updating the index properly.
++
+In particular, a common (dodgy) practice when creating/updating entities
+with Hibernate ORM is to only update the owning side of associations,
+ignoring the non-owning side.
+Hibernate ORM will generally handle the creation/update just fine,
+because only the owning side of associations is actually modeled in the database.
+Reading the non-owning side of the association later, in another Hibernate ORM session,
+will also work fine, as the non-owning side is derived from the (updated) owning side.
+However, reading the non-owning side of the association _within the same session that updated the entity_
+will expose inconsistencies.
+Thus, the practice of "one-sided association updates" must be avoided when using Hibernate Search.
+[[mapper-orm-indexing-automatic-concepts-transaction-commit]]
 Inside transactions, indexing happens after transactions are committed::
 When entity changes happen inside a transaction,
 indexes are not updated immediately, but only after the transaction is successfully committed.
@@ -69,10 +89,12 @@ be aware that Hibernate Search's internal buffer holding documents to index
 will grow on each flush, and will not be cleared until the transaction is committed or rolled back.
 If you encounter memory issues because of that,
 see <<mapper-orm-indexing-manual-indexingplan-process-execute>> for a few solutions.
+[[mapper-orm-indexing-automatic-concepts-notransaction-flush]]
 Outside of transactions, indexing happens on session flush::
 When entity changes happen outside of any transaction (not recommended),
 indexes are updated immediately upon session `flush()`.
 Without that flush, indexes will not be updated automatically.
+[[mapper-orm-indexing-automatic-concepts-nearrealtime]]
 Index changes may not be visible immediately::
 By default, indexing will resume the application thread after index changes are committed to the indexes.
 This means index changes are safely stored to disk,
@@ -80,6 +102,7 @@ but this does not mean a search query ran immediately after indexing will take t
 when using the Elasticsearch backend in particular, changes may take some time to be visible from search queries.
 +
 See <<mapper-orm-indexing-automatic-synchronization>> for details.
+[[mapper-orm-indexing-automatic-concepts-changes-filter]]
 Only relevant changes trigger indexing::
 Hibernate Search is aware of the properties that are accessed when building indexed documents.
 Thanks to that knowledge, it is able to skip reindexing
@@ -93,6 +116,7 @@ Hibernate Search will consider whether modified properties are relevant
 before triggering reindexing.
 * when set to `false`, Hibernate Search will trigger reindexing upon any change,
 regardless of the entity properties that changed.
+[[mapper-orm-indexing-automatic-concepts-indexing-triggers-lazy-loading]]
 Indexing may fetch extra data from the database::
 Even when you change only a single property of an indexed entity,
 if that property is indexed,
