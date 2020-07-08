@@ -24,7 +24,7 @@ import com.google.gson.JsonPrimitive;
  *
  * @author Yoann Rodiere
  */
-class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition> {
+public class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition> {
 
 	private final Class<D> targetClass;
 	private final Map<String, AnalysisDefinitionFactory<D>> result = new HashMap<>();
@@ -52,7 +52,7 @@ class LuceneAnalysisDefinitionTranslationMapBuilder<D extends AnalysisDefinition
 		return Collections.unmodifiableMap( result );
 	}
 
-	static class SimpleAnalysisDefinitionFactoryBuilder<D extends AnalysisDefinition> {
+	public static class SimpleAnalysisDefinitionFactoryBuilder<D extends AnalysisDefinition> {
 
 		private final LuceneAnalysisDefinitionTranslationMapBuilder<D> parent;
 		private final Class<? extends AbstractAnalysisFactory> luceneClass;

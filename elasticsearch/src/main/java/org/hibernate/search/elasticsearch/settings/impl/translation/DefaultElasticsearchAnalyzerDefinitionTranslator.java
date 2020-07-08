@@ -178,7 +178,7 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 	public void start(Properties properties, BuildContext context) {
 		final ResourceLoader resourceLoader = new HibernateSearchResourceLoader( context.getServiceManager() );
 
-		luceneAnalyzers = new LuceneAnalyzerImplementationTranslationMapBuilder()
+		LuceneAnalyzerImplementationTranslationMapBuilder luceneAnalyzersBuilder = new LuceneAnalyzerImplementationTranslationMapBuilder()
 				.add( StandardAnalyzer.class, "standard" )
 				.add( SimpleAnalyzer.class, "simple" )
 				.add( WhitespaceAnalyzer.class, "whitespace" )
@@ -216,10 +216,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.add( SpanishAnalyzer.class, "spanish" )
 				.add( SwedishAnalyzer.class, "swedish" )
 				.add( TurkishAnalyzer.class, "turkish" )
-				.add( ThaiAnalyzer.class, "thai" )
-				.build();
+				.add( ThaiAnalyzer.class, "thai" );
 
-		luceneCharFilters = new LuceneAnalysisDefinitionTranslationMapBuilder<>( CharFilterDefinition.class )
+		LuceneAnalysisDefinitionTranslationMapBuilder<CharFilterDefinition> luceneCharFiltersBuilder = new LuceneAnalysisDefinitionTranslationMapBuilder<>( CharFilterDefinition.class )
 				.builder( MappingCharFilterFactory.class, "mapping" ) // "mappings" (unmapped) is an array
 						.rename( "mapping", "mappings" )
 						.transform(
@@ -232,10 +231,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.transform( "escapedTags", new SplitArrayParameterValueTransformer( "[\\s,]+", StringParameterValueTransformer.INSTANCE ) )
 				.end()
 				.builder( PatternReplaceCharFilterFactory.class, "pattern_replace" ).end()
-				.addJsonPassThrough( ElasticsearchCharFilterFactory.class )
-				.build();
+				.addJsonPassThrough( ElasticsearchCharFilterFactory.class );
 
-		luceneTokenizers = new LuceneAnalysisDefinitionTranslationMapBuilder<>( TokenizerDefinition.class )
+		LuceneAnalysisDefinitionTranslationMapBuilder<TokenizerDefinition> luceneTokenizersBuilder = new LuceneAnalysisDefinitionTranslationMapBuilder<>( TokenizerDefinition.class )
 				.builder( StandardTokenizerFactory.class, "standard" )
 						.rename( "maxTokenLength", "max_token_length" )
 				.end()
@@ -264,10 +262,9 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 						.rename( "maxTokenLength", "max_token_length" )
 				.end()
 				.builder( ThaiTokenizerFactory.class, "thai" ).end()
-				.addJsonPassThrough( ElasticsearchTokenizerFactory.class )
-				.build();
+				.addJsonPassThrough( ElasticsearchTokenizerFactory.class );
 
-		luceneTokenFilters = new LuceneAnalysisDefinitionTranslationMapBuilder<>( TokenFilterDefinition.class )
+		LuceneAnalysisDefinitionTranslationMapBuilder<TokenFilterDefinition> luceneTokenFiltersBuilder = new LuceneAnalysisDefinitionTranslationMapBuilder<>( TokenFilterDefinition.class )
 				.builder( StandardFilterFactory.class, "standard" ).end()
 				.builder( ASCIIFoldingFilterFactory.class, "asciifolding" )
 						.rename( "preserveOriginal", "preserve_original" )
@@ -504,8 +501,29 @@ public class DefaultElasticsearchAnalyzerDefinitionTranslator implements Elastic
 				.builder( ClassicFilterFactory.class, "classic" ).end()
 				.builder( ApostropheFilterFactory.class, "apostrophe" ).end()
 				.builder( DecimalDigitFilterFactory.class, "decimal_digit" ).end()
-				.addJsonPassThrough( ElasticsearchTokenFilterFactory.class )
-				.build();
+				.addJsonPassThrough( ElasticsearchTokenFilterFactory.class );
+
+		addAnalyzerDefinitions( luceneAnalyzersBuilder, luceneCharFiltersBuilder, luceneTokenizersBuilder, luceneTokenFiltersBuilder );
+
+		luceneAnalyzers = luceneAnalyzersBuilder.build();
+		luceneCharFilters = luceneCharFiltersBuilder.build();
+		luceneTokenizers = luceneTokenizersBuilder.build();
+		luceneTokenFilters = luceneTokenFiltersBuilder.build();
+	}
+
+	/**
+	 * Method for Custom ElasticsearchAnalyzerDefinitions to customize Mapping
+	 *
+	 * @param luceneAnalyzersBuilder Builder for analyzers
+	 * @param luceneCharFiltersBuilder Builder for char filters
+	 * @param luceneTokenizersBuilder Builder for tokenizers
+	 * @param luceneTokenFiltersBuilder Builder for token filters
+	 */
+	protected void addAnalyzerDefinitions(LuceneAnalyzerImplementationTranslationMapBuilder luceneAnalyzersBuilder,
+		LuceneAnalysisDefinitionTranslationMapBuilder<CharFilterDefinition> luceneCharFiltersBuilder,
+		LuceneAnalysisDefinitionTranslationMapBuilder<TokenizerDefinition> luceneTokenizersBuilder,
+		LuceneAnalysisDefinitionTranslationMapBuilder<TokenFilterDefinition> luceneTokenFiltersBuilder) {
+
 	}
 
 	@Override
