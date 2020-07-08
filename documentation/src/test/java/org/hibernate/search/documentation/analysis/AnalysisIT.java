@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.mapper.orm.Search;
@@ -25,7 +26,6 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Assume;
@@ -45,12 +45,12 @@ public class AnalysisIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper;
 
 	private final BackendConfiguration backendConfiguration;
 
 	public AnalysisIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = OrmSetupHelper.withSingleBackend( BACKEND_NAME, backendConfiguration );
+		this.setupHelper = DocumentationSetupHelper.withSingleBackend( BACKEND_NAME, backendConfiguration );
 		this.backendConfiguration = backendConfiguration;
 	}
 

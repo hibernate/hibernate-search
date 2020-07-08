@@ -22,6 +22,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -34,7 +35,6 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Assume;
@@ -61,14 +61,14 @@ public class AggregationDslIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper;
 
 	private BackendConfiguration backendConfiguration;
 
 	private EntityManagerFactory entityManagerFactory;
 
 	public AggregationDslIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
 		this.backendConfiguration = backendConfiguration;
 	}
 

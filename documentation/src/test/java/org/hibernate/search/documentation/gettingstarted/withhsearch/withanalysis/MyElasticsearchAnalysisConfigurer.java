@@ -7,8 +7,8 @@
 // tag::include[]
 package org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 
 public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override

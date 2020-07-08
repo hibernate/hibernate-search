@@ -19,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.mapper.orm.Search;
@@ -28,7 +29,6 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -45,12 +45,12 @@ public class ProjectionConverterIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
 	public ProjectionConverterIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Before

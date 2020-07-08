@@ -7,9 +7,9 @@
 package org.hibernate.search.documentation.gettingstarted.withhsearch.withoutanalysis;
 
 // tag::include[]
+
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

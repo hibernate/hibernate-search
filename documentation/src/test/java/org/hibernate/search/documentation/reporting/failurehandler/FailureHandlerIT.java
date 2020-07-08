@@ -13,10 +13,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
@@ -33,13 +33,13 @@ public class FailureHandlerIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper;
 
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();
 
 	public FailureHandlerIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Test
