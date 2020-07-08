@@ -22,8 +22,6 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescrip
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
@@ -53,12 +51,7 @@ public class SearchMappingIndexedEntitiesIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyNames.SYNC
-				)
-				.setup( Book.class );
+		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}
 
 	@Test
