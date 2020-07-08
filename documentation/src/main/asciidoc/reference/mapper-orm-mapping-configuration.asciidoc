@@ -1,0 +1,40 @@
+[[mapper-orm-mapping-configuration]]
+= Configuration
+
+== Enabling/disabling Hibernate Search
+// Search 5 anchors backward compatibility
+[[search-configuration-event]]
+
+The Hibernate Search integration into Hibernate ORM is enabled by default as soon as it is present in the classpath.
+If for some reason you need to disable it,
+set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
+
+== Configuring the mapping
+
+By default, Hibernate Search will automatically process mapping annotations for entity types,
+as well as nested types in those entity types, for instance embedded types.
+See <<mapper-orm-entityindexmapping>> and <<mapper-orm-directfieldmapping>>
+to get started with annotation-based mapping.
+
+If you want to ignore these annotations, set `hibernate.search.mapping.process_annotations` to `false`.
+
+To configure the mapping manually, you can set a mapping configurer.
+By setting `hibernate.search.mapping.configurer`
+to a <<configuration-property-types,bean reference>> of type `org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer`,
+you can use a programmatic API to define the mapping.
+
+.Implementing a mapping configurer
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/mappingconfigurer/MySearchMappingConfigurer.java[tags=include]
+----
+====
+
+See <<mapper-orm-programmatic-mapping>> for more information about the programmatic mapping API.
+
+== Other configuration properties
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+link:{hibernateSearchJavadocUrl}/org/hibernate/search/mapper/orm/cfg/HibernateOrmMapperSettings.html[org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings].
