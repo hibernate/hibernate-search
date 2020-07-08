@@ -13,6 +13,7 @@ import java.util.Optional;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
@@ -26,7 +27,6 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,12 +43,12 @@ public class SearchMappingIndexedEntitiesIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
 
 	public SearchMappingIndexedEntitiesIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
 	@Before

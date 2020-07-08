@@ -16,19 +16,20 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 public class HibernateOrmIndexedIT {
 	private static final String BACKEND_1 = "backend1";
@@ -50,13 +51,13 @@ public class HibernateOrmIndexedIT {
 	}
 
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS );
 
 	private EntityManagerFactory entityManagerFactory;
 
 	@Before
 	public void setup() {
-		OrmSetupHelper.SetupContext setupContext = setupHelper.start();
+		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
 
 		setupContext.withProperty(
 				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,

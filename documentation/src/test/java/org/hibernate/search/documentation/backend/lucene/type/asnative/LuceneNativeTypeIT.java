@@ -13,12 +13,12 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -29,7 +29,7 @@ import org.apache.lucene.document.FeatureField;
 
 public class LuceneNativeTypeIT {
 	@Rule
-	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( new LuceneBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new LuceneBackendConfiguration() );
 
 	private EntityManagerFactory entityManagerFactory;
 

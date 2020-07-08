@@ -12,11 +12,11 @@ import java.io.IOException;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,8 +29,8 @@ import org.elasticsearch.client.RestClient;
 public class ElasticsearchGetClientIT {
 
 	@Rule
-	public OrmSetupHelper setupHelper =
-			OrmSetupHelper.withSingleBackend( "myBackend", new ElasticsearchBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper =
+			DocumentationSetupHelper.withSingleBackend( "myBackend", new ElasticsearchBackendConfiguration() );
 
 	private EntityManagerFactory entityManagerFactory;
 

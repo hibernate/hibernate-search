@@ -13,12 +13,12 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,8 +29,8 @@ import org.apache.lucene.analysis.Analyzer;
 public class LuceneGetAnalyzerIT {
 
 	@Rule
-	public OrmSetupHelper setupHelper =
-			OrmSetupHelper.withSingleBackend( "myBackend", new LuceneBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper =
+			DocumentationSetupHelper.withSingleBackend( "myBackend", new LuceneBackendConfiguration() );
 
 	private EntityManagerFactory entityManagerFactory;
 
