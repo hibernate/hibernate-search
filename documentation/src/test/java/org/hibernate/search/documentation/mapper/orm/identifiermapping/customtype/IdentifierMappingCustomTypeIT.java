@@ -17,8 +17,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -47,12 +45,7 @@ public class IdentifierMappingCustomTypeIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyNames.SYNC
-				)
-				.setup( Book.class );
+		entityManagerFactory = setupHelper.start().setup( Book.class );
 	}
 
 	@Test

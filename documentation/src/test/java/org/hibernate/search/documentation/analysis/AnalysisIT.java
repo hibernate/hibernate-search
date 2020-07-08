@@ -20,7 +20,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -57,10 +56,6 @@ public class AnalysisIT {
 	@Test
 	public void simple() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyNames.SYNC
-				)
 				.withProperties(
 						backendConfiguration instanceof LuceneBackendConfiguration
 								? "/analysis/lucene-simple.properties"
@@ -124,10 +119,6 @@ public class AnalysisIT {
 		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyNames.SYNC
-				)
 				.withBackendProperty(
 						BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						new AdvancedLuceneAnalysisConfigurer()
@@ -167,10 +158,6 @@ public class AnalysisIT {
 		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyNames.SYNC
-				)
 				.withBackendProperty(
 						BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						new CustomSimilarityLuceneAnalysisConfigurer()
@@ -210,10 +197,6 @@ public class AnalysisIT {
 		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyNames.SYNC
-				)
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new AdvancedElasticsearchAnalysisConfigurer()

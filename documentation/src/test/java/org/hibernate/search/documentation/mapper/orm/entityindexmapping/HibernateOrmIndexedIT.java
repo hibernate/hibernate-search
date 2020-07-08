@@ -18,8 +18,6 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
@@ -57,14 +55,7 @@ public class HibernateOrmIndexedIT {
 
 	@Before
 	public void setup() {
-		DocumentationSetupHelper.SetupContext setupContext = setupHelper.start();
-
-		setupContext.withProperty(
-				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-				AutomaticIndexingSynchronizationStrategyNames.SYNC
-		);
-
-		entityManagerFactory = setupContext.setup( Book.class, User.class, Author.class );
+		entityManagerFactory = setupHelper.start().setup( Book.class, User.class, Author.class );
 		initData();
 	}
 
