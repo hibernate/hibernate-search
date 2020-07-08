@@ -1,0 +1,77 @@
+[[mapper-orm-entityindexmapping]]
+= Entity/index mapping
+
+In order to index an entity, it must be annotated with `@Indexed`.
+
+.Marking a class for indexing with `@Indexed`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/Book.java[tags=indexed-default]
+----
+====
+
+[NOTE]
+====
+Subclasses inherit the `@Indexed` annotation and will also be indexed by default.
+Each indexed subclass will have its own index,
+though this will be transparent when searching
+(<<search-dsl-query-targeting-multiple,all targeted indexes will be queried simultaneously>>).
+
+If the fact that `@Indexed` is inherited is a problem for your application,
+you can annotate subclasses with `@Indexed(enabled = false)`.
+====
+
+By default:
+
+* The index name will be equal to the entity name,
+which in Hibernate ORM is set using the `@Entity` annotation
+and defaults to the simple class name.
+* The index will be created in the default backend.
+See <<getting-started-configuration,the getting stated guide>>
+or <<configuration-structure>> for more information about how to configure backends.
+* The identifier of indexed documents will be generated from the entity identifier.
+Most types commonly used for entity identifiers are supported out of the box,
+but for more exotic types you may need specific configuration.
+See <<mapper-orm-identifiermapping>> for details.
+* The index won't have any field.
+Fields must be mapped to properties explicitly.
+See <<mapper-orm-directfieldmapping>> for details.
+
+You can change the name of the index by setting `@Indexed(index = ...)`.
+Note that index names must be unique in a given application.
+
+.Explicit index name with `@Indexed.index`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/Author.java[tags=indexed-explicitindexname]
+----
+====
+
+If you defined multiple backends, you can map entities to another backend than the default one.
+By setting `@Indexed(backend = "backend2")` you inform Hibernate Search that the index
+for your entity must be created in the backend named "backend2".
+This may be useful if your model has clearly defined sub-parts with very different indexing requirements.
+
+.Explicit backend with `@Indexed.backend`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/User.java[tags=indexed-explicitbackend]
+----
+====
+
+[NOTE]
+====
+Entities indexed in different backends cannot be targeted by the same query.
+For example, with the mappings defined above,
+and assuming "backend2" is not the default backend,
+the following code will throw an exception,
+because `Author` and `User` are indexed in different backends:
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexmapping/HibernateOrmIndexedIT.java[tags=cross-backend-search]
+----
+====
