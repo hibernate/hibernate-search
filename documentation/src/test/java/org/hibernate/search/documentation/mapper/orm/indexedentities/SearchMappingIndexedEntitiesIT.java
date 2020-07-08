@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.indexedentities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManagerFactory;
 
@@ -24,7 +25,6 @@ import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescript
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,18 +36,15 @@ import org.junit.runners.Parameterized;
 public class SearchMappingIndexedEntitiesIT {
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
-
-	public SearchMappingIndexedEntitiesIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Before
 	public void setup() {

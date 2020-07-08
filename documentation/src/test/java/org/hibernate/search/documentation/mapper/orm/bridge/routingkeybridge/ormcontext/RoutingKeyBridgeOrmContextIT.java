@@ -16,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -31,18 +30,15 @@ public class RoutingKeyBridgeOrmContextIT {
 	private static final int SHARD_COUNT = 4;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendConfigurations.hashBasedSharding( SHARD_COUNT ).toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
-
-	public RoutingKeyBridgeOrmContextIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Before
 	public void setup() {

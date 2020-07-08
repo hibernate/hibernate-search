@@ -32,19 +32,15 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
-import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchTimeoutException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.stat.Statistics;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,21 +68,15 @@ public class QueryDslIT {
 	private static final int ASSOCIATE2_ID = 2;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
-	private final BackendConfiguration backendConfiguration;
-
 	private EntityManagerFactory entityManagerFactory;
-
-	public QueryDslIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-		this.backendConfiguration = backendConfiguration;
-	}
 
 	@Before
 	public void setup() {
@@ -316,7 +306,7 @@ public class QueryDslIT {
 
 	@Test
 	public void explain_lucene() {
-		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+		setupHelper.assumeLucene();
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -344,7 +334,7 @@ public class QueryDslIT {
 
 	@Test
 	public void explain_elasticsearch() {
-		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+		setupHelper.assumeElasticsearch();
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -534,7 +524,7 @@ public class QueryDslIT {
 
 	@Test
 	public void json_elasticsearch() {
-		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+		setupHelper.assumeElasticsearch();
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -598,7 +588,7 @@ public class QueryDslIT {
 
 	@Test
 	public void lucene_lowLevel() {
-		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+		setupHelper.assumeLucene();
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );

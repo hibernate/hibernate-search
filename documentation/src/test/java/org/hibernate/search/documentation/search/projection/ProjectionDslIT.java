@@ -22,8 +22,6 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
-import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -35,10 +33,8 @@ import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,21 +59,15 @@ public class ProjectionDslIT {
 	private static final int BOOK4_ID = 4;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
-	private BackendConfiguration backendConfiguration;
-
 	private EntityManagerFactory entityManagerFactory;
-
-	public ProjectionDslIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-		this.backendConfiguration = backendConfiguration;
-	}
 
 	@Before
 	public void setup() {
@@ -393,7 +383,7 @@ public class ProjectionDslIT {
 
 	@Test
 	public void lucene() {
-		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+		setupHelper.assumeLucene();
 
 		withinSearchSession( searchSession -> {
 			// tag::lucene-document[]
@@ -420,7 +410,7 @@ public class ProjectionDslIT {
 
 	@Test
 	public void elasticsearch() {
-		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+		setupHelper.assumeElasticsearch();
 
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-source[]
@@ -447,7 +437,7 @@ public class ProjectionDslIT {
 
 	@Test
 	public void elasticsearch_jsonHit() {
-		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+		setupHelper.assumeElasticsearch();
 
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-jsonHit[]

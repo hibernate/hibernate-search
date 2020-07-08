@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.si
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -15,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -35,18 +35,15 @@ public class RoutingKeyBridgeSimpleIT {
 	private static final int BOOK4_ID = 4;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendSetups() {
-		return BackendConfigurations.hashBasedSharding( SHARD_COUNT ).toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
-
-	public RoutingKeyBridgeSimpleIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Before
 	public void setup() {
