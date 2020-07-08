@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 // tag::indexed-default[]
@@ -23,7 +22,6 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "english")
 	private String title;
 
 	public Book() {

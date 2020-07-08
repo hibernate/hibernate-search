@@ -22,7 +22,6 @@ import javax.persistence.OrderBy;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -38,7 +37,6 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "name")
 	private String title;
 
 	@ElementCollection // <1>

@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
@@ -25,7 +24,6 @@ public class Book {
 	@Id
 	private Integer id;
 
-	@FullTextField(analyzer = "english")
 	private String title;
 
 	@Basic(optional = false)

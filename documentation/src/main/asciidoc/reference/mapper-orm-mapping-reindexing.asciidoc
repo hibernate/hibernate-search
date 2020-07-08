@@ -147,3 +147,33 @@ Thus we use `@IndexingDependency.reindexOnUpdate` to tell Hibernate Search that 
 should not be reindexed when the content of a `BookCategory` changes.
 If we rename a `BookCategory`, we will need to reindex the corresponding books manually.
 ====
+
+[[mapper-orm-reindexing-programmatic]]
+== Programmatic mapping
+
+You can control reindexing through through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Mapping the inverse side of an association with `.associationInverseSide(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/associationinverseside/AssociationInverseSideIT.java[tags=programmatic]
+----
+====
+
+.Mapping a derived value with `.indexingDependency().derivedFrom(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/derivedfrom/DerivedFromIT.java[tags=programmatic]
+----
+====
+
+.Disabling automatic reindexing with `.indexingDependency().reindexOnUpdate(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/ReindexOnUpdateIT.java[tags=programmatic]
+----
+====

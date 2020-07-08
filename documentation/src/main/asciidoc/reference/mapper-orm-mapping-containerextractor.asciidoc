@@ -28,7 +28,7 @@ as shown in the example below.
 TIP: All built-in extractor names are available as constants
 in `org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors`.
 
-.Mapping map keys to an index field using explicit container extractor definition
+.Mapping `Map` keys to an index field using explicit container extractor definition
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -75,4 +75,31 @@ which will extract the collection size (the number of authors).
 <3> Because the bridge is applied to the collection as a whole,
 and not to each author,
 the `extraction` attribute is used to disable container extraction.
+====
+
+[[mapper-orm-containerextractor-programmatic]]
+== Programmatic mapping
+
+You can pick the container extractors to use explicitly
+when defining <<mapper-orm-directfieldmapping-programmatic,fields>>
+or <<mapper-orm-indexedembedded-programmatic,indexed-embeddeds>>
+through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Mapping `Map` keys to an index field using `.extractor(...)`/`.extactors(...)` for explicit container extractor definition
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/ContainerExtractorIT.java[tags=programmatic-extractor]
+----
+====
+
+Similarly, you can disable container extraction.
+
+.Disabling container extraction with `.noExtractors()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/containerextractor/ContainerExtractorIT.java[tags=programmatic-noExtractors]
+----
 ====

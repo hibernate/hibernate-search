@@ -16,6 +16,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -36,7 +37,16 @@ public class RoutingKeyBridgeSimpleIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
+		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+				BackendConfigurations.hashBasedSharding( SHARD_COUNT ),
+				mapping -> {
+					//tag::programmatic[]
+					TypeMappingStep bookMapping = mapping.type( Book.class );
+					bookMapping.indexed();
+					bookMapping.routingKeyBinder( new BookGenreRoutingKeyBinder() );
+					bookMapping.property( "genre" ).keywordField();
+					//end::programmatic[]
+				} );
 	}
 
 	@Parameterized.Parameter

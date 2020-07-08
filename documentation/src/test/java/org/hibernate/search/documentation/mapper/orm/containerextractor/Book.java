@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -35,7 +34,6 @@ public class Book {
 	@Id
 	private Integer id;
 
-	@FullTextField(analyzer = "name")
 	private String title;
 
 	// tag::no-extractor[]

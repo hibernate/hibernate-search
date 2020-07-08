@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 // tag::include[]
@@ -25,7 +24,6 @@ public class Book {
 	)
 	private BookId id = new BookId();
 
-	@FullTextField(analyzer = "english")
 	private String title;
 
 	// Getters and setters

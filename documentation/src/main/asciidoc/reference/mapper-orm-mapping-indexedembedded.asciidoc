@@ -452,3 +452,23 @@ will behave as one would (intuitively) expect.
 The book given in example
 would *not* show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
 as long as a `nested` predicate is used.
+
+[[mapper-orm-indexedembedded-programmatic]]
+== Programmatic mapping
+
+You can embed the fields of an associated object into the main object
+through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Using `.indexedEmbedded()` to index associated elements
+====
+This mapping will declare the following fields in the `Book` index:
+
+* `title`
+* `authors.name`
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedded/onelevel/IndexedEmbeddedOneLevelIT.java[tags=programmatic]
+----
+====

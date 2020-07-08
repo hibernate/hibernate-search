@@ -109,6 +109,20 @@ also exposes a `getBeanResolver` method to access the bean resolver and instanti
 
 See <<configuration-bean-injection>> for more details.
 
+[[mapper-orm-bridge-routingkeybridge-programmatic]]
+== Programmatic mapping
+
+You can apply a routing key bridge through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Just pass an instance of the binder.
+
+.Applying an `RoutingKeyBinder` with `.binder(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/routingkeybridge/simple/RoutingKeyBridgeSimpleIT.java[tags=programmatic]
+----
+====
+
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]

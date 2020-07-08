@@ -14,8 +14,11 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -40,7 +43,21 @@ public class HibernateOrmSimpleMappingIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
+		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+				BackendConfigurations.simple(),
+				mapping -> {
+					//tag::programmatic[]
+					TypeMappingStep bookMapping = mapping.type( Book.class );
+					bookMapping.indexed();
+					bookMapping.property( "title" )
+							.fullTextField()
+									.analyzer( "english" ).projectable( Projectable.YES )
+							.keywordField( "title_sort" )
+									.normalizer( "english" ).sortable( Sortable.YES );
+					bookMapping.property( "pageCount" )
+							.genericField().projectable( Projectable.YES ).sortable( Sortable.YES );
+					//end::programmatic[]
+				} );
 	}
 
 	@Parameterized.Parameter

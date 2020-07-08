@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.documentation.testsupport;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
@@ -40,6 +44,21 @@ public final class DocumentationSetupHelper
 				.collect( Collectors.toList() );
 	}
 
+	public static List<DocumentationSetupHelper> testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+			List<BackendConfiguration> backendConfigurations,
+			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
+		HibernateOrmSearchMappingConfigurer mappingConfigurer =
+				context -> programmaticMappingContributor.accept( context.programmaticMapping() );
+		List<DocumentationSetupHelper> result = new ArrayList<>();
+		for ( BackendConfiguration configuration : backendConfigurations ) {
+			// Annotation-based mapping
+			result.add( withSingleBackend( DEFAULT_BACKEND_NAME, configuration, null ) );
+			// Programmatic mapping
+			result.add( withSingleBackend( DEFAULT_BACKEND_NAME, configuration, mappingConfigurer ) );
+		}
+		return result;
+	}
+
 	public static DocumentationSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
 		return withSingleBackend( DEFAULT_BACKEND_NAME, backendConfiguration );
 	}
@@ -47,34 +66,51 @@ public final class DocumentationSetupHelper
 	public static DocumentationSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
 		return new DocumentationSetupHelper(
 				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
-				backendConfiguration
+				backendConfiguration,
+				null
+		);
+	}
+
+	public static DocumentationSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration,
+			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
+		return new DocumentationSetupHelper(
+				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
+				backendConfiguration,
+				mappingConfigurerOrNull
 		);
 	}
 
 	public static DocumentationSetupHelper withMultipleBackends(String defaultBackendName,
-			Map<String, BackendConfiguration> backendConfigurations) {
+			Map<String, BackendConfiguration> backendConfigurations,
+			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
 		return new DocumentationSetupHelper(
 				BackendSetupStrategy.withMultipleBackends( defaultBackendName, backendConfigurations ),
-				backendConfigurations.get( defaultBackendName )
+				backendConfigurations.get( defaultBackendName ),
+				mappingConfigurerOrNull
 		);
 	}
 
 	private final BackendConfiguration defaultBackendConfiguration;
 
+	private final HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull;
+
 	private DocumentationSetupHelper(BackendSetupStrategy backendSetupStrategy,
-			BackendConfiguration defaultBackendConfiguration) {
+			BackendConfiguration defaultBackendConfiguration,
+			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
 		super( backendSetupStrategy );
 		this.defaultBackendConfiguration = defaultBackendConfiguration;
+		this.mappingConfigurerOrNull = mappingConfigurerOrNull;
 	}
 
 	@Override
 	public String toString() {
-		return defaultBackendConfiguration.toString();
+		return defaultBackendConfiguration.toString()
+				+ (mappingConfigurerOrNull != null ? " - programmatic mapping" : "");
 	}
 
 	@Override
 	protected SetupContext createSetupContext() {
-		return new SetupContext();
+		return new SetupContext( mappingConfigurerOrNull );
 	}
 
 	@Override
@@ -104,13 +140,18 @@ public final class DocumentationSetupHelper
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
-		SetupContext() {
+		SetupContext(HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
 			// Real backend => ensure we clean up everything before and after the tests
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY,
 					SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP );
 			// Override the automatic indexing synchronization strategy according to our needs for testing
 			withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 					AutomaticIndexingSynchronizationStrategyNames.SYNC );
+			// Set up programmatic mapping if necessary
+			if ( mappingConfigurerOrNull != null ) {
+				withProperty( HibernateOrmMapperSettings.MAPPING_PROCESS_ANNOTATIONS, false );
+				withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, mappingConfigurerOrNull );
+			}
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}

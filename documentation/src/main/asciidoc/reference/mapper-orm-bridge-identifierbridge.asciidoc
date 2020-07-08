@@ -215,6 +215,30 @@ also exposes a `getBeanResolver` method to access the bean resolver and instanti
 
 See <<configuration-bean-injection>> for more details.
 
+[[mapper-orm-bridge-identifierbridge-programmatic]]
+== Programmatic mapping
+
+You can apply an identifier bridge through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Just pass an instance of the bridge.
+
+.Applying an `IdentifierBridge` with `.identifierBridge(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/simple/IdentifierBridgeSimpleIT.java[tags=programmatic]
+----
+====
+
+Similarly, you can pass a binder instance:
+
+.Applying an `IdentifierBinder` with `.identifierBinder(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/binder/IdentifierBinderIT.java[tags=programmatic]
+----
+====
+
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]

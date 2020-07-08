@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 //tag::include[]
@@ -26,7 +25,6 @@ public class Author {
 	@GeneratedValue
 	private Integer id;
 
-	@FullTextField(analyzer = "name")
 	private String name;
 
 	@Latitude // <2>

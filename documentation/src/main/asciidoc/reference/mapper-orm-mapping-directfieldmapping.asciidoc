@@ -468,3 +468,18 @@ then what you need is a container extractor.
 See <<mapper-orm-containerextractor>> for more information.
 2. Otherwise, you will have to rely on a custom component, called a bridge, to extract data from your type.
 See <<mapper-orm-bridge>> for more information on custom bridges.
+
+[[mapper-orm-directfieldmapping-programmatic]]
+== Programmatic mapping
+
+You can map properties of an entity to an index field directly
+through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Mapping properties to fields directly with `.genericField()`, `.fullTextField()`, ...
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/HibernateOrmSimpleMappingIT.java[tags=programmatic]
+----
+====

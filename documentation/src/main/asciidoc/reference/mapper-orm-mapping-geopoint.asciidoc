@@ -36,7 +36,7 @@ When geo-points are represented in your entity model by a dedicated, *immutable*
 you can simply make that type implement the `GeoPoint` interface,
 and use simple <<mapper-orm-directfieldmapping,property/field mapping>> with `@GenericField`:
 
-.Mapping spatial coordinates by implementing `GeoPoint`
+.Mapping spatial coordinates by implementing `GeoPoint` and using `@GenericField`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -144,4 +144,26 @@ Set the `markerSet` attribute to the same value as the corresponding `@GeoPointB
 Set the `markerSet` attribute to the same value as the corresponding `@GeoPointBinding` annotation.
 <6> Apply `@Longitude` to the property holding the longitude for the second geo-point field.
 Set the `markerSet` attribute to the same value as the corresponding `@GeoPointBinding` annotation.
+====
+
+[[mapper-orm-geopoint-programmatic]]
+== Programmatic mapping
+
+You can map geo-point fields document identifier through the <<mapper-orm-programmatic-mapping,programmatic mapping>> too.
+Behavior and options are identical to annotation-based mapping.
+
+.Mapping spatial coordinates by implementing `GeoPoint` and using `.genericField()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/genericfield/GeoPointGenericFieldIT.java[tags=programmatic]
+----
+====
+
+.Mapping spatial coordinates using `GeoPointBinder`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/spatial/geopointbinding/type/GeoPointBindingTypeIT.java[tags=programmatic]
+----
 ====
