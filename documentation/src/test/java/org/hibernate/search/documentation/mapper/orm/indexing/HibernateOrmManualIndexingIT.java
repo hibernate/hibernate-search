@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -19,7 +20,6 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
@@ -35,16 +35,13 @@ public class HibernateOrmManualIndexingIT {
 	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
-
-	public HibernateOrmManualIndexingIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Test
 	public void persist_automaticIndexing_periodicFlushClear() {

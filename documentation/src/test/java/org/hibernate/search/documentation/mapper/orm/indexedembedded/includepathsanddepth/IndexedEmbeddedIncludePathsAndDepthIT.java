@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -32,18 +31,15 @@ import org.assertj.core.api.Assertions;
 public class IndexedEmbeddedIncludePathsAndDepthIT {
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
-
-	public IndexedEmbeddedIncludePathsAndDepthIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Before
 	public void setup() {

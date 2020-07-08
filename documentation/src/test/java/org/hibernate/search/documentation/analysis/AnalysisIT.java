@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
@@ -17,17 +18,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
-import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,25 +36,19 @@ public class AnalysisIT {
 	private static final String BACKEND_NAME = "myBackend"; // Don't change, the same name is used in property files
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BACKEND_NAME, BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
-
-	private final BackendConfiguration backendConfiguration;
-
-	public AnalysisIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( BACKEND_NAME, backendConfiguration );
-		this.backendConfiguration = backendConfiguration;
-	}
 
 	@Test
 	public void simple() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperties(
-						backendConfiguration instanceof LuceneBackendConfiguration
+						setupHelper.isLucene()
 								? "/analysis/lucene-simple.properties"
 								: "/analysis/elasticsearch-simple.properties"
 				)
@@ -116,7 +107,7 @@ public class AnalysisIT {
 
 	@Test
 	public void lucene_advanced() {
-		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+		setupHelper.assumeLucene();
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
@@ -155,7 +146,7 @@ public class AnalysisIT {
 
 	@Test
 	public void lucene_similarity() {
-		Assume.assumeTrue( backendConfiguration instanceof LuceneBackendConfiguration );
+		setupHelper.assumeLucene();
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
@@ -194,7 +185,7 @@ public class AnalysisIT {
 
 	@Test
 	public void elasticsearch_advanced() {
-		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+		setupHelper.assumeElasticsearch();
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(

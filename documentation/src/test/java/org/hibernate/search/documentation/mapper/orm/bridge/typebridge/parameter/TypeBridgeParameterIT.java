@@ -16,7 +16,6 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -28,18 +27,15 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class TypeBridgeParameterIT {
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
 
 	private EntityManagerFactory entityManagerFactory;
-
-	public TypeBridgeParameterIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Before
 	public void setup() {

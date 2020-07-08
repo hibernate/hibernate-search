@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
@@ -36,16 +35,13 @@ public class HibernateOrmAutomaticIndexingIT {
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[] backendConfigurations() {
-		return BackendConfigurations.simple().toArray();
+	public static List<?> params() {
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
+	@Parameterized.Parameter
 	@Rule
 	public DocumentationSetupHelper setupHelper;
-
-	public HibernateOrmAutomaticIndexingIT(BackendConfiguration backendConfiguration) {
-		this.setupHelper = DocumentationSetupHelper.withSingleBackend( backendConfiguration );
-	}
 
 	@Test
 	public void synchronizationStrategyOverride() {

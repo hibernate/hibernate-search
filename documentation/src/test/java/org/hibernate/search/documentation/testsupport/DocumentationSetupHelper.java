@@ -8,7 +8,9 @@ package org.hibernate.search.documentation.testsupport;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
@@ -19,10 +21,24 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupSt
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
+import org.junit.Assume;
+
 public final class DocumentationSetupHelper
 		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
 	private static final String DEFAULT_BACKEND_NAME = "backendName";
+
+	public static List<DocumentationSetupHelper> testParamsWithSingleBackend(
+			List<BackendConfiguration> backendConfigurations) {
+		return testParamsWithSingleBackend( DEFAULT_BACKEND_NAME, backendConfigurations );
+	}
+
+	public static List<DocumentationSetupHelper> testParamsWithSingleBackend(String backendName,
+			List<BackendConfiguration> backendConfigurations) {
+		return backendConfigurations.stream()
+				.map( config -> withSingleBackend( backendName, config ) )
+				.collect( Collectors.toList() );
+	}
 
 	public static DocumentationSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
 		return withSingleBackend( DEFAULT_BACKEND_NAME, backendConfiguration );
@@ -30,19 +46,30 @@ public final class DocumentationSetupHelper
 
 	public static DocumentationSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
 		return new DocumentationSetupHelper(
-				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration )
+				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
+				backendConfiguration
 		);
 	}
 
 	public static DocumentationSetupHelper withMultipleBackends(String defaultBackendName,
 			Map<String, BackendConfiguration> backendConfigurations) {
 		return new DocumentationSetupHelper(
-				BackendSetupStrategy.withMultipleBackends( defaultBackendName, backendConfigurations )
+				BackendSetupStrategy.withMultipleBackends( defaultBackendName, backendConfigurations ),
+				backendConfigurations.get( defaultBackendName )
 		);
 	}
 
-	private DocumentationSetupHelper(BackendSetupStrategy backendSetupStrategy) {
+	private final BackendConfiguration defaultBackendConfiguration;
+
+	private DocumentationSetupHelper(BackendSetupStrategy backendSetupStrategy,
+			BackendConfiguration defaultBackendConfiguration) {
 		super( backendSetupStrategy );
+		this.defaultBackendConfiguration = defaultBackendConfiguration;
+	}
+
+	@Override
+	public String toString() {
+		return defaultBackendConfiguration.toString();
 	}
 
 	@Override
@@ -53,6 +80,22 @@ public final class DocumentationSetupHelper
 	@Override
 	protected void close(SessionFactory toClose) {
 		toClose.close();
+	}
+
+	public boolean isElasticsearch() {
+		return defaultBackendConfiguration instanceof ElasticsearchBackendConfiguration;
+	}
+
+	public boolean isLucene() {
+		return defaultBackendConfiguration instanceof LuceneBackendConfiguration;
+	}
+
+	public void assumeElasticsearch() {
+		Assume.assumeTrue( isElasticsearch() );
+	}
+
+	public void assumeLucene() {
+		Assume.assumeTrue( isLucene() );
 	}
 
 	public final class SetupContext
