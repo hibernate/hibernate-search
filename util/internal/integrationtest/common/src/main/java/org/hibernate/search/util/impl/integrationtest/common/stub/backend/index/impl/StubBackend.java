@@ -20,10 +20,12 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 public class StubBackend implements BackendImplementor, Backend {
 
 	private final String name;
+	private final StubBackendBehavior behavior;
 
-	StubBackend(String name, BackendBuildContext context) {
+	StubBackend(String name, BackendBuildContext context, StubBackendBehavior behavior) {
 		this.name = name;
-		getBehavior().onCreateBackend( context );
+		this.behavior = behavior;
+		behavior.onCreateBackend( context );
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class StubBackend implements BackendImplementor, Backend {
 
 	@Override
 	public void stop() {
-		getBehavior().onStopBackend();
+		behavior.onStopBackend();
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class StubBackend implements BackendImplementor, Backend {
 	}
 
 	public StubBackendBehavior getBehavior() {
-		return StubBackendBehavior.get( name );
+		return behavior;
 	}
 
 	@Override

@@ -11,7 +11,6 @@ import java.util.List;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
 class BackendMockSetupStrategy implements BackendSetupStrategy {
 	private final String defaultBackendName;
@@ -27,9 +26,8 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider) {
 		for ( BackendMock backendMock : backendMocks ) {
-			setupContext = setupContext.withBackendProperty(
-					backendMock.getBackendName(), "type", StubBackendFactory.class.getName()
-			);
+			setupContext = setupContext.withBackendProperty( backendMock.getBackendName(),
+					"type", backendMock.factory() );
 		}
 		return setupContext.withProperty( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
 	}

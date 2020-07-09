@@ -17,18 +17,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 
 import org.junit.rules.TestRule;
@@ -42,7 +43,10 @@ public class BackendMock implements TestRule {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String backendName;
-	private final VerifyingStubBackendBehavior behaviorMock = new VerifyingStubBackendBehavior();
+
+	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior();
+
+	private boolean started = false;
 
 	public BackendMock() {
 		this( "stubBackend" );
@@ -61,47 +65,43 @@ public class BackendMock implements TestRule {
 		return new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				setup();
+				started = true;
 				try {
 					base.evaluate();
 					verifyExpectationsMet();
 				}
 				finally {
 					resetExpectations();
-					tearDown();
+					started = false;
 				}
 			}
 		};
 	}
 
+	public StubBackendFactory factory() {
+		return new StubBackendFactory( backendBehavior );
+	}
+
 	public void resetExpectations() {
-		behaviorMock.resetExpectations();
+		backendBehavior().resetExpectations();
 	}
 
 	public void verifyExpectationsMet() {
-		behaviorMock.verifyExpectationsMet();
-	}
-
-	private void setup() {
-		StubBackendBehavior.set( backendName, behaviorMock );
-	}
-
-	private void tearDown() {
-		StubBackendBehavior.unset( backendName, behaviorMock );
+		backendBehavior().verifyExpectationsMet();
 	}
 
 	public void inLenientMode(Runnable action) {
-		behaviorMock.setLenient( true );
+		backendBehavior().setLenient( true );
 		try {
 			action.run();
 		}
 		finally {
-			behaviorMock.setLenient( false );
+			backendBehavior().setLenient( false );
 		}
 	}
 
 	public BackendMock onCreate(Consumer<BackendBuildContext> behavior) {
-		behaviorMock.addCreateBackendBehavior( context -> {
+		backendBehavior().addCreateBackendBehavior( context -> {
 			behavior.accept( context );
 			return null;
 		} );
@@ -109,7 +109,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock onStop(Runnable behavior) {
-		behaviorMock.addStopBackendBehavior( () -> {
+		backendBehavior().addStopBackendBehavior( () -> {
 			behavior.run();
 			return null;
 		} );
@@ -118,7 +118,7 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectFailingField(String indexName, String absoluteFieldPath,
 			Supplier<RuntimeException> exceptionSupplier) {
-		behaviorMock.setIndexFieldAddBehavior( indexName, absoluteFieldPath, () -> {
+		backendBehavior().setIndexFieldAddBehavior( indexName, absoluteFieldPath, () -> {
 			throw exceptionSupplier.get();
 		} );
 		return this;
@@ -130,7 +130,7 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor,
 			Capture<StubIndexSchemaNode> capture) {
-		CallQueue<SchemaDefinitionCall> callQueue = behaviorMock.getSchemaDefinitionCalls( indexName );
+		CallQueue<SchemaDefinitionCall> callQueue = backendBehavior().getSchemaDefinitionCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
 		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, builder.build(), capture ) );
@@ -138,13 +138,13 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectAnySchema(String indexName) {
-		CallQueue<SchemaDefinitionCall> callQueue = behaviorMock.getSchemaDefinitionCalls( indexName );
+		CallQueue<SchemaDefinitionCall> callQueue = backendBehavior().getSchemaDefinitionCalls( indexName );
 		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, null ) );
 		return this;
 	}
 
 	public SchemaManagementWorkCallListContext expectSchemaManagementWorks(String indexName) {
-		CallQueue<SchemaManagementWorkCall> callQueue = behaviorMock.getSchemaManagementWorkCalls( indexName );
+		CallQueue<SchemaManagementWorkCall> callQueue = backendBehavior().getSchemaManagementWorkCalls( indexName );
 		return new SchemaManagementWorkCallListContext(
 				indexName,
 				callQueue::expectInOrder
@@ -159,7 +159,7 @@ public class BackendMock implements TestRule {
 	public DocumentWorkCallListContext expectWorks(String indexName,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
-		CallQueue<DocumentWorkCall> callQueue = behaviorMock.getDocumentWorkCalls( indexName );
+		CallQueue<DocumentWorkCall> callQueue = backendBehavior().getDocumentWorkCalls( indexName );
 		return new DocumentWorkCallListContext(
 				indexName,
 				commitStrategy, refreshStrategy,
@@ -170,7 +170,7 @@ public class BackendMock implements TestRule {
 	public DocumentWorkCallListContext expectWorksAnyOrder(String indexName,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
-		CallQueue<DocumentWorkCall> callQueue = behaviorMock.getDocumentWorkCalls( indexName );
+		CallQueue<DocumentWorkCall> callQueue = backendBehavior().getDocumentWorkCalls( indexName );
 		return new DocumentWorkCallListContext(
 				indexName,
 				commitStrategy, refreshStrategy,
@@ -183,7 +183,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String tenantId) {
-		CallQueue<IndexScaleWorkCall> callQueue = behaviorMock.getIndexScaleWorkCalls();
+		CallQueue<IndexScaleWorkCall> callQueue = backendBehavior().getIndexScaleWorkCalls();
 		return new IndexScaleWorkCallListContext(
 				indexName, tenantId,
 				callQueue::expectInOrder
@@ -217,7 +217,7 @@ public class BackendMock implements TestRule {
 
 	private BackendMock expectSearch(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWork.ResultType resultType, StubSearchWorkBehavior<?> behavior) {
-		CallQueue<SearchWorkCall<?>> callQueue = behaviorMock.getSearchWorkCalls();
+		CallQueue<SearchWorkCall<?>> callQueue = backendBehavior().getSearchWorkCalls();
 		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
 		contributor.accept( builder );
 		callQueue.expectInOrder( new SearchWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), behavior ) );
@@ -225,9 +225,19 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectCount(Collection<String> indexNames, long expectedResult) {
-		CallQueue<CountWorkCall> callQueue = behaviorMock.getCountWorkCalls();
+		CallQueue<CountWorkCall> callQueue = backendBehavior().getCountWorkCalls();
 		callQueue.expectInOrder( new CountWorkCall( new LinkedHashSet<>( indexNames ), expectedResult ) );
 		return this;
+	}
+
+	private VerifyingStubBackendBehavior backendBehavior() {
+		if ( !started ) {
+			throw new AssertionFailure( "The backend mock was not configured as a JUnit @Rule/@ClassRule,"
+					+ " or its statement wrapper hasn't started executing yet,"
+					+ " or its statement wrapper has finished executing."
+					+ " Double check the @Rule/@ClassRule annotations and the execution order of rules." );
+		}
+		return backendBehavior;
 	}
 
 	public static class SchemaManagementWorkCallListContext {
