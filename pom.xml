@@ -156,9 +156,9 @@
         <module>util/common</module>
         <module>util/internal/test</module>
         <module>engine</module>
+        <module>backend/lucene</module>
         <module>backend/elasticsearch</module>
         <module>backend/elasticsearch-aws</module>
-        <module>backend/lucene</module>
         <module>mapper/pojo-base</module>
         <module>mapper/javabean</module>
         <module>mapper/orm</module>
