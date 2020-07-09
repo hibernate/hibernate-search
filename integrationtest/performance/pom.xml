@@ -14,8 +14,8 @@
 
     <modules>
         <module>backend/base</module>
-        <module>backend/elasticsearch</module>
         <module>backend/lucene</module>
+        <module>backend/elasticsearch</module>
     </modules>
 
     <dependencyManagement>
