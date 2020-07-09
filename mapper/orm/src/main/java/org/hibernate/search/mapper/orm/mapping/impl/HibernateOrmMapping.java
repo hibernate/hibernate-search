@@ -230,6 +230,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public Backend backend() {
+		return searchIntegration().backend();
+	}
+
+	@Override
 	public Backend backend(String backendName) {
 		return searchIntegration().backend( backendName );
 	}

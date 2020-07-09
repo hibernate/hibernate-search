@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 
 public class StubBackendFactory implements BackendFactory {
@@ -21,7 +22,8 @@ public class StubBackendFactory implements BackendFactory {
 	}
 
 	@Override
-	public BackendImplementor create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource) {
-		return new StubBackend( name, context, behavior );
+	public BackendImplementor create(EventContext eventContext, BackendBuildContext context,
+			ConfigurationPropertySource propertySource) {
+		return new StubBackend( eventContext, context, behavior );
 	}
 }

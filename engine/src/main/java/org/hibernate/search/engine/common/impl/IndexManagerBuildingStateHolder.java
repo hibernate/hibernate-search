@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -33,7 +34,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 class IndexManagerBuildingStateHolder {
@@ -71,24 +72,20 @@ class IndexManagerBuildingStateHolder {
 					defaultBackendName );
 		}
 		else {
-			defaultBackendName = "default";
+			defaultBackendName = null;
 		}
 	}
 
 	void createBackends(Set<Optional<String>> backendNames) {
-		if ( backendNames.remove( Optional.<String>empty() ) ) {
-			backendNames.add( Optional.of( defaultBackendName ) );
-		}
 		for ( Optional<String> backendNameOptional : backendNames ) {
-			String backendName = backendNameOptional.get(); // Never empty, see above
+			String backendName = backendNameOptional.orElse( defaultBackendName );
+			EventContext eventContext = EventContexts.fromBackendName( backendName );
 			BackendInitialBuildState backendBuildState;
 			try {
-				backendBuildState = createBackend( backendName );
+				backendBuildState = createBackend( backendNameOptional, eventContext );
 			}
 			catch (RuntimeException e) {
-				rootBuildContext.getFailureCollector()
-						.withContext( EventContexts.fromBackendName( backendName ) )
-						.add( e );
+				rootBuildContext.getFailureCollector().withContext( eventContext ).add( e );
 				continue;
 			}
 			backendBuildStateByName.put( backendName, backendBuildState );
@@ -135,49 +132,38 @@ class IndexManagerBuildingStateHolder {
 		closer.pushAll( BackendInitialBuildState::closeOnFailure, backendBuildStateByName.values() );
 	}
 
-	private BackendInitialBuildState createBackend(String backendName) {
-		ConfigurationPropertySource backendPropertySource;
-		if ( backendName.equals( defaultBackendName ) ) {
-			backendPropertySource = EngineConfigurationUtils.getDefaultBackend( propertySource )
-					// Fall back to the syntax "hibernate.search.backends.default.foo".
-					// Mostly supported for consistency and backward compatibility.
-					// Ideally, we'd drop it, but that may be surprising since the default backend does have a name.
-					.withFallback( EngineConfigurationUtils.getBackendByName( propertySource, backendName ) );
-		}
-		else {
-			backendPropertySource = EngineConfigurationUtils.getBackendByName( propertySource, backendName );
-		}
+	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, EventContext eventContext) {
+		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
+				EngineConfigurationUtils.extractorForBackend( backendNameOptional, defaultBackendName );
+		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.getAndMapOrThrow(
 						backendPropertySource,
 						beanResolver::resolve,
-						key -> log.backendTypeCannotBeNullOrEmpty( backendName, key )
+						log::backendTypeCannotBeNullOrEmpty
 				) ) {
 			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
 			BackendImplementor backend = backendFactoryHolder.get()
-					.create( backendName, backendBuildContext, backendPropertySource );
-			return new BackendInitialBuildState( backendName, backendBuildContext, backendPropertySource, backend );
+					.create( eventContext, backendBuildContext, backendPropertySource );
+			return new BackendInitialBuildState( eventContext, backendPropertySourceExtractor, backendBuildContext,
+					backend );
 		}
 	}
 
 	class BackendInitialBuildState {
-		private final String backendName;
+		private final EventContext eventContext;
+		private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 		private final BackendBuildContext backendBuildContext;
-		private final ConfigurationPropertySource backendPropertySource;
-		private final ConfigurationPropertySource defaultIndexPropertySource;
 		private final BackendImplementor backend;
 
-		private BackendInitialBuildState(
-				String backendName,
+		private BackendInitialBuildState(EventContext eventContext,
+				ConfigurationPropertySourceExtractor propertySourceExtractor,
 				BackendBuildContext backendBuildContext,
-				ConfigurationPropertySource backendPropertySource,
 				BackendImplementor backend) {
-			this.backendName = backendName;
+			this.eventContext = eventContext;
+			this.propertySourceExtractor = propertySourceExtractor;
 			this.backendBuildContext = backendBuildContext;
-			this.backendPropertySource = backendPropertySource;
-			this.defaultIndexPropertySource =
-					EngineConfigurationUtils.getIndexDefaults( backendPropertySource );
 			this.backend = backend;
 		}
 
@@ -185,15 +171,17 @@ class IndexManagerBuildingStateHolder {
 				String indexName, String mappedTypeName, boolean multiTenancyEnabled) {
 			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
 			if ( state == null ) {
-				ConfigurationPropertySource indexPropertySource =
-						EngineConfigurationUtils.getIndex( backendPropertySource, defaultIndexPropertySource, indexName );
+				ConfigurationPropertySourceExtractor indexPropertySourceExtractor =
+						EngineConfigurationUtils.extractorForIndex( propertySourceExtractor, indexName );
+				ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
 
 				IndexManagerBuilder builder = backend.createIndexManagerBuilder(
 						indexName, mappedTypeName, multiTenancyEnabled, backendBuildContext, indexPropertySource
 				);
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
 
-				state = new IndexManagerInitialBuildState( backendName, indexName, builder, schemaRootNodeBuilder );
+				state = new IndexManagerInitialBuildState( indexName, indexPropertySourceExtractor,
+						builder, schemaRootNodeBuilder );
 				indexManagerBuildStateByName.put( indexName, state );
 			}
 			return state;
@@ -205,24 +193,25 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		BackendNonStartedState getNonStartedState() {
-			return new BackendNonStartedState( backendName, backend );
+			return new BackendNonStartedState( eventContext, propertySourceExtractor, backend );
 		}
 	}
 
 	private static class IndexManagerInitialBuildState implements IndexManagerBuildingState {
 
-		private final String backendName;
 		private final String indexName;
+		private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 		private final IndexManagerBuilder builder;
 		private final IndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 		private IndexManagerImplementor indexManager;
 
-		IndexManagerInitialBuildState(String backendName, String indexName,
+		IndexManagerInitialBuildState(String indexName,
+				ConfigurationPropertySourceExtractor propertySourceExtractor,
 				IndexManagerBuilder builder,
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder) {
-			this.backendName = backendName;
 			this.indexName = indexName;
+			this.propertySourceExtractor = propertySourceExtractor;
 			this.builder = builder;
 			this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		}
@@ -265,7 +254,8 @@ class IndexManagerBuildingStateHolder {
 						+ " There is probably a bug in the mapper implementation."
 				);
 			}
-			return new IndexManagerNonStartedState( backendName, indexName, indexManager );
+			return new IndexManagerNonStartedState( EventContexts.fromIndexName( indexName ),
+					propertySourceExtractor, indexManager );
 		}
 	}
 

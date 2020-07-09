@@ -203,10 +203,9 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> actualType);
 
 	@Message(id = ID_OFFSET_2 + 49,
-			value = "Missing backend type for backend '%1$s'."
-					+ " Set the property '%2$s' to a supported value."
+			value = "Missing backend type. Set the property '%1$s' to a supported value."
 	)
-	SearchException backendTypeCannotBeNullOrEmpty(String backendName, String key);
+	SearchException backendTypeCannotBeNullOrEmpty(String key);
 
 	@Message(id = ID_OFFSET_2 + 51,
 			value = "It is not possible to use per-field boosts together with withConstantScore option"
@@ -309,4 +308,7 @@ public interface Log extends BasicLogger {
 					+ " and configure it using the 'hibernate.search.backend' prefix,"
 					+ " e.g. hibernate.search.backend.type = elasticsearch.")
 	void deprecatedExplicitDefaultBackendName(String propertyKey, String explicitDefaultBackendName);
+
+	@Message(id = ID_OFFSET_2 + 75, value = "No default backend registered.")
+	SearchException noDefaultBackendRegistered();
 }

@@ -43,7 +43,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String name;
+	private final EventContext eventContext;
 
 	private final BackendThreads threads;
 	private final BeanHolder<? extends DirectoryProvider> directoryProviderHolder;
@@ -54,10 +54,9 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
 
-	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
-	LuceneBackendImpl(String name,
+	LuceneBackendImpl(EventContext eventContext,
 			BackendThreads threads,
 			BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
 			LuceneWorkFactory workFactory,
@@ -65,7 +64,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			FailureHandler failureHandler) {
-		this.name = name;
+		this.eventContext = eventContext;
 		this.threads = threads;
 		this.directoryProviderHolder = directoryProviderHolder;
 
@@ -73,12 +72,11 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		Similarity similarity = analysisDefinitionRegistry.getSimilarity();
 
 		this.readOrchestrator = new LuceneSyncWorkOrchestratorImpl(
-				"Lucene read work orchestrator for backend " + name, similarity
+				"Lucene read work orchestrator - " + eventContext.render(), similarity
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
 
-		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, directoryProviderHolder.get(), similarity,
 				workFactory, multiTenancyStrategy,
@@ -92,7 +90,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "name=" ).append( name ).append( ", " )
+				.append( eventContext.render() ).append( ", " )
 				.append( "directoryProvider=" ).append( directoryProviderHolder.get() )
 				.append( "]" )
 				.toString();

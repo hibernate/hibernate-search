@@ -37,7 +37,6 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -66,19 +65,17 @@ public class LuceneBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor create(String name, BackendBuildContext buildContext,
+	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
-		EventContext backendContext = EventContexts.fromBackendName( name );
-
 		BackendThreads backendThreads = null;
 		BeanHolder<? extends DirectoryProvider> directoryProviderHolder = null;
 
 		try {
-			backendThreads = new BackendThreads( "Backend " + name );
+			backendThreads = new BackendThreads( eventContext.render() );
 
-			Version luceneVersion = getLuceneVersion( backendContext, propertySource );
+			Version luceneVersion = getLuceneVersion( eventContext, propertySource );
 
-			directoryProviderHolder = getDirectoryProvider( backendContext, buildContext, propertySource );
+			directoryProviderHolder = getDirectoryProvider( eventContext, buildContext, propertySource );
 
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
@@ -87,7 +84,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			);
 
 			return new LuceneBackendImpl(
-					name,
+					eventContext,
 					backendThreads,
 					directoryProviderHolder,
 					new LuceneWorkFactoryImpl( multiTenancyStrategy ),

@@ -45,6 +45,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -101,7 +102,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
+			ConfigurationPropertySource propertySource) {
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		/*
 		 * The Elasticsearch client only converts JsonObjects to String and
@@ -119,7 +121,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		BackendThreads threads = null;
 		ElasticsearchLinkImpl link = null;
 		try {
-			threads = new BackendThreads( "Backend " + name );
+			threads = new BackendThreads( eventContext.render() );
 
 			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
 
@@ -155,14 +157,14 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			indexLayoutStrategyHolder = createIndexLayoutStrategy( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					name,
+					eventContext,
 					threads, link,
 					typeFactoryProvider,
 					userFacingGson,
 					analysisDefinitionRegistry,
-					getMultiTenancyStrategy( name, propertySource ),
+					getMultiTenancyStrategy( propertySource ),
 					indexLayoutStrategyHolder,
-					createTypeNameMapping( name, propertySource, indexLayoutStrategyHolder.get() ),
+					createTypeNameMapping( propertySource, indexLayoutStrategyHolder.get() ),
 					buildContext.failureHandler()
 			);
 		}
@@ -190,7 +192,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		return versionCheckEnabled;
 	}
 
-	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {
+	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
 		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
 
 		switch ( multiTenancyStrategyName ) {
@@ -200,8 +202,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				return new DiscriminatorMultiTenancyStrategy();
 			default:
 				throw new AssertionFailure( String.format(
-						Locale.ROOT, "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'",
-						backendName, multiTenancyStrategyName
+						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'",
+						multiTenancyStrategyName
 				) );
 		}
 	}
@@ -212,7 +214,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		return LAYOUT_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
 	}
 
-	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource,
+	private TypeNameMapping createTypeNameMapping(ConfigurationPropertySource propertySource,
 			IndexLayoutStrategy indexLayoutStrategy) {
 		TypeNameMappingStrategyName strategyName = MAPPING_TYPE_STRATEGY.get( propertySource );
 
@@ -223,8 +225,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				return new DiscriminatorTypeNameMapping();
 			default:
 				throw new AssertionFailure( String.format(
-						Locale.ROOT, "Unsupported type mapping strategy '%2$s' for backend '%1$s'",
-						backendName, strategyName
+						Locale.ROOT, "Unsupported type mapping strategy '%1$s'",
+						strategyName
 				) );
 		}
 	}

@@ -68,6 +68,9 @@ public final class IndexSettings {
 	 * @return the concatenated default index settings key
 	 */
 	public static String indexDefaultsKey(String backendName, String radical) {
+		if ( backendName == null ) {
+			return indexDefaultsKey( radical );
+		}
 		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEX_DEFAULTS, radical );
 	}
 
@@ -86,6 +89,9 @@ public final class IndexSettings {
 	 * @return the concatenated index settings key
 	 */
 	public static String indexKey(String backendName, String indexName, String radical) {
+		if ( backendName == null ) {
+			return indexKey( indexName, radical );
+		}
 		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName, radical );
 	}
 

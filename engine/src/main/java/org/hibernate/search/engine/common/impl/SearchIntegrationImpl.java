@@ -56,6 +56,15 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	}
 
 	@Override
+	public Backend backend() {
+		BackendImplementor backend = backends.get( null );
+		if ( backend == null ) {
+			throw log.noDefaultBackendRegistered();
+		}
+		return backend.toAPI();
+	}
+
+	@Override
 	public Backend backend(String backendName) {
 		BackendImplementor backend = backends.get( backendName );
 		if ( backend == null ) {
