@@ -36,7 +36,7 @@ class BackendNonStartedState {
 		ContextualFailureCollector backendFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromBackendName( backendName ) );
 		ConfigurationPropertySource backendPropertySource =
-				EngineConfigurationUtils.getBackend( rootPropertySource, backendName );
+				EngineConfigurationUtils.getBackendByName( rootPropertySource, backendName );
 		BackendStartContextImpl startContext = new BackendStartContextImpl(
 				backendFailureCollector,
 				beanResolver,

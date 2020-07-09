@@ -41,8 +41,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Unable to convert configuration property 'hibernate.search.backends." + BACKEND_NAME
-										+ "." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER + "'",
+								"Unable to convert configuration property 'hibernate.search.backend."
+										+ ElasticsearchBackendSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'",
 								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
