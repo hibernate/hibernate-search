@@ -26,8 +26,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 public class LuceneBackendIT {
 
-	private static final String BACKEND_NAME = "MyBackend";
-
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -37,10 +35,10 @@ public class LuceneBackendIT {
 
 	@BeforeClass
 	public static void setup() {
-		SearchIntegration integration = setupHelper.start( BACKEND_NAME ).withIndex( index )
+		SearchIntegration integration = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
-		backend = integration.backend( BACKEND_NAME ).unwrap( LuceneBackend.class );
+		backend = integration.backend().unwrap( LuceneBackend.class );
 	}
 
 	@Test

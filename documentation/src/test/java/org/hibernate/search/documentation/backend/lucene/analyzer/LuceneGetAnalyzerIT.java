@@ -30,7 +30,7 @@ public class LuceneGetAnalyzerIT {
 
 	@Rule
 	public DocumentationSetupHelper setupHelper =
-			DocumentationSetupHelper.withSingleBackend( "myBackend", new LuceneBackendConfiguration() );
+			DocumentationSetupHelper.withSingleBackend( new LuceneBackendConfiguration() );
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -43,7 +43,7 @@ public class LuceneGetAnalyzerIT {
 	public void fromBackend() {
 		//tag::fromBackend[]
 		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
-		Backend backend = mapping.backend( "myBackend" ); // <2>
+		Backend backend = mapping.backend(); // <2>
 		LuceneBackend luceneBackend = backend.unwrap( LuceneBackend.class ); // <3>
 		Optional<? extends Analyzer> analyzer = luceneBackend.analyzer( "english" ); // <4>
 		Optional<? extends Analyzer> normalizer = luceneBackend.normalizer( "isbn" ); // <5>

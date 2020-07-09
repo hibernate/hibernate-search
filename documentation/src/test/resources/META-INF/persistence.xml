@@ -22,14 +22,12 @@
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_lucene[] -->
-            <property name="hibernate.search.backends.myBackend.type"
+            <property name="hibernate.search.backend.type"
                       value="lucene"/> <!--1-->
             <!--
-            <property name="hibernate.search.backends.myBackend.directory.root"
+            <property name="hibernate.search.backend.directory.root"
                       value="some/filesystem/path"/>
              --> <!--2-->
-            <property name="hibernate.search.default_backend"
-                      value="myBackend"/> <!--3-->
             <!-- end::gettingstarted-configuration-orm_lucene[] -->
 
             <!--
@@ -40,7 +38,7 @@
              -->
             <property name="hibernate.search.schema_management.strategy"
                       value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backends.myBackend.directory.root"
+            <property name="hibernate.search.backend.directory.root"
                       value="${project.build.directory}/test-indexes/gettingstarted/withoutanalysis/"/>
         </properties>
     </persistence-unit>
@@ -51,20 +49,18 @@
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_elasticsearch[] -->
-            <property name="hibernate.search.backends.myBackend.type"
+            <property name="hibernate.search.backend.type"
                       value="elasticsearch" /> <!--1-->
             <!--
-            <property name="hibernate.search.backends.myBackend.hosts"
+            <property name="hibernate.search.backend.hosts"
                       value="elasticsearch.mycompany.com"/>
-            <property name="hibernate.search.backends.myBackend.protocol"
+            <property name="hibernate.search.backend.protocol"
                       value="https"/>
-            <property name="hibernate.search.backends.myBackend.username"
+            <property name="hibernate.search.backend.username"
                       value="ironman"/>
-            <property name="hibernate.search.backends.myBackend.password"
+            <property name="hibernate.search.backend.password"
                       value="j@rV1s"/>
              --> <!--2-->
-            <property name="hibernate.search.default_backend"
-                      value="myBackend"/> <!--3-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch[] -->
 
             <!--
@@ -75,24 +71,24 @@
              -->
             <property name="hibernate.search.schema_management.strategy"
                       value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backends.myBackend.hosts"
+            <property name="hibernate.search.backend.hosts"
                       value="${test.elasticsearch.connection.hosts}"/>
-            <property name="hibernate.search.backends.myBackend.protocol"
+            <property name="hibernate.search.backend.protocol"
                       value="${test.elasticsearch.connection.protocol}"/>
-            <property name="hibernate.search.backends.myBackend.username"
+            <property name="hibernate.search.backend.username"
                       value="${test.elasticsearch.connection.username}"/>
-            <property name="hibernate.search.backends.myBackend.password"
+            <property name="hibernate.search.backend.password"
                       value="${test.elasticsearch.connection.password}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.enabled"
+            <property name="hibernate.search.backend.aws.signing.enabled"
                       value="${test.elasticsearch.connection.aws.signing.enabled}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.access_key"
+            <property name="hibernate.search.backend.aws.signing.access_key"
                       value="${test.elasticsearch.connection.aws.signing.access_key}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.secret_key"
+            <property name="hibernate.search.backend.aws.signing.secret_key"
                       value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.region"
+            <property name="hibernate.search.backend.aws.signing.region"
                       value="${test.elasticsearch.connection.aws.signing.region}"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
-            <property name="hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status"
+            <property name="hibernate.search.backend.index_defaults.schema_management.minimal_required_status"
                       value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="sync"/>
@@ -104,14 +100,12 @@
         <class>org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
-            <property name="hibernate.search.backends.myBackend.type"
+            <property name="hibernate.search.backend.type"
                       value="lucene"/>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
-            <property name="hibernate.search.backends.myBackend.analysis.configurer"
+            <property name="hibernate.search.backend.analysis.configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
             <!-- end::gettingstarted-configuration-orm_lucene-analysis[] -->
-            <property name="hibernate.search.default_backend"
-                      value="myBackend"/>
 
             <!--
                 Not to be included in the documentation:
@@ -121,7 +115,7 @@
              -->
             <property name="hibernate.search.schema_management.strategy"
                       value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backends.myBackend.directory.root"
+            <property name="hibernate.search.backend.directory.root"
                       value="${project.build.directory}/test-indexes/gettingstarted/withanalysis/"/>
         </properties>
     </persistence-unit>
@@ -131,14 +125,12 @@
         <class>org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
-            <property name="hibernate.search.backends.myBackend.type"
+            <property name="hibernate.search.backend.type"
                       value="elasticsearch" />
             <!-- tag::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
-            <property name="hibernate.search.backends.myBackend.analysis.configurer"
+            <property name="hibernate.search.backend.analysis.configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
-            <property name="hibernate.search.default_backend"
-                      value="myBackend"/>
 
             <!--
                 Not to be included in the documentation:
@@ -148,24 +140,24 @@
              -->
             <property name="hibernate.search.schema_management.strategy"
                       value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backends.myBackend.hosts"
+            <property name="hibernate.search.backend.hosts"
                       value="${test.elasticsearch.connection.hosts}"/>
-            <property name="hibernate.search.backends.myBackend.protocol"
+            <property name="hibernate.search.backend.protocol"
                       value="${test.elasticsearch.connection.protocol}"/>
-            <property name="hibernate.search.backends.myBackend.username"
+            <property name="hibernate.search.backend.username"
                       value="${test.elasticsearch.connection.username}"/>
-            <property name="hibernate.search.backends.myBackend.password"
+            <property name="hibernate.search.backend.password"
                       value="${test.elasticsearch.connection.password}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.enabled"
+            <property name="hibernate.search.backend.aws.signing.enabled"
                       value="${test.elasticsearch.connection.aws.signing.enabled}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.access_key"
+            <property name="hibernate.search.backend.aws.signing.access_key"
                       value="${test.elasticsearch.connection.aws.signing.access_key}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.secret_key"
+            <property name="hibernate.search.backend.aws.signing.secret_key"
                       value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
-            <property name="hibernate.search.backends.myBackend.aws.signing.region"
+            <property name="hibernate.search.backend.aws.signing.region"
                       value="${test.elasticsearch.connection.aws.signing.region}"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
-            <property name="hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status"
+            <property name="hibernate.search.backend.index_defaults.schema_management.minimal_required_status"
                       value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="sync"/>

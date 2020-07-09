@@ -37,7 +37,7 @@ public interface ElasticsearchHttpClientConfigurer {
 	 *
 	 * @param builder An Apache HTTP client builder, to set the configuration to be applied.
 	 * @param propertySource The property source for the Elasticsearch backend being configured.
-	 * Properties are masked, i.e. {@code hibernate.search.backends.es.my.property}
+	 * Properties are masked, i.e. {@code hibernate.search.backend.my.property}
 	 * will be accessed as simply {@code my.property}.
 	 *
 	 * @see <a href="http://hc.apache.org/httpcomponents-client-ga/">the Apache HTTP Client documentation</a>

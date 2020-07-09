@@ -80,8 +80,6 @@ import org.junit.Test;
 
 public class LuceneExtensionIT {
 
-	private static final String BACKEND_NAME = "myLuceneBackend";
-
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
 	private static final String THIRD_ID = "3";
@@ -98,7 +96,7 @@ public class LuceneExtensionIT {
 
 	@Before
 	public void setup() {
-		this.integration = setupHelper.start( BACKEND_NAME ).withIndexes( mainIndex, otherIndex ).setup();
+		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
@@ -719,14 +717,14 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void backend_unwrap() {
-		Backend backend = integration.backend( BACKEND_NAME );
+		Backend backend = integration.backend();
 		Assertions.assertThat( backend.unwrap( LuceneBackend.class ) )
 				.isNotNull();
 	}
 
 	@Test
 	public void backend_unwrap_error_unknownType() {
-		Backend backend = integration.backend( BACKEND_NAME );
+		Backend backend = integration.backend();
 
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )

@@ -37,16 +37,12 @@ public abstract class AbstractBackendHolder {
 
 	public static final int INDEX_COUNT = 3;
 
-	private static final String BACKEND_NAME = "testedBackend";
-
 	private SearchIntegration integration;
 	private List<MappedIndex> indexes;
 
 	@Setup(Level.Trial)
-	@SuppressWarnings("deprecation")
 	public void startHibernateSearch(TemporaryFileHolder temporaryFileHolder) throws IOException {
 		Map<String, Object> baseProperties = new LinkedHashMap<>();
-		baseProperties.put( EngineSettings.DEFAULT_BACKEND, BACKEND_NAME );
 
 		ConfigurationPropertySource configurationFromParameter =
 				ConfigurationPropertySource.fromMap( stringToMap( getConfigurationParameter() ) );
@@ -61,7 +57,7 @@ public abstract class AbstractBackendHolder {
 								.withOverride( configurationFromParameter )
 								// > Apply the configuration at the index level (for convenience)
 								.withOverride( configurationFromParameter.withPrefix( BackendSettings.INDEX_DEFAULTS ) )
-								.withPrefix( EngineSettings.BACKENDS + "." + BACKEND_NAME )
+								.withPrefix( EngineSettings.BACKEND )
 				);
 
 		ConfigurationPropertyChecker unusedPropertyChecker = ConfigurationPropertyChecker.create();
@@ -75,7 +71,7 @@ public abstract class AbstractBackendHolder {
 
 		indexes = new ArrayList<>();
 		for ( int i = 0; i < INDEX_COUNT; ++i ) {
-			MappedIndex index = new MappedIndex( BACKEND_NAME, i );
+			MappedIndex index = new MappedIndex( i );
 			initiator.add( index );
 			indexes.add( index );
 		}

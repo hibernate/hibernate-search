@@ -21,8 +21,6 @@ import org.junit.Test;
 
 public class ElasticsearchBootstrapFailureIT {
 
-	private static final String BACKEND_NAME = "BackendName";
-
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -36,7 +34,7 @@ public class ElasticsearchBootstrapFailureIT {
 	@TestForIssue(jiraKey = "HSEARCH-3621")
 	public void cannotConnect() {
 		Assertions.assertThatThrownBy(
-				() -> setupHelper.start( BACKEND_NAME )
+				() -> setupHelper.start()
 						.withBackendProperty(
 								ElasticsearchBackendSettings.HOSTS,
 								// We just need a closed port, hopefully this one will generally be closed
@@ -48,7 +46,7 @@ public class ElasticsearchBootstrapFailureIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								"Failed to detect the Elasticsearch version running on the cluster",
 								"Elasticsearch request failed",

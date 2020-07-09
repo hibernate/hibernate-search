@@ -87,7 +87,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								"Invalid locking strategy name",
 								"'some_invalid_name'",

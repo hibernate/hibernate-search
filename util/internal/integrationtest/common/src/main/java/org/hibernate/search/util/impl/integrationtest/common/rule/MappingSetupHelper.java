@@ -92,8 +92,21 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			return withProperties( configurationProvider.getPropertiesFromFile( propertyFilePath ) );
 		}
 
+		public final C withBackendProperty(String keyRadical, Object value) {
+			return withBackendProperty( null, keyRadical, value );
+		}
+
 		public final C withBackendProperty(String backendName, String keyRadical, Object value) {
-			return withPropertyRadical( "backends." + backendName + "." + keyRadical, value );
+			if ( backendName == null ) {
+				return withPropertyRadical( EngineSettings.Radicals.BACKEND + "." + keyRadical, value );
+			}
+			else {
+				return withPropertyRadical( EngineSettings.Radicals.BACKENDS + "." + backendName + "." + keyRadical, value );
+			}
+		}
+
+		public final C withBackendProperties(Map<String, Object> relativeProperties) {
+			return withBackendProperties( null, relativeProperties );
 		}
 
 		public final C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
@@ -101,12 +114,12 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			return thisAsC();
 		}
 
+		public C withIndexDefaultsProperty(String keyRadical, Object value) {
+			return withIndexDefaultsProperty( null, keyRadical, value );
+		}
+
 		public C withIndexDefaultsProperty(String backendName, String keyRadical, Object value) {
-			return withProperty(
-					EngineSettings.BACKENDS + "." + backendName
-							+ "." + BackendSettings.INDEX_DEFAULTS + "." + keyRadical,
-					value
-			);
+			return withBackendProperty( backendName, BackendSettings.INDEX_DEFAULTS + "." + keyRadical, value );
 		}
 
 		/**

@@ -32,7 +32,7 @@ public class AutomaticIndexingOutOfTransactionIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backendMock );
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
 

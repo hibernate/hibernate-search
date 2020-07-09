@@ -74,8 +74,6 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ElasticsearchExtensionIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
-
 	private static final String FIRST_ID = "1";
 	private static final String SECOND_ID = "2";
 	private static final String THIRD_ID = "3";
@@ -95,7 +93,7 @@ public class ElasticsearchExtensionIT {
 
 	@Before
 	public void setup() {
-		this.integration = setupHelper.start( BACKEND_NAME ).withIndexes( mainIndex, otherIndex ).setup();
+		this.integration = setupHelper.start().withIndexes( mainIndex, otherIndex ).setup();
 
 		initData();
 	}
@@ -1006,14 +1004,14 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void backend_unwrap() {
-		Backend backend = integration.backend( BACKEND_NAME );
+		Backend backend = integration.backend();
 		Assertions.assertThat( backend.unwrap( ElasticsearchBackend.class ) )
 				.isNotNull();
 	}
 
 	@Test
 	public void backend_unwrap_error_unknownType() {
-		Backend backend = integration.backend( BACKEND_NAME );
+		Backend backend = integration.backend();
 
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
@@ -1025,7 +1023,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void backend_getClient() throws Exception {
-		Backend backend = integration.backend( BACKEND_NAME );
+		Backend backend = integration.backend();
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 		RestClient restClient = elasticsearchBackend.client( RestClient.class );
 
@@ -1036,7 +1034,7 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void backend_getClient_error_invalidClass() {
-		Backend backend = integration.backend( BACKEND_NAME );
+		Backend backend = integration.backend();
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 
 		assertThatThrownBy( () -> elasticsearchBackend.client( HttpAsyncClient.class ) )

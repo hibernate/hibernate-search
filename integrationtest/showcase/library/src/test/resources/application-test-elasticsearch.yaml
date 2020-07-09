@@ -1,0 +1,7 @@
+spring.jpa:
+  properties:
+    hibernate.search:
+      backend:
+        index_defaults:
+          schema_management.minimal_required_status: yellow
+        log.json_pretty_printing: true

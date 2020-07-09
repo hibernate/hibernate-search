@@ -33,14 +33,12 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-3049")
 public class SearchIndexingPlanPersistBatchIndexingIT {
 
-	private static final String BACKEND_NAME = "stubBackend";
-
-	private static int BATCH_SIZE = 100;
+	private static final int BATCH_SIZE = 100;
 	// Make sure that entity count is not a multiple of batch size, to test for corner cases
-	private static int ENTITY_COUNT = BATCH_SIZE * 200 + BATCH_SIZE / 2;
+	private static final int ENTITY_COUNT = BATCH_SIZE * 200 + BATCH_SIZE / 2;
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( BACKEND_NAME );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
@@ -154,7 +152,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 	}
 
 	@Entity(name = "indexed1")
-	@Indexed(backend = BACKEND_NAME, index = IndexedEntity.INDEX_NAME)
+	@Indexed(index = IndexedEntity.INDEX_NAME)
 	public static class IndexedEntity {
 
 		static final String INDEX_NAME = "index1Name";

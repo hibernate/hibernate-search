@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -25,23 +27,29 @@ import org.junit.Test;
 public class IndexedIT {
 
 	@Rule
-	public BackendMock defaultBackendMock = new BackendMock( "defaultBackend" );
+	public BackendMock defaultBackendMock = new BackendMock();
 
 	@Rule
-	public BackendMock backend2Mock = new BackendMock( "backend2" );
+	public BackendMock backend2Mock = new BackendMock();
 
 	@Rule
-	public BackendMock backend3Mock = new BackendMock( "backend3" );
+	public BackendMock backend3Mock = new BackendMock();
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper =
 			JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), defaultBackendMock );
 
 	@Rule
-	public JavaBeanMappingSetupHelper multiBackendSetupHelper =
-			JavaBeanMappingSetupHelper.withBackendMocks(
-					MethodHandles.lookup(), defaultBackendMock, backend2Mock, backend3Mock
-			);
+	public JavaBeanMappingSetupHelper multiBackendSetupHelper;
+
+	public IndexedIT() {
+		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
+		namedBackendMocks.put( "backend2", backend2Mock );
+		namedBackendMocks.put( "backend3", backend3Mock );
+		multiBackendSetupHelper = JavaBeanMappingSetupHelper.withBackendMocks(
+				MethodHandles.lookup(), defaultBackendMock, namedBackendMocks
+		);
+	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3705")

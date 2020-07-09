@@ -1,9 +1,7 @@
 spring.jpa:
   properties:
     hibernate.search:
-      default_backend: lucene1
-      backends:
-        lucene1:
-          type: lucene
-          analysis.configurer: luceneAnalysisConfigurer
-          directory.root: ${LUCENE_ROOT_PATH} # From environment variable
+      backend:
+        type: lucene
+        analysis.configurer: luceneAnalysisConfigurer
+        directory.root: ${LUCENE_ROOT_PATH} # From environment variable

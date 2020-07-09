@@ -31,10 +31,8 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ElasticsearchCustomLayoutStrategyIT {
-	private static final String BACKEND_NAME = "testBackend";
-
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BACKEND_NAME, new ElasticsearchBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new ElasticsearchBackendConfiguration() );
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
@@ -51,7 +49,6 @@ public class ElasticsearchCustomLayoutStrategyIT {
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME,
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY,
 						CustomLayoutStrategy.class.getName()
 				)

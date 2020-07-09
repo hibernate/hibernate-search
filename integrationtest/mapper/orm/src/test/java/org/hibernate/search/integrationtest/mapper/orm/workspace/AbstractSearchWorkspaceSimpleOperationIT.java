@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.mapper.orm.workspace;
 
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -27,17 +29,23 @@ import org.junit.Test;
 
 public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
-	private static final String BACKEND1_NAME = "stubBackend1";
 	private static final String BACKEND2_NAME = "stubBackend2";
 
 	@Rule
-	public BackendMock backend1Mock = new BackendMock( BACKEND1_NAME );
+	public BackendMock defaultBackendMock = new BackendMock();
 
 	@Rule
-	public BackendMock backend2Mock = new BackendMock( BACKEND2_NAME );
+	public BackendMock backend2Mock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backend1Mock, backend2Mock );
+	public OrmSetupHelper ormSetupHelper;
+
+	public AbstractSearchWorkspaceSimpleOperationIT() {
+		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
+		namedBackendMocks.put( BACKEND2_NAME, backend2Mock );
+		ormSetupHelper = OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks );
+	}
+
 
 	@Test
 	public void async_success() {
@@ -47,10 +55,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
-			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 			assertThat( futureFromWorkspace ).isPending();
 
 			futureFromBackend.complete( new Object() );
@@ -66,10 +74,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
-			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 			assertThat( futureFromWorkspace ).isPending();
 
 			RuntimeException exception = new RuntimeException();
@@ -86,11 +94,11 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
-			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 			futureFromBackend.complete( new Object() );
 			executeSync( workspace );
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 		} );
 	}
 
@@ -102,7 +110,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			SearchWorkspace workspace = Search.session( session ).workspace( IndexedEntity1.class );
 
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
-			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 			RuntimeException exception = new RuntimeException();
 			futureFromBackend.completeExceptionally( exception );
@@ -123,11 +131,11 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 			CompletableFuture<Object> future1FromBackend = new CompletableFuture<>();
 			CompletableFuture<Object> future2FromBackend = new CompletableFuture<>();
-			expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, future1FromBackend );
+			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, future1FromBackend );
 			expectWork( backend2Mock, IndexedEntity2.INDEX_NAME, future2FromBackend );
 
 			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 			backend2Mock.verifyExpectationsMet();
 			assertThat( futureFromWorkspace ).isPending();
 
@@ -149,10 +157,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 		}
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
-		expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+		expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 		CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 		assertThat( futureFromWorkspace ).isPending();
 
 		futureFromBackend.complete( new Object() );
@@ -166,10 +174,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 		SearchWorkspace workspace = Search.mapping( sessionFactory ).scope( IndexedEntity1.class ).workspace();
 
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
-		expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+		expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
 		CompletableFuture<?> futureFromWriter = executeAsync( workspace );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 		assertThat( futureFromWriter ).isPending();
 
 		futureFromBackend.complete( new Object() );
@@ -183,20 +191,20 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 	protected abstract CompletableFuture<?> executeAsync(SearchWorkspace workspace);
 
 	private SessionFactory setup() {
-		backend1Mock.expectAnySchema( IndexedEntity1.INDEX_NAME );
+		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity1.class, IndexedEntity2.class );
 
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();
 
 		return sessionFactory;
 	}
 
 	@Entity(name = "indexed1")
-	@Indexed(backend = BACKEND1_NAME, index = IndexedEntity1.INDEX_NAME)
+	@Indexed(index = IndexedEntity1.INDEX_NAME)
 	public static class IndexedEntity1 {
 
 		static final String INDEX_NAME = "index1Name";

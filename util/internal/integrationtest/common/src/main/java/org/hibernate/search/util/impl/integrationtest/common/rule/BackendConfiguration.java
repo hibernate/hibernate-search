@@ -18,7 +18,7 @@ public interface BackendConfiguration {
 		return Optional.empty();
 	}
 
-	<C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
+	<C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 			String backendName, TestConfigurationProvider configurationProvider);
 
 }

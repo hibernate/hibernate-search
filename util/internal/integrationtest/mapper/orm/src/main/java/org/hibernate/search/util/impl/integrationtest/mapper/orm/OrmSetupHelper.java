@@ -21,40 +21,35 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHe
 public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
-	private static final String DEFAULT_BACKEND_NAME = "backendName";
-
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
 		return new OrmSetupHelper(
-				BackendSetupStrategy.withBackendMocks( backendMock ),
+				BackendSetupStrategy.withSingleBackendMock( backendMock ),
 				// Mock backend => avoid schema management unless we want to test it
 				SchemaManagementStrategyName.NONE
 		);
 	}
 
-	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, BackendMock ... otherBackendMocks) {
+	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock,
+			Map<String, BackendMock> namedBackendMocks) {
 		return new OrmSetupHelper(
-				BackendSetupStrategy.withBackendMocks( defaultBackendMock, otherBackendMocks ),
+				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks ),
 				// Mock backend => avoid schema management unless we want to test it
 				SchemaManagementStrategyName.NONE
 		);
 	}
 
 	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
-		return withSingleBackend( DEFAULT_BACKEND_NAME, backendConfiguration );
-	}
-
-	public static OrmSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
 		return new OrmSetupHelper(
-				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
+				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				// Real backend => ensure we clean up everything before and after the tests
 				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
 		);
 	}
 
-	public static OrmSetupHelper withMultipleBackends(String defaultBackendName,
-			Map<String, BackendConfiguration> backendConfigurations) {
+	public static OrmSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
 		return new OrmSetupHelper(
-				BackendSetupStrategy.withMultipleBackends( defaultBackendName, backendConfigurations ),
+				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
 				// Real backend => ensure to clean up everything
 				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
 		);

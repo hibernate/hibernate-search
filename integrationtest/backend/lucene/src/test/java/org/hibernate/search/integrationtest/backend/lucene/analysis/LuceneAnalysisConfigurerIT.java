@@ -27,8 +27,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 public class LuceneAnalysisConfigurerIT {
 
-	private static final String BACKEND_NAME = "BackendName";
-
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
 
 	@Rule
@@ -41,7 +39,7 @@ public class LuceneAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Unable to convert configuration property 'hibernate.search.backend."
@@ -60,7 +58,7 @@ public class LuceneAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								FailingConfigurer.FAILURE_MESSAGE
@@ -90,7 +88,7 @@ public class LuceneAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple analyzer definitions with the same name",
@@ -116,7 +114,7 @@ public class LuceneAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple normalizer definitions with the same name",
@@ -142,7 +140,7 @@ public class LuceneAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple parameters with the same name",
@@ -171,11 +169,8 @@ public class LuceneAnalysisConfigurerIT {
 
 	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> binder) {
 		StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( binder );
-		setupHelper.start( BACKEND_NAME )
-				.withPropertyRadical(
-						"backends." + BACKEND_NAME + "." + LuceneBackendSettings.ANALYSIS_CONFIGURER,
-						analysisConfigurer
-				)
+		setupHelper.start()
+				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
 				.withIndex( index )
 				.setup();
 	}

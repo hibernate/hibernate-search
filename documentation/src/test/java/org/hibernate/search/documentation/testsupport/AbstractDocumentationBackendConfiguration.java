@@ -15,11 +15,11 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHe
 abstract class AbstractDocumentationBackendConfiguration implements BackendConfiguration {
 
 	@Override
-	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
-			String backendName, TestConfigurationProvider configurationProvider) {
+	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+			String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 		return setupContext
 				.withBackendProperties(
-						backendName,
+						backendNameOrNull,
 						configurationProvider.interpolateProperties( getBackendProperties() )
 				);
 	}

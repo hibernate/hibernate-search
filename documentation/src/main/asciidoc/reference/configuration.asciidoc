@@ -31,24 +31,21 @@ Global properties::
 These properties potentially affect all Hibernate Search.
 They are generally located just under the `hibernate.search` root.
 +
-Notable properties:
-
-* `hibernate.search.default_backend`: defines the name of the backend used by default on all indexes.
-
-+
-Other global properties are explained in the relevant parts of this documentation:
+Global properties are explained in the relevant parts of this documentation:
 
 * <<mapper-orm-mapping-configuration,Hibernate ORM mapping>>
 
 Backend properties::
 These properties affect a single backend.
-They are grouped under a common root that includes the backend name: `hibernate.search.backends.<backend name>`.
-The backend name is arbitrarily defined by the user: just pick a string, such as `myBackend` or `elasticsearch`,
-and make sure to use it consistently.
+They are grouped under a common root:
+
+* `hibernate.search.backend` for the default backend (most common usage).
+* `hibernate.search.backends.<backend name>` for a named backend (advanced usage).
+
 +
 Notable properties:
 
-* `hibernate.search.backends.<backend name>.type`: the type of the backend.
+* `hibernate.search.backend.type`: the type of the backend.
 Set this to either `lucene` or `elasticsearch`.
 
 +
@@ -60,24 +57,31 @@ Other backend properties are explained in the relevant parts of this documentati
 Index properties::
 These properties affect either one or multiple indexes, depending on the root.
 +
-With the root `hibernate.search.backends.<backend name>.index_defaults`,
+With the root `hibernate.search.backend.index_defaults`,
 they set defaults for all indexes of the referenced backend.
 The backend name must match the name defined in the mapping.
 +
-With the root `hibernate.search.backends.<backend name>.indexes.<index name>`,
+With the root `hibernate.search.backend.indexes.<index name>`,
 they set the value for a specific index, overriding the defaults (if any).
 The backend and index names must match the names defined in the mapping.
 For ORM entities, the default index name is the name of the indexed class, without the package:
 `org.mycompany.Book` will have `Book` as its default index name.
 Index names can be customized in the mapping.
-
++
+Alternatively, the backend can also be referenced by name,
+i.e. the roots above can also be `hibernate.search.backends.<backend name>.index_defaults`
+or `hibernate.search.backends.<backend name>.indexes.<index name>`.
 +
 Examples:
 
+* `hibernate.search.backend.index_defaults.io.commit_interval = 500`
+sets the `io.commit_interval` property for all indexes of the default backend.
+* `hibernate.search.backend.indexes.Product.io.commit_interval = 2000`
+sets the `io.commit_interval` property for the `Product` index of the default backend.
 * `hibernate.search.backends.myBackend.index_defaults.io.commit_interval = 500`
-sets the `io.commit_interval` property for all indexes of the backend `myBackend`.
+sets the `io.commit_interval` property for all indexes of backend `myBackend`.
 * `hibernate.search.backends.myBackend.indexes.Product.io.commit_interval = 2000`
-sets the `io.commit_interval` property for the `Product` index of the backend `myBackend`.
+sets the `io.commit_interval` property for the `Product` index of backend `myBackend`.
 
 +
 Other index properties are explained in the relevant parts of this documentation:

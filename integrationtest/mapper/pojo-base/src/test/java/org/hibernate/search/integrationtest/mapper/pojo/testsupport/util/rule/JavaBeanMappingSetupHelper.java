@@ -29,14 +29,14 @@ public final class JavaBeanMappingSetupHelper
 	 * @param backendMock A backend mock.
 	 */
 	public static JavaBeanMappingSetupHelper withBackendMock(MethodHandles.Lookup lookup, BackendMock backendMock) {
-		return new JavaBeanMappingSetupHelper( lookup, BackendSetupStrategy.withBackendMocks( backendMock ) );
+		return new JavaBeanMappingSetupHelper( lookup, BackendSetupStrategy.withSingleBackendMock( backendMock ) );
 	}
 
 	public static JavaBeanMappingSetupHelper withBackendMocks(MethodHandles.Lookup lookup,
-			BackendMock defaultBackendMock, BackendMock ... otherBackendMocks) {
+			BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
 		return new JavaBeanMappingSetupHelper(
 				lookup,
-				BackendSetupStrategy.withBackendMocks( defaultBackendMock, otherBackendMocks )
+				BackendSetupStrategy.withMultipleBackendMocks( defaultBackendMock, namedBackendMocks )
 		);
 	}
 
