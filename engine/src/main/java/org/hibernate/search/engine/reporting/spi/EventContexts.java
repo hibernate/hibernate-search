@@ -35,6 +35,20 @@ public class EventContexts {
 			}
 	);
 
+	private static final EventContext DEFAULT_BACKEND = EventContext.create(
+			new EventContextElement() {
+				@Override
+				public String toString() {
+					return "EventContextElement[" + render() + "]";
+				}
+
+				@Override
+				public String render() {
+					return MESSAGES.defaultBackend();
+				}
+			}
+	);
+
 	private static final EventContext INDEX_SCHEMA_ROOT = EventContext.create(
 			new EventContextElement() {
 				@Override
@@ -80,13 +94,22 @@ public class EventContexts {
 		} );
 	}
 
+	public static EventContext defaultBackend() {
+		return DEFAULT_BACKEND;
+	}
+
 	public static EventContext fromBackendName(String name) {
-		return EventContext.create( new AbstractSimpleEventContextElement<String>( name ) {
-			@Override
-			public String render(String param) {
-				return MESSAGES.backend( param );
-			}
-		} );
+		if ( name == null ) {
+			return DEFAULT_BACKEND;
+		}
+		else {
+			return EventContext.create( new AbstractSimpleEventContextElement<String>( name ) {
+				@Override
+				public String render(String param) {
+					return MESSAGES.backend( param );
+				}
+			} );
+		}
 	}
 
 	public static EventContext fromIndexName(String name) {

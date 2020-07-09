@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 /**
  * The Hibernate Search mapping between the Hibernate ORM model and the backend(s).
@@ -100,13 +101,13 @@ public interface SearchMapping {
 	Collection<? extends SearchIndexedEntity> allIndexedEntities();
 
 	/**
-	 * @param indexName The key to get the required {@link IndexManager} instance.
+	 * @param indexName The name of an index. See {@link Indexed#index()}.
 	 * @return The index manager for the index having {@code indexName} as name.
 	 */
 	IndexManager indexManager(String indexName);
 
 	/**
-	 * @param indexName The key to get the required {@link IndexManager} instance.
+	 * @param indexName The name of an index. See {@link Indexed#index()}.
 	 * @return The index manager for the index having {@code indexName} as name.
 	 * @deprecated Use {@link #indexManager(String)} instead.
 	 */
@@ -116,13 +117,18 @@ public interface SearchMapping {
 	}
 
 	/**
-	 * @param backendName The key to get the required {@link Backend} instance.
+	 * @return The default backend, if any.
+	 */
+	Backend backend();
+
+	/**
+	 * @param backendName The name of a backend. See {@link Indexed#backend()}.
 	 * @return The backend having {@code backendName} as name.
 	 */
 	Backend backend(String backendName);
 
 	/**
-	 * @param backendName The key to get the required {@link Backend} instance.
+	 * @param backendName The name of a backend. See {@link Indexed#backend()}.
 	 * @return The backend having {@code backendName} as name.
 	 * @deprecated Use {@link #backend(String)} instead.
 	 */

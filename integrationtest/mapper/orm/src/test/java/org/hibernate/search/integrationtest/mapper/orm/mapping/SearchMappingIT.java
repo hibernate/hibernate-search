@@ -19,12 +19,14 @@ import javax.persistence.OneToMany;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
@@ -32,6 +34,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -147,26 +150,34 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
-	public void getIndexManager_customIndexName() {
+	public void indexManager_customIndexName() {
 		IndexManager indexManager = mapping.indexManager( Person.INDEX_NAME );
 		checkIndexManager( Person.INDEX_NAME, indexManager );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
-	public void getIndexManager_defaultIndexName() {
+	public void indexManager_defaultIndexName() {
 		IndexManager indexManager = mapping.indexManager( Pet.JPA_ENTITY_NAME );
 		checkIndexManager( Pet.JPA_ENTITY_NAME, indexManager );
 	}
 
 	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3640", "HSEARCH-3950" })
+	@Ignore // TODO enable once we actually define backend 1 as an unnamed, default backend
+	public void backend_default() {
+		Backend backend = mapping.backend();
+		checkBackend( EventContexts.defaultBackend(), backend );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
-	public void getBackendByName() {
+	public void backend_byName() {
 		Backend backend = mapping.backend( BACKEND_1_NAME );
-		checkBackend( BACKEND_1_NAME, backend );
+		checkBackend( EventContexts.fromBackendName( BACKEND_1_NAME ), backend );
 
 		backend = mapping.backend( BACKEND_2_NAME );
-		checkBackend( BACKEND_2_NAME, backend );
+		checkBackend( EventContexts.fromBackendName( BACKEND_2_NAME ), backend );
 	}
 
 	private void checkIndexManager(String expectedIndexName, IndexManager indexManager) {
@@ -175,10 +186,10 @@ public class SearchMappingIT {
 				.returns( expectedIndexName, StubIndexManager::getName );
 	}
 
-	private void checkBackend(String expectedBackendName, Backend indexManager) {
+	private void checkBackend(EventContext expectedEventContext, Backend indexManager) {
 		assertThat( indexManager )
 				.asInstanceOf( InstanceOfAssertFactories.type( StubBackend.class ) )
-				.returns( expectedBackendName, StubBackend::getName );
+				.returns( expectedEventContext, StubBackend::eventContext );
 	}
 
 	@Entity(name = Person.JPA_ENTITY_NAME)

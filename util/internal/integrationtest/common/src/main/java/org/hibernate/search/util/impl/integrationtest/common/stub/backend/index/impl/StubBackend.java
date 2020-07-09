@@ -15,26 +15,27 @@ import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 
 public class StubBackend implements BackendImplementor, Backend {
 
-	private final String name;
+	private final EventContext eventContext;
 	private final StubBackendBehavior behavior;
 
-	StubBackend(String name, BackendBuildContext context, StubBackendBehavior behavior) {
-		this.name = name;
+	StubBackend(EventContext eventContext, BackendBuildContext context, StubBackendBehavior behavior) {
+		this.eventContext = eventContext;
 		this.behavior = behavior;
 		behavior.onCreateBackend( context );
 	}
 
 	@Override
 	public String toString() {
-		return StubBackend.class.getSimpleName() + "[" + name + "]";
+		return StubBackend.class.getSimpleName() + "[" + eventContext + "]";
 	}
 
-	public String getName() {
-		return name;
+	public EventContext eventContext() {
+		return eventContext;
 	}
 
 	@Override

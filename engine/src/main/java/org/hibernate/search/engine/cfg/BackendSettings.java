@@ -60,6 +60,9 @@ public final class BackendSettings {
 	 * @return the concatenated prefix + backend name + radical
 	 */
 	public static String backendKey(String backendName, String radical) {
+		if ( backendName == null ) {
+			return backendKey( radical );
+		}
 		return join( ".", EngineSettings.BACKENDS, backendName, radical );
 	}
 }

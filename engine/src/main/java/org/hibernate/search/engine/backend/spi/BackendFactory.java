@@ -8,12 +8,13 @@ package org.hibernate.search.engine.backend.spi;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public interface BackendFactory {
 
 	/**
-	 * @param name The name of the backend.
+	 * @param eventContext An {@link org.hibernate.search.util.common.reporting.EventContext} representing the backend.
 	 * @param context The build context.
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
@@ -23,6 +24,6 @@ public interface BackendFactory {
 	 * are reserved for use by the engine.
 	 * @return A backend.
 	 */
-	BackendImplementor create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource);
+	BackendImplementor create(EventContext eventContext, BackendBuildContext context, ConfigurationPropertySource propertySource);
 
 }

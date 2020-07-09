@@ -70,7 +70,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
 				.andReturn( BeanHolder.of( backendFactoryMock ) );
 		EasyMock.expect( backendFactoryMock.create(
-				EasyMock.eq( "default" ),
+				EasyMock.eq( EventContexts.defaultBackend() ),
 				EasyMock.anyObject(),
 				EasyMock.capture( backendPropertySourceCapture )
 		) )
@@ -99,20 +99,9 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		// Check that configuration property sources behave as expected
 		Optional result;
 
-		// Backend configuration - syntax "hibernate.search.backend.foo"
+		// Backend configuration
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.foo" ) )
-				.andReturn( (Optional) Optional.of( "bar" ) );
-		replayAll();
-		result = backendPropertySourceCapture.getValue().get( "foo" );
-		verifyAll();
-		assertThat( result ).contains( "bar" );
-
-		// Backend configuration - syntax "hibernate.search.backends.default.foo"
-		resetAll();
-		EasyMock.expect( configurationSourceMock.get( "backend.foo" ) )
-				.andReturn( (Optional) Optional.empty() );
-		EasyMock.expect( configurationSourceMock.get( "backends.default.foo" ) )
 				.andReturn( (Optional) Optional.of( "bar" ) );
 		replayAll();
 		result = backendPropertySourceCapture.getValue().get( "foo" );
@@ -131,8 +120,6 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		// Index configuration defaults
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
-				.andReturn( Optional.empty() );
-		EasyMock.expect( configurationSourceMock.get( "backends.default.indexes.myIndex.foo" ) )
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backend.index_defaults.foo" ) )
 				.andReturn( (Optional) Optional.of( "bar" ) );
@@ -173,7 +160,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
 				.andReturn( BeanHolder.of( backendFactoryMock ) );
 		EasyMock.expect( backendFactoryMock.create(
-				EasyMock.eq( "myBackend" ),
+				EasyMock.eq( EventContexts.fromBackendName( "myBackend" ) ),
 				EasyMock.anyObject(),
 				EasyMock.capture( backendPropertySourceCapture )
 		) )
@@ -273,7 +260,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
 				.andReturn( BeanHolder.of( backendFactoryMock ) );
 		EasyMock.expect( backendFactoryMock.create(
-				EasyMock.eq( "myBackend" ),
+				EasyMock.eq( EventContexts.fromBackendName( "myBackend" ) ),
 				EasyMock.anyObject(),
 				EasyMock.capture( backendPropertySourceCapture )
 		) )
@@ -374,7 +361,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
 		assertThat( throwableCapture.getValue() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Missing backend type for backend 'backendName'" )
+				.hasMessageContaining( "Missing backend type" )
 				.hasMessageContaining( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
 	}
 
@@ -411,7 +398,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
 		assertThat( throwableCapture.getValue() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Missing backend type for backend 'backendName'" )
+				.hasMessageContaining( "Missing backend type" )
 				.hasMessageContaining( "Set the property 'somePrefix.backends.backendName.type' to a supported value" );
 	}
 

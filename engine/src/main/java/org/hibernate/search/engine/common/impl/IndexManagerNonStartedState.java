@@ -7,23 +7,24 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 class IndexManagerNonStartedState {
 
-	private final String backendName;
-	private final String indexName;
+	private final EventContext eventContext;
+	private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 	private final IndexManagerImplementor indexManager;
 
-	IndexManagerNonStartedState(String backendName,
-			String indexName, IndexManagerImplementor indexManager) {
-		this.backendName = backendName;
-		this.indexName = indexName;
+	IndexManagerNonStartedState(EventContext eventContext,
+			ConfigurationPropertySourceExtractor propertySourceExtractor,
+			IndexManagerImplementor indexManager) {
+		this.eventContext = eventContext;
+		this.propertySourceExtractor = propertySourceExtractor;
 		this.indexManager = indexManager;
 	}
 
@@ -34,16 +35,8 @@ class IndexManagerNonStartedState {
 	IndexManagerImplementor start(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
-		ContextualFailureCollector indexFailureCollector =
-				rootFailureCollector.withContext( EventContexts.fromIndexName( indexName ) );
-		ConfigurationPropertySource backendPropertySource =
-				EngineConfigurationUtils.getBackendByName( rootPropertySource, backendName );
-		ConfigurationPropertySource indexPropertySource =
-				EngineConfigurationUtils.getIndex(
-						backendPropertySource,
-						EngineConfigurationUtils.getIndexDefaults( backendPropertySource ),
-						indexName
-				);
+		ContextualFailureCollector indexFailureCollector = rootFailureCollector.withContext( eventContext );
+		ConfigurationPropertySource indexPropertySource = propertySourceExtractor.extract( rootPropertySource );
 		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, beanResolver, indexPropertySource
 		);

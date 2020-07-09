@@ -14,6 +14,8 @@ import org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl;
 
 public interface SearchIntegration extends AutoCloseable {
 
+	Backend backend();
+
 	Backend backend(String backendName);
 
 	IndexManager indexManager(String indexManagerName);

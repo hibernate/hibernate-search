@@ -57,6 +57,9 @@ public interface EngineEventContextMessages {
 	@Message(value = "type '%1$s'")
 	String type(String name);
 
+	@Message(value = "default backend")
+	String defaultBackend();
+
 	@Message(value = "backend '%1$s'")
 	String backend(String name);
 

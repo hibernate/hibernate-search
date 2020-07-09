@@ -49,7 +49,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String name;
+	private final EventContext eventContext;
 
 	private final BackendThreads threads;
 	private final ElasticsearchLinkImpl link;
@@ -62,12 +62,10 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private final BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
 
-	private final EventContext eventContext;
-
 	private final IndexManagerBackendContext indexManagerBackendContext;
 	private final IndexNamesRegistry indexNamesRegistry;
 
-	ElasticsearchBackendImpl(String name,
+	ElasticsearchBackendImpl(EventContext eventContext,
 			BackendThreads threads,
 			ElasticsearchLinkImpl link,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
@@ -77,12 +75,12 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler) {
-		this.name = name;
+		this.eventContext = eventContext;
 		this.threads = threads;
 		this.link = link;
 
 		this.generalPurposeOrchestrator = new ElasticsearchSimpleWorkOrchestrator(
-				"Elasticsearch general purpose orchestrator for backend " + name,
+				"Elasticsearch general purpose orchestrator - " + eventContext.render(),
 				link
 		);
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
@@ -91,7 +89,6 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		this.indexLayoutStrategyHolder = indexLayoutStrategyHolder;
 		this.typeNameMapping = typeNameMapping;
 
-		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, link,
 				userFacingGson,
@@ -106,11 +103,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "name=" ).append( name )
-				.append( "]" )
-				.toString();
+		return getClass().getSimpleName() + "[" + eventContext.render() + "]";
 	}
 
 	@Override

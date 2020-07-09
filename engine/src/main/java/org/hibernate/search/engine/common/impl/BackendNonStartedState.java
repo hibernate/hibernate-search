@@ -7,21 +7,24 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
-import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 class BackendNonStartedState {
 
-	private final String backendName;
+	private final EventContext eventContext;
+	private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 	private final BackendImplementor backend;
 
-	BackendNonStartedState(String backendName, BackendImplementor backend) {
-		this.backendName = backendName;
+	BackendNonStartedState(EventContext eventContext, ConfigurationPropertySourceExtractor propertySourceExtractor,
+			BackendImplementor backend) {
+		this.eventContext = eventContext;
+		this.propertySourceExtractor = propertySourceExtractor;
 		this.backend = backend;
 	}
 
@@ -33,10 +36,8 @@ class BackendNonStartedState {
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource,
 			ThreadPoolProvider threadPoolProvider) {
-		ContextualFailureCollector backendFailureCollector =
-				rootFailureCollector.withContext( EventContexts.fromBackendName( backendName ) );
-		ConfigurationPropertySource backendPropertySource =
-				EngineConfigurationUtils.getBackendByName( rootPropertySource, backendName );
+		ContextualFailureCollector backendFailureCollector = rootFailureCollector.withContext( eventContext );
+		ConfigurationPropertySource backendPropertySource = propertySourceExtractor.extract( rootPropertySource );
 		BackendStartContextImpl startContext = new BackendStartContextImpl(
 				backendFailureCollector,
 				beanResolver,
