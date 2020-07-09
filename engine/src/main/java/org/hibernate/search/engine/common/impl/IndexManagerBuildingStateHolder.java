@@ -128,8 +128,17 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	private BackendInitialBuildState createBackend(String backendName) {
-		ConfigurationPropertySource backendPropertySource =
-				EngineConfigurationUtils.getBackend( propertySource, backendName );
+		ConfigurationPropertySource backendPropertySource;
+		if ( backendName.equals( defaultBackendName ) ) {
+			backendPropertySource = EngineConfigurationUtils.getDefaultBackend( propertySource )
+					// Fall back to the syntax "hibernate.search.backends.default.foo".
+					// Mostly supported for consistency and backward compatibility.
+					// Ideally, we'd drop it, but that may be surprising since the default backend does have a name.
+					.withFallback( EngineConfigurationUtils.getBackendByName( propertySource, backendName ) );
+		}
+		else {
+			backendPropertySource = EngineConfigurationUtils.getBackendByName( propertySource, backendName );
+		}
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.getAndMapOrThrow(
 						backendPropertySource,

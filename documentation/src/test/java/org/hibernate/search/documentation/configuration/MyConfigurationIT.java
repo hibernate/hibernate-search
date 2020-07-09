@@ -27,23 +27,21 @@ public class MyConfigurationIT {
 	// tag::build-hibernate-configuration[]
 	private Properties buildHibernateConfiguration() {
 		Properties config = new Properties();
-		// add hibernate configuration
-		String myBackend = "myBackend";
 		// backend configuration
-		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.HOSTS ), "127.0.0.1:9200" );
-		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.PROTOCOL ), "http" );
+		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.HOSTS ), "127.0.0.1:9200" );
+		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.PROTOCOL ), "http" );
 		config.put(
-				BackendSettings.backendKey( myBackend, BackendSettings.TYPE ), ElasticsearchBackendSettings.TYPE_NAME );
+				BackendSettings.backendKey( BackendSettings.TYPE ), ElasticsearchBackendSettings.TYPE_NAME );
 		config.put(
-				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
+				BackendSettings.backendKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
 				MultiTenancyStrategyName.DISCRIMINATOR.externalRepresentation()
 		);
-		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION ), "7.8" );
+		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), "7.8" );
 		config.put(
-				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
+				BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
 		// index configuration
 		config.put(
-				IndexSettings.indexDefaultsKey( myBackend, ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
+				IndexSettings.indexDefaultsKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
 				IndexStatus.YELLOW.externalRepresentation()
 		);
 		// orm configuration
@@ -53,7 +51,6 @@ public class MyConfigurationIT {
 		);
 		// engine configuration
 		config.put( EngineSettings.BACKGROUND_FAILURE_HANDLER, "myFailureHandler" );
-		config.put( EngineSettings.DEFAULT_BACKEND, myBackend );
 		return config;
 	}
 	// end::build-hibernate-configuration[]
@@ -62,16 +59,15 @@ public class MyConfigurationIT {
 	public void shouldBuildHibernateConfiguration() {
 		assertThat( buildHibernateConfiguration() )
 				.containsOnly(
-						entry( "hibernate.search.backends.myBackend.hosts", "127.0.0.1:9200" ),
-						entry( "hibernate.search.backends.myBackend.protocol", "http" ),
-						entry( "hibernate.search.backends.myBackend.type", "elasticsearch" ),
-						entry( "hibernate.search.backends.myBackend.multi_tenancy.strategy", "discriminator" ),
-						entry( "hibernate.search.backends.myBackend.version", "7.8" ),
-						entry( "hibernate.search.backends.myBackend.version_check.enabled", "false" ),
-						entry( "hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status", "yellow" ),
+						entry( "hibernate.search.backend.hosts", "127.0.0.1:9200" ),
+						entry( "hibernate.search.backend.protocol", "http" ),
+						entry( "hibernate.search.backend.type", "elasticsearch" ),
+						entry( "hibernate.search.backend.multi_tenancy.strategy", "discriminator" ),
+						entry( "hibernate.search.backend.version", "7.8" ),
+						entry( "hibernate.search.backend.version_check.enabled", "false" ),
+						entry( "hibernate.search.backend.index_defaults.schema_management.minimal_required_status", "yellow" ),
 						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
-						entry( "hibernate.search.background_failure_handler", "myFailureHandler" ),
-						entry( "hibernate.search.default_backend", "myBackend" )
+						entry( "hibernate.search.background_failure_handler", "myFailureHandler" )
 				);
 	}
 }

@@ -22,9 +22,42 @@ public final class IndexSettings {
 	}
 
 	/**
+	 * Builds a configuration property key for the index defaults of the default backend, with the given radical.
+	 * <p>
+	 * See the javadoc of your backend for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backend.index_defaults.lifecycle.strategy}"
+	 *
+	 * @param radical The radical of the configuration property (see constants in
+	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
+	 *
+	 * @return the concatenated default index settings key
+	 */
+	public static String indexDefaultsKey(String radical) {
+		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEX_DEFAULTS, radical );
+	}
+
+	/**
+	 * Builds a configuration property key for the index of the given backend, with the given radical.
+	 * <p>
+	 * See the javadoc of your backend for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backend.indexes.<indexName>.lifecycle.strategy}"
+	 *
+	 * @param indexName Expect the specific targeted index name
+	 * @param radical The radical of the configuration property (see constants in
+	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
+	 *
+	 * @return the concatenated index settings key
+	 */
+	public static String indexKey(String indexName, String radical) {
+		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEXES, indexName, radical );
+	}
+
+	/**
 	 * Builds a configuration property key for the index defaults of the given backend, with the given radical.
 	 * <p>
-	 * See the javadoc of your backend for avalaible radicals.
+	 * See the javadoc of your backend for available radicals.
 	 * </p>
 	 * Example result: "{@code hibernate.search.backends.<backendName>.index_defaults.lifecycle.strategy}"
 	 *
@@ -35,15 +68,13 @@ public final class IndexSettings {
 	 * @return the concatenated default index settings key
 	 */
 	public static String indexDefaultsKey(String backendName, String radical) {
-		return join( ".",
-				EngineSettings.BACKENDS, backendName, BackendSettings.INDEX_DEFAULTS, radical
-		);
+		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEX_DEFAULTS, radical );
 	}
 
 	/**
 	 * Builds a configuration property key for the index of the given backend, with the given radical.
 	 * <p>
-	 * See the javadoc of your backend for avalaible radicals.
+	 * See the javadoc of your backend for available radicals.
 	 * </p>
 	 * Example result: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.lifecycle.strategy}"
 	 *
@@ -55,9 +86,7 @@ public final class IndexSettings {
 	 * @return the concatenated index settings key
 	 */
 	public static String indexKey(String backendName, String indexName, String radical) {
-		return join( ".",
-				EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName, radical
-		);
+		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName, radical );
 	}
 
 }

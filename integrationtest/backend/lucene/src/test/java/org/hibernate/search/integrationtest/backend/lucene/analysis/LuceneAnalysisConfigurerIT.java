@@ -44,7 +44,7 @@ public class LuceneAnalysisConfigurerIT {
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Unable to convert configuration property 'hibernate.search.backends." + BACKEND_NAME + "."
+								"Unable to convert configuration property 'hibernate.search.backend."
 										+ LuceneBackendSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'",
 								"Unable to find " + LuceneAnalysisConfigurer.class.getName() + " implementation class: foobar"

@@ -121,21 +121,34 @@ or a reference by type as a `java.lang.Class`
 === Configuration Builders
 Both `BackendSettings` and `IndexSettings` provide tools to help build the configuration property keys.
 
-
 BackendSettings::
 +
-`BackendSettings.backendKey("myBackend", ElasticsearchBackendSettings.HOSTS)` is equivalent to `hibernate.search.backends.myBackend.host`.
+`BackendSettings.backendKey(ElasticsearchBackendSettings.HOSTS)`
+is equivalent to `hibernate.search.backend.hosts`.
 +
-For a list of available property keys, see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[ElasticsearchBackendSettings] or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[LuceneBackendSettings]
+`BackendSettings.backendKey("myBackend", ElasticsearchBackendSettings.HOSTS)`
+is equivalent to `hibernate.search.backends.myBackend.hosts`.
++
+For a list of available property keys,
+see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[ElasticsearchBackendSettings]
+or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[LuceneBackendSettings]
 
 IndexSettings::
 +
-`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)` is equivalent to `hibernate.search.backends.signature.index_defaults.lifecycle.minimal_required_status`.
+`IndexSettings.indexDefaultsKey(ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
+is equivalent to `hibernate.search.backend.index_defaults.lifecycle.minimal_required_status`.
 +
-For a list of available property keys, see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[ElasticsearchIndexSettings] or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[LuceneIndexSettings]
+`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
+is equivalent to `hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status`.
++
+For a list of available property keys,
+see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[ElasticsearchIndexSettings]
+or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[LuceneIndexSettings]
 [TIP]
 ====
-You can also use the `IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)` to apply a configuration to a specific index.
+You can also use `IndexSettings.indexKey("myIndex", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
+or `IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
+to apply a configuration to a specific index.
 ====
 
 .Using the helper to build hibernate configuration

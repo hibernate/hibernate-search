@@ -41,6 +41,17 @@ public final class BackendSettings {
 	public static final String INDEXES = "indexes";
 
 	/**
+	 * Builds a configuration property key for the default backend, with the given radical.
+	 *
+	 * @param radical The radical of the configuration property (see constants in
+	 * 	 * {@code ElasticsearchBackendSettings}, {@code ElasticsearchBackendSettings}, etc.)
+	 * @return the concatenated prefix + radical
+	 */
+	public static String backendKey(String radical) {
+		return join( ".", EngineSettings.BACKEND, radical );
+	}
+
+	/**
 	 * Builds a configuration property key for the given backend, with the given radical.
 	 *
 	 * @param backendName Expect the backendName
@@ -49,8 +60,6 @@ public final class BackendSettings {
 	 * @return the concatenated prefix + backend name + radical
 	 */
 	public static String backendKey(String backendName, String radical) {
-		return join( ".",
-				EngineSettings.BACKENDS, backendName, radical
-		);
+		return join( ".", EngineSettings.BACKENDS, backendName, radical );
 	}
 }

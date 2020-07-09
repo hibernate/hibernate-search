@@ -32,7 +32,12 @@ public final class EngineSettings {
 	public static final String DEFAULT_BACKEND = PREFIX + Radicals.DEFAULT_BACKEND;
 
 	/**
-	 * The root property whose children are backend names, e.g. "hibernate.search.backends.myBackend.type = elasticsearch".
+	 * The root property for properties of the default backend, e.g. "hibernate.search.backend.type = elasticsearch".
+	 */
+	public static final String BACKEND = PREFIX + Radicals.BACKEND;
+
+	/**
+	 * The root property for properties of named backends, e.g. "hibernate.search.backends.myBackend.type = elasticsearch".
 	 */
 	public static final String BACKENDS = PREFIX + Radicals.BACKENDS;
 
@@ -70,6 +75,7 @@ public final class EngineSettings {
 		}
 
 		public static final String DEFAULT_BACKEND = "default_backend";
+		public static final String BACKEND = "backend";
 		public static final String BACKENDS = "backends";
 		public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY = "configuration_property_checking.strategy";
 		public static final String BACKGROUND_FAILURE_HANDLER = "background_failure_handler";

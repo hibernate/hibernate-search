@@ -37,7 +37,7 @@ class IndexManagerNonStartedState {
 		ContextualFailureCollector indexFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromIndexName( indexName ) );
 		ConfigurationPropertySource backendPropertySource =
-				EngineConfigurationUtils.getBackend( rootPropertySource, backendName );
+				EngineConfigurationUtils.getBackendByName( rootPropertySource, backendName );
 		ConfigurationPropertySource indexPropertySource =
 				EngineConfigurationUtils.getIndex(
 						backendPropertySource,

@@ -27,7 +27,7 @@ public @interface Indexed {
 
 	/**
 	 * @return The name of the backend.
-	 * Defaults to the {@link org.hibernate.search.engine.cfg.EngineSettings#DEFAULT_BACKEND default backend}.
+	 * Defaults to the {@link org.hibernate.search.engine.cfg.EngineSettings#BACKEND default backend}.
 	 */
 	String backend() default "";
 
