@@ -36,13 +36,13 @@ import org.easymock.EasyMockSupport;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
-	private RootBuildContext rootBuildContextMock = createMock( RootBuildContext.class );
-	private ConfigurationPropertySource configurationSourceMock =
+	private final RootBuildContext rootBuildContextMock = createMock( RootBuildContext.class );
+	private final ConfigurationPropertySource configurationSourceMock =
 			partialMockBuilder( AbstractConfigurationPropertySourcePartialMock.class ).mock();
-	private BeanResolver beanResolverMock =
+	private final BeanResolver beanResolverMock =
 			partialMockBuilder( AbstractBeanResolverPartialMock.class ).mock();
 
-	private IndexManagerBuildingStateHolder holder =
+	private final IndexManagerBuildingStateHolder holder =
 			new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
 
 	@Test
@@ -65,7 +65,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				EasyMock.anyObject(),
 				EasyMock.capture( backendPropertySourceCapture )
 		) )
-				.andReturn( (BackendImplementor) backendMock );
+				.andReturn( backendMock );
 		replayAll();
 		holder.createBackends( CollectionHelper.asSet( Optional.of( "myBackend" ) ) );
 		verifyAll();
@@ -78,7 +78,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				EasyMock.anyObject(),
 				EasyMock.capture( indexPropertySourceCapture )
 		) )
-				.andReturn( (IndexManagerBuilder) indexManagerBuilderMock );
+				.andReturn( indexManagerBuilderMock );
 		EasyMock.expect( indexManagerBuilderMock.schemaRootNodeBuilder() )
 				.andStubReturn( indexSchemaRootNodeBuilderMock );
 		replayAll();
