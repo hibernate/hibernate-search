@@ -41,6 +41,7 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider) {
 		for ( Map.Entry<String, BackendConfiguration> entry : backendConfigurations.entrySet() ) {

@@ -43,6 +43,7 @@ public abstract class AbstractBackendHolder {
 	private List<MappedIndex> indexes;
 
 	@Setup(Level.Trial)
+	@SuppressWarnings("deprecation")
 	public void startHibernateSearch(TemporaryFileHolder temporaryFileHolder) throws IOException {
 		Map<String, Object> baseProperties = new LinkedHashMap<>();
 		baseProperties.put( EngineSettings.DEFAULT_BACKEND, BACKEND_NAME );

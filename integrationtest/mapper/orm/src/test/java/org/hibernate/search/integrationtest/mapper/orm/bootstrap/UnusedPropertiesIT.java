@@ -49,6 +49,7 @@ public class UnusedPropertiesIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void checkEnabledByDefault_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
 		logged.expectMessage(

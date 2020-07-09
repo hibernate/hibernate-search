@@ -74,6 +74,7 @@ public class SearchSetupHelper implements TestRule {
 		return start( "testedBackend" );
 	}
 
+	@SuppressWarnings("deprecation")
 	public SetupContext start(String backendName) {
 		Map<String, ?> backendRelativeProperties =
 				setupStrategy.createBackendConfigurationProperties( configurationProvider );

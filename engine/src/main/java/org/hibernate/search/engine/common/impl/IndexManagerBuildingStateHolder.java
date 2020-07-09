@@ -40,9 +40,9 @@ class IndexManagerBuildingStateHolder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<String> EXPLICIT_DEFAULT_BACKEND_NAME =
-			ConfigurationProperty.forKey( EngineSettings.Radicals.DEFAULT_BACKEND ).asString()
-					.withDefault( "default" ).build();
+	@SuppressWarnings("deprecation")
+	private static final OptionalConfigurationProperty<String> EXPLICIT_DEFAULT_BACKEND_NAME =
+			ConfigurationProperty.forKey( EngineSettings.Radicals.DEFAULT_BACKEND ).asString().build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
@@ -64,7 +64,15 @@ class IndexManagerBuildingStateHolder {
 		this.beanResolver = beanResolver;
 		this.propertySource = propertySource;
 		this.rootBuildContext = rootBuildContext;
-		defaultBackendName = EXPLICIT_DEFAULT_BACKEND_NAME.get( propertySource );
+		Optional<String> explicitDefaultBackendName = EXPLICIT_DEFAULT_BACKEND_NAME.get( propertySource );
+		if ( explicitDefaultBackendName.isPresent() ) {
+			defaultBackendName = explicitDefaultBackendName.get();
+			log.deprecatedExplicitDefaultBackendName( EXPLICIT_DEFAULT_BACKEND_NAME.resolveOrRaw( propertySource ),
+					defaultBackendName );
+		}
+		else {
+			defaultBackendName = "default";
+		}
 	}
 
 	void createBackends(Set<Optional<String>> backendNames) {

@@ -28,7 +28,10 @@ public final class EngineSettings {
 	 * Expects a String.
 	 * <p>
 	 * Defaults to no value, meaning a backend must be set in the mapping for every single index.
+	 * @deprecated The default backend shouldn't be assigned a name;
+	 * just prefix its properties with {@link #BACKEND} instead of {@link #BACKENDS} + a name.
 	 */
+	@Deprecated
 	public static final String DEFAULT_BACKEND = PREFIX + Radicals.DEFAULT_BACKEND;
 
 	/**
@@ -74,6 +77,7 @@ public final class EngineSettings {
 		private Radicals() {
 		}
 
+		@Deprecated
 		public static final String DEFAULT_BACKEND = "default_backend";
 		public static final String BACKEND = "backend";
 		public static final String BACKENDS = "backends";

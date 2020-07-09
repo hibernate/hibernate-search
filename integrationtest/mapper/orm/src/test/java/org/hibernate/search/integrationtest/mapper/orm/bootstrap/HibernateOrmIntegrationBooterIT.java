@@ -108,6 +108,7 @@ public class HibernateOrmIntegrationBooterIT {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private HibernateOrmIntegrationBooter createBooter(Class<?> ... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 

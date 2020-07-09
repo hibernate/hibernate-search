@@ -23,6 +23,7 @@ class BackendMockSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider) {
 		for ( BackendMock backendMock : backendMocks ) {
