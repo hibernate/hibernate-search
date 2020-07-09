@@ -22,8 +22,6 @@ import org.junit.Test;
 
 public class IndexManagerIT {
 
-	private static final String BACKEND_NAME = "MyBackend";
-
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -34,10 +32,10 @@ public class IndexManagerIT {
 
 	@BeforeClass
 	public static void setup() {
-		SearchIntegration integration = setupHelper.start( BACKEND_NAME ).withIndex( index )
+		SearchIntegration integration = setupHelper.start().withIndex( index )
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.NONE )
 				.setup();
-		backendApi = integration.backend( BACKEND_NAME );
+		backendApi = integration.backend();
 		indexApi = index.toApi();
 	}
 

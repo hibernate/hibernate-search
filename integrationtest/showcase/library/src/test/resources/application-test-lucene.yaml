@@ -1,15 +1,9 @@
 spring.jpa:
-  hibernate:
-    ddl-auto: create-drop
   properties:
     hibernate.search:
-      # Overridden in some tests
-      schema_management.strategy: drop-and-create-and-drop
-      automatic_indexing:
-        # This really is only for tests:
-        # it makes documents searchable directly upon returning from a transaction,
-        # but it also hurts performance.
-        synchronization.strategy: sync
+      backend:
+        # Hack to use a different directory for each test
+        directory.root: ${LUCENE_ROOT_PATH}/${random.uuid} # LUCENE_ROOT_PATH is an environment variable
 
 logging.level:
   org.hibernate.SQL: DEBUG
@@ -20,4 +14,4 @@ logging.level:
 
 # Default environment variable values for IDEs that are unable to extract them from the maven-failsafe configuration
 # These values are overridden when running tests from Intellij IDEA or directly from Maven
-JDBC_URL: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1
+LUCENE_ROOT_PATH: target/test-indexes

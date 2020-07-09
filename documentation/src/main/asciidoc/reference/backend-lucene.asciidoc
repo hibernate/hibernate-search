@@ -7,7 +7,7 @@
 == Basic configuration
 
 In order to define a Lucene backend,
-the `hibernate.search.backends.<backend name>.type` property must be set to `lucene`.
+the property `hibernate.search.backend.type` must be set to `lucene`.
 
 All other configuration properties are optional,
 but the defaults might not suit everyone.
@@ -38,7 +38,7 @@ The type of directory is set a the backend level:
 [[example-configuring-directory-providers]]
 [source]
 ----
-hibernate.search.backends.<backend-name>.directory.type = local-filesystem
+hibernate.search.backend.directory.type = local-filesystem
 ----
 
 // Search 5 anchors backward compatibility
@@ -85,7 +85,7 @@ It can be configured at the backend level:
 
 [source]
 ----
-hibernate.search.backends.<backend-name>.directory.root = /path/to/my/root
+hibernate.search.backend.directory.root = /path/to/my/root
 ----
 
 For example, with the configuration above,
@@ -107,7 +107,7 @@ Hibernate Search exposes a configuration property at the backend level:
 
 [source]
 ----
-hibernate.search.backends.<backend-name>.directory.filesystem_access.strategy = auto (default)
+hibernate.search.backend.directory.filesystem_access.strategy = auto (default)
 ----
 
 Allowed values are:
@@ -166,7 +166,7 @@ Hibernate Search exposes a configuration property at the backend level:
 
 [source]
 ----
-hibernate.search.backends.<backend-name>.directory.locking.strategy = native-filesystem
+hibernate.search.backend.directory.locking.strategy = native-filesystem
 ----
 
 The following strategies are available:
@@ -223,11 +223,11 @@ Multiple strategies are available:
 +
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.sharding.strategy = hash
-hibernate.search.backends.<backend name>.indexes.<index name>.sharding.number_of_shards = 2 (no default)
+hibernate.search.backend.indexes.<index name>.sharding.strategy = hash
+hibernate.search.backend.indexes.<index name>.sharding.number_of_shards = 2 (no default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.sharding.strategy = hash
-hibernate.search.backends.<backend name>.index_defaults.sharding.number_of_shards = 2 (no default)
+hibernate.search.backend.index_defaults.sharding.strategy = hash
+hibernate.search.backend.index_defaults.sharding.number_of_shards = 2 (no default)
 ----
 +
 The `hash` strategy requires to set a number of shards through the `number_of_shards` property.
@@ -248,11 +248,11 @@ to be brought down to a smaller number (e.g. "all integers").
 +
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.sharding.strategy = explicit
-hibernate.search.backends.<backend name>.indexes.<index name>.sharding.shard_identifiers = fr,en,de (no default)
+hibernate.search.backend.indexes.<index name>.sharding.strategy = explicit
+hibernate.search.backend.indexes.<index name>.sharding.shard_identifiers = fr,en,de (no default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.sharding.strategy = explicit
-hibernate.search.backends.<backend name>.index_defaults.sharding.shard_identifiers = fr,en,de (no default)
+hibernate.search.backend.index_defaults.sharding.strategy = explicit
+hibernate.search.backend.index_defaults.sharding.shard_identifiers = fr,en,de (no default)
 ----
 +
 The `explicit` strategy requires to set a list of shard identifiers through the `shard_identifiers` property.
@@ -295,7 +295,7 @@ This configuration property is set at the backend level:
 
 [source]
 ----
-hibernate.search.backends.<backend-name>.lucene_version = LUCENE_8_1_1
+hibernate.search.backend.lucene_version = LUCENE_8_1_1
 ----
 
 Depending on the specific version of Lucene you're using,
@@ -489,7 +489,7 @@ The multi-tenancy strategy is set a the backend level:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.multi_tenancy.strategy = none (default)
+hibernate.search.backend.multi_tenancy.strategy = none (default)
 ----
 
 See the following subsections for details about available strategies.
@@ -526,7 +526,7 @@ To configure analysis in a Lucene backend, you will need to:
 
 * Define a class that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
 * Configure the backend to use that implementation by setting the configuration property
-`hibernate.search.backends.<backend name>.analysis.configurer`
+`hibernate.search.backend.analysis.configurer`
 to a <<configuration-property-types,bean reference>> pointing to the implementation.
 
 Hibernate Search will call the `configure` method of this implementation on startup,
@@ -628,7 +628,7 @@ That can be changed using a configuration property:
 
 [source]
 ----
-hibernate.search.backends.<backend-name>.thread_pool.size = 4
+hibernate.search.backend.thread_pool.size = 4
 ----
 
 [NOTE]
@@ -668,11 +668,11 @@ This is done through the following configuration properties, at the index level:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_count 10 (default)
-hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_size 1000 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_count 10 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_size 1000 (default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.indexing.queue_count 10 (default)
-hibernate.search.backends.<backend name>.index_defaults.indexing.queue_size 1000 (default)
+hibernate.search.backend.index_defaults.indexing.queue_count 10 (default)
+hibernate.search.backend.index_defaults.indexing.queue_size 1000 (default)
 ----
 
 * `indexing.queue_count` defines the number of queues.
@@ -758,9 +758,9 @@ by setting the commit interval (in milliseconds) at the index level:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.io.commit_interval = 1000 (default)
+hibernate.search.backend.indexes.<index name>.io.commit_interval = 1000 (default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.io.commit_interval = 1000 (default)
+hibernate.search.backend.index_defaults.io.commit_interval = 1000 (default)
 ----
 
 [WARNING]
@@ -808,9 +808,9 @@ The refresh interval is set at the index level:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.io.refresh_interval = 0 (default)
+hibernate.search.backend.indexes.<index name>.io.refresh_interval = 0 (default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.io.refresh_interval = 0 (default)
+hibernate.search.backend.index_defaults.io.refresh_interval = 0 (default)
 ----
 
 [[backend-lucene-io-writer]]
@@ -831,9 +831,9 @@ For example, `io.writer.ram_buffer_size` can be set like this:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.io.writer.ram_buffer_size = 32
+hibernate.search.backend.indexes.<index name>.io.writer.ram_buffer_size = 32
 # OR
-hibernate.search.backends.<backend name>.index_defaults.io.writer.ram_buffer_size = 32
+hibernate.search.backend.index_defaults.io.writer.ram_buffer_size = 32
 ----
 
 [[table-performance-parameters]]
@@ -900,9 +900,9 @@ For example, `io.merge.factor` can be set like this:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.io.merge.factor = 10
+hibernate.search.backend.indexes.<index name>.io.merge.factor = 10
 # OR
-hibernate.search.backends.<backend name>.index_defaults.io.merge.factor = 10
+hibernate.search.backend.index_defaults.io.merge.factor = 10
 ----
 
 [cols="1,2a", options="header"]
@@ -990,9 +990,9 @@ use something like this:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.index_defaults.io.writer.ram_buffer_size = 10
-hibernate.search.backends.<backend name>.index_defaults.io.merge.max_size = 7
-hibernate.search.backends.<backend name>.index_defaults.io.merge.max_forced_size = 7
+hibernate.search.backend.index_defaults.io.writer.ram_buffer_size = 10
+hibernate.search.backend.index_defaults.io.merge.max_size = 7
+hibernate.search.backend.index_defaults.io.merge.max_forced_size = 7
 ----
 ========
 

@@ -54,7 +54,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 ----
 ====
 
-If you defined multiple backends, you can map entities to another backend than the default one.
+If you <<configuration-structure,defined named backends>>, you can map entities to another backend than the default one.
 By setting `@Indexed(backend = "backend2")` you inform Hibernate Search that the index
 for your entity must be created in the backend named "backend2".
 This may be useful if your model has clearly defined sub-parts with very different indexing requirements.

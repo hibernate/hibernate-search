@@ -157,7 +157,6 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 <2> The backend will store indexes in the current working directory by default.
 If you want to store the indexes elsewhere,
 uncomment this line and set the value of the property.
-<3> Make sure to use the backend we just defined for all indexes.
 ====
 
 .Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
@@ -171,7 +170,6 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 If you want to connect to another URL, uncomment these lines
 and set the value for the "hosts" property,
 and optionally the username and password.
-<3> Make sure to use the backend we just defined for all indexes.
 ====
 
 [[getting-started-mapping]]

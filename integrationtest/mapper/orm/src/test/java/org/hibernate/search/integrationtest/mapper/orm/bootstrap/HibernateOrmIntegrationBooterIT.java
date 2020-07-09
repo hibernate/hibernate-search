@@ -107,18 +107,12 @@ public class HibernateOrmIntegrationBooterIT {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private HibernateOrmIntegrationBooter createBooter(Class<?> ... entityClasses) {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 
 		// Configure the backend
 		registryBuilder.applySetting(
-				EngineSettings.DEFAULT_BACKEND,
-				backendMock.getBackendName()
-		);
-		registryBuilder.applySetting(
-				EngineSettings.BACKENDS
-						+ "." + backendMock.getBackendName() + "." + BackendSettings.TYPE,
+				EngineSettings.BACKEND + "." + BackendSettings.TYPE,
 				backendMock.factory()
 		);
 

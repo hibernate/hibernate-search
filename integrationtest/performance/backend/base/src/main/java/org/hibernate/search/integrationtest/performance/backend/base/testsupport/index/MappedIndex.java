@@ -27,8 +27,7 @@ public class MappedIndex extends StubMappedIndex {
 	private IndexFieldReference<String> longTextField;
 	private IndexFieldReference<Long> numericField;
 
-	public MappedIndex(String backendName, int indexId) {
-		backendName( backendName );
+	public MappedIndex(int indexId) {
 		name( "index_" + indexId );
 		typeName( "type_" + indexId );
 	}

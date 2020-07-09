@@ -30,21 +30,21 @@ public final class BackendConfigurations {
 		return Arrays.asList(
 				new LuceneBackendConfiguration() {
 					@Override
-					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
-							String backendName, TestConfigurationProvider configurationProvider) {
-						return super.setupWithName( setupContext, backendName, configurationProvider )
+					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
+						return super.setup( setupContext, backendNameOrNull, configurationProvider )
 								.withIndexDefaultsProperty(
-										backendName, LuceneIndexSettings.SHARDING_STRATEGY, "hash"
+										backendNameOrNull, LuceneIndexSettings.SHARDING_STRATEGY, "hash"
 								)
 								.withIndexDefaultsProperty(
-										backendName, LuceneIndexSettings.SHARDING_NUMBER_OF_SHARDS, shardCount
+										backendNameOrNull, LuceneIndexSettings.SHARDING_NUMBER_OF_SHARDS, shardCount
 								);
 					}
 				},
 				new ElasticsearchBackendConfiguration() {
 					@Override
-					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
-							String backendName, TestConfigurationProvider configurationProvider) {
+					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 						// Make sure automatically created indexes will have an appropriate number of shards
 						testElasticsearchClient.template( "sharded_index" )
 								.create(
@@ -52,7 +52,7 @@ public final class BackendConfigurations {
 										99999, // Override other templates, if any
 										"{'number_of_shards': " + shardCount + "}"
 								);
-						return super.setupWithName( setupContext, backendName, configurationProvider );
+						return super.setup( setupContext, backendNameOrNull, configurationProvider );
 					}
 				}
 		);

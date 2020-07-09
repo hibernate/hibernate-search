@@ -107,7 +107,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 		) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								"Invalid filesystem access strategy name",
 								"'some_invalid_name'",

@@ -1,18 +1,16 @@
 spring.jpa:
   properties:
     hibernate.search:
-      default_backend: elasticsearch1
-      backends:
-        elasticsearch1:
-          type: elasticsearch
-          hosts: ${ELASTICSEARCH_HOSTS} # From environment variable
-          protocol: ${ELASTICSEARCH_PROTOCOL} # From environment variable
-          username: ${ELASTICSEARCH_USERNAME} # From environment variable
-          password: ${ELASTICSEARCH_PASSWORD} # From environment variable
-          aws.signing:
-            enabled: ${ELASTICSEARCH_AWS_SIGNING_ENABLED} # From environment variable
-            access_key: ${ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY} # From environment variable
-            secret_key: ${ELASTICSEARCH_AWS_SIGNING_SECRET_LEY} # From environment variable
-            region: ${ELASTICSEARCH_AWS_SIGNING_REGION} # From environment variable
-          discovery.enabled: true
-          analysis.configurer: elasticsearchAnalysisConfigurer
+      backend:
+        type: elasticsearch
+        hosts: ${ELASTICSEARCH_HOSTS} # From environment variable
+        protocol: ${ELASTICSEARCH_PROTOCOL} # From environment variable
+        username: ${ELASTICSEARCH_USERNAME} # From environment variable
+        password: ${ELASTICSEARCH_PASSWORD} # From environment variable
+        aws.signing:
+          enabled: ${ELASTICSEARCH_AWS_SIGNING_ENABLED} # From environment variable
+          access_key: ${ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY} # From environment variable
+          secret_key: ${ELASTICSEARCH_AWS_SIGNING_SECRET_LEY} # From environment variable
+          region: ${ELASTICSEARCH_AWS_SIGNING_REGION} # From environment variable
+        discovery.enabled: true
+        analysis.configurer: elasticsearchAnalysisConfigurer

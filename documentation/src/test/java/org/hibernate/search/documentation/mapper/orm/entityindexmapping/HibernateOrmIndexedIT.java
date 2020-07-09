@@ -38,10 +38,10 @@ import org.assertj.core.api.Assertions;
 @RunWith(Parameterized.class)
 public class HibernateOrmIndexedIT {
 
-	private static final String BACKEND_1 = "backend1";
 	private static final String BACKEND_2 = "backend2";
 
-	private static final Map<String, BackendConfiguration> BACKEND_CONFIGURATIONS;
+	private static final BackendConfiguration DEFAULT_BACKEND_CONFIGURATION;
+	private static final Map<String, BackendConfiguration> NAMED_BACKEND_CONFIGURATIONS;
 	static {
 		List<BackendConfiguration> backendConfigurations = BackendConfigurations.simple();
 		if ( backendConfigurations.size() != 2 ) {
@@ -50,17 +50,17 @@ public class HibernateOrmIndexedIT {
 							+ " If this changed, please update this test to add/remove entity types mapped to each backend as necessary."
 			);
 		}
+		DEFAULT_BACKEND_CONFIGURATION = backendConfigurations.get( 0 );
 		Map<String, BackendConfiguration> map = new HashMap<>();
-		map.put( BACKEND_1, backendConfigurations.get( 0 ) );
 		map.put( BACKEND_2, backendConfigurations.get( 1 ) );
-		BACKEND_CONFIGURATIONS = map;
+		NAMED_BACKEND_CONFIGURATIONS = map;
 	}
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
 		return Arrays.asList(
-				DocumentationSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS, null ),
-				DocumentationSetupHelper.withMultipleBackends( BACKEND_1, BACKEND_CONFIGURATIONS,
+				DocumentationSetupHelper.withMultipleBackends( DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS, null ),
+				DocumentationSetupHelper.withMultipleBackends( DEFAULT_BACKEND_CONFIGURATION, NAMED_BACKEND_CONFIGURATIONS,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
 							public void configure(HibernateOrmMappingConfigurationContext context) {

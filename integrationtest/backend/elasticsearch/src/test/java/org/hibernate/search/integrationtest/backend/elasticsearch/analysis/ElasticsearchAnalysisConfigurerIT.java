@@ -24,8 +24,6 @@ import org.junit.Test;
 
 public class ElasticsearchAnalysisConfigurerIT {
 
-	private static final String BACKEND_NAME = "BackendName";
-
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
 
 	@Rule
@@ -38,7 +36,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Unable to convert configuration property 'hibernate.search.backend."
@@ -57,7 +55,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								FailingConfigurer.FAILURE_MESSAGE
@@ -87,7 +85,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple analyzer definitions with the same name",
@@ -113,7 +111,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple normalizer definitions with the same name",
@@ -139,7 +137,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple tokenizer definitions with the same name",
@@ -164,7 +162,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid tokenizer definition for name 'tokenizerName'",
@@ -188,7 +186,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple char filter definitions with the same name",
@@ -213,7 +211,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid char filter definition for name 'charFilterName'",
@@ -237,7 +235,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple token filter definitions with the same name",
@@ -262,7 +260,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid token filter definition for name 'tokenFilterName'",
@@ -286,7 +284,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple parameters with the same name",
@@ -313,11 +311,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.start( BACKEND_NAME )
-				.withPropertyRadical(
-						"backends." + BACKEND_NAME + "." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						analysisConfigurer
-				)
+		setupHelper.start()
+				.withBackendProperty( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
 				.withIndex( StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor ) )
 				.setup();
 	}

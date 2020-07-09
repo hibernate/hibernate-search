@@ -22,7 +22,7 @@ public class TestActiveProfilesResolver implements ActiveProfilesResolver {
 			 */
 			testBackend = "lucene";
 		}
-		// The test profile must be mentioned last, to allow it to override properties
-		return new String[] { testBackend, "test" };
+		// The test profiles must be mentioned last, to allow them to override properties
+		return new String[] { testBackend, "test", "test-" + testBackend };
 	}
 }

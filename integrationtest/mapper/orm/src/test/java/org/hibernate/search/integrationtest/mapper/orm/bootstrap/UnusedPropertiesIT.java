@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -49,7 +50,6 @@ public class UnusedPropertiesIT {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void checkEnabledByDefault_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
 		logged.expectMessage(
@@ -62,11 +62,12 @@ public class UnusedPropertiesIT {
 		logged.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		// Also check that used properties are not reported as unused
-		logged.expectMessage( "not used", EngineSettings.DEFAULT_BACKEND )
+		logged.expectMessage( "not used", HibernateOrmMapperSettings.QUERY_LOADING_FETCH_SIZE )
 				.never();
 
 		setup( builder -> {
 			builder.setProperty( unusedPropertyKey, "bar" );
+			builder.setProperty( HibernateOrmMapperSettings.QUERY_LOADING_FETCH_SIZE, 2 );
 		} );
 	}
 

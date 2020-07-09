@@ -33,11 +33,9 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class AnalysisIT {
 
-	private static final String BACKEND_NAME = "myBackend"; // Don't change, the same name is used in property files
-
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BACKEND_NAME, BackendConfigurations.simple() );
+		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
 	}
 
 	@Parameterized.Parameter
@@ -111,7 +109,7 @@ public class AnalysisIT {
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
+						LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						new AdvancedLuceneAnalysisConfigurer()
 				)
 				.withProperty(
@@ -150,7 +148,7 @@ public class AnalysisIT {
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
+						LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						new CustomSimilarityLuceneAnalysisConfigurer()
 				)
 				.withProperty(
@@ -189,7 +187,7 @@ public class AnalysisIT {
 
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new AdvancedElasticsearchAnalysisConfigurer()
 				)
 				.withProperty(

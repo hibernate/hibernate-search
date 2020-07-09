@@ -71,14 +71,14 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	public SetupContext start() {
-		return start( "testedBackend" );
+		return start( null );
 	}
 
-	@SuppressWarnings("deprecation")
 	public SetupContext start(String backendName) {
 		Map<String, ?> backendRelativeProperties =
 				setupStrategy.createBackendConfigurationProperties( configurationProvider );
-		String backendPrefix = EngineSettings.BACKENDS + "." + backendName + ".";
+		String backendPrefix = backendName == null ? EngineSettings.BACKEND + "."
+				: EngineSettings.BACKENDS + "." + backendName + ".";
 		Map<String, Object> properties = new LinkedHashMap<>();
 		for ( Map.Entry<String, ?> entry : backendRelativeProperties.entrySet() ) {
 			properties.put( backendPrefix + entry.getKey(), entry.getValue() );
@@ -86,8 +86,7 @@ public class SearchSetupHelper implements TestRule {
 
 		AllAwareConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap( properties );
 
-		SetupContext setupContext = new SetupContext( backendName, propertySource )
-				.withProperty( EngineSettings.DEFAULT_BACKEND, backendName );
+		SetupContext setupContext = new SetupContext( backendName, propertySource );
 
 		return setupStrategy.startSetup( setupContext );
 	}
@@ -147,7 +146,6 @@ public class SearchSetupHelper implements TestRule {
 
 	public class SetupContext {
 
-		private final String defaultBackendName;
 		private final ConfigurationPropertyChecker unusedPropertyChecker;
 		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
@@ -157,7 +155,6 @@ public class SearchSetupHelper implements TestRule {
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
 		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
-			this.defaultBackendName = defaultBackendName;
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
 					.withOverride( unusedPropertyChecker.wrap( ConfigurationPropertySource.fromMap( overriddenProperties ) ) );
@@ -174,23 +171,23 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public SetupContext withBackendProperty(String keyRadical, Object value) {
-			return withBackendProperty( defaultBackendName, keyRadical, value );
+			return withBackendProperty( null, keyRadical, value );
 		}
 
 		public SetupContext withBackendProperty(String backendName, String keyRadical, Object value) {
+			if ( backendName == null ) {
+				return withProperty( EngineSettings.BACKEND + "." + keyRadical, value );
+			}
 			return withProperty( EngineSettings.BACKENDS + "." + backendName + "." + keyRadical, value );
 		}
 
 		public SetupContext withIndexDefaultsProperty(String keyRadical, Object value) {
-			return withIndexDefaultsProperty( defaultBackendName, keyRadical, value );
+			return withIndexDefaultsProperty( null, keyRadical, value );
 		}
 
 		public SetupContext withIndexDefaultsProperty(String backendName, String keyRadical, Object value) {
-			return withProperty(
-					EngineSettings.BACKENDS + "." + backendName
-							+ "." + BackendSettings.INDEX_DEFAULTS + "." + keyRadical,
-					value
-			);
+			return withBackendProperty( backendName, BackendSettings.INDEX_DEFAULTS + "." + keyRadical,
+					value );
 		}
 
 		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {

@@ -6,28 +6,37 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 
 class ActualBackendSetupStrategy implements BackendSetupStrategy {
-	private final String defaultBackendName;
-	private final Map<String, BackendConfiguration> backendConfigurations;
+	private final BackendConfiguration defaultBackendConfiguration;
+	private final Map<String, BackendConfiguration> namedBackendConfigurations;
+	private final List<BackendConfiguration> allConfigurations;
 
-	ActualBackendSetupStrategy(String defaultBackendName, Map<String, BackendConfiguration> backendConfigurations) {
-		this.defaultBackendName = defaultBackendName;
-		this.backendConfigurations = backendConfigurations;
+	ActualBackendSetupStrategy(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
+		this.defaultBackendConfiguration = defaultBackendConfiguration;
+		this.namedBackendConfigurations = namedBackendConfigurations;
+		allConfigurations = new ArrayList<>();
+		if ( defaultBackendConfiguration != null ) {
+			allConfigurations.add( defaultBackendConfiguration );
+		}
+		allConfigurations.removeIf( Objects::isNull );
 	}
 
 	@Override
 	public Optional<TestRule> getTestRule() {
 		RuleChain ruleChain = null;
-		for ( BackendConfiguration configuration : backendConfigurations.values() ) {
+		for ( BackendConfiguration configuration : allConfigurations ) {
 			Optional<TestRule> rule = configuration.getTestRule();
 			if ( !rule.isPresent() ) {
 				continue;
@@ -41,14 +50,16 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider) {
-		for ( Map.Entry<String, BackendConfiguration> entry : backendConfigurations.entrySet() ) {
+		if ( defaultBackendConfiguration != null ) {
+			setupContext = defaultBackendConfiguration.setup( setupContext, null, configurationProvider );
+		}
+		for ( Map.Entry<String, BackendConfiguration> entry : namedBackendConfigurations.entrySet() ) {
 			String name = entry.getKey();
 			BackendConfiguration configuration = entry.getValue();
-			setupContext = configuration.setupWithName( setupContext, name, configurationProvider );
+			setupContext = configuration.setup( setupContext, name, configurationProvider );
 		}
-		return setupContext.withProperty( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
+		return setupContext;
 	}
 }

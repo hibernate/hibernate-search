@@ -8,7 +8,9 @@ package org.hibernate.search.integrationtest.mapper.orm.session;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -35,17 +37,22 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-3049")
 public class SearchIndexingPlanBaseIT {
 
-	private static final String BACKEND1_NAME = "stubBackend1";
 	private static final String BACKEND2_NAME = "stubBackend2";
 
 	@Rule
-	public BackendMock backend1Mock = new BackendMock( BACKEND1_NAME );
+	public BackendMock defaultBackendMock = new BackendMock();
 
 	@Rule
-	public BackendMock backend2Mock = new BackendMock( BACKEND2_NAME );
+	public BackendMock backend2Mock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backend1Mock, backend2Mock );
+	public OrmSetupHelper ormSetupHelper;
+
+	public SearchIndexingPlanBaseIT() {
+		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
+		namedBackendMocks.put( BACKEND2_NAME, backend2Mock );
+		ormSetupHelper = OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks );
+	}
 
 	@Test
 	public void simple() {
@@ -66,14 +73,14 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.delete( entity3 );
 			indexingPlan.purge( IndexedEntity1.class, 42, null ); // Does not exist in database, but may exist in the index
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
 					.update( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
 					.delete( "42" )
 					.processedThenExecuted();
 		} );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -128,7 +135,7 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.purge( IndexedEntity1.class, 8, null );
 			indexingPlan.addOrUpdate( entity8 );
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// multiple addOrUpdate => single update
 					.update( "1", b -> b.field( "text", "number1" ) )
 					// multiple delete => single delete
@@ -149,7 +156,7 @@ public class SearchIndexingPlanBaseIT {
 					.update( "8", b -> b.field( "text", "number8" ) )
 					.processedThenExecuted();
 		} );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -198,11 +205,11 @@ public class SearchIndexingPlanBaseIT {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			indexingPlan.purge( IndexedEntity1.NAME, 42, null ); // Does not exist in database, but may exist in the index
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.delete( "42" )
 					.processedThenExecuted();
 		} );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -245,7 +252,7 @@ public class SearchIndexingPlanBaseIT {
 			session.persist( entity2 );
 
 			// flush triggers the prepare of the current indexing plan
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.processed();
@@ -253,7 +260,7 @@ public class SearchIndexingPlanBaseIT {
 			session.flush();
 
 			// Works should be prepared immediately
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 
 			/*
 			 * Detach entities and change their data.
@@ -266,13 +273,13 @@ public class SearchIndexingPlanBaseIT {
 			entity1.text = "WRONG";
 			entity2.text = "WRONG";
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.executed();
 		} );
 		// Works should be executed on transaction commit
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -286,17 +293,17 @@ public class SearchIndexingPlanBaseIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.processed();
 
 			session.flush();
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.executed();
@@ -304,10 +311,10 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.execute();
 
 			// Works should be executed immediately
-			backend1Mock.verifyExpectationsMet();
+			defaultBackendMock.verifyExpectationsMet();
 		} );
 		// There shouldn't be any more work to execute
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -321,12 +328,12 @@ public class SearchIndexingPlanBaseIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
 					.processedThenExecuted();
 		} );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 
 		withinTransaction( sessionFactory, session -> {
 			IndexedEntity1 entity1 = session.getReference( IndexedEntity1.class, 1 );
@@ -339,7 +346,7 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.addOrUpdate( entity1 );
 			indexingPlan.delete( entity2 );
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// Requested explicitly
 					.update( "1", b -> b.field( "text", "number1" ) )
 					.delete( "2" )
@@ -347,7 +354,7 @@ public class SearchIndexingPlanBaseIT {
 					.add( "3", b -> b.field( "text", "number3" ) )
 					.processedThenExecuted();
 		} );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -368,7 +375,7 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.addOrUpdate( entity2 );
 			indexingPlan.delete( entity3 );
 
-			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
 					.delete( "3" )
 					.processedThenExecuted();
@@ -376,7 +383,7 @@ public class SearchIndexingPlanBaseIT {
 					.update( "2", b -> b.field( "text", "number2" ) )
 					.processedThenExecuted();
 		} );
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();
 	}
 
@@ -418,7 +425,7 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	private SessionFactory setup(AutomaticIndexingStrategyName automaticIndexingStrategy) {
-		backend1Mock.expectAnySchema( IndexedEntity1.INDEX_NAME );
+		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );
 		backend2Mock.expectAnySchema( IndexedEntity2.INDEX_NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
@@ -428,14 +435,14 @@ public class SearchIndexingPlanBaseIT {
 				)
 				.setup( IndexedEntity1.class, IndexedEntity2.class, ContainedEntity.class );
 
-		backend1Mock.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();
 
 		return sessionFactory;
 	}
 
 	@Entity(name = IndexedEntity1.NAME)
-	@Indexed(backend = BACKEND1_NAME, index = IndexedEntity1.INDEX_NAME)
+	@Indexed(index = IndexedEntity1.INDEX_NAME)
 	public static class IndexedEntity1 {
 
 		static final String NAME = "indexed1";

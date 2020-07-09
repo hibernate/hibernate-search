@@ -27,8 +27,6 @@ import org.junit.rules.TemporaryFolder;
 
 public abstract class AbstractDirectoryIT {
 
-	protected static final String BACKEND_NAME = "BackendName";
-
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
@@ -70,7 +68,7 @@ public abstract class AbstractDirectoryIT {
 	protected final void setup(Object directoryType,
 			Function<SearchSetupHelper.SetupContext, SearchSetupHelper.SetupContext> additionalConfiguration) {
 		searchIntegration = additionalConfiguration.apply(
-				setupHelper.start( BACKEND_NAME )
+				setupHelper.start()
 						.withIndex( index )
 						.withBackendProperty(
 								LuceneBackendSettings.DIRECTORY_TYPE, directoryType

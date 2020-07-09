@@ -42,23 +42,9 @@ public class BackendMock implements TestRule {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String backendName;
-
 	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior();
 
 	private boolean started = false;
-
-	public BackendMock() {
-		this( "stubBackend" );
-	}
-
-	public BackendMock(String backendName) {
-		this.backendName = backendName;
-	}
-
-	public String getBackendName() {
-		return backendName;
-	}
 
 	@Override
 	public Statement apply(Statement base, Description description) {

@@ -30,17 +30,10 @@ import org.junit.Assume;
 public final class DocumentationSetupHelper
 		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
-	private static final String DEFAULT_BACKEND_NAME = "backendName";
-
 	public static List<DocumentationSetupHelper> testParamsWithSingleBackend(
 			List<BackendConfiguration> backendConfigurations) {
-		return testParamsWithSingleBackend( DEFAULT_BACKEND_NAME, backendConfigurations );
-	}
-
-	public static List<DocumentationSetupHelper> testParamsWithSingleBackend(String backendName,
-			List<BackendConfiguration> backendConfigurations) {
 		return backendConfigurations.stream()
-				.map( config -> withSingleBackend( backendName, config ) )
+				.map( DocumentationSetupHelper::withSingleBackend )
 				.collect( Collectors.toList() );
 	}
 
@@ -52,40 +45,36 @@ public final class DocumentationSetupHelper
 		List<DocumentationSetupHelper> result = new ArrayList<>();
 		for ( BackendConfiguration configuration : backendConfigurations ) {
 			// Annotation-based mapping
-			result.add( withSingleBackend( DEFAULT_BACKEND_NAME, configuration, null ) );
+			result.add( withSingleBackend( configuration, null ) );
 			// Programmatic mapping
-			result.add( withSingleBackend( DEFAULT_BACKEND_NAME, configuration, mappingConfigurer ) );
+			result.add( withSingleBackend( configuration, mappingConfigurer ) );
 		}
 		return result;
 	}
 
 	public static DocumentationSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
-		return withSingleBackend( DEFAULT_BACKEND_NAME, backendConfiguration );
-	}
-
-	public static DocumentationSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
 		return new DocumentationSetupHelper(
-				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
+				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				backendConfiguration,
 				null
 		);
 	}
 
-	public static DocumentationSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration,
+	public static DocumentationSetupHelper withSingleBackend(BackendConfiguration backendConfiguration,
 			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
 		return new DocumentationSetupHelper(
-				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
+				BackendSetupStrategy.withSingleBackend( backendConfiguration ),
 				backendConfiguration,
 				mappingConfigurerOrNull
 		);
 	}
 
-	public static DocumentationSetupHelper withMultipleBackends(String defaultBackendName,
-			Map<String, BackendConfiguration> backendConfigurations,
+	public static DocumentationSetupHelper withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations,
 			HibernateOrmSearchMappingConfigurer mappingConfigurerOrNull) {
 		return new DocumentationSetupHelper(
-				BackendSetupStrategy.withMultipleBackends( defaultBackendName, backendConfigurations ),
-				backendConfigurations.get( defaultBackendName ),
+				BackendSetupStrategy.withMultipleBackends( defaultBackendConfiguration, namedBackendConfigurations ),
+				defaultBackendConfiguration,
 				mappingConfigurerOrNull
 		);
 	}

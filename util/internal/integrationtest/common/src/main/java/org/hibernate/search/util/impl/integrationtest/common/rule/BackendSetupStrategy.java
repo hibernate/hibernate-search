@@ -23,17 +23,22 @@ public interface BackendSetupStrategy {
 	<C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider);
 
-	static BackendSetupStrategy withBackendMocks(BackendMock defaultBackendMock, BackendMock ... otherBackendMocks) {
-		return new BackendMockSetupStrategy( defaultBackendMock, otherBackendMocks );
+	static BackendSetupStrategy withSingleBackendMock(BackendMock defaultBackendMock) {
+		return new BackendMockSetupStrategy( defaultBackendMock, Collections.emptyMap() );
 	}
 
-	static BackendSetupStrategy withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
-		return withMultipleBackends( backendName, Collections.singletonMap( backendName, backendConfiguration ) );
+	static BackendSetupStrategy withMultipleBackendMocks(BackendMock defaultBackendMock,
+			Map<String, BackendMock> namedBackendMocks) {
+		return new BackendMockSetupStrategy( defaultBackendMock, namedBackendMocks );
 	}
 
-	static BackendSetupStrategy withMultipleBackends(String defaultBackendName,
-			Map<String, BackendConfiguration> backendConfigurations) {
-		return new ActualBackendSetupStrategy( defaultBackendName, backendConfigurations );
+	static BackendSetupStrategy withSingleBackend(BackendConfiguration backendConfiguration) {
+		return withMultipleBackends( backendConfiguration, Collections.emptyMap() );
+	}
+
+	static BackendSetupStrategy withMultipleBackends(BackendConfiguration defaultBackendConfiguration,
+			Map<String, BackendConfiguration> namedBackendConfigurations) {
+		return new ActualBackendSetupStrategy( defaultBackendConfiguration, namedBackendConfigurations );
 	}
 
 }

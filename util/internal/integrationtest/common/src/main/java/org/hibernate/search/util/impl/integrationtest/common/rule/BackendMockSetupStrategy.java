@@ -6,29 +6,28 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import java.util.List;
+import java.util.Map;
 
-import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 class BackendMockSetupStrategy implements BackendSetupStrategy {
-	private final String defaultBackendName;
-	private final List<BackendMock> backendMocks;
+	private final BackendMock defaultBackendMock;
+	private final Map<String, BackendMock> namedBackendMocks;
 
-	BackendMockSetupStrategy(BackendMock defaultBackendMock, BackendMock ... otherBackendMocks) {
-		this.defaultBackendName = defaultBackendMock.getBackendName();
-		this.backendMocks = CollectionHelper.asList( defaultBackendMock, otherBackendMocks );
+	BackendMockSetupStrategy(BackendMock defaultBackendMock, Map<String, BackendMock> namedBackendMocks) {
+		this.defaultBackendMock = defaultBackendMock;
+		this.namedBackendMocks = namedBackendMocks;
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C start(C setupContext,
 			TestConfigurationProvider configurationProvider) {
-		for ( BackendMock backendMock : backendMocks ) {
-			setupContext = setupContext.withBackendProperty( backendMock.getBackendName(),
-					"type", backendMock.factory() );
+		setupContext = setupContext.withBackendProperty( "type",
+				defaultBackendMock.factory() );
+		for ( Map.Entry<String, BackendMock> entry : namedBackendMocks.entrySet() ) {
+			setupContext = setupContext.withBackendProperty( entry.getKey(),
+					"type", entry.getValue().factory() );
 		}
-		return setupContext.withProperty( EngineSettings.DEFAULT_BACKEND, defaultBackendName );
+		return setupContext;
 	}
 }

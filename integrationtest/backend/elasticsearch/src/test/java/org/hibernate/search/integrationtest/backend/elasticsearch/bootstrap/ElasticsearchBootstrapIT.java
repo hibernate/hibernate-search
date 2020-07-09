@@ -27,8 +27,6 @@ import org.junit.Test;
 
 public class ElasticsearchBootstrapIT {
 
-	private static final String BACKEND_NAME = "BackendName";
-
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -73,7 +71,7 @@ public class ElasticsearchBootstrapIT {
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck() {
 		Assertions.assertThatThrownBy(
-				() -> setupHelper.start( BACKEND_NAME )
+				() -> setupHelper.start()
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 						)
@@ -88,7 +86,7 @@ public class ElasticsearchBootstrapIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								"Invalid Elasticsearch version",
 								"When version_check.enabled is set to false",
@@ -105,7 +103,7 @@ public class ElasticsearchBootstrapIT {
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck_incompleteVersion() {
 		Assertions.assertThatThrownBy(
-				() -> setupHelper.start( BACKEND_NAME )
+				() -> setupHelper.start()
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 						)
@@ -123,7 +121,7 @@ public class ElasticsearchBootstrapIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.backendContext( BACKEND_NAME )
+						.defaultBackendContext()
 						.failure(
 								"Invalid Elasticsearch version",
 								"When version_check.enabled is set to false",
@@ -139,7 +137,7 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck_completeVersion() {
-		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start( BACKEND_NAME )
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 				)

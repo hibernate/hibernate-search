@@ -10,7 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -34,7 +36,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,27 +44,32 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 
 public class SearchMappingIT {
 
-	private static final String BACKEND_1_NAME = "stubBackend1";
 	private static final String BACKEND_2_NAME = "stubBackend2";
 
 	@Rule
-	public BackendMock backendMock1 = new BackendMock( BACKEND_1_NAME );
+	public BackendMock defaultBackendMock = new BackendMock();
 
 	@Rule
-	public BackendMock backendMock2 = new BackendMock( BACKEND_2_NAME );
+	public BackendMock backend2Mock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backendMock1, backendMock2 );
+	public OrmSetupHelper ormSetupHelper;
 
 	private SearchMapping mapping;
 
+	public SearchMappingIT() {
+		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
+		namedBackendMocks.put( BACKEND_2_NAME, backend2Mock );
+		ormSetupHelper = OrmSetupHelper.withBackendMocks( defaultBackendMock, namedBackendMocks );
+	}
+
 	@Before
 	public void before() {
-		backendMock1.expectAnySchema( Person.INDEX_NAME );
-		backendMock2.expectAnySchema( Pet.JPA_ENTITY_NAME );
+		defaultBackendMock.expectAnySchema( Person.INDEX_NAME );
+		backend2Mock.expectAnySchema( Pet.JPA_ENTITY_NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( Person.class, Pet.class, Toy.class );
-		backendMock1.verifyExpectationsMet();
-		backendMock2.verifyExpectationsMet();
+		defaultBackendMock.verifyExpectationsMet();
+		backend2Mock.verifyExpectationsMet();
 		mapping = Search.mapping( sessionFactory );
 	}
 
@@ -164,7 +170,6 @@ public class SearchMappingIT {
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3640", "HSEARCH-3950" })
-	@Ignore // TODO enable once we actually define backend 1 as an unnamed, default backend
 	public void backend_default() {
 		Backend backend = mapping.backend();
 		checkBackend( EventContexts.defaultBackend(), backend );
@@ -173,10 +178,7 @@ public class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3640")
 	public void backend_byName() {
-		Backend backend = mapping.backend( BACKEND_1_NAME );
-		checkBackend( EventContexts.fromBackendName( BACKEND_1_NAME ), backend );
-
-		backend = mapping.backend( BACKEND_2_NAME );
+		Backend backend = mapping.backend( BACKEND_2_NAME );
 		checkBackend( EventContexts.fromBackendName( BACKEND_2_NAME ), backend );
 	}
 
@@ -193,7 +195,7 @@ public class SearchMappingIT {
 	}
 
 	@Entity(name = Person.JPA_ENTITY_NAME)
-	@Indexed(index = Person.INDEX_NAME, backend = BACKEND_1_NAME)
+	@Indexed(index = Person.INDEX_NAME)
 	private static class Person {
 		public static final String JPA_ENTITY_NAME = "PersonEntity";
 		public static final String INDEX_NAME = "Person";
