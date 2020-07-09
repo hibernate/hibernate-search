@@ -27,7 +27,7 @@ import org.junit.Test;
 public abstract class AbstractSchemaManagementStrategyIT {
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );

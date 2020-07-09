@@ -25,7 +25,7 @@ import org.junit.Test;
 public class ImplementedInterfaceIT {
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );

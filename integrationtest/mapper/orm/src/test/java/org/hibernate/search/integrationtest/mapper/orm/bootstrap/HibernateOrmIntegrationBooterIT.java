@@ -48,7 +48,7 @@ public class HibernateOrmIntegrationBooterIT {
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@After
 	public void cleanup() throws Exception {

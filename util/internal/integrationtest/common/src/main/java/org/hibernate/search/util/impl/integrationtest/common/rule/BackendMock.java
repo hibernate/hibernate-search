@@ -44,6 +44,10 @@ public class BackendMock implements TestRule {
 	private final String backendName;
 	private final VerifyingStubBackendBehavior behaviorMock = new VerifyingStubBackendBehavior();
 
+	public BackendMock() {
+		this( "stubBackend" );
+	}
+
 	public BackendMock(String backendName) {
 		this.backendName = backendName;
 	}

@@ -29,7 +29,7 @@ import org.junit.Test;
 public class AutomaticIndexingOutOfTransactionIT {
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "myBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMocks( backendMock );
