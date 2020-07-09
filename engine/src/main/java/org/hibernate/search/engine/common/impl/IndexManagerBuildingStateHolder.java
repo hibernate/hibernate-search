@@ -40,8 +40,9 @@ class IndexManagerBuildingStateHolder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final OptionalConfigurationProperty<String> DEFAULT_INDEX_BACKEND_NAME =
-			ConfigurationProperty.forKey( EngineSettings.Radicals.DEFAULT_BACKEND ).asString().build();
+	private static final ConfigurationProperty<String> EXPLICIT_DEFAULT_BACKEND_NAME =
+			ConfigurationProperty.forKey( EngineSettings.Radicals.DEFAULT_BACKEND ).asString()
+					.withDefault( "default" ).build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
@@ -50,6 +51,8 @@ class IndexManagerBuildingStateHolder {
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource propertySource;
 	private final RootBuildContext rootBuildContext;
+
+	private final String defaultBackendName;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, BackendInitialBuildState> backendBuildStateByName = new LinkedHashMap<>();
@@ -61,11 +64,12 @@ class IndexManagerBuildingStateHolder {
 		this.beanResolver = beanResolver;
 		this.propertySource = propertySource;
 		this.rootBuildContext = rootBuildContext;
+		defaultBackendName = EXPLICIT_DEFAULT_BACKEND_NAME.get( propertySource );
 	}
 
 	void createBackends(Set<Optional<String>> backendNames) {
 		if ( backendNames.remove( Optional.<String>empty() ) ) {
-			backendNames.add( Optional.of( getDefaultBackendName() ) );
+			backendNames.add( Optional.of( defaultBackendName ) );
 		}
 		for ( Optional<String> backendNameOptional : backendNames ) {
 			String backendName = backendNameOptional.get(); // Never empty, see above
@@ -85,7 +89,7 @@ class IndexManagerBuildingStateHolder {
 
 	IndexManagerBuildingState getIndexManagerBuildingState(Optional<String> backendName, String indexName,
 			String mappedTypeName, boolean multiTenancyEnabled) {
-		return getBackend( backendName.orElseGet( this::getDefaultBackendName ) )
+		return getBackend( backendName.orElse( defaultBackendName ) )
 				.getIndexManagerBuildingState( indexName, mappedTypeName, multiTenancyEnabled );
 	}
 
@@ -98,19 +102,6 @@ class IndexManagerBuildingStateHolder {
 			);
 		}
 		return backendBuildState;
-	}
-
-	private String getDefaultBackendName() {
-		Optional<String> defaultBackendNameOptional = DEFAULT_INDEX_BACKEND_NAME.get( propertySource );
-		if ( defaultBackendNameOptional.isPresent() ) {
-			return defaultBackendNameOptional.get();
-		}
-		else {
-			throw log.defaultBackendNameNotSet(
-					// Retrieve the resolved *default* key (*.default_backend) from the global (non-index-scoped) source
-					DEFAULT_INDEX_BACKEND_NAME.resolveOrRaw( propertySource )
-			);
-		}
 	}
 
 	Map<String, BackendNonStartedState> getBackendNonStartedStates() {
