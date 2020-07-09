@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,95 +22,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 public abstract class StubBackendBehavior {
-
-	private static final StubBackendBehavior DEFAULT = new StubBackendBehavior() {
-		@Override
-		public void onCreateBackend(BackendBuildContext context) {
-			throw new IllegalStateException( "The stub backend behavior was not set when creating a backend." );
-		}
-
-		@Override
-		public void onStopBackend() {
-			// This is acceptable: we probably just ended the test before the backend was stopped.
-		}
-
-		@Override
-		public void onAddField(String indexName, String absoluteFieldPath) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a field was added to index '"
-					+ indexName + "': " + absoluteFieldPath );
-		}
-
-		@Override
-		public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a schema was pushed for index '"
-					+ indexName + "': " + rootSchemaNode );
-		}
-
-		@Override
-		public CompletableFuture<?> executeSchemaManagementWork(String indexName, StubSchemaManagementWork work,
-				ContextualFailureCollector failureCollector) {
-			throw new IllegalStateException( "The stub backend behavior was not set during execution of a schema management work for index "
-					+ indexName + ": " + work );
-		}
-
-		@Override
-		public void processDocumentWork(String indexName, StubDocumentWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a work was prepared for index '"
-					+ indexName + "': " + work );
-		}
-
-		@Override
-		public void discardDocumentWork(String indexName, StubDocumentWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a work was discarded from index '"
-					+ indexName + "': " + work );
-		}
-
-		@Override
-		public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a work was executed for index '"
-					+ indexName + "': " + work );
-		}
-
-		@Override
-		public CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set when work were prepared and executed for index '"
-					+ indexName + "': " + work );
-		}
-
-		@Override
-		public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-				StubSearchProjectionContext projectionContext,
-				LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
-					+ indexNames + ": " + work );
-		}
-
-		@Override
-		public CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set during execution of an index-scale work for index "
-					+ indexName + ": " + work );
-		}
-
-		@Override
-		public long executeCountWork(Set<String> indexNames) {
-			throw new IllegalStateException( "The stub backend behavior was not set when a count work was executed for indexes "
-					+ indexNames );
-		}
-	};
-
-	private static final Map<String, StubBackendBehavior> BEHAVIORS = new HashMap<>();
-
-	public static void set(String backendName, StubBackendBehavior behavior) {
-		BEHAVIORS.put( backendName, behavior );
-	}
-
-	public static void unset(String backendName, StubBackendBehavior behavior) {
-		BEHAVIORS.remove( backendName, behavior );
-	}
-
-	public static StubBackendBehavior get(String backendName) {
-		return BEHAVIORS.getOrDefault( backendName, DEFAULT );
-	}
 
 	protected StubBackendBehavior() {
 	}

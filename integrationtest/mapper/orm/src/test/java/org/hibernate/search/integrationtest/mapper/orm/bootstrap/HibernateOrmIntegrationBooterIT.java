@@ -31,7 +31,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
@@ -120,7 +119,7 @@ public class HibernateOrmIntegrationBooterIT {
 		registryBuilder.applySetting(
 				EngineSettings.BACKENDS
 						+ "." + backendMock.getBackendName() + "." + BackendSettings.TYPE,
-				StubBackendFactory.class.getName()
+				backendMock.factory()
 		);
 
 		StandardServiceRegistry serviceRegistry = registryBuilder.build();
