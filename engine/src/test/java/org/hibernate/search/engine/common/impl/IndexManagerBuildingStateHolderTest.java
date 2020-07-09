@@ -24,7 +24,9 @@ import org.hibernate.search.engine.testsupport.util.AbstractBeanResolverPartialM
 import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.easymock.Capture;
@@ -34,6 +36,9 @@ import org.easymock.EasyMockSupport;
 // We have to use raw types to mock methods returning generic types with wildcards
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final RootBuildContext rootBuildContextMock = createMock( RootBuildContext.class );
 	private final ConfigurationPropertySource configurationSourceMock =
@@ -147,9 +152,14 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		Capture<ConfigurationPropertySource> backendPropertySourceCapture = Capture.newInstance();
 		Capture<ConfigurationPropertySource> indexPropertySourceCapture = Capture.newInstance();
 
+		logged.expectMessage(
+				"Using configuration property 'hibernate.search.default_backend' to set the name of the default backend to 'myBackend'.",
+				"This configuration property is deprecated and shouldn't be used anymore" );
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "default_backend" ) )
 				.andReturn( (Optional) Optional.of( "myBackend" ) );
+		EasyMock.expect( configurationSourceMock.resolve( "default_backend" ) )
+				.andStubReturn( Optional.of( "hibernate.search.default_backend" ) );
 		replayAll();
 		IndexManagerBuildingStateHolder holder =
 				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
