@@ -31,10 +31,8 @@ import org.junit.Test;
  */
 public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 
-	private static final String BACKEND_NAME = "stubBackend";
-
 	@Rule
-	public BackendMock backendMock = new BackendMock( BACKEND_NAME );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

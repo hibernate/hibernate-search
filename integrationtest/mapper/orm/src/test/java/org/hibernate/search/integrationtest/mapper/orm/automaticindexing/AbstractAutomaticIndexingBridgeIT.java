@@ -41,7 +41,7 @@ import org.junit.Test;
 public abstract class AbstractAutomaticIndexingBridgeIT {
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

@@ -45,7 +45,7 @@ public class MassIndexingInterruptionIT {
 	public static final String AUTHOR_1 = "Charles Dickens";
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

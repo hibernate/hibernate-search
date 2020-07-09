@@ -36,7 +36,7 @@ public class FailureReportIT {
 			+ "    JavaBean mapping: \n";
 
 	@Rule
-	public BackendMock backendMock = new BackendMock( "stubBackend" );
+	public BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();

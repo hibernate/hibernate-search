@@ -45,7 +45,7 @@ import org.junit.Test;
 public class CdiExtendedBeanManagerBootstrapShutdownIT {
 
 	@Rule
-	public final BackendMock backendMock = new BackendMock( "stubBackend" );
+	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public final OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );

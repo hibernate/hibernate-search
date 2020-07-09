@@ -54,7 +54,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	@Rule
-	public final BackendMock backendMock = new BackendMock( "stubBackend" );
+	public final BackendMock backendMock = new BackendMock();
 
 	@Rule
 	public final JavaBeanMappingSetupHelper setupHelper =
