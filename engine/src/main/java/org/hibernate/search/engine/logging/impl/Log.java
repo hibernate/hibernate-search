@@ -10,6 +10,7 @@ import static org.jboss.logging.Logger.Level.DEBUG;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -204,11 +205,6 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
 			@FormatWith(ClassFormatter.class) Class<?> actualType);
 
-	@Message(id = ID_OFFSET_2 + 49,
-			value = "Missing backend type. Set the property '%1$s' to a supported value."
-	)
-	SearchException backendTypeCannotBeNullOrEmpty(String key);
-
 	@Message(id = ID_OFFSET_2 + 51,
 			value = "It is not possible to use per-field boosts together with withConstantScore option"
 	)
@@ -338,4 +334,12 @@ public interface Log extends BasicLogger {
 	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference,
 			String beanProviderFailureMessage, String configuredBeansFailureMessage,
 			@Cause SearchException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
+
+	@Message(id = ID_OFFSET_2 + 81, value = "Configuration property '%1$s' is not set, and no backend was found in the classpath."
+			+ " Did you forget to add the desired backend to your project's dependencies?")
+	SearchException noBackendFactoryRegistered(String propertyKey);
+
+	@Message(id = ID_OFFSET_2 + 82, value = "Configuration property '%1$s' is not set, and multiple backend types were found in the classpath."
+			+ " Set property '%1$s' to one of the following to select the backend type: %2$s")
+	SearchException multipleBackendFactoriesRegistered(String propertyKey, Collection<String> backendTypeNames);
 }

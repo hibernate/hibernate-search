@@ -23,6 +23,9 @@ public final class BackendSettings {
 	/**
 	 * The type of the backend.
 	 * <p>
+	 * Only useful if you have more than one backend technology in the classpath;
+	 * otherwise the backend type is automatically detected.
+	 * <p>
 	 * Expects a String, such as "lucene" or "elasticsearch".
 	 * See the documentation of your backend to find the appropriate value.
 	 * <p>

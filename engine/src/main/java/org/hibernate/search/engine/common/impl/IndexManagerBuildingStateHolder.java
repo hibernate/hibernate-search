@@ -137,11 +137,8 @@ class IndexManagerBuildingStateHolder {
 				EngineConfigurationUtils.extractorForBackend( backendNameOptional, defaultBackendName );
 		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
-				BACKEND_TYPE.getAndMapOrThrow(
-						backendPropertySource,
-						beanResolver::resolve,
-						log::backendTypeCannotBeNullOrEmpty
-				) ) {
+				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
+						.orElseGet( () -> createDefaultBackendFactory( backendPropertySource ) ) ) {
 			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
 			BackendImplementor backend = backendFactoryHolder.get()
@@ -149,6 +146,20 @@ class IndexManagerBuildingStateHolder {
 			return new BackendInitialBuildState( eventContext, backendPropertySourceExtractor, backendBuildContext,
 					backend );
 		}
+	}
+
+	private BeanHolder<? extends BackendFactory> createDefaultBackendFactory(
+			ConfigurationPropertySource backendPropertySource) {
+		Map<String, BeanReference<BackendFactory>> referencesByName = beanResolver.namedConfiguredForRole(
+				BackendFactory.class );
+		if ( referencesByName.isEmpty() ) {
+			throw log.noBackendFactoryRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ) );
+		}
+		else if ( referencesByName.size() > 1 ) {
+			throw log.multipleBackendFactoriesRegistered( BACKEND_TYPE.resolveOrRaw( backendPropertySource ),
+					referencesByName.keySet() );
+		}
+		return referencesByName.values().iterator().next().resolve( beanResolver );
 	}
 
 	class BackendInitialBuildState {

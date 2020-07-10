@@ -8,6 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -348,6 +349,8 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.type" ) )
 				.andReturn( Optional.empty() );
+		EasyMock.expect( beanResolverMock.namedConfiguredForRole( BackendFactory.class ) )
+				.andReturn( Collections.emptyMap() );
 		EasyMock.expect( configurationSourceMock.resolve( "backend.type" ) )
 				.andReturn( Optional.of( keyPrefix + "backend.type" ) );
 		EasyMock.expect( rootBuildContextMock.getFailureCollector() )
@@ -361,8 +364,9 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
 		assertThat( throwableCapture.getValue() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Missing backend type" )
-				.hasMessageContaining( "Set the property 'somePrefix.backend.type' to a supported value" );
+				.hasMessageContainingAll(
+						"Configuration property 'somePrefix.backend.type' is not set, and no backend was found in the classpath",
+						"Did you forget to add the desired backend to your project's dependencies?" );
 	}
 
 	@Test
@@ -385,6 +389,8 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.type" ) )
 				.andReturn( (Optional) Optional.of( "" ) );
+		EasyMock.expect( beanResolverMock.namedConfiguredForRole( BackendFactory.class ) )
+				.andReturn( Collections.emptyMap() );
 		EasyMock.expect( configurationSourceMock.resolve( "backend.type" ) )
 				.andReturn( Optional.of( keyPrefix + "backend.type" ) );
 		EasyMock.expect( rootBuildContextMock.getFailureCollector() )
@@ -398,8 +404,9 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 
 		assertThat( throwableCapture.getValue() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Missing backend type" )
-				.hasMessageContaining( "Set the property 'somePrefix.backend.type' to a supported value" );
+				.hasMessageContainingAll(
+						"Configuration property 'somePrefix.backend.type' is not set, and no backend was found in the classpath",
+						"Did you forget to add the desired backend to your project's dependencies?" );
 	}
 
 }
