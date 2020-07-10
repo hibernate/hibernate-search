@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
@@ -18,22 +18,22 @@ public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 		context.define(
 				AutomaticIndexingSynchronizationStrategy.class,
 				AutomaticIndexingSynchronizationStrategyNames.ASYNC,
-				factoryCreationContext -> BeanHolder.of( AutomaticIndexingSynchronizationStrategy.async() )
+				BeanReference.ofInstance( AutomaticIndexingSynchronizationStrategy.async() )
 		);
 		context.define(
 				AutomaticIndexingSynchronizationStrategy.class,
 				AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC,
-				factoryCreationContext -> BeanHolder.of( AutomaticIndexingSynchronizationStrategy.writeSync() )
+				BeanReference.ofInstance( AutomaticIndexingSynchronizationStrategy.writeSync() )
 		);
 		context.define(
 				AutomaticIndexingSynchronizationStrategy.class,
 				AutomaticIndexingSynchronizationStrategyNames.READ_SYNC,
-				factoryCreationContext -> BeanHolder.of( AutomaticIndexingSynchronizationStrategy.readSync() )
+				BeanReference.ofInstance( AutomaticIndexingSynchronizationStrategy.readSync() )
 		);
 		context.define(
 				AutomaticIndexingSynchronizationStrategy.class,
 				AutomaticIndexingSynchronizationStrategyNames.SYNC,
-				factoryCreationContext -> BeanHolder.of( AutomaticIndexingSynchronizationStrategy.sync() )
+				BeanReference.ofInstance( AutomaticIndexingSynchronizationStrategy.sync() )
 		);
 	}
 }

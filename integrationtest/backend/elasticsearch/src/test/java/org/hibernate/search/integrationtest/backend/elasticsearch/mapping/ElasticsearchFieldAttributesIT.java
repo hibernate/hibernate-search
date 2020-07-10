@@ -110,7 +110,7 @@ public class ElasticsearchFieldAttributesIT {
 		);
 
 		setupHelper.start()
-				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )
+				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference() )
 				.withIndex( index )
 				.setup();
 

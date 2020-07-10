@@ -17,7 +17,7 @@ public class EngineBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				FailureHandler.class, "log",
-				factoryCreationContext -> BeanHolder.of( new LogFailureHandler() )
+				beanResolver -> BeanHolder.of( new LogFailureHandler() )
 		);
 	}
 }

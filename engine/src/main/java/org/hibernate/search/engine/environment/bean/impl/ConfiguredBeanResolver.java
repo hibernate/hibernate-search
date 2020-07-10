@@ -14,11 +14,10 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
-import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.util.common.SearchException;
@@ -34,10 +33,8 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 					.build();
 
 	private final BeanProvider beanProvider;
-	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans;
+	private final Map<ConfiguredBeanKey<?>, BeanReference<?>> explicitlyConfiguredBeans;
 	private final Map<Class<?>, List<? extends BeanReference<?>>> roleMap;
-
-	private final BeanCreationContext beanCreationContext;
 
 	public ConfiguredBeanResolver(ServiceResolver serviceResolver, BeanProvider beanProvider,
 			ConfigurationPropertySource configurationPropertySource) {
@@ -56,8 +53,6 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 		}
 		this.explicitlyConfiguredBeans = configurationContext.getConfiguredBeans();
 		this.roleMap = configurationContext.getRoleMap();
-
-		this.beanCreationContext = new BeanCreationContextImpl( this );
 	}
 
 	@Override
@@ -118,12 +113,12 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	private <T> BeanHolder<T> getExplicitlyConfiguredBean(Class<T> exposedType, String name) {
 		ConfiguredBeanKey<T> key = new ConfiguredBeanKey<>( exposedType, name );
 		@SuppressWarnings("unchecked") // We know the factory has the correct type, see BeanConfigurationContextImpl
-		BeanFactory<T> factory = (BeanFactory<T>) explicitlyConfiguredBeans.get( key );
-		if ( factory == null ) {
+		BeanReference<T> reference = (BeanReference<T>) explicitlyConfiguredBeans.get( key );
+		if ( reference == null ) {
 			return null;
 		}
 		else {
-			return factory.create( beanCreationContext );
+			return resolve( reference );
 		}
 	}
 

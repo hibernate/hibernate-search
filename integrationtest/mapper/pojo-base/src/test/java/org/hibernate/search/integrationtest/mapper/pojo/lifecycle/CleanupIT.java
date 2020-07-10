@@ -363,7 +363,7 @@ public class CleanupIT {
 							public void configure(BeanConfigurationContext context) {
 								context.define(
 										StartupStubContainerExtractor.class,
-										creationContext ->
+										beanResolver ->
 												StartupStubContainerExtractor.create( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS )
 								);
 							}

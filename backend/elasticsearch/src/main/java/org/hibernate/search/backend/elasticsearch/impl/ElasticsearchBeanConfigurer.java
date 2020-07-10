@@ -17,7 +17,7 @@ public class ElasticsearchBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				BackendFactory.class, ElasticsearchBackendSettings.TYPE_NAME,
-				factoryCreationContext -> BeanHolder.of( new ElasticsearchBackendFactory() )
+				beanResolver -> BeanHolder.of( new ElasticsearchBackendFactory() )
 		);
 	}
 }

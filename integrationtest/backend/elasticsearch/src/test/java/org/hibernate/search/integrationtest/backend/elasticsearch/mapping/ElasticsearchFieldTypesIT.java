@@ -61,7 +61,7 @@ public class ElasticsearchFieldTypesIT {
 
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withIndex( index )
 				.setup();

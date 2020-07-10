@@ -56,7 +56,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	public void setup() {
 		setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.factoryReference()
 				)
 				.withIndexes( mainIndex, otherIndex )
 				.setup();

@@ -67,7 +67,7 @@ public class ElasticsearchClientSpy implements TestRule {
 		return createdClientCount.get();
 	}
 
-	public BeanReference<ElasticsearchClientFactory> getFactory() {
+	public BeanReference<ElasticsearchClientFactory> factoryReference() {
 		return beanResolver -> {
 			BeanHolder<ElasticsearchClientFactory> delegateHolder =
 					beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE );

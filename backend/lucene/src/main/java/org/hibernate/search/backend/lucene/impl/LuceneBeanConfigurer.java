@@ -24,27 +24,27 @@ public class LuceneBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				BackendFactory.class, LuceneBackendSettings.TYPE_NAME,
-				factoryCreationContext -> BeanHolder.of( new LuceneBackendFactory() )
+				beanResolver -> BeanHolder.of( new LuceneBackendFactory() )
 		);
 		context.define(
 				DirectoryProvider.class, LocalFileSystemDirectoryProvider.NAME,
-				factoryCreationContext -> BeanHolder.of( new LocalFileSystemDirectoryProvider() )
+				beanResolver -> BeanHolder.of( new LocalFileSystemDirectoryProvider() )
 		);
 		context.define(
 				DirectoryProvider.class, LocalHeapDirectoryProvider.NAME,
-				factoryCreationContext -> BeanHolder.of( new LocalHeapDirectoryProvider() )
+				beanResolver -> BeanHolder.of( new LocalHeapDirectoryProvider() )
 		);
 		context.define(
 				ShardingStrategy.class, NoShardingStrategy.NAME,
-				factoryCreationContext -> BeanHolder.of( new NoShardingStrategy() )
+				beanResolver -> BeanHolder.of( new NoShardingStrategy() )
 		);
 		context.define(
 				ShardingStrategy.class, HashShardingStrategy.NAME,
-				factoryCreationContext -> BeanHolder.of( new HashShardingStrategy() )
+				beanResolver -> BeanHolder.of( new HashShardingStrategy() )
 		);
 		context.define(
 				ShardingStrategy.class, ExplicitShardingStrategy.NAME,
-				factoryCreationContext -> BeanHolder.of( new ExplicitShardingStrategy() )
+				beanResolver -> BeanHolder.of( new ExplicitShardingStrategy() )
 		);
 	}
 }

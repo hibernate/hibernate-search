@@ -18,10 +18,13 @@ public interface BeanConfigurationContext {
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
-	 * @param factory The factory allowing to create the bean.
+	 * @param reference The reference to the bean.
+	 * This reference should generally call the bean's constructor directly without relying on the bean resolver.
+	 * However, the reference can also rely on the bean resolver to resolve a reference,
+	 * provided that reference is not {@code BeanReference.of( exposedType )} (which would create a cycle).
 	 * @param <T> The exposed type of the bean.
 	 */
-	<T> void define(Class<T> exposedType, BeanFactory<T> factory);
+	<T> void define(Class<T> exposedType, BeanReference<T> reference);
 
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType} and {@code name}.
@@ -31,10 +34,13 @@ public interface BeanConfigurationContext {
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
 	 * @param name The name that this definition will match (exact match: case is taken into account).
-	 * @param factory The factory allowing to create the bean.
+	 * @param reference The reference to the bean.
+	 * This reference should generally call the bean's constructor directly without relying on the bean resolver.
+	 * However, the reference can also rely on the bean resolver to resolve a reference,
+	 * provided that reference is not {@code BeanReference.of( exposedType, name )} (which would create a cycle).
 	 * @param <T> The exposed type of the bean.
 	 */
-	<T> void define(Class<T> exposedType, String name, BeanFactory<T> factory);
+	<T> void define(Class<T> exposedType, String name, BeanReference<T> reference);
 
 	/**
 	 * Assign a role to a bean reference.

@@ -14,28 +14,27 @@ import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
-import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
 final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 
-	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans = new HashMap<>();
+	private final Map<ConfiguredBeanKey<?>, BeanReference<?>> explicitlyConfiguredBeans = new HashMap<>();
 
 	private final Map<Class<?>, List<BeanReference<?>>> roleMap = new HashMap<>();
 
 	@Override
-	public <T> void define(Class<T> exposedType, BeanFactory<T> factory) {
+	public <T> void define(Class<T> exposedType, BeanReference<T> reference) {
 		Contracts.assertNotNull( exposedType, "exposedType" );
-		Contracts.assertNotNull( factory, "factory" );
-		explicitlyConfiguredBeans.put( new ConfiguredBeanKey<>( exposedType, null ), factory );
+		Contracts.assertNotNull( reference, "reference" );
+		explicitlyConfiguredBeans.put( new ConfiguredBeanKey<>( exposedType, null ), reference );
 	}
 
 	@Override
-	public <T> void define(Class<T> exposedType, String name, BeanFactory<T> factory) {
+	public <T> void define(Class<T> exposedType, String name, BeanReference<T> reference) {
 		Contracts.assertNotNull( exposedType, "exposedType" );
 		Contracts.assertNotNull( name, "name" );
-		Contracts.assertNotNull( factory, "factory" );
-		explicitlyConfiguredBeans.put( new ConfiguredBeanKey<>( exposedType, name ), factory );
+		Contracts.assertNotNull( reference, "reference" );
+		explicitlyConfiguredBeans.put( new ConfiguredBeanKey<>( exposedType, name ), reference );
 	}
 
 	@Override
@@ -46,7 +45,7 @@ final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 				.add( reference );
 	}
 
-	Map<ConfiguredBeanKey<?>, BeanFactory<?>> getConfiguredBeans() {
+	Map<ConfiguredBeanKey<?>, BeanReference<?>> getConfiguredBeans() {
 		return Collections.unmodifiableMap( explicitlyConfiguredBeans );
 	}
 

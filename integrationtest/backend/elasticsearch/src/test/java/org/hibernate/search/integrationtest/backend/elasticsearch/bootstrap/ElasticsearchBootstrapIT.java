@@ -46,7 +46,7 @@ public class ElasticsearchBootstrapIT {
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
-						elasticsearchClientSpy.getFactory()
+						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndex( StubMappedIndex.withoutFields() )
@@ -77,7 +77,7 @@ public class ElasticsearchBootstrapIT {
 						)
 						.withBackendProperty(
 								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
-								elasticsearchClientSpy.getFactory()
+								elasticsearchClientSpy.factoryReference()
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 						.withIndex( StubMappedIndex.withoutFields() )
@@ -112,7 +112,7 @@ public class ElasticsearchBootstrapIT {
 						)
 						.withBackendProperty(
 								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
-								elasticsearchClientSpy.getFactory()
+								elasticsearchClientSpy.factoryReference()
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 						.withIndex( StubMappedIndex.withoutFields() )
@@ -146,7 +146,7 @@ public class ElasticsearchBootstrapIT {
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
-						elasticsearchClientSpy.getFactory()
+						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndex( StubMappedIndex.withoutFields() )
