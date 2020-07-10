@@ -108,10 +108,9 @@ public interface BeanResolver {
 	 * Resolve the given role into a list of beans.
 	 * <p>
 	 * <strong>WARNING:</strong> this does not just return all the beans that implement {@code role}.
-	 * Beans are assigned a role explicitly during
+	 * Only beans registered during
 	 * {@link org.hibernate.search.engine.environment.bean.spi.BeanConfigurer bean configuration}
-	 * by calling
-	 * {@link org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext#assignRole(Class, BeanReference)}.
+	 * are taken into account.
 	 *
 	 * @param <T> The expected bean type.
 	 * @param role The role that must have been assigned to the retrieved beans. Must be non-null and non-empty.

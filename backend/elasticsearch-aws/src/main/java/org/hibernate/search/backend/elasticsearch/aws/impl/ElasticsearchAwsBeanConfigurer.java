@@ -7,16 +7,16 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
 public class ElasticsearchAwsBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
-		context.assignRole(
+		context.define(
 				ElasticsearchHttpClientConfigurer.class,
-				BeanReference.of( ElasticsearchAwsHttpClientConfigurer.class )
+				beanResolver -> BeanHolder.of( new ElasticsearchAwsHttpClientConfigurer() )
 		);
 	}
 }

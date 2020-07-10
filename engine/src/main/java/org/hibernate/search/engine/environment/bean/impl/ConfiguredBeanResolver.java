@@ -33,8 +33,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 					.build();
 
 	private final BeanProvider beanProvider;
-	private final Map<ConfiguredBeanKey<?>, BeanReference<?>> explicitlyConfiguredBeans;
-	private final Map<Class<?>, List<? extends BeanReference<?>>> roleMap;
+	private final Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans;
 
 	public ConfiguredBeanResolver(ServiceResolver serviceResolver, BeanProvider beanProvider,
 			ConfigurationPropertySource configurationPropertySource) {
@@ -51,8 +50,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 				beanConfigurer.configure( configurationContext );
 			}
 		}
-		this.explicitlyConfiguredBeans = configurationContext.getConfiguredBeans();
-		this.roleMap = configurationContext.getRoleMap();
+		this.explicitlyConfiguredBeans = configurationContext.configuredBeans();
 	}
 
 	@Override
@@ -81,9 +79,12 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	@Override
 	public <T> BeanHolder<List<T>> resolveRole(Class<T> role) {
 		Contracts.assertNotNull( role, "role" );
-		@SuppressWarnings("unchecked") // We know the references have the correct type, see BeanConfigurationContextImpl
-		List<BeanReference<? extends T>> references = (List<BeanReference<? extends T>>) roleMap.get( role );
-		if ( references == null || references.isEmpty() ) {
+		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( role );
+		if ( registry == null ) {
+			return BeanHolder.of( Collections.emptyList() );
+		}
+		List<BeanReference<? extends T>> references = registry.all();
+		if ( references.isEmpty() ) {
 			return BeanHolder.of( Collections.emptyList() );
 		}
 		else {
@@ -97,29 +98,28 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	 * so that adding explicitly configured beans in a new version of Hibernate Search
 	 * doesn't break existing user's configuration.
 	 */
-	private <T> BeanHolder<T> fallbackToConfiguredBeans(SearchException e, Class<T> typeReference, String nameReference) {
+	private <T> BeanHolder<T> fallbackToConfiguredBeans(SearchException e, Class<T> exposedType, String nameOrNull) {
+		BeanReference<T> reference = null;
 		try {
-			BeanHolder<T> explicitlyConfiguredBean = getExplicitlyConfiguredBean( typeReference, nameReference );
-			if ( explicitlyConfiguredBean != null ) {
-				return explicitlyConfiguredBean;
+			BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
+			if ( registry != null ) {
+				reference = registry.single( nameOrNull );
 			}
 		}
 		catch (RuntimeException e2) {
 			e.addSuppressed( e2 );
 		}
-		throw e;
-	}
-
-	private <T> BeanHolder<T> getExplicitlyConfiguredBean(Class<T> exposedType, String name) {
-		ConfiguredBeanKey<T> key = new ConfiguredBeanKey<>( exposedType, name );
-		@SuppressWarnings("unchecked") // We know the factory has the correct type, see BeanConfigurationContextImpl
-		BeanReference<T> reference = (BeanReference<T>) explicitlyConfiguredBeans.get( key );
-		if ( reference == null ) {
-			return null;
+		if ( reference != null ) {
+			return reference.resolve( this );
 		}
 		else {
-			return resolve( reference );
+			throw e;
 		}
+	}
+
+	@SuppressWarnings("unchecked") // We know the registry has the correct type, see BeanConfigurationContextImpl
+	private <T> BeanReferenceRegistryForType<T> explicitlyConfiguredBeans(Class<T> exposedType) {
+		return (BeanReferenceRegistryForType<T>) explicitlyConfiguredBeans.get( exposedType );
 	}
 
 }

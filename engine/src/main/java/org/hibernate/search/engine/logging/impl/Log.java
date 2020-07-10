@@ -13,16 +13,17 @@ import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -311,4 +312,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 75, value = "No default backend registered.")
 	SearchException noDefaultBackendRegistered();
+
+	@Message(id = ID_OFFSET_2 + 76, value = "Multiple beans registered for type '%1$s': %2$s.")
+	SearchException multipleConfiguredBeanReferencesForType(@FormatWith(ClassFormatter.class) Class<?> exposedType,
+			List<? extends BeanReference<?>> references);
 }

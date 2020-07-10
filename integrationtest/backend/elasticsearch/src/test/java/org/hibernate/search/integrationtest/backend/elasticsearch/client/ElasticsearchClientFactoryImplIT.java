@@ -760,7 +760,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	private static BeanConfigurer elasticsearchSslBeanConfigurer() {
 		return context -> {
-			context.assignRole(
+			context.define(
 					ElasticsearchHttpClientConfigurer.class,
 					BeanReference.ofInstance( new ElasticsearchHttpClientConfigurer() {
 						@Override
