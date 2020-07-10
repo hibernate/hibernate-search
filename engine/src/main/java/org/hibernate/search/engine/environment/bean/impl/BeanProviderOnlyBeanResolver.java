@@ -7,8 +7,10 @@
 package org.hibernate.search.engine.environment.bean.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -39,7 +41,12 @@ final class BeanProviderOnlyBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> BeanHolder<List<T>> resolveRole(Class<T> role) {
-		throw new AssertionFailure( "Unexpected call to resolveRole before roles are even defined." );
+	public <T> List<BeanReference<T>> allConfiguredForRole(Class<T> role) {
+		throw new AssertionFailure( "Unexpected call to allConfiguredForRole(...) before roles are even defined." );
+	}
+
+	@Override
+	public <T> Map<String, BeanReference<T>> namedConfiguredForRole(Class<T> role) {
+		throw new AssertionFailure( "Unexpected call to namedConfiguredForRole(...) before roles are even defined." );
 	}
 }

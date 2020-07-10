@@ -416,7 +416,8 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		expect( beanReference3Mock.resolve( EasyMock.anyObject() ) ).andReturn( beanHolder3 );
 		expect( beanReference4Mock.resolve( EasyMock.anyObject() ) ).andReturn( beanHolder4 );
 		replayAll();
-		BeanHolder<List<RoleType>> beansWithRole = beanResolver.resolveRole( RoleType.class );
+		List<BeanReference<RoleType>> beanReferencesWithRole = beanResolver.allConfiguredForRole( RoleType.class );
+		BeanHolder<List<RoleType>> beansWithRole = beanResolver.resolve( beanReferencesWithRole );
 		verifyAll();
 		assertThat( beansWithRole.get() )
 				.containsExactlyInAnyOrder( beanHolder1.get(), beanHolder2.get(), beanHolder3.get(), beanHolder4.get() );
@@ -424,14 +425,16 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		// Roles should ignore inheritance
 		resetAll();
 		replayAll();
-		BeanHolder<List<Object>> beansWithObjectRole = beanResolver.resolveRole( Object.class );
+		List<BeanReference<Object>> beanReferencesWithObjectRole = beanResolver.allConfiguredForRole( Object.class );
+		BeanHolder<List<Object>> beansWithObjectRole = beanResolver.resolve( beanReferencesWithObjectRole );
 		verifyAll();
 		assertThat( beansWithObjectRole.get() ).isEmpty();
 
 		// Unassigned roles should result in an empty list
 		resetAll();
 		replayAll();
-		BeanHolder<List<NonRoleType>> beansWithNonRole = beanResolver.resolveRole( NonRoleType.class );
+		List<BeanReference<NonRoleType>> beanReferencesWithNonRole = beanResolver.allConfiguredForRole( NonRoleType.class );
+		BeanHolder<List<NonRoleType>> beansWithNonRole = beanResolver.resolve( beanReferencesWithNonRole );
 		verifyAll();
 		assertThat( beansWithNonRole.get() ).isEmpty();
 	}

@@ -25,6 +25,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.auth.AuthScope;
@@ -47,11 +48,20 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = (BeanResolver beanResolver) -> {
+		List<BeanReference<ElasticsearchHttpClientConfigurer>> httpClientConfigurerReferences =
+				beanResolver.allConfiguredForRole( ElasticsearchHttpClientConfigurer.class );
 		BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
-			beanResolver.resolveRole( ElasticsearchHttpClientConfigurer.class );
-		ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl( httpClientConfigurerHolders.get() );
-		return BeanHolder.<ElasticsearchClientFactory>of( factory )
-			.withDependencyAutoClosing( httpClientConfigurerHolders );
+				beanResolver.resolve( httpClientConfigurerReferences );
+		try {
+			ElasticsearchClientFactoryImpl factory = new ElasticsearchClientFactoryImpl(
+					httpClientConfigurerHolders.get() );
+			return BeanHolder.<ElasticsearchClientFactory>of( factory )
+					.withDependencyAutoClosing( httpClientConfigurerHolders );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).push( httpClientConfigurerHolders );
+			throw e;
+		}
 	};
 
 	private static final ConfigurationProperty<List<String>> HOSTS =

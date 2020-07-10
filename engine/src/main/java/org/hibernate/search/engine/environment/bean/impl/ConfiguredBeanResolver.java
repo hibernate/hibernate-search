@@ -93,19 +93,23 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> BeanHolder<List<T>> resolveRole(Class<T> role) {
+	public <T> List<BeanReference<T>> allConfiguredForRole(Class<T> role) {
 		Contracts.assertNotNull( role, "role" );
 		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( role );
 		if ( registry == null ) {
-			return BeanHolder.of( Collections.emptyList() );
+			return Collections.emptyList();
 		}
-		List<BeanReference<? extends T>> references = registry.all();
-		if ( references.isEmpty() ) {
-			return BeanHolder.of( Collections.emptyList() );
+		return registry.all();
+	}
+
+	@Override
+	public <T> Map<String, BeanReference<T>> namedConfiguredForRole(Class<T> role) {
+		Contracts.assertNotNull( role, "role" );
+		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( role );
+		if ( registry == null ) {
+			return Collections.emptyMap();
 		}
-		else {
-			return resolve( references );
-		}
+		return registry.named();
 	}
 
 	/*

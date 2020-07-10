@@ -9,6 +9,7 @@ package org.hibernate.search.engine.environment.bean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -25,8 +26,9 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * Regardless of the underlying implementation, this interface is used to resolve beans,
  * referenced either
  * {@link #resolve(Class) by their type},
- * or {@link #resolve(Class, String) by their type and name},
- * or {@link #resolveRole(Class) by their role}.
+ * or {@link #resolve(Class, String) by their type and name}.
+ * <p>
+ * It also offers ways to {@link #allConfiguredForRole(Class) get references to configured beans of a given type}.
  * <p>
  * This interface is API,
  * but should only be implemented by Hibernate Search itself;
@@ -105,18 +107,31 @@ public interface BeanResolver {
 	}
 
 	/**
-	 * Resolve the given role into a list of beans.
+	 * Return all the bean references configured for the given role.
 	 * <p>
-	 * <strong>WARNING:</strong> this does not just return all the beans that implement {@code role}.
+	 * <strong>WARNING:</strong> this does not just return references to all the beans that implement {@code role}.
 	 * Only beans registered during
 	 * {@link org.hibernate.search.engine.environment.bean.spi.BeanConfigurer bean configuration}
 	 * are taken into account.
 	 *
 	 * @param <T> The expected bean type.
 	 * @param role The role that must have been assigned to the retrieved beans. Must be non-null and non-empty.
-	 * @return A {@link BeanHolder} containing a {@link List} containing the resolved beans.
-	 * @throws SearchException if one of the references assigned to the role cannot be resolved.
+	 * @return A {@link List} of bean references, possibly empty.
 	 */
-	<T> BeanHolder<List<T>> resolveRole(Class<T> role);
+	<T> List<BeanReference<T>> allConfiguredForRole(Class<T> role);
+
+	/**
+	 * Return named bean references configured for the given role.
+	 * <p>
+	 * <strong>WARNING:</strong> this does not just return references to all the beans that implement {@code role}.
+	 * Only beans registered during
+	 * {@link org.hibernate.search.engine.environment.bean.spi.BeanConfigurer bean configuration}
+	 * are taken into account.
+	 *
+	 * @param <T> The expected bean type.
+	 * @param role The role that must have been assigned to the retrieved beans. Must be non-null and non-empty.
+	 * @return A {@link Map} from name to bean reference, possibly empty.
+	 */
+	<T> Map<String, BeanReference<T>> namedConfiguredForRole(Class<T> role);
 
 }

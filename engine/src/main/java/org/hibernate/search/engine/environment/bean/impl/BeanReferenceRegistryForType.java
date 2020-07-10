@@ -41,6 +41,10 @@ public class BeanReferenceRegistryForType<T> {
 		return Collections.unmodifiableList( all );
 	}
 
+	public Map<String, BeanReference<T>> named() {
+		return Collections.unmodifiableMap( named );
+	}
+
 	public BeanReference<T> single() {
 		if ( all.size() == 1 ) {
 			return all.get( 0 );
