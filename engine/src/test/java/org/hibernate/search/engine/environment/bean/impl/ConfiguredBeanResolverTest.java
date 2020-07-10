@@ -176,6 +176,157 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 	}
 
 	@Test
+	public void resolve_noBean() {
+		// Setup
+		resetAll();
+		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.andReturn( Collections.emptyList() );
+		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.andReturn( (Optional) Optional.empty() );
+		replayAll();
+		BeanResolver beanResolver =
+				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+		verifyAll();
+
+		// resolve(Class)
+		SearchException providerType1NotFound = new SearchException( "cannot find Type1" );
+		resetAll();
+		expect( beanProviderMock.forType( Type1.class ) ).andThrow( providerType1NotFound );
+		replayAll();
+		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
+						" cannot find Type1" )
+				.hasCauseReference( providerType1NotFound );
+		verifyAll();
+
+		// resolve(Class, String)
+		SearchException providerType2NotFound = new SearchException( "cannot find Type2#someName" );
+		resetAll();
+		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
+				.andThrow( providerType2NotFound );
+		replayAll();
+		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
+						"cannot find Type2#someName" )
+				.hasCauseReference( providerType2NotFound );
+		verifyAll();
+	}
+
+	@Test
+	public void resolve_withBeanConfigurer_providerFailure() {
+		// Setup
+		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
+		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+
+		BeanReference<Type1> beanReference1Mock = createMock( BeanReference.class );
+		BeanReference<Type1> beanReference2Mock = createMock( BeanReference.class );
+
+		resetAll();
+		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
+		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
+		beanConfigurer1Mock.configure( EasyMock.anyObject() );
+		expectLastCall().andAnswer( () -> {
+			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+			context.define( Type1.class, beanReference1Mock );
+			return null;
+		} );
+		beanConfigurer2Mock.configure( EasyMock.anyObject() );
+		expectLastCall().andAnswer( () -> {
+			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+			context.define( Type1.class, "someName", beanReference2Mock );
+			return null;
+		} );
+		replayAll();
+		BeanResolver beanResolver =
+				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+		verifyAll();
+
+		// resolve(Class)
+		RuntimeException providerFailure = new RuntimeException( "internal failure in provider" );
+		resetAll();
+		expect( beanProviderMock.forType( Type1.class ) ).andThrow( providerFailure );
+		replayAll();
+		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) ).isSameAs( providerFailure );
+		verifyAll();
+
+		// resolve(Class, String)
+		resetAll();
+		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).andThrow( providerFailure );
+		replayAll();
+		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
+				.isSameAs( providerFailure );
+		verifyAll();
+	}
+
+	@Test
+	public void resolve_withBeanConfigurer_noProviderBean_configuredBeanFailure() {
+		// Setup
+		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
+		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+
+		BeanReference<Type1> beanReference1Mock = createMock( BeanReference.class );
+		BeanReference<Type2> beanReference2Mock = createMock( BeanReference.class );
+
+		resetAll();
+		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
+		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
+		beanConfigurer1Mock.configure( EasyMock.anyObject() );
+		expectLastCall().andAnswer( () -> {
+			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+			context.define( Type1.class, beanReference1Mock );
+			return null;
+		} );
+		beanConfigurer2Mock.configure( EasyMock.anyObject() );
+		expectLastCall().andAnswer( () -> {
+			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+			context.define( Type2.class, "someName", beanReference2Mock );
+			return null;
+		} );
+		replayAll();
+		BeanResolver beanResolver =
+				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+		verifyAll();
+
+		// resolve(Class)
+		SearchException providerType1NotFound = new SearchException( "cannot find Type1" );
+		RuntimeException configuredBeanType1Failed = new RuntimeException( "configured bean failed for Type1" );
+		resetAll();
+		expect( beanProviderMock.forType( Type1.class ) ).andThrow( providerType1NotFound );
+		expect( beanReference1Mock.resolve( EasyMock.anyObject() ) ).andThrow( configuredBeanType1Failed );
+		replayAll();
+		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
+						"cannot find Type1", "configured bean failed for Type1" )
+				.hasCauseReference( providerType1NotFound )
+				.hasSuppressedException( configuredBeanType1Failed );
+		verifyAll();
+
+		// resolve(Class, String)
+		SearchException providerType2NotFound = new SearchException( "provider cannot find Type2#someName" );
+		RuntimeException configuredBeanType2Failed = new RuntimeException( "configured bean failed for Type2#someName" );
+		resetAll();
+		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
+				.andThrow( providerType2NotFound );
+		expect( beanReference2Mock.resolve( EasyMock.anyObject() ) ).andThrow( configuredBeanType2Failed );
+		replayAll();
+		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
+						"provider cannot find Type2#someName",
+						"configured bean failed for Type2#someName" )
+				.hasCauseReference( providerType2NotFound )
+				.hasSuppressedException( configuredBeanType2Failed );
+		verifyAll();
+	}
+
+	@Test
 	public void resolve_withBeanConfigurer_multipleBeans() {
 		// Setup
 		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
@@ -213,10 +364,9 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		replayAll();
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot find Type1" )
-				// TODO HSEARCH-3102 this error message should really appear in the top-level exception
-				.satisfies( e -> assertThat( e.getSuppressed()[0] )
-						.hasMessageContaining( "Multiple beans registered for type '" + Type1.class.getName() + "'" ) );
+				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
+						"cannot find Type1",
+						"Multiple beans registered for type '" + Type1.class.getName() + "'" );
 		verifyAll();
 	}
 

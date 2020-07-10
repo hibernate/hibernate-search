@@ -41,21 +41,20 @@ public class BeanReferenceRegistryForType<T> {
 		return Collections.unmodifiableList( all );
 	}
 
-	public BeanReference<T> single(String nameOrNull) {
-		if ( nameOrNull == null ) {
-			if ( all.size() == 1 ) {
-				return all.get( 0 );
-			}
-			else if ( all.size() > 1 ) {
-				throw log.multipleConfiguredBeanReferencesForType( exposedType, all );
-			}
-			else {
-				return null;
-			}
+	public BeanReference<T> single() {
+		if ( all.size() == 1 ) {
+			return all.get( 0 );
+		}
+		else if ( all.size() > 1 ) {
+			throw log.multipleConfiguredBeanReferencesForType( exposedType, all );
 		}
 		else {
-			return named.get( nameOrNull );
+			return null;
 		}
+	}
+
+	public BeanReference<T> named(String name) {
+		return named.get( name );
 	}
 
 	void add(BeanReference<T> reference) {

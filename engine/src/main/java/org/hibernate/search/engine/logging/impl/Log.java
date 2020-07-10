@@ -33,6 +33,7 @@ import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
+import org.jboss.logging.annotations.Suppressed;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
@@ -316,4 +317,25 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 76, value = "Multiple beans registered for type '%1$s': %2$s.")
 	SearchException multipleConfiguredBeanReferencesForType(@FormatWith(ClassFormatter.class) Class<?> exposedType,
 			List<? extends BeanReference<?>> references);
+
+	@Message(id = ID_OFFSET_2 + 77, value = "No beans registered for type '%1$s'.")
+	SearchException noConfiguredBeanReferenceForType(@FormatWith(ClassFormatter.class) Class<?> exposedType);
+
+	@Message(id = ID_OFFSET_2 + 78, value = "No beans registered for type '%1$s' and name '%2$s'.")
+	SearchException noConfiguredBeanReferenceForTypeAndName(@FormatWith(ClassFormatter.class) Class<?> exposedType,
+			String nameReference);
+
+	@Message(id = ID_OFFSET_2 + 79, value = "Cannot resolve bean reference to type '%1$s' and name '%2$s'."
+			+ " Failed to resolve bean from bean provider with exception: %3$s."
+			+ " Failed to resolve bean from built-in beans with exception: %4$s.")
+	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference, String nameReference,
+			String beanProviderFailureMessage, String configuredBeansFailureMessage,
+			@Cause SearchException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
+
+	@Message(id = ID_OFFSET_2 + 80, value = "Cannot resolve bean reference to type '%1$s'."
+			+ " Failed to resolve bean from bean provider with exception: %2$s."
+			+ " Failed to resolve bean from built-in beans with exception: %3$s.")
+	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference,
+			String beanProviderFailureMessage, String configuredBeansFailureMessage,
+			@Cause SearchException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
 }

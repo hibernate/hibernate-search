@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +21,14 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class ConfiguredBeanResolver implements BeanResolver {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<List<BeanReference<? extends BeanConfigurer>>> BEAN_CONFIGURERS =
 			ConfigurationProperty.forKey( EngineSpiSettings.Radicals.BEAN_CONFIGURERS )
@@ -60,7 +65,12 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 			return beanProvider.forType( typeReference );
 		}
 		catch (SearchException e) {
-			return fallbackToConfiguredBeans( e, typeReference, null );
+			try {
+				return resolveSingleConfiguredBean( typeReference );
+			}
+			catch (RuntimeException e2) {
+				throw log.cannotResolveBeanReference( typeReference, e.getMessage(), e2.getMessage(), e, e2 );
+			}
 		}
 	}
 
@@ -72,7 +82,13 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 			return beanProvider.forTypeAndName( typeReference, nameReference );
 		}
 		catch (SearchException e) {
-			return fallbackToConfiguredBeans( e, typeReference, nameReference );
+			try {
+				return resolveSingleConfiguredBean( typeReference, nameReference );
+			}
+			catch (RuntimeException e2) {
+				throw log.cannotResolveBeanReference( typeReference, nameReference, e.getMessage(), e2.getMessage(),
+						e, e2 );
+			}
 		}
 	}
 
@@ -98,22 +114,31 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	 * so that adding explicitly configured beans in a new version of Hibernate Search
 	 * doesn't break existing user's configuration.
 	 */
-	private <T> BeanHolder<T> fallbackToConfiguredBeans(SearchException e, Class<T> exposedType, String nameOrNull) {
+	private <T> BeanHolder<T> resolveSingleConfiguredBean(Class<T> exposedType, String name) {
+		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
 		BeanReference<T> reference = null;
-		try {
-			BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
-			if ( registry != null ) {
-				reference = registry.single( nameOrNull );
-			}
-		}
-		catch (RuntimeException e2) {
-			e.addSuppressed( e2 );
+		if ( registry != null ) {
+			reference = registry.named( name );
 		}
 		if ( reference != null ) {
-			return reference.resolve( this );
+			return resolve( reference );
 		}
 		else {
-			throw e;
+			throw log.noConfiguredBeanReferenceForTypeAndName( exposedType, name );
+		}
+	}
+
+	private <T> BeanHolder<T> resolveSingleConfiguredBean(Class<T> exposedType) {
+		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
+		BeanReference<T> reference = null;
+		if ( registry != null ) {
+			reference = registry.single();
+		}
+		if ( reference != null ) {
+			return resolve( reference );
+		}
+		else {
+			throw log.noConfiguredBeanReferenceForType( exposedType );
 		}
 	}
 
