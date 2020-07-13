@@ -6,17 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
 import java.util.function.Function;
+
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 
 class ElasticsearchCompositeFunctionProjection<P1, P>
 		extends AbstractElasticsearchCompositeProjection<P> {
 
 	private final Function<P1, P> transformer;
 
-	ElasticsearchCompositeFunctionProjection(Set<String> indexNames, Function<P1, P> transformer,
+	ElasticsearchCompositeFunctionProjection(ElasticsearchSearchContext searchContext,
+			Function<P1, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection) {
-		super( indexNames, projection );
+		super( searchContext, projection );
 		this.transformer = transformer;
 	}
 

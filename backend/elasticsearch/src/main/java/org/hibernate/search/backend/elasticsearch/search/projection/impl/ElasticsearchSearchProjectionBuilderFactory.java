@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
@@ -29,13 +27,10 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchIndexesContext indexes;
@@ -51,10 +46,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return new ElasticsearchDocumentReferenceProjectionBuilder(
-				indexes.hibernateSearchIndexNames(),
-				documentReferenceExtractionHelper
-		);
+		return new ElasticsearchDocumentReferenceProjection.Builder( searchContext, documentReferenceExtractionHelper );
 	}
 
 	@Override
@@ -68,23 +60,17 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new ElasticsearchEntityProjectionBuilder<>(
-				indexes.hibernateSearchIndexNames(),
-				documentReferenceExtractionHelper
-		);
+		return new ElasticsearchEntityProjection.Builder<>( searchContext, documentReferenceExtractionHelper );
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new ElasticsearchEntityReferenceProjectionBuilder<>(
-				indexes.hibernateSearchIndexNames(),
-				documentReferenceExtractionHelper
-		);
+		return new ElasticsearchEntityReferenceProjection.Builder<>( searchContext, documentReferenceExtractionHelper );
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new ElasticsearchScoreProjectionBuilder( indexes.hibernateSearchIndexNames() );
+		return new ElasticsearchScoreProjection.Builder( searchContext );
 	}
 
 	@Override
@@ -103,57 +89,52 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 			typedProjections.add( toImplementation( projection ) );
 		}
 
-		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeListProjection<>( indexes.hibernateSearchIndexNames(), transformer, typedProjections )
+		return new ElasticsearchCompositeListProjection.Builder<>(
+				new ElasticsearchCompositeListProjection<>( searchContext, transformer, typedProjections )
 		);
 	}
 
 	@Override
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
-		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeFunctionProjection<>( indexes.hibernateSearchIndexNames(), transformer, toImplementation( projection ) )
+		return new ElasticsearchCompositeFunctionProjection.Builder<>(
+				new ElasticsearchCompositeFunctionProjection<>( searchContext, transformer,
+						toImplementation( projection ) )
 		);
 	}
 
 	@Override
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeBiFunctionProjection<>( indexes.hibernateSearchIndexNames(), transformer, toImplementation( projection1 ),
-						toImplementation( projection2 ) )
+		return new ElasticsearchCompositeBiFunctionProjection.Builder<>(
+				new ElasticsearchCompositeBiFunctionProjection<>( searchContext, transformer,
+						toImplementation( projection1 ), toImplementation( projection2 ) )
 		);
 	}
 
 	@Override
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new ElasticsearchCompositeProjectionBuilder<>(
-				new ElasticsearchCompositeTriFunctionProjection<>( indexes.hibernateSearchIndexNames(), transformer, toImplementation( projection1 ),
-						toImplementation( projection2 ), toImplementation( projection3 ) )
+		return new ElasticsearchCompositeTriFunctionProjection.Builder<>(
+				new ElasticsearchCompositeTriFunctionProjection<>( searchContext, transformer,
+						toImplementation( projection1 ), toImplementation( projection2 ),
+						toImplementation( projection3 ) )
 		);
 	}
 
 	public SearchProjectionBuilder<JsonObject> source() {
-		return new ElasticsearchSourceProjectionBuilder( indexes.hibernateSearchIndexNames() );
+		return new ElasticsearchSourceProjection.Builder( searchContext );
 	}
 
 	public SearchProjectionBuilder<JsonObject> explanation() {
-		return new ElasticsearchExplanationProjectionBuilder( indexes.hibernateSearchIndexNames() );
+		return new ElasticsearchExplanationProjection.Builder( searchContext );
 	}
 
 	public SearchProjectionBuilder<JsonObject> jsonHit() {
-		return new ElasticsearchJsonHitProjectionBuilder( indexes.hibernateSearchIndexNames() );
+		return new ElasticsearchJsonHitProjection.Builder( searchContext );
 	}
 
-	public <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
-		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
-			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
-		}
-		ElasticsearchSearchProjection<?, T> casted = (ElasticsearchSearchProjection<?, T>) projection;
-		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
-			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), indexes.hibernateSearchIndexNames() );
-		}
-		return casted;
+	private <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
+		return ElasticsearchSearchProjection.from( searchContext, projection );
 	}
 }

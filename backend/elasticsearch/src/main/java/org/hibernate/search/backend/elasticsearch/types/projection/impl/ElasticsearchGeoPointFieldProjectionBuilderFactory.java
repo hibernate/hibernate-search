@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjectionBuilder;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjection;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -26,6 +26,6 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory
 			ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
 		checkProjectable( field );
 
-		return new ElasticsearchDistanceToFieldProjectionBuilder( searchContext, field, center );
+		return new ElasticsearchDistanceToFieldProjection.Builder( searchContext, field, center );
 	}
 }

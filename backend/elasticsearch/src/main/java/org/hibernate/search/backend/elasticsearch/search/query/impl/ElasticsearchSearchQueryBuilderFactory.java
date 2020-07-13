@@ -58,10 +58,8 @@ public class ElasticsearchSearchQueryBuilderFactory
 	public <P> ElasticsearchSearchQueryBuilder<P> select(
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
-		return createSearchQueryBuilder(
-				sessionContext, loadingContextBuilder,
-				searchProjectionFactory.toImplementation( projection )
-		);
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
+				ElasticsearchSearchProjection.from( searchContext, projection ) );
 	}
 
 	@Override
@@ -75,10 +73,10 @@ public class ElasticsearchSearchQueryBuilderFactory
 		List<ElasticsearchSearchProjection<?, ?>> children = new ArrayList<>( projections.length );
 
 		for ( SearchProjection<?> projection : projections ) {
-			children.add( searchProjectionFactory.toImplementation( projection ) );
+			children.add( ElasticsearchSearchProjection.from( searchContext, projection ) );
 		}
 
-		return new ElasticsearchCompositeListProjection<>( searchContext.indexes().hibernateSearchIndexNames(), Function.identity(), children );
+		return new ElasticsearchCompositeListProjection<>( searchContext, Function.identity(), children );
 	}
 
 	private <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(

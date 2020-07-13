@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -61,7 +61,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F>
 			throw log.invalidProjectionInvalidType( field.absolutePath(), expectedType, field.eventContext() );
 		}
 
-		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>( searchContext, field,
+		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjection.Builder<>( searchContext, field,
 				requestConverter, codec );
 	}
 

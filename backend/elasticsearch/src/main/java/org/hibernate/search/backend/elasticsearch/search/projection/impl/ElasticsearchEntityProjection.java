@@ -6,21 +6,27 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
-
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProjection<Object, E> {
+public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProjection<Object, E> {
 
-	private final Set<String> indexNames;
 	private final DocumentReferenceExtractionHelper helper;
 
-	public ElasticsearchEntityProjection(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
-		this.indexNames = indexNames;
+	private ElasticsearchEntityProjection(ElasticsearchSearchContext searchContext,
+			DocumentReferenceExtractionHelper helper) {
+		super( searchContext );
 		this.helper = helper;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -45,13 +51,19 @@ public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProj
 		return loaded;
 	}
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+	static class Builder<E> extends AbstractElasticsearchProjection.AbstractBuilder<E>
+			implements EntityProjectionBuilder<E> {
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
+		private final ElasticsearchEntityProjection<E> projection;
+
+		Builder(ElasticsearchSearchContext searchContext, DocumentReferenceExtractionHelper helper) {
+			super( searchContext );
+			this.projection = new ElasticsearchEntityProjection<>( searchContext, helper );
+		}
+
+		@Override
+		public SearchProjection<E> build() {
+			return projection;
+		}
 	}
 }

@@ -7,18 +7,21 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -32,7 +35,7 @@ import com.google.gson.JsonObject;
  * @param <E> The type of aggregated values extracted from the backend response (before conversion).
  * @param <P> The type of aggregated values returned by the projection (after conversion).
  */
-class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearchProjection<E, P> {
+public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasticsearchProjection<E, P> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
@@ -54,7 +57,6 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 			" return null;" +
 		" }";
 
-	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final boolean multiValued;
 
@@ -66,17 +68,15 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 	private final String scriptFieldName;
 	private final ElasticsearchFieldProjection<E, P, ?, Double> sourceProjection;
 
-	ElasticsearchDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath,
-			String[] absoluteFieldPathComponents, boolean nested, boolean multiValued,
-			GeoPoint center, DistanceUnit unit,
+	private ElasticsearchDistanceToFieldProjection(Builder builder, boolean multiValued,
 			ProjectionAccumulator<Double, Double, E, P> accumulator) {
-		this.indexNames = indexNames;
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( builder );
+		this.absoluteFieldPath = builder.field.absolutePath();
 		this.multiValued = multiValued;
-		this.center = center;
-		this.unit = unit;
+		this.center = builder.center;
+		this.unit = builder.unit;
 		this.accumulator = accumulator;
-		if ( !multiValued && !nested ) {
+		if ( !multiValued && builder.field.nestedPathHierarchy().isEmpty() ) {
 			// Rely on docValues when there is no sort to extract the distance from.
 			scriptFieldName = createScriptFieldName( absoluteFieldPath, center );
 			sourceProjection = null;
@@ -85,10 +85,8 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 			// Rely on _source when there is no sort to extract the distance from.
 			scriptFieldName = null;
 			this.sourceProjection = new ElasticsearchFieldProjection<>(
-					indexNames, absoluteFieldPath, absoluteFieldPathComponents,
-					this::computeDistanceWithUnit,
-					NO_OP_DOUBLE_CONVERTER,
-					accumulator
+					builder.searchContext, absoluteFieldPath, builder.field.absolutePathComponents(),
+					this::computeDistanceWithUnit, NO_OP_DOUBLE_CONVERTER, accumulator
 			);
 		}
 	}
@@ -103,11 +101,6 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 				.append( ", accumulator=" ).append( accumulator )
 				.append( "]" );
 		return sb.toString();
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
 	}
 
 	@Override
@@ -223,5 +216,34 @@ class ElasticsearchDistanceToFieldProjection<E, P> implements ElasticsearchSearc
 		scriptContent.addProperty( "source", DISTANCE_PROJECTION_SCRIPT );
 
 		return scriptContent;
+	}
+
+	public static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<Double>
+			implements DistanceToFieldProjectionBuilder {
+
+		private final ElasticsearchSearchFieldContext<GeoPoint> field;
+
+		private final GeoPoint center;
+
+		private DistanceUnit unit = DistanceUnit.METERS;
+
+		public Builder(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
+			super( searchContext );
+			this.field = field;
+			this.center = center;
+		}
+
+		@Override
+		public DistanceToFieldProjectionBuilder unit(DistanceUnit unit) {
+			this.unit = unit;
+			return this;
+		}
+
+		@Override
+		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
+			return new ElasticsearchDistanceToFieldProjection<>( this, !accumulatorProvider.isSingleValued(),
+					accumulatorProvider.get() );
+		}
 	}
 }

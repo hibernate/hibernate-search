@@ -6,15 +6,23 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P> {
+
+	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	Set<String> indexNames();
 
 	/**
 	 * Contribute to the request, making sure that the requirements for this projection are met.
@@ -53,6 +61,18 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 */
 	P transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context);
 
+	static <P> ElasticsearchSearchProjection<?, P> from(ElasticsearchSearchContext searchContext, SearchProjection<P> projection) {
+		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
+			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
+		}
+		ElasticsearchSearchProjection<?, P> casted = (ElasticsearchSearchProjection<?, P>) projection;
+		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
+					searchContext.indexes().hibernateSearchIndexNames() );
+		}
+		return casted;
+	}
+
 	/**
 	 * Transform the extracted data and cast it to the right type.
 	 * <p>
@@ -63,6 +83,4 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 			Object extractedData, SearchProjectionTransformContext context) {
 		return (Z) ( (ElasticsearchSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}
-
-	Set<String> getIndexNames();
 }
