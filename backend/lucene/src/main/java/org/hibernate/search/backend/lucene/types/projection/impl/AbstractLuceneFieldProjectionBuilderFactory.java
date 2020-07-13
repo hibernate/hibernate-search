@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjectionBuilder;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -56,7 +56,7 @@ public abstract class AbstractLuceneFieldProjectionBuilderFactory<F> implements 
 			throw log.invalidProjectionInvalidType( field.absolutePath(), expectedType, field.eventContext() );
 		}
 
-		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>( searchContext, field, converter, codec );
+		return (FieldProjectionBuilder<T>) new LuceneFieldProjection.Builder<>( searchContext, field, converter, codec );
 	}
 
 	protected void checkProjectable(LuceneSearchFieldContext<?> field) {

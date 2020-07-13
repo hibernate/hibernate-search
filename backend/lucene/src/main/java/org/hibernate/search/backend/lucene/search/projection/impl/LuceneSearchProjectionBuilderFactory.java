@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
@@ -29,14 +27,11 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchIndexesContext indexes;
@@ -48,7 +43,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return new LuceneDocumentReferenceProjectionBuilder( indexes.indexNames() );
+		return new LuceneDocumentReferenceProjection.Builder( searchContext );
 	}
 
 	@Override
@@ -61,17 +56,17 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new LuceneEntityProjectionBuilder<>( indexes.indexNames() );
+		return new LuceneEntityProjection.Builder<>( searchContext );
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new LuceneEntityReferenceProjectionBuilder<>( indexes.indexNames() );
+		return new LuceneEntityReferenceProjection.Builder<>( searchContext );
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new LuceneScoreProjectionBuilder( indexes.indexNames() );
+		return new LuceneScoreProjection.Builder( searchContext );
 	}
 
 	@Override
@@ -90,24 +85,24 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 			typedProjections.add( toImplementation( projection ) );
 		}
 
-		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeListProjection<>( indexes.indexNames(), transformer, typedProjections )
+		return new AbstractLuceneCompositeProjection.Builder<>(
+				new LuceneCompositeListProjection<>( searchContext, transformer, typedProjections )
 		);
 	}
 
 	@Override
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
-		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeFunctionProjection<>( indexes.indexNames(), transformer, toImplementation( projection ) )
+		return new AbstractLuceneCompositeProjection.Builder<>(
+				new LuceneCompositeFunctionProjection<>( searchContext, transformer, toImplementation( projection ) )
 		);
 	}
 
 	@Override
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeBiFunctionProjection<>( indexes.indexNames(), transformer, toImplementation( projection1 ),
+		return new AbstractLuceneCompositeProjection.Builder<>(
+				new LuceneCompositeBiFunctionProjection<>( searchContext, transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -115,28 +110,21 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	@Override
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new LuceneCompositeProjectionBuilder<>(
-				new LuceneCompositeTriFunctionProjection<>( indexes.indexNames(), transformer, toImplementation( projection1 ),
+		return new AbstractLuceneCompositeProjection.Builder<>(
+				new LuceneCompositeTriFunctionProjection<>( searchContext, transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}
 
-	public <T> LuceneSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
-		if ( !( projection instanceof LuceneSearchProjection ) ) {
-			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
-		}
-		LuceneSearchProjection<?, T> casted = (LuceneSearchProjection<?, T>) projection;
-		if ( !indexes.indexNames().equals( casted.getIndexNames() ) ) {
-			throw log.projectionDefinedOnDifferentIndexes( projection, casted.getIndexNames(), indexes.indexNames() );
-		}
-		return casted;
-	}
-
 	public SearchProjectionBuilder<Document> document() {
-		return new LuceneDocumentProjectionBuilder( indexes.indexNames() );
+		return new LuceneDocumentProjection.Builder( searchContext );
 	}
 
 	public SearchProjectionBuilder<Explanation> explanation() {
-		return new LuceneExplanationProjectionBuilder( indexes.indexNames() );
+		return new LuceneExplanationProjection.Builder( searchContext );
+	}
+
+	private <T> LuceneSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
+		return LuceneSearchProjection.from( searchContext, projection );
 	}
 }

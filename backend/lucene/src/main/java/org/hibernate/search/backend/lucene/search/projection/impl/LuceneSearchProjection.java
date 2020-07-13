@@ -6,14 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
+
+	Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	Set<String> indexNames();
 
 	/**
 	 * Request the collection of per-document data that will be used in
@@ -55,6 +63,18 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 	P transform(LoadingResult<?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context);
 
+	static <P> LuceneSearchProjection<?, P> from(LuceneSearchContext searchContext, SearchProjection<P> projection) {
+		if ( !( projection instanceof LuceneSearchProjection ) ) {
+			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
+		}
+		LuceneSearchProjection<?, P> casted = (LuceneSearchProjection<?, P>) projection;
+		if ( !searchContext.indexes().indexNames().equals( casted.indexNames() ) ) {
+			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
+					searchContext.indexes().indexNames() );
+		}
+		return casted;
+	}
+
 	/**
 	 * Transform the extracted data and cast it to the right type.
 	 * <p>
@@ -65,6 +85,4 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 			Object extractedData, SearchProjectionTransformContext context) {
 		return (Z) ( (LuceneSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}
-
-	Set<String> getIndexNames();
 }

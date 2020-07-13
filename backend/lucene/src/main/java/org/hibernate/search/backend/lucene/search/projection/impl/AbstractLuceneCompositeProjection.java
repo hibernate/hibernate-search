@@ -7,22 +7,22 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 abstract class AbstractLuceneCompositeProjection<P>
-		implements LuceneSearchProjection<Object[], P> {
-
-	private final Set<String> indexNames;
+		extends AbstractLuceneProjection<Object[], P> {
 
 	private final LuceneSearchProjection<?, ?>[] children;
 
-	AbstractLuceneCompositeProjection(Set<String> indexNames,
+	AbstractLuceneCompositeProjection(LuceneSearchContext searchContext,
 			LuceneSearchProjection<?, ?> ... children) {
-		this.indexNames = indexNames;
+		super( searchContext );
 		this.children = children;
 	}
 
@@ -70,11 +70,6 @@ abstract class AbstractLuceneCompositeProjection<P>
 		return doTransform( extractedData );
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
 	/**
 	 * @param childResults An object array guaranteed to contain
 	 * the result of calling {@link LuceneSearchProjection#extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)},
@@ -84,4 +79,18 @@ abstract class AbstractLuceneCompositeProjection<P>
 	 * @return The combination of the child results to return from {@link #transform(LoadingResult, Object[], SearchProjectionTransformContext)}.
 	 */
 	abstract P doTransform(Object[] childResults);
+
+	static class Builder<P> implements CompositeProjectionBuilder<P> {
+
+		private final AbstractLuceneCompositeProjection<P> projection;
+
+		Builder(AbstractLuceneCompositeProjection<P> projection) {
+			this.projection = projection;
+		}
+
+		@Override
+		public SearchProjection<P> build() {
+			return projection;
+		}
+	}
 }

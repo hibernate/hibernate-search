@@ -6,22 +6,28 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
-import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.SloppyMath;
@@ -32,15 +38,14 @@ import org.apache.lucene.util.SloppyMath;
  * @param <E> The type of aggregated values extracted from the backend response (before conversion).
  * @param <P> The type of aggregated values returned by the projection (after conversion).
  */
-class LuceneDistanceToFieldProjection<E, P>
-		implements LuceneSearchProjection<E, P>, CollectorFactory<GeoPointDistanceCollector> {
+public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProjection<E, P>
+		implements CollectorFactory<GeoPointDistanceCollector> {
 
 	private static final ProjectionConverter<Double, Double> NO_OP_DOUBLE_CONVERTER = new ProjectionConverter<>(
 			Double.class,
 			(value, context) -> value
 	);
 
-	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 	private final boolean multiValued;
@@ -54,17 +59,15 @@ class LuceneDistanceToFieldProjection<E, P>
 
 	private final DistanceCollectorKey collectorKey;
 
-	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
-			boolean multiValued, LuceneFieldCodec<GeoPoint> codec,
-			GeoPoint center, DistanceUnit unit,
+	private LuceneDistanceToFieldProjection(Builder builder, boolean multiValued,
 			ProjectionAccumulator<Double, Double, E, P> accumulator) {
-		this.indexNames = indexNames;
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPath = nestedDocumentPath;
+		super( builder );
+		this.absoluteFieldPath = builder.field.absolutePath();
+		this.nestedDocumentPath = builder.field.nestedDocumentPath();
 		this.multiValued = multiValued;
-		this.codec = codec;
-		this.center = center;
-		this.unit = unit;
+		this.codec = builder.codec;
+		this.center = builder.center;
+		this.unit = builder.unit;
 		this.accumulator = accumulator;
 		this.collectorKey = new DistanceCollectorKey( absoluteFieldPath, center );
 	}
@@ -78,11 +81,6 @@ class LuceneDistanceToFieldProjection<E, P>
 				.append( ", accumulator=" ).append( accumulator )
 				.append( "]" );
 		return sb.toString();
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
 	}
 
 	@Override
@@ -175,4 +173,40 @@ class LuceneDistanceToFieldProjection<E, P>
 		}
 	}
 
+	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Double>
+			implements DistanceToFieldProjectionBuilder {
+
+		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+		private final LuceneSearchFieldContext<GeoPoint> field;
+
+		private final LuceneFieldCodec<GeoPoint> codec;
+
+		private final GeoPoint center;
+
+		private DistanceUnit unit = DistanceUnit.METERS;
+
+		public Builder(LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<GeoPoint> field, LuceneFieldCodec<GeoPoint> codec, GeoPoint center) {
+			super( searchContext );
+			this.field = field;
+			this.codec = codec;
+			this.center = center;
+		}
+
+		@Override
+		public DistanceToFieldProjectionBuilder unit(DistanceUnit unit) {
+			this.unit = unit;
+			return this;
+		}
+
+		@Override
+		public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
+			if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
+			}
+			return new LuceneDistanceToFieldProjection<>( this, !accumulatorProvider.isSingleValued(),
+					accumulatorProvider.get() );
+		}
+	}
 }

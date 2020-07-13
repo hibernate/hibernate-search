@@ -6,18 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
-class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
+class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 
-	private final Set<String> indexNames;
+	private LuceneScoreProjection(LuceneSearchContext searchContext) {
+		super( searchContext );
+	}
 
-	public LuceneScoreProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -37,14 +41,16 @@ class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
 		return extractedData;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Float>
+			implements ScoreProjectionBuilder {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+		public Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
 
+		@Override
+		public SearchProjection<Float> build() {
+			return new LuceneScoreProjection( searchContext );
+		}
+	}
 }

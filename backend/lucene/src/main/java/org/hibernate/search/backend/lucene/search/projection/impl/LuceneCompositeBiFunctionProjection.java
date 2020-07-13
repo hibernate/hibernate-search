@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
 import java.util.function.BiFunction;
+
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 
 class LuceneCompositeBiFunctionProjection<P1, P2, P>
 		extends AbstractLuceneCompositeProjection<P> {
 
 	private final BiFunction<P1, P2, P> transformer;
 
-	LuceneCompositeBiFunctionProjection(Set<String> indexNames, BiFunction<P1, P2, P> transformer,
+	LuceneCompositeBiFunctionProjection(LuceneSearchContext searchContext, BiFunction<P1, P2, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2) {
-		super( indexNames, projection1, projection2 );
+		super( searchContext, projection1, projection2 );
 		this.transformer = transformer;
 	}
 

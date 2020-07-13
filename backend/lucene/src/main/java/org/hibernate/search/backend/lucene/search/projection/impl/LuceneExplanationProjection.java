@@ -6,20 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.search.Explanation;
 
-class LuceneExplanationProjection implements LuceneSearchProjection<Explanation, Explanation> {
+class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation, Explanation> {
 
-	private final Set<String> indexNames;
-
-	public LuceneExplanationProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	private LuceneExplanationProjection(LuceneSearchContext searchContext) {
+		super( searchContext );
 	}
 
 	@Override
@@ -40,13 +39,20 @@ class LuceneExplanationProjection implements LuceneSearchProjection<Explanation,
 	}
 
 	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
-	@Override
 	public String toString() {
 		return getClass().getSimpleName();
 	}
 
+	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Explanation>
+			implements SearchProjectionBuilder<Explanation> {
+
+		public Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public SearchProjection<Explanation> build() {
+			return new LuceneExplanationProjection( searchContext );
+		}
+	}
 }
