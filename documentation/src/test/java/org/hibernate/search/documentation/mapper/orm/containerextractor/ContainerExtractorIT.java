@@ -32,7 +32,7 @@ public class ContainerExtractorIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				mapping -> {
 					TypeMappingStep bookMapping = mapping.type( Book.class );

@@ -21,22 +21,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class RoutingKeyBridgeOrmContextIT {
 
 	private static final int SHARD_COUNT = 4;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
-	}
-
-	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend(
+			BackendConfigurations.hashBasedSharding( SHARD_COUNT ) );
 
 	private EntityManagerFactory entityManagerFactory;
 

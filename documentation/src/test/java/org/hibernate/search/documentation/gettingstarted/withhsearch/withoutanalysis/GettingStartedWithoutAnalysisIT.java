@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -24,27 +25,12 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class GettingStartedWithoutAnalysisIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] persistenceUnits() {
-		return new Object[][] {
-				{ "lucene" },
-				{ "elasticsearch" }
-		};
-	}
-
-	private final String persistenceUnitName;
+	private final String persistenceUnitName = "GettingStartedWithoutAnalysisIT_" + BackendConfigurations.BACKEND_TYPE;
 
 	private EntityManagerFactory entityManagerFactory;
-
-	public GettingStartedWithoutAnalysisIT(String persistenceUnitSuffix) {
-		this.persistenceUnitName = "GettingStartedWithoutAnalysisIT_" + persistenceUnitSuffix;
-	}
 
 	@Before
 	public void setup() {

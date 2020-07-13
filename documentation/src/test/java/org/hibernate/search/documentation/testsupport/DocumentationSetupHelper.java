@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
@@ -30,25 +29,16 @@ import org.junit.Assume;
 public final class DocumentationSetupHelper
 		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
-	public static List<DocumentationSetupHelper> testParamsWithSingleBackend(
-			List<BackendConfiguration> backendConfigurations) {
-		return backendConfigurations.stream()
-				.map( DocumentationSetupHelper::withSingleBackend )
-				.collect( Collectors.toList() );
-	}
-
-	public static List<DocumentationSetupHelper> testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
-			List<BackendConfiguration> backendConfigurations,
+	public static List<DocumentationSetupHelper> testParamsForBothAnnotationsAndProgrammatic(
+			BackendConfiguration backendConfiguration,
 			Consumer<ProgrammaticMappingConfigurationContext> programmaticMappingContributor) {
 		HibernateOrmSearchMappingConfigurer mappingConfigurer =
 				context -> programmaticMappingContributor.accept( context.programmaticMapping() );
 		List<DocumentationSetupHelper> result = new ArrayList<>();
-		for ( BackendConfiguration configuration : backendConfigurations ) {
-			// Annotation-based mapping
-			result.add( withSingleBackend( configuration, null ) );
-			// Programmatic mapping
-			result.add( withSingleBackend( configuration, mappingConfigurer ) );
-		}
+		// Annotation-based mapping
+		result.add( withSingleBackend( backendConfiguration, null ) );
+		// Programmatic mapping
+		result.add( withSingleBackend( backendConfiguration, mappingConfigurer ) );
 		return result;
 	}
 

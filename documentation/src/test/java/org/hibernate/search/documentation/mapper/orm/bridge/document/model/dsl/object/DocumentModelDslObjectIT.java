@@ -20,21 +20,12 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.Assertions;
 
-@RunWith(Parameterized.class)
 public class DocumentModelDslObjectIT {
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
-	}
-
-	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 

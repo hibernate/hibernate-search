@@ -32,7 +32,7 @@ public class AssociationInverseSideIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.simple(),
 				mapping -> {
 					//tag::programmatic[]

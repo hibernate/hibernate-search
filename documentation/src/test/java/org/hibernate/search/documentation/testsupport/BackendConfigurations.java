@@ -6,29 +6,51 @@
  */
 package org.hibernate.search.documentation.testsupport;
 
-import java.util.Arrays;
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class BackendConfigurations {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	public static final String BACKEND_TYPE;
+
+	static {
+		String property = System.getProperty( "test.backendType" );
+		if ( property == null ) {
+			log.warn( "The expected backend type wasn't set; tests are probably running from an IDE."
+					+ " Defaulting to 'lucene'." );
+			BACKEND_TYPE = "lucene";
+		}
+		else {
+			BACKEND_TYPE = property;
+		}
+	}
+
 	private BackendConfigurations() {
 	}
 
-	public static List<BackendConfiguration> simple() {
-		return Arrays.asList(
-				new DocumentationLuceneBackendConfiguration(),
-				new DocumentationElasticsearchBackendConfiguration()
-		);
+	public static BackendConfiguration simple() {
+		switch ( BACKEND_TYPE ) {
+			case "lucene":
+				return new DocumentationLuceneBackendConfiguration();
+			case "elasticsearch":
+				return new DocumentationElasticsearchBackendConfiguration();
+			default:
+				throw new IllegalStateException( "Unknown backend type: " + BACKEND_TYPE );
+		}
 	}
 
-	public static List<BackendConfiguration> hashBasedSharding(int shardCount) {
-		return Arrays.asList(
-				new DocumentationLuceneBackendConfiguration() {
+	public static BackendConfiguration hashBasedSharding(int shardCount) {
+		switch ( BACKEND_TYPE ) {
+			case "lucene":
+				return new DocumentationLuceneBackendConfiguration() {
 					@Override
 					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
@@ -40,8 +62,9 @@ public final class BackendConfigurations {
 										backendNameOrNull, LuceneIndexSettings.SHARDING_NUMBER_OF_SHARDS, shardCount
 								);
 					}
-				},
-				new DocumentationElasticsearchBackendConfiguration() {
+				};
+			case "elasticsearch":
+				return new DocumentationElasticsearchBackendConfiguration() {
 					@Override
 					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
@@ -54,8 +77,10 @@ public final class BackendConfigurations {
 								);
 						return super.setup( setupContext, backendNameOrNull, configurationProvider );
 					}
-				}
-		);
+				};
+			default:
+				throw new IllegalStateException( "Unknown backend type: " + BACKEND_TYPE );
+		}
 	}
 
 }

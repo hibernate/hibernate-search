@@ -43,16 +43,10 @@ public class HibernateOrmIndexedIT {
 	private static final BackendConfiguration DEFAULT_BACKEND_CONFIGURATION;
 	private static final Map<String, BackendConfiguration> NAMED_BACKEND_CONFIGURATIONS;
 	static {
-		List<BackendConfiguration> backendConfigurations = BackendConfigurations.simple();
-		if ( backendConfigurations.size() != 2 ) {
-			throw new IllegalStateException(
-					"This test assumes there are only two types of backends."
-							+ " If this changed, please update this test to add/remove entity types mapped to each backend as necessary."
-			);
-		}
-		DEFAULT_BACKEND_CONFIGURATION = backendConfigurations.get( 0 );
+		BackendConfiguration backendConfiguration = BackendConfigurations.simple();
+		DEFAULT_BACKEND_CONFIGURATION = backendConfiguration;
 		Map<String, BackendConfiguration> map = new HashMap<>();
-		map.put( BACKEND_2, backendConfigurations.get( 1 ) );
+		map.put( BACKEND_2, backendConfiguration );
 		NAMED_BACKEND_CONFIGURATIONS = map;
 	}
 
@@ -122,8 +116,7 @@ public class HibernateOrmIndexedIT {
 				} )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "A multi-index scope cannot include both " )
-				.hasMessageContaining( " and another type of index" );
+				.hasMessageContaining( "A multi-index scope cannot span multiple " );
 	}
 
 	private void initData() {

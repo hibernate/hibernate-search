@@ -94,11 +94,30 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>it</id>
+                        <id>it-lucene</id>
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-lucene</reportNameSuffix>
+                            <systemPropertyVariables>
+                                <test.backendType>lucene</test.backendType>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-elasticsearch</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-elasticsearch</reportNameSuffix>
+                            <systemPropertyVariables>
+                                <test.backendType>elasticsearch</test.backendType>
+                            </systemPropertyVariables>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

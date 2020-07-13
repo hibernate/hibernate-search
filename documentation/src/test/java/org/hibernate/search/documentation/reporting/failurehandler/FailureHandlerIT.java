@@ -8,7 +8,6 @@ package org.hibernate.search.documentation.reporting.failurehandler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -21,20 +20,11 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class FailureHandlerIT {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
-	}
-
-	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();

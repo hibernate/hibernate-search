@@ -23,10 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class HibernateOrmAutomaticIndexingIT {
 	private static final String BOOK1_TITLE = "I, Robot";
 
@@ -34,14 +31,8 @@ public class HibernateOrmAutomaticIndexingIT {
 
 	private static final String BOOK3_TITLE = "The Robots of Dawn";
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
-	}
-
-	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
 	public void synchronizationStrategyOverride() {

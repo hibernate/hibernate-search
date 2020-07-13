@@ -37,7 +37,7 @@ public class RoutingKeyBridgeSimpleIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackendForBothAnnotationsAndProgrammatic(
+		return DocumentationSetupHelper.testParamsForBothAnnotationsAndProgrammatic(
 				BackendConfigurations.hashBasedSharding( SHARD_COUNT ),
 				mapping -> {
 					//tag::programmatic[]

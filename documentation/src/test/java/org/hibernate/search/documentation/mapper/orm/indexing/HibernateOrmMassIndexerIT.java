@@ -8,7 +8,6 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,23 +23,14 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class HibernateOrmMassIndexerIT {
 
 	private static final int NUMBER_OF_BOOKS = 1000;
 	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
-	}
-
-	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 

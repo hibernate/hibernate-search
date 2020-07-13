@@ -44,8 +44,6 @@ import org.hibernate.stat.Statistics;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -54,7 +52,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TopDocs;
 
-@RunWith(Parameterized.class)
 public class QueryDslIT {
 
 	private static final int BOOK1_ID = 1;
@@ -67,14 +64,8 @@ public class QueryDslIT {
 	private static final int ASSOCIATE1_ID = 1;
 	private static final int ASSOCIATE2_ID = 2;
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<?> params() {
-		return DocumentationSetupHelper.testParamsWithSingleBackend( BackendConfigurations.simple() );
-	}
-
-	@Parameterized.Parameter
 	@Rule
-	public DocumentationSetupHelper setupHelper;
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 
