@@ -12,8 +12,8 @@ import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBacke
 
 public class DocumentationLuceneBackendConfiguration extends LuceneBackendConfiguration {
 	@Override
-	protected Map<String, Object> getBackendProperties() {
-		Map<String, Object> properties = super.getBackendProperties();
+	protected Map<String, Object> backendProperties() {
+		Map<String, Object> properties = super.backendProperties();
 		properties.put(
 				"analysis.configurer",
 				new LuceneSimpleMappingAnalysisConfigurer()

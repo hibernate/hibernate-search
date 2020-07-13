@@ -37,7 +37,7 @@ class ActualBackendSetupStrategy implements BackendSetupStrategy {
 	public Optional<TestRule> getTestRule() {
 		RuleChain ruleChain = null;
 		for ( BackendConfiguration configuration : allConfigurations ) {
-			Optional<TestRule> rule = configuration.getTestRule();
+			Optional<TestRule> rule = configuration.testRule();
 			if ( !rule.isPresent() ) {
 				continue;
 			}

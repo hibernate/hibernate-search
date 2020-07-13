@@ -18,7 +18,7 @@ public class LuceneBackendConfiguration extends BackendConfiguration {
 	}
 
 	@Override
-	protected Map<String, Object> getBackendProperties() {
+	protected Map<String, Object> backendProperties() {
 		Map<String, Object> properties = new LinkedHashMap<>();
 		properties.put( "type", "lucene" );
 		properties.put(

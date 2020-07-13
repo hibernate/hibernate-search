@@ -15,7 +15,7 @@ import org.junit.rules.TestRule;
 
 public abstract class BackendConfiguration {
 
-	public Optional<TestRule> getTestRule() {
+	public Optional<TestRule> testRule() {
 		return Optional.empty();
 	}
 
@@ -24,10 +24,10 @@ public abstract class BackendConfiguration {
 		return setupContext
 				.withBackendProperties(
 						backendNameOrNull,
-						configurationProvider.interpolateProperties( getBackendProperties() )
+						configurationProvider.interpolateProperties( backendProperties() )
 				);
 	}
 
-	protected abstract Map<String, Object> getBackendProperties();
+	protected abstract Map<String, Object> backendProperties();
 
 }
