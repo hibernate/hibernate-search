@@ -6,20 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 import org.apache.lucene.document.Document;
 
-class LuceneDocumentProjection implements LuceneSearchProjection<Document, Document> {
+class LuceneDocumentProjection extends AbstractLuceneProjection<Document, Document> {
 
-	private final Set<String> indexNames;
+	private LuceneDocumentProjection(LuceneSearchContext searchContext) {
+		super( searchContext );
+	}
 
-	public LuceneDocumentProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -39,14 +43,16 @@ class LuceneDocumentProjection implements LuceneSearchProjection<Document, Docum
 		return extractedData;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Document>
+			implements SearchProjectionBuilder<Document> {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+		public Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
 
+		@Override
+		public SearchProjection<Document> build() {
+			return new LuceneDocumentProjection( searchContext );
+		}
+	}
 }

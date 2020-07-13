@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.projection.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistanceToFieldProjectionBuilder;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistanceToFieldProjection;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -23,6 +23,6 @@ public class LuceneGeoPointFieldProjectionBuilderFactory extends AbstractLuceneF
 	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<GeoPoint> field, GeoPoint center) {
 		checkProjectable( field );
-		return new LuceneDistanceToFieldProjectionBuilder( searchContext, field, codec, center );
+		return new LuceneDistanceToFieldProjection.Builder( searchContext, field, codec, center );
 	}
 }

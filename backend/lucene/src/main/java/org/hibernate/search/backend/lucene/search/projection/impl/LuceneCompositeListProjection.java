@@ -8,17 +8,18 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
+
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 
 public class LuceneCompositeListProjection<P>
 		extends AbstractLuceneCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	public LuceneCompositeListProjection(Set<String> indexNames, Function<List<?>, P> transformer,
+	public LuceneCompositeListProjection(LuceneSearchContext searchContext, Function<List<?>, P> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
-		super( indexNames, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
+		super( searchContext, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;
 	}
 

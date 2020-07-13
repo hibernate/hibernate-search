@@ -6,20 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DocumentReferenceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
-public class LuceneEntityProjection<E> implements LuceneSearchProjection<Object, E> {
+public class LuceneEntityProjection<E> extends AbstractLuceneProjection<Object, E> {
 
-	private final Set<String> indexNames;
+	private LuceneEntityProjection(LuceneSearchContext searchContext) {
+		super( searchContext );
+	}
 
-	public LuceneEntityProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -46,13 +50,16 @@ public class LuceneEntityProjection<E> implements LuceneSearchProjection<Object,
 		return loaded;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	public static class Builder<E> extends AbstractLuceneProjection.AbstractBuilder<E>
+			implements EntityProjectionBuilder<E> {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
+		public Builder(LuceneSearchContext searchContext) {
+			super( searchContext );
+		}
+
+		@Override
+		public SearchProjection<E> build() {
+			return new LuceneEntityProjection<>( searchContext );
+		}
 	}
 }

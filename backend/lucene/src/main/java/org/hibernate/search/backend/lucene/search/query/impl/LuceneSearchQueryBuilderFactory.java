@@ -54,7 +54,7 @@ public class LuceneSearchQueryBuilderFactory
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
-				searchProjectionFactory.toImplementation( projection ) );
+				LuceneSearchProjection.from( searchContext, projection ) );
 	}
 
 	@Override
@@ -68,10 +68,10 @@ public class LuceneSearchQueryBuilderFactory
 		List<LuceneSearchProjection<?, ?>> children = new ArrayList<>( projections.length );
 
 		for ( SearchProjection<?> projection : projections ) {
-			children.add( searchProjectionFactory.toImplementation( projection ) );
+			children.add( LuceneSearchProjection.from( searchContext, projection ) );
 		}
 
-		return new LuceneCompositeListProjection<>( searchContext.indexes().indexNames(), Function.identity(), children );
+		return new LuceneCompositeListProjection<>( searchContext, Function.identity(), children );
 	}
 
 	private <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
