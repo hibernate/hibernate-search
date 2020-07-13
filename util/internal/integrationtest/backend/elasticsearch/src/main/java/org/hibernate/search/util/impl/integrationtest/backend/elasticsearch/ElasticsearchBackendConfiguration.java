@@ -4,18 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.testsupport;
+package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
 import org.junit.rules.TestRule;
 
-public class ElasticsearchBackendConfiguration extends AbstractDocumentationBackendConfiguration {
+public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 
 	protected final TestElasticsearchClient testElasticsearchClient = new TestElasticsearchClient();
 
@@ -36,10 +36,6 @@ public class ElasticsearchBackendConfiguration extends AbstractDocumentationBack
 		properties.put( "log.json_pretty_printing", "true" );
 		properties.put( "index_defaults.schema_management.minimal_required_status", "yellow" );
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
-		properties.put(
-				"analysis.configurer",
-				new ElasticsearchSimpleMappingAnalysisConfigurer()
-		);
 		return properties;
 	}
 }

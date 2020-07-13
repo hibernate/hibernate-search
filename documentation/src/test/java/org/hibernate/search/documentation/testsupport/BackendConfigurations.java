@@ -21,14 +21,14 @@ public final class BackendConfigurations {
 
 	public static List<BackendConfiguration> simple() {
 		return Arrays.asList(
-				new LuceneBackendConfiguration(),
-				new ElasticsearchBackendConfiguration()
+				new DocumentationLuceneBackendConfiguration(),
+				new DocumentationElasticsearchBackendConfiguration()
 		);
 	}
 
 	public static List<BackendConfiguration> hashBasedSharding(int shardCount) {
 		return Arrays.asList(
-				new LuceneBackendConfiguration() {
+				new DocumentationLuceneBackendConfiguration() {
 					@Override
 					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
@@ -41,7 +41,7 @@ public final class BackendConfigurations {
 								);
 					}
 				},
-				new ElasticsearchBackendConfiguration() {
+				new DocumentationElasticsearchBackendConfiguration() {
 					@Override
 					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {

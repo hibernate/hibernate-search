@@ -14,7 +14,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
+import org.hibernate.search.documentation.testsupport.DocumentationElasticsearchBackendConfiguration;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class ElasticsearchNativeTypeIT {
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new ElasticsearchBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new DocumentationElasticsearchBackendConfiguration() );
 
 	private EntityManagerFactory entityManagerFactory;
 

@@ -4,14 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.testsupport;
+package org.hibernate.search.util.impl.integrationtest.backend.lucene;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneTestIndexesPathConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
-public class LuceneBackendConfiguration extends AbstractDocumentationBackendConfiguration {
+public class LuceneBackendConfiguration extends BackendConfiguration {
 	@Override
 	public String toString() {
 		return "lucene";
@@ -25,10 +25,6 @@ public class LuceneBackendConfiguration extends AbstractDocumentationBackendConf
 				"directory.root",
 				LuceneTestIndexesPathConfiguration.get().getPath()
 						+ "/test-indexes/#{tck.startup.timestamp}/#{tck.test.id}/"
-		);
-		properties.put(
-				"analysis.configurer",
-				new LuceneSimpleMappingAnalysisConfigurer()
 		);
 		return properties;
 	}

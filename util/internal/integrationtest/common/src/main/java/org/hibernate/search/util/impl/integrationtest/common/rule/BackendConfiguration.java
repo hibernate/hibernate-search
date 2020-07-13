@@ -6,19 +6,28 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 import org.junit.rules.TestRule;
 
-public interface BackendConfiguration {
+public abstract class BackendConfiguration {
 
-	default Optional<TestRule> getTestRule() {
+	public Optional<TestRule> getTestRule() {
 		return Optional.empty();
 	}
 
-	<C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
-			String backendName, TestConfigurationProvider configurationProvider);
+	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
+			String backendNameOrNull, TestConfigurationProvider configurationProvider) {
+		return setupContext
+				.withBackendProperties(
+						backendNameOrNull,
+						configurationProvider.interpolateProperties( getBackendProperties() )
+				);
+	}
+
+	protected abstract Map<String, Object> getBackendProperties();
 
 }

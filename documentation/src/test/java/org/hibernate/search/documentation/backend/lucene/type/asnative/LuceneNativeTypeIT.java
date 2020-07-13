@@ -14,7 +14,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
-import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
+import org.hibernate.search.documentation.testsupport.DocumentationLuceneBackendConfiguration;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -27,7 +27,7 @@ import org.apache.lucene.document.FeatureField;
 
 public class LuceneNativeTypeIT {
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new LuceneBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new DocumentationLuceneBackendConfiguration() );
 
 	private EntityManagerFactory entityManagerFactory;
 

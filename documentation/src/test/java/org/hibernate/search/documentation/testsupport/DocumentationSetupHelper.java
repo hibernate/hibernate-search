@@ -108,11 +108,11 @@ public final class DocumentationSetupHelper
 	}
 
 	public boolean isElasticsearch() {
-		return defaultBackendConfiguration instanceof ElasticsearchBackendConfiguration;
+		return defaultBackendConfiguration instanceof DocumentationElasticsearchBackendConfiguration;
 	}
 
 	public boolean isLucene() {
-		return defaultBackendConfiguration instanceof LuceneBackendConfiguration;
+		return defaultBackendConfiguration instanceof DocumentationLuceneBackendConfiguration;
 	}
 
 	public void assumeElasticsearch() {
