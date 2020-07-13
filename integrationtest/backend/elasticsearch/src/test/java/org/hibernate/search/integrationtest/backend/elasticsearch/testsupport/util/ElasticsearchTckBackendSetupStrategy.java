@@ -25,7 +25,6 @@ class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 	private final Map<String, Object> properties = new LinkedHashMap<>();
 
 	ElasticsearchTckBackendSetupStrategy() {
-		setProperty( "type", "elasticsearch" );
 		setProperty( "log.json_pretty_printing", "true" );
 		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
 		setProperty( "index_defaults.schema_management.minimal_required_status", "yellow" );

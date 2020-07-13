@@ -26,7 +26,6 @@ class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
 	private final Map<String, Object> properties = new LinkedHashMap<>();
 
 	LuceneTckBackendSetupStrategy() {
-		setProperty( "type", "lucene" );
 		setProperty( "directory.root", LuceneTestIndexesPathConfiguration.get().getPath()
 				+ "/#{test.startup.timestamp}/#{test.id}/" );
 		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
