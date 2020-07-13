@@ -143,16 +143,4 @@ public class HibernateOrmIndexedIT {
 		} );
 	}
 
-	// Note: ideally we should use "static" here, but it looks better without it in the documentation.
-	// tag::projection-advanced-bean[]
-	public class MyEntityAndScoreBean<T> {
-		public final T entity;
-		public final float score;
-		public MyEntityAndScoreBean(T entity, float score) {
-			this.entity = entity;
-			this.score = score;
-		}
-	}
-	// end::projection-advanced-bean[]
-
 }
