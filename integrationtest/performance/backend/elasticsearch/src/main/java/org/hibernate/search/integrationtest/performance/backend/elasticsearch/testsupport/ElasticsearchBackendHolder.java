@@ -41,7 +41,6 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 	protected ConfigurationPropertySource getDefaultBackendProperties(TemporaryFileHolder temporaryFileHolder) {
 		Map<String, Object> map = new LinkedHashMap<>();
 
-		map.put( BackendSettings.TYPE, ElasticsearchBackendSettings.TYPE_NAME );
 		// Custom connection info is provided by setting system properties,
 		// e.g. "hosts" or "aws.signing.enabled".
 		map.put( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, ElasticsearchPerformanceAnalysisConfigurer.class );

@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
@@ -41,7 +40,6 @@ public class LuceneBackendHolder extends AbstractBackendHolder {
 			throws IOException {
 		Map<String, Object> map = new LinkedHashMap<>();
 
-		map.put( BackendSettings.TYPE, LuceneBackendSettings.TYPE_NAME );
 		map.put( LuceneBackendSettings.DIRECTORY_ROOT, temporaryFileHolder.getIndexesDirectory().toAbsolutePath() );
 		map.put( LuceneBackendSettings.ANALYSIS_CONFIGURER, LucenePerformanceAnalysisConfigurer.class );
 
