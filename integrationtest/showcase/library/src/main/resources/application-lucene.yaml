@@ -2,6 +2,6 @@ spring.jpa:
   properties:
     hibernate.search:
       backend:
-        type: lucene
+        type: lucene # Only necessary because we have both the Elasticsearch and Lucene backend in the classpath
         analysis.configurer: luceneAnalysisConfigurer
         directory.root: ${LUCENE_ROOT_PATH} # From environment variable
