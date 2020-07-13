@@ -6,24 +6,27 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchExplanationProjection implements ElasticsearchSearchProjection<JsonObject, JsonObject> {
+class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
 
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
 
-	private final Set<String> indexNames;
+	private ElasticsearchExplanationProjection(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
+	}
 
-	ElasticsearchExplanationProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -44,14 +47,18 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 		return extractedData;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<JsonObject> {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+		private final ElasticsearchExplanationProjection projection;
 
+		Builder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+			this.projection = new ElasticsearchExplanationProjection( searchContext );
+		}
+
+		@Override
+		public SearchProjection<JsonObject> build() {
+			return projection;
+		}
+	}
 }

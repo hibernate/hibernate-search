@@ -8,17 +8,19 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
+
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 
 public class ElasticsearchCompositeListProjection<P>
 		extends AbstractElasticsearchCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	public ElasticsearchCompositeListProjection(Set<String> indexNames, Function<List<?>, P> transformer,
+	public ElasticsearchCompositeListProjection(ElasticsearchSearchContext searchContext,
+			Function<List<?>, P> transformer,
 			List<ElasticsearchSearchProjection<?, ?>> children) {
-		super( indexNames, children.toArray( new ElasticsearchSearchProjection<?, ?>[0] ) );
+		super( searchContext, children.toArray( new ElasticsearchSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;
 	}
 

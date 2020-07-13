@@ -6,21 +6,26 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
-
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchEntityReferenceProjection<R> implements ElasticsearchSearchProjection<R, R> {
+public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticsearchProjection<R, R> {
 
-	private final Set<String> indexNames;
 	private final DocumentReferenceExtractionHelper helper;
 
-	public ElasticsearchEntityReferenceProjection(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
-		this.indexNames = indexNames;
+	private ElasticsearchEntityReferenceProjection(ElasticsearchSearchContext searchContext, DocumentReferenceExtractionHelper helper) {
+		super( searchContext );
 		this.helper = helper;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -41,13 +46,19 @@ public class ElasticsearchEntityReferenceProjection<R> implements ElasticsearchS
 		return extractedData;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	static class Builder<R> extends AbstractElasticsearchProjection.AbstractBuilder<R>
+			implements EntityReferenceProjectionBuilder<R> {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
+		private final ElasticsearchEntityReferenceProjection<R> projection;
+
+		Builder(ElasticsearchSearchContext searchContext, DocumentReferenceExtractionHelper helper) {
+			super( searchContext );
+			this.projection = new ElasticsearchEntityReferenceProjection<>( searchContext, helper );
+		}
+
+		@Override
+		public SearchProjection<R> build() {
+			return projection;
+		}
 	}
 }

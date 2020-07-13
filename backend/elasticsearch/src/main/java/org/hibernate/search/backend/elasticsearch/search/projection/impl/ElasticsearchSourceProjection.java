@@ -7,27 +7,31 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<JsonObject, JsonObject> {
+class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
 
-	private final Set<String> indexNames;
+	private ElasticsearchSourceProjection(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
+	}
 
-	ElasticsearchSourceProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -53,14 +57,18 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Jso
 		return extractedData;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<JsonObject> {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+		private final ElasticsearchSourceProjection projection;
 
+		Builder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+			this.projection = new ElasticsearchSourceProjection( searchContext );
+		}
+
+		@Override
+		public SearchProjection<JsonObject> build() {
+			return projection;
+		}
+	}
 }

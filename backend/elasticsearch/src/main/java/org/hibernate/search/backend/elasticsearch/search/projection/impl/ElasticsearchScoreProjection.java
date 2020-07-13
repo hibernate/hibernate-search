@@ -6,23 +6,27 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Float, Float> {
+class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float, Float> {
 
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();
 
-	private final Set<String> indexNames;
+	private ElasticsearchScoreProjection(ElasticsearchSearchContext searchContext) {
+		super( searchContext );
+	}
 
-	ElasticsearchScoreProjection(Set<String> indexNames) {
-		this.indexNames = indexNames;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -42,14 +46,19 @@ class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Floa
 		return extractedData;
 	}
 
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
+	static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<Float>
+			implements ScoreProjectionBuilder {
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+		private final ElasticsearchScoreProjection projection;
 
+		Builder(ElasticsearchSearchContext searchContext) {
+			super( searchContext );
+			this.projection = new ElasticsearchScoreProjection( searchContext );
+		}
+
+		@Override
+		public SearchProjection<Float> build() {
+			return projection;
+		}
+	}
 }

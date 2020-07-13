@@ -7,23 +7,23 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
-import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 import com.google.gson.JsonObject;
 
 abstract class AbstractElasticsearchCompositeProjection<P>
-		implements ElasticsearchSearchProjection<Object[], P> {
-
-	private final Set<String> indexNames;
+		extends AbstractElasticsearchProjection<Object[], P> {
 
 	private final ElasticsearchSearchProjection<?, ?>[] children;
 
-	AbstractElasticsearchCompositeProjection(Set<String> indexNames,
+	AbstractElasticsearchCompositeProjection(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchProjection<?, ?> ... children) {
-		this.indexNames = indexNames;
+		super( searchContext );
 		this.children = children;
 	}
 
@@ -72,11 +72,6 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 		return doTransform( extractedData );
 	}
 
-	@Override
-	public final Set<String> getIndexNames() {
-		return indexNames;
-	}
-
 	/**
 	 * @param childResults An object array guaranteed to contain
 	 * the result of calling {@link ElasticsearchSearchProjection#extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)},
@@ -87,4 +82,17 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 	 */
 	abstract P doTransform(Object[] childResults);
 
+	static class Builder<P> implements CompositeProjectionBuilder<P> {
+
+		private final AbstractElasticsearchCompositeProjection<P> projection;
+
+		Builder(AbstractElasticsearchCompositeProjection<P> projection) {
+			this.projection = projection;
+		}
+
+		@Override
+		public SearchProjection<P> build() {
+			return projection;
+		}
+	}
 }

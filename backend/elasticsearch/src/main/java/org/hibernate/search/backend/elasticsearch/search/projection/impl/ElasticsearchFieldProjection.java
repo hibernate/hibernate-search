@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,11 +16,18 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,12 +41,11 @@ import com.google.gson.JsonPrimitive;
  * @param <F> The type of individual field values obtained from the backend (before conversion).
  * @param <V> The type of individual field values after conversion.
  */
-class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchProjection<E, P> {
+public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsearchProjection<E, P> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 
-	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 	private final String[] absoluteFieldPathComponents;
 
@@ -47,10 +53,16 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 	private final ProjectionConverter<? super F, V> converter;
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
-	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath, String[] absoluteFieldPathComponents,
+	private ElasticsearchFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
+		this( builder.searchContext, builder.field.absolutePath(), builder.field.absolutePathComponents(),
+				builder.codec::decode, builder.converter, accumulator );
+	}
+
+	ElasticsearchFieldProjection(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, String[] absoluteFieldPathComponents,
 			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, V> converter,
 			ProjectionAccumulator<F, V, E, P> accumulator) {
-		this.indexNames = indexNames;
+		super( searchContext );
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
 		this.decodeFunction = decodeFunction;
@@ -85,11 +97,6 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 	public P transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return accumulator.finish( extractedData, converter, convertContext );
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
 	}
 
 	private E collect(JsonObject parent, E accumulated, int currentPathComponentIndex) {
@@ -146,5 +153,34 @@ class ElasticsearchFieldProjection<E, P, F, V> implements ElasticsearchSearchPro
 			);
 		}
 		return childElement.getAsJsonObject();
+	}
+
+	public static class Builder<F, V> implements FieldProjectionBuilder<V> {
+
+		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchFieldContext<F> field;
+
+		private final ProjectionConverter<? super F, V> converter;
+		private final ElasticsearchFieldCodec<F> codec;
+
+		public Builder(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field,
+				ProjectionConverter<? super F, V> converter,
+				ElasticsearchFieldCodec<F> codec) {
+			this.searchContext = searchContext;
+			this.field = field;
+			this.converter = converter;
+			this.codec = codec;
+		}
+
+		@Override
+		public <R> SearchProjection<R> build(ProjectionAccumulator.Provider<V, R> accumulatorProvider) {
+			if ( accumulatorProvider.isSingleValued() && field.multiValuedInRoot() ) {
+				throw log.invalidSingleValuedProjectionOnMultiValuedField( field.absolutePath(), field.eventContext() );
+			}
+			return new ElasticsearchFieldProjection<>( this, accumulatorProvider.get() );
+		}
 	}
 }
