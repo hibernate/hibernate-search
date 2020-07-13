@@ -97,27 +97,43 @@
                         <id>it-lucene</id>
                         <goals>
                             <goal>integration-test</goal>
-                            <goal>verify</goal>
                         </goals>
                         <configuration>
                             <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-lucene</reportNameSuffix>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-elasticsearch</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
                             <systemPropertyVariables>
-                                <test.backendType>lucene</test.backendType>
+                                <org.hibernate.search.integrationtest.backend.type>lucene</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
+                            <excludes>
+                                <exclude>**/Elasticsearch*IT</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                     <execution>
                         <id>it-elasticsearch</id>
                         <goals>
                             <goal>integration-test</goal>
-                            <goal>verify</goal>
                         </goals>
                         <configuration>
                             <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-elasticsearch</reportNameSuffix>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.hibernate.search:hibernate-search-backend-lucene</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
                             <systemPropertyVariables>
-                                <test.backendType>elasticsearch</test.backendType>
+                                <org.hibernate.search.integrationtest.backend.type>elasticsearch</org.hibernate.search.integrationtest.backend.type>
                             </systemPropertyVariables>
+                            <excludes>
+                                <exclude>**/Lucene*IT</exclude>
+                            </excludes>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

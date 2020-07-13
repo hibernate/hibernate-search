@@ -6,32 +6,14 @@
  */
 package org.hibernate.search.documentation.testsupport;
 
-import java.lang.invoke.MethodHandles;
+import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class BackendConfigurations {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	public static final String BACKEND_TYPE;
-
-	static {
-		String property = System.getProperty( "test.backendType" );
-		if ( property == null ) {
-			log.warn( "The expected backend type wasn't set; tests are probably running from an IDE."
-					+ " Defaulting to 'lucene'." );
-			BACKEND_TYPE = "lucene";
-		}
-		else {
-			BACKEND_TYPE = property;
-		}
-	}
 
 	private BackendConfigurations() {
 	}

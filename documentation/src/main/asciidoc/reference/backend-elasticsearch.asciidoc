@@ -50,10 +50,7 @@ and <<mapper-orm-indexing-massindexer,reindex your data>>.
 // Search 5 anchors backward compatibility
 [[elasticsearch-integration-configuration]]
 
-In order to define an Elasticsearch backend,
-the property `hibernate.search.backend.type` must be set to `elasticsearch`.
-
-All other configuration properties are optional,
+All configuration properties of the Elasticsearch backend are optional,
 but the defaults might not suit everyone.
 In particular your production Elasticsearch cluster is probably not reachable at `http://localhost:9200`,
 so you will need to set the address of your cluster by <<backend-elasticsearch-configuration-client,configuring the client>>.

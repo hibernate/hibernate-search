@@ -145,7 +145,8 @@ so they can be added to any file from which Hibernate ORM takes its configuratio
 * The `hibernate.cfg.xml` file in your classpath, if using Hibernate ORM native bootstrapping.
 * The `persistence.xml` file in your classpath, if using Hibernate ORM JPA bootstrapping.
 
-The minimal working configuration is short, but depends on your setup:
+Hibernate Search provides sensible defaults for all configuration properties,
+but depending on your setup you might want to set the following:
 
 .Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Lucene" setup
 ====
@@ -153,10 +154,8 @@ The minimal working configuration is short, but depends on your setup:
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene]
 ----
-<1> Define a backend relying on Lucene technology.
-<2> The backend will store indexes in the current working directory by default.
-If you want to store the indexes elsewhere,
-uncomment this line and set the value of the property.
+<1> Set the location of indexes in the filesystem.
+By default, the backend will store indexes in the current working directory.
 ====
 
 .Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
@@ -165,11 +164,11 @@ uncomment this line and set the value of the property.
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch]
 ----
-<1> Define a backend relying on Elasticsearch technology.
-<2> The backend will attempt to connect to http://localhost:9200 by default.
-If you want to connect to another URL, uncomment these lines
-and set the value for the "hosts" property,
-and optionally the username and password.
+<1> Set the Elasticsearch hosts to connect to.
+By default, the backend will attempt to connect to `localhost:9200`.
+<2> Set the protocol. The default is `http`, but you may need to use `https`.
+<3> Set the username and password for basic HTTP authentication.
+You may also be interested in <<backend-elasticsearch-configuration-aws,AWS IAM authentication>>.
 ====
 
 [[getting-started-mapping]]

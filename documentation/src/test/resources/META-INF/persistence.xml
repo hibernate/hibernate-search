@@ -22,12 +22,8 @@
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_lucene[] -->
-            <property name="hibernate.search.backend.type"
-                      value="lucene"/> <!--1-->
-            <!--
             <property name="hibernate.search.backend.directory.root"
-                      value="some/filesystem/path"/>
-             --> <!--2-->
+                      value="some/filesystem/path"/> <!--1-->
             <!-- end::gettingstarted-configuration-orm_lucene[] -->
 
             <!--
@@ -49,18 +45,14 @@
         <exclude-unlisted-classes />
         <properties>
             <!-- tag::gettingstarted-configuration-orm_elasticsearch[] -->
-            <property name="hibernate.search.backend.type"
-                      value="elasticsearch" /> <!--1-->
-            <!--
             <property name="hibernate.search.backend.hosts"
-                      value="elasticsearch.mycompany.com"/>
+                      value="elasticsearch.mycompany.com"/> <!--1-->
             <property name="hibernate.search.backend.protocol"
-                      value="https"/>
+                      value="https"/> <!--2-->
             <property name="hibernate.search.backend.username"
-                      value="ironman"/>
+                      value="ironman"/> <!--3-->
             <property name="hibernate.search.backend.password"
                       value="j@rV1s"/>
-             --> <!--2-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch[] -->
 
             <!--
@@ -100,8 +92,6 @@
         <class>org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
-            <property name="hibernate.search.backend.type"
-                      value="lucene"/>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
             <property name="hibernate.search.backend.analysis.configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
@@ -125,8 +115,6 @@
         <class>org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.Book</class>
         <exclude-unlisted-classes />
         <properties>
-            <property name="hibernate.search.backend.type"
-                      value="elasticsearch" />
             <!-- tag::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
             <property name="hibernate.search.backend.analysis.configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
@@ -134,7 +122,8 @@
 
             <!--
                 Not to be included in the documentation:
-                this configuration is only relevant in our own testing infrastructure.
+                this configuration is only relevant in our own testing in
+                frastructure.
                 WARNING: if you update the property names below,
                 take care to also update the name of the commented properties just above.
              -->

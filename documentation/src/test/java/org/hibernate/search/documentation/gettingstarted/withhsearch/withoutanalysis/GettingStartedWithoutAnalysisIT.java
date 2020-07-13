@@ -7,14 +7,17 @@
 package org.hibernate.search.documentation.gettingstarted.withhsearch.withoutanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
+import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.IS_IDE;
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -28,13 +31,21 @@ import org.junit.Test;
 
 public class GettingStartedWithoutAnalysisIT {
 
-	private final String persistenceUnitName = "GettingStartedWithoutAnalysisIT_" + BackendConfigurations.BACKEND_TYPE;
+	private final String persistenceUnitName = "GettingStartedWithoutAnalysisIT_" + BACKEND_TYPE;
 
 	private EntityManagerFactory entityManagerFactory;
 
 	@Before
 	public void setup() {
-		entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName );
+		if ( IS_IDE ) {
+			Map<String, String> properties = new HashMap<>();
+			// More than one backend type in the classpath, we have to set it explicitly.
+			properties.put( "hibernate.search.backend.type", BACKEND_TYPE );
+			entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName, properties );
+		}
+		else {
+			entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName );
+		}
 	}
 
 	@After

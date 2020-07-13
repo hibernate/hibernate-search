@@ -43,13 +43,7 @@ They are grouped under a common root:
 * `hibernate.search.backends.<backend name>` for a named backend (advanced usage).
 
 +
-Notable properties:
-
-* `hibernate.search.backend.type`: the type of the backend.
-Set this to either `lucene` or `elasticsearch`.
-
-+
-Other backend properties are explained in the relevant parts of this documentation:
+Backend properties are explained in the relevant parts of this documentation:
 
 * <<backend-lucene-configuration,Lucene backend>>
 * <<backend-elasticsearch-configuration,Elasticsearch backend>>

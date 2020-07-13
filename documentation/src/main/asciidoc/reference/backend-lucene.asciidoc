@@ -6,10 +6,7 @@
 [[backend-lucene-configuration]]
 == Basic configuration
 
-In order to define a Lucene backend,
-the property `hibernate.search.backend.type` must be set to `lucene`.
-
-All other configuration properties are optional,
+All configuration properties of the Lucene backend are optional,
 but the defaults might not suit everyone.
 In particular, you might want to
 <<backend-lucene-configuration-directory-local-filesystem-location,set the location of your indexes in the filesystem>>.

@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.isLucene;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
@@ -34,7 +35,7 @@ public class AnalysisIT {
 	public void simple() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperties(
-						setupHelper.isLucene()
+						isLucene()
 								? "/analysis/lucene-simple.properties"
 								: "/analysis/elasticsearch-simple.properties"
 				)

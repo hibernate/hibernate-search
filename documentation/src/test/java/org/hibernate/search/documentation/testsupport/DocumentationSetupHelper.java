@@ -95,14 +95,6 @@ public final class DocumentationSetupHelper
 		toClose.close();
 	}
 
-	public boolean isElasticsearch() {
-		return defaultBackendConfiguration instanceof DocumentationElasticsearchBackendConfiguration;
-	}
-
-	public boolean isLucene() {
-		return defaultBackendConfiguration instanceof DocumentationLuceneBackendConfiguration;
-	}
-
 	public final class SetupContext
 			extends MappingSetupHelper<SetupContext, SimpleSessionFactoryBuilder, SessionFactory>.AbstractSetupContext {
 

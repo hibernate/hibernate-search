@@ -32,7 +32,6 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 	@Override
 	protected Map<String, Object> backendProperties() {
 		Map<String, Object> properties = new LinkedHashMap<>();
-		properties.put( "type", "elasticsearch" );
 		properties.put( "log.json_pretty_printing", "true" );
 		properties.put( "index_defaults.schema_management.minimal_required_status", "yellow" );
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );

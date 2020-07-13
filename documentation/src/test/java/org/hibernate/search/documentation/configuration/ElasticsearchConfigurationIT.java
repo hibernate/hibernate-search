@@ -31,8 +31,6 @@ public class ElasticsearchConfigurationIT {
 		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.HOSTS ), "127.0.0.1:9200" );
 		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.PROTOCOL ), "http" );
 		config.put(
-				BackendSettings.backendKey( BackendSettings.TYPE ), ElasticsearchBackendSettings.TYPE_NAME );
-		config.put(
 				BackendSettings.backendKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
 				MultiTenancyStrategyName.DISCRIMINATOR.externalRepresentation()
 		);
@@ -61,7 +59,6 @@ public class ElasticsearchConfigurationIT {
 				.containsOnly(
 						entry( "hibernate.search.backend.hosts", "127.0.0.1:9200" ),
 						entry( "hibernate.search.backend.protocol", "http" ),
-						entry( "hibernate.search.backend.type", "elasticsearch" ),
 						entry( "hibernate.search.backend.multi_tenancy.strategy", "discriminator" ),
 						entry( "hibernate.search.backend.version", "7.8" ),
 						entry( "hibernate.search.backend.version_check.enabled", "false" ),
