@@ -557,7 +557,7 @@ include::{sourcedir}/org/hibernate/search/documentation/analysis/MyLuceneAnalysi
 ----
 include::{resourcesdir}/analysis/lucene-simple.properties[]
 ----
-<1> Assign the configurer to the backend `myBackend` using a Hibernate Search configuration property.
+<1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
 
 It is also possible to assign a name to a built-in analyzer,

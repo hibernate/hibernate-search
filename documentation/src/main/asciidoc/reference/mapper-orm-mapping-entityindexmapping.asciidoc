@@ -29,9 +29,6 @@ By default:
 * The index name will be equal to the entity name,
 which in Hibernate ORM is set using the `@Entity` annotation
 and defaults to the simple class name.
-* The index will be created in the default backend.
-See <<getting-started-configuration,the getting stated guide>>
-or <<configuration-structure>> for more information about how to configure backends.
 * The identifier of indexed documents will be generated from the entity identifier.
 Most types commonly used for entity identifiers are supported out of the box,
 but for more exotic types you may need specific configuration.
@@ -71,8 +68,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 ====
 Entities indexed in different backends cannot be targeted by the same query.
 For example, with the mappings defined above,
-and assuming "backend2" is not the default backend,
-the following code will throw an exception,
+the following code will throw an exception
 because `Author` and `User` are indexed in different backends:
 
 [source, JAVA, indent=0]

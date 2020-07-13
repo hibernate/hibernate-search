@@ -153,7 +153,7 @@ The minimal working configuration is short, but depends on your setup:
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene]
 ----
-<1> Define a backend named "myBackend" relying on Lucene technology.
+<1> Define a backend relying on Lucene technology.
 <2> The backend will store indexes in the current working directory by default.
 If you want to store the indexes elsewhere,
 uncomment this line and set the value of the property.
@@ -165,7 +165,7 @@ uncomment this line and set the value of the property.
 ----
 include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch]
 ----
-<1> Define a backend named "myBackend" relying on Elasticsearch technology.
+<1> Define a backend relying on Elasticsearch technology.
 <2> The backend will attempt to connect to http://localhost:9200 by default.
 If you want to connect to another URL, uncomment these lines
 and set the value for the "hosts" property,
@@ -438,7 +438,7 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 <5> Define another custom analyzer, named "name", to analyze author names.
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
-<6> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
+<6> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
 ====
 
 .Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
@@ -460,7 +460,7 @@ must be defined separately and assigned a name.
 <6> Define another custom analyzer, named "name", to analyze author names.
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
-<7> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
+<7> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
 ====
 
 Once analysis is configured, the mapping must be adapted to assign the relevant analyzer to each field:
