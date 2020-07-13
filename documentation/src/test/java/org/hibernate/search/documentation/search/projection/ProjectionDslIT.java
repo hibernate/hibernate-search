@@ -7,8 +7,6 @@
 package org.hibernate.search.documentation.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
-import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +16,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -38,11 +34,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.gson.JsonObject;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.Explanation;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ProjectionDslIT {
 
@@ -369,83 +360,6 @@ public class ProjectionDslIT {
 							session.getReference( Book.class, BOOK4_ID ).getGenre()
 					)
 			);
-		} );
-	}
-
-	@Test
-	public void lucene() {
-		setupHelper.assumeLucene();
-
-		withinSearchSession( searchSession -> {
-			// tag::lucene-document[]
-			List<Document> hits = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() )
-					.select( f -> f.document() )
-					.where( f -> f.matchAll() )
-					.fetchHits( 20 );
-			// end::lucene-document[]
-			assertThat( hits ).hasSize( 4 );
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::lucene-explanation[]
-			List<Explanation> hits = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() )
-					.select( f -> f.explanation() )
-					.where( f -> f.matchAll() )
-					.fetchHits( 20 );
-			// end::lucene-explanation[]
-			assertThat( hits ).hasSize( 4 );
-		} );
-	}
-
-	@Test
-	public void elasticsearch() {
-		setupHelper.assumeElasticsearch();
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-source[]
-			List<JsonObject> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.select( f -> f.source() )
-					.where( f -> f.matchAll() )
-					.fetchHits( 20 );
-			// end::elasticsearch-source[]
-			assertThat( hits ).hasSize( 4 );
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-explanation[]
-			List<JsonObject> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.select( f -> f.explanation() )
-					.where( f -> f.matchAll() )
-					.fetchHits( 20 );
-			// end::elasticsearch-explanation[]
-			assertThat( hits ).hasSize( 4 );
-		} );
-	}
-
-	@Test
-	public void elasticsearch_jsonHit() {
-		setupHelper.assumeElasticsearch();
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-jsonHit[]
-			List<JsonObject> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.select( f -> f.jsonHit() )
-					.where( f -> f.matchAll() )
-					.fetchHits( 20 );
-			// end::elasticsearch-jsonHit[]
-			assertThat( hits ).hasSize( 4 );
-			assertThat( hits ).allSatisfy( hit -> assertJsonEquals(
-					"{"
-							+ "'_index': '" + defaultPrimaryName( Book.NAME ) + "'"
-							+ "}",
-					hit.toString(),
-					JSONCompareMode.LENIENT
-			) );
 		} );
 	}
 

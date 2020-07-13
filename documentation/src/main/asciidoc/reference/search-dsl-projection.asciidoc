@@ -331,7 +331,7 @@ include::components/lucene-api-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=lucene-document]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-document]
 ----
 ====
 
@@ -367,7 +367,7 @@ include::components/lucene-api-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=lucene-explanation]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/LuceneProjectionDslIT.java[tags=lucene-explanation]
 ----
 ====
 
@@ -383,7 +383,7 @@ include::components/elasticsearch-json-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-source]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-source]
 ----
 ====
 
@@ -405,7 +405,7 @@ include::components/elasticsearch-json-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-explanation]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-explanation]
 ----
 ====
 
@@ -426,6 +426,6 @@ include::components/elasticsearch-json-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-jsonHit]
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ElasticsearchProjectionDslIT.java[tags=elasticsearch-jsonHit]
 ----
 ====

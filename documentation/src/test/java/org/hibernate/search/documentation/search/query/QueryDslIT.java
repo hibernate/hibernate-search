@@ -12,10 +12,8 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedA
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,12 +22,6 @@ import javax.persistence.SharedCacheMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.graph.GraphSemantic;
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
-import org.hibernate.search.backend.lucene.LuceneExtension;
-import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -44,13 +36,6 @@ import org.hibernate.stat.Statistics;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TopDocs;
 
 public class QueryDslIT {
 
@@ -296,60 +281,6 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void explain_lucene() {
-		setupHelper.assumeLucene();
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			// tag::explain-lucene[]
-			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() ) // <1>
-					.where( f -> f.match()
-							.field( "title" )
-							.matching( "robot" ) )
-					.toQuery(); // <2>
-
-			Explanation explanation1 = query.explain( "1" ); // <3>
-			Explanation explanation2 = query.explain( "Book", "1" ); // <4>
-
-			LuceneSearchQuery<Book> luceneQuery = query.extension( LuceneExtension.get() ); // <5>
-			// end::explain-lucene[]
-
-			assertThat( explanation1 ).asString()
-					.contains( "title" );
-			assertThat( explanation2 ).asString()
-					.contains( "title" );
-			assertThat( luceneQuery ).isNotNull();
-		} );
-	}
-
-	@Test
-	public void explain_elasticsearch() {
-		setupHelper.assumeElasticsearch();
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			// tag::explain-elasticsearch[]
-			ElasticsearchSearchQuery<Book> query = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() ) // <1>
-					.where( f -> f.match()
-							.field( "title" )
-							.matching( "robot" ) )
-					.toQuery(); // <2>
-
-			JsonObject explanation1 = query.explain( "1" ); // <3>
-			JsonObject explanation2 = query.explain( "Book", "1" ); // <4>
-
-			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <5>
-			// end::explain-elasticsearch[]
-
-			assertThat( explanation1 ).asString().contains( "title" );
-			assertThat( explanation2 ).asString().contains( "title" );
-			assertThat( elasticsearchQuery ).isNotNull();
-		} );
-	}
-
-	@Test
 	public void tookAndTimedOut() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
@@ -512,113 +443,6 @@ public class QueryDslIT {
 					.allSatisfy( manager -> assertThatManaged( manager.getAssociates() ).isInitialized() );
 		} );
 	}
-
-	@Test
-	public void json_elasticsearch() {
-		setupHelper.assumeElasticsearch();
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			// tag::elasticsearch-requestTransformer[]
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() ) // <1>
-					.where( f -> f.match()
-							.field( "title" )
-							.matching( "robot" ) )
-					.requestTransformer( context -> { // <2>
-						Map<String, String> parameters = context.parametersMap(); // <3>
-						parameters.put( "search_type", "dfs_query_then_fetch" );
-
-						JsonObject body = context.body(); // <4>
-						body.addProperty( "min_score", 0.5f );
-					} )
-					.fetchHits( 20 ); // <5>
-			// end::elasticsearch-requestTransformer[]
-
-			assertThat( hits ).extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
-		} );
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			// tag::elasticsearch-responseBody[]
-			ElasticsearchSearchResult<Book> result = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() ) // <1>
-					.where( f -> f.match()
-							.field( "title" )
-							.matching( "robt" ) )
-					.requestTransformer( context -> { // <2>
-						JsonObject body = context.body();
-						body.add( "suggest", jsonObject( suggest -> { // <3>
-							suggest.add( "my-suggest", jsonObject( mySuggest -> {
-								mySuggest.addProperty( "text", "robt" );
-								mySuggest.add( "term", jsonObject( term -> {
-									term.addProperty( "field", "title" );
-								} ) );
-							} ) );
-						} ) );
-					} )
-					.fetch( 20 ); // <4>
-
-			JsonObject responseBody = result.responseBody(); // <5>
-			JsonArray mySuggestResults = responseBody.getAsJsonObject( "suggest" ) // <6>
-					.getAsJsonArray( "my-suggest" );
-			// end::elasticsearch-responseBody[]
-
-			assertThat( mySuggestResults.size() ).isGreaterThanOrEqualTo( 1 );
-			JsonObject mySuggestResult0 = mySuggestResults.get( 0 ).getAsJsonObject();
-			assertThat( mySuggestResult0.get( "text" ).getAsString() )
-					.isEqualTo( "robt" );
-			JsonObject mySuggestResult0Option0 = mySuggestResult0.getAsJsonArray( "options" ).get( 0 )
-					.getAsJsonObject();
-			assertThat( mySuggestResult0Option0.get( "text" ).getAsString() )
-					.isEqualTo( "robot" );
-
-		} );
-	}
-
-	@Test
-	public void lucene_lowLevel() {
-		setupHelper.assumeLucene();
-
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			// tag::lucene-lowLevel[]
-			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() ) // <1>
-					.where( f -> f.match()
-							.field( "title" )
-							.matching( "robot" ) )
-					.sort( f -> f.field( "title_sort" ) )
-					.toQuery(); // <2>
-
-			Sort sort = query.luceneSort(); // <3>
-
-			LuceneSearchResult<Book> result = query.fetch( 20 ); // <4>
-
-			TopDocs topDocs = result.topDocs(); // <5>
-			// end::lucene-lowLevel[]
-
-			assertThat( result.hits() ).extracting( Book::getId )
-					.containsExactly( BOOK1_ID, BOOK3_ID );
-
-			assertThat( sort ).isNotNull();
-			assertThat( sort.getSort() ).hasSize( 1 );
-			assertThat( sort.getSort()[0].getType() ).isEqualTo( SortField.Type.CUSTOM );
-
-			assertThat( topDocs ).isNotNull();
-			assertThat( topDocs.totalHits.value ).isEqualTo( 2L );
-			assertThat( topDocs.scoreDocs ).hasSize( 2 );
-		} );
-	}
-
-	// tag::elasticsearch-responseBody-helper[]
-	private static JsonObject jsonObject(Consumer<JsonObject> instructions) {
-		JsonObject object = new JsonObject();
-		instructions.accept( object );
-		return object;
-	}
-	// end::elasticsearch-responseBody-helper[]
 
 	private void initData() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {

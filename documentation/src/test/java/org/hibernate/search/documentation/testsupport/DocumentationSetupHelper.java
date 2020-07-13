@@ -24,8 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupSt
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
-import org.junit.Assume;
-
 public final class DocumentationSetupHelper
 		extends MappingSetupHelper<DocumentationSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
@@ -103,14 +101,6 @@ public final class DocumentationSetupHelper
 
 	public boolean isLucene() {
 		return defaultBackendConfiguration instanceof DocumentationLuceneBackendConfiguration;
-	}
-
-	public void assumeElasticsearch() {
-		Assume.assumeTrue( isElasticsearch() );
-	}
-
-	public void assumeLucene() {
-		Assume.assumeTrue( isLucene() );
 	}
 
 	public final class SetupContext

@@ -13,6 +13,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -25,34 +26,30 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AnalysisIT {
+public class LuceneAnalysisIT {
 
 	@Rule
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Test
-	public void simple() {
+	public void advanced() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
-				.withProperties(
-						setupHelper.isLucene()
-								? "/analysis/lucene-simple.properties"
-								: "/analysis/elasticsearch-simple.properties"
+				.withBackendProperty(
+						LuceneBackendSettings.ANALYSIS_CONFIGURER,
+						new AdvancedLuceneAnalysisConfigurer()
 				)
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
 								.type( IndexedEntity.class )
 										.property( "text" )
-												.fullTextField( "english" ).analyzer( "english" )
-												.fullTextField( "french" ).analyzer( "french" )
-												.keywordField( "lowercase" ).normalizer( "lowercase" )
+												.fullTextField( "standard" ).analyzer( "standard" )
 				)
 				.setup( IndexedEntity.class );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			IndexedEntity entity = new IndexedEntity();
-			// Mix French and English to test multiple analyzers with different stemmers
-			entity.setText( "THE <strong>châtié</strong> wording" );
+			entity.setText( "the Wording" );
 			entityManager.persist( entity );
 		} );
 
@@ -62,28 +59,45 @@ public class AnalysisIT {
 			assertThat(
 					searchSession.search( IndexedEntity.class )
 							.where( f -> f.match()
-									.field( "english" )
-									.matching( "worded" )
+									.field( "standard" )
+									.matching( "wording" )
 							)
 							.fetchHits( 20 )
 			)
 					.hasSize( 1 );
+		} );
+	}
+
+	@Test
+	public void similarity() {
+		EntityManagerFactory entityManagerFactory = setupHelper.start()
+				.withBackendProperty(
+						LuceneBackendSettings.ANALYSIS_CONFIGURER,
+						new CustomSimilarityLuceneAnalysisConfigurer()
+				)
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> context.programmaticMapping()
+								.type( IndexedEntity.class )
+								.property( "text" )
+								.fullTextField( "standard" ).analyzer( "english" )
+				)
+				.setup( IndexedEntity.class );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setText( "the Wording" );
+			entityManager.persist( entity );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
 
 			assertThat(
 					searchSession.search( IndexedEntity.class )
 							.where( f -> f.match()
-									.field( "french" )
-									.matching( "châtier" )
-							)
-							.fetchHits( 20 )
-			)
-					.hasSize( 1 );
-
-			assertThat(
-					searchSession.search( IndexedEntity.class )
-							.where( f -> f.match()
-									.field( "lowercase" )
-									.matching( "the <strong>châtié</strong> WORDING" )
+									.field( "standard" )
+									.matching( "wording" )
 							)
 							.fetchHits( 20 )
 			)

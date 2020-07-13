@@ -16,7 +16,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.documentation.testsupport.DocumentationElasticsearchBackendConfiguration;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -32,7 +32,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ElasticsearchCustomLayoutStrategyIT {
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new DocumentationElasticsearchBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();

@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
 import org.junit.Test;
 
-public class MyConfigurationIT {
+public class ElasticsearchConfigurationIT {
 	// tag::build-hibernate-configuration[]
 	private Properties buildHibernateConfiguration() {
 		Properties config = new Properties();

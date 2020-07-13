@@ -159,7 +159,7 @@ to apply a configuration to a specific index.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/configuration/MyConfigurationIT.java[tags=build-hibernate-configuration]
+include::{sourcedir}/org/hibernate/search/documentation/configuration/ElasticsearchConfigurationIT.java[tags=build-hibernate-configuration]
 ----
 ====
 

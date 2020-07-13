@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.common.BooleanOperator;
@@ -32,11 +30,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.RegexpQuery;
 
 public class PredicateDslIT {
 
@@ -851,70 +844,6 @@ public class PredicateDslIT {
 			assertThat( hits )
 					.extracting( Author::getId )
 					.containsExactlyInAnyOrder( ASIMOV_ID );
-		} );
-	}
-
-	@Test
-	public void lucene() {
-		setupHelper.assumeLucene();
-
-		withinSearchSession( searchSession -> {
-			// tag::lucene-fromLuceneQuery[]
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() ) // <1>
-					.where( f -> f.fromLuceneQuery( // <2>
-							new RegexpQuery( new Term( "description", "neighbor|neighbour" ) )
-					) )
-					.fetchHits( 20 );
-			// end::lucene-fromLuceneQuery[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK4_ID );
-		} );
-	}
-
-	@Test
-	public void elasticsearch() {
-		setupHelper.assumeElasticsearch();
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson-jsonObject[]
-			JsonObject jsonObject =
-					// end::elasticsearch-fromJson-jsonObject[]
-					new Gson().fromJson(
-							"{"
-									+ "\"regexp\": {"
-											+ "\"description\": \"neighbor|neighbour\""
-									+ "}"
-							+ "}",
-							JsonObject.class
-					)
-					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */; // <1>
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() ) // <2>
-					.where( f -> f.fromJson( jsonObject ) ) // <3>
-					.fetchHits( 20 );
-			// end::elasticsearch-fromJson-jsonObject[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK4_ID );
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson-string[]
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() ) // <1>
-					.where( f -> f.fromJson( "{" // <2>
-									+ "\"regexp\": {"
-											+ "\"description\": \"neighbor|neighbour\""
-									+ "}"
-							+ "}" ) )
-					.fetchHits( 20 );
-			// end::elasticsearch-fromJson-string[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactlyInAnyOrder( BOOK4_ID );
 		} );
 	}
 

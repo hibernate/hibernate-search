@@ -284,7 +284,7 @@ include::components/lucene-api-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=lucene-fromLuceneSort]
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDslIT.java[tags=lucene-fromLuceneSort]
 ----
 ====
 
@@ -301,7 +301,7 @@ include::components/lucene-api-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=lucene-fromLuceneSortField]
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/LuceneSortDslIT.java[tags=lucene-fromLuceneSortField]
 ----
 ====
 
@@ -316,7 +316,7 @@ include::components/elasticsearch-json-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/ElasticsearchSortDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
 ====
 
@@ -324,7 +324,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-string]
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/ElasticsearchSortDslIT.java[tags=elasticsearch-fromJson-string]
 ----
 ====
 

@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -28,11 +26,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortedSetSortField;
 
 public class SortDslIT {
 
@@ -338,87 +331,6 @@ public class SortDslIT {
 			assertThat( hits )
 					.extracting( Author::getId )
 					.containsExactly( ASIMOV_ID, MARTINEZ_ID );
-		} );
-	}
-
-	@Test
-	public void lucene() {
-		setupHelper.assumeLucene();
-
-		withinSearchSession( searchSession -> {
-			// tag::lucene-fromLuceneSort[]
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() )
-					.where( f -> f.matchAll() )
-					.sort( f -> f.fromLuceneSort(
-							new Sort(
-									new SortedSetSortField( "genre_sort", false ),
-									new SortedSetSortField( "title_sort", false )
-							)
-					) )
-					.fetchHits( 20 );
-			// end::lucene-fromLuceneSort[]
-
-			assertThat( hits ).extracting( Book::getId )
-					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::lucene-fromLuceneSortField[]
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( LuceneExtension.get() )
-					.where( f -> f.matchAll() )
-					.sort( f -> f.fromLuceneSortField(
-							new SortedSetSortField( "title_sort", false )
-					) )
-					.fetchHits( 20 );
-			// end::lucene-fromLuceneSortField[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
-		} );
-	}
-
-	@Test
-	public void elasticsearch() {
-		setupHelper.assumeElasticsearch();
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson-jsonObject[]
-			JsonObject jsonObject =
-					// end::elasticsearch-fromJson-jsonObject[]
-					new Gson().fromJson(
-							"{"
-									+ "\"title_sort\": \"asc\""
-							+ "}",
-							JsonObject.class
-					)
-					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */;
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.where( f -> f.matchAll() )
-					.sort( f -> f.fromJson( jsonObject ) )
-					.fetchHits( 20 );
-			// end::elasticsearch-fromJson-jsonObject[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson-string[]
-			List<Book> hits = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.where( f -> f.matchAll() )
-					.sort( f -> f.fromJson( "{"
-									+ "\"title_sort\": \"asc\""
-							+ "}" ) )
-					.fetchHits( 20 );
-			// end::elasticsearch-fromJson-string[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
 		} );
 	}
 

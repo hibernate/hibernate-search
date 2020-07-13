@@ -1066,7 +1066,7 @@ include::components/lucene-api-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=lucene-fromLuceneQuery]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/LucenePredicateDslIT.java[tags=lucene-fromLuceneQuery]
 ----
 <1> Build the query as usual,
 but using the Lucene extension so that Lucene-specific options are available.
@@ -1084,7 +1084,7 @@ include::components/elasticsearch-json-warning.asciidoc[]
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/ElasticsearchPredicateDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
 <1> Build a JSON object using link:{gsonUrl}[Gson].
 <2> Build the query as usual,
@@ -1096,7 +1096,7 @@ but using the Lucene extension so that Lucene-specific options are available.
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-string]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/ElasticsearchPredicateDslIT.java[tags=elasticsearch-fromJson-string]
 ----
 <1> Build the query as usual,
 but using the Lucene extension so that Lucene-specific options are available.

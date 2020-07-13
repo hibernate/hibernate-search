@@ -13,7 +13,7 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.documentation.testsupport.DocumentationElasticsearchBackendConfiguration;
+import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class ElasticsearchNativeTypeIT {
 	@Rule
-	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( new DocumentationElasticsearchBackendConfiguration() );
+	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private EntityManagerFactory entityManagerFactory;
 

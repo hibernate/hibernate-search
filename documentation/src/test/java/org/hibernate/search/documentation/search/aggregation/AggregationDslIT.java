@@ -8,7 +8,6 @@ package org.hibernate.search.documentation.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -36,9 +34,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 public class AggregationDslIT {
 
@@ -403,91 +398,6 @@ public class AggregationDslIT {
 							entry( Range.canonical( 10.0, 20.0 ), 1L ),
 							entry( Range.canonical( 20.0, null ), 0L )
 					);
-		} );
-	}
-
-	@Test
-	public void elasticsearch() {
-		setupHelper.assumeElasticsearch();
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson-jsonObject[]
-			JsonObject jsonObject =
-					// end::elasticsearch-fromJson-jsonObject[]
-					new Gson().fromJson(
-							"{"
-									+ "\"histogram\": {"
-											+ "\"field\": \"price\","
-											+ "\"interval\": 10"
-									+ "}"
-							+ "}",
-							JsonObject.class
-					)
-					// tag::elasticsearch-fromJson-jsonObject[]
-					/* ... */;
-			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
-			SearchResult<Book> result = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.where( f -> f.matchAll() )
-					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( jsonObject ) )
-					.fetch( 20 );
-			JsonObject countsByPriceHistogram = result.aggregation( countsByPriceHistogramKey ); // <1>
-			// end::elasticsearch-fromJson-jsonObject[]
-			assertJsonEquals(
-					"{"
-							+ "\"buckets\": ["
-									+ "{"
-											+ "\"key\": 0.0,"
-											+ "\"doc_count\": 1"
-									+ "},"
-									+ "{"
-											+ "\"key\": 10.0,"
-											+ "\"doc_count\": 2"
-									+ "},"
-									+ "{"
-											+ "\"key\": 20.0,"
-											+ "\"doc_count\": 1"
-									+ "}"
-							+ "]"
-					+ "}",
-					countsByPriceHistogram.toString()
-			);
-		} );
-
-		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson-string[]
-			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
-			SearchResult<Book> result = searchSession.search( Book.class )
-					.extension( ElasticsearchExtension.get() )
-					.where( f -> f.matchAll() )
-					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( "{"
-									+ "\"histogram\": {"
-											+ "\"field\": \"price\","
-											+ "\"interval\": 10"
-									+ "}"
-							+ "}" ) )
-					.fetch( 20 );
-			JsonObject countsByPriceHistogram = result.aggregation( countsByPriceHistogramKey ); // <1>
-			// end::elasticsearch-fromJson-string[]
-			assertJsonEquals(
-					"{"
-							+ "\"buckets\": ["
-									+ "{"
-											+ "\"key\": 0.0,"
-											+ "\"doc_count\": 1"
-									+ "},"
-									+ "{"
-											+ "\"key\": 10.0,"
-											+ "\"doc_count\": 2"
-									+ "},"
-									+ "{"
-											+ "\"key\": 20.0,"
-											+ "\"doc_count\": 1"
-									+ "}"
-							+ "]"
-					+ "}",
-					countsByPriceHistogram.toString()
-			);
 		} );
 	}
 

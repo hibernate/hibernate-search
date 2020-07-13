@@ -637,7 +637,7 @@ only use them for debugging purposes.
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=explain-lucene]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/LuceneQueryDslIT.java[tags=explain-lucene]
 ----
 <1> Build the query as usual,
 but using the Lucene extension so that the retrieved query exposes Lucene-specific operations.
@@ -654,7 +654,7 @@ you can instead use the Lucene extension on the `SearchQuery` to convert it afte
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=explain-elasticsearch]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=explain-elasticsearch]
 ----
 <1> Build the query as usual,
 but using the Elasticsearch extension so that the retrieved query exposes Elasticsearch-specific operations.
@@ -702,7 +702,7 @@ Most simple use cases will only need to change the HTTP request slightly, as sho
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-requestTransformer]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=elasticsearch-requestTransformer]
 ----
 <1> Build the query as usual,
 but using the Elasticsearch extension so that Elasticsearch-specific options are available.
@@ -720,7 +720,7 @@ For more complicated use cases, it is possible to access the raw JSON of the HTT
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-responseBody]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=elasticsearch-responseBody]
 ----
 <1> Build the query as usual,
 but using the Elasticsearch extension so that Elasticsearch-specific options are available.
@@ -743,7 +743,7 @@ so the example above relies on a small, custom helper method to make the code mo
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-responseBody-helper]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/ElasticsearchQueryDslIT.java[tags=elasticsearch-responseBody-helper]
 ----
 ====
 
@@ -764,7 +764,7 @@ This should only be useful to integrators, but is documented here for the sake o
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=lucene-lowLevel]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/LuceneQueryDslIT.java[tags=lucene-lowLevel]
 ----
 <1> Build the query as usual,
 but using the Lucene extension so that Lucene-specific options are available.
