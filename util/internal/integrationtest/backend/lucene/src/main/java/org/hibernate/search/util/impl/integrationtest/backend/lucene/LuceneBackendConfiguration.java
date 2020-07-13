@@ -24,7 +24,7 @@ public class LuceneBackendConfiguration extends BackendConfiguration {
 		properties.put(
 				"directory.root",
 				LuceneTestIndexesPathConfiguration.get().getPath()
-						+ "/test-indexes/#{tck.startup.timestamp}/#{tck.test.id}/"
+						+ "/test-indexes/#{test.startup.timestamp}/#{test.id}/"
 		);
 		return properties;
 	}

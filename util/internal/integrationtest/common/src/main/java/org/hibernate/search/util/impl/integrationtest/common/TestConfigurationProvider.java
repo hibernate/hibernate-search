@@ -95,8 +95,8 @@ public final class TestConfigurationProvider implements TestRule {
 			if ( v instanceof String ) {
 				interpolatedProperties.put(
 						k,
-						( (String) v ).replace( "#{tck.test.id}", testId )
-								.replace( "#{tck.startup.timestamp}", STARTUP_TIMESTAMP ) );
+						( (String) v ).replace( "#{test.id}", testId )
+								.replace( "#{test.startup.timestamp}", STARTUP_TIMESTAMP ) );
 			}
 			else {
 				interpolatedProperties.put( k, v );

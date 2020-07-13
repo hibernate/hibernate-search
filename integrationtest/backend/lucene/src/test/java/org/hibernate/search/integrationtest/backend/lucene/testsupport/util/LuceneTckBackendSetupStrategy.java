@@ -28,7 +28,7 @@ class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
 	LuceneTckBackendSetupStrategy() {
 		setProperty( "type", "lucene" );
 		setProperty( "directory.root", LuceneTestIndexesPathConfiguration.get().getPath()
-				+ "/#{tck.startup.timestamp}/#{tck.test.id}/" );
+				+ "/#{test.startup.timestamp}/#{test.id}/" );
 		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
 	}
 
