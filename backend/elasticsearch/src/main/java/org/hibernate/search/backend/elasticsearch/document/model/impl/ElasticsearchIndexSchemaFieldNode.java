@@ -8,7 +8,10 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
@@ -63,6 +66,15 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 	@Override
 	public EventContext eventContext() {
 		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
+
+	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
+		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		if ( factory == null ) {
+			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
+		}
+		return factory.create( searchContext, this );
 	}
 
 	@SuppressWarnings("unchecked")

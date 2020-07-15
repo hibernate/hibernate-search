@@ -648,4 +648,14 @@ public interface Log extends BasicLogger {
 					+ " Make sure to call '.multi()' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
 
+	@Message(id = ID_OFFSET_2 + 132, value = "Cannot use '%2$s' on field '%1$s'."
+			+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
+			+ " If it already is, then '%2$s' is not available for fields of this type.")
+	SearchException cannotUseQueryElementForField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 133,
+			value = "Multiple conflicting implementations of '%2$s' for field '%1$s' in different indexes: '%3$s' vs. '%4$s'.")
+	SearchException conflictingQueryElementForFieldOnMultipleIndexes(String absoluteFieldPath, String queryElementName,
+			Object component1, Object component2, @Param EventContext context);
+
 }

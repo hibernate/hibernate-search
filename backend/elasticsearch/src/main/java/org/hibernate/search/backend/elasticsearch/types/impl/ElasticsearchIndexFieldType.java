@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
@@ -34,6 +38,8 @@ public class ElasticsearchIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>> queryElementFactories;
+
 	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
 	private final ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
@@ -52,6 +58,7 @@ public class ElasticsearchIndexFieldType<F>
 		this.codec = builder.codec;
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
+		this.queryElementFactories = builder.queryElementFactories;
 		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.sortBuilderFactory = builder.sortBuilderFactory;
 		this.projectionBuilderFactory = builder.projectionBuilderFactory;
@@ -64,7 +71,10 @@ public class ElasticsearchIndexFieldType<F>
 
 	@Override
 	public String toString() {
-		return mapping.toString();
+		return getClass().getSimpleName() + "["
+				+ "mapping=" + mapping.toString()
+				+ ", capabilities=" + queryElementFactories.keySet()
+				+ "]";
 	}
 
 	@Override
@@ -141,6 +151,12 @@ public class ElasticsearchIndexFieldType<F>
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
+	@SuppressWarnings("unchecked") // The cast is safe by construction; see the builder.
+	@Override
+	public <T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (ElasticsearchSearchFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
+	}
+
 	@Override
 	public ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
 		return predicateBuilderFactory;
@@ -174,6 +190,9 @@ public class ElasticsearchIndexFieldType<F>
 		private ElasticsearchFieldCodec<F> codec;
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
+
+		private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>>
+				queryElementFactories = new HashMap<>();
 
 		private ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
@@ -211,6 +230,11 @@ public class ElasticsearchIndexFieldType<F>
 
 		public <V> void projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+		}
+
+		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
+				ElasticsearchSearchFieldQueryElementFactory<T, F> factory) {
+			queryElementFactories.put( key, factory );
 		}
 
 		public void predicateBuilderFactory(ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory) {

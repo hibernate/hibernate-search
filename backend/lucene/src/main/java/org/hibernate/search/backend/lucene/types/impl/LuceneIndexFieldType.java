@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.types.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldTypeContext;
+import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -35,6 +39,8 @@ public class LuceneIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>> queryElementFactories;
+
 	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
@@ -51,8 +57,10 @@ public class LuceneIndexFieldType<F>
 		this.rawDslConverter = builder.rawDslConverter;
 		this.rawProjectionConverter = builder.rawProjectionConverter;
 		this.codec = builder.codec;
-		this.dslConverter = builder.dslConverter;
-		this.projectionConverter = builder.projectionConverter;
+		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
+		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter
+				: rawProjectionConverter;
+		this.queryElementFactories = builder.queryElementFactories;
 		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.sortBuilderFactory = builder.sortBuilderFactory;
 		this.projectionBuilderFactory = builder.projectionBuilderFactory;
@@ -68,11 +76,12 @@ public class LuceneIndexFieldType<F>
 
 	@Override
 	public String toString() {
-		return "LuceneIndexFieldType["
+		return getClass().getSimpleName() + "["
 				+ "codec=" + codec
 				+ ", analyzerName=" + analyzerName
 				+ ", searchAnalyzerName=" + searchAnalyzerName
 				+ ", normalizerName=" + normalizerName
+				+ ", capabilities=" + queryElementFactories.keySet()
 				+ "]";
 	}
 
@@ -150,6 +159,12 @@ public class LuceneIndexFieldType<F>
 		return Optional.ofNullable( searchAnalyzerName );
 	}
 
+	@SuppressWarnings("unchecked") // The cast is safe by construction; see the builder.
+	@Override
+	public <T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (LuceneSearchFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
+	}
+
 	@Override
 	public LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
 		return predicateBuilderFactory;
@@ -189,6 +204,9 @@ public class LuceneIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>>
+				queryElementFactories = new HashMap<>();
+
 		private LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
 		private LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
@@ -219,6 +237,11 @@ public class LuceneIndexFieldType<F>
 
 		public <V> void projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+		}
+
+		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
+				LuceneSearchFieldQueryElementFactory<T, F> factory) {
+			queryElementFactories.put( key, factory );
 		}
 
 		public void predicateBuilderFactory(LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory) {
