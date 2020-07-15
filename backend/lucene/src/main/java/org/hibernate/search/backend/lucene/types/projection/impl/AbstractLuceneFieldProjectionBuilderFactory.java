@@ -50,7 +50,7 @@ public abstract class AbstractLuceneFieldProjectionBuilderFactory<F> implements 
 			LuceneSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( field );
 
-		ProjectionConverter<? super F, ? extends T> converter = field.type().projectionConverter( convert )
+		ProjectionConverter<F, ? extends T> converter = field.type().projectionConverter( convert )
 				.withConvertedType( expectedType, field );
 
 		return new LuceneFieldProjection.Builder<>( searchContext, field, converter, codec );

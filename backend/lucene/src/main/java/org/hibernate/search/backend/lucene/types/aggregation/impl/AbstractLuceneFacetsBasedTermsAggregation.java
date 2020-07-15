@@ -38,7 +38,7 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
-	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
+	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
 
 	private final BucketOrder order;
 	private final int maxTermCount;
@@ -151,14 +151,14 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
+		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
 
 		private BucketOrder order = BucketOrder.COUNT_DESC;
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
 		AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( searchContext, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}

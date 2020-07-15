@@ -55,7 +55,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F>
 			ElasticsearchSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( field );
 
-		ProjectionConverter<? super F, ? extends T> converter = field.type().projectionConverter( convert )
+		ProjectionConverter<F, ? extends T> converter = field.type().projectionConverter( convert )
 				.withConvertedType( expectedType, field );
 
 		return new ElasticsearchFieldProjection.Builder<>( searchContext, field, converter, codec );

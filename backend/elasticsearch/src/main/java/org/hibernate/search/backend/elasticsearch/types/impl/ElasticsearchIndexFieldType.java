@@ -27,12 +27,12 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 public class ElasticsearchIndexFieldType<F>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchFieldTypeContext<F> {
 	private final Class<F> valueType;
-	private final DslConverter<F, ? extends F> rawDslConverter;
-	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+	private final DslConverter<F, F> rawDslConverter;
+	private final ProjectionConverter<F, F> rawProjectionConverter;
 
 	private final ElasticsearchFieldCodec<F> codec;
-	private final DslConverter<?, ? extends F> dslConverter;
-	private final ProjectionConverter<? super F, ?> projectionConverter;
+	private final DslConverter<?, F> dslConverter;
+	private final ProjectionConverter<F, ?> projectionConverter;
 
 	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
@@ -102,12 +102,12 @@ public class ElasticsearchIndexFieldType<F>
 	}
 
 	@Override
-	public DslConverter<?, ? extends F> dslConverter() {
+	public DslConverter<?, F> dslConverter() {
 		return dslConverter;
 	}
 
 	@Override
-	public DslConverter<F, ? extends F> rawDslConverter() {
+	public DslConverter<F, F> rawDslConverter() {
 		return rawDslConverter;
 	}
 
@@ -117,12 +117,12 @@ public class ElasticsearchIndexFieldType<F>
 	}
 
 	@Override
-	public ProjectionConverter<? super F, ?> projectionConverter() {
+	public ProjectionConverter<F, ?> projectionConverter() {
 		return projectionConverter;
 	}
 
 	@Override
-	public ProjectionConverter<? super F, F> rawProjectionConverter() {
+	public ProjectionConverter<F, F> rawProjectionConverter() {
 		return rawProjectionConverter;
 	}
 
@@ -168,12 +168,12 @@ public class ElasticsearchIndexFieldType<F>
 	public static class Builder<F> {
 
 		private final Class<F> valueType;
-		private final DslConverter<F, ? extends F> rawDslConverter;
-		private final ProjectionConverter<? super F, F> rawProjectionConverter;
+		private final DslConverter<F, F> rawDslConverter;
+		private final ProjectionConverter<F, F> rawProjectionConverter;
 
 		private ElasticsearchFieldCodec<F> codec;
-		private DslConverter<?, ? extends F> dslConverter;
-		private ProjectionConverter<? super F, ?> projectionConverter;
+		private DslConverter<?, F> dslConverter;
+		private ProjectionConverter<F, ?> projectionConverter;
 
 		private ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;

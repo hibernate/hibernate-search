@@ -28,12 +28,12 @@ import org.apache.lucene.analysis.Analyzer;
 public class LuceneIndexFieldType<F>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, LuceneSearchFieldTypeContext<F> {
 	private final Class<F> valueType;
-	private final DslConverter<F, ? extends F> rawDslConverter;
-	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+	private final DslConverter<F, F> rawDslConverter;
+	private final ProjectionConverter<F, F> rawProjectionConverter;
 
 	private final LuceneFieldCodec<F> codec;
-	private final DslConverter<?, ? extends F> dslConverter;
-	private final ProjectionConverter<? super F, ?> projectionConverter;
+	private final DslConverter<?, F> dslConverter;
+	private final ProjectionConverter<F, ?> projectionConverter;
 
 	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
@@ -111,12 +111,12 @@ public class LuceneIndexFieldType<F>
 	}
 
 	@Override
-	public DslConverter<?, ? extends F> dslConverter() {
+	public DslConverter<?, F> dslConverter() {
 		return dslConverter;
 	}
 
 	@Override
-	public DslConverter<F, ? extends F> rawDslConverter() {
+	public DslConverter<F, F> rawDslConverter() {
 		return rawDslConverter;
 	}
 
@@ -126,12 +126,12 @@ public class LuceneIndexFieldType<F>
 	}
 
 	@Override
-	public ProjectionConverter<? super F, ?> projectionConverter() {
+	public ProjectionConverter<F, ?> projectionConverter() {
 		return projectionConverter;
 	}
 
 	@Override
-	public ProjectionConverter<? super F, F> rawProjectionConverter() {
+	public ProjectionConverter<F, F> rawProjectionConverter() {
 		return rawProjectionConverter;
 	}
 
@@ -182,12 +182,12 @@ public class LuceneIndexFieldType<F>
 	public static class Builder<F> {
 
 		private final Class<F> valueType;
-		private final DslConverter<F, ? extends F> rawDslConverter;
-		private final ProjectionConverter<? super F, F> rawProjectionConverter;
+		private final DslConverter<F, F> rawDslConverter;
+		private final ProjectionConverter<F, F> rawProjectionConverter;
 
 		private LuceneFieldCodec<F> codec;
-		private DslConverter<?, ? extends F> dslConverter;
-		private ProjectionConverter<? super F, ?> projectionConverter;
+		private DslConverter<?, F> dslConverter;
+		private ProjectionConverter<F, ?> projectionConverter;
 
 		private LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private LuceneFieldSortBuilderFactory<F> sortBuilderFactory;

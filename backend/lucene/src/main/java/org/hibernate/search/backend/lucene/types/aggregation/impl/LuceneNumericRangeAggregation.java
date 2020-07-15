@@ -87,14 +87,14 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final DslConverter<? super K, ? extends F> toFieldValueConverter;
+		private final DslConverter<? super K, F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
 		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field,
-				DslConverter<? super K, ? extends F> toFieldValueConverter,
+				DslConverter<? super K, F> toFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( searchContext, field );
 			this.toFieldValueConverter = toFieldValueConverter;

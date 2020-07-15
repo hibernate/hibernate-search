@@ -26,11 +26,11 @@ import org.apache.lucene.analysis.Analyzer;
  */
 public interface LuceneSearchFieldTypeContext<F> {
 
-	DslConverter<?, ? extends F> dslConverter();
+	DslConverter<?, F> dslConverter();
 
-	DslConverter<F, ? extends F> rawDslConverter();
+	DslConverter<F, F> rawDslConverter();
 
-	default DslConverter<?, ? extends F> dslConverter(ValueConvert convert) {
+	default DslConverter<?, F> dslConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawDslConverter();
@@ -40,11 +40,11 @@ public interface LuceneSearchFieldTypeContext<F> {
 		}
 	}
 
-	ProjectionConverter<? super F, ?> projectionConverter();
+	ProjectionConverter<F, ?> projectionConverter();
 
-	ProjectionConverter<? super F, F> rawProjectionConverter();
+	ProjectionConverter<F, F> rawProjectionConverter();
 
-	default ProjectionConverter<? super F, ?> projectionConverter(ValueConvert convert) {
+	default ProjectionConverter<F, ?> projectionConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawProjectionConverter();

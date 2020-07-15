@@ -83,25 +83,25 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
-	public DslConverter<?, ? extends F> dslConverter() {
+	public DslConverter<?, F> dslConverter() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
 				"dslConverter" );
 	}
 
 	@Override
-	public DslConverter<F, ? extends F> rawDslConverter() {
+	public DslConverter<F, F> rawDslConverter() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
 				"rawDslConverter" );
 	}
 
 	@Override
-	public ProjectionConverter<? super F, ?> projectionConverter() {
+	public ProjectionConverter<F, ?> projectionConverter() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::projectionConverter,
 				ProjectionConverter::isCompatibleWith, "projectionConverter" );
 	}
 
 	@Override
-	public ProjectionConverter<? super F, F> rawProjectionConverter() {
+	public ProjectionConverter<F, F> rawProjectionConverter() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
 	}

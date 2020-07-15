@@ -27,9 +27,9 @@ public final class ProjectionConverter<F, V> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<V> valueType;
-	private final FromDocumentFieldValueConverter<F, V> delegate;
+	private final FromDocumentFieldValueConverter<? super F, V> delegate;
 
-	public ProjectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<F, V> delegate) {
+	public ProjectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> delegate) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( delegate, "delegate" );
 		this.valueType = valueType;

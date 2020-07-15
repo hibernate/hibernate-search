@@ -162,12 +162,12 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		private final ElasticsearchSearchContext searchContext;
 		private final ElasticsearchSearchFieldContext<F> field;
 
-		private final ProjectionConverter<? super F, ? extends V> converter;
+		private final ProjectionConverter<F, ? extends V> converter;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		public Builder(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<F> field,
-				ProjectionConverter<? super F, ? extends V> converter,
+				ProjectionConverter<F, ? extends V> converter,
 				ElasticsearchFieldCodec<F> codec) {
 			this.searchContext = searchContext;
 			this.field = field;

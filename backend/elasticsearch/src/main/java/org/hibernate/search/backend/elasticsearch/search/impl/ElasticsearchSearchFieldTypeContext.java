@@ -24,11 +24,11 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  */
 public interface ElasticsearchSearchFieldTypeContext<F> {
 
-	DslConverter<?, ? extends F> dslConverter();
+	DslConverter<?, F> dslConverter();
 
-	DslConverter<F, ? extends F> rawDslConverter();
+	DslConverter<F, F> rawDslConverter();
 
-	default DslConverter<?, ? extends F> dslConverter(ValueConvert convert) {
+	default DslConverter<?, F> dslConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawDslConverter();
@@ -38,11 +38,11 @@ public interface ElasticsearchSearchFieldTypeContext<F> {
 		}
 	}
 
-	ProjectionConverter<? super F, ?> projectionConverter();
+	ProjectionConverter<F, ?> projectionConverter();
 
-	ProjectionConverter<? super F, F> rawProjectionConverter();
+	ProjectionConverter<F, F> rawProjectionConverter();
 
-	default ProjectionConverter<? super F, ?> projectionConverter(ValueConvert convert) {
+	default ProjectionConverter<F, ?> projectionConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawProjectionConverter();

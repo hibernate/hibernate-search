@@ -97,7 +97,7 @@ public class LuceneTextTermsAggregation<K>
 			extends AbstractBuilder<String, String, K> {
 
 		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field,
-				ProjectionConverter<? super String, ? extends K> fromFieldValueConverter) {
+				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
 			super( searchContext, field, fromFieldValueConverter );
 		}
 
