@@ -43,6 +43,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 				resolvedAggregable,
 				indexNullAsValue
 		);
+		builder.codec( codec );
 
 		builder.predicateBuilderFactory(
 				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );

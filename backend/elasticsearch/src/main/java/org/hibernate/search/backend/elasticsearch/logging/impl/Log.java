@@ -662,8 +662,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 114, value = "Cannot use '%2$s' on field '%1$s'."
 			+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
-			+ " If it is, check in the reference documentation that '%2$s' is implemented for this field's type.")
-	SearchException cannotUseFieldQueryElement(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+			+ " If it already is, then '%2$s' is not available for fields of this type.")
+	SearchException cannotUseQueryElementForField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 115,
 			value = "Multiple conflicting implementations of '%2$s' for field '%1$s' in different indexes: '%3$s' vs. '%4$s'.")

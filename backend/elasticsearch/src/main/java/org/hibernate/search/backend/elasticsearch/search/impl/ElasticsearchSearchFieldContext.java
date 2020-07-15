@@ -44,6 +44,10 @@ public interface ElasticsearchSearchFieldContext<F> extends EventContextProvider
 
 	ElasticsearchSearchFieldTypeContext<F> type();
 
+	// Query elements: predicates, sorts, projections, aggregations, ...
+
+	<T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext);
+
 	// Predicates
 
 	default MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext) {

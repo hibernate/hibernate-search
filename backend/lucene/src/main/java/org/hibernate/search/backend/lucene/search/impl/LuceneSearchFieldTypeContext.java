@@ -54,6 +54,8 @@ public interface LuceneSearchFieldTypeContext<F> {
 		}
 	}
 
+	<T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
+
 	Optional<String> searchAnalyzerName();
 
 	Analyzer searchAnalyzerOrNormalizer();

@@ -56,6 +56,8 @@ public interface ElasticsearchSearchFieldTypeContext<F> {
 
 	Optional<String> normalizerName();
 
+	<T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
+
 	ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory();
 
 	ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory();
@@ -63,5 +65,4 @@ public interface ElasticsearchSearchFieldTypeContext<F> {
 	ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory();
 
 	ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory();
-
 }

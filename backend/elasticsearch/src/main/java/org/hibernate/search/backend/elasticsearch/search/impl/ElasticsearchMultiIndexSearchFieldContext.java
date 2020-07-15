@@ -83,6 +83,15 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
+		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		if ( factory == null ) {
+			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
+		}
+		return factory.create( searchContext, this );
+	}
+
+	@Override
 	public DslConverter<?, F> dslConverter() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
 				"dslConverter" );
@@ -116,6 +125,28 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	public Optional<String> normalizerName() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::normalizerName, Object::equals,
 				"normalizer" );
+	}
+
+	@Override
+	public <T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = null;
+		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
+			ElasticsearchSearchFieldTypeContext<F> fieldType = fieldContext.type();
+			ElasticsearchSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
+					fieldType.queryElementFactory( key );
+			if ( factoryForFieldContext == null ) {
+				// The query element can't be created for at least one of the indexes.
+				return null;
+			}
+			if ( factory == null ) {
+				factory = factoryForFieldContext;
+			}
+			else if ( !factory.isCompatibleWith( factoryForFieldContext ) ) {
+				throw log.conflictingQueryElementForFieldOnMultipleIndexes( absolutePath, key.toString(),
+						factory, factoryForFieldContext, indexesEventContext() );
+			}
+		}
+		return factory;
 	}
 
 	@Override

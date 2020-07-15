@@ -45,6 +45,10 @@ public interface LuceneSearchFieldContext<F> extends EventContextProvider {
 
 	LuceneSearchFieldTypeContext<F> type();
 
+	// Query elements: predicates, sorts, projections, aggregations, ...
+
+	<T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext);
+
 	// Predicates
 
 	default MatchPredicateBuilder createMatchPredicateBuilder(

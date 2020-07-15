@@ -85,6 +85,15 @@ public class LuceneMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
+		LuceneSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		if ( factory == null ) {
+			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
+		}
+		return factory.create( searchContext, this );
+	}
+
+	@Override
 	public DslConverter<?, F> dslConverter() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
 				"dslConverter" );
@@ -118,6 +127,28 @@ public class LuceneMultiIndexSearchFieldContext<F>
 	public Analyzer searchAnalyzerOrNormalizer() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::searchAnalyzerOrNormalizer, Object::equals,
 				"searchAnalyzerOrNormalizer" );
+	}
+
+	@Override
+	public <T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		LuceneSearchFieldQueryElementFactory<T, F> factory = null;
+		for ( LuceneSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
+			LuceneSearchFieldTypeContext<F> fieldType = fieldContext.type();
+			LuceneSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
+					fieldType.queryElementFactory( key );
+			if ( factoryForFieldContext == null ) {
+				// The query element can't be created for at least one of the indexes.
+				return null;
+			}
+			if ( factory == null ) {
+				factory = factoryForFieldContext;
+			}
+			else if ( !factory.isCompatibleWith( factoryForFieldContext ) ) {
+				throw log.conflictingQueryElementForFieldOnMultipleIndexes( absolutePath, key.toString(),
+						factory, factoryForFieldContext, indexesEventContext() );
+			}
+		}
+		return factory;
 	}
 
 	@Override

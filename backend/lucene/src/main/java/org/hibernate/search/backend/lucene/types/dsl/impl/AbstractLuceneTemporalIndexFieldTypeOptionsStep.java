@@ -48,6 +48,7 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 				resolvedAggregable,
 				indexNullAsValue
 		);
+		builder.codec( codec );
 
 		builder.predicateBuilderFactory(
 				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );

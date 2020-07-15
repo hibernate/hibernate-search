@@ -10,7 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
@@ -80,6 +83,15 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 	@Override
 	public EventContext eventContext() {
 		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
+
+	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
+		LuceneSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		if ( factory == null ) {
+			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
+		}
+		return factory.create( searchContext, this );
 	}
 
 	@SuppressWarnings("unchecked")
