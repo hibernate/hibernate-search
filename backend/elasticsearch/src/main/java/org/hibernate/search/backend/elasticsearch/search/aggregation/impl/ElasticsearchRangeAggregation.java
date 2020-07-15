@@ -75,14 +75,14 @@ public class ElasticsearchRangeAggregation<F, K>
 	public static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final DslConverter<?, ? extends F> toFieldValueConverter;
+		private final DslConverter<? super K, ? extends F> toFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
 		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
-				DslConverter<?, ? extends F> toFieldValueConverter,
+				DslConverter<? super K, ? extends F> toFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
 			super( searchContext, field );
 			this.toFieldValueConverter = toFieldValueConverter;
@@ -120,7 +120,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private JsonElement convertToFieldValue(K value) {
 			try {
-				F converted = toFieldValueConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.convert( value, searchContext.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

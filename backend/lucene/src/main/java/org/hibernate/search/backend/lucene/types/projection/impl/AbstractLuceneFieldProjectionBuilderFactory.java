@@ -46,17 +46,14 @@ public abstract class AbstractLuceneFieldProjectionBuilderFactory<F> implements 
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(LuceneSearchContext searchContext,
 			LuceneSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( field );
 
-		ProjectionConverter<? super F, ?> converter = field.type().projectionConverter( convert );
-		if ( !converter.isConvertedTypeAssignableTo( expectedType ) ) {
-			throw log.invalidProjectionInvalidType( field.absolutePath(), expectedType, field.eventContext() );
-		}
+		ProjectionConverter<? super F, ? extends T> converter = field.type().projectionConverter( convert )
+				.withConvertedType( expectedType, field );
 
-		return (FieldProjectionBuilder<T>) new LuceneFieldProjection.Builder<>( searchContext, field, converter, codec );
+		return new LuceneFieldProjection.Builder<>( searchContext, field, converter, codec );
 	}
 
 	protected void checkProjectable(LuceneSearchFieldContext<?> field) {

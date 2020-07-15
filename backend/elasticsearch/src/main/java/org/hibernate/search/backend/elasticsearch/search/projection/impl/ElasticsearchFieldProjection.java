@@ -50,7 +50,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	private final String[] absoluteFieldPathComponents;
 
 	private final Function<JsonElement, F> decodeFunction;
-	private final ProjectionConverter<? super F, V> converter;
+	private final ProjectionConverter<? super F, ? extends V> converter;
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	private ElasticsearchFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
@@ -60,7 +60,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 	ElasticsearchFieldProjection(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, String[] absoluteFieldPathComponents,
-			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, V> converter,
+			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, ? extends V> converter,
 			ProjectionAccumulator<F, V, E, P> accumulator) {
 		super( searchContext );
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -162,12 +162,12 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		private final ElasticsearchSearchContext searchContext;
 		private final ElasticsearchSearchFieldContext<F> field;
 
-		private final ProjectionConverter<? super F, V> converter;
+		private final ProjectionConverter<? super F, ? extends V> converter;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		public Builder(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<F> field,
-				ProjectionConverter<? super F, V> converter,
+				ProjectionConverter<? super F, ? extends V> converter,
 				ElasticsearchFieldCodec<F> codec) {
 			this.searchContext = searchContext;
 			this.field = field;

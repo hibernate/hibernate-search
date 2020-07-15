@@ -31,8 +31,8 @@ public class LuceneNumericFieldAggregationBuilderFactory<F>
 			LuceneSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( field );
 
-		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter =
-				getFromFieldValueConverter( field, expectedType, convert );
+		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter = field.type()
+				.projectionConverter( convert ).withConvertedType( expectedType, field );
 
 		return new LuceneNumericTermsAggregation.Builder<>( searchContext, field, fromFieldValueConverter, getCodec() );
 	}
@@ -42,8 +42,8 @@ public class LuceneNumericFieldAggregationBuilderFactory<F>
 			LuceneSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( field );
 
-		DslConverter<?, ? extends F> toFieldValueConverter =
-				getToFieldValueConverter( field, expectedType, convert );
+		DslConverter<? super K, ? extends F> toFieldValueConverter =
+				field.type().dslConverter( convert ).withInputType( expectedType, field );
 
 		return new LuceneNumericRangeAggregation.Builder<>( searchContext, field, toFieldValueConverter, codec );
 	}

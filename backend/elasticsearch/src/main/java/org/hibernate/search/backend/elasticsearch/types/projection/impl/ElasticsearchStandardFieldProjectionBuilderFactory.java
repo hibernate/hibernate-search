@@ -51,18 +51,14 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( field );
 
-		ProjectionConverter<? super F, ?> requestConverter = field.type().projectionConverter( convert );
-		if ( !requestConverter.isConvertedTypeAssignableTo( expectedType ) ) {
-			throw log.invalidProjectionInvalidType( field.absolutePath(), expectedType, field.eventContext() );
-		}
+		ProjectionConverter<? super F, ? extends T> converter = field.type().projectionConverter( convert )
+				.withConvertedType( expectedType, field );
 
-		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjection.Builder<>( searchContext, field,
-				requestConverter, codec );
+		return new ElasticsearchFieldProjection.Builder<>( searchContext, field, converter, codec );
 	}
 
 	@Override

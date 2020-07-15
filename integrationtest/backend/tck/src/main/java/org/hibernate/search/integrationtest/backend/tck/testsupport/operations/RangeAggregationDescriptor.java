@@ -187,6 +187,11 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 	private <F> UnsupportedSingleFieldAggregationExpectations unsupportedExpectations(FieldTypeDescriptor<F> typeDescriptor) {
 		return new UnsupportedSingleFieldAggregationExpectations() {
 			@Override
+			public String aggregationName() {
+				return "range";
+			}
+
+			@Override
 			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
 				factory.range().field( fieldPath, typeDescriptor.getJavaType() );
 			}

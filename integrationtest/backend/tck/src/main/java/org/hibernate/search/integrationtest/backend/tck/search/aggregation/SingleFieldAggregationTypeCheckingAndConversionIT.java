@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -19,8 +20,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -54,8 +55,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
@@ -198,7 +197,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.toAggregation();
 
 		// reuse the aggregation instance on a different scope targeting a different index
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				compatibleIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
@@ -211,7 +210,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.hasMessageContaining( compatibleIndex.name() );
 
 		// reuse the aggregation instance on a different scope targeting a superset of the original indexes
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				mainIndex.createScope( compatibleIndex ).query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
@@ -228,28 +227,36 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	public void invalidFieldType_conversionEnabled() {
 		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( fieldType ) );
+		FieldTypeDescriptor<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
+		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
+
+		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid type" )
-				.hasMessageContaining( "for aggregation on field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Invalid type", "'" + wrongType.getJavaType().getName() + "'",
+						"Expected '" + fieldType.getJavaType().getName() + "'",
+						"field '" + fieldPath + "'"
+				);
 	}
 
 	@Test
 	public void invalidFieldType_conversionDisabled() {
 		String fieldPath = mainIndex.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( fieldType ) );
+		FieldTypeDescriptor<?> wrongType = FieldTypeDescriptor.getIncompatible( fieldType );
 
-		Assertions.assertThatThrownBy( () -> scenario.setupWithConverterSetting(
+		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( wrongType ) );
+
+		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
 				mainIndex.createScope().aggregation(), fieldPath, ValueConvert.NO
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid type" )
-				.hasMessageContaining( "for aggregation on field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Invalid type", "'" + wrongType.getJavaType().getName() + "'",
+						"Expected '" + fieldType.getJavaType().getName() + "'",
+						"field '" + fieldPath + "'"
+				);
 	}
 
 	@Test
@@ -259,7 +266,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.nullType() );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
+		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'type'" )
 				.hasMessageContaining( "must not be null" );
@@ -316,7 +323,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 	private <A> void doTestDuplicatedSameKey(String fieldPath, AggregationScenario<A> scenario) {
 		AggregationKey<A> key1 = AggregationKey.of( "aggregationName1" );
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				mainIndex.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
@@ -334,7 +341,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( fieldType ) );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
+		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Aggregations are not enabled for field" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -368,11 +375,13 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple();
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
+		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid type" )
-				.hasMessageContaining( "for aggregation on field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Invalid type", "'" + fieldType.getJavaType().getName() + "'",
+						"Expected '" + ValueWrapper.class.getName() + "'",
+						"field '" + fieldPath + "'"
+				);
 	}
 
 	@Test
@@ -411,7 +420,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				TypeAssertionHelper.wrapper( fieldType )
 		);
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
+		assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -437,7 +446,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple();
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
+		assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -451,7 +460,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple();
 
-		Assertions.assertThatThrownBy( () -> scenario.setupWithConverterSetting(
+		assertThatThrownBy( () -> scenario.setupWithConverterSetting(
 				scope.aggregation(), fieldPath, ValueConvert.NO
 		) )
 				.isInstanceOf( SearchException.class )

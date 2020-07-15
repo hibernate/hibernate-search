@@ -10,6 +10,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 
 public interface UnsupportedSingleFieldAggregationExpectations {
 
+	String aggregationName();
+
 	void trySetup(SearchAggregationFactory factory, String fieldPath);
 
 }
