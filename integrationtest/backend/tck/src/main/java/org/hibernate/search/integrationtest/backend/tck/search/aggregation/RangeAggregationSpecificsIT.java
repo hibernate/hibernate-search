@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.junit.Assume.assumeTrue;
@@ -46,8 +47,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior specific to the range aggregation on supported field types.
@@ -309,7 +308,7 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangeNull() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
 						.field( fieldPath, fieldType.getJavaType() )
 						.range( null )
@@ -323,7 +322,7 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangesNull() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
 						.field( fieldPath, fieldType.getJavaType() )
 						.ranges( null )
@@ -337,7 +336,7 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangesContainingNull() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
 						.field( fieldPath, fieldType.getJavaType() )
 						.ranges( Arrays.asList(
@@ -352,17 +351,19 @@ public class RangeAggregationSpecificsIT<F> {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testUnsupportedRangeParameterTypeThrowsException")
-	public void superClassFieldType() {
+	public void fieldTypeSuperClass() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
-				index.createScope().aggregation().range()
-						.field( fieldPath, fieldType.getJavaType().getSuperclass() )
-		)
+		Class<? super F> fieldTypeSuperClass = fieldType.getJavaType().getSuperclass();
+
+		assertThatThrownBy( () -> index.createScope().aggregation().range()
+				.field( fieldPath, fieldTypeSuperClass ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid type" )
-				.hasMessageContaining( "for aggregation on field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Invalid type for DSL arguments: '" + fieldTypeSuperClass.getName() + "'",
+						"Expected '" + fieldType.getJavaType().getName() + "' or a subtype",
+						"field '" + fieldPath + "'"
+				);
 	}
 
 	/**

@@ -11,9 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractLuceneFieldAggregationBuilderFactory<F>
@@ -49,22 +46,4 @@ public abstract class AbstractLuceneFieldAggregationBuilderFactory<F>
 		}
 	}
 
-	protected <T> DslConverter<?, ? extends F> getToFieldValueConverter(LuceneSearchFieldContext<F> field,
-			Class<T> expectedType, ValueConvert convert) {
-		DslConverter<?, ? extends F> result = field.type().dslConverter( convert );
-		if ( !result.isValidInputType( expectedType ) ) {
-			throw log.invalidAggregationInvalidType( field.absolutePath(), expectedType, field.eventContext() );
-		}
-		return result;
-	}
-
-	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	protected <T> ProjectionConverter<? super F, ? extends T> getFromFieldValueConverter(
-			LuceneSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
-		ProjectionConverter<? super F, ?> result = field.type().projectionConverter( convert );
-		if ( !result.isConvertedTypeAssignableTo( expectedType ) ) {
-			throw log.invalidAggregationInvalidType( field.absolutePath(), expectedType, field.eventContext() );
-		}
-		return (ProjectionConverter<? super F, ? extends T>) result;
-	}
 }

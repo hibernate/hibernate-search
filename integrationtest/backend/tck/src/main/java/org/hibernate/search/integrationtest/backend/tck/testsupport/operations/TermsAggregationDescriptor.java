@@ -181,6 +181,11 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 	private <F> UnsupportedSingleFieldAggregationExpectations unsupportedExpectations(FieldTypeDescriptor<F> typeDescriptor) {
 		return new UnsupportedSingleFieldAggregationExpectations() {
 			@Override
+			public String aggregationName() {
+				return "terms";
+			}
+
+			@Override
 			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
 				factory.terms().field( fieldPath, typeDescriptor.getJavaType() );
 			}

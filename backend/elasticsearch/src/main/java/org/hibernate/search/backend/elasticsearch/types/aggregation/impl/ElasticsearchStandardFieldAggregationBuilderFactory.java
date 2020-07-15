@@ -29,9 +29,8 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			ElasticsearchSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( field );
 
-		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter = getFromFieldValueConverter(
-				field, expectedType, convert
-		);
+		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter = field.type().projectionConverter( convert )
+				.withConvertedType( expectedType, field );
 
 		return new ElasticsearchTermsAggregation.Builder<>(
 				searchContext, field, fromFieldValueConverter, codec
@@ -43,31 +42,12 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			ElasticsearchSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( field );
 
-		DslConverter<?, ? extends F> toFieldValueConverter = getToFieldValueConverter(
-				field, expectedType, convert
-		);
+		DslConverter<? super K, ? extends F> toFieldValueConverter = field.type().dslConverter( convert )
+				.withInputType( expectedType, field );
 
 		return new ElasticsearchRangeAggregation.Builder<>(
 				searchContext, field, toFieldValueConverter, codec
 		);
 	}
 
-	private <T> DslConverter<?, ? extends F> getToFieldValueConverter(
-			ElasticsearchSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
-		DslConverter<?, ? extends F> result = field.type().dslConverter( convert );
-		if ( !result.isValidInputType( expectedType ) ) {
-			throw log.invalidAggregationInvalidType( field.absolutePath(), expectedType, field.eventContext() );
-		}
-		return result;
-	}
-
-	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	private <T> ProjectionConverter<? super F, ? extends T> getFromFieldValueConverter(
-			ElasticsearchSearchFieldContext<F> field, Class<T> expectedType, ValueConvert convert) {
-		ProjectionConverter<? super F, ?> result = field.type().projectionConverter( convert );
-		if ( !result.isConvertedTypeAssignableTo( expectedType ) ) {
-			throw log.invalidAggregationInvalidType( field.absolutePath(), expectedType, field.eventContext() );
-		}
-		return (ProjectionConverter<? super F, ? extends T>) result;
-	}
 }

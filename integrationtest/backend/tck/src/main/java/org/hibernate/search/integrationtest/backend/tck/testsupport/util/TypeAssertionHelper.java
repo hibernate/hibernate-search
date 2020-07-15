@@ -59,12 +59,7 @@ public abstract class TypeAssertionHelper<F, T> {
 		};
 	}
 
-	public static <F> TypeAssertionHelper<F, ?> wrongType(FieldTypeDescriptor<F> typeDescriptor) {
-		return wrongType( typeDescriptor, FieldTypeDescriptor.getIncompatible( typeDescriptor ) );
-	}
-
-	private static <F, T> TypeAssertionHelper<F, T> wrongType(FieldTypeDescriptor<F> typeDescriptor,
-			FieldTypeDescriptor<T> wrongTypeDescriptor) {
+	public static <F, T> TypeAssertionHelper<F, T> wrongType(FieldTypeDescriptor<T> wrongTypeDescriptor) {
 		return new TypeAssertionHelper<F, T>() {
 			@Override
 			public Class<T> getJavaClass() {

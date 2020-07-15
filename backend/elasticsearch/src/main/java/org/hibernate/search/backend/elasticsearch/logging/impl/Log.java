@@ -384,11 +384,6 @@ public interface Log extends BasicLogger {
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
-	@Message(id = ID_OFFSET_3 + 39, value = "Invalid type '%2$s' for projection on field '%1$s'.")
-	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
-			@FormatWith(ClassFormatter.class) Class<?> type,
-			@Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 40,
 			value = "Traditional sorting operations are not supported by the GeoPoint field type, use distance sorting instead.")
 	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
@@ -510,11 +505,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 77,
 			value = "Aggregations are not enabled for field '%1$s'. Make sure the field is marked as aggregable.")
 	SearchException nonAggregableField(String absoluteFieldPath, @Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 78, value = "Invalid type '%2$s' for aggregation on field '%1$s'.")
-	SearchException invalidAggregationInvalidType(String absoluteFieldPath,
-			@FormatWith(ClassFormatter.class) Class<?> type,
-			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 80,
 			value = "Elasticsearch range aggregations only accept ranges in the canonical form:"
@@ -669,5 +659,15 @@ public interface Log extends BasicLogger {
 			value = "Projection on field '%1$s' cannot be single-valued, because this field is multi-valued."
 					+ " Make sure to call '.multi()' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 114, value = "Cannot use '%2$s' on field '%1$s'."
+			+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
+			+ " If it is, check in the reference documentation that '%2$s' is implemented for this field's type.")
+	SearchException cannotUseFieldQueryElement(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 115,
+			value = "Multiple conflicting implementations of '%2$s' for field '%1$s' in different indexes: '%3$s' vs. '%4$s'.")
+	SearchException conflictingQueryElementForFieldOnMultipleIndexes(String absoluteFieldPath, String queryElementName,
+			Object component1, Object component2, @Param EventContext context);
 
 }

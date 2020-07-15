@@ -342,4 +342,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 82, value = "Configuration property '%1$s' is not set, and multiple backend types were found in the classpath."
 			+ " Set property '%1$s' to one of the following to select the backend type: %2$s")
 	SearchException multipleBackendFactoriesRegistered(String propertyKey, Collection<String> backendTypeNames);
+
+	@Message(id = ID_OFFSET_2 + 83, value = "Invalid type for DSL arguments: '%1$s'. Expected '%2$s' or a subtype.")
+	SearchException invalidDslArgumentType(@FormatWith(ClassFormatter.class) Class<?> type,
+			@FormatWith(ClassFormatter.class) Class<?> correctType,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 84, value = "Invalid type for returned values: '%1$s'. Expected '%2$s' or a supertype.")
+	SearchException invalidOutputTypeForField(@FormatWith(ClassFormatter.class) Class<?> type,
+			@FormatWith(ClassFormatter.class) Class<?> correctType,
+			@Param EventContext context);
 }

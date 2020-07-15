@@ -361,11 +361,6 @@ public interface Log extends BasicLogger {
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
-	@Message(id = ID_OFFSET_2 + 56, value = "Invalid type '%2$s' for projection on field '%1$s'.")
-	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
-			@FormatWith(ClassFormatter.class) Class<?> type,
-			@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 58,
 			value = "Multiple conflicting types for field '%1$s', attribute '%2$s' was different: '%3$s' vs. '%4$s'.")
 	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, String attributeName,
@@ -502,11 +497,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 95,
 			value = "Aggregations are not enabled for field '%1$s'. Make sure the field is marked as aggregable.")
 	SearchException nonAggregableField(String absoluteFieldPath, @Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 96, value = "Invalid type '%2$s' for aggregation on field '%1$s'.")
-	SearchException invalidAggregationInvalidType(String absoluteFieldPath,
-			@FormatWith(ClassFormatter.class) Class<?> type,
-			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 98,
 			value = "An Lucene query cannot include search aggregations built using a non-Lucene search scope."

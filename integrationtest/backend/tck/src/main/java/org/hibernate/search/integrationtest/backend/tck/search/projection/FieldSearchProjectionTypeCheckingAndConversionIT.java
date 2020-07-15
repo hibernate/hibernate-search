@@ -124,9 +124,11 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldPath, wrongType ).toProjection() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid type" )
-				.hasMessageContaining( "for projection on field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Invalid type for returned values: '" + wrongType.getName() + "'",
+						"Expected '" + fieldType.getJavaType().getName() + "' or a supertype",
+						"field '" + fieldPath + "'"
+				);
 	}
 
 	@Test
@@ -140,9 +142,11 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldPath, wrongType, ValueConvert.NO ).toProjection() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Invalid type" )
-				.hasMessageContaining( "for projection on field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Invalid type for returned values: '" + wrongType.getName() + "'",
+						"Expected '" + fieldType.getJavaType().getName() + "' or a supertype",
+						"field '" + fieldPath + "'"
+				);
 	}
 
 	@Test
@@ -276,9 +280,9 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.toProjection() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid type",
-						"for projection on field",
-						fieldPath
+						"Invalid type for returned values: '" + String.class.getName() + "'",
+						"Expected '" + ValueWrapper.class.getName() + "' or a supertype",
+						"field '" + fieldPath + "'"
 				);
 	}
 

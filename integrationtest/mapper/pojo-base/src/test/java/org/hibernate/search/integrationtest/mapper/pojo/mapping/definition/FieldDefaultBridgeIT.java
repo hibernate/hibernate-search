@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -23,12 +25,14 @@ import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocum
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -64,8 +68,8 @@ public class FieldDefaultBridgeIT<V, F> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private PropertyTypeDescriptor<V> typeDescriptor;
-	private DefaultValueBridgeExpectations<V, F> expectations;
+	private final PropertyTypeDescriptor<V> typeDescriptor;
+	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
 	private StubIndexSchemaNode index1FieldSchemaNode;
 	private StubIndexSchemaNode index2FieldSchemaNode;
@@ -231,9 +235,19 @@ public class FieldDefaultBridgeIT<V, F> {
 		assertThat( indexToProjectionConverter.isCompatibleWith( incompatibleIndexToProjectionConverter ) ).isFalse();
 
 		// isConvertedTypeAssignableTo must return true for compatible types and false for clearly incompatible types
-		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( Object.class ) ).isTrue();
-		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( expectations.getProjectionType() ) ).isTrue();
-		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( IncompatibleType.class ) ).isFalse();
+		assertThatCode( () -> indexToProjectionConverter.withConvertedType( Object.class,
+				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> indexToProjectionConverter.withConvertedType( expectations.getProjectionType(), () -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+				.doesNotThrowAnyException();
+		assertThatThrownBy( () -> indexToProjectionConverter.withConvertedType( IncompatibleType.class,
+				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid type for returned values: '" + IncompatibleType.class.getName() + "'",
+						"Expected '" + expectations.getProjectionType().getName() + "' or a supertype",
+						"Context: field 'foo'"
+				);
 
 		// convert must behave appropriately on valid input
 		try ( SearchSession searchSession = mapping.createSession() ) {

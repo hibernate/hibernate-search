@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
  * Information about a field targeted by search,
@@ -33,7 +33,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
  *
  * @param <F> The indexed field value type.
  */
-public interface LuceneSearchFieldContext<F> {
+public interface LuceneSearchFieldContext<F> extends EventContextProvider {
 
 	String absolutePath();
 
@@ -44,8 +44,6 @@ public interface LuceneSearchFieldContext<F> {
 	boolean multiValuedInRoot();
 
 	LuceneSearchFieldTypeContext<F> type();
-
-	EventContext eventContext();
 
 	// Predicates
 

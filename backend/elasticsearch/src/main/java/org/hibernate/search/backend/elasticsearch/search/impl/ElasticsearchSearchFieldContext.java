@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
  * Information about a field targeted by search,
@@ -32,7 +32,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
  *
  * @param <F> The indexed field value type.
  */
-public interface ElasticsearchSearchFieldContext<F> {
+public interface ElasticsearchSearchFieldContext<F> extends EventContextProvider {
 
 	String absolutePath();
 
@@ -43,8 +43,6 @@ public interface ElasticsearchSearchFieldContext<F> {
 	boolean multiValuedInRoot();
 
 	ElasticsearchSearchFieldTypeContext<F> type();
-
-	EventContext eventContext();
 
 	// Predicates
 

@@ -38,7 +38,7 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	private final String nestedDocumentPath;
 
 	private final LuceneFieldCodec<F> codec;
-	private final ProjectionConverter<? super F, V> converter;
+	private final ProjectionConverter<? super F, ? extends V> converter;
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	private LuceneFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
@@ -90,11 +90,11 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 
 		private final LuceneSearchFieldContext<F> field;
 
-		private final ProjectionConverter<? super F, V> converter;
+		private final ProjectionConverter<? super F, ? extends V> converter;
 		private final LuceneFieldCodec<F> codec;
 
 		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				ProjectionConverter<? super F, V> converter, LuceneFieldCodec<F> codec) {
+				ProjectionConverter<? super F, ? extends V> converter, LuceneFieldCodec<F> codec) {
 			super( searchContext );
 			this.field = field;
 			this.converter = converter;
