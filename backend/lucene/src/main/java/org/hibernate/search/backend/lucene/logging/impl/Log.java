@@ -494,10 +494,6 @@ public interface Log extends BasicLogger {
 					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
 	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 95,
-			value = "Aggregations are not enabled for field '%1$s'. Make sure the field is marked as aggregable.")
-	SearchException nonAggregableField(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 98,
 			value = "An Lucene query cannot include search aggregations built using a non-Lucene search scope."
 					+ " Given aggregation was: '%1$s'")
@@ -508,20 +504,9 @@ public interface Log extends BasicLogger {
 	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
 			Set<String> aggregationIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET_2 + 100,
-			value = "Terms aggregations are not supported by this field's type (string field with analyzed). Use a normalized field instead.")
-	SearchException termsAggregationsNotSupportedByAnalyzedTextFieldType(@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 101,
-			value = "Range aggregations are not supported by this field's type.")
-	SearchException rangeAggregationsNotSupportedByFieldType(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 102,
 			value = "Multiple aggregations with the same key: '%1$s'")
 	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
-
-	@Message(id = ID_OFFSET_2 + 103, value = "This field does not support aggregations.")
-	SearchException unsupportedDSLAggregationsForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 104, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
 			" Search analyzer: '%1$s'.")

@@ -10,7 +10,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
@@ -46,8 +48,12 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 				new ElasticsearchTemporalFieldSortBuilderFactory<>( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new ElasticsearchStandardFieldAggregationBuilderFactory<>( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.RANGE, new ElasticsearchRangeAggregation.Factory<>( codec ) );
+		}
 	}
 
 	protected abstract ElasticsearchFieldCodec<F> createCodec(DateTimeFormatter formatter);

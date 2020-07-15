@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
@@ -38,12 +37,13 @@ public class ElasticsearchIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final boolean aggregable;
+
 	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>> queryElementFactories;
 
 	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
 	private final ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
-	private final ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
 
 	private final String analyzerName;
 	private final String searchAnalyzerName;
@@ -58,11 +58,11 @@ public class ElasticsearchIndexFieldType<F>
 		this.codec = builder.codec;
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
+		this.aggregable = builder.aggregable;
 		this.queryElementFactories = builder.queryElementFactories;
 		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.sortBuilderFactory = builder.sortBuilderFactory;
 		this.projectionBuilderFactory = builder.projectionBuilderFactory;
-		this.aggregationBuilderFactory = builder.aggregationBuilderFactory;
 		this.analyzerName = builder.analyzerName;
 		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName : builder.analyzerName;
 		this.normalizerName = builder.normalizerName;
@@ -103,7 +103,7 @@ public class ElasticsearchIndexFieldType<F>
 
 	@Override
 	public boolean aggregable() {
-		return aggregationBuilderFactory.isAggregable();
+		return aggregable;
 	}
 
 	@Override
@@ -172,11 +172,6 @@ public class ElasticsearchIndexFieldType<F>
 		return projectionBuilderFactory;
 	}
 
-	@Override
-	public ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory() {
-		return aggregationBuilderFactory;
-	}
-
 	public PropertyMapping mapping() {
 		return mapping;
 	}
@@ -191,13 +186,14 @@ public class ElasticsearchIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private boolean aggregable;
+
 		private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>>
 				queryElementFactories = new HashMap<>();
 
 		private ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
 		private ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
-		private ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
 
 		private String analyzerName;
 		private String searchAnalyzerName;
@@ -232,6 +228,10 @@ public class ElasticsearchIndexFieldType<F>
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
+		public void aggregable(boolean aggregable) {
+			this.aggregable = aggregable;
+		}
+
 		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
 				ElasticsearchSearchFieldQueryElementFactory<T, F> factory) {
 			queryElementFactories.put( key, factory );
@@ -247,10 +247,6 @@ public class ElasticsearchIndexFieldType<F>
 
 		public void projectionBuilderFactory(ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory) {
 			this.projectionBuilderFactory = projectionBuilderFactory;
-		}
-
-		public void aggregationBuilderFactory(ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory) {
-			this.aggregationBuilderFactory = aggregationBuilderFactory;
 		}
 
 		public void analyzerName(String analyzerName) {

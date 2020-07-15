@@ -502,10 +502,6 @@ public interface Log extends BasicLogger {
 					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
 	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_3 + 77,
-			value = "Aggregations are not enabled for field '%1$s'. Make sure the field is marked as aggregable.")
-	SearchException nonAggregableField(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 80,
 			value = "Elasticsearch range aggregations only accept ranges in the canonical form:"
 					+ " (-Infinity, <value>) or [<value1>, <value2>) or [<value>, +Infinity)."
@@ -521,14 +517,6 @@ public interface Log extends BasicLogger {
 			+ " Aggregation is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
 			Set<String> aggregationIndexes, Set<String> scopeIndexes);
-
-	@Message(id = ID_OFFSET_3 + 83,
-			value = "Terms aggregations are not supported by this field's type (string field with analyzed). Use a normalized field instead.")
-	SearchException termsAggregationsNotSupportedByAnalyzedTextFieldType(@Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 84,
-			value = "Range aggregations are not supported by this field's type.")
-	SearchException rangeAggregationsNotSupportedByFieldType(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 85,
 			value = "Multiple aggregations with the same key: '%1$s'")

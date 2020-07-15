@@ -12,11 +12,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
@@ -95,14 +97,41 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		return codec.decode( term );
 	}
 
+	public static class Factory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<AbstractTypeSelector<?>, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
+			super( codec );
+		}
+
+		@Override
+		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new TypeSelector<>( codec, searchContext, field );
+		}
+	}
+
+	public static class TypeSelector<F> extends AbstractTypeSelector<F> {
+		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
+
+		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
+				LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			super( searchContext, field );
+			this.codec = codec;
+		}
+
+		@Override
+		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueConvert convert) {
+			return new Builder<>( codec, searchContext, field,
+					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+		}
+	}
+
 	public static class Builder<F, E extends Number, K>
 			extends AbstractBuilder<F, E, K> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				ProjectionConverter<F, ? extends K> fromFieldValueConverter,
-				AbstractLuceneNumericFieldCodec<F, E> codec) {
+		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( searchContext, field, fromFieldValueConverter );
 			this.codec = codec;
 		}

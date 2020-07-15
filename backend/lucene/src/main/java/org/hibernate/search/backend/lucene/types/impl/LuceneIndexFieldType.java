@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
@@ -39,12 +38,13 @@ public class LuceneIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final boolean aggregable;
+
 	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>> queryElementFactories;
 
 	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
-	private final LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
 
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
@@ -60,11 +60,11 @@ public class LuceneIndexFieldType<F>
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter
 				: rawProjectionConverter;
+		this.aggregable = builder.aggregable;
 		this.queryElementFactories = builder.queryElementFactories;
 		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.sortBuilderFactory = builder.sortBuilderFactory;
 		this.projectionBuilderFactory = builder.projectionBuilderFactory;
-		this.aggregationBuilderFactory = builder.aggregationBuilderFactory;
 		this.indexingAnalyzerOrNormalizer = builder.indexingAnalyzerOrNormalizer();
 		this.searchAnalyzerOrNormalizer = builder.searchAnalyzer != null ? builder.searchAnalyzer
 				: indexingAnalyzerOrNormalizer;
@@ -111,7 +111,7 @@ public class LuceneIndexFieldType<F>
 
 	@Override
 	public boolean aggregable() {
-		return aggregationBuilderFactory.isAggregable();
+		return aggregable;
 	}
 
 	@Override
@@ -180,11 +180,6 @@ public class LuceneIndexFieldType<F>
 		return projectionBuilderFactory;
 	}
 
-	@Override
-	public LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory() {
-		return aggregationBuilderFactory;
-	}
-
 	public Analyzer indexingAnalyzerOrNormalizer() {
 		return indexingAnalyzerOrNormalizer;
 	}
@@ -204,13 +199,14 @@ public class LuceneIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private boolean aggregable;
+
 		private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>>
 				queryElementFactories = new HashMap<>();
 
 		private LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
 		private LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
-		private LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
 
 		private Analyzer analyzer;
 		private String analyzerName;
@@ -239,6 +235,10 @@ public class LuceneIndexFieldType<F>
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
+		public void aggregable(boolean aggregable) {
+			this.aggregable = aggregable;
+		}
+
 		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
 				LuceneSearchFieldQueryElementFactory<T, F> factory) {
 			queryElementFactories.put( key, factory );
@@ -254,10 +254,6 @@ public class LuceneIndexFieldType<F>
 
 		public void projectionBuilderFactory(LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory) {
 			this.projectionBuilderFactory = projectionBuilderFactory;
-		}
-
-		public void aggregationBuilderFactory(LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory) {
-			this.aggregationBuilderFactory = aggregationBuilderFactory;
 		}
 
 		public void analyzer(String analyzerName, Analyzer analyzer) {

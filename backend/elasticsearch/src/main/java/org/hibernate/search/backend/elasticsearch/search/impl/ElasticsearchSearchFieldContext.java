@@ -9,8 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
-import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -108,20 +106,6 @@ public interface ElasticsearchSearchFieldContext<F> extends EventContextProvider
 	default DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(ElasticsearchSearchContext searchContext,
 			GeoPoint center) {
 		return type().projectionBuilderFactory().createDistanceProjectionBuilder( searchContext, this, center );
-	}
-
-	// Aggregations
-
-	default <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(ElasticsearchSearchContext searchContext,
-			Class<K> expectedType, ValueConvert convert) {
-		return type().aggregationBuilderFactory().createTermsAggregationBuilder( searchContext, this,
-				expectedType, convert );
-	}
-
-	default <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(ElasticsearchSearchContext searchContext,
-			Class<K> expectedType, ValueConvert convert) {
-		return type().aggregationBuilderFactory().createRangeAggregationBuilder( searchContext, this,
-				expectedType, convert );
 	}
 
 }

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
@@ -64,5 +63,4 @@ public interface ElasticsearchSearchFieldTypeContext<F> {
 
 	ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory();
 
-	ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory();
 }

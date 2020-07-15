@@ -7,7 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchBooleanFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBooleanFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
@@ -32,8 +33,11 @@ class ElasticsearchBooleanIndexFieldTypeOptionsStep
 				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new ElasticsearchBooleanFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
+		}
 	}
 
 	@Override

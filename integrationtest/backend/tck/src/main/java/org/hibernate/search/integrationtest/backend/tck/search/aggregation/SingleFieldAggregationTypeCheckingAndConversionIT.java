@@ -343,8 +343,10 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Aggregations are not enabled for field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 	}
 
 	@Test

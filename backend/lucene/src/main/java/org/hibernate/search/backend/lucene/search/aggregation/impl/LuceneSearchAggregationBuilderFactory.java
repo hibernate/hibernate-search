@@ -52,12 +52,14 @@ public class LuceneSearchAggregationBuilderFactory
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return indexes.field( absoluteFieldPath ).createTermsAggregationBuilder( searchContext, expectedType, convert );
+		return indexes.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
+				.type( expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return indexes.field( absoluteFieldPath ).createRangeAggregationBuilder( searchContext, expectedType, convert );
+		return indexes.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
+				.type( expectedType, convert );
 	}
 }

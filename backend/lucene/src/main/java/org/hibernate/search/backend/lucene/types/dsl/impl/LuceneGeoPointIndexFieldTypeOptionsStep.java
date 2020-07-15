@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneGeoPointFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
@@ -49,8 +48,11 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new LuceneGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			// No supported aggregation at the moment.
+		}
 
 		return builder.build();
 	}
