@@ -119,6 +119,18 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		replayAll();
 		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		MapperEasyMockUtils.expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				c -> c
+						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+		);
+		replayAll();
+		assertThat( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		verifyAll();
 	}
 
 	@Test
@@ -131,6 +143,10 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
+
+		// check the same for the scroll API
+		assertThat( hitsUsingScroll( query ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -142,6 +158,10 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
+
+		// check the same for the scroll API
+		assertThat( hitsUsingScroll( query ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
@@ -184,6 +204,18 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		);
 		replayAll();
 		assertThat( referencesQuery ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
+		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		MapperEasyMockUtils.expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				c -> c
+						.entityReference( mainReference, mainTransformedReference )
+						.entityReference( emptyReference, emptyTransformedReference )
+		);
+		replayAll();
+		assertThat( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
 		verifyAll();
 	}
 
@@ -228,6 +260,18 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		);
 		replayAll();
 		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		MapperEasyMockUtils.expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				c -> c
+						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+		);
+		replayAll();
+		assertThat( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 	}
 
@@ -289,6 +333,27 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
 		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		MapperEasyMockUtils.expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				/*
+				 * Expect each reference to be transformed because of the entity reference projection,
+				 * but also loaded because of the entity projection.
+				 */
+				c -> c
+						.entityReference( mainReference, mainTransformedReference )
+						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.entityReference( emptyReference, emptyTransformedReference )
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+		);
+		replayAll();
+		assertThat( hitsUsingScroll( projectionsQuery ) ).hasListHitsAnyOrder( b -> {
+			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
+			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
+		} );
+		verifyAll();
 	}
 
 	@Test
@@ -335,6 +400,22 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.andReturn( emptyTransformedHit );
 		replayAll();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		expect( hitTransformerMock.apply( projectionMatcher(
+				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
+				mainReference, mainReference, mainReference
+		) ) )
+				.andReturn( mainTransformedHit );
+		expect( hitTransformerMock.apply( projectionMatcher(
+				null, null, null, null, null,
+				emptyReference, emptyReference, emptyReference
+		) ) )
+				.andReturn( emptyTransformedHit );
+		replayAll();
+		assertThat( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 	}
 
@@ -405,6 +486,32 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		replayAll();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		MapperEasyMockUtils.expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				/*
+				 * Expect each reference to be transformed because of the entity reference projection,
+				 * but also loaded because of the entity projection.
+				 */
+				c -> c
+						.entityReference( mainReference, mainTransformedReference )
+						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.entityReference( emptyReference, emptyTransformedReference )
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+		);
+		expect( hitTransformerMock.apply( projectionMatcher(
+				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
+		) ) )
+				.andReturn( mainTransformedHit );
+		expect( hitTransformerMock.apply( projectionMatcher(
+				null, emptyReference, emptyTransformedReference, emptyLoadedObject
+		) ) )
+				.andReturn( emptyTransformedHit );
+		replayAll();
+		assertThat( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		verifyAll();
 	}
 
 	@Test
@@ -418,6 +525,10 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
+
+		// check the same for the scroll API
+		assertThat( hitsUsingScroll( query ) )
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -430,6 +541,10 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
+				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
+
+		// check the same for the scroll API
+		assertThat( hitsUsingScroll( query ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
@@ -478,6 +593,22 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.andReturn( emptyTransformedHit );
 		replayAll();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		verifyAll();
+
+		// check the same for the scroll API
+		resetAll();
+		expect( hitTransformerMock.apply( projectionMatcher(
+				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
+				mainReference, mainReference, mainReference
+		) ) )
+				.andReturn( mainTransformedHit );
+		expect( hitTransformerMock.apply( projectionMatcher(
+				null, null, null, null, null,
+				emptyReference, emptyReference, emptyReference
+		) ) )
+				.andReturn( emptyTransformedHit );
+		replayAll();
+		assertThat( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 	}
 
@@ -604,6 +735,10 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// Expect the main document to be excluded from hits, since it could not be loaded.
 		assertThat( objectsQuery ).hasHitsAnyOrder( emptyLoadedObject );
 		verifyAll();
+	}
+
+	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {
+		return query.scroll( 10 ).next().hits();
 	}
 
 	private void initData() {
