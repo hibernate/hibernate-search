@@ -48,7 +48,7 @@ class LuceneBigIntegerIndexFieldTypeOptionsStep
 			BigInteger indexNullAsValue) {
 		int resolvedDecimalScale = resolveDecimalScale();
 		if ( resolvedDecimalScale > 0 ) {
-			throw log.invalidDecimalScale( resolvedDecimalScale, getBuildContext().getEventContext() );
+			throw log.invalidDecimalScale( resolvedDecimalScale, buildContext.getEventContext() );
 		}
 		return new LuceneBigIntegerFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue,
@@ -64,6 +64,6 @@ class LuceneBigIntegerIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw log.nullDecimalScale( getBuildContext().getEventContext() );
+		throw log.nullDecimalScale( buildContext.getEventContext() );
 	}
 }

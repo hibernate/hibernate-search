@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -22,16 +22,13 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 		extends AbstractLuceneIndexFieldTypeOptionsStep<S, F>
 		implements LuceneStandardIndexFieldTypeOptionsStep<S, F> {
 
-	private final LuceneIndexFieldTypeBuildContext buildContext;
-
 	protected Projectable projectable = Projectable.DEFAULT;
 	protected Searchable searchable = Searchable.DEFAULT;
 	protected Aggregable aggregable = Aggregable.DEFAULT;
 	protected F indexNullAsValue = null;
 
-	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
-		super( fieldType );
-		this.buildContext = buildContext;
+	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType) {
+		super( buildContext, valueType );
 	}
 
 	@Override
@@ -60,10 +57,6 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 
 	@Override
 	public abstract LuceneIndexFieldType<F> toIndexFieldType();
-
-	protected final LuceneIndexFieldTypeBuildContext getBuildContext() {
-		return buildContext;
-	}
 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {

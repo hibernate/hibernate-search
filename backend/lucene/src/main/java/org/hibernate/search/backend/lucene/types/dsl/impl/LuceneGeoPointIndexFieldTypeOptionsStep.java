@@ -41,16 +41,18 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);
+		builder.codec( codec );
 
-		return new LuceneIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, codec ),
-				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable, codec ),
-				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ),
-				new LuceneGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec )
-		);
+		builder.predicateBuilderFactory(
+				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, codec ) );
+		builder.sortBuilderFactory(
+				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable, codec ) );
+		builder.projectionBuilderFactory(
+				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ) );
+		builder.aggregationBuilderFactory(
+				new LuceneGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+
+		return builder.build();
 	}
 
 	@Override

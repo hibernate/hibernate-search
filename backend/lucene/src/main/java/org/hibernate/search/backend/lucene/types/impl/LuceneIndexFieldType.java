@@ -16,7 +16,11 @@ import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProj
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -24,62 +28,42 @@ import org.apache.lucene.analysis.Analyzer;
 public class LuceneIndexFieldType<F>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, LuceneSearchFieldTypeContext<F> {
 	private final Class<F> valueType;
+	private final DslConverter<F, ? extends F> rawDslConverter;
+	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+
 	private final LuceneFieldCodec<F> codec;
 	private final DslConverter<?, ? extends F> dslConverter;
-	private final DslConverter<F, ? extends F> rawDslConverter;
 	private final ProjectionConverter<? super F, ?> projectionConverter;
-	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+
 	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
 	private final LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
 	private final LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
+
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
 	private final String analyzerName;
 	private final String searchAnalyzerName;
 	private final String normalizerName;
 
-	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
-			DslConverter<?, ? extends F> dslConverter,
-			DslConverter<F, ? extends F> rawDslConverter,
-			ProjectionConverter<? super F, ?> projectionConverter,
-			ProjectionConverter<? super F, F> rawProjectionConverter,
-			LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory,
-			LuceneFieldSortBuilderFactory<F> sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory,
-			LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory) {
-		this( valueType, codec, dslConverter, rawDslConverter, projectionConverter, rawProjectionConverter,
-				predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
-				aggregationBuilderFactory,
-				null, null, null, null, null );
-	}
-
-	public LuceneIndexFieldType(Class<F> valueType, LuceneFieldCodec<F> codec,
-			DslConverter<?, ? extends F> dslConverter,
-			DslConverter<F, ? extends F> rawDslConverter,
-			ProjectionConverter<? super F, ?> projectionConverter,
-			ProjectionConverter<? super F, F> rawProjectionConverter,
-			LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory,
-			LuceneFieldSortBuilderFactory<F> sortBuilderFactory,
-			LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory,
-			LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory,
-			Analyzer indexingAnalyzerOrNormalizer, Analyzer searchAnalyzerOrNormalizer,
-			String analyzerName, String searchAnalyzerName, String normalizerName) {
-		this.valueType = valueType;
-		this.codec = codec;
-		this.dslConverter = dslConverter;
-		this.rawDslConverter = rawDslConverter;
-		this.projectionConverter = projectionConverter;
-		this.rawProjectionConverter = rawProjectionConverter;
-		this.predicateBuilderFactory = predicateBuilderFactory;
-		this.sortBuilderFactory = sortBuilderFactory;
-		this.projectionBuilderFactory = projectionBuilderFactory;
-		this.aggregationBuilderFactory = aggregationBuilderFactory;
-		this.indexingAnalyzerOrNormalizer = indexingAnalyzerOrNormalizer;
-		this.searchAnalyzerOrNormalizer = searchAnalyzerOrNormalizer;
-		this.analyzerName = analyzerName;
-		this.searchAnalyzerName = searchAnalyzerName;
-		this.normalizerName = normalizerName;
+	private LuceneIndexFieldType(Builder<F> builder) {
+		this.valueType = builder.valueType;
+		this.rawDslConverter = builder.rawDslConverter;
+		this.rawProjectionConverter = builder.rawProjectionConverter;
+		this.codec = builder.codec;
+		this.dslConverter = builder.dslConverter;
+		this.projectionConverter = builder.projectionConverter;
+		this.predicateBuilderFactory = builder.predicateBuilderFactory;
+		this.sortBuilderFactory = builder.sortBuilderFactory;
+		this.projectionBuilderFactory = builder.projectionBuilderFactory;
+		this.aggregationBuilderFactory = builder.aggregationBuilderFactory;
+		this.indexingAnalyzerOrNormalizer = builder.indexingAnalyzerOrNormalizer();
+		this.searchAnalyzerOrNormalizer = builder.searchAnalyzer != null ? builder.searchAnalyzer
+				: indexingAnalyzerOrNormalizer;
+		this.analyzerName = builder.analyzerName;
+		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName
+				: analyzerName;
+		this.normalizerName = builder.normalizerName;
 	}
 
 	@Override
@@ -193,5 +177,87 @@ public class LuceneIndexFieldType<F>
 	@Override
 	public Analyzer searchAnalyzerOrNormalizer() {
 		return searchAnalyzerOrNormalizer;
+	}
+
+	public static class Builder<F> {
+
+		private final Class<F> valueType;
+		private final DslConverter<F, ? extends F> rawDslConverter;
+		private final ProjectionConverter<? super F, F> rawProjectionConverter;
+
+		private LuceneFieldCodec<F> codec;
+		private DslConverter<?, ? extends F> dslConverter;
+		private ProjectionConverter<? super F, ?> projectionConverter;
+
+		private LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
+		private LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
+		private LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
+		private LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
+
+		private Analyzer analyzer;
+		private String analyzerName;
+
+		private Analyzer searchAnalyzer;
+		private String searchAnalyzerName;
+
+		private Analyzer normalizer;
+		private String normalizerName;
+
+		public Builder(Class<F> valueType) {
+			this.valueType = valueType;
+			this.rawDslConverter = new DslConverter<>( valueType, new PassThroughToDocumentFieldValueConverter<>() );
+			this.rawProjectionConverter = new ProjectionConverter<>( valueType, new PassThroughFromDocumentFieldValueConverter<>() );
+		}
+
+		public void codec(LuceneFieldCodec<F> codec) {
+			this.codec = codec;
+		}
+
+		public <V> void dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
+			this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
+		}
+
+		public <V> void projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
+			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+		}
+
+		public void predicateBuilderFactory(LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory) {
+			this.predicateBuilderFactory = predicateBuilderFactory;
+		}
+
+		public void sortBuilderFactory(LuceneFieldSortBuilderFactory<F> sortBuilderFactory) {
+			this.sortBuilderFactory = sortBuilderFactory;
+		}
+
+		public void projectionBuilderFactory(LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory) {
+			this.projectionBuilderFactory = projectionBuilderFactory;
+		}
+
+		public void aggregationBuilderFactory(LuceneFieldAggregationBuilderFactory<F> aggregationBuilderFactory) {
+			this.aggregationBuilderFactory = aggregationBuilderFactory;
+		}
+
+		public void analyzer(String analyzerName, Analyzer analyzer) {
+			this.analyzerName = analyzerName;
+			this.analyzer = analyzer;
+		}
+
+		public void searchAnalyzer(String searchAnalyzerName, Analyzer searchAnalyzer) {
+			this.searchAnalyzerName = searchAnalyzerName;
+			this.searchAnalyzer = searchAnalyzer;
+		}
+
+		public void normalizer(String normalizerName, Analyzer normalizer) {
+			this.normalizerName = normalizerName;
+			this.normalizer = normalizer;
+		}
+
+		public Analyzer indexingAnalyzerOrNormalizer() {
+			return analyzer != null ? analyzer : normalizer;
+		}
+
+		public LuceneIndexFieldType<F> build() {
+			return new LuceneIndexFieldType<>( this );
+		}
 	}
 }

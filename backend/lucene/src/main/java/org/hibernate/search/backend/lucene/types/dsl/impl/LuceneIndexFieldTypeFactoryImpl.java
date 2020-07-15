@@ -21,18 +21,18 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 
@@ -233,7 +233,7 @@ public class LuceneIndexFieldTypeFactoryImpl
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		return new LuceneNativeIndexFieldTypeOptionsStep<>(
-				indexFieldType, fieldContributor, fieldValueExtractor
+				this, indexFieldType, fieldContributor, fieldValueExtractor
 		);
 	}
 
