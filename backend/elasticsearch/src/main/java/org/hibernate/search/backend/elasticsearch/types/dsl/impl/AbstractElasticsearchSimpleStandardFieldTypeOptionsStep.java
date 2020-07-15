@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -17,8 +16,6 @@ import org.hibernate.search.engine.backend.types.Sortable;
 
 abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<?, F>, F>
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S, F> {
-
-	private final String dataType;
 
 	private Sortable sortable = Sortable.DEFAULT;
 	protected boolean resolvedSortable;
@@ -37,7 +34,7 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 	AbstractElasticsearchSimpleStandardFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			Class<F> fieldType, String dataType) {
 		super( buildContext, fieldType );
-		this.dataType = dataType;
+		builder.mapping().setType( dataType );
 	}
 
 	@Override
@@ -72,9 +69,7 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 
 	@Override
 	public final IndexFieldType<F> toIndexFieldType() {
-		PropertyMapping mapping = new PropertyMapping();
-
-		mapping.setType( dataType );
+		PropertyMapping mapping = builder.mapping();
 
 		resolvedSortable = resolveDefault( sortable );
 		resolvedProjectable = resolveDefault( projectable );
@@ -84,13 +79,15 @@ abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends
 		mapping.setIndex( resolvedSearchable );
 		mapping.setDocValues( resolvedSortable || resolvedAggregable );
 
-		ElasticsearchIndexFieldType<F> indexFieldType = toIndexFieldType( mapping );
+		complete();
+
 		if ( indexNullAs != null ) {
-			indexFieldType.mapping().setNullValue( indexFieldType.codec().encode( indexNullAs ) );
+			builder.mapping().setNullValue( builder.codec().encode( indexNullAs ) );
 		}
-		return indexFieldType;
+
+		return builder.build();
 	}
 
-	protected abstract ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping);
+	protected abstract void complete();
 
 }

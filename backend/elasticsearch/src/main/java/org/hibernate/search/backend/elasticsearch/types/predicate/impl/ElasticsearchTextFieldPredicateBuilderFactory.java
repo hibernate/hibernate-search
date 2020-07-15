@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -20,9 +19,9 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	private final String type;
 
 	public ElasticsearchTextFieldPredicateBuilderFactory(boolean searchable,
-			ElasticsearchFieldCodec<String> codec, PropertyMapping mapping) {
+			ElasticsearchFieldCodec<String> codec, String dataType) {
 		super( searchable, codec );
-		this.type = mapping.getType();
+		this.type = dataType;
 	}
 
 	@Override

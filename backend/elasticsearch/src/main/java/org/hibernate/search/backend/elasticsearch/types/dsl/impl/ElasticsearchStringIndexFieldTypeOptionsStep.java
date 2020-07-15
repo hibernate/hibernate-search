@@ -9,23 +9,22 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchTextFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchTextFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -115,7 +114,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 	@Override
 	public IndexFieldType<String> toIndexFieldType() {
-		PropertyMapping mapping = new PropertyMapping();
+		PropertyMapping mapping = builder.mapping();
 
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
@@ -130,30 +129,35 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			mapping.setSearchAnalyzer( searchAnalyzerName );
 			mapping.setTermVector( resolveTermVector() );
 
+			builder.analyzerName( analyzerName );
+			builder.searchAnalyzerName( searchAnalyzerName );
+
 			if ( normalizerName != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getBuildContext().getEventContext() );
+				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, buildContext.getEventContext() );
 			}
 
 			if ( resolvedSortable ) {
-				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getBuildContext().getEventContext() );
+				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
 			}
 
 			if ( indexNullAs != null ) {
-				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs, getBuildContext().getEventContext() );
+				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAs, buildContext.getEventContext() );
 			}
 
 			if ( resolvedAggregable ) {
-				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, getBuildContext().getEventContext() );
+				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
 			}
 		}
 		else {
-			if ( searchAnalyzerName != null ) {
-				throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
-			}
-
 			mapping.setType( DataTypes.KEYWORD );
 			mapping.setNormalizer( normalizerName );
 			mapping.setDocValues( resolvedSortable || resolvedAggregable );
+
+			builder.normalizerName( normalizerName );
+
+			if ( searchAnalyzerName != null ) {
+				throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+			}
 		}
 
 		mapping.setNorms( resolveNorms() );
@@ -163,20 +167,18 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		}
 
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
+		builder.codec( codec );
 
-		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, codec, mapping ),
-				new ElasticsearchTextFieldSortBuilderFactory( resolvedSortable, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ),
-				new ElasticsearchTextFieldAggregationBuilderFactory( resolvedAggregable, codec,
-						analyzerName != null ),
-				mapping,
-				analyzerName, searchAnalyzerName != null ? searchAnalyzerName : analyzerName,
-				normalizerName
-		);
+		builder.predicateBuilderFactory(
+				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, codec, mapping.getType() ) );
+		builder.sortBuilderFactory(
+				new ElasticsearchTextFieldSortBuilderFactory( resolvedSortable, codec ) );
+		builder.projectionBuilderFactory(
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
+		builder.aggregationBuilderFactory(
+				new ElasticsearchTextFieldAggregationBuilderFactory( resolvedAggregable, codec, analyzerName != null ) );
+
+		return builder.build();
 	}
 
 	@Override

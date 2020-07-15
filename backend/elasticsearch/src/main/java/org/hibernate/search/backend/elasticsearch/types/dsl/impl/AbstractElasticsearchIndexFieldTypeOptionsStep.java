@@ -6,66 +6,40 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
 abstract class AbstractElasticsearchIndexFieldTypeOptionsStep<S extends AbstractElasticsearchIndexFieldTypeOptionsStep<?, F>, F>
 		implements IndexFieldTypeOptionsStep<S, F> {
-	private final ElasticsearchIndexFieldTypeBuildContext buildContext;
-	private final Class<F> fieldType;
-
-	private DslConverter<?, ? extends F> dslConverter;
-	private ProjectionConverter<? super F, ?> projectionConverter;
+	protected final ElasticsearchIndexFieldTypeBuildContext buildContext;
+	protected final ElasticsearchIndexFieldType.Builder<F> builder;
 
 	AbstractElasticsearchIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType) {
+			Class<F> valueType, PropertyMapping mapping) {
 		this.buildContext = buildContext;
-		this.fieldType = fieldType;
+		this.builder = new ElasticsearchIndexFieldType.Builder<>( valueType, mapping );
 	}
 
 	@Override
 	public <V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
+		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
-		this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
+		builder.dslConverter( valueType, toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
 	public <V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
+		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
-		this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+		builder.projectionConverter( valueType, fromIndexConverter );
 		return thisAsS();
 	}
 
 	protected abstract S thisAsS();
 
-	final Class<F> getFieldType() {
-		return fieldType;
-	}
-
-	final ElasticsearchIndexFieldTypeBuildContext getBuildContext() {
-		return buildContext;
-	}
-
-	final DslConverter<?, ? extends F> createDslConverter() {
-		return dslConverter == null ? createRawDslConverter() : dslConverter;
-	}
-
-	final DslConverter<F, ? extends F> createRawDslConverter() {
-		return new DslConverter<>( fieldType, new PassThroughToDocumentFieldValueConverter<>() );
-	}
-
-	final ProjectionConverter<? super F, ?> createProjectionConverter() {
-		return projectionConverter == null ? createRawProjectionConverter() : projectionConverter;
-	}
-
-	final ProjectionConverter<? super F, F> createRawProjectionConverter() {
-		return new ProjectionConverter<>( fieldType, new PassThroughFromDocumentFieldValueConverter<>() );
-	}
 }

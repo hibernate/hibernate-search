@@ -7,19 +7,18 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchByteFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 
 class ElasticsearchByteIndexFieldTypeOptionsStep
-		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchByteIndexFieldTypeOptionsStep, Byte> {
+		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchByteIndexFieldTypeOptionsStep, Byte> {
 
 	ElasticsearchByteIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, Byte.class, DataTypes.BYTE );
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Byte> complete(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<Byte> completeCodec() {
 		return ElasticsearchByteFieldCodec.INSTANCE;
 	}
 
