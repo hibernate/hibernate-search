@@ -27,9 +27,9 @@ public final class DslConverter<V, F> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<V> valueType;
-	private final ToDocumentFieldValueConverter<V, F> delegate;
+	private final ToDocumentFieldValueConverter<V, ? extends F> delegate;
 
-	public DslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, F> delegate) {
+	public DslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> delegate) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( delegate, "delegate" );
 		this.valueType = valueType;

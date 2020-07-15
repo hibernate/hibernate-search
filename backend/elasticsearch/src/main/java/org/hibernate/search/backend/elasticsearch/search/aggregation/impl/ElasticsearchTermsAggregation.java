@@ -30,7 +30,7 @@ public class ElasticsearchTermsAggregation<F, K>
 
 	private final String absoluteFieldPath;
 
-	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
+	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private final JsonObject order;
@@ -80,7 +80,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	public static class Builder<F, K> extends AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
+		private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonObject order;
@@ -88,7 +88,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		private int size = 100;
 
 		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
-				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
 			super( searchContext, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;

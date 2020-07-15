@@ -39,7 +39,7 @@ public class LuceneTextFieldAggregationBuilderFactory
 
 		checkAggregable( field );
 
-		ProjectionConverter<? super String, ? extends K> fromFieldValueConverter = field.type()
+		ProjectionConverter<String, ? extends K> fromFieldValueConverter = field.type()
 				.projectionConverter( convert ).withConvertedType( expectedType, field );
 
 		return new LuceneTextTermsAggregation.Builder<>( searchContext, field, fromFieldValueConverter );

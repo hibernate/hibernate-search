@@ -101,7 +101,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
+				ProjectionConverter<F, ? extends K> fromFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( searchContext, field, fromFieldValueConverter );
 			this.codec = codec;

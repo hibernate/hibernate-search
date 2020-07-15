@@ -29,7 +29,7 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			ElasticsearchSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( field );
 
-		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter = field.type().projectionConverter( convert )
+		ProjectionConverter<F, ? extends K> fromFieldValueConverter = field.type().projectionConverter( convert )
 				.withConvertedType( expectedType, field );
 
 		return new ElasticsearchTermsAggregation.Builder<>(
@@ -42,7 +42,7 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			ElasticsearchSearchFieldContext<F> field, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( field );
 
-		DslConverter<? super K, ? extends F> toFieldValueConverter = field.type().dslConverter( convert )
+		DslConverter<? super K, F> toFieldValueConverter = field.type().dslConverter( convert )
 				.withInputType( expectedType, field );
 
 		return new ElasticsearchRangeAggregation.Builder<>(

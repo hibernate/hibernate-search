@@ -85,25 +85,25 @@ public class LuceneMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
-	public DslConverter<?, ? extends F> dslConverter() {
+	public DslConverter<?, F> dslConverter() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
 				"dslConverter" );
 	}
 
 	@Override
-	public DslConverter<F, ? extends F> rawDslConverter() {
+	public DslConverter<F, F> rawDslConverter() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
 				"rawDslConverter" );
 	}
 
 	@Override
-	public ProjectionConverter<? super F, ?> projectionConverter() {
+	public ProjectionConverter<F, ?> projectionConverter() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::projectionConverter,
 				ProjectionConverter::isCompatibleWith, "projectionConverter" );
 	}
 
 	@Override
-	public ProjectionConverter<? super F, F> rawProjectionConverter() {
+	public ProjectionConverter<F, F> rawProjectionConverter() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
 	}
