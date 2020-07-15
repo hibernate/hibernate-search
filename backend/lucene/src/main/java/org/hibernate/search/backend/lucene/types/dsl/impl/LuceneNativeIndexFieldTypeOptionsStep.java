@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNativeFi
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNativeFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNativeFieldSortBuilderFactory;
@@ -23,9 +22,9 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	LuceneNativeIndexFieldTypeOptionsStep(Class<F> fieldType,
+	LuceneNativeIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		super( fieldType );
+		super( buildContext, fieldType );
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}
@@ -33,16 +32,18 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 	@Override
 	public IndexFieldType<F> toIndexFieldType() {
 		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
+		builder.codec( codec );
 
-		return new LuceneIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new LuceneNativeFieldPredicateBuilderFactory<>(),
-				new LuceneNativeFieldSortBuilderFactory<>(),
-				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec ),
-				new LuceneNativeFieldAggregationBuilderFactory<>()
-		);
+		builder.predicateBuilderFactory(
+				new LuceneNativeFieldPredicateBuilderFactory<>() );
+		builder.sortBuilderFactory(
+				new LuceneNativeFieldSortBuilderFactory<>() );
+		builder.projectionBuilderFactory(
+				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec ) );
+		builder.aggregationBuilderFactory(
+				new LuceneNativeFieldAggregationBuilderFactory<>() );
+
+		return builder.build();
 	}
 
 	@Override

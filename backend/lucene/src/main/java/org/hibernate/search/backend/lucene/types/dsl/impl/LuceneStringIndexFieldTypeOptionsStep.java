@@ -58,7 +58,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
-			throw log.unknownAnalyzer( analyzerName, getBuildContext().getEventContext() );
+			throw log.unknownAnalyzer( analyzerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -68,7 +68,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.searchAnalyzerName = searchAnalyzerName;
 		this.searchAnalyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( searchAnalyzerName );
 		if ( searchAnalyzer == null ) {
-			throw log.unknownAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
+			throw log.unknownAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -78,7 +78,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
-			throw log.unknownNormalizer( normalizerName, getBuildContext().getEventContext() );
+			throw log.unknownNormalizer( normalizerName, buildContext.getEventContext() );
 		}
 		return this;
 	}
@@ -111,50 +111,56 @@ class LuceneStringIndexFieldTypeOptionsStep
 		ResolvedTermVector resolvedTermVector = resolveTermVector();
 
 		if ( analyzer != null ) {
+			builder.analyzer( analyzerName, analyzer );
+			builder.searchAnalyzer( searchAnalyzerName, searchAnalyzer );
+
 			if ( resolvedSortable ) {
-				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getBuildContext().getEventContext() );
+				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
 			}
 
 			if ( normalizer != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getBuildContext().getEventContext() );
+				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, buildContext.getEventContext() );
 			}
 
 			if ( indexNullAsValue != null ) {
-				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue, getBuildContext().getEventContext() );
+				throw log.cannotUseIndexNullAsAndAnalyzer( analyzerName, indexNullAsValue, buildContext.getEventContext() );
 			}
 
 			if ( resolvedAggregable ) {
-				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, getBuildContext().getEventContext() );
+				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, buildContext.getEventContext() );
 			}
 		}
-		else if ( searchAnalyzer != null ) {
-			throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
-		}
+		else {
+			if ( normalizer != null ) {
+				builder.normalizer( normalizerName, normalizer );
+			}
+			else {
+				builder.analyzer( null, AnalyzerConstants.KEYWORD_ANALYZER );
+			}
 
-		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
-		if ( analyzerOrNormalizer == null ) {
-			analyzerOrNormalizer = AnalyzerConstants.KEYWORD_ANALYZER;
+			if ( searchAnalyzer != null ) {
+				throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, buildContext.getEventContext() );
+			}
 		}
 
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSearchable, resolvedSortable, resolvedAggregable,
 				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ),
 				indexNullAsValue,
-				analyzerOrNormalizer
+				builder.indexingAnalyzerOrNormalizer()
 		);
+		builder.codec( codec );
 
-		return new LuceneIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new LuceneTextFieldPredicateBuilderFactory<>( resolvedSearchable, codec ),
-				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ),
-				new LuceneTextFieldAggregationBuilderFactory( resolvedAggregable, codec ),
-				analyzerOrNormalizer, searchAnalyzer != null ? searchAnalyzer : analyzerOrNormalizer,
-				analyzerName, searchAnalyzerName != null ? searchAnalyzerName : analyzerName,
-				normalizerName
-		);
+		builder.predicateBuilderFactory(
+				new LuceneTextFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );
+		builder.sortBuilderFactory(
+				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, codec ) );
+		builder.projectionBuilderFactory(
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
+		builder.aggregationBuilderFactory(
+				new LuceneTextFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+
+		return builder.build();
 	}
 
 	@Override
@@ -163,7 +169,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 	}
 
 	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
-		return getBuildContext().getAnalysisDefinitionRegistry();
+		return buildContext.getAnalysisDefinitionRegistry();
 	}
 
 	private boolean resolveNorms() {

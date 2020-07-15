@@ -44,28 +44,20 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 				indexNullAsValue
 		);
 
-		return new LuceneIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ),
-				createFieldSortBuilderFactory( resolvedSortable, codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ),
-				createAggregationBuilderFactory( resolvedAggregable, codec )
-		);
+		builder.predicateBuilderFactory(
+				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );
+		builder.sortBuilderFactory(
+				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, codec ) );
+		builder.projectionBuilderFactory(
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
+		builder.aggregationBuilderFactory(
+				new LuceneNumericFieldAggregationBuilderFactory<>( resolvedAggregable, codec ) );
+
+		return builder.build();
 	}
 
 	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(boolean resolvedProjectable,
 			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
 			F indexNullAsValue);
 
-	protected LuceneNumericFieldSortBuilderFactory<F, ?> createFieldSortBuilderFactory(boolean resolvedSortable,
-			AbstractLuceneNumericFieldCodec<F, ?> codec) {
-		return new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, codec );
-	}
-
-	protected LuceneNumericFieldAggregationBuilderFactory<F> createAggregationBuilderFactory(
-			boolean resolvedAggregable, AbstractLuceneNumericFieldCodec<F, ?> codec) {
-		return new LuceneNumericFieldAggregationBuilderFactory<>( resolvedAggregable, codec );
-	}
 }
