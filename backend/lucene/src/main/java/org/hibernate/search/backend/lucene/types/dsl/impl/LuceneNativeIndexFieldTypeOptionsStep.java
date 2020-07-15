@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNativeFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
@@ -40,8 +39,6 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 				new LuceneNativeFieldSortBuilderFactory<>() );
 		builder.projectionBuilderFactory(
 				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec ) );
-		builder.aggregationBuilderFactory(
-				new LuceneNativeFieldAggregationBuilderFactory<>() );
 
 		return builder.build();
 	}

@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.search.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
-import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
-import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -115,20 +113,6 @@ public interface LuceneSearchFieldContext<F> extends EventContextProvider {
 	default DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(LuceneSearchContext searchContext,
 			GeoPoint center) {
 		return type().projectionBuilderFactory().createDistanceProjectionBuilder( searchContext, this, center );
-	}
-
-	// Aggregations
-
-	default <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			Class<K> expectedType, ValueConvert convert) {
-		return type().aggregationBuilderFactory().createTermsAggregationBuilder( searchContext, this,
-				expectedType, convert );
-	}
-
-	default <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			Class<K> expectedType, ValueConvert convert) {
-		return type().aggregationBuilderFactory().createRangeAggregationBuilder( searchContext, this,
-				expectedType, convert );
 	}
 
 }

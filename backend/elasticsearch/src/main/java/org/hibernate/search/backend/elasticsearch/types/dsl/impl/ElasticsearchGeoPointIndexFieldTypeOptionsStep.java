@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchGeoPointFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchGeoPointFieldProjectionBuilderFactory;
@@ -36,8 +35,11 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ) );
 		builder.projectionBuilderFactory(
 				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new ElasticsearchGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			// No supported aggregation at the moment.
+		}
 	}
 
 	@Override

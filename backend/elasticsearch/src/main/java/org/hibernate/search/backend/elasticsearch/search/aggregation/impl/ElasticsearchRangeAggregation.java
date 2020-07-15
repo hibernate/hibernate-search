@@ -14,11 +14,13 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -72,21 +74,51 @@ public class ElasticsearchRangeAggregation<F, K>
 		return result;
 	}
 
+	public static class Factory<F>
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<TypeSelector<?>, F> {
+		public Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public TypeSelector<?> create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			return new TypeSelector<>( codec, searchContext, field );
+		}
+	}
+
+	public static class TypeSelector<F> {
+		private final ElasticsearchFieldCodec<F> codec;
+		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchFieldContext<F> field;
+
+		private TypeSelector(ElasticsearchFieldCodec<F> codec,
+				ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+			this.codec = codec;
+			this.searchContext = searchContext;
+			this.field = field;
+		}
+
+		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
+			return new Builder<>( codec, searchContext, field,
+					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
+		}
+	}
+
 	public static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final DslConverter<? super K, F> toFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
+		private final DslConverter<? super K, F> toFieldValueConverter;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
-		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
-				DslConverter<? super K, F> toFieldValueConverter,
-				ElasticsearchFieldCodec<F> codec) {
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
 			super( searchContext, field );
-			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
+			this.toFieldValueConverter = toFieldValueConverter;
 		}
 
 		@Override

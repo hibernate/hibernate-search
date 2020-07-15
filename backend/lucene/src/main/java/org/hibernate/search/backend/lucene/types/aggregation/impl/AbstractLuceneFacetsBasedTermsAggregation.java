@@ -28,6 +28,7 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * @param <F> The type of field values exposed to the mapper.
@@ -35,7 +36,7 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
  * @param <K> The type of keys in the returned map. It can be {@code F}
  * or a different type if value converters are used.
  */
-abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
+public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
 	private final ProjectionConverter<F, ? extends K> fromFieldValueConverter;
@@ -145,6 +146,18 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			result.put( key, bucket.count );
 		}
 		return result;
+	}
+
+	public abstract static class AbstractTypeSelector<F> {
+		protected final LuceneSearchContext searchContext;
+		protected final LuceneSearchFieldContext<F> field;
+
+		protected AbstractTypeSelector(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			this.searchContext = searchContext;
+			this.field = field;
+		}
+
+		public abstract <K> AbstractBuilder<F, ?, K> type(Class<K> expectedType, ValueConvert convert);
 	}
 
 	abstract static class AbstractBuilder<F, T, K>

@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
@@ -51,8 +53,12 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new LuceneNumericFieldAggregationBuilderFactory<>( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneNumericTermsAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.RANGE, new LuceneNumericRangeAggregation.Factory<>( codec ) );
+		}
 
 		return builder.build();
 	}

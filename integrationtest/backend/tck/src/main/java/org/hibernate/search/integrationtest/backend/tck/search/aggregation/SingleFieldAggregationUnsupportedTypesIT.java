@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,8 +35,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior common to all single-field aggregations (range, terms, ...)
@@ -88,13 +88,15 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 		SimpleFieldModel<F> model = index.binding().fieldModels.get( fieldType );
 		String fieldPath = model.relativeFieldName;
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> expectations.trySetup( index.createScope().aggregation(), fieldPath )
 		)
 				.isInstanceOf( SearchException.class )
-				// Example: Numeric aggregations (range) are not supported by this field's type
-				.hasMessageContaining( "aggregations" )
-				.hasMessageContaining( "are not supported by this field's type" )
+				.hasMessageContainingAll(
+						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
+						"'aggregation:" + expectations.aggregationName()
+								+ "' is not available for fields of this type"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );

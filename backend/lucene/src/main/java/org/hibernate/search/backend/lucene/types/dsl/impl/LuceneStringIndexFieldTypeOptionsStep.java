@@ -11,7 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextFieldPredicateBuilderFactory;
@@ -157,8 +158,11 @@ class LuceneStringIndexFieldTypeOptionsStep
 				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new LuceneTextFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneTextTermsAggregation.Factory( codec ) );
+		}
 
 		return builder.build();
 	}

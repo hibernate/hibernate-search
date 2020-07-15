@@ -12,7 +12,8 @@ import java.util.Locale;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchTextFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
@@ -175,8 +176,11 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 				new ElasticsearchTextFieldSortBuilderFactory( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new ElasticsearchTextFieldAggregationBuilderFactory( resolvedAggregable, codec, analyzerName != null ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
+		}
 
 		return builder.build();
 	}

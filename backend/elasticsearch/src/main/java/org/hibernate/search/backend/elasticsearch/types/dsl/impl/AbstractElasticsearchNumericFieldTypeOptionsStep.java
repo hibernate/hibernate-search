@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
@@ -31,8 +33,12 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<S extends Abstra
 				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, codec ) );
 		builder.projectionBuilderFactory(
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
-		builder.aggregationBuilderFactory(
-				new ElasticsearchStandardFieldAggregationBuilderFactory<>( resolvedAggregable, codec ) );
+
+		if ( resolvedAggregable ) {
+			builder.aggregable( true );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new ElasticsearchTermsAggregation.Factory<>( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.RANGE, new ElasticsearchRangeAggregation.Factory<>( codec ) );
+		}
 	}
 
 	protected abstract ElasticsearchFieldCodec<F> completeCodec();
