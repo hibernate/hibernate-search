@@ -11,9 +11,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigDecimalFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
@@ -21,7 +20,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
-		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchBigDecimalIndexFieldTypeOptionsStep, BigDecimal>
+		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchBigDecimalIndexFieldTypeOptionsStep, BigDecimal>
 		implements ScaledNumberIndexFieldTypeOptionsStep<ElasticsearchBigDecimalIndexFieldTypeOptionsStep, BigDecimal> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -42,9 +41,9 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<BigDecimal> complete(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<BigDecimal> completeCodec() {
 		BigDecimal scalingFactor = BigDecimal.TEN.pow( resolveDecimalScale(), new MathContext( 10, RoundingMode.HALF_UP ) );
-		mapping.setScalingFactor( scalingFactor.doubleValue() );
+		builder.mapping().setScalingFactor( scalingFactor.doubleValue() );
 
 		return new ElasticsearchBigDecimalFieldCodec( scalingFactor );
 	}
@@ -62,6 +61,6 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw log.nullDecimalScale( getBuildContext().getEventContext() );
+		throw log.nullDecimalScale( buildContext.getEventContext() );
 	}
 }

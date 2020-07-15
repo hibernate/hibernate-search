@@ -7,10 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchGeoPointFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory;
@@ -25,22 +23,21 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<GeoPoint> toIndexFieldType(PropertyMapping mapping) {
+	protected void complete() {
 		ElasticsearchGeoPointFieldCodec codec = ElasticsearchGeoPointFieldCodec.INSTANCE;
+		builder.codec( codec );
 
 		// We need doc values for the projection script when not sorting on the same field
-		mapping.setDocValues( resolvedSortable || resolvedProjectable );
+		builder.mapping().setDocValues( resolvedSortable || resolvedProjectable );
 
-		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ),
-				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ),
-				new ElasticsearchGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec ),
-				mapping
-		);
+		builder.predicateBuilderFactory(
+				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ) );
+		builder.sortBuilderFactory(
+				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ) );
+		builder.projectionBuilderFactory(
+				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ) );
+		builder.aggregationBuilderFactory(
+				new ElasticsearchGeoPointFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
 	}
 
 	@Override

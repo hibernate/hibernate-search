@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonElementFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeOptionsStep;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
@@ -24,12 +23,9 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		extends AbstractElasticsearchIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl, JsonElement>
 		implements ElasticsearchNativeIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl> {
 
-	private final PropertyMapping mapping;
-
 	ElasticsearchNativeIndexFieldTypeOptionsStepImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			PropertyMapping mapping) {
-		super( buildContext, JsonElement.class );
-		this.mapping = mapping;
+		super( buildContext, JsonElement.class, mapping );
 	}
 
 	@Override
@@ -39,19 +35,20 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 
 	@Override
 	public IndexFieldType<JsonElement> toIndexFieldType() {
-		Gson gson = getBuildContext().getUserFacingGson();
+		Gson gson = buildContext.getUserFacingGson();
 
 		ElasticsearchJsonElementFieldCodec codec = new ElasticsearchJsonElementFieldCodec( gson );
+		builder.codec( codec );
 
-		return new ElasticsearchIndexFieldType<>(
-				getFieldType(), codec,
-				createDslConverter(), createRawDslConverter(),
-				createProjectionConverter(), createRawProjectionConverter(),
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( true, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, codec ),
-				new ElasticsearchStandardFieldAggregationBuilderFactory<>( true, codec ),
-				mapping
-		);
+		builder.predicateBuilderFactory(
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, codec ) );
+		builder.sortBuilderFactory(
+				new ElasticsearchStandardFieldSortBuilderFactory<>( true, codec ) );
+		builder.projectionBuilderFactory(
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, codec ) );
+		builder.aggregationBuilderFactory(
+				new ElasticsearchStandardFieldAggregationBuilderFactory<>( true, codec ) );
+
+		return builder.build();
 	}
 }

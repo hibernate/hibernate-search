@@ -7,19 +7,18 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchDoubleFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 
 class ElasticsearchDoubleIndexFieldTypeOptionsStep
-		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchDoubleIndexFieldTypeOptionsStep, Double> {
+		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchDoubleIndexFieldTypeOptionsStep, Double> {
 
 	ElasticsearchDoubleIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, Double.class, DataTypes.DOUBLE );
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Double> complete(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<Double> completeCodec() {
 		return ElasticsearchDoubleFieldCodec.INSTANCE;
 	}
 

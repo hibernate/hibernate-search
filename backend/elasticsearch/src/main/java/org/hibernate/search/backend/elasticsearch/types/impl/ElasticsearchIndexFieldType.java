@@ -17,69 +17,49 @@ import org.hibernate.search.backend.elasticsearch.types.projection.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 public class ElasticsearchIndexFieldType<F>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchFieldTypeContext<F> {
 	private final Class<F> valueType;
+	private final DslConverter<F, ? extends F> rawDslConverter;
+	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+
 	private final ElasticsearchFieldCodec<F> codec;
 	private final DslConverter<?, ? extends F> dslConverter;
-	private final DslConverter<F, ? extends F> rawDslConverter;
 	private final ProjectionConverter<? super F, ?> projectionConverter;
-	private final ProjectionConverter<? super F, F> rawProjectionConverter;
+
 	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
 	private final ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
 	private final ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
-	private final PropertyMapping mapping;
+
 	private final String analyzerName;
 	private final String searchAnalyzerName;
 	private final String normalizerName;
 
-	public ElasticsearchIndexFieldType(Class<F> valueType,
-			ElasticsearchFieldCodec<F> codec,
-			DslConverter<?, ? extends F> dslConverter,
-			DslConverter<F, ? extends F> rawDslConverter,
-			ProjectionConverter<? super F, ?> projectionConverter,
-			ProjectionConverter<? super F, F> rawProjectionConverter,
-			ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory,
-			ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory,
-			ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory,
-			ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory,
-			PropertyMapping mapping) {
-		this( valueType, codec, dslConverter, rawDslConverter, projectionConverter, rawProjectionConverter,
-				predicateBuilderFactory, sortBuilderFactory, projectionBuilderFactory,
-				aggregationBuilderFactory,
-				mapping, null, null, null );
-	}
+	private final PropertyMapping mapping;
 
-	public ElasticsearchIndexFieldType(Class<F> valueType,
-			ElasticsearchFieldCodec<F> codec,
-			DslConverter<?, ? extends F> dslConverter,
-			DslConverter<F, ? extends F> rawDslConverter,
-			ProjectionConverter<? super F, ?> projectionConverter,
-			ProjectionConverter<? super F, F> rawProjectionConverter,
-			ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory,
-			ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory,
-			ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory,
-			ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory,
-			PropertyMapping mapping,
-			String analyzerName, String searchAnalyzerName, String normalizerName) {
-		this.valueType = valueType;
-		this.codec = codec;
-		this.dslConverter = dslConverter;
-		this.rawDslConverter = rawDslConverter;
-		this.projectionConverter = projectionConverter;
-		this.rawProjectionConverter = rawProjectionConverter;
-		this.predicateBuilderFactory = predicateBuilderFactory;
-		this.sortBuilderFactory = sortBuilderFactory;
-		this.projectionBuilderFactory = projectionBuilderFactory;
-		this.aggregationBuilderFactory = aggregationBuilderFactory;
-		this.mapping = mapping;
-		this.analyzerName = analyzerName;
-		this.searchAnalyzerName = searchAnalyzerName;
-		this.normalizerName = normalizerName;
+	public ElasticsearchIndexFieldType(Builder<F> builder) {
+		this.valueType = builder.valueType;
+		this.rawDslConverter = builder.rawDslConverter;
+		this.rawProjectionConverter = builder.rawProjectionConverter;
+		this.codec = builder.codec;
+		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
+		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
+		this.predicateBuilderFactory = builder.predicateBuilderFactory;
+		this.sortBuilderFactory = builder.sortBuilderFactory;
+		this.projectionBuilderFactory = builder.projectionBuilderFactory;
+		this.aggregationBuilderFactory = builder.aggregationBuilderFactory;
+		this.analyzerName = builder.analyzerName;
+		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName : builder.analyzerName;
+		this.normalizerName = builder.normalizerName;
+		this.mapping = builder.mapping;
 	}
 
 	@Override
@@ -183,5 +163,90 @@ public class ElasticsearchIndexFieldType<F>
 
 	public PropertyMapping mapping() {
 		return mapping;
+	}
+
+	public static class Builder<F> {
+
+		private final Class<F> valueType;
+		private final DslConverter<F, ? extends F> rawDslConverter;
+		private final ProjectionConverter<? super F, F> rawProjectionConverter;
+
+		private ElasticsearchFieldCodec<F> codec;
+		private DslConverter<?, ? extends F> dslConverter;
+		private ProjectionConverter<? super F, ?> projectionConverter;
+
+		private ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
+		private ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
+		private ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
+		private ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory;
+
+		private String analyzerName;
+		private String searchAnalyzerName;
+		private String normalizerName;
+
+		private final PropertyMapping mapping;
+
+		public Builder(Class<F> valueType, PropertyMapping mapping) {
+			this.valueType = valueType;
+			this.rawDslConverter = new DslConverter<>( valueType, new PassThroughToDocumentFieldValueConverter<>() );
+			this.rawProjectionConverter = new ProjectionConverter<>( valueType, new PassThroughFromDocumentFieldValueConverter<>() );
+			this.mapping = mapping;
+		}
+
+		public Class<F> valueType() {
+			return valueType;
+		}
+
+		public void codec(ElasticsearchFieldCodec<F> codec) {
+			this.codec = codec;
+		}
+
+		public ElasticsearchFieldCodec<F> codec() {
+			return codec;
+		}
+
+		public <V> void dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
+			this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
+		}
+
+		public <V> void projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
+			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
+		}
+
+		public void predicateBuilderFactory(ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory) {
+			this.predicateBuilderFactory = predicateBuilderFactory;
+		}
+
+		public void sortBuilderFactory(ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory) {
+			this.sortBuilderFactory = sortBuilderFactory;
+		}
+
+		public void projectionBuilderFactory(ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory) {
+			this.projectionBuilderFactory = projectionBuilderFactory;
+		}
+
+		public void aggregationBuilderFactory(ElasticsearchFieldAggregationBuilderFactory<F> aggregationBuilderFactory) {
+			this.aggregationBuilderFactory = aggregationBuilderFactory;
+		}
+
+		public void analyzerName(String analyzerName) {
+			this.analyzerName = analyzerName;
+		}
+
+		public void searchAnalyzerName(String searchAnalyzerName) {
+			this.searchAnalyzerName = searchAnalyzerName;
+		}
+
+		public void normalizerName(String normalizerName) {
+			this.normalizerName = normalizerName;
+		}
+
+		public PropertyMapping mapping() {
+			return mapping;
+		}
+
+		public ElasticsearchIndexFieldType<F> build() {
+			return new ElasticsearchIndexFieldType<>( this );
+		}
 	}
 }

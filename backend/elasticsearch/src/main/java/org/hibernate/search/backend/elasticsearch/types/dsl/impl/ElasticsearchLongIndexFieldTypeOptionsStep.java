@@ -7,19 +7,18 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLongFieldCodec;
 
 class ElasticsearchLongIndexFieldTypeOptionsStep
-		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchLongIndexFieldTypeOptionsStep, Long> {
+		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchLongIndexFieldTypeOptionsStep, Long> {
 
 	ElasticsearchLongIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, Long.class, DataTypes.LONG );
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<Long> complete(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<Long> completeCodec() {
 		return ElasticsearchLongFieldCodec.INSTANCE;
 	}
 

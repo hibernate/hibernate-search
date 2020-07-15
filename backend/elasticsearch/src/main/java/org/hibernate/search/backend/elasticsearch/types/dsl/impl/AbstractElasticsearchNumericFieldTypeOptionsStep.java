@@ -6,24 +6,23 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchBooleanFieldAggregationBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBooleanFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 
-class ElasticsearchBooleanIndexFieldTypeOptionsStep
-		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<ElasticsearchBooleanIndexFieldTypeOptionsStep, Boolean> {
+abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<S extends AbstractElasticsearchNumericFieldTypeOptionsStep<?, F>, F>
+		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
 
-	ElasticsearchBooleanIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Boolean.class, DataTypes.BOOLEAN );
+	AbstractElasticsearchNumericFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			Class<F> fieldType, String dataType) {
+		super( buildContext, fieldType, dataType );
 	}
 
 	@Override
-	protected void complete() {
-		ElasticsearchFieldCodec<Boolean> codec = ElasticsearchBooleanFieldCodec.INSTANCE;
+	protected final void complete() {
+		ElasticsearchFieldCodec<F> codec = completeCodec();
 		builder.codec( codec );
 
 		builder.predicateBuilderFactory(
@@ -33,12 +32,8 @@ class ElasticsearchBooleanIndexFieldTypeOptionsStep
 		builder.projectionBuilderFactory(
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
 		builder.aggregationBuilderFactory(
-				new ElasticsearchBooleanFieldAggregationBuilderFactory( resolvedAggregable, codec ) );
+				new ElasticsearchStandardFieldAggregationBuilderFactory<>( resolvedAggregable, codec ) );
 	}
 
-	@Override
-	protected ElasticsearchBooleanIndexFieldTypeOptionsStep thisAsS() {
-		return this;
-	}
-
+	protected abstract ElasticsearchFieldCodec<F> completeCodec();
 }

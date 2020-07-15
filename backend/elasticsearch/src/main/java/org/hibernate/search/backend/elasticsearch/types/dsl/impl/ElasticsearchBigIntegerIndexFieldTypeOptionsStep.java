@@ -12,9 +12,8 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBigIntegerFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
@@ -22,7 +21,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
-		extends AbstractElasticsearchScalarFieldTypeOptionsStep<ElasticsearchBigIntegerIndexFieldTypeOptionsStep, BigInteger>
+		extends AbstractElasticsearchNumericFieldTypeOptionsStep<ElasticsearchBigIntegerIndexFieldTypeOptionsStep, BigInteger>
 		implements ScaledNumberIndexFieldTypeOptionsStep<ElasticsearchBigIntegerIndexFieldTypeOptionsStep, BigInteger> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -43,15 +42,15 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected ElasticsearchFieldCodec<BigInteger> complete(PropertyMapping mapping) {
+	protected ElasticsearchFieldCodec<BigInteger> completeCodec() {
 		int resolvedDecimalScale = resolveDecimalScale();
 
 		if ( resolvedDecimalScale > 0 ) {
-			throw log.invalidDecimalScale( resolvedDecimalScale, getBuildContext().getEventContext() );
+			throw log.invalidDecimalScale( resolvedDecimalScale, buildContext.getEventContext() );
 		}
 
 		BigDecimal scalingFactor = BigDecimal.TEN.pow( resolvedDecimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
-		mapping.setScalingFactor( scalingFactor.doubleValue() );
+		builder.mapping().setScalingFactor( scalingFactor.doubleValue() );
 
 		return new ElasticsearchBigIntegerFieldCodec( scalingFactor );
 	}
@@ -69,6 +68,6 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 			return defaultsProvider.decimalScale();
 		}
 
-		throw log.nullDecimalScale( getBuildContext().getEventContext() );
+		throw log.nullDecimalScale( buildContext.getEventContext() );
 	}
 }
