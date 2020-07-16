@@ -11,9 +11,11 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -31,7 +33,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 	private final GeoPoint center;
 
-	public ElasticsearchDistanceSort(Builder builder) {
+	private ElasticsearchDistanceSort(Builder builder) {
 		super( builder );
 		center = builder.center;
 	}
@@ -45,12 +47,28 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 		collector.collectDistanceSort( outerObject, absoluteFieldPath, center );
 	}
 
-	public static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
-		private final GeoPoint center;
+	public static class Factory
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
+		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
+			super( codec );
+		}
 
-		public Builder(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<GeoPoint> field, GeoPoint center) {
+		@Override
+		public DistanceSortBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<GeoPoint> field) {
+			return new Builder( searchContext, field );
+		}
+	}
+
+	private static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
+		private GeoPoint center;
+
+		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 			super( searchContext, field );
+		}
+
+		@Override
+		public void center(GeoPoint center) {
 			this.center = center;
 		}
 

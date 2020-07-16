@@ -11,6 +11,7 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
@@ -36,7 +37,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 	private final JsonElement missing;
 
-	public ElasticsearchStandardFieldSort(Builder<?> builder) {
+	private ElasticsearchStandardFieldSort(Builder<?> builder) {
 		super( builder );
 		missing = builder.missing;
 	}
@@ -57,13 +58,25 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 	}
 
-	public static class Builder<F> extends AbstractBuilder<F> implements FieldSortBuilder {
+	public static class Factory<F>
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<FieldSortBuilder, F> {
+		public Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder<F> create(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+			return new Builder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class Builder<F> extends AbstractBuilder<F> implements FieldSortBuilder {
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonElement missing;
 
-		public Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
-				ElasticsearchFieldCodec<F> codec) {
+		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}
@@ -96,10 +109,22 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 	}
 
-	public static class TemporalFieldBuilder<F extends TemporalAccessor> extends Builder<F> {
-		public TemporalFieldBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
-				ElasticsearchFieldCodec<F> codec) {
-			super( searchContext, field, codec );
+	public static class TemporalFieldFactory<F extends TemporalAccessor> extends Factory<F> {
+		public TemporalFieldFactory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public TemporalFieldBuilder<F> create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			return new TemporalFieldBuilder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class TemporalFieldBuilder<F extends TemporalAccessor> extends Builder<F> {
+		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			super( codec, searchContext, field );
 		}
 
 		@Override
@@ -118,10 +143,22 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 	}
 
-	public static class TextFieldBuilder extends Builder<String> {
-		public TextFieldBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field,
-				ElasticsearchFieldCodec<String> codec) {
-			super( searchContext, field, codec );
+	public static class TextFieldFactory extends Factory<String> {
+		public TextFieldFactory(ElasticsearchFieldCodec<String> codec) {
+			super( codec );
+		}
+
+		@Override
+		public TextFieldBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<String> field) {
+			return new TextFieldBuilder( codec, searchContext, field );
+		}
+	}
+
+	private static class TextFieldBuilder extends Builder<String> {
+		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<String> field) {
+			super( codec, searchContext, field );
 		}
 
 		@Override

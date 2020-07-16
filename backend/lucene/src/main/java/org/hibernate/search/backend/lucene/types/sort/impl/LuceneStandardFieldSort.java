@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -28,12 +29,19 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.SortField;
 
-class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
+public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected LuceneStandardFieldSort(AbstractBuilder builder) {
+	private LuceneStandardFieldSort(AbstractBuilder builder) {
 		super( builder );
+	}
+
+	abstract static class AbstractFactory<F, E, C extends LuceneStandardFieldCodec<F, E>>
+			extends AbstractLuceneSearchFieldQueryElementFactory<FieldSortBuilder, F, C> {
+		protected AbstractFactory(C codec) {
+			super( codec );
+		}
 	}
 
 	/**
@@ -110,10 +118,22 @@ class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 	}
 
-	public static class NumericFieldBuilder<F, E extends Number>
+	public static class NumericFieldFactory<F, E extends Number>
+			extends AbstractFactory<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
+		public NumericFieldFactory(AbstractLuceneNumericFieldCodec<F, E> codec) {
+			super( codec );
+		}
+
+		@Override
+		public FieldSortBuilder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new NumericFieldBuilder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class NumericFieldBuilder<F, E extends Number>
 			extends AbstractBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
-		NumericFieldBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				AbstractLuceneNumericFieldCodec<F, E> codec) {
+		private NumericFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field) {
 			super( searchContext, field, codec, codec.getDomain().getMinValue(), codec.getDomain().getMaxValue() );
 		}
 
@@ -124,9 +144,21 @@ class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 	}
 
-	public static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneTextFieldCodec<F>> {
-		TextFieldBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				LuceneTextFieldCodec<F> codec) {
+	public static class TextFieldFactory<F>
+			extends AbstractFactory<F, String, LuceneTextFieldCodec<F>> {
+		public TextFieldFactory(LuceneTextFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public FieldSortBuilder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new TextFieldBuilder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneTextFieldCodec<F>> {
+		private TextFieldBuilder(LuceneTextFieldCodec<F> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field) {
 			super( searchContext, field, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 		}
 
@@ -157,11 +189,23 @@ class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 	}
 
-	public static class TemporalFieldBuilder<F extends TemporalAccessor, E extends Number>
+	public static class TemporalFieldFactory<F extends TemporalAccessor, E extends Number>
+			extends AbstractFactory<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
+		public TemporalFieldFactory(AbstractLuceneNumericFieldCodec<F, E> codec) {
+			super( codec );
+		}
+
+		@Override
+		public FieldSortBuilder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new TemporalFieldBuilder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class TemporalFieldBuilder<F extends TemporalAccessor, E extends Number>
 			extends NumericFieldBuilder<F, E> {
-		TemporalFieldBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext, field, codec );
+		private TemporalFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field) {
+			super( codec, searchContext, field );
 		}
 
 		@Override

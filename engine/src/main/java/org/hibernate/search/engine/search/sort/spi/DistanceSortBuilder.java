@@ -9,8 +9,11 @@ package org.hibernate.search.engine.search.sort.spi;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface DistanceSortBuilder extends SearchSortBuilder {
+
+	void center(GeoPoint center);
 
 	void order(SortOrder order);
 

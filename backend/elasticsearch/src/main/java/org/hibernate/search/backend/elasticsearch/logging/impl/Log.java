@@ -333,10 +333,6 @@ public interface Log extends BasicLogger {
 			value = "Spatial predicates are not supported by this field's type.")
 	SearchException spatialPredicatesNotSupportedByFieldType(@Param EventContext context);
 
-	@Message(id = ID_OFFSET_3 + 28,
-			value = "Distance related operations are not supported by this field's type.")
-	SearchException distanceOperationsNotSupportedByFieldType(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 29,
 			value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
 	SearchException minimumShouldMatchConflictingConstraints(int ceiling);
@@ -384,10 +380,6 @@ public interface Log extends BasicLogger {
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
-	@Message(id = ID_OFFSET_3 + 40,
-			value = "Traditional sorting operations are not supported by the GeoPoint field type, use distance sorting instead.")
-	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 41,
 			value = "Multiple conflicting types for field '%1$s', attribute '%2$s' was different: '%3$s' vs. '%4$s'.")
 	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, String attributeName, Object component1, Object component2,
@@ -398,10 +390,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 45, value = "Cannot guess field type for input type %1$s.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 48,
-			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
-	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 49,
 			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
 import java.util.ArrayList;
@@ -45,8 +46,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
@@ -167,12 +166,14 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath();
 
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 				scope.sort().field( fieldPath );
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Sorting is not enabled for field" )
-				.hasMessageContaining( fieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'sort:field' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 	}
 
 	@Test
@@ -182,7 +183,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		String absoluteFieldPath = getFieldPath();
 		Object invalidValueToMatch = new InvalidType();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath ).missing()
 						.use( invalidValueToMatch ),
 				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath
@@ -203,7 +204,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		String absoluteFieldPath = getFieldWithDslConverterPath();
 		Object invalidValueToMatch = new InvalidType();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath ).missing()
 						.use( invalidValueToMatch ),
 				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath
@@ -247,7 +248,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 							.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ), scope );
@@ -291,7 +292,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ), scope );
 				}
@@ -310,7 +311,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ), scope );
 				}

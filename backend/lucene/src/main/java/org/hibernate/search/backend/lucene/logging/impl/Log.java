@@ -300,14 +300,6 @@ public interface Log extends BasicLogger {
 			value = "Spatial predicates are not supported by this field's type.")
 	SearchException spatialPredicatesNotSupportedByFieldType(@Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 41,
-			value = "Distance related operations are not supported by this field's type.")
-	SearchException distanceOperationsNotSupportedByFieldType(@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 42,
-			value = "Traditional sorting operations are not supported by the GeoPoint field type, use distance sorting instead.")
-	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 44,
 			value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
 					+ " expected a number between '1' and '%1$s', got '%2$s'.")
@@ -320,10 +312,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 46,
 			value = "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query.")
 	SearchException unsupportedDSLPredicatesForNativeField(@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 47,
-			value = "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort.")
-	SearchException unsupportedDSLSortsForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 48,
 			value = "This native field does not support projection.")
@@ -374,10 +362,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 64, value = "Unexpected index: documentId '%1$s' was not collected." )
 	SearchException documentIdNotCollected(Integer documentId);
-
-	@Message(id = ID_OFFSET_2 + 66,
-			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
-	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 67, value = "Unable to delete all entries matching query '%1$s'.")
 	SearchException unableToDeleteAllEntriesFromIndex(Query query, @Param EventContext context, @Cause Exception e);

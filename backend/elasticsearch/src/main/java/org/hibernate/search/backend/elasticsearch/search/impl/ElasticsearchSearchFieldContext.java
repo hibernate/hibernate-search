@@ -16,9 +16,6 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
-import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
@@ -78,18 +75,6 @@ public interface ElasticsearchSearchFieldContext<F> extends EventContextProvider
 	default SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
 			ElasticsearchSearchContext searchContext) {
 		return type().predicateBuilderFactory().createSpatialWithinBoundingBoxPredicateBuilder( searchContext, this );
-	}
-
-	// Sorts
-
-	default FieldSortBuilder createFieldSortBuilder(
-			ElasticsearchSearchContext searchContext) {
-		return type().sortBuilderFactory().createFieldSortBuilder( searchContext, this );
-	}
-
-	default DistanceSortBuilder createDistanceSortBuilder(
-			ElasticsearchSearchContext searchContext, GeoPoint center) {
-		return type().sortBuilderFactory().createDistanceSortBuilder( searchContext, this, center );
 	}
 
 }

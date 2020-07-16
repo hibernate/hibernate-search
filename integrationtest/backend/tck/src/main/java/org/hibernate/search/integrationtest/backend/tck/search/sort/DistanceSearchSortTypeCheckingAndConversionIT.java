@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
@@ -37,8 +38,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior related to type checking and type conversion of DSL arguments
@@ -95,12 +94,14 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 		StubMappingScope scope = mainIndex.createScope();
 		String fieldPath = getNonSortableFieldPath();
 
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 				scope.sort().distance( fieldPath, CENTER_POINT );
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Sorting is not enabled for field" )
-				.hasMessageContaining( fieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'sort:distance' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 	}
 
 	@Test
@@ -145,7 +146,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.distance( fieldPath, CENTER_POINT ), scope );
 				}
@@ -164,7 +165,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.distance( fieldPath, CENTER_POINT ), scope );
 				}

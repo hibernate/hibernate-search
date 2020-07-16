@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class StubSortBuilder implements ScoreSortBuilder,
 		FieldSortBuilder, DistanceSortBuilder, CompositeSortBuilder {
@@ -36,6 +37,11 @@ public class StubSortBuilder implements ScoreSortBuilder,
 
 	@Override
 	public void missingAs(Object value, ValueConvert convert) {
+		// No-op
+	}
+
+	@Override
+	public void center(GeoPoint center) {
 		// No-op
 	}
 

@@ -16,9 +16,10 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.Aggreg
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTypeKeys;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchTextFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Norms;
@@ -173,8 +174,11 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 		builder.predicateBuilderFactory(
 				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, codec, mapping.getType() ) );
-		builder.sortBuilderFactory(
-				new ElasticsearchTextFieldSortBuilderFactory( resolvedSortable, codec ) );
+
+		if ( resolvedSortable ) {
+			builder.sortable( true );
+			builder.queryElementFactory( SortTypeKeys.FIELD, new ElasticsearchStandardFieldSort.TextFieldFactory( codec ) );
+		}
 
 		if ( resolvedProjectable ) {
 			builder.projectable( true );
