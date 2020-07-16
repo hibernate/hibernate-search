@@ -399,10 +399,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 45, value = "Cannot guess field type for input type %1$s.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_3 + 47,
-			value = "Projections are not enabled for field '%1$s'. Make sure the field is marked as projectable.")
-	SearchException nonProjectableField(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 48,
 			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
 	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);

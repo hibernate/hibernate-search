@@ -21,8 +21,9 @@ public class DistanceToFieldProjectionValueStepImpl
 
 	DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
 			GeoPoint center) {
-		super( dslContext.builderFactory().distance( absoluteFieldPath, center ),
+		super( dslContext.builderFactory().distance( absoluteFieldPath ),
 				SingleValuedProjectionAccumulator.provider() );
+		distanceFieldProjectionBuilder.center( center );
 	}
 
 	@Override

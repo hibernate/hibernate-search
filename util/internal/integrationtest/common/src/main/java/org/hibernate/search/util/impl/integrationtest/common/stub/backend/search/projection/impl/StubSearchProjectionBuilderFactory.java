@@ -93,11 +93,16 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
 		return new DistanceToFieldProjectionBuilder() {
 			@Override
-			public DistanceToFieldProjectionBuilder unit(DistanceUnit unit) {
-				return this;
+			public void center(GeoPoint center) {
+				// No-op
+			}
+
+			@Override
+			public void unit(DistanceUnit unit) {
+				// No-op
 			}
 
 			@Override

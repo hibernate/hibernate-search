@@ -83,8 +83,10 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 		assertThatThrownBy( () -> scope.projection()
 				.distance( fieldPath, CENTER_POINT_1 ).toProjection() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Projections are not enabled for field" )
-				.hasMessageContaining( fieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 	}
 
 	@Test

@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -37,13 +36,13 @@ public class ElasticsearchIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final boolean projectable;
 	private final boolean aggregable;
 
 	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>> queryElementFactories;
 
 	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
-	private final ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
 
 	private final String analyzerName;
 	private final String searchAnalyzerName;
@@ -58,11 +57,11 @@ public class ElasticsearchIndexFieldType<F>
 		this.codec = builder.codec;
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
+		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
 		this.queryElementFactories = builder.queryElementFactories;
 		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.sortBuilderFactory = builder.sortBuilderFactory;
-		this.projectionBuilderFactory = builder.projectionBuilderFactory;
 		this.analyzerName = builder.analyzerName;
 		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName : builder.analyzerName;
 		this.normalizerName = builder.normalizerName;
@@ -98,7 +97,7 @@ public class ElasticsearchIndexFieldType<F>
 
 	@Override
 	public boolean projectable() {
-		return projectionBuilderFactory.isProjectable();
+		return projectable;
 	}
 
 	@Override
@@ -167,11 +166,6 @@ public class ElasticsearchIndexFieldType<F>
 		return sortBuilderFactory;
 	}
 
-	@Override
-	public ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory() {
-		return projectionBuilderFactory;
-	}
-
 	public PropertyMapping mapping() {
 		return mapping;
 	}
@@ -186,6 +180,7 @@ public class ElasticsearchIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private boolean projectable;
 		private boolean aggregable;
 
 		private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>>
@@ -193,7 +188,6 @@ public class ElasticsearchIndexFieldType<F>
 
 		private ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory;
-		private ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory;
 
 		private String analyzerName;
 		private String searchAnalyzerName;
@@ -228,6 +222,10 @@ public class ElasticsearchIndexFieldType<F>
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
+		public void projectable(boolean projectable) {
+			this.projectable = projectable;
+		}
+
 		public void aggregable(boolean aggregable) {
 			this.aggregable = aggregable;
 		}
@@ -243,10 +241,6 @@ public class ElasticsearchIndexFieldType<F>
 
 		public void sortBuilderFactory(ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory) {
 			this.sortBuilderFactory = sortBuilderFactory;
-		}
-
-		public void projectionBuilderFactory(ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory) {
-			this.projectionBuilderFactory = projectionBuilderFactory;
 		}
 
 		public void analyzerName(String analyzerName) {

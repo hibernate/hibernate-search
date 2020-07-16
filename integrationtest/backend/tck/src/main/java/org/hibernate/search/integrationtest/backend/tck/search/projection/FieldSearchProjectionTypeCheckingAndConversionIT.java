@@ -158,8 +158,10 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		assertThatThrownBy( () -> scope.projection()
 				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Projections are not enabled for field" )
-				.hasMessageContaining( fieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'projection:field' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 	}
 
 	@Test

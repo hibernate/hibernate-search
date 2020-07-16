@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -17,8 +16,6 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -93,19 +90,6 @@ public interface ElasticsearchSearchFieldContext<F> extends EventContextProvider
 	default DistanceSortBuilder createDistanceSortBuilder(
 			ElasticsearchSearchContext searchContext, GeoPoint center) {
 		return type().sortBuilderFactory().createDistanceSortBuilder( searchContext, this, center );
-	}
-
-	// Projections
-
-	default <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(ElasticsearchSearchContext searchContext,
-			Class<T> expectedType, ValueConvert convert) {
-		return type().projectionBuilderFactory().createFieldValueProjectionBuilder( searchContext, this,
-				expectedType, convert );
-	}
-
-	default DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(ElasticsearchSearchContext searchContext,
-			GeoPoint center) {
-		return type().projectionBuilderFactory().createDistanceProjectionBuilder( searchContext, this, center );
 	}
 
 }

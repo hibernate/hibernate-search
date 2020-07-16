@@ -17,11 +17,13 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -155,24 +157,54 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		return childElement.getAsJsonObject();
 	}
 
+	public static class Factory<F>
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<TypeSelector<?>, F> {
+		public Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public TypeSelector<?> create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			return new TypeSelector<>( codec, searchContext, field );
+		}
+	}
+
+	public static class TypeSelector<F> {
+		private final ElasticsearchFieldCodec<F> codec;
+		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchFieldContext<F> field;
+
+		private TypeSelector(ElasticsearchFieldCodec<F> codec,
+				ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+			this.codec = codec;
+			this.searchContext = searchContext;
+			this.field = field;
+		}
+
+		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
+			return new Builder<>( codec, searchContext, field,
+					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+		}
+	}
+
 	public static class Builder<F, V> implements FieldProjectionBuilder<V> {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+		private final ElasticsearchFieldCodec<F> codec;
 
 		private final ElasticsearchSearchContext searchContext;
 		private final ElasticsearchSearchFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
-		private final ElasticsearchFieldCodec<F> codec;
 
-		public Builder(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field,
-				ProjectionConverter<F, ? extends V> converter,
-				ElasticsearchFieldCodec<F> codec) {
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
+			this.codec = codec;
 			this.searchContext = searchContext;
 			this.field = field;
 			this.converter = converter;
-			this.codec = codec;
 		}
 
 		@Override

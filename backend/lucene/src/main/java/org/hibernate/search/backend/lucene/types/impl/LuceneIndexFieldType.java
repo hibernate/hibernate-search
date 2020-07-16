@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldTypeCont
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -38,13 +37,13 @@ public class LuceneIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final boolean projectable;
 	private final boolean aggregable;
 
 	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>> queryElementFactories;
 
 	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 	private final LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
-	private final LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
 
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
@@ -60,11 +59,11 @@ public class LuceneIndexFieldType<F>
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter
 				: rawProjectionConverter;
+		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
 		this.queryElementFactories = builder.queryElementFactories;
 		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.sortBuilderFactory = builder.sortBuilderFactory;
-		this.projectionBuilderFactory = builder.projectionBuilderFactory;
 		this.indexingAnalyzerOrNormalizer = builder.indexingAnalyzerOrNormalizer();
 		this.searchAnalyzerOrNormalizer = builder.searchAnalyzer != null ? builder.searchAnalyzer
 				: indexingAnalyzerOrNormalizer;
@@ -106,7 +105,7 @@ public class LuceneIndexFieldType<F>
 
 	@Override
 	public boolean projectable() {
-		return projectionBuilderFactory.isProjectable();
+		return projectable;
 	}
 
 	@Override
@@ -175,11 +174,6 @@ public class LuceneIndexFieldType<F>
 		return sortBuilderFactory;
 	}
 
-	@Override
-	public LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory() {
-		return projectionBuilderFactory;
-	}
-
 	public Analyzer indexingAnalyzerOrNormalizer() {
 		return indexingAnalyzerOrNormalizer;
 	}
@@ -199,6 +193,7 @@ public class LuceneIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private boolean projectable;
 		private boolean aggregable;
 
 		private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>>
@@ -206,7 +201,6 @@ public class LuceneIndexFieldType<F>
 
 		private LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 		private LuceneFieldSortBuilderFactory<F> sortBuilderFactory;
-		private LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory;
 
 		private Analyzer analyzer;
 		private String analyzerName;
@@ -235,6 +229,10 @@ public class LuceneIndexFieldType<F>
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
+		public void projectable(boolean projectable) {
+			this.projectable = projectable;
+		}
+
 		public void aggregable(boolean aggregable) {
 			this.aggregable = aggregable;
 		}
@@ -250,10 +248,6 @@ public class LuceneIndexFieldType<F>
 
 		public void sortBuilderFactory(LuceneFieldSortBuilderFactory<F> sortBuilderFactory) {
 			this.sortBuilderFactory = sortBuilderFactory;
-		}
-
-		public void projectionBuilderFactory(LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory) {
-			this.projectionBuilderFactory = projectionBuilderFactory;
 		}
 
 		public void analyzer(String analyzerName, Analyzer analyzer) {

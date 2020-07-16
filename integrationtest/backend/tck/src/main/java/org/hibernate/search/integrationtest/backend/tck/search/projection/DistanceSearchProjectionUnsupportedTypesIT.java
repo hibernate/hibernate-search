@@ -73,7 +73,10 @@ public class DistanceSearchProjectionUnsupportedTypesIT<F> {
 				() -> scope.projection().distance( absoluteFieldPath, GeoPoint.of( 42.0, 45.0 ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Distance related operations are not supported", absoluteFieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'projection:distance' on field '" + absoluteFieldPath + "'",
+						"'projection:distance' is not available for fields of this type"
+				);
 	}
 
 	private String getFieldPath() {
