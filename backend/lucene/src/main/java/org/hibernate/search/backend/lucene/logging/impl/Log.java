@@ -138,16 +138,6 @@ public interface Log extends BasicLogger {
 			value = "An exception occurred while opening multiple indexes." )
 	SearchException failureOnMultiReaderRefresh(@Param EventContext context, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_1 + 320,
-			value = "Could not normalize value for field '%1$s'.")
-	SearchException couldNotNormalizeField(String absoluteFieldPath, @Cause Exception cause);
-
-	@LogMessage(level = Level.WARN)
-	@Message(id = ID_OFFSET_1 + 321,
-			value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
-			+ " (synonyms) should not be used on sortable fields or range queries. Only the first token will be considered.")
-	void multipleTermsDetectedDuringNormalization(String absoluteFieldPath);
-
 	@Message(id = ID_OFFSET_1 + 329,
 			value = "Error while applying analysis configuration: %1$s")
 	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e);
@@ -242,17 +232,9 @@ public interface Log extends BasicLogger {
 	SearchException unableToDeleteEntryFromIndex(String tenantId, String entityTypeName, Object entityIdentifier,
 			@Param EventContext context, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_2 + 18,
-			value = "Unable to flush.")
-	SearchException unableToFlushIndex(@Param EventContext context, @Cause Exception e);
-
 	@Message(id = ID_OFFSET_2 + 19,
 			value = "Unable to commit.")
 	SearchException unableToCommitIndex(@Param EventContext context, @Cause Exception e);
-
-	@Message(id = ID_OFFSET_2 + 22,
-			value = "Unable to refresh.")
-	SearchException unableToRefreshIndex(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 24,
 			value = "A multi-index scope cannot include both a Lucene index and another type of index."
