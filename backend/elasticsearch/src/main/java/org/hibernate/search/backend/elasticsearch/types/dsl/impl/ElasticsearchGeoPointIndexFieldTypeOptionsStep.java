@@ -10,9 +10,10 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Da
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTypeKeys;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchDistanceSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
@@ -33,8 +34,11 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 
 		builder.predicateBuilderFactory(
 				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ) );
-		builder.sortBuilderFactory(
-				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ) );
+
+		if ( resolvedSortable ) {
+			builder.sortable( true );
+			builder.queryElementFactory( SortTypeKeys.DISTANCE, new ElasticsearchDistanceSort.Factory( codec ) );
+		}
 
 		if ( resolvedProjectable ) {
 			builder.projectable( true );

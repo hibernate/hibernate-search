@@ -14,11 +14,12 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstant
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
+import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneTextFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -155,8 +156,11 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 		builder.predicateBuilderFactory(
 				new LuceneTextFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );
-		builder.sortBuilderFactory(
-				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, codec ) );
+
+		if ( resolvedSortable ) {
+			builder.sortable( true );
+			builder.queryElementFactory( SortTypeKeys.FIELD, new LuceneStandardFieldSort.TextFieldFactory<>( codec ) );
+		}
 
 		if ( resolvedProjectable ) {
 			builder.projectable( true );

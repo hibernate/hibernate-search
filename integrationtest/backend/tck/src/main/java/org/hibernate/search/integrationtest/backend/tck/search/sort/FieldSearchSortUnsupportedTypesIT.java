@@ -6,19 +6,22 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
@@ -70,11 +73,17 @@ public class FieldSearchSortUnsupportedTypesIT<F> {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( absoluteFieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'sort:field' on field '" + absoluteFieldPath + "'",
+						"'sort:field' is not available for fields of this type"
+				)
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+				) );
 	}
 
 	private String getFieldPath() {

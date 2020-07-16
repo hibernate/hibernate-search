@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCode
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNativeFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNativeFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 
@@ -36,8 +35,6 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 
 		builder.predicateBuilderFactory(
 				new LuceneNativeFieldPredicateBuilderFactory<>() );
-		builder.sortBuilderFactory(
-				new LuceneNativeFieldSortBuilderFactory<>() );
 
 		if ( fieldValueExtractor != null ) {
 			builder.projectable( true );

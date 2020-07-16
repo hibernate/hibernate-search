@@ -492,17 +492,19 @@ public class LuceneExtensionIT {
 	public void sort_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		assertThatThrownBy(
-				() -> scope.query()
-						.where( f -> f.matchAll() )
-						.sort( f -> f.field( "nativeField" ) )
-						.toQuery(),
-				"sort on unsupported native field"
-		)
+		String fieldPath = "nativeField";
+
+		assertThatThrownBy( () -> scope.query()
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( fieldPath ) )
+				.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort." )
+				.hasMessageContainingAll(
+						"Cannot use 'sort:field' on field '" + fieldPath + "'",
+						"'sort:field' is not available for fields of this type"
+				)
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
+						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
 	}
 

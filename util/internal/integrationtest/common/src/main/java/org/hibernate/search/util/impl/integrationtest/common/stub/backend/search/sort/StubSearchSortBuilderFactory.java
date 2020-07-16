@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 
 public class StubSearchSortBuilderFactory
@@ -40,7 +39,7 @@ public class StubSearchSortBuilderFactory
 	}
 
 	@Override
-	public DistanceSortBuilder distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortBuilder distance(String absoluteFieldPath) {
 		return new StubSortBuilder();
 	}
 

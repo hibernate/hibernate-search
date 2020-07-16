@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -65,7 +66,7 @@ public class DistanceSearchSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableNotSortable";
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				scope.query()
 						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
@@ -73,9 +74,10 @@ public class DistanceSearchSearchableSortableIT {
 
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Sorting is not enabled for field" )
-				.hasMessageContaining( "Make sure the field is marked as sortable" )
-				.hasMessageContaining( fieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'sort:distance' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
@@ -89,7 +91,7 @@ public class DistanceSearchSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "searchableDefaultSortable";
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				scope.query()
 						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
@@ -97,9 +99,10 @@ public class DistanceSearchSearchableSortableIT {
 
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Sorting is not enabled for field" )
-				.hasMessageContaining( "Make sure the field is marked as sortable" )
-				.hasMessageContaining( fieldPath );
+				.hasMessageContainingAll(
+						"Cannot use 'sort:distance' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
@@ -113,7 +116,7 @@ public class DistanceSearchSearchableSortableIT {
 		StubMappingScope scope = index.createScope();
 		String fieldPath = "notSearchableSortable";
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				scope.query()
 						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )

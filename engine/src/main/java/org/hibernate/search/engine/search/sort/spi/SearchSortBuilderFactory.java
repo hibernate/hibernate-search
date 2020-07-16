@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.sort.spi;
 
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * A factory for search sort builders.
@@ -32,7 +31,7 @@ public interface SearchSortBuilderFactory<C> {
 
 	FieldSortBuilder field(String absoluteFieldPath);
 
-	DistanceSortBuilder distance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortBuilder distance(String absoluteFieldPath);
 
 	SearchSort indexOrder();
 

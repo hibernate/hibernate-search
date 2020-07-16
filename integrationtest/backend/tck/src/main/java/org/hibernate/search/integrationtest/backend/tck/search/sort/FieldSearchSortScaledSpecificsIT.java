@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.math.BigDecimal;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -20,8 +23,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class FieldSearchSortScaledSpecificsIT {
 
@@ -42,13 +43,16 @@ public class FieldSearchSortScaledSpecificsIT {
 	public void incompatibleDecimalScale() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleDecimalScaleIndex );
 
-		Assertions.assertThatThrownBy(
+		String fieldPath = "scaledBigDecimal";
+
+		assertThatThrownBy(
 				() -> scope.query().where( f -> f.matchAll() )
-						.sort( f -> f.field( "scaledBigDecimal" ) )
+						.sort( f -> f.field( fieldPath ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'scaledBigDecimal'" )
+				.hasMessageContainingAll(
+						"Multiple conflicting implementations of 'sort:field' for field '" + fieldPath + "'"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )
 				) );
@@ -60,7 +64,7 @@ public class FieldSearchSortScaledSpecificsIT {
 		IndexBinding(IndexSchemaElement root, int scale) {
 			scaledBigDecimal = root.field(
 					"scaledBigDecimal",
-					f -> f.asBigDecimal().decimalScale( scale )
+					f -> f.asBigDecimal().decimalScale( scale ).sortable( Sortable.YES )
 			)
 					.toReference();
 		}
