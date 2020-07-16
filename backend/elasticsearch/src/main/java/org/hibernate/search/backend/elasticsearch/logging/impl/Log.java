@@ -7,8 +7,6 @@
 
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import static org.jboss.logging.Logger.Level.WARN;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -477,11 +475,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 66,
 			value = "Document with id '%1$s' does not exist in the targeted index and thus its match cannot be explained." )
 	SearchException explainUnknownDocument(URLEncodedString id);
-
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_3 + 67,
-			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
-	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
 	@Message(id = ID_OFFSET_3 + 68, value = "Impossible to detect a decimal scale to use for this field."
 			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
