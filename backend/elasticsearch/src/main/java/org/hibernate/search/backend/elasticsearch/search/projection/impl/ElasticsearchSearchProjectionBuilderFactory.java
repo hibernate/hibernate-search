@@ -25,7 +25,6 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
 import com.google.gson.JsonObject;
@@ -54,8 +53,8 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return indexes.field( absoluteFieldPath ).createFieldValueProjectionBuilder( searchContext,
-				expectedType, convert );
+		return indexes.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, searchContext )
+				.type( expectedType, convert );
 	}
 
 	@Override
@@ -74,11 +73,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
 		ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return field.createDistanceProjectionBuilder( searchContext, center );
+		return field.queryElement( ProjectionTypeKeys.DISTANCE, searchContext );
 	}
 
 	@Override

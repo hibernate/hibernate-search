@@ -8,10 +8,13 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.spatial.DistanceUnit;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilder<Double> {
 
-	DistanceToFieldProjectionBuilder unit(DistanceUnit unit);
+	void center(GeoPoint center);
+
+	void unit(DistanceUnit unit);
 
 	@Override
 	default SearchProjection<Double> build() {

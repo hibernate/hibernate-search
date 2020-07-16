@@ -15,7 +15,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -158,12 +157,6 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	public ElasticsearchFieldSortBuilderFactory<F> sortBuilderFactory() {
 		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::sortBuilderFactory,
 				ElasticsearchFieldSortBuilderFactory::isCompatibleWith, "sortFactory" );
-	}
-
-	@Override
-	public ElasticsearchFieldProjectionBuilderFactory<F> projectionBuilderFactory() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::projectionBuilderFactory,
-				ElasticsearchFieldProjectionBuilderFactory::isCompatibleWith, "projectionFactory" );
 	}
 
 	private <T> T getFromFieldIfCompatible(Function<ElasticsearchSearchFieldContext<F>, T> getter,

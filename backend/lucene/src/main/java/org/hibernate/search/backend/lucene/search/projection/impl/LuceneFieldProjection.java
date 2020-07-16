@@ -10,11 +10,13 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -83,22 +85,53 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 		return accumulator.finish( extractedData, converter, convertContext );
 	}
 
+	public static class Factory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<TypeSelector<?>, F, LuceneFieldCodec<F>> {
+		public Factory(LuceneFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new TypeSelector<>( codec, searchContext, field );
+		}
+	}
+
+	public static class TypeSelector<F> {
+		private final LuceneFieldCodec<F> codec;
+		private final LuceneSearchContext searchContext;
+		private final LuceneSearchFieldContext<F> field;
+
+		private TypeSelector(LuceneFieldCodec<F> codec,
+				LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			this.codec = codec;
+			this.searchContext = searchContext;
+			this.field = field;
+		}
+
+		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
+			return new Builder<>( codec, searchContext, field,
+					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
+		}
+	}
+
 	public static class Builder<F, V> extends AbstractLuceneProjection.AbstractBuilder<V>
 			implements FieldProjectionBuilder<V> {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+		private final LuceneFieldCodec<F> codec;
+
 		private final LuceneSearchFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
-		private final LuceneFieldCodec<F> codec;
 
-		public Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				ProjectionConverter<F, ? extends V> converter, LuceneFieldCodec<F> codec) {
+		private Builder(LuceneFieldCodec<F> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
 			super( searchContext );
+			this.codec = codec;
 			this.field = field;
 			this.converter = converter;
-			this.codec = codec;
 		}
 
 		@Override

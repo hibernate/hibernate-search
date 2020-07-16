@@ -12,7 +12,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
 /**
@@ -33,7 +32,7 @@ public interface SearchProjectionBuilderFactory {
 
 	ScoreProjectionBuilder score();
 
-	DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionBuilder distance(String absoluteFieldPath);
 
 	<P> CompositeProjectionBuilder<P> composite(Function<List<?>, P> transformer, SearchProjection<?>... projections);
 

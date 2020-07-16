@@ -375,10 +375,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 64, value = "Unexpected index: documentId '%1$s' was not collected." )
 	SearchException documentIdNotCollected(Integer documentId);
 
-	@Message(id = ID_OFFSET_2 + 65,
-			value = "Projections are not enabled for field '%1$s'. Make sure the field is marked as projectable.")
-	SearchException nonProjectableField(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 66,
 			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
 	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);

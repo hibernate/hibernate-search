@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNativeFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNativeFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
@@ -37,8 +38,11 @@ class LuceneNativeIndexFieldTypeOptionsStep<F>
 				new LuceneNativeFieldPredicateBuilderFactory<>() );
 		builder.sortBuilderFactory(
 				new LuceneNativeFieldSortBuilderFactory<>() );
-		builder.projectionBuilderFactory(
-				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec ) );
+
+		if ( fieldValueExtractor != null ) {
+			builder.projectable( true );
+			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new LuceneFieldProjection.Factory<>( codec ) );
+		}
 
 		return builder.build();
 	}

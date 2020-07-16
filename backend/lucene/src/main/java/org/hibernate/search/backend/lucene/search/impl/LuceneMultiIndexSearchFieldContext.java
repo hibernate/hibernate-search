@@ -15,7 +15,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -160,12 +159,6 @@ public class LuceneMultiIndexSearchFieldContext<F>
 	public LuceneFieldSortBuilderFactory<F> sortBuilderFactory() {
 		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::sortBuilderFactory,
 				LuceneFieldSortBuilderFactory::isCompatibleWith, "sortFactory" );
-	}
-
-	@Override
-	public LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::projectionBuilderFactory,
-				LuceneFieldProjectionBuilderFactory::isCompatibleWith, "projectionFactory" );
 	}
 
 	private <T> T getFromFieldIfCompatible(Function<LuceneSearchFieldContext<F>, T> getter,

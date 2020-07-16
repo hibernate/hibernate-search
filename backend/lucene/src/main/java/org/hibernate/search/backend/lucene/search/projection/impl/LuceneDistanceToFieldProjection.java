@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFact
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -173,31 +174,45 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 		}
 	}
 
+	public static class Factory
+			extends AbstractLuceneSearchFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
+		public Factory(LuceneFieldCodec<GeoPoint> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
+			return new Builder( codec, searchContext, field );
+		}
+	}
+
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Double>
 			implements DistanceToFieldProjectionBuilder {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-		private final LuceneSearchFieldContext<GeoPoint> field;
-
 		private final LuceneFieldCodec<GeoPoint> codec;
 
-		private final GeoPoint center;
+		private final LuceneSearchFieldContext<GeoPoint> field;
 
+		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
-		public Builder(LuceneSearchContext searchContext,
-				LuceneSearchFieldContext<GeoPoint> field, LuceneFieldCodec<GeoPoint> codec, GeoPoint center) {
+		private Builder(LuceneFieldCodec<GeoPoint> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<GeoPoint> field) {
 			super( searchContext );
-			this.field = field;
 			this.codec = codec;
+			this.field = field;
+		}
+
+		@Override
+		public void center(GeoPoint center) {
 			this.center = center;
 		}
 
 		@Override
-		public DistanceToFieldProjectionBuilder unit(DistanceUnit unit) {
+		public void unit(DistanceUnit unit) {
 			this.unit = unit;
-			return this;
 		}
 
 		@Override

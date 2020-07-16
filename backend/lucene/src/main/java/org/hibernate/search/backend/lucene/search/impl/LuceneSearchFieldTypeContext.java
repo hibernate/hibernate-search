@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.search.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -62,7 +61,5 @@ public interface LuceneSearchFieldTypeContext<F> {
 	LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory();
 
 	LuceneFieldSortBuilderFactory<F> sortBuilderFactory();
-
-	LuceneFieldProjectionBuilderFactory<F> projectionBuilderFactory();
 
 }

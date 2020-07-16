@@ -162,7 +162,7 @@ public class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Unsupported extension
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -207,7 +207,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		// Non-existing document
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.explain( "InvalidId" )
 		)
 				.isInstanceOf( SearchException.class )
@@ -243,7 +243,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
@@ -261,7 +261,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.explain( "NotAnIndexName", FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
@@ -446,7 +446,7 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.match().field( "nativeField" ).matching( "37" ) )
 						.toQuery(),
@@ -477,7 +477,7 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField_exists() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.predicate().exists().field( "nativeField" ),
 				"exists() predicate on unsupported native field"
 		)
@@ -492,7 +492,7 @@ public class LuceneExtensionIT {
 	public void sort_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.matchAll() )
 						.sort( f -> f.field( "nativeField" ) )
@@ -559,10 +559,12 @@ public class LuceneExtensionIT {
 	public void projection_nativeField_unsupportedProjection() {
 		StubMappingScope scope = mainIndex.createScope();
 
+		String fieldPath = "nativeField_unsupportedProjection";
+
 		// let's check that it's possible to query the field beforehand
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.extension( LuceneExtension.get() )
-						.fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
+						.fromLuceneQuery( new TermQuery( new Term( fieldPath, "37" ) ) )
 				)
 				.toQuery();
 
@@ -570,14 +572,15 @@ public class LuceneExtensionIT {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
-		Assertions.assertThatThrownBy(
-				() -> scope.projection().field( "nativeField_unsupportedProjection", Integer.class ),
-				"projection on native field not supporting projections"
-		)
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldPath, Integer.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Projections are not enabled for field" )
+				.hasMessageContainingAll(
+						"Cannot use 'projection:field' on field '" + fieldPath + "'",
+						"'projection:field' is not available for fields of this type"
+				)
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( "nativeField_unsupportedProjection" )
+						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
 	}
 

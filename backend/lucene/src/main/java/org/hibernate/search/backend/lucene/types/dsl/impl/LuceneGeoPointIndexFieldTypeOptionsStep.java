@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistanceToFieldProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -46,8 +48,12 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, codec ) );
 		builder.sortBuilderFactory(
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable, codec ) );
-		builder.projectionBuilderFactory(
-				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec ) );
+
+		if ( resolvedProjectable ) {
+			builder.projectable( true );
+			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new LuceneFieldProjection.Factory<>( codec ) );
+			builder.queryElementFactory( ProjectionTypeKeys.DISTANCE, new LuceneDistanceToFieldProjection.Factory( codec ) );
+		}
 
 		if ( resolvedAggregable ) {
 			builder.aggregable( true );

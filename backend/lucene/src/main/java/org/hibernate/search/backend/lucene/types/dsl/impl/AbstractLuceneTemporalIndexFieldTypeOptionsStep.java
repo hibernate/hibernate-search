@@ -9,12 +9,13 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneTemporalFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
 
@@ -56,8 +57,11 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );
 		builder.sortBuilderFactory(
 				new LuceneTemporalFieldSortBuilderFactory<>( resolvedSortable, codec ) );
-		builder.projectionBuilderFactory(
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec ) );
+
+		if ( resolvedProjectable ) {
+			builder.projectable( true );
+			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new LuceneFieldProjection.Factory<>( codec ) );
+		}
 
 		if ( resolvedAggregable ) {
 			builder.aggregable( true );
