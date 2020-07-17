@@ -33,7 +33,7 @@ public interface PojoWorkIndexedTypeContext<I, E> {
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 
 	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
-			I identifier, Supplier<E> entitySupplier);
+			I identifier, String providedRoutingKey, Supplier<E> entitySupplier);
 
 	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
 			I identifier, String providedRoutingKey);

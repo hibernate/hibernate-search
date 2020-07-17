@@ -112,15 +112,16 @@ public class PojoIndexedTypeManager<I, E>
 
 	@Override
 	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
-			I identifier, Supplier<E> entitySupplier) {
+			I identifier, String providedRoutingKey, Supplier<E> entitySupplier) {
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.mappingContext()
 		);
-		String routingKey = routingKeyProvider.toRoutingKey(
-				identifier,
-				entitySupplier,
-				sessionContext
-		);
+		String routingKey = ( providedRoutingKey != null ) ? providedRoutingKey :
+				routingKeyProvider.toRoutingKey(
+						identifier,
+						entitySupplier,
+						sessionContext
+				);
 		return new PojoDocumentReferenceProvider(
 				documentIdentifier, routingKey, identifier
 		);

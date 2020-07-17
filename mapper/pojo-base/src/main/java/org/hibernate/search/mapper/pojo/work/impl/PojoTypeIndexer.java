@@ -33,8 +33,10 @@ public class PojoTypeIndexer<I, E> {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
-				sessionContext, identifier, entitySupplier
+				// TODO HSEARCH-3891 expose the providedRoutingKey
+				sessionContext, identifier, null, entitySupplier
 		);
 		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
 				commitStrategy, refreshStrategy );
@@ -45,7 +47,8 @@ public class PojoTypeIndexer<I, E> {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
-				sessionContext, identifier, entitySupplier
+				// TODO HSEARCH-3891 expose the providedRoutingKey
+				sessionContext, identifier, null, entitySupplier
 		);
 		return delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
 				commitStrategy, refreshStrategy );
@@ -56,7 +59,8 @@ public class PojoTypeIndexer<I, E> {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
-				sessionContext, identifier, entitySupplier
+				// TODO HSEARCH-3891 expose the providedRoutingKey
+				sessionContext, identifier, null, entitySupplier
 		);
 		return delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
 	}

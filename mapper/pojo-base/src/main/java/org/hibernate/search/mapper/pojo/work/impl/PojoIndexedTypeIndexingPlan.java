@@ -43,10 +43,10 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 	}
 
 	@Override
-	void add(Object providedId, Object entity) {
+	void add(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).add( entitySupplier );
+		getPlan( identifier ).add( entitySupplier, providedRoutingKey );
 	}
 
 	@Override
@@ -155,9 +155,9 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			this.identifier = identifier;
 		}
 
-		void add(Supplier<E> entitySupplier) {
+		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			providedRoutingKey = null;
+			this.providedRoutingKey = providedRoutingKey;
 			shouldResolveToReindex = true;
 			add = true;
 		}
@@ -238,14 +238,14 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing(
 							dirtyPaths ) ) {
 						delegate.update(
-								typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
+								typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey, entitySupplier ),
 								typeContext.toDocumentContributor( entitySupplier, sessionContext )
 						);
 					}
 				}
 				else {
 					delegate.add(
-							typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
+							typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey, entitySupplier ),
 							typeContext.toDocumentContributor( entitySupplier, sessionContext )
 					);
 				}
@@ -255,7 +255,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 						entitySupplier == null
 								? typeContext.toDocumentReferenceProvider(
 								sessionContext, identifier, providedRoutingKey )
-								: typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
+								: typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey, entitySupplier );
 				delegate.delete( referenceProvider );
 			}
 		}
