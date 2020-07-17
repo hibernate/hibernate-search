@@ -34,7 +34,7 @@ public class PojoIndexingDeleteIT extends AbstractPojoIndexingOperationIT {
 
 	@Override
 	protected void addTo(SearchIndexingPlan indexingPlan, Object providedId, int id) {
-		indexingPlan.delete( providedId, createEntity( id ) );
+		indexingPlan.delete( providedId, null, createEntity( id ) );
 	}
 
 	@Override
