@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
@@ -48,7 +48,7 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchSearchFieldQueryElementFactory<SpatialWithinCirclePredicateBuilder, GeoPoint> {
+			extends AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<SpatialWithinCirclePredicateBuilder, GeoPoint> {
 		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
 			super( codec );
 		}

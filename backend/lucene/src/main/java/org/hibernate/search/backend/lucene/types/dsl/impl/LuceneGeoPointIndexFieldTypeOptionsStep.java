@@ -53,16 +53,16 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
-					new LuceneGeoPointSpatialWithinCirclePredicate.Factory( codec ) );
+					new LuceneGeoPointSpatialWithinCirclePredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,
-					new LuceneGeoPointSpatialWithinPolygonPredicate.Factory( codec ) );
+					new LuceneGeoPointSpatialWithinPolygonPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX,
-					new LuceneGeoPointSpatialWithinBoundingBoxPredicate.Factory( codec ) );
+					new LuceneGeoPointSpatialWithinBoundingBoxPredicate.Factory() );
 		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );
-			builder.queryElementFactory( SortTypeKeys.DISTANCE, new LuceneGeoPointDistanceSort.Factory( codec ) );
+			builder.queryElementFactory( SortTypeKeys.DISTANCE, new LuceneGeoPointDistanceSort.Factory() );
 		}
 
 		if ( resolvedProjectable ) {

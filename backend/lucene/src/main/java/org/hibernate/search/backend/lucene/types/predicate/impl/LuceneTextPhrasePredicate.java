@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchField
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -37,11 +36,7 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneSearchFieldQueryElementFactory<PhrasePredicateBuilder, F, LuceneTextFieldCodec<F>> {
-		public Factory(LuceneTextFieldCodec<F> codec) {
-			super( codec );
-		}
-
+			extends AbstractLuceneSearchFieldQueryElementFactory<PhrasePredicateBuilder, F> {
 		@Override
 		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			return new Builder<>( searchContext, field );

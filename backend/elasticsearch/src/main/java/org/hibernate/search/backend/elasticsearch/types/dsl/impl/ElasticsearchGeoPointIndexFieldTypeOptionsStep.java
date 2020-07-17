@@ -42,21 +42,21 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
 					new ElasticsearchGeoPointSpatialWithinCirclePredicate.Factory( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,
-					new ElasticsearchGeoPointSpatialWithinPolygonPredicate.Factory( codec ) );
+					new ElasticsearchGeoPointSpatialWithinPolygonPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX,
 					new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate.Factory( codec ) );
 		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );
-			builder.queryElementFactory( SortTypeKeys.DISTANCE, new ElasticsearchDistanceSort.Factory( codec ) );
+			builder.queryElementFactory( SortTypeKeys.DISTANCE, new ElasticsearchDistanceSort.Factory() );
 		}
 
 		if ( resolvedProjectable ) {
 			builder.projectable( true );
 			builder.queryElementFactory( ProjectionTypeKeys.FIELD, new ElasticsearchFieldProjection.Factory<>( codec ) );
 			builder.queryElementFactory( ProjectionTypeKeys.DISTANCE,
-					new ElasticsearchDistanceToFieldProjection.Factory( codec ) );
+					new ElasticsearchDistanceToFieldProjection.Factory() );
 		}
 
 		if ( resolvedAggregable ) {

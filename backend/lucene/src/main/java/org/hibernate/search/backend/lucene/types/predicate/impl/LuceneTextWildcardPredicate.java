@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchField
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -28,11 +27,7 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneSearchFieldQueryElementFactory<WildcardPredicateBuilder, F, LuceneTextFieldCodec<F>> {
-		public Factory(LuceneTextFieldCodec<F> codec) {
-			super( codec );
-		}
-
+			extends AbstractLuceneSearchFieldQueryElementFactory<WildcardPredicateBuilder, F> {
 		@Override
 		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			return new Builder<>( searchContext, field );

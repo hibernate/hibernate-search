@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchField
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -26,11 +25,7 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinBoundingBoxPredicateBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
-		public Factory(LuceneFieldCodec<GeoPoint> codec) {
-			super( codec );
-		}
-
+			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinBoundingBoxPredicateBuilder, GeoPoint> {
 		@Override
 		public Builder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );
