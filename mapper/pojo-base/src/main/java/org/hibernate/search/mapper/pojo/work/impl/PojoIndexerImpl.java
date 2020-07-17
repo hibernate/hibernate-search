@@ -43,9 +43,9 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity,
+	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return getDelegate( typeIdentifier ).addOrUpdate( providedId, entity, commitStrategy, refreshStrategy );
+		return getDelegate( typeIdentifier ).addOrUpdate( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
