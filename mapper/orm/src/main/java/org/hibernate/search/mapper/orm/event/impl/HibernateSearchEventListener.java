@@ -103,10 +103,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
-				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, entity, getDirtyPropertyNames( event ) );
+				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, entity );
+				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity );
 			}
 		}
 	}
@@ -230,18 +230,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, ownerEntity, collectionRole );
+					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, ownerEntity );
+					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity );
 				}
 			}
 			else {
-				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, ownerEntity );
+				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity );
 			}
 		}
 	}

@@ -43,13 +43,13 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 	}
 
 	@Override
-	void update(Object providedId, Object entity) {
+	void update(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getPlan( providedId ).update( entitySupplier );
 	}
 
 	@Override
-	void update(Object providedId, Object entity, String... dirtyPaths) {
+	void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getPlan( providedId ).update( entitySupplier, dirtyPaths );
 	}

@@ -43,7 +43,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object providedId, Object entity) {
-		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, entity );
+		// TODO HSEARCH-3891 expose the providedRoutingKey
+		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, null, entity );
 	}
 
 	@Override
@@ -53,7 +54,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
-		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, entity, dirtyPaths );
+		// TODO HSEARCH-3891 expose the providedRoutingKey
+		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, null, entity, dirtyPaths );
 	}
 
 	@Override
