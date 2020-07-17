@@ -52,13 +52,12 @@ public class PojoTypeIndexer<I, E> {
 				commitStrategy, refreshStrategy );
 	}
 
-	CompletableFuture<?> delete(Object providedId, Object entity,
+	CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
-				// TODO HSEARCH-3891 expose the providedRoutingKey
-				sessionContext, identifier, null, entitySupplier
+				sessionContext, identifier, providedRoutingKey, entitySupplier
 		);
 		return delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
 	}
