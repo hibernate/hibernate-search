@@ -34,7 +34,7 @@ public class PojoIndexingAddIT extends AbstractPojoIndexingOperationIT {
 
 	@Override
 	protected void addTo(SearchIndexingPlan indexingPlan, Object providedId, int id) {
-		indexingPlan.add( providedId, createEntity( id ) );
+		indexingPlan.add( providedId, null, createEntity( id ) );
 	}
 
 	@Override

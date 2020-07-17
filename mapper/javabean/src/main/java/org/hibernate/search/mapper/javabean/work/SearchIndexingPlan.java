@@ -18,7 +18,7 @@ public interface SearchIndexingPlan {
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
 	 * <p>
-	 * Shorthand for {@code add(null, entity)}; see {@link #add(Object, Object)}.
+	 * Shorthand for {@code add(null, null, entity)}; see {@link #add(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 */
@@ -34,9 +34,12 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to add to the index.
 	 */
-	void add(Object providedId, Object entity);
+	void add(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.

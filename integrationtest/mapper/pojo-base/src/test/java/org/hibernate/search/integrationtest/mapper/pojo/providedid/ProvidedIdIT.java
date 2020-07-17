@@ -59,7 +59,7 @@ public class ProvidedIdIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 
-			session.indexingPlan().add( "42", entity1 );
+			session.indexingPlan().add( "42", null, entity1 );
 
 			backendMock.expectWorks( entityAndIndexName )
 					.add( "42", b -> { } )
