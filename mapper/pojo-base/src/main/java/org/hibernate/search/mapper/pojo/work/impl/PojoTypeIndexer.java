@@ -29,14 +29,13 @@ public class PojoTypeIndexer<I, E> {
 		this.delegate = delegate;
 	}
 
-	CompletableFuture<?> add(Object providedId, Object entity,
+	CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
 
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
-				// TODO HSEARCH-3891 expose the providedRoutingKey
-				sessionContext, identifier, null, entitySupplier
+				sessionContext, identifier, providedRoutingKey, entitySupplier
 		);
 		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
 				commitStrategy, refreshStrategy );

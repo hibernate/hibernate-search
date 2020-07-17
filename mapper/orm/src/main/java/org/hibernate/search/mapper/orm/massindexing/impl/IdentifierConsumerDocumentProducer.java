@@ -238,7 +238,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		CompletableFuture<?> future;
 		try {
-			future = indexer.add( type.typeIdentifier(), null, entity,
+			future = indexer.add( type.typeIdentifier(), null, null, entity,
 					// Commit and refresh are handled globally after all documents are indexed.
 					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 		}
