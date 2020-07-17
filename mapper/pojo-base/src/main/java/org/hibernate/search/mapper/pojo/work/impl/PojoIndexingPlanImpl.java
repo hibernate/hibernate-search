@@ -74,9 +74,9 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 	}
 
 	@Override
-	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
+	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
-		delegate.delete( providedId, entity );
+		delegate.delete( providedId, providedRoutingKey, entity );
 	}
 
 	@Override

@@ -65,7 +65,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void delete(Object providedId, Object entity) {
-		delegate.delete( getTypeIdentifier( entity ), providedId, entity );
+		// TODO HSEARCH-3891 expose the providedRoutingKey
+		delegate.delete( getTypeIdentifier( entity ), providedId, null, entity );
 	}
 
 	@Override

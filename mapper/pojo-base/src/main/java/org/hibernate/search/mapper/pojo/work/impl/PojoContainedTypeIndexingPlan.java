@@ -55,7 +55,7 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 	}
 
 	@Override
-	void delete(Object providedId, Object entity) {
+	void delete(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		getPlan( providedId ).delete( entitySupplier );
 	}

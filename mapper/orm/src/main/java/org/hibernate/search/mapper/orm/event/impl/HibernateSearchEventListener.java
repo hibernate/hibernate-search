@@ -78,7 +78,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.delete( typeContext.typeIdentifier(), providedId, entity );
+					.delete( typeContext.typeIdentifier(), providedId, null, entity );
 		}
 	}
 

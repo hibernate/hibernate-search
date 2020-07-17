@@ -64,10 +64,10 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 	}
 
 	@Override
-	void delete(Object providedId, Object entity) {
+	void delete(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).delete( entitySupplier );
+		getPlan( identifier ).delete( entitySupplier, providedRoutingKey );
 	}
 
 	@Override
@@ -189,9 +189,9 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			 */
 		}
 
-		void delete(Supplier<E> entitySupplier) {
+		void delete(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			providedRoutingKey = null;
+			this.providedRoutingKey = providedRoutingKey;
 			if ( add && !delete ) {
 				/*
 				 * We called add() in the same plan, so we don't expect the document to be in the index.
