@@ -32,7 +32,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void add(Object providedId, Object entity) {
-		delegate.add( getTypeIdentifier( entity ), providedId, entity );
+		// TODO HSEARCH-3891 expose the providedRoutingKey
+		delegate.add( getTypeIdentifier( entity ), providedId, null, entity );
 	}
 
 	@Override

@@ -56,9 +56,9 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 	}
 
 	@Override
-	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
+	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
-		delegate.add( providedId, entity );
+		delegate.add( providedId, providedRoutingKey, entity );
 	}
 
 	@Override

@@ -90,7 +90,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.add( typeContext.typeIdentifier(), providedId, entity );
+					.add( typeContext.typeIdentifier(), providedId, null, entity );
 		}
 	}
 

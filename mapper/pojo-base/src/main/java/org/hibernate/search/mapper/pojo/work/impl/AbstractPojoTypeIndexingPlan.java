@@ -16,7 +16,7 @@ abstract class AbstractPojoTypeIndexingPlan {
 		this.sessionContext = sessionContext;
 	}
 
-	abstract void add(Object providedId, Object entity);
+	abstract void add(Object providedId, String providedRoutingKey, Object entity);
 
 	abstract void update(Object providedId, Object entity);
 
