@@ -18,7 +18,7 @@ import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
 
-public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String> {
+public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<String, String> {
 
 	private final boolean sortable;
 	private final boolean searchable;
@@ -91,8 +91,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		return value;
 	}
 
-	@Override
-	public BytesRef normalize(String absoluteFieldPath, String value) {
+	private BytesRef normalize(String absoluteFieldPath, String value) {
 		if ( value == null ) {
 			return null;
 		}

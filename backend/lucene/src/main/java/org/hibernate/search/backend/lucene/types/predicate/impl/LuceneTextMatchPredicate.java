@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareS
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -39,8 +39,8 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<MatchPredicateBuilder, F, LuceneTextFieldCodec<F>> {
-		public Factory(LuceneTextFieldCodec<F> codec) {
+			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<MatchPredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
+		public Factory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
@@ -51,7 +51,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements MatchPredicateBuilder {
-		private final LuceneTextFieldCodec<F> codec;
+		private final LuceneStandardFieldCodec<F, String> codec;
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 		private String value;
@@ -61,7 +61,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		private Analyzer overrideAnalyzerOrNormalizer;
 
-		private Builder(LuceneTextFieldCodec<F> codec, LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();

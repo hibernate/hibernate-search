@@ -10,15 +10,17 @@ import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareS
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
@@ -27,8 +29,8 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<RangePredicateBuilder, F, LuceneTextFieldCodec<F>> {
-		public Factory(LuceneTextFieldCodec<F> codec) {
+			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<RangePredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
+		public Factory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
@@ -39,11 +41,11 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	private static class Builder<F> extends AbstractBuilder<F> implements RangePredicateBuilder {
-		private final LuceneTextFieldCodec<F> codec;
+		private final LuceneStandardFieldCodec<F, String> codec;
 
 		private Range<String> range;
 
-		private Builder(LuceneTextFieldCodec<F> codec, LuceneSearchContext searchContext,
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext,
 				LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
@@ -67,14 +69,22 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 
 			return new TermRangeQuery(
 					absoluteFieldPath,
-					codec.normalize( absoluteFieldPath, range.lowerBoundValue().orElse( null ) ),
-					codec.normalize( absoluteFieldPath, range.upperBoundValue().orElse( null ) ),
+					normalize( range.lowerBoundValue().orElse( null ) ),
+					normalize( range.upperBoundValue().orElse( null ) ),
 					// we force the true value if the bound is null because of some Lucene checks down the hill
 					RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() )
 							|| !range.lowerBoundValue().isPresent(),
 					RangeBoundInclusion.INCLUDED.equals( range.upperBoundInclusion() )
 							|| !range.upperBoundValue().isPresent()
 			);
+		}
+
+		private BytesRef normalize(String value) {
+			if ( value == null ) {
+				return null;
+			}
+			Analyzer searchAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
+			return searchAnalyzerOrNormalizer.normalize( absoluteFieldPath, value );
 		}
 	}
 }

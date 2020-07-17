@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneNumericFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneTextFieldComparatorSource;
@@ -27,7 +26,9 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 
@@ -53,7 +54,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	abstract static class AbstractBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 			extends AbstractLuceneDocumentValueSort.AbstractBuilder
 			implements FieldSortBuilder {
-		private final LuceneSearchFieldContext<F> field;
+		protected final LuceneSearchFieldContext<F> field;
 		protected final C codec;
 		private final Object sortMissingValueFirstPlaceholder;
 		private final Object sortMissingValueLastPlaceholder;
@@ -145,8 +146,8 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	}
 
 	public static class TextFieldFactory<F>
-			extends AbstractFactory<F, String, LuceneTextFieldCodec<F>> {
-		public TextFieldFactory(LuceneTextFieldCodec<F> codec) {
+			extends AbstractFactory<F, String, LuceneStandardFieldCodec<F, String>> {
+		public TextFieldFactory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
@@ -156,15 +157,15 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 	}
 
-	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneTextFieldCodec<F>> {
-		private TextFieldBuilder(LuceneTextFieldCodec<F> codec, LuceneSearchContext searchContext,
+	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneStandardFieldCodec<F, String>> {
+		private TextFieldBuilder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext,
 				LuceneSearchFieldContext<F> field) {
 			super( searchContext, field, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 		}
 
 		@Override
 		protected Object encodeMissingAs(F converted) {
-			return codec.normalize( absoluteFieldPath, codec.encode( converted ) );
+			return normalize( codec.encode( converted ) );
 		}
 
 		@Override
@@ -186,6 +187,14 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		protected LuceneFieldComparatorSource toFieldComparatorSource() {
 			return new LuceneTextFieldComparatorSource( nestedDocumentPath, missingValue,
 					getMultiValueMode(), getNestedFilter() );
+		}
+
+		private BytesRef normalize(String value) {
+			if ( value == null ) {
+				return null;
+			}
+			Analyzer searchAnalyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
+			return searchAnalyzerOrNormalizer.normalize( absoluteFieldPath, value );
 		}
 	}
 
