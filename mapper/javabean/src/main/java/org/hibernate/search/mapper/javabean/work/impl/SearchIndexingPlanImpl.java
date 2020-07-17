@@ -27,13 +27,12 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void add(Object entity) {
-		add( null, entity );
+		add( null, null, entity );
 	}
 
 	@Override
-	public void add(Object providedId, Object entity) {
-		// TODO HSEARCH-3891 expose the providedRoutingKey
-		delegate.add( getTypeIdentifier( entity ), providedId, null, entity );
+	public void add(Object providedId, String providedRoutingKey, Object entity) {
+		delegate.add( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity );
 	}
 
 	@Override
