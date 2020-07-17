@@ -33,12 +33,15 @@ public interface PojoIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to add to the index.
 	 * @param commitStrategy How to handle the commit.
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity,
+	CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**
