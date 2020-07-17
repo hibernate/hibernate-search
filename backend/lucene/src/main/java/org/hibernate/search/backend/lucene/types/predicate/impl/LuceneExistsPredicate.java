@@ -6,40 +6,30 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.DocValuesFieldExistsQuery;
+import org.apache.lucene.search.NormsFieldExistsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneExistsPredicate(Builder builder) {
+	private LuceneExistsPredicate(AbstractBuilder<?> builder) {
 		super( builder );
 	}
 
-	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<ExistsPredicateBuilder, F, LuceneFieldCodec<F>> {
-		public Factory(LuceneFieldCodec<F> codec) {
-			super( codec );
-		}
-
-		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
-		}
-	}
-
-	private static class Builder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
-		private final LuceneFieldCodec<F> codec;
-
-		private Builder(LuceneFieldCodec<F> codec, LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+	private static class AbstractBuilder<F> extends AbstractLuceneLeafSingleFieldPredicate.AbstractBuilder<F>
+			implements ExistsPredicateBuilder {
+		private AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
-			this.codec = codec;
 			// Score is always constant for this query
 			constantScore();
 		}
@@ -51,7 +41,65 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 
 		@Override
 		protected Query buildQuery() {
-			return codec.createExistsQuery( absoluteFieldPath );
+			return new NormsFieldExistsQuery( absoluteFieldPath );
 		}
 	}
+
+	public static class NormsBasedFactory
+			extends AbstractLuceneSearchFieldQueryElementFactory<ExistsPredicateBuilder, String> {
+		@Override
+		public NormsBasedBuilder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field) {
+			return new NormsBasedBuilder( searchContext, field );
+		}
+	}
+
+	private static class NormsBasedBuilder extends AbstractBuilder<String> implements ExistsPredicateBuilder {
+		private NormsBasedBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field) {
+			super( searchContext, field );
+		}
+
+		@Override
+		protected Query buildQuery() {
+			return new NormsFieldExistsQuery( absoluteFieldPath );
+		}
+	}
+
+	public static class DocValuesBasedFactory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<ExistsPredicateBuilder, F> {
+		@Override
+		public DocValuesBasedBuilder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new DocValuesBasedBuilder<>( searchContext, field );
+		}
+	}
+
+	private static class DocValuesBasedBuilder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
+		private DocValuesBasedBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			super( searchContext, field );
+		}
+
+		@Override
+		protected Query buildQuery() {
+			return new DocValuesFieldExistsQuery( absoluteFieldPath );
+		}
+	}
+
+	public static class DefaultFactory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<ExistsPredicateBuilder, F> {
+		@Override
+		public DefaultBuilder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new DefaultBuilder<>( searchContext, field );
+		}
+	}
+
+	private static class DefaultBuilder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
+		private DefaultBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			super( searchContext, field );
+		}
+
+		@Override
+		protected Query buildQuery() {
+			return new TermQuery( new Term( MetadataFields.fieldNamesFieldName(), absoluteFieldPath ) );
+		}
+	}
+
 }

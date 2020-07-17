@@ -48,6 +48,8 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
+		boolean docValues = resolvedSortable || resolvedAggregable;
+
 		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec(
 				resolvedProjectable,
 				resolvedSearchable,
@@ -61,7 +63,9 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneNumericMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneNumericRangePredicate.Factory<>( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
+					docValues ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+							: new LuceneExistsPredicate.DefaultFactory<>() );
 		}
 
 		if ( resolvedSortable ) {

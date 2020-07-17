@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -72,15 +71,13 @@ public class ExistsPredicateObjectsSpecificsIT {
 			SimpleMappedIndex.of( InvertedIndexBinding::new ).name( "inverted" );
 	private static final SimpleMappedIndex<DifferentFieldsIndexBinding> differentFieldsIndex =
 			SimpleMappedIndex.of( DifferentFieldsIndexBinding::new ).name( "differentFields" );
-	private static final SimpleMappedIndex<IncompatibleFieldsIndexBinding> incompatibleFieldsIndex =
-			SimpleMappedIndex.of( IncompatibleFieldsIndexBinding::new ).name( "incompatibleFields" );
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
 						mainIndex, compatibleIndex, emptyIndex,
-						incompatibleIndex, invertedIndex, differentFieldsIndex, incompatibleFieldsIndex
+						incompatibleIndex, invertedIndex, differentFieldsIndex
 				)
 				.setup();
 
@@ -168,20 +165,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 	}
 
 	@Test
-	public void nested_multiIndexes_incompatibleFields() {
-		assumeFullMultiIndexCompatibilityCheck();
-		SearchPredicateFactory f = mainIndex.createScope( incompatibleFieldsIndex ).predicate();
-
-		assertThatThrownBy( () -> f.exists().field( "nested" ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for object field" )
-				.hasMessageContaining( "'nested'" )
-				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( mainIndex.name(), incompatibleFieldsIndex.name() )
-				) );
-	}
-
-	@Test
 	public void flattened() {
 		assertThatQuery( mainIndex.query()
 				.where( p -> p.exists().field( "flattened" ) ) )
@@ -256,20 +239,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 				.hasMessageContaining( "'flattened'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( differentFieldsIndex.name(), mainIndex.name() )
-				) );
-	}
-
-	@Test
-	public void flattened_multiIndexes_incompatibleFields() {
-		assumeFullMultiIndexCompatibilityCheck();
-		SearchPredicateFactory f = incompatibleFieldsIndex.createScope( mainIndex ).predicate();
-
-		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for object field" )
-				.hasMessageContaining( "'flattened'" )
-				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( incompatibleFieldsIndex.name(), mainIndex.name() )
 				) );
 	}
 
@@ -411,28 +380,6 @@ public class ExistsPredicateObjectsSpecificsIT {
 			flattenedObject.field( "stringDifferentName", f -> f.asString() ).toReference();
 			// change field numeric into numericDifferentName
 			flattenedObject.field( "numericDifferentName", f -> f.asInteger() ).toReference();
-
-			nestedObject.objectField( "flattenedX2", ObjectStructure.FLATTENED ).toReference();
-		}
-	}
-
-	private static class IncompatibleFieldsIndexBinding {
-		IncompatibleFieldsIndexBinding(IndexSchemaElement root) {
-			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectStructure.NESTED );
-			nestedObject.toReference();
-
-			// field has same name, but with an incompatible exists predicates: string vs BigDecimal
-			nestedObject.field( "string", f -> f.asBigDecimal().decimalScale( 3 ) ).toReference();
-			nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
-
-			nestedObject.objectField( "nestedX2", ObjectStructure.NESTED ).toReference();
-
-			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectStructure.FLATTENED );
-			flattenedObject.toReference();
-
-			flattenedObject.field( "string", f -> f.asString() ).toReference();
-			// field has same name, but with an incompatible exists predicates: unSortable vs Sortable
-			flattenedObject.field( "numeric", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
 
 			nestedObject.objectField( "flattenedX2", ObjectStructure.FLATTENED ).toReference();
 		}

@@ -38,7 +38,7 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
-			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
 					new ElasticsearchGeoPointSpatialWithinCirclePredicate.Factory( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,

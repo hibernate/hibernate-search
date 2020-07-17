@@ -375,6 +375,12 @@ public class ExistsPredicateBaseIT {
 		}
 
 		@Override
+		public void multiIndex_withIncompatibleIndex() {
+			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used when a field relies"
+					+ " on different codecs in different indexes" );
+		}
+
+		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
 			return f.exists().field( fieldPath );
 		}

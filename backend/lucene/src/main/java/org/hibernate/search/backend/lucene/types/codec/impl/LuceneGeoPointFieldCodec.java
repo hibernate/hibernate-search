@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.document.DoublePoint;
@@ -15,10 +14,6 @@ import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.DocValuesFieldExistsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRef;
 
 public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
@@ -56,7 +51,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.latitude(), value.longitude() ) );
 		}
 		else {
-			// For createExistsQuery()
+			// For the "exists" predicate
 			documentBuilder.addFieldName( absoluteFieldPath );
 		}
 
@@ -68,16 +63,6 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	@Override
 	public GeoPoint decode(IndexableField field) {
 		return fromStoredBytes( field.binaryValue() );
-	}
-
-	@Override
-	public Query createExistsQuery(String absoluteFieldPath) {
-		if ( sortable ) {
-			return new DocValuesFieldExistsQuery( absoluteFieldPath );
-		}
-		else {
-			return new TermQuery( new Term( MetadataFields.fieldNamesFieldName(), absoluteFieldPath ) );
-		}
 	}
 
 	@Override
