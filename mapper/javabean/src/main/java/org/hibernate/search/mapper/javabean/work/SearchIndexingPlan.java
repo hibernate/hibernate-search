@@ -29,7 +29,7 @@ public interface SearchIndexingPlan {
 	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #addOrUpdate(Object, Object)} or {@link #addOrUpdate(Object)}.
+	 * When in doubt, you should rather use {@link #addOrUpdate(Object, String, Object)} or {@link #addOrUpdate(Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -44,7 +44,7 @@ public interface SearchIndexingPlan {
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity)}; see {@link #addOrUpdate(Object, Object)}.
+	 * Shorthand for {@code update(null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 */
@@ -56,9 +56,12 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to update in the index.
 	 */
-	void addOrUpdate(Object providedId, Object entity);
+	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -67,7 +70,7 @@ public interface SearchIndexingPlan {
 	 * <p>
 	 * Assumes that the entity may already be present in the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, Object)}.
+	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, String, Object, String...)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
@@ -83,11 +86,14 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void addOrUpdate(Object providedId, Object entity, String... dirtyPaths);
+	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
