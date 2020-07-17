@@ -31,7 +31,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	@Override
 	public void delete(Object entity) {
 		sessionContext.currentIndexingPlan( true )
-				.delete( getTypeIdentifier( entity ), null, entity );
+				.delete( getTypeIdentifier( entity ), null, null, entity );
 	}
 
 	@Override
