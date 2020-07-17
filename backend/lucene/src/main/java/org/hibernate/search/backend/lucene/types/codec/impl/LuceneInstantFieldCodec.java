@@ -26,7 +26,7 @@ public final class LuceneInstantFieldCodec extends AbstractLuceneNumericFieldCod
 	}
 
 	@Override
-	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Instant value,
+	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Instant value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

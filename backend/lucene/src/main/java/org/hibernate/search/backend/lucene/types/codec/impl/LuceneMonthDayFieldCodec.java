@@ -38,7 +38,7 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 	}
 
 	@Override
-	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, MonthDay value,
+	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, MonthDay value,
 			Integer encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

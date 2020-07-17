@@ -29,7 +29,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 	}
 
 	@Override
-	public final void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
+	public final void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
 		if ( value == null && indexNullAsValue != null ) {
 			value = indexNullAsValue;
 		}
@@ -41,7 +41,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 		E encodedValue = encode( value );
 
 		if ( projectable ) {
-			doEncodeForProjection( documentBuilder, absoluteFieldPath, value, encodedValue );
+			addStoredToDocument( documentBuilder, absoluteFieldPath, value, encodedValue );
 		}
 
 		LuceneNumericDomain<E> domain = getDomain();
@@ -64,21 +64,14 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 		if ( this == obj ) {
 			return true;
 		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-
-		AbstractLuceneNumericFieldCodec<?, ?> other = (AbstractLuceneNumericFieldCodec<?, ?>) obj;
-
-		return (projectable == other.projectable) && (searchable == other.searchable)
-			&& (sortable == other.sortable) && (aggregable == other.aggregable);
+		return getClass() == obj.getClass();
 	}
 
 	public abstract F decode(E encoded);
 
 	public abstract LuceneNumericDomain<E> getDomain();
 
-	abstract void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath,
+	abstract void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath,
 			F value, E encodedValue);
 
 }

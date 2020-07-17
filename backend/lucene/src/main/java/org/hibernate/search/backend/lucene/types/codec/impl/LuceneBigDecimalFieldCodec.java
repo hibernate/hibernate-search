@@ -38,9 +38,8 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
-	void doEncodeForProjection(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigDecimal value,
+	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigDecimal value,
 			Long encodedValue) {
-		// storing field as String for projections
 		documentBuilder.addField( new StoredField( absoluteFieldPath, value.toString() ) );
 	}
 

@@ -28,7 +28,7 @@ public interface LuceneFieldCodec<F> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param value The value to encode.
 	 */
-	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value);
+	void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value);
 
 	/**
 	 * Extract the value from the given stored field.
@@ -41,8 +41,16 @@ public interface LuceneFieldCodec<F> {
 	F decode(IndexableField field);
 
 	/**
-	 * Determine whether another codec is compatible with this one, i.e. whether it will encode/decode the information
-	 * to/from the document in a compatible way.
+	 * Determine whether the given codec provides an encoding that is compatible with this codec,
+	 * i.e. whether its {@link #decode(IndexableField)}
+	 * and {@link LuceneStandardFieldCodec#encode(Object)} methods behave the same way.
+	 * <p>
+	 * NOTE: {@link #addToDocument(LuceneDocumentBuilder, String, Object)} may behave differently,
+	 * e.g. it may add docvalues while this codec does not.
+	 * The behavior of {@link #addToDocument(LuceneDocumentBuilder, String, Object)}
+	 * is considered irrelevant when checking the equivalence of encoding,
+	 * because such differences should be accounted for through other ways
+	 * (fields being assigned incompatible predicate factories, etc.).
 	 *
 	 * @param other Another {@link LuceneFieldCodec}, never {@code null}.
 	 * @return {@code true} if the given codec is compatible. {@code false} otherwise, or when
