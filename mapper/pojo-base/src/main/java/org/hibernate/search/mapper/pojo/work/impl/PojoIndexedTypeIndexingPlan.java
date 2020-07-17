@@ -50,17 +50,17 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 	}
 
 	@Override
-	void update(Object providedId, Object entity) {
+	void update(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).update( entitySupplier );
+		getPlan( identifier ).update( entitySupplier, providedRoutingKey );
 	}
 
 	@Override
-	void update(Object providedId, Object entity, String... dirtyPaths) {
+	void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).update( entitySupplier, dirtyPaths );
+		getPlan( identifier ).update( entitySupplier, providedRoutingKey, dirtyPaths );
 	}
 
 	@Override
@@ -162,15 +162,15 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			add = true;
 		}
 
-		void update(Supplier<E> entitySupplier) {
-			doUpdate( entitySupplier );
+		void update(Supplier<E> entitySupplier, String providedRoutingKey) {
+			doUpdate( entitySupplier, providedRoutingKey );
 			shouldResolveToReindex = true;
 			considerAllDirty = true;
 			dirtyPaths = null;
 		}
 
-		void update(Supplier<E> entitySupplier, String... dirtyPaths) {
-			doUpdate( entitySupplier );
+		void update(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPaths) {
+			doUpdate( entitySupplier, providedRoutingKey );
 			shouldResolveToReindex = true;
 			if ( !considerAllDirty ) {
 				for ( String dirtyPropertyName : dirtyPaths ) {
@@ -180,7 +180,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 		}
 
 		void updateBecauseOfContained(Supplier<E> entitySupplier) {
-			doUpdate( entitySupplier );
+			doUpdate( entitySupplier, null );
 			updatedBecauseOfContained = true;
 			/*
 			 * We don't want contained entities that haven't been modified to trigger an update of their
@@ -260,9 +260,9 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			}
 		}
 
-		private void doUpdate(Supplier<E> entitySupplier) {
+		private void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			providedRoutingKey = null;
+			this.providedRoutingKey = providedRoutingKey;
 			/*
 			 * If add is true, either this is already an update (in which case we don't need to change the flags)
 			 * or we called add() in the same plan (in which case we don't expect the document to be in the index).

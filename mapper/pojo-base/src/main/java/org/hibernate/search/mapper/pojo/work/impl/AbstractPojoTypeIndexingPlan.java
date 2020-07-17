@@ -18,9 +18,9 @@ abstract class AbstractPojoTypeIndexingPlan {
 
 	abstract void add(Object providedId, String providedRoutingKey, Object entity);
 
-	abstract void update(Object providedId, Object entity);
+	abstract void update(Object providedId, String providedRoutingKey, Object entity);
 
-	abstract void update(Object providedId, Object entity, String... dirtyPaths);
+	abstract void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths);
 
 	abstract void delete(Object providedId, Object entity);
 
