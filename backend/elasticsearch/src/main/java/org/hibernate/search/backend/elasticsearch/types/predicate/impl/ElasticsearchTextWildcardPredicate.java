@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
@@ -48,10 +47,6 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 
 	public static class Factory
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<WildcardPredicateBuilder, String> {
-		public Factory(ElasticsearchFieldCodec<String> codec) {
-			super( codec );
-		}
-
 		@Override
 		public WildcardPredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<String> field) {

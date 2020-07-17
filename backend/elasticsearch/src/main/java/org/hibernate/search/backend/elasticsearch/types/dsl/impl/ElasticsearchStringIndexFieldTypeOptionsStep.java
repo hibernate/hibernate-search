@@ -184,12 +184,10 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 					new ElasticsearchTextMatchPredicate.Factory( codec, mapping.getType() ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.PHRASE,
-					new ElasticsearchTextPhrasePredicate.Factory( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.WILDCARD,
-					new ElasticsearchTextWildcardPredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new ElasticsearchTextPhrasePredicate.Factory() );
+			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new ElasticsearchTextWildcardPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new ElasticsearchSimpleQueryStringPredicateBuilderFieldState.Factory( codec ) );
+					new ElasticsearchSimpleQueryStringPredicateBuilderFieldState.Factory() );
 		}
 
 		if ( resolvedSortable ) {

@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -30,11 +29,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchFieldQueryElementFactory<DistanceSortBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
-		public Factory(LuceneFieldCodec<GeoPoint> codec) {
-			super( codec );
-		}
-
+			extends AbstractLuceneSearchFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
 		@Override
 		public DistanceSortBuilder create(LuceneSearchContext searchContext,
 				LuceneSearchFieldContext<GeoPoint> field) {

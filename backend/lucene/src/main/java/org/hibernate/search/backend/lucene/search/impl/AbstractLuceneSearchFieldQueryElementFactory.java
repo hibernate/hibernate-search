@@ -6,24 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-
-public abstract class AbstractLuceneSearchFieldQueryElementFactory<T, F, C extends LuceneFieldCodec<F>>
+public abstract class AbstractLuceneSearchFieldQueryElementFactory<T, F>
 		implements LuceneSearchFieldQueryElementFactory<T, F> {
-
-	protected final C codec;
-
-	public AbstractLuceneSearchFieldQueryElementFactory(C codec) {
-		this.codec = codec;
-	}
 
 	@Override
 	public boolean isCompatibleWith(LuceneSearchFieldQueryElementFactory<?, ?> other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		AbstractLuceneSearchFieldQueryElementFactory<?, ?, ?> castedOther =
-				(AbstractLuceneSearchFieldQueryElementFactory<?, ?, ?>) other;
-		return codec.isCompatibleWith( castedOther.codec );
+		return getClass().equals( other.getClass() );
 	}
 }

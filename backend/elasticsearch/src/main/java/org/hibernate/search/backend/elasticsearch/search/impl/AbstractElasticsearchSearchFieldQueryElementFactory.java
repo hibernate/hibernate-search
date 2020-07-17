@@ -6,24 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-
 public abstract class AbstractElasticsearchSearchFieldQueryElementFactory<T, F>
 		implements ElasticsearchSearchFieldQueryElementFactory<T, F> {
 
-	protected final ElasticsearchFieldCodec<F> codec;
-
-	public AbstractElasticsearchSearchFieldQueryElementFactory(ElasticsearchFieldCodec<F> codec) {
-		this.codec = codec;
-	}
-
 	@Override
 	public boolean isCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		AbstractElasticsearchSearchFieldQueryElementFactory<?, ?> castedOther =
-				(AbstractElasticsearchSearchFieldQueryElementFactory<?, ?>) other;
-		return codec.isCompatibleWith( castedOther.codec );
+		return getClass().equals( other.getClass() );
 	}
 }

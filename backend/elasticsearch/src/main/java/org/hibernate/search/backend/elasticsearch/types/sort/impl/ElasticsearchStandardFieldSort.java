@@ -11,7 +11,7 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
@@ -59,7 +59,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchSearchFieldQueryElementFactory<FieldSortBuilder, F> {
+			extends AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<FieldSortBuilder, F> {
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}

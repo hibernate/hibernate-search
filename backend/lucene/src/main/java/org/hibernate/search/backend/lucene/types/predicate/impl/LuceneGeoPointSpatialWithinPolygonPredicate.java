@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchField
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -29,11 +28,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
-		public Factory(LuceneFieldCodec<GeoPoint> codec) {
-			super( codec );
-		}
-
+			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
 		public Builder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );

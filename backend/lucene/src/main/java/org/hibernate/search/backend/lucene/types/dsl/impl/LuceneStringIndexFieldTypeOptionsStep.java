@@ -165,10 +165,10 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneTextMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneTextRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
+			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
-					new LuceneSimpleQueryStringPredicateBuilderFieldState.Factory( codec ) );
+					new LuceneSimpleQueryStringPredicateBuilderFieldState.Factory() );
 		}
 
 		if ( resolvedSortable ) {
@@ -183,7 +183,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 		if ( resolvedAggregable ) {
 			builder.aggregable( true );
-			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneTextTermsAggregation.Factory( codec ) );
+			builder.queryElementFactory( AggregationTypeKeys.TERMS, new LuceneTextTermsAggregation.Factory() );
 		}
 
 		return builder.build();

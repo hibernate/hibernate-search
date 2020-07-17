@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsea
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -49,10 +48,6 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 	public static class Factory
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
-		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
-			super( codec );
-		}
-
 		@Override
 		public DistanceSortBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<GeoPoint> field) {

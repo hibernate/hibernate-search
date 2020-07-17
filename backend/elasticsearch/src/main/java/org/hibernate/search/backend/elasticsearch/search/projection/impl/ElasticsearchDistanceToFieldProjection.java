@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsea
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -222,10 +221,6 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 
 	public static class Factory
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
-		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
-			super( codec );
-		}
-
 		@Override
 		public Builder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<GeoPoint> field) {
