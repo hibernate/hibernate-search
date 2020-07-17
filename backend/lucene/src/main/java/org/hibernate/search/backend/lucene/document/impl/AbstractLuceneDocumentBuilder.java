@@ -163,7 +163,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 			checkNoValueYetForSingleValued( absolutePath );
 		}
 
-		type.codec().encode( this, absolutePath, value );
+		type.codec().addToDocument( this, absolutePath, value );
 	}
 
 	private DocumentElement addObject(LuceneIndexSchemaObjectFieldNode node, boolean nullObject) {

@@ -32,7 +32,7 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
+	public void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
 		if ( value == null ) {
 			return;
 		}
@@ -61,8 +61,7 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 
 		LuceneFieldFieldCodec<?> other = (LuceneFieldFieldCodec<?>) obj;
 
-		return Objects.equals( fieldContributor, other.fieldContributor )
-				&& Objects.equals( fieldValueExtractor, other.fieldValueExtractor );
+		return Objects.equals( fieldValueExtractor, other.fieldValueExtractor );
 	}
 
 	private static void contributeField(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, IndexableField field) {

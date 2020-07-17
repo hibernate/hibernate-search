@@ -32,7 +32,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, GeoPoint value) {
+	public void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, GeoPoint value) {
 		if ( value == null && indexNullAsValue != null ) {
 			value = indexNullAsValue;
 		}
@@ -70,14 +70,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneGeoPointFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneGeoPointFieldCodec other = (LuceneGeoPointFieldCodec) obj;
-
-		return ( projectable == other.projectable ) && ( searchable == other.searchable )
-				&& ( sortable == other.sortable );
+		return LuceneGeoPointFieldCodec.class == obj.getClass();
 	}
 
 	private static BytesRef toStoredBytes(GeoPoint geoPoint) {

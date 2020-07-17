@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Objects;
-
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 
@@ -26,7 +24,7 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 
 	private final FieldType fieldType;
 
-	private String indexNullAsValue;
+	private final String indexNullAsValue;
 
 	private final Analyzer analyzerOrNormalizer;
 
@@ -41,7 +39,7 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, String value) {
+	public void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, String value) {
 		if ( value == null && indexNullAsValue != null ) {
 			value = indexNullAsValue;
 		}
@@ -76,14 +74,7 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneStringFieldCodec.class != obj.getClass() ) {
-			return false;
-		}
-
-		LuceneStringFieldCodec other = (LuceneStringFieldCodec) obj;
-
-		return ( sortable == other.sortable ) && ( searchable == other.searchable )
-				&& Objects.equals( fieldType, other.fieldType );
+		return LuceneStringFieldCodec.class == obj.getClass();
 	}
 
 	@Override
