@@ -365,7 +365,7 @@ public class SimpleQueryStringPredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "wildcard";
+			return "predicate:simple-query-string";
 		}
 	}
 
@@ -398,6 +398,11 @@ public class SimpleQueryStringPredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.simpleQueryString().field( fieldPath );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:simple-query-string";
 		}
 	}
 

@@ -231,11 +231,13 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	public void multiIndex_withRawFieldCompatibleIndex_valueConvertYes() {
 		StubMappingScope scope = index.createScope( rawFieldCompatibleIndex );
 
-		assertThatThrownBy( () -> predicate( scope.predicate(), defaultDslConverterField0Path(),
+		String fieldPath = defaultDslConverterField0Path();
+
+		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + defaultDslConverterField0Path() + "'" )
+				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), rawFieldCompatibleIndex.name() )
 				) );
@@ -259,11 +261,13 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	public void multiIndex_withIncompatibleIndex_valueConvertYes() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
-		assertThatThrownBy( () -> predicate( scope.predicate(), defaultDslConverterField0Path(),
+		String fieldPath = defaultDslConverterField0Path();
+
+		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + defaultDslConverterField0Path() + "'" )
+				.hasMessageContaining( "'" + fieldPath + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );
@@ -273,7 +277,9 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	public void multiIndex_withIncompatibleIndex_valueConvertNo() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
-		assertThatThrownBy( () -> predicate( scope.predicate(), defaultDslConverterField0Path(),
+		String fieldPath = defaultDslConverterField0Path();
+
+		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types" )
@@ -296,6 +302,8 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 	protected abstract P unwrappedMatchingParam(int matchingDocOrdinal);
 
 	protected abstract P wrappedMatchingParam(int matchingDocOrdinal);
+
+	protected abstract String predicateNameInErrorMessage();
 
 	private String defaultDslConverterField0Path() {
 		return index.binding().defaultDslConverterField0.get( dataSet.fieldType ).relativeFieldName;

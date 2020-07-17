@@ -284,21 +284,9 @@ public interface Log extends BasicLogger {
 	SearchException indexSchemaNodeNameConflict(String relativeFieldName,
 			@Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 37,
-			value = "Range lookups (range predicates, range aggregations) are not supported by this field's type (GeoPoint). Use spatial features instead.")
-	SearchException rangesNotSupportedByGeoPoint(@Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 38,
-			value = "Direct value lookups (match predicates, terms aggregations) are not supported by this field's type (GeoPoint). Use spatial features instead.")
-	SearchException directValueLookupNotSupportedByGeoPoint(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 39,
 			value = "Invalid field reference for this document element: this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")
 	SearchException invalidFieldForDocumentElement(String expectedPath, String actualPath);
-
-	@Message(id = ID_OFFSET_2 + 40,
-			value = "Spatial predicates are not supported by this field's type.")
-	SearchException spatialPredicatesNotSupportedByFieldType(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 44,
 			value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
@@ -308,10 +296,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 45,
 			value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
 	SearchException minimumShouldMatchConflictingConstraints(int ignoreConstraintCeiling);
-
-	@Message(id = ID_OFFSET_2 + 46,
-			value = "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query.")
-	SearchException unsupportedDSLPredicatesForNativeField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 48,
 			value = "This native field does not support projection.")
@@ -376,8 +360,8 @@ public interface Log extends BasicLogger {
 	SearchException ioExceptionOnExplain(@Cause IOException e);
 
 	@Message(id = ID_OFFSET_2 + 70,
-			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
-	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
+			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")
+	SearchException fullTextFeaturesNotSupportedByFieldType(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 71,
 			value = "Incomplete field definition."
@@ -430,9 +414,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 82, value = "Positive decimal scale ['%1$s'] is not allowed for BigInteger fields, since a BigInteger value cannot have any decimal digits.")
 	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
-
-	@Message(id = ID_OFFSET_2 + 83, value = "Field '%1$s' is not searchable. Make sure the field is marked as searchable.")
-	SearchException nonSearchableField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 84, value = "The predicate '%1$s' is defined on a scope targeting different indexes."
 			+ " Predicate is targeting: '%2$s'. Current scope is targeting: '%3$s'.")

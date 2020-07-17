@@ -10,10 +10,12 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -22,7 +24,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR = JsonAccessor.root().property( "geo_polygon" ).asObject();
 
@@ -53,11 +55,22 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends AbstractElastic
 		return outerObject;
 	}
 
-	static class Builder extends AbstractBuilder implements SpatialWithinPolygonPredicateBuilder {
+	public static class Factory
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
+		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder create(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+			return new Builder( searchContext, field );
+		}
+	}
+
+	private static class Builder extends AbstractBuilder implements SpatialWithinPolygonPredicateBuilder {
 		private double[] coordinates;
 
-		Builder(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
 			super( searchContext, field );
 		}
 

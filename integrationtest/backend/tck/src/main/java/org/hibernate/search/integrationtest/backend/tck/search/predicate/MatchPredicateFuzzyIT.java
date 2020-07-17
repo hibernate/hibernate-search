@@ -230,8 +230,7 @@ public class MatchPredicateFuzzyIT {
 			assertThatThrownBy( () -> f.match().field( absoluteFieldPath ).matching( valueToMatch ).fuzzy(),
 					"match() predicate with fuzzy() and unsupported type on field " + absoluteFieldPath )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Text predicates" )
-					.hasMessageContaining( "not supported by" )
+					.hasMessageContaining( "Full-text features (analysis, fuzziness) are not supported for fields of this type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
@@ -239,8 +238,7 @@ public class MatchPredicateFuzzyIT {
 			assertThatThrownBy( () -> f.match().field( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1 ),
 					"match() predicate with fuzzy(int) and unsupported type on field " + absoluteFieldPath )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Text predicates" )
-					.hasMessageContaining( "not supported by" )
+					.hasMessageContaining( "Full-text features (analysis, fuzziness) are not supported for fields of this type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
@@ -248,8 +246,7 @@ public class MatchPredicateFuzzyIT {
 			assertThatThrownBy( () -> f.match() .field( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1, 1 ),
 					"match() predicate with fuzzy(int, int) and unsupported type on field " + absoluteFieldPath )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Text predicates" )
-					.hasMessageContaining( "not supported by" )
+					.hasMessageContaining( "Full-text features (analysis, fuzziness) are not supported for fields of this type" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );

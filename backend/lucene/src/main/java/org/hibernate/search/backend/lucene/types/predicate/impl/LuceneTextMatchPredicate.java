@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -29,7 +30,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
-class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
+public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,9 +38,21 @@ class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 		super( builder );
 	}
 
-	static class Builder<F> extends AbstractBuilder<F> implements MatchPredicateBuilder {
-		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	public static class Factory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<MatchPredicateBuilder, F, LuceneTextFieldCodec<F>> {
+		public Factory(LuceneTextFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new Builder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class Builder<F> extends AbstractBuilder<F> implements MatchPredicateBuilder {
 		private final LuceneTextFieldCodec<F> codec;
+		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 		private String value;
 
@@ -48,11 +61,10 @@ class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 		private Analyzer overrideAnalyzerOrNormalizer;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				LuceneTextFieldCodec<F> codec) {
+		private Builder(LuceneTextFieldCodec<F> codec, LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
-			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 			this.codec = codec;
+			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 		}
 
 		@Override

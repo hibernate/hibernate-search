@@ -288,7 +288,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "Spatial predicates";
+			return "predicate:spatial:within-circle";
 		}
 	}
 
@@ -310,6 +310,11 @@ public class SpatialWithinCirclePredicateBaseIT {
 			f.spatial().within().field( fieldPath )
 					// We need this because the backend is not involved before the call to circle()
 					.circle( GeoPoint.of( 0, 0 ), 1 );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-circle";
 		}
 	}
 

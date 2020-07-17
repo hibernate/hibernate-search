@@ -10,13 +10,16 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonObjectAccessor EXISTS_ACCESSOR = JsonAccessor.root().property( "exists" ).asObject();
 	private static final JsonAccessor<String> FIELD_ACCESSOR = JsonAccessor.root().property( "field" ).asString();
@@ -34,8 +37,21 @@ class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFieldPredi
 		return outerObject;
 	}
 
-	static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
-		Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
+	public static class Factory<F>
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<ExistsPredicateBuilder, F> {
+		public Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+		}
+	}
+
+	public static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
+		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
 				List<String> nestedPathHierarchy) {
 			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
 		}

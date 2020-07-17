@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
@@ -35,13 +34,12 @@ public class ElasticsearchIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final boolean searchable;
 	private final boolean sortable;
 	private final boolean projectable;
 	private final boolean aggregable;
 
 	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>> queryElementFactories;
-
-	private final ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 
 	private final String analyzerName;
 	private final String searchAnalyzerName;
@@ -56,11 +54,11 @@ public class ElasticsearchIndexFieldType<F>
 		this.codec = builder.codec;
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter : rawProjectionConverter;
+		this.searchable = builder.searchable;
 		this.sortable = builder.sortable;
 		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
 		this.queryElementFactories = builder.queryElementFactories;
-		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.analyzerName = builder.analyzerName;
 		this.searchAnalyzerName = builder.searchAnalyzerName != null ? builder.searchAnalyzerName : builder.analyzerName;
 		this.normalizerName = builder.normalizerName;
@@ -86,7 +84,7 @@ public class ElasticsearchIndexFieldType<F>
 
 	@Override
 	public boolean searchable() {
-		return predicateBuilderFactory.isSearchable();
+		return searchable;
 	}
 
 	@Override
@@ -155,11 +153,6 @@ public class ElasticsearchIndexFieldType<F>
 		return (ElasticsearchSearchFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
 	}
 
-	@Override
-	public ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
-		return predicateBuilderFactory;
-	}
-
 	public PropertyMapping mapping() {
 		return mapping;
 	}
@@ -174,14 +167,13 @@ public class ElasticsearchIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private boolean searchable;
 		private boolean sortable;
 		private boolean projectable;
 		private boolean aggregable;
 
 		private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>>
 				queryElementFactories = new HashMap<>();
-
-		private ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 
 		private String analyzerName;
 		private String searchAnalyzerName;
@@ -216,6 +208,10 @@ public class ElasticsearchIndexFieldType<F>
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
+		public void searchable(boolean searchable) {
+			this.searchable = searchable;
+		}
+
 		public void sortable(boolean sortable) {
 			this.sortable = sortable;
 		}
@@ -231,10 +227,6 @@ public class ElasticsearchIndexFieldType<F>
 		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
 				ElasticsearchSearchFieldQueryElementFactory<T, F> factory) {
 			queryElementFactories.put( key, factory );
-		}
-
-		public void predicateBuilderFactory(ElasticsearchFieldPredicateBuilderFactory<F> predicateBuilderFactory) {
-			this.predicateBuilderFactory = predicateBuilderFactory;
 		}
 
 		public void analyzerName(String analyzerName) {

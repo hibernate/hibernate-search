@@ -62,22 +62,22 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchPredicateBuilder match(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createMatchPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, searchContext );
 	}
 
 	@Override
 	public RangePredicateBuilder range(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createRangePredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, searchContext );
 	}
 
 	@Override
 	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createPhrasePredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
 	}
 
 	@Override
 	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createWildcardPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, searchContext );
 	}
 
 	@Override
@@ -94,23 +94,26 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			return objectPredicateBuilderFactory.createExistsPredicateBuilder( searchContext );
 		}
 
-		return indexes.field( absoluteFieldPath ).createExistsPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, searchContext );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder spatialWithinCircle(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createSpatialWithinCirclePredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE, searchContext );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createSpatialWithinPolygonPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON, searchContext );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(
 			String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createSpatialWithinBoundingBoxPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX, searchContext );
 	}
 
 	@Override

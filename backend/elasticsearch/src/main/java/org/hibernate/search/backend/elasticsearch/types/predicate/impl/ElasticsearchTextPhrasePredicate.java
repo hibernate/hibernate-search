@@ -9,10 +9,12 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
@@ -20,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonObjectAccessor MATCH_PHRASE_ACCESSOR = JsonAccessor.root().property( "match_phrase" ).asObject();
 
@@ -57,13 +59,26 @@ class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingleFieldP
 		return outerObject;
 	}
 
-	static class Builder extends AbstractBuilder implements PhrasePredicateBuilder {
+	public static class Factory
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<PhrasePredicateBuilder, String> {
+		public Factory(ElasticsearchFieldCodec<String> codec) {
+			super( codec );
+		}
+
+		@Override
+		public PhrasePredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<String> field) {
+			return new Builder( searchContext, field );
+		}
+	}
+
+	private static class Builder extends AbstractBuilder implements PhrasePredicateBuilder {
 		private final ElasticsearchSearchFieldContext<String> field;
 		private Integer slop;
 		private JsonElement phrase;
 		private String analyzer;
 
-		Builder(ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<String> field) {
 			super( searchContext, field );
 			this.field = field;

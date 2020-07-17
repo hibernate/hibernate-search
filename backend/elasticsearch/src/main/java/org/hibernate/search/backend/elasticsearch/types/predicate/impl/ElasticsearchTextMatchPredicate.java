@@ -12,17 +12,20 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicate {
+public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,7 +37,7 @@ class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicat
 	private final Integer prefixLength;
 	private final String analyzer;
 
-	ElasticsearchTextMatchPredicate(Builder builder) {
+	private ElasticsearchTextMatchPredicate(Builder builder) {
 		super( builder );
 		fuzziness = builder.fuzziness;
 		prefixLength = builder.prefixLength;
@@ -56,16 +59,42 @@ class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicat
 		return super.doToJsonQuery( context, outerObject, innerObject );
 	}
 
-	static class Builder extends ElasticsearchStandardMatchPredicate.Builder<String> {
+	public static class Factory
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<MatchPredicateBuilder, String> {
+		private final String dataType;
+
+		public Factory(ElasticsearchFieldCodec<String> codec, String dataType) {
+			super( codec );
+			this.dataType = dataType;
+		}
+
+		@Override
+		public boolean isCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
+			if ( !super.isCompatibleWith( other ) ) {
+				return false;
+			}
+
+			Factory castedOther = (Factory) other;
+			return dataType.equals( castedOther.dataType );
+		}
+
+		@Override
+		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<String> field) {
+			return new Builder( codec, dataType, searchContext, field );
+		}
+	}
+
+	private static class Builder extends ElasticsearchStandardMatchPredicate.Builder<String> {
 		private final String type;
 
 		private Integer fuzziness;
 		private Integer prefixLength;
 		private String analyzer;
 
-		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field,
-				ElasticsearchFieldCodec<String> codec, String type) {
-			super( searchContext, field, codec );
+		private Builder(ElasticsearchFieldCodec<String> codec, String type, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<String> field) {
+			super( codec, searchContext, field );
 			this.type = type;
 		}
 
@@ -83,7 +112,8 @@ class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchPredicat
 		@Override
 		public void skipAnalysis() {
 			if ( DataTypes.KEYWORD.equals( type ) ) {
-				throw log.skipAnalysisOnKeywordField( absoluteFieldPath, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+				throw log.skipAnalysisOnKeywordField( absoluteFieldPath,
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 			}
 
 			analyzer( AnalyzerConstants.KEYWORD_ANALYZER );

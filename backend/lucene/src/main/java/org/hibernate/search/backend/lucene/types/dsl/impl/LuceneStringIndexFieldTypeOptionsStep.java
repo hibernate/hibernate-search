@@ -12,13 +12,19 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextMatchPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextPhrasePredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRangePredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextWildcardPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -154,8 +160,16 @@ class LuceneStringIndexFieldTypeOptionsStep
 		);
 		builder.codec( codec );
 
-		builder.predicateBuilderFactory(
-				new LuceneTextFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );
+		if ( resolvedSearchable ) {
+			builder.searchable( true );
+			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneTextMatchPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneTextRangePredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
+					new LuceneSimpleQueryStringPredicateBuilderFieldState.Factory( codec ) );
+		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );

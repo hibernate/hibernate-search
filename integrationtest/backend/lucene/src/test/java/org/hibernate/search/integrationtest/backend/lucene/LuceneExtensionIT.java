@@ -446,14 +446,19 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField() {
 		StubMappingScope scope = mainIndex.createScope();
 
+		String fieldPath = "nativeField";
+
 		assertThatThrownBy(
 				() -> scope.query()
-						.where( f -> f.match().field( "nativeField" ).matching( "37" ) )
+						.where( f -> f.match().field( fieldPath ).matching( "37" ) )
 						.toQuery(),
 				"match() predicate on unsupported native field"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
+				.hasMessageContainingAll(
+						"Cannot use 'predicate:match' on field '" + fieldPath + "'",
+						"'predicate:match' is not available for fields of this type"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
 				) );
@@ -477,12 +482,17 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField_exists() {
 		StubMappingScope scope = mainIndex.createScope();
 
+		String fieldPath = "nativeField";
+
 		assertThatThrownBy(
-				() -> scope.predicate().exists().field( "nativeField" ),
+				() -> scope.predicate().exists().field( fieldPath ),
 				"exists() predicate on unsupported native field"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
+				.hasMessageContainingAll(
+						"Cannot use 'predicate:exists' on field '" + fieldPath + "'",
+						"'predicate:exists' is not available for fields of this type"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
 				) );

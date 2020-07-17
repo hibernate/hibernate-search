@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
@@ -16,7 +17,9 @@ import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericR
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRangePredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Sortable;
 
@@ -54,8 +57,12 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 		);
 		builder.codec( codec );
 
-		builder.predicateBuilderFactory(
-				new LuceneNumericFieldPredicateBuilderFactory<>( resolvedSearchable, codec ) );
+		if ( resolvedSearchable ) {
+			builder.searchable( true );
+			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneNumericMatchPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneNumericRangePredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
+		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );

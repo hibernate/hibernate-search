@@ -366,7 +366,7 @@ public class MatchPredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "match predicates";
+			return "predicate:match";
 		}
 	}
 
@@ -399,6 +399,11 @@ public class MatchPredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.match().field( fieldPath );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:match";
 		}
 	}
 
@@ -496,6 +501,11 @@ public class MatchPredicateBaseIT {
 		protected Object wrappedMatchingParam(int matchingDocOrdinal) {
 			return new ValueWrapper<>( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:match";
+		}
 	}
 
 	public static class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
@@ -516,6 +526,11 @@ public class MatchPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
 			return f.match().field( fieldPath ).matching( matchingParam );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:match";
 		}
 	}
 }

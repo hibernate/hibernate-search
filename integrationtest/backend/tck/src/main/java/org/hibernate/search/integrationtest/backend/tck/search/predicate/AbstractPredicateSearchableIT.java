@@ -12,12 +12,10 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.Test;
@@ -45,8 +43,8 @@ public abstract class AbstractPredicateSearchableIT {
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"'" + fieldPath + "'", "is not searchable",
-						"Make sure the field is marked as searchable"
+						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
 				);
 	}
 
@@ -59,15 +57,14 @@ public abstract class AbstractPredicateSearchableIT {
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Multiple conflicting types",
-						"'" + fieldPath + "'"
-				)
-				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( searchableYesIndex.name(), searchableNoIndex.name() )
-				) );
+						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
+						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+				);
 	}
 
 	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath);
+
+	protected abstract String predicateNameInErrorMessage();
 
 	public static final class SearchableYesIndexBinding {
 		private final SimpleFieldModelsByType field;

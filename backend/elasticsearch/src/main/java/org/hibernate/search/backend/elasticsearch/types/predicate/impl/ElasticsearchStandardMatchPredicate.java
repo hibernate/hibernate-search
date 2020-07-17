@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
@@ -27,7 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -54,6 +55,19 @@ class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSingleFie
 		return outerObject;
 	}
 
+	public static class Factory<F>
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<MatchPredicateBuilder, F> {
+		public Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			return new Builder<>( codec, searchContext, field );
+		}
+	}
+
 	static class Builder<F> extends AbstractBuilder implements MatchPredicateBuilder {
 
 		protected final ElasticsearchSearchFieldContext<F> field;
@@ -61,8 +75,8 @@ class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSingleFie
 
 		private JsonElement value;
 
-		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field,
-				ElasticsearchFieldCodec<F> codec) {
+		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.field = field;
 			this.codec = codec;
@@ -70,17 +84,17 @@ class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSingleFie
 
 		@Override
 		public void fuzzy(int maxEditDistance, int exactPrefixLength) {
-			throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.fullTextFeaturesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
 		@Override
 		public void analyzer(String analyzerName) {
-			throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.fullTextFeaturesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
 		@Override
 		public void skipAnalysis() {
-			throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+			throw log.fullTextFeaturesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
 		@Override

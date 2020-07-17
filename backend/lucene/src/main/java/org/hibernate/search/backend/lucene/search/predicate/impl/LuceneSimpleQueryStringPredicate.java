@@ -107,7 +107,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 			LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 			if ( field == null ) {
 				LuceneSearchFieldContext<?> fieldContext = indexes.field( absoluteFieldPath );
-				field = fieldContext.createSimpleQueryStringFieldState();
+				field = fieldContext.queryElement( PredicateTypeKeys.SIMPLE_QUERY_STRING, searchContext );
 				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 				fields.put( absoluteFieldPath, field );
 			}

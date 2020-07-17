@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
@@ -21,7 +22,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonObjectAccessor GEO_BOUNDING_BOX_ACCESSOR = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
 
@@ -50,14 +51,26 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends AbstractEla
 		return outerObject;
 	}
 
-	static class Builder extends AbstractBuilder implements SpatialWithinBoundingBoxPredicateBuilder {
+	public static class Factory
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<SpatialWithinBoundingBoxPredicateBuilder, GeoPoint> {
+		public Factory(ElasticsearchFieldCodec<GeoPoint> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder create(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+			return new Builder( codec, searchContext, field );
+		}
+	}
+
+	private static class Builder extends AbstractBuilder implements SpatialWithinBoundingBoxPredicateBuilder {
 		private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 		private JsonElement topLeft;
 		private JsonElement bottomRight;
 
-		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field,
-				ElasticsearchFieldCodec<GeoPoint> codec) {
+		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<GeoPoint> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}

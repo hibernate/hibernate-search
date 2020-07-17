@@ -61,22 +61,22 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchPredicateBuilder match(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createMatchPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, searchContext );
 	}
 
 	@Override
 	public RangePredicateBuilder range(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createRangePredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, searchContext );
 	}
 
 	@Override
 	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createPhrasePredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
 	}
 
 	@Override
 	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createWildcardPredicateBuilder( searchContext );
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, searchContext );
 	}
 
 	@Override
@@ -89,33 +89,32 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		List<String> nestedPathHierarchy;
 		if ( indexes.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
 			nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
+			return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
 		}
 		else {
 			ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
-			nestedPathHierarchy = field.nestedPathHierarchy();
 			// Make sure to fail for fields with different type
 			// We may be able to relax this constraint, but that would require more extensive testing
-			field.type().predicateBuilderFactory();
+			return field.queryElement( PredicateTypeKeys.EXISTS, searchContext );
 		}
-		return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
-	public SpatialWithinCirclePredicateBuilder spatialWithinCircle(
-			String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createSpatialWithinCirclePredicateBuilder( searchContext );
+	public SpatialWithinCirclePredicateBuilder spatialWithinCircle(String absoluteFieldPath) {
+		return indexes.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE, searchContext );
 	}
 
 	@Override
-	public SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(
-			String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createSpatialWithinPolygonPredicateBuilder( searchContext );
+	public SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath) {
+		return indexes.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON, searchContext );
 	}
 
 	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(
-			String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).createSpatialWithinBoundingBoxPredicateBuilder( searchContext );
+	public SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(String absoluteFieldPath) {
+		return indexes.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX, searchContext );
 	}
 
 	@Override

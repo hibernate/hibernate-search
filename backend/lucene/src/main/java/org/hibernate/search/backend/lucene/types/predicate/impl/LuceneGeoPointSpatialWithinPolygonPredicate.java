@@ -8,9 +8,11 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -20,10 +22,22 @@ import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.geo.Polygon;
 import org.apache.lucene.search.Query;
 
-class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneLeafSingleFieldPredicate {
+public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneGeoPointSpatialWithinPolygonPredicate(Builder builder) {
 		super( builder );
+	}
+
+	public static class Factory
+			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
+		public Factory(LuceneFieldCodec<GeoPoint> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
+			return new Builder( searchContext, field );
+		}
 	}
 
 	static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinPolygonPredicateBuilder {
