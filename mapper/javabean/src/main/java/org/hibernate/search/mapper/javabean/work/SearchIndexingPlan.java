@@ -98,7 +98,7 @@ public interface SearchIndexingPlan {
 	/**
 	 * Delete an entity from the index.
 	 * <p>
-	 * Shorthand for {@code delete(null, entity)}; see {@link #delete(Object, Object)}.
+	 * Shorthand for {@code delete(null, entity)}; see {@link #delete(Object, String, Object)}.
 	 *
 	 * @param entity The entity to delete from the index.
 	 */
@@ -112,9 +112,12 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to delete from the index.
 	 */
-	void delete(Object providedId, Object entity);
+	void delete(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Delete the entity from the index.
