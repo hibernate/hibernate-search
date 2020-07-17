@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -19,19 +21,31 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.BytesRef;
 
-class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPredicate {
+public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneTextWildcardPredicate(Builder builder) {
 		super( builder );
 	}
 
-	static class Builder<F> extends AbstractBuilder<F> implements WildcardPredicateBuilder {
+	public static class Factory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<WildcardPredicateBuilder, F, LuceneTextFieldCodec<F>> {
+		public Factory(LuceneTextFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new Builder<>( searchContext, field );
+		}
+	}
+
+	private static class Builder<F> extends AbstractBuilder<F> implements WildcardPredicateBuilder {
 
 		private final Analyzer analyzerOrNormalizer;
 
 		private String pattern;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		private Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.analyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 		}

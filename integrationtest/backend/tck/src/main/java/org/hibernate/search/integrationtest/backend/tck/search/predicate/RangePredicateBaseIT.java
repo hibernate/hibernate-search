@@ -329,7 +329,7 @@ public class RangePredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "range predicates";
+			return "predicate:range";
 		}
 	}
 
@@ -362,6 +362,11 @@ public class RangePredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.range().field( fieldPath );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:range";
 		}
 	}
 
@@ -473,6 +478,11 @@ public class RangePredicateBaseIT {
 		protected Range<?> wrappedMatchingParam(int matchingDocOrdinal) {
 			return unwrappedMatchingParam( matchingDocOrdinal ).map( ValueWrapper::new );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:range";
+		}
 	}
 
 	public static class ScaleCheckingIT extends AbstractPredicateScaleCheckingIT {
@@ -493,6 +503,11 @@ public class RangePredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
 			return f.range().field( fieldPath ).range( Range.between( matchingParam, matchingParam ) );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:range";
 		}
 	}
 }

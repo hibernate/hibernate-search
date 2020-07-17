@@ -10,12 +10,15 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchRangeAggregation;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonElementFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeOptionsStep;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
@@ -44,8 +47,11 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		ElasticsearchJsonElementFieldCodec codec = new ElasticsearchJsonElementFieldCodec( gson );
 		builder.codec( codec );
 
-		builder.predicateBuilderFactory(
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, codec ) );
+		builder.searchable( true );
+		builder.queryElementFactory( PredicateTypeKeys.MATCH,
+				new ElasticsearchStandardMatchPredicate.Factory<>( codec ) );
+		builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
+		builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
 
 		builder.sortable( true );
 		builder.queryElementFactory( SortTypeKeys.FIELD, new ElasticsearchStandardFieldSort.Factory<>( codec ) );

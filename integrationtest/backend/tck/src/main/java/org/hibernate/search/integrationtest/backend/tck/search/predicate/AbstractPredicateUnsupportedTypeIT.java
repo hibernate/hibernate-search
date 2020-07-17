@@ -40,8 +40,8 @@ public abstract class AbstractPredicateUnsupportedTypeIT {
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						predicateNameInErrorMessage(),
-						"are not supported by this field's type"
+						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
+						"'" + predicateNameInErrorMessage() + "' is not available for fields of this type"
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( fieldPath )

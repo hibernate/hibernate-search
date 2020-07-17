@@ -14,11 +14,17 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Da
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextMatchPredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextPhrasePredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextWildcardPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -172,8 +178,19 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 		builder.codec( codec );
 
-		builder.predicateBuilderFactory(
-				new ElasticsearchTextFieldPredicateBuilderFactory( resolvedSearchable, codec, mapping.getType() ) );
+		if ( resolvedSearchable ) {
+			builder.searchable( true );
+			builder.queryElementFactory( PredicateTypeKeys.MATCH,
+					new ElasticsearchTextMatchPredicate.Factory( codec, mapping.getType() ) );
+			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.PHRASE,
+					new ElasticsearchTextPhrasePredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.WILDCARD,
+					new ElasticsearchTextWildcardPredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
+					new ElasticsearchSimpleQueryStringPredicateBuilderFieldState.Factory( codec ) );
+		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );

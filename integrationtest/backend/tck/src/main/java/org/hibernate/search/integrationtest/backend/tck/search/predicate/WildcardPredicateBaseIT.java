@@ -316,7 +316,7 @@ public class WildcardPredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "wildcard";
+			return "predicate:wildcard";
 		}
 	}
 
@@ -349,6 +349,11 @@ public class WildcardPredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.wildcard().field( fieldPath );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:wildcard";
 		}
 	}
 

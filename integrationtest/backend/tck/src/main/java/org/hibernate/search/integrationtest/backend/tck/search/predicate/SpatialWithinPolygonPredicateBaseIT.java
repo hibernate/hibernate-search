@@ -273,7 +273,7 @@ public class SpatialWithinPolygonPredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "Spatial predicates";
+			return "predicate:spatial:within-polygon";
 		}
 	}
 
@@ -295,6 +295,11 @@ public class SpatialWithinPolygonPredicateBaseIT {
 			f.spatial().within().field( fieldPath )
 					// We need this because the backend is not involved before the call to polygon()
 					.polygon( unsusedPolygon() );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-polygon";
 		}
 	}
 

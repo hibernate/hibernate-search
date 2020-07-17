@@ -7,12 +7,16 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinCirclePredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinPolygonPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchDistanceSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -32,8 +36,16 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		// We need doc values for the projection script when not sorting on the same field
 		builder.mapping().setDocValues( resolvedSortable || resolvedProjectable );
 
-		builder.predicateBuilderFactory(
-				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ) );
+		if ( resolvedSearchable ) {
+			builder.searchable( true );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
+					new ElasticsearchGeoPointSpatialWithinCirclePredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,
+					new ElasticsearchGeoPointSpatialWithinPolygonPredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX,
+					new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate.Factory( codec ) );
+		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );

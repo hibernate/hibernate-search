@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistanceToFieldProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinBoundingBoxPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinCirclePredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinPolygonPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointDistanceSort;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -45,8 +49,16 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		);
 		builder.codec( codec );
 
-		builder.predicateBuilderFactory(
-				new LuceneGeoPointFieldPredicateBuilderFactory( resolvedSearchable, codec ) );
+		if ( resolvedSearchable ) {
+			builder.searchable( true );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
+					new LuceneGeoPointSpatialWithinCirclePredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,
+					new LuceneGeoPointSpatialWithinPolygonPredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX,
+					new LuceneGeoPointSpatialWithinBoundingBoxPredicate.Factory( codec ) );
+		}
 
 		if ( resolvedSortable ) {
 			builder.sortable( true );

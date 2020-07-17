@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneInd
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPredicateBuilderFactory {
@@ -42,8 +43,9 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		}
 
 		for ( String leafFieldPath : leafFieldPaths ) {
-			if ( !leafFields.get( leafFieldPath ).type().predicateBuilderFactory()
-					.isCompatibleWith( casted.leafFields.get( leafFieldPath ).type().predicateBuilderFactory() ) ) {
+			// TODO temporary hack - we should use query element factories for object fields as well
+			if ( !leafFields.get( leafFieldPath ).type().queryElementFactory( PredicateTypeKeys.EXISTS )
+					.isCompatibleWith( casted.leafFields.get( leafFieldPath ).type().queryElementFactory( PredicateTypeKeys.EXISTS ) ) ) {
 				return false;
 			}
 		}
@@ -57,7 +59,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		);
 		for ( Map.Entry<String, LuceneSearchFieldContext<?>> entry : leafFields.entrySet() ) {
 			ExistsPredicateBuilder existsPredicateBuilder =
-					entry.getValue().createExistsPredicateBuilder( searchContext );
+					entry.getValue().queryElement( PredicateTypeKeys.EXISTS, searchContext );
 			builder.addChild( existsPredicateBuilder.build() );
 		}
 		return builder;

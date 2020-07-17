@@ -11,9 +11,11 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -26,7 +28,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
-class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPredicate {
+public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,7 +36,19 @@ class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 		super( builder );
 	}
 
-	static class Builder<F> extends AbstractBuilder<F>
+	public static class Factory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<PhrasePredicateBuilder, F, LuceneTextFieldCodec<F>> {
+		public Factory(LuceneTextFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new Builder<>( searchContext, field );
+		}
+	}
+
+	private static class Builder<F> extends AbstractBuilder<F>
 			implements PhrasePredicateBuilder {
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -43,7 +57,7 @@ class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 		private Analyzer overrideAnalyzer;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		private Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
 		}

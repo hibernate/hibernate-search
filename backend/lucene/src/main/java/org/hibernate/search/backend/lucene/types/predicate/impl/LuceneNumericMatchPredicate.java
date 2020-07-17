@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -20,7 +21,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
-class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
+public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -28,13 +29,25 @@ class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate
 		super( builder );
 	}
 
-	static class Builder<F, E extends Number> extends AbstractBuilder<F> implements MatchPredicateBuilder {
+	public static class Factory<F, E extends Number>
+			extends AbstractLuceneSearchFieldQueryElementFactory<MatchPredicateBuilder, F, AbstractLuceneNumericFieldCodec<F, E>> {
+		public Factory(AbstractLuceneNumericFieldCodec<F, E> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder<F, E> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new Builder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class Builder<F, E extends Number> extends AbstractBuilder<F> implements MatchPredicateBuilder {
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		private E value;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				AbstractLuceneNumericFieldCodec<F, E> codec) {
+		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}
@@ -46,17 +59,17 @@ class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPredicate
 
 		@Override
 		public void fuzzy(int maxEditDistance, int exactPrefixLength) {
-			throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
+			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		public void analyzer(String analyzerName) {
-			throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
+			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override
 		public void skipAnalysis() {
-			throw log.textPredicatesNotSupportedByFieldType( field.eventContext() );
+			throw log.fullTextFeaturesNotSupportedByFieldType( field.eventContext() );
 		}
 
 		@Override

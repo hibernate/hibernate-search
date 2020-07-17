@@ -68,22 +68,24 @@ public abstract class AbstractPredicateScaleCheckingIT {
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigDecimalFieldPath(), dataSet.bigDecimal0 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + bigDecimalFieldPath() + "'" )
+				.hasMessageContaining( "Multiple conflicting implementations of '" + predicateNameInErrorMessage()
+						+ "' for field '" + bigDecimalFieldPath() + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigIntegerFieldPath(), dataSet.bigInteger0 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + bigIntegerFieldPath() + "'" )
+				.hasMessageContaining( "Multiple conflicting implementations of '" + predicateNameInErrorMessage()
+						+ "' for field '" + bigIntegerFieldPath() + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );
 	}
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam);
+
+	protected abstract String predicateNameInErrorMessage();
 
 	private String bigDecimalFieldPath() {
 		return "bigDecimal";

@@ -178,7 +178,8 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		public FieldState field(String absoluteFieldPath) {
 			ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 			if ( field == null ) {
-				field = indexes.field( absoluteFieldPath ).createSimpleQueryStringFieldState();
+				field = indexes.field( absoluteFieldPath )
+						.queryElement( PredicateTypeKeys.SIMPLE_QUERY_STRING, searchContext );
 				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 				fields.put( absoluteFieldPath, field );
 			}

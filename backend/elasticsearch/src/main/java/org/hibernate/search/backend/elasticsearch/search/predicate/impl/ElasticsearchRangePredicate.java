@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -68,18 +69,31 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		return outerObject;
 	}
 
-	public static class Builder<F> extends AbstractBuilder implements RangePredicateBuilder {
+	public static class Factory<F>
+			extends AbstractElasticsearchSearchFieldQueryElementFactory<RangePredicateBuilder, F> {
+		public Factory(ElasticsearchFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public RangePredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
+			return new Builder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class Builder<F> extends AbstractBuilder implements RangePredicateBuilder {
 
 		private final ElasticsearchSearchFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private Range<JsonElement> range;
 
-		public Builder(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field, ElasticsearchFieldCodec<F> codec) {
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchFieldContext<F> field) {
 			super( searchContext, field );
-			this.field = field;
 			this.codec = codec;
+			this.field = field;
 		}
 
 		@Override

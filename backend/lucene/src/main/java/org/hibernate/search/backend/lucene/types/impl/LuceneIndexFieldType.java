@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryEle
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
@@ -36,13 +35,12 @@ public class LuceneIndexFieldType<F>
 	private final DslConverter<?, F> dslConverter;
 	private final ProjectionConverter<F, ?> projectionConverter;
 
+	private final boolean searchable;
 	private final boolean sortable;
 	private final boolean projectable;
 	private final boolean aggregable;
 
 	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>> queryElementFactories;
-
-	private final LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
@@ -58,11 +56,11 @@ public class LuceneIndexFieldType<F>
 		this.dslConverter = builder.dslConverter != null ? builder.dslConverter : rawDslConverter;
 		this.projectionConverter = builder.projectionConverter != null ? builder.projectionConverter
 				: rawProjectionConverter;
+		this.searchable = builder.searchable;
 		this.sortable = builder.sortable;
 		this.projectable = builder.projectable;
 		this.aggregable = builder.aggregable;
 		this.queryElementFactories = builder.queryElementFactories;
-		this.predicateBuilderFactory = builder.predicateBuilderFactory;
 		this.indexingAnalyzerOrNormalizer = builder.indexingAnalyzerOrNormalizer();
 		this.searchAnalyzerOrNormalizer = builder.searchAnalyzer != null ? builder.searchAnalyzer
 				: indexingAnalyzerOrNormalizer;
@@ -94,7 +92,7 @@ public class LuceneIndexFieldType<F>
 
 	@Override
 	public boolean searchable() {
-		return predicateBuilderFactory.isSearchable();
+		return searchable;
 	}
 
 	@Override
@@ -163,11 +161,6 @@ public class LuceneIndexFieldType<F>
 		return (LuceneSearchFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
 	}
 
-	@Override
-	public LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
-		return predicateBuilderFactory;
-	}
-
 	public Analyzer indexingAnalyzerOrNormalizer() {
 		return indexingAnalyzerOrNormalizer;
 	}
@@ -187,14 +180,13 @@ public class LuceneIndexFieldType<F>
 		private DslConverter<?, F> dslConverter;
 		private ProjectionConverter<F, ?> projectionConverter;
 
+		private boolean searchable;
 		private boolean sortable;
 		private boolean projectable;
 		private boolean aggregable;
 
 		private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>>
 				queryElementFactories = new HashMap<>();
-
-		private LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory;
 
 		private Analyzer analyzer;
 		private String analyzerName;
@@ -223,6 +215,10 @@ public class LuceneIndexFieldType<F>
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 
+		public void searchable(boolean searchable) {
+			this.searchable = searchable;
+		}
+
 		public void sortable(boolean sortable) {
 			this.sortable = sortable;
 		}
@@ -238,10 +234,6 @@ public class LuceneIndexFieldType<F>
 		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
 				LuceneSearchFieldQueryElementFactory<T, F> factory) {
 			queryElementFactories.put( key, factory );
-		}
-
-		public void predicateBuilderFactory(LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory) {
-			this.predicateBuilderFactory = predicateBuilderFactory;
 		}
 
 		public void analyzer(String analyzerName, Analyzer analyzer) {

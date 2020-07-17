@@ -306,6 +306,11 @@ public class ExistsPredicateBaseIT {
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.exists().field( fieldPath );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:exists";
+		}
 	}
 
 	@RunWith(Parameterized.class)
@@ -372,6 +377,11 @@ public class ExistsPredicateBaseIT {
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
 			return f.exists().field( fieldPath );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:exists";
 		}
 	}
 }

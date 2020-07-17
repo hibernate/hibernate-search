@@ -14,7 +14,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -146,12 +145,6 @@ public class LuceneMultiIndexSearchFieldContext<F>
 			}
 		}
 		return factory;
-	}
-
-	@Override
-	public LuceneFieldPredicateBuilderFactory<F> predicateBuilderFactory() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::predicateBuilderFactory,
-				LuceneFieldPredicateBuilderFactory::isCompatibleWith, "predicateFactory" );
 	}
 
 	private <T> T getFromFieldIfCompatible(Function<LuceneSearchFieldContext<F>, T> getter,

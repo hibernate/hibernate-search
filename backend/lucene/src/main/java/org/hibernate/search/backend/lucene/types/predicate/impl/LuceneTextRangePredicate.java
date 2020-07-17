@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -19,19 +20,31 @@ import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
-class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredicate {
+public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
 	private LuceneTextRangePredicate(Builder builder) {
 		super( builder );
 	}
 
-	static class Builder<F> extends AbstractBuilder<F> implements RangePredicateBuilder {
+	public static class Factory<F>
+			extends AbstractLuceneSearchFieldQueryElementFactory<RangePredicateBuilder, F, LuceneTextFieldCodec<F>> {
+		public Factory(LuceneTextFieldCodec<F> codec) {
+			super( codec );
+		}
+
+		@Override
+		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+			return new Builder<>( codec, searchContext, field );
+		}
+	}
+
+	private static class Builder<F> extends AbstractBuilder<F> implements RangePredicateBuilder {
 		private final LuceneTextFieldCodec<F> codec;
 
 		private Range<String> range;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field,
-				LuceneTextFieldCodec<F> codec) {
+		private Builder(LuceneTextFieldCodec<F> codec, LuceneSearchContext searchContext,
+				LuceneSearchFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}

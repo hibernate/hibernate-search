@@ -373,7 +373,7 @@ public class PhrasePredicateBaseIT {
 
 		@Override
 		protected String predicateNameInErrorMessage() {
-			return "wildcard";
+			return "predicate:phrase";
 		}
 	}
 
@@ -406,6 +406,11 @@ public class PhrasePredicateBaseIT {
 		@Override
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.phrase().field( fieldPath );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:phrase";
 		}
 	}
 
