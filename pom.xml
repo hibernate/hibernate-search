@@ -1794,9 +1794,6 @@
                     --add-opens java.base/java.lang=ALL-UNNAMED
                 </surefire.jvm.args.java-version.strict>
             </properties>
-            <modules>
-                <!-- Nothing at the moment -->
-            </modules>
         </profile>
 
         <profile>
@@ -1850,6 +1847,37 @@
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- Spring isn't ready for JDK14 yet: https://github.com/spring-projects/spring-framework/issues/23678 -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>jdk16+</id>
+            <activation>
+                <jdk>[16,)</jdk>
+            </activation>
+            <properties>
+                <!--
+                    We need net.bytebuddy.experimental=true
+                    to make BytecodeEnhancementIT pass
+                 -->
+                <surefire.jvm.args.java-version.lenient>
+                    -Djdk.attach.allowAttachSelf=true
+                    -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true
+                    -Dnet.bytebuddy.experimental=true
+                </surefire.jvm.args.java-version.lenient>
+                <!--
+                     When we use illegal-access=deny,
+                     we have to open the java.lang package to EasyMock,
+                     because cglib (used by EasyMock) requires to execute setAccessible(true)
+                     on ClassLoader.defineClass(...).
+                     See https://github.com/easymock/easymock/issues/235
+                     See https://hibernate.atlassian.net/browse/HSEARCH-3419
+                 -->
+                <surefire.jvm.args.java-version.strict>
+                    ${surefire.jvm.args.java-version.lenient}
+                    --illegal-access=deny
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                </surefire.jvm.args.java-version.strict>
             </properties>
         </profile>
 
