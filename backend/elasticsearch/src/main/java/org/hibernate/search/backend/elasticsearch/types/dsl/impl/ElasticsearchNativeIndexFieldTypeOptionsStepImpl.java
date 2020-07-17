@@ -51,7 +51,7 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		builder.queryElementFactory( PredicateTypeKeys.MATCH,
 				new ElasticsearchStandardMatchPredicate.Factory<>( codec ) );
 		builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
-		builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
+		builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 
 		builder.sortable( true );
 		builder.queryElementFactory( SortTypeKeys.FIELD, new ElasticsearchStandardFieldSort.Factory<>( codec ) );

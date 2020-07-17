@@ -10,7 +10,6 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.search.Query;
 
 /**
  * Defines how a given value will be encoded in the Lucene document and how it will be decoded.
@@ -40,14 +39,6 @@ public interface LuceneFieldCodec<F> {
 	 * @return The decoded value.
 	 */
 	F decode(IndexableField field);
-
-	/**
-	 * Create a {@link Query} that will match every document in which the field with the given path appears.
-	 *
-	 * @param absoluteFieldPath The absolute path of the field.
-	 * @return A Lucene {@link Query}.
-	 */
-	Query createExistsQuery(String absoluteFieldPath);
 
 	/**
 	 * Determine whether another codec is compatible with this one, i.e. whether it will encode/decode the information

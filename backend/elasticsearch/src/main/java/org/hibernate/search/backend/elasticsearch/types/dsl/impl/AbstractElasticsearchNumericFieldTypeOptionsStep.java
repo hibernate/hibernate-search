@@ -37,7 +37,7 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<S extends Abstra
 			builder.queryElementFactory( PredicateTypeKeys.MATCH,
 					new ElasticsearchStandardMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 		}
 
 		if ( resolvedSortable ) {

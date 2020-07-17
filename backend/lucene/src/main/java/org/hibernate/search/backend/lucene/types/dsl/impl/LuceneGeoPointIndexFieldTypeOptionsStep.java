@@ -44,6 +44,9 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
+		// When projectable, we need distance projections; thus we need docValues.
+		boolean docValues = resolvedSortable || resolvedProjectable;
+
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);
@@ -51,7 +54,9 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
-			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
+					docValues ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+							: new LuceneExistsPredicate.DefaultFactory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
 					new LuceneGeoPointSpatialWithinCirclePredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,

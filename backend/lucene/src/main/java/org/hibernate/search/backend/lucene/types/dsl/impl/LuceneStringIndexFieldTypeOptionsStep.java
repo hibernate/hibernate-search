@@ -119,6 +119,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 		boolean resolvedNorms = resolveNorms();
 		ResolvedTermVector resolvedTermVector = resolveTermVector();
 
+		boolean docValues = resolvedSortable || resolvedAggregable;
+
 		if ( analyzer != null ) {
 			builder.analyzer( analyzerName, analyzer );
 			builder.searchAnalyzer( searchAnalyzerName, searchAnalyzer );
@@ -164,7 +166,14 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneTextMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneTextRangePredicate.Factory<>( codec ) );
-			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.Factory<>( codec ) );
+			if ( resolvedNorms ) {
+				builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.NormsBasedFactory() );
+			}
+			else {
+				builder.queryElementFactory( PredicateTypeKeys.EXISTS,
+						docValues ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+								: new LuceneExistsPredicate.DefaultFactory<>() );
+			}
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
