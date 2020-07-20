@@ -23,10 +23,10 @@ public interface ElasticsearchSearchFieldQueryElementFactory<T, F> {
 	T create(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
 
 	/**
-	 * Determines whether this factory and the given factory can be used interchangeably.
+	 * Checks whether this factory and the given factory can be used interchangeably.
 	 * @param other Another factory.
-	 * @return {@code true} if the two factories can be used interchangeably, {@code false} otherwise.
+	 * @throws org.hibernate.search.util.common.SearchException if the two factories cannot be used interchangeably.
 	 */
-	boolean isCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other);
+	void checkCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other);
 
 }

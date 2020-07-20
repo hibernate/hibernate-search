@@ -51,7 +51,9 @@ public class FieldSearchSortScaledSpecificsIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Multiple conflicting implementations of 'sort:field' for field '" + fieldPath + "'"
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'sort:field'",
+						"Field codec differs:", "decimalScale=2", " vs. ", "decimalScale=5"
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleDecimalScaleIndex.name() )

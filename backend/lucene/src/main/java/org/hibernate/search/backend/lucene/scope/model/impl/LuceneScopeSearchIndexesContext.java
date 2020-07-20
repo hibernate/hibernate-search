@@ -86,7 +86,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 				converter = converterForIndex;
 			}
 			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
-				throw log.conflictingIdentifierTypesForSearch( converter, converterForIndex, indexesEventContext() );
+				throw log.inconsistentConfigurationForIdentifierForSearch( converter, converterForIndex, indexesEventContext() );
 			}
 		}
 		return converter;
@@ -157,7 +157,6 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 		}
 		else {
 			// Multi-index search
-			Class<?> fieldValueTypeForAllIndexes = null;
 			List<LuceneSearchFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
 			for ( LuceneIndexModel indexModel : indexModels ) {
@@ -165,16 +164,6 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( fieldForCurrentIndex == null ) {
 					continue;
-				}
-				Class<?> fieldValueTypeForCurrentIndex = fieldForCurrentIndex.type().valueClass();
-				if ( fieldValueTypeForAllIndexes == null ) {
-					fieldValueTypeForAllIndexes = fieldValueTypeForCurrentIndex;
-				}
-				else {
-					if ( !fieldValueTypeForAllIndexes.equals( fieldValueTypeForCurrentIndex ) ) {
-						throw log.conflictingFieldTypesForSearch( absoluteFieldPath, "valueType",
-								fieldValueTypeForAllIndexes, fieldValueTypeForCurrentIndex, indexesEventContext() );
-					}
 				}
 				fieldForEachIndex.add( fieldForCurrentIndex );
 			}

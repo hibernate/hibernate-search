@@ -141,7 +141,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndex_dslConverterEnabled() {
+	public void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
@@ -152,27 +152,10 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
-				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
-				) );
-	}
-
-	@Test
-	public void multiIndex_withNoCompatibleIndex_dslConverterDisabled() {
-		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
-
-		String fieldPath = getFieldPath();
-
-		assertThatThrownBy(
-				() -> {
-					matchAllQuery( f -> f.distance( fieldPath, CENTER_POINT ), scope );
-				}
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'sort:distance'"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 				) );

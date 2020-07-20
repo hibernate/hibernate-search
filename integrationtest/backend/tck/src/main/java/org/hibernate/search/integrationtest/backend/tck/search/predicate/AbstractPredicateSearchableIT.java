@@ -57,8 +57,8 @@ public abstract class AbstractPredicateSearchableIT {
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
-						"Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)"
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for '" + predicateNameInErrorMessage() + "'"
 				);
 	}
 

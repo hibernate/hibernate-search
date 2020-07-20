@@ -332,8 +332,10 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'projectionConverter' differs:", " vs. "
+				);
 	}
 
 	@Test
@@ -363,8 +365,10 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'projection:field'"
+				);
 	}
 
 	@Test
@@ -375,8 +379,10 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'projection:field'"
+				);
 	}
 
 	@Test
@@ -388,8 +394,10 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scope.projection().field( fieldPath, ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'nested", "' differs:"
+				);
 	}
 
 	private String getFieldPath() {

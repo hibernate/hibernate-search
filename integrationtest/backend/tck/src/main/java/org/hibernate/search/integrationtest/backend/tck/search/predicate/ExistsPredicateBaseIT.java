@@ -348,6 +348,12 @@ public class ExistsPredicateBaseIT {
 		}
 
 		@Override
+		public void multiIndex_withIncompatibleIndex() {
+			throw new AssumptionViolatedException( "The 'exists' predicate actually can be used when a field relies"
+					+ " on different codecs in different indexes" );
+		}
+
+		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
 			return f.exists().field( fieldPath );
 		}
@@ -356,6 +362,11 @@ public class ExistsPredicateBaseIT {
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 				int matchingDocOrdinal) {
 			throw new AssumptionViolatedException( "The 'exists' predicate can only target one field at a time" );
+		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:exists";
 		}
 	}
 

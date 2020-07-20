@@ -107,11 +107,15 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	public void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = index.createScope( incompatibleIndex );
 
-		assertThatThrownBy( () -> predicate( scope.predicate(), defaultDslConverterField0Path(),
+		String fieldPath = defaultDslConverterField0Path();
+
+		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				0 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + defaultDslConverterField0Path() + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for '" + predicateNameInErrorMessage() + "'"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );
@@ -122,7 +126,9 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
 			int matchingDocOrdinal);
 
-	private String defaultDslConverterField0Path() {
+	protected abstract String predicateNameInErrorMessage();
+
+	protected final String defaultDslConverterField0Path() {
 		return index.binding().defaultDslConverterField0.get( dataSet.fieldType ).relativeFieldName;
 	}
 

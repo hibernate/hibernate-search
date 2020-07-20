@@ -236,8 +236,10 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'dslConverter' differs:", " vs. "
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), rawFieldCompatibleIndex.name() )
 				) );
@@ -266,8 +268,10 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				unwrappedMatchingParam( 0 ), ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for '" + predicateNameInErrorMessage() + "'", " vs. "
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );
@@ -282,8 +286,10 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( scope.predicate(), fieldPath,
 				unwrappedMatchingParam( 0 ), ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + defaultDslConverterField0Path() + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for '" + predicateNameInErrorMessage() + "'"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );

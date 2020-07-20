@@ -38,6 +38,13 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "decimalScale=" + decimalScale
+				+ "]";
+	}
+
+	@Override
 	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigDecimal value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, value.toString() ) );

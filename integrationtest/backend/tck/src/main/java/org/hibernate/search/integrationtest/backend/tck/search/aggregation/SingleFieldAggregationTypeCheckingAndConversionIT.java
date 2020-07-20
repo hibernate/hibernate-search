@@ -424,8 +424,10 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute '", "Converter' differs:", " vs. "
+				);
 	}
 
 	@Test
@@ -450,8 +452,10 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		assertThatThrownBy( () -> scenario.setup( scope.aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'aggregation:" + expectations.aggregationName() + "'"
+				);
 	}
 
 	@Test
@@ -466,8 +470,10 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				scope.aggregation(), fieldPath, ValueConvert.NO
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'aggregation:" + expectations.aggregationName() + "'"
+				);
 	}
 
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
@@ -628,7 +634,8 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
 			supportedFieldTypes.forEach( typeDescriptor ->
-					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
+					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ),
+							o -> o.aggregable( Aggregable.YES ) )
 							.map( parent, "" + typeDescriptor.getUniqueName() )
 			);
 		}

@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -23,10 +25,19 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final int decimalScale;
 	private final BigDecimal scalingFactor;
 
-	public ElasticsearchBigIntegerFieldCodec(BigDecimal scalingFactor) {
-		this.scalingFactor = scalingFactor;
+	public ElasticsearchBigIntegerFieldCodec(int decimalScale) {
+		this.decimalScale = decimalScale;
+		scalingFactor = BigDecimal.TEN.pow( decimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "decimalScale=" + decimalScale
+				+ "]";
 	}
 
 	@Override
@@ -71,8 +82,11 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 		}
 
 		ElasticsearchBigIntegerFieldCodec other = (ElasticsearchBigIntegerFieldCodec) obj;
-		// comparing only their numeric values, they can have different scales
-		return scalingFactor.compareTo( other.scalingFactor ) == 0;
+		return decimalScale == other.decimalScale;
+	}
+
+	public BigDecimal scalingFactor() {
+		return scalingFactor;
 	}
 
 	public boolean isTooLarge(BigInteger value) {

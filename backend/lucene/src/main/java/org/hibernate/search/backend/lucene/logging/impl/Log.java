@@ -334,9 +334,9 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
 	@Message(id = ID_OFFSET_2 + 58,
-			value = "Multiple conflicting types for field '%1$s', attribute '%2$s' was different: '%3$s' vs. '%4$s'.")
-	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath, String attributeName,
-			Object component1, Object component2, @Param EventContext context);
+			value = "Inconsistent configuration for field '%1$s' in a search query across multiple indexes: %2$s")
+	SearchException inconsistentConfigurationForFieldForSearch(String absoluteFieldPath, String causeMessage,
+			@Param EventContext context, @Cause SearchException cause);
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Failed to shut down the Lucene index manager.")
 	SearchException failedToShutdownBackend(@Cause Exception cause, @Param EventContext context);
@@ -351,8 +351,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToDeleteAllEntriesFromIndex(Query query, @Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 68,
-			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
-	SearchException conflictingIdentifierTypesForSearch(ToDocumentIdentifierValueConverter<?> component1,
+			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
+	SearchException inconsistentConfigurationForIdentifierForSearch(ToDocumentIdentifierValueConverter<?> component1,
 			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 69,
@@ -600,8 +600,27 @@ public interface Log extends BasicLogger {
 	SearchException cannotUseQueryElementForField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 133,
-			value = "Multiple conflicting implementations of '%2$s' for field '%1$s' in different indexes: '%3$s' vs. '%4$s'.")
-	SearchException conflictingQueryElementForFieldOnMultipleIndexes(String absoluteFieldPath, String queryElementName,
-			Object component1, Object component2, @Param EventContext context);
+			value = "Inconsistent support for '%1$s': %2$s")
+	SearchException inconsistentSupportForQueryElement(String queryElementName,
+			String causeMessage, @Cause SearchException cause);
+
+	@Message(id = ID_OFFSET_2 + 134,
+			value = "Field attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
+	SearchException differentFieldAttribute(String attributeName, Object component1, Object component2);
+
+	@Message(id = ID_OFFSET_2 + 135,
+			value = "Implementation class differs: '%1$s' vs. '%2$s'.")
+	SearchException differentImplementationClassForQueryElement(@FormatWith(ClassFormatter.class) Class<?> class1,
+			@FormatWith(ClassFormatter.class) Class<?> class2);
+
+	@Message(id = ID_OFFSET_2 + 136,
+			value = "Field codec differs: '%1$s' vs. '%2$s'.")
+	SearchException differentFieldCodecForQueryElement(Object codec1, Object codec2);
+
+	@Message(id = ID_OFFSET_2 + 137,
+			value = "'%1$s' can be used in some of the targeted indexes, but not all of them."
+					+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant) in all indexes,"
+					+ " and that the field has the same type in all indexes.")
+	SearchException partialSupportForQueryElement(String queryElementName);
 
 }

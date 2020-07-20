@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -140,16 +141,11 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 			ElasticsearchSearchFieldTypeContext<F> fieldType = fieldContext.type();
 			ElasticsearchSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
 					fieldType.queryElementFactory( key );
-			if ( factoryForFieldContext == null ) {
-				// The query element can't be created for at least one of the indexes.
-				return null;
-			}
 			if ( factory == null ) {
 				factory = factoryForFieldContext;
 			}
-			else if ( !factory.isCompatibleWith( factoryForFieldContext ) ) {
-				throw log.conflictingQueryElementForFieldOnMultipleIndexes( absolutePath, key.toString(),
-						factory, factoryForFieldContext, indexesEventContext() );
+			else {
+				checkFactoryCompatibility( key, factory, factoryForFieldContext );
 			}
 		}
 		return factory;
@@ -163,9 +159,8 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 			if ( attribute == null ) {
 				attribute = attributeForFieldContext;
 			}
-			else if ( !compatiblityChecker.test( attribute, attributeForFieldContext ) ) {
-				throw log.conflictingFieldTypesForSearch( absolutePath, attributeName,
-						attribute, attributeForFieldContext, indexesEventContext() );
+			else {
+				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
 			}
 		}
 		return attribute;
@@ -180,11 +175,45 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 			if ( attribute == null ) {
 				attribute = attributeForFieldContext;
 			}
-			else if ( !compatiblityChecker.test( attribute, attributeForFieldContext ) ) {
-				throw log.conflictingFieldTypesForSearch( absolutePath, attributeName,
-						attribute, attributeForFieldContext, indexesEventContext() );
+			else {
+				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
 			}
 		}
 		return attribute;
+	}
+
+	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
+			ElasticsearchSearchFieldQueryElementFactory<T, F> factory1,
+			ElasticsearchSearchFieldQueryElementFactory<T, F> factory2) {
+		if ( factory1 == null && factory2 == null ) {
+			return;
+		}
+		try {
+			try {
+				if ( factory1 == null || factory2 == null ) {
+					throw log.inconsistentSupportForQueryElement( key.toString() );
+				}
+
+				factory1.checkCompatibleWith( factory2 );
+			}
+			catch (SearchException e) {
+				throw log.inconsistentSupportForQueryElement( key.toString(), e.getMessage(), e );
+			}
+		}
+		catch (SearchException e) {
+			throw log.inconsistentConfigurationForFieldForSearch( absolutePath, e.getMessage(), indexesEventContext(), e );
+		}
+	}
+
+	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatiblityChecker, String attributeName,
+			T attribute1, T attribute2) {
+		try {
+			if ( !compatiblityChecker.test( attribute1, attribute2 ) ) {
+				throw log.differentFieldAttribute( attributeName, attribute1, attribute2 );
+			}
+		}
+		catch (SearchException e) {
+			throw log.inconsistentConfigurationForFieldForSearch( absolutePath, e.getMessage(), indexesEventContext(), e );
+		}
 	}
 }

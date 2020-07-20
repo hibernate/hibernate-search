@@ -86,8 +86,10 @@ public abstract class AbstractPredicateSimpleAnalysisIT {
 				.where( f -> predicate( f, absoluteFieldPath, "fox" ) )
 				.fetchAll() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'analyzedString'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + absoluteFieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'searchAnalyzer", "' differs:", " vs. "
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleSearchAnalyzerIndex.name() )
 				) );

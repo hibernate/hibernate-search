@@ -210,8 +210,10 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 		assertThatThrownBy( () -> scope.projection().distance( fieldPath, CENTER_POINT_1 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'projection:distance'"
+				);
 	}
 
 	@Test
@@ -223,10 +225,11 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 		assertThatThrownBy( () -> scope.projection().distance( fieldPath, CENTER_POINT_1 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'nested", "' differs:"
+				);
 	}
-
 
 	private String getFieldPath() {
 		return mainIndex.binding().fieldModel.relativeFieldName;

@@ -8,8 +8,6 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
@@ -42,10 +40,12 @@ class ElasticsearchBigDecimalIndexFieldTypeOptionsStep
 
 	@Override
 	protected ElasticsearchFieldCodec<BigDecimal> completeCodec() {
-		BigDecimal scalingFactor = BigDecimal.TEN.pow( resolveDecimalScale(), new MathContext( 10, RoundingMode.HALF_UP ) );
-		builder.mapping().setScalingFactor( scalingFactor.doubleValue() );
+		int resolvedDecimalScale = resolveDecimalScale();
 
-		return new ElasticsearchBigDecimalFieldCodec( scalingFactor );
+		ElasticsearchBigDecimalFieldCodec codec = new ElasticsearchBigDecimalFieldCodec( resolvedDecimalScale );
+		builder.mapping().setScalingFactor( codec.scalingFactor().doubleValue() );
+
+		return codec;
 	}
 
 	@Override

@@ -6,11 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
 public abstract class AbstractLuceneSearchFieldQueryElementFactory<T, F>
 		implements LuceneSearchFieldQueryElementFactory<T, F> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	@Override
-	public boolean isCompatibleWith(LuceneSearchFieldQueryElementFactory<?, ?> other) {
-		return getClass().equals( other.getClass() );
+	public void checkCompatibleWith(LuceneSearchFieldQueryElementFactory<?, ?> other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			throw log.differentImplementationClassForQueryElement( getClass(), other.getClass() );
+		}
 	}
 }
