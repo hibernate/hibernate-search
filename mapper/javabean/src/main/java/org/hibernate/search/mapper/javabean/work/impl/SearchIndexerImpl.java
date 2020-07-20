@@ -44,9 +44,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> delete(Object providedId, Object entity) {
-		// TODO HSEARCH-3891 expose the providedRoutingKey
-		return delegate.delete( getTypeIdentifier( entity ), providedId, null, entity,
+	public CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity) {
+		return delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
 				commitStrategy, refreshStrategy );
 	}
 

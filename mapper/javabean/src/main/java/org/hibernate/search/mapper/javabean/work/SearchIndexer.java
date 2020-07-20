@@ -119,7 +119,7 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code delete(null, entity)}; see {@link #delete(Object, Object)}.
+	 * Shorthand for {@code delete(null, null, entity)}; see {@link #delete(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
@@ -133,7 +133,7 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * No effect on the index if the entity is not in the index.
+	 * Shorthand for {@code delete(providedId, null, entity)}; see {@link #delete(Object, String, Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -141,7 +141,27 @@ public interface SearchIndexer {
 	 * @param entity The entity to delete from the index.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> delete(Object providedId, Object entity);
+	default CompletableFuture<?> delete(Object providedId, Object entity) {
+		return delete( providedId, null, entity );
+	}
+
+	/**
+	 * Delete an entity from the index.
+	 * <p>
+	 * Entities to reindex as a result of this operation will not be resolved.
+	 * <p>
+	 * No effect on the index if the entity is not in the index.
+	 *
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the delete request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
+	 * @param entity The entity to delete from the index.
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 */
+	CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Purge an entity from the index.
