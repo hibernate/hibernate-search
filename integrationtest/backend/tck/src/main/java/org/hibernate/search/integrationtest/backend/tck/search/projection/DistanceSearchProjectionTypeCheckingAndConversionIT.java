@@ -14,11 +14,14 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -58,8 +61,8 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
-	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
@@ -146,8 +149,6 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 	public void withProjectionConverters() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		@SuppressWarnings("rawtypes") // The projection DSL only allows to work with raw types, not with parameterized types
-		SearchQuery<ValueWrapper> query;
 		String fieldPath = getFieldWithConverterPath();
 
 		assertThat( scope.query()
@@ -276,8 +277,10 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, 3 ) )
 				.add( EMPTY, document -> { } );
 		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
-				.add( COMPATIBLE_INDEX_DOCUMENT_1,
-						document -> initDocument( compatibleIndex.binding(), document, 1 ) );
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					addFieldValue( document, compatibleIndex.binding().fieldModel, 1 );
+					addFieldValue( document, compatibleIndex.binding().fieldWithConverterModel, 1 );
+				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> addFieldValue( document, rawFieldCompatibleIndex.binding().fieldWithConverterModel, 1 ) );
@@ -333,6 +336,33 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 			self = objectField.toReference();
 			fieldModel = SimpleFieldModel.mapper( fieldType )
 					.map( objectField, "unconverted", c -> c.projectable( Projectable.YES ) );
+		}
+	}
+
+	private static class CompatibleIndexBinding {
+		final SimpleFieldModel<GeoPoint> fieldModel;
+		final SimpleFieldModel<GeoPoint> fieldWithConverterModel;
+
+		CompatibleIndexBinding(IndexSchemaElement root) {
+			fieldModel = SimpleFieldModel.mapper( fieldType )
+					.map( root, "unconverted", c -> {
+						c.projectable( Projectable.YES );
+						addIrrelevantOptions( c );
+					} );
+			fieldWithConverterModel = SimpleFieldModel.mapper( fieldType )
+					.map( root, "converted", c -> {
+						c.projectable( Projectable.YES )
+								.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+								.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() );
+						addIrrelevantOptions( c );
+					} );
+		}
+
+		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
+		protected void addIrrelevantOptions(StandardIndexFieldTypeOptionsStep<?, ?> c) {
+			c.searchable( Searchable.NO );
+			c.sortable( Sortable.YES );
+			c.aggregable( Aggregable.YES );
 		}
 	}
 
