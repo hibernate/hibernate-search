@@ -41,9 +41,8 @@ public class ElasticsearchMatchSearchPredicateIT {
 				.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "HSEARCH400560" )
-				.hasMessageContaining( "Elasticsearch backend does not support skip analysis on not analyzed field" )
-				.hasMessageContaining( "normalizedStringField" );
+				.hasMessageContainingAll( "Cannot skip analysis on field 'normalizedStringField'",
+						"the Elasticsearch backend will always normalize arguments before attempting matches on normalized fields" );
 	}
 
 	private void initData() {

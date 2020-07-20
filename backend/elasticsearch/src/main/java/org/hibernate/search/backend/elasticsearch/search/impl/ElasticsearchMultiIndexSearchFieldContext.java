@@ -124,6 +124,16 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
+	public boolean hasNormalizerOnAtLeastOneIndex() {
+		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
+			if ( fieldContext.type().hasNormalizerOnAtLeastOneIndex() ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public <T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = null;
 		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {

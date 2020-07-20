@@ -412,8 +412,9 @@ public interface Log extends BasicLogger {
 	SearchException unexpectedElasticsearchVersion(ElasticsearchVersion configuredVersion,
 			ElasticsearchVersion actualVersion);
 
-	@Message(id = ID_OFFSET_3 + 60, value = "Elasticsearch backend does not support skip analysis on not analyzed field: '%1$s'.")
-	SearchException skipAnalysisOnKeywordField(String absoluteFieldPath, @Param EventContext context);
+	@Message(id = ID_OFFSET_3 + 60, value = "Cannot skip analysis on field '%1$s':"
+			+ " the Elasticsearch backend will always normalize arguments before attempting matches on normalized fields.")
+	SearchException skipAnalysisOnNormalizedField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 61,
 			value = "Ambiguous Elasticsearch version: '%s'."
