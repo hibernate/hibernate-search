@@ -58,7 +58,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
 
-	@Parameterized.Parameters(name = "{0} - {1}")
+	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
