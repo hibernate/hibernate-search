@@ -23,8 +23,8 @@ public class PojoIndexingAddOrUpdateIT extends AbstractPojoIndexingOperationIT {
 
 	@Override
 	protected void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
-			String id, String value) {
-		context.update( b -> addWorkInfoAndDocument( b, tenantId, id, value ) );
+			String id, String routingKey, String value) {
+		context.update( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value ) );
 	}
 
 	@Override
@@ -38,6 +38,11 @@ public class PojoIndexingAddOrUpdateIT extends AbstractPojoIndexingOperationIT {
 	}
 
 	@Override
+	protected void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey, int id) {
+		indexingPlan.addOrUpdate( providedId, providedRoutingKey, createEntity( id ) );
+	}
+
+	@Override
 	protected CompletableFuture<?> execute(SearchIndexer indexer, int id) {
 		return indexer.addOrUpdate( createEntity( id ) );
 	}
@@ -45,5 +50,10 @@ public class PojoIndexingAddOrUpdateIT extends AbstractPojoIndexingOperationIT {
 	@Override
 	protected CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, int id) {
 		return indexer.addOrUpdate( providedId, createEntity( id ) );
+	}
+
+	@Override
+	protected CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id) {
+		return indexer.addOrUpdate( providedId, providedRoutingKey, createEntity( id ) );
 	}
 }

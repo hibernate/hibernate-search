@@ -23,8 +23,8 @@ public class PojoIndexingDeleteIT extends AbstractPojoIndexingOperationIT {
 
 	@Override
 	protected void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
-			String id, String value) {
-		context.delete( b -> addWorkInfo( b, tenantId, id ) );
+			String id, String routingKey, String value) {
+		context.delete( b -> addWorkInfo( b, tenantId, id, routingKey ) );
 	}
 
 	@Override
@@ -38,6 +38,11 @@ public class PojoIndexingDeleteIT extends AbstractPojoIndexingOperationIT {
 	}
 
 	@Override
+	protected void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey, int id) {
+		indexingPlan.delete( providedId, providedRoutingKey, createEntity( id ) );
+	}
+
+	@Override
 	protected CompletableFuture<?> execute(SearchIndexer indexer, int id) {
 		return indexer.delete( createEntity( id ) );
 	}
@@ -45,5 +50,10 @@ public class PojoIndexingDeleteIT extends AbstractPojoIndexingOperationIT {
 	@Override
 	protected CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, int id) {
 		return indexer.delete( providedId, createEntity( id ) );
+	}
+
+	@Override
+	protected CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id) {
+		return indexer.delete( providedId, providedRoutingKey, createEntity( id ) );
 	}
 }
