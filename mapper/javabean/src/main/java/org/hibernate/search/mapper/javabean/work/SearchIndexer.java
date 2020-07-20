@@ -22,13 +22,30 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code add(null, entity)}; see {@link #add(Object, Object)}.
+	 * Shorthand for {@code add(null, null)}; see {@link #add(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
 	default CompletableFuture<?> add(Object entity) {
-		return add( null, entity );
+		return add( null, null, entity );
+	}
+
+	/**
+	 * Add an entity to the index, assuming that the entity is absent from the index.
+	 * <p>
+	 * Entities to reindex as a result of this operation will not be resolved.
+	 * <p>
+	 * Shorthand for {@code add(null, entity)}; see {@link #add(Object, String, Object)}.
+	 *
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param entity The entity to add to the index.
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 */
+	default CompletableFuture<?> add(Object providedId, Object entity) {
+		return add( providedId, null, entity );
 	}
 
 	/**
@@ -42,10 +59,13 @@ public interface SearchIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> add(Object providedId, Object entity);
+	CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.

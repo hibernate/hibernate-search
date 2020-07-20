@@ -32,9 +32,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(Object providedId, Object entity) {
-		// TODO HSEARCH-3891 expose the providedRoutingKey
-		return delegate.add( getTypeIdentifier( entity ), providedId, null, entity,
+	public CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity) {
+		return delegate.add( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
 				commitStrategy, refreshStrategy );
 	}
 
