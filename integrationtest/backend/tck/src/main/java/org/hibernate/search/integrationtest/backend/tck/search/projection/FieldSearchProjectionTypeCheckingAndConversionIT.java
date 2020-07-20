@@ -16,10 +16,14 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
@@ -69,8 +73,8 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
-	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
@@ -445,8 +449,12 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, 3 ) )
 				.add( EMPTY, document -> { } );
 		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
-				.add( COMPATIBLE_INDEX_DOCUMENT_1,
-						document -> initDocument( compatibleIndex.binding(), document, 1 ) );
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					compatibleIndex.binding().fieldModels
+								.forEach( f -> addFieldValue( document, f, 1 ) );
+					compatibleIndex.binding().fieldWithConverterModels
+							.forEach( f -> addFieldValue( document, f, 1 ) );
+				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> rawFieldCompatibleIndex.binding().fieldWithConverterModels
@@ -503,6 +511,35 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 			self = objectField.toReference();
 			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, objectField,
 					"", c -> c.projectable( Projectable.YES ) );
+		}
+	}
+
+	private static class CompatibleIndexBinding {
+		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithConverterModels;
+
+		CompatibleIndexBinding(IndexSchemaElement root) {
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"", (fieldType, c) -> {
+						c.projectable( Projectable.YES );
+						addIrrelevantOptions( fieldType, c );
+					} );
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"converted_", (fieldType, c) -> {
+							c.projectable( Projectable.YES )
+								.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+								.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() );
+							addIrrelevantOptions( fieldType, c );
+					} );
+		}
+
+		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
+		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
+			c.searchable( Searchable.NO );
+			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+				c.sortable( Sortable.YES );
+				c.aggregable( Aggregable.YES );
+			}
 		}
 	}
 
