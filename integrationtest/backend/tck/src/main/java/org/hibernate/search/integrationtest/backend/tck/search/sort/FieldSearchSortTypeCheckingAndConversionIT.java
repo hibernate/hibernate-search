@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -54,20 +56,18 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
-	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
-		return FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
-	}
+	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = new ArrayList<>();
 
 	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
-		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
-			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
+		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+			ExpectationsAlternative<?, ?> expectations = fieldType.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
-				parameters.add( new Object[] { fieldTypeDescriptor } );
+				supportedFieldTypes.add( fieldType );
+				parameters.add( new Object[] { fieldType } );
 			}
-		} );
+		}
 		return parameters.toArray( new Object[0][] );
 	}
 
@@ -93,8 +93,8 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
-	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
@@ -392,8 +392,11 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				.add( DOCUMENT_1, document -> initDocument( mainIndex.binding(), document, DOCUMENT_1_ORDINAL ) )
 				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, DOCUMENT_3_ORDINAL ) );
 		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
-				.add( COMPATIBLE_INDEX_DOCUMENT_1,
-						document -> initDocument( compatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					CompatibleIndexBinding binding = compatibleIndex.binding();
+					binding.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, DOCUMENT_1_ORDINAL ) );
+					binding.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, DOCUMENT_1_ORDINAL ) );
+				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> initDocument( rawFieldCompatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
@@ -412,21 +415,52 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		IndexBinding(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
 			fieldModels = SimpleFieldModelsByType.mapAll(
-					supportedTypeDescriptors(),
+					supportedFieldTypes,
 					root, "", c -> c.sortable( Sortable.YES ), additionalConfiguration
 			);
 			fieldWithDslConverterModels = SimpleFieldModelsByType.mapAll(
-					supportedTypeDescriptors(), root, "converted_",
+					supportedFieldTypes, root, "converted_",
 					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen(
 							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 					)
 			);
 			nonSortableFieldModels = SimpleFieldModelsByType.mapAll(
-					supportedTypeDescriptors(), root, "nonSortable_",
+					supportedFieldTypes, root, "nonSortable_",
 					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 			);
+		}
+	}
+
+	private static class CompatibleIndexBinding {
+		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithDslConverterModels;
+
+		CompatibleIndexBinding(IndexSchemaElement root) {
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					supportedFieldTypes,
+					root, "", (fieldType, c) -> {
+						c.sortable( Sortable.YES );
+						addIrrelevantOptions( fieldType, c );
+					}
+			);
+			fieldWithDslConverterModels = SimpleFieldModelsByType.mapAll(
+					supportedFieldTypes, root, "converted_", (fieldType, c) -> {
+						c.sortable( Sortable.YES );
+						c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() );
+						addIrrelevantOptions( fieldType, c );
+					}
+			);
+		}
+
+		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
+		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
+			c.searchable( Searchable.NO );
+			c.projectable( Projectable.YES );
+			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+				c.aggregable( Aggregable.YES );
+			}
 		}
 	}
 
@@ -450,7 +484,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		}
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
-			supportedTypeDescriptors().forEach( typeDescriptor ->
+			supportedFieldTypes.forEach( typeDescriptor ->
 					SimpleFieldModel.mapper( FieldTypeDescriptor.getIncompatible( typeDescriptor ) )
 							.map( parent, "" + typeDescriptor.getUniqueName() )
 			);

@@ -16,6 +16,9 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -70,8 +73,8 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "main" );
-	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-			SimpleMappedIndex.of( IndexBinding::new ).name( "compatible" );
+	private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
@@ -204,8 +207,11 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 				.add( DOCUMENT_1, document -> initDocument( mainIndex.binding(), document, DOCUMENT_1_ORDINAL ) )
 				.add( DOCUMENT_3, document -> initDocument( mainIndex.binding(), document, DOCUMENT_3_ORDINAL ) );
 		BulkIndexer compatibleIndexer = compatibleIndex.bulkIndexer()
-				.add( COMPATIBLE_INDEX_DOCUMENT_1,
-						document -> initDocument( compatibleIndex.binding(), document, BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) );
+				.add( COMPATIBLE_INDEX_DOCUMENT_1, document -> {
+					CompatibleIndexBinding binding = compatibleIndex.binding();
+					addValue( binding.fieldModel, document, BETWEEN_DOCUMENT_1_AND_2_ORDINAL );
+					addValue( binding.fieldWithDslConverterModel, document, BETWEEN_DOCUMENT_1_AND_2_ORDINAL );
+				} );
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> initDocument( rawFieldCompatibleIndex.binding(), document, BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) );
@@ -236,6 +242,40 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 							root, "nonSortable", c -> c.sortable( Sortable.YES ),
 							additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 					);
+		}
+	}
+
+	private static class CompatibleIndexBinding {
+		final SimpleFieldModel<GeoPoint> fieldModel;
+		final SimpleFieldModel<GeoPoint> fieldWithDslConverterModel;
+
+		CompatibleIndexBinding(IndexSchemaElement root) {
+			this( root, ignored -> { } );
+		}
+
+		CompatibleIndexBinding(IndexSchemaElement root,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			fieldModel = SimpleFieldModel.mapper( fieldType )
+					.map( root, "unconverted", c -> {
+						c.sortable( Sortable.YES );
+						addIrrelevantOptions( c );
+					}, additionalConfiguration );
+			fieldWithDslConverterModel = SimpleFieldModel.mapper( fieldType )
+					.map(
+							root, "converted", c -> {
+								c.sortable( Sortable.YES );
+								addIrrelevantOptions( c );
+							},
+							additionalConfiguration.andThen(
+									c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) )
+					);
+		}
+
+		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
+		protected void addIrrelevantOptions(StandardIndexFieldTypeOptionsStep<?, ?> c) {
+			c.searchable( Searchable.NO );
+			c.projectable( Projectable.YES );
+			c.aggregable( Aggregable.YES );
 		}
 	}
 
