@@ -90,7 +90,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
-			expectOperation( futureFromBackend, 1, "1" );
+			expectOperation( futureFromBackend, 1, null, "1" );
 			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isPending();
@@ -106,8 +106,24 @@ public abstract class AbstractPojoIndexingOperationIT {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
-			expectOperation( futureFromBackend, 42, "1" );
+			expectOperation( futureFromBackend, 42, null, "1" );
 			CompletableFuture<?> returnedFuture = execute( indexer, 42, 1 );
+			backendMock.verifyExpectationsMet();
+			FutureAssert.assertThat( returnedFuture ).isPending();
+
+			futureFromBackend.complete( null );
+			FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	public void indexer_providedId_providedRoutingKey() {
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			CompletableFuture<?> returnedFuture = execute( indexer, 42, "UE-123", 1 );
 			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isPending();
 
@@ -123,7 +139,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
-			expectOperation( futureFromBackend, 1, "1" );
+			expectOperation( futureFromBackend, 1, null, "1" );
 			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isPending();
@@ -140,7 +156,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
-			expectOperation( futureFromBackend, 1, "1" );
+			expectOperation( futureFromBackend, 1, null, "1" );
 			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isPending();
@@ -155,7 +171,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
-			expectOperation( futureFromBackend, 1, "1" );
+			expectOperation( futureFromBackend, 1, null, "1" );
 			addTo( indexingPlan, 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
@@ -168,8 +184,21 @@ public abstract class AbstractPojoIndexingOperationIT {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
-			expectOperation( futureFromBackend, 42, "1" );
+			expectOperation( futureFromBackend, 42, null, "1" );
 			addTo( indexingPlan, 42, 1 );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	public void indexingPlan_providedId_providedRoutingKey() {
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			addTo( indexingPlan, 42, "UE-123", 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
@@ -183,7 +212,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		Assertions.assertThatThrownBy( () -> {
 			try ( SearchSession session = createSession() ) {
 				SearchIndexingPlan indexingPlan = session.indexingPlan();
-				expectOperation( futureFromBackend, 1, "1" );
+				expectOperation( futureFromBackend, 1, null, "1" );
 				addTo( indexingPlan, 1 );
 				// The session will wait for completion of the indexing plan upon closing,
 				// so we need to complete it now.
@@ -200,7 +229,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		Assertions.assertThatThrownBy( () -> {
 			try ( SearchSession session = createSession() ) {
 				SearchIndexingPlan indexingPlan = session.indexingPlan();
-				expectOperation( futureFromBackend, 1, "1" );
+				expectOperation( futureFromBackend, 1, null, "1" );
 				addTo( indexingPlan, 1 );
 				// The session will wait for completion of the indexing plan upon closing,
 				// so we need to complete it now.
@@ -211,15 +240,19 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	protected abstract void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
-			String id, String value);
+			String id, String routingKey, String value);
 
 	protected abstract void addTo(SearchIndexingPlan indexingPlan, int id);
 
 	protected abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, int id);
 
+	protected abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey, int id);
+
 	protected abstract CompletableFuture<?> execute(SearchIndexer indexer, int id);
 
 	protected abstract CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, int id);
+
+	protected abstract CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id);
 
 	protected final IndexedEntity createEntity(int id) {
 		IndexedEntity entity = new IndexedEntity();
@@ -229,15 +262,17 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	protected final void addWorkInfo(StubDocumentWork.Builder builder, String tenantId,
-			String identifier) {
+			String identifier, String routingKey) {
 		builder.tenantIdentifier( tenantId );
 		builder.identifier( identifier );
+		builder.routingKey( routingKey );
 	}
 
 	protected final void addWorkInfoAndDocument(StubDocumentWork.Builder builder, String tenantId,
-			String identifier, String value) {
+			String identifier, String routingKey, String value) {
 		builder.tenantIdentifier( tenantId );
 		builder.identifier( identifier );
+		builder.routingKey( routingKey );
 		builder.document( StubDocumentNode.document().field( "value", value ).build() );
 	}
 
@@ -249,11 +284,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.build();
 	}
 
-	private void expectOperation(CompletableFuture<?> futureFromBackend, int id, String value) {
+	private void expectOperation(CompletableFuture<?> futureFromBackend, int id, String routingKey, String value) {
 		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
 				IndexedEntity.INDEX, commitStrategy, refreshStrategy
 		);
-		expectOperation( context, tenantId, String.valueOf( id ), value );
+		expectOperation( context, tenantId, String.valueOf( id ), routingKey, value );
 		context.processedThenExecuted( futureFromBackend );
 	}
 
