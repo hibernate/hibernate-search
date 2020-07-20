@@ -108,6 +108,10 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public SearchPredicate build() {
+			// Check analyzer compatibility for multi-index search
+			field.type().searchAnalyzerName();
+			field.type().normalizerName();
+
 			return new ElasticsearchRangePredicate( this );
 		}
 
