@@ -22,10 +22,14 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -94,8 +98,8 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 	private static final SimpleMappedIndex<IndexBinding> mainIndex =
 			SimpleMappedIndex.of( IndexBinding::new ).name( "Main" );
-	private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-			SimpleMappedIndex.of( IndexBinding::new ).name( "Compatible" );
+	private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "Compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "RawFieldCompatible" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
@@ -587,6 +591,35 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
 			self = objectField.toReference();
+		}
+	}
+
+	private static class CompatibleIndexBinding {
+		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithConverterModels;
+
+		CompatibleIndexBinding(IndexSchemaElement root) {
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"", (fieldType, c) -> {
+						c.aggregable( Aggregable.YES );
+						addIrrelevantOptions( fieldType, c );
+					} );
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"converted_", (fieldType, c) -> {
+						c.aggregable( Aggregable.YES )
+								.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+								.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() );
+						addIrrelevantOptions( fieldType, c );
+					} );
+		}
+
+		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
+		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
+			c.searchable( Searchable.NO );
+			c.projectable( Projectable.YES );
+			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+				c.sortable( Sortable.YES );
+			}
 		}
 	}
 
