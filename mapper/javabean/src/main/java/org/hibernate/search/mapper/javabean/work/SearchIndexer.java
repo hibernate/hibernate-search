@@ -72,13 +72,30 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code addOrUpdate(null, entity)}; see {@link #addOrUpdate(Object, Object)}.
+	 * Shorthand for {@code addOrUpdate(null, null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
 	default CompletableFuture<?> addOrUpdate(Object entity) {
-		return addOrUpdate( null, entity );
+		return addOrUpdate( null, null, entity );
+	}
+
+	/**
+	 * Update an entity in the index, or add it if it's absent from the index.
+	 * <p>
+	 * Entities to reindex as a result of this operation will not be resolved.
+	 * <p>
+	 * Shorthand for {@code addOrUpdate(providedId, null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
+	 *
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param entity The entity to update in the index.
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 */
+	default CompletableFuture<?> addOrUpdate(Object providedId, Object entity) {
+		return addOrUpdate( providedId, null, entity );
 	}
 
 	/**
@@ -89,10 +106,13 @@ public interface SearchIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @param entity The entity to update in the index.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> addOrUpdate(Object providedId, Object entity);
+	CompletableFuture<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Delete an entity from the index.
