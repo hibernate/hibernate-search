@@ -325,8 +325,8 @@ public class SpatialWithinPolygonPredicateBaseIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_main" );
-		private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+		private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+				SimpleMappedIndex.of( root -> new CompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_compatible" );
 		private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 				SimpleMappedIndex.of( root -> new RawFieldCompatibleIndexBinding( root, supportedFieldTypes ) )

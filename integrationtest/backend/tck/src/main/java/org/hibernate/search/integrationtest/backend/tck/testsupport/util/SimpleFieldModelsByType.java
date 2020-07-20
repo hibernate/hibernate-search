@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -17,6 +18,11 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 
 public class SimpleFieldModelsByType {
+	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
+			IndexSchemaElement parent, String prefix) {
+		return mapAll( typeDescriptors.stream(), parent, prefix, new Consumer[0] );
+	}
+
 	@SafeVarargs
 	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
@@ -34,6 +40,25 @@ public class SimpleFieldModelsByType {
 					typeDescriptor,
 					SimpleFieldModel.mapper( typeDescriptor, ignored -> { } )
 							.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
+			);
+		} );
+		return result;
+	}
+
+	@SafeVarargs
+	public static SimpleFieldModelsByType mapAll(Collection<? extends FieldTypeDescriptor<?>> typeDescriptors,
+			IndexSchemaElement parent, String prefix,
+			BiConsumer<FieldTypeDescriptor<?>, StandardIndexFieldTypeOptionsStep<?, ?>>... additionalConfiguration) {
+		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
+		typeDescriptors.forEach( typeDescriptor -> {
+			result.content.put(
+					typeDescriptor,
+					SimpleFieldModel.mapper( typeDescriptor, c -> {
+						for ( BiConsumer<FieldTypeDescriptor<?>, StandardIndexFieldTypeOptionsStep<?, ?>> config : additionalConfiguration ) {
+							config.accept( typeDescriptor, c );
+						}
+					} )
+							.map( parent, prefix + typeDescriptor.getUniqueName() )
 			);
 		} );
 		return result;

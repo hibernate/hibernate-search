@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -333,8 +334,16 @@ public class ExistsPredicateBaseIT {
 		private static final SimpleMappedIndex<IndexBinding> index =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_main" );
-		private static final SimpleMappedIndex<IndexBinding> compatibleIndex =
-				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+		private static final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex =
+				SimpleMappedIndex.<CompatibleIndexBinding>of( root -> new CompatibleIndexBinding( root, supportedFieldTypes ) {
+					@Override
+					protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType,
+							StandardIndexFieldTypeOptionsStep<?, ?> c) {
+						// It's not as easy to find irrelevant options for the "exists" predicate,
+						// since "sortable" and "aggregable", and even "projectable" in some cases,
+						// may add doc values which may lead to a different implementation of the "exists" predicate.
+					}
+				} )
 						.name( "typeChecking_compatible" );
 		private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 				SimpleMappedIndex.of( root -> new RawFieldCompatibleIndexBinding( root, supportedFieldTypes ) )
