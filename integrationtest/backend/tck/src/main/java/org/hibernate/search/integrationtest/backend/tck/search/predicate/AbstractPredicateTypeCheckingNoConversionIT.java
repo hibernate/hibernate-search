@@ -13,8 +13,12 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -33,13 +37,13 @@ import org.junit.Test;
 public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends AbstractPredicateTestValues<?>> {
 
 	private final SimpleMappedIndex<IndexBinding> index;
-	private final SimpleMappedIndex<IndexBinding> compatibleIndex;
+	private final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex;
 	private final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex;
 	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex;
 	protected final DataSet<?, V> dataSet;
 
 	protected AbstractPredicateTypeCheckingNoConversionIT(SimpleMappedIndex<IndexBinding> index,
-			SimpleMappedIndex<IndexBinding> compatibleIndex,
+			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
@@ -169,6 +173,36 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 		}
 	}
 
+	public static class CompatibleIndexBinding {
+		private final SimpleFieldModelsByType defaultDslConverterField0;
+		private final SimpleFieldModelsByType customDslConverterField0;
+		private final SimpleFieldModelsByType customDslConverterField1;
+
+		public CompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_",
+					this::addIrrelevantOptions );
+			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_",
+					(fieldType, c) -> {
+						c.dslConverter( ValueWrapper.class, unusedDslConverter() );
+						addIrrelevantOptions( fieldType, c );
+					} );
+			customDslConverterField1 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField1_",
+					(fieldType, c) -> {
+						c.dslConverter( ValueWrapper.class, unusedDslConverter() );
+						addIrrelevantOptions( fieldType, c );
+					} );
+		}
+
+		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
+		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
+			c.projectable( Projectable.YES );
+			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+				c.sortable( Sortable.YES );
+				c.aggregable( Aggregable.YES );
+			}
+		}
+	}
+
 	public static final class RawFieldCompatibleIndexBinding {
 		private final SimpleFieldModelsByType defaultDslConverterField0;
 		private final SimpleFieldModelsByType customDslConverterField0;
@@ -206,10 +240,10 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 		}
 
 		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
-				SimpleMappedIndex<IndexBinding> compatibleIndex, BulkIndexer compatibleIndexer,
+				SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex, BulkIndexer compatibleIndexer,
 				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex, BulkIndexer rawFieldCompatibleIndexer) {
 			mainIndexer.add( docId( 0 ), routingKey,
-					document -> initCompatibleDocument( mainIndex, document, values.fieldValue( 0 ) ) );
+					document -> initDocument( mainIndex, document, values.fieldValue( 0 ) ) );
 			compatibleIndexer.add( docId( 0 ), routingKey,
 					document -> initCompatibleDocument( compatibleIndex, document, values.fieldValue( 0 ) ) );
 			rawFieldCompatibleIndexer.add( docId( 0 ), routingKey,
@@ -217,7 +251,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 
 			if ( values.size() > 1 ) {
 				mainIndexer.add( docId( 1 ), routingKey,
-						document -> initCompatibleDocument( mainIndex, document, values.fieldValue( 1 ) ) );
+						document -> initDocument( mainIndex, document, values.fieldValue( 1 ) ) );
 				compatibleIndexer.add( docId( 1 ), routingKey,
 						document -> initCompatibleDocument( compatibleIndex, document, values.fieldValue( 1 ) ) );
 				rawFieldCompatibleIndexer.add( docId( 1 ), routingKey,
@@ -225,9 +259,17 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 			}
 		}
 
-		private void initCompatibleDocument(SimpleMappedIndex<IndexBinding> index, DocumentElement document,
+		private void initDocument(SimpleMappedIndex<IndexBinding> index, DocumentElement document,
 				F fieldValue) {
 			IndexBinding binding = index.binding();
+			document.addValue( binding.defaultDslConverterField0.get( fieldType ).reference, fieldValue );
+			document.addValue( binding.customDslConverterField0.get( fieldType ).reference, fieldValue );
+			document.addValue( binding.customDslConverterField1.get( fieldType ).reference, fieldValue );
+		}
+
+		private void initCompatibleDocument(SimpleMappedIndex<CompatibleIndexBinding> index, DocumentElement document,
+				F fieldValue) {
+			CompatibleIndexBinding binding = index.binding();
 			document.addValue( binding.defaultDslConverterField0.get( fieldType ).reference, fieldValue );
 			document.addValue( binding.customDslConverterField0.get( fieldType ).reference, fieldValue );
 			document.addValue( binding.customDslConverterField1.get( fieldType ).reference, fieldValue );
