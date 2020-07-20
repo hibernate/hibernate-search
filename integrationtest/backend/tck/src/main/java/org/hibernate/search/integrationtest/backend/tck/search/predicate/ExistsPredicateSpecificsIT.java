@@ -7,26 +7,20 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -35,50 +29,49 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-public class ExistsPredicateSpecificsIT {
+@RunWith(Parameterized.class)
+public class ExistsPredicateSpecificsIT<F> {
+	private static final List<FieldTypeDescriptor<?>> supportedFieldTypes = FieldTypeDescriptor.getAll();
+	private static final List<FieldTypeDescriptor<?>> supportedFieldTypesWithDocValues = new ArrayList<>();
+	private static final List<DataSet<?>> dataSets = new ArrayList<>();
+	private static final List<Object[]> parameters = new ArrayList<>();
+	static {
+		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+				supportedFieldTypesWithDocValues.add( fieldType );
+			}
+			DataSet<?> dataSet = new DataSet<>( fieldType );
+			dataSets.add( dataSet );
+			parameters.add( new Object[] { dataSet } );
+		}
+	}
 
-	private static final String DOCUMENT_1 = "document1";
-	private static final String DOCUMENT_2 = "document2";
-	private static final String DOCUMENT_3 = "document3";
-	private static final String EMPTY = "empty";
+	@Parameterized.Parameters(name = "{0}")
+	public static List<Object[]> parameters() {
+		return parameters;
+	}
 
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start().withIndexes( index ).setup();
+		setupHelper.start().withIndex( mainIndex ).setup();
 
-		initData();
+		BulkIndexer mainIndexer = mainIndex.bulkIndexer();
+		dataSets.forEach( dataSet -> dataSet.contribute( mainIndexer ) );
+		mainIndexer.join();
 	}
 
-	@Test
-	public void exists() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().supportedFieldModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
+	private final DataSet<F> dataSet;
 
-			assertThatQuery( index.query()
-					.where( f -> f.exists().field( absoluteFieldPath ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
-	}
-
-	/**
-	 * Fields with docvalues may be optimized and use a different Lucene query.
-	 * Make sure to test the optimization as well.
-	 */
-	@Test
-	public void exists_withDocValues() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().supportedFieldWithDocValuesModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
-
-			assertThatQuery( index.query()
-					.where( f -> f.exists().field( absoluteFieldPath ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
+	public ExistsPredicateSpecificsIT(DataSet<F> dataSet) {
+		this.dataSet = dataSet;
 	}
 
 	/**
@@ -87,236 +80,89 @@ public class ExistsPredicateSpecificsIT {
 	 */
 	@Test
 	public void missing() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().supportedFieldModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
-			assertThatQuery( index.query()
-					.where( f -> f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3, EMPTY );
-		}
-	}
-
-	@Test
-	public void predicateLevelBoost() {
-		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( f.exists().field( index.binding().string1Field.relativeFieldName ) )
-						.should( f.exists().field( index.binding().string2Field.relativeFieldName ).boost( 7 ) ) )
-				.sort( f -> f.score() ) )
-				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_2, DOCUMENT_1 );
-
-		assertThatQuery( index.query()
-				.where( f -> f.bool()
-						.should( f.exists().field( index.binding().string1Field.relativeFieldName ).boost( 39 ) )
-						.should( f.exists().field( index.binding().string2Field.relativeFieldName ) ) )
-				.sort( f -> f.score() ) )
-				.hasDocRefHitsExactOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-	}
-
-	@Test
-	public void inFlattenedObject() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().flattenedObject.supportedFieldModels ) {
-			String absoluteFieldPath = index.binding().flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
-
-			assertThatQuery( index.query()
-					.where( f -> f.exists().field( absoluteFieldPath ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.bool().mustNot( f.exists().field( fieldPath ) ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 2 ), dataSet.docId( 3 ) );
 	}
 
 	/**
 	 * Fields with docvalues may be optimized and use a different Lucene query.
 	 * Make sure to test the optimization as well.
 	 */
+	@Test
+	public void withDocValues() {
+		assumeDocValuesAllowed();
+
+		String fieldPath = mainIndex.binding().fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
+
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.exists().field( fieldPath ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
+	}
+
 	@Test
 	public void inFlattenedObject_withDocValues() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().flattenedObject.supportedFieldWithDocValuesModels ) {
-			String absoluteFieldPath = index.binding().flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		assumeDocValuesAllowed();
 
-			assertThatQuery( index.query()
-					.where( f -> f.exists().field( absoluteFieldPath ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
+		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName + "."
+				+ mainIndex.binding().flattenedObject.fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
+
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.exists().field( fieldPath ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ), dataSet.docId( 1 ) );
 	}
 
 	@Test
-	public void inNestedPredicate_implicit() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().nestedObject.supportedFieldModels ) {
-			String absoluteFieldPath = index.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+	public void inNestedObject_withDocValues() {
+		assumeDocValuesAllowed();
 
-			assertThatQuery( index.query()
-					.where( f -> f.exists().field( absoluteFieldPath ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
-	}
+		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
+				+ mainIndex.binding().nestedObject.fieldWithDocValues.get( dataSet.fieldType ).relativeFieldName;
 
-	@Test
-	public void inNestedPredicate_explicit() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().nestedObject.supportedFieldModels ) {
-			String absoluteFieldPath = index.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
-
-			assertThatQuery( index.query()
-					.where( f -> f.nested().objectField( index.binding().nestedObject.relativeFieldName )
-							.nest( f.exists().field( absoluteFieldPath ) ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.bool().mustNot( f.exists().field( fieldPath ) ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 2 ), dataSet.docId( 3 ) );
 	}
 
 	/**
-	 * Fields with docvalues may be optimized and use a different Lucene query.
-	 * Make sure to test the optimization as well.
-	 */
-	@Test
-	public void inNestedPredicate_withDocValues() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().nestedObject.supportedFieldWithDocValuesModels ) {
-			String absoluteFieldPath = index.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
-
-			assertThatQuery( index.query()
-					.where( f -> f.nested().objectField( index.binding().nestedObject.relativeFieldName )
-							.nest( f.exists().field( absoluteFieldPath ) ) ) )
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		}
-	}
-
-	/**
-	 * If we require a field not to exist in a nested predicate,
+	 * If we require a field not to exist in a nested object,
 	 * a document will match if *any* of its nested objects lacks the field.
 	 */
 	@Test
 	public void inNestedPredicate_missing() {
-		for ( ByTypeFieldModel<?> fieldModel : index.binding().nestedObject.supportedFieldModels ) {
-			String absoluteFieldPath = index.binding().nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName + "."
+				+ mainIndex.binding().nestedObject.fieldWithDefaults.get( dataSet.fieldType ).relativeFieldName;
 
-			assertThatQuery( index.query()
-					.where( f -> f.nested().objectField( index.binding().nestedObject.relativeFieldName )
-							.nest( f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) ) ) )
-					// No match for document 1, since all of its nested objects have this field
-					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
-		}
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.nested().objectField( mainIndex.binding().nestedObject.relativeFieldName )
+						.nest( f.bool().mustNot( f.exists().field( fieldPath ) ) ) )
+				.routing( dataSet.routingKey ) )
+				// No match for document 0, since all of its nested objects have this field
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 1 ), dataSet.docId( 2 ) );
 	}
 
-	private static void initData() {
-		BulkIndexer mainIndexer = index.bulkIndexer()
-				.add( DOCUMENT_1, document -> {
-					index.binding().supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-					index.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
-					index.binding().string1Field.document1Value.write( document );
-
-					// Add one object with the values of document 1, and another with the values of document 2
-					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
-					index.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
-					index.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( flattenedObject1 ) );
-					DocumentElement flattenedObject2 = document.addObject( index.binding().flattenedObject.self );
-					index.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-					// Can't add two values to a sortable field
-					//index.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-
-					// Same for the nested object
-					DocumentElement nestedObject1 = document.addObject( index.binding().nestedObject.self );
-					index.binding().nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
-					index.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( nestedObject1 ) );
-					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-					index.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-					index.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-				} )
-				.add( DOCUMENT_2, document -> {
-					index.binding().supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
-					index.binding().supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
-					index.binding().string2Field.document2Value.write( document );
-
-					// Add one empty object, and and another with the values of document 2
-					document.addObject( index.binding().flattenedObject.self );
-					DocumentElement flattenedObject2 = document.addObject( index.binding().flattenedObject.self );
-					index.binding().flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-					index.binding().flattenedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( flattenedObject2 ) );
-
-					// Same for the nested object
-					document.addObject( index.binding().nestedObject.self );
-					DocumentElement nestedObject2 = document.addObject( index.binding().nestedObject.self );
-					index.binding().nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-					index.binding().nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
-				} )
-				.add( DOCUMENT_3, document -> {
-					index.binding().string1Field.document3Value.write( document );
-
-					// Add two empty objects
-					document.addObject( index.binding().flattenedObject.self );
-					document.addObject( index.binding().flattenedObject.self );
-
-					// Same for the nested object
-					document.addObject( index.binding().nestedObject.self );
-					document.addObject( index.binding().nestedObject.self );
-				} )
-				.add( EMPTY, document -> { } );
-		mainIndexer.join();
-	}
-
-	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
-		FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getMatchPredicateExpectations().isPresent() )
-				.forEach( action );
-	}
-
-	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
-			FieldModelConsumer<MatchPredicateExpectations<?>, ByTypeFieldModel<?>> consumer) {
-		forEachTypeDescriptor( typeDescriptor -> {
-			// Safe, see forEachTypeDescriptor
-			MatchPredicateExpectations<?> expectations = typeDescriptor.getMatchPredicateExpectations().get();
-			ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
-					.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
-			consumer.accept( typeDescriptor, expectations, fieldModel );
-		} );
-	}
-
-	private static void mapByTypeFieldsIfSortSupported(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
-			FieldModelConsumer<MatchPredicateExpectations<?>, ByTypeFieldModel<?>> consumer) {
-		forEachTypeDescriptor( typeDescriptor -> {
-			// Safe, see forEachTypeDescriptor
-			MatchPredicateExpectations<?> expectations = typeDescriptor.getMatchPredicateExpectations().get();
-			// Ignore non-sortable fields
-			if ( typeDescriptor.getFieldSortExpectations().isSupported() ) {
-				ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
-						.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
-				consumer.accept( typeDescriptor, expectations, fieldModel );
-			}
-		} );
+	private void assumeDocValuesAllowed() {
+		assumeTrue( "This test is only relevant if the field type supports doc values",
+				supportedFieldTypesWithDocValues.contains( dataSet.fieldType ) );
 	}
 
 	private static class IndexBinding {
-		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
-		final List<ByTypeFieldModel<?>> supportedFieldWithDocValuesModels = new ArrayList<>();
+		final SimpleFieldModelsByType fieldWithDefaults;
+		final SimpleFieldModelsByType fieldWithDocValues;
 
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
 
-		final MainFieldModel string1Field;
-		final MainFieldModel string2Field;
-
 		IndexBinding(IndexSchemaElement root) {
-			mapByTypeFields(
-					root, "byType_", ignored -> { },
-					(typeDescriptor, expectations, model) -> {
-						// All types are supported
-						supportedFieldModels.add( model );
-					}
-			);
-			mapByTypeFieldsIfSortSupported(
-					root, "byType_withDocValues_", c -> c.sortable( Sortable.YES ),
-					(typeDescriptor, expectations, model) -> {
-						// All types are supported
-						supportedFieldWithDocValuesModels.add( model );
-					}
-			);
-			string1Field = MainFieldModel.mapper(
-					"Irving", null, null
-			)
-					.map( root, "string1" );
-			string2Field = MainFieldModel.mapper(
-					null, "Auster", null
-			)
-					.map( root, "string2" );
+			fieldWithDefaults = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root, "fieldWithDefaults_" );
+			fieldWithDocValues = SimpleFieldModelsByType.mapAll( supportedFieldTypesWithDocValues, root, "fieldWithDocValues_",
+					c -> c.sortable( Sortable.YES ) );
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectStructure.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectStructure.NESTED );
 		}
@@ -325,142 +171,98 @@ public class ExistsPredicateSpecificsIT {
 	private static class ObjectMapping {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
-		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
-		final List<ByTypeFieldModel<?>> supportedFieldWithDocValuesModels = new ArrayList<>();
+		final SimpleFieldModelsByType fieldWithDefaults;
+		final SimpleFieldModelsByType fieldWithDocValues;
 
 		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectStructure structure) {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure )
 					.multiValued();
 			self = objectField.toReference();
-			mapByTypeFields(
-					objectField, "byType_", ignored -> { },
-					(typeDescriptor, expectations, model) -> {
-						// All types are supported
-						supportedFieldModels.add( model );
-					}
-			);
-			mapByTypeFieldsIfSortSupported(
-					objectField, "byType_withDocValues_", c -> c.sortable( Sortable.YES ),
-					(typeDescriptor, expectations, model) -> {
-						// All types are supported
-						supportedFieldWithDocValuesModels.add( model );
-					}
-			);
+			fieldWithDefaults = SimpleFieldModelsByType.mapAll( supportedFieldTypes, objectField, "fieldWithDefaults_" );
+			fieldWithDocValues = SimpleFieldModelsByType.mapAll( supportedFieldTypesWithDocValues, objectField, "fieldWithDocValues_",
+					c -> c.sortable( Sortable.YES ) );
 		}
 	}
 
-	private static class RawFieldCompatibleIndexBinding {
-		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+	private static final class DataSet<F> extends AbstractPredicateDataSet {
+		protected final FieldTypeDescriptor<F> fieldType;
 
-		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
-			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
-			 * but with an incompatible DSL converter.
-			 */
-			mapByTypeFields(
-					root, "byType_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
-					(typeDescriptor, expectations, model) -> {
-						// All types are supported
-						supportedFieldModels.add( model );
-					}
-			);
-		}
-	}
-
-	private static class IncompatibleIndexBinding {
-		IncompatibleIndexBinding(IndexSchemaElement root) {
-			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexBinding,
-			 * but with an incompatible type.
-			 */
-			forEachTypeDescriptor( typeDescriptor -> {
-				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
-				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
-					mapper = IncompatibleFieldModel.mapper( context -> context.asLong() );
-				}
-				else {
-					mapper = IncompatibleFieldModel.mapper( context -> context.asInteger() );
-				}
-				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
-			} );
-		}
-	}
-
-	private static class ValueModel<F> {
-		private final IndexFieldReference<F> reference;
-		final F indexedValue;
-
-		private ValueModel(IndexFieldReference<F> reference, F indexedValue) {
-			this.reference = reference;
-			this.indexedValue = indexedValue;
+		public DataSet(FieldTypeDescriptor<F> fieldType) {
+			super( fieldType.getUniqueName() );
+			this.fieldType = fieldType;
 		}
 
-		public void write(DocumentElement target) {
-			target.addValue( reference, indexedValue );
-		}
-	}
+		public void contribute(BulkIndexer mainIndexer) {
+			List<F> values = fieldType.getIndexableValues().getSingle();
+			F value1 = values.get( 0 );
+			F value2 = values.get( 1 );
 
-	private static class MainFieldModel {
-		static StandardFieldMapper<String, MainFieldModel> mapper(
-				String document1Value, String document2Value, String document3Value) {
-			return mapper( c -> c.asString(), document1Value, document2Value, document3Value );
-		}
+			final boolean docValues = supportedFieldTypesWithDocValues.contains( fieldType );
 
-		static StandardFieldMapper<String, MainFieldModel> mapper(
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, String>> configuration,
-				String document1Value, String document2Value, String document3Value) {
-			return StandardFieldMapper.of(
-					configuration,
-					(reference, name) -> new MainFieldModel( reference, name, document1Value, document2Value, document3Value )
-			);
-		}
+			mainIndexer
+					.add( docId( 0 ), routingKey, document -> {
+						document.addValue( mainIndex.binding().fieldWithDefaults.get( fieldType ).reference, value1 );
+						if ( docValues ) {
+							document.addValue( mainIndex.binding().fieldWithDocValues.get( fieldType ).reference, value1 );
+						}
 
-		final String relativeFieldName;
-		final ValueModel<String> document1Value;
-		final ValueModel<String> document2Value;
-		final ValueModel<String> document3Value;
+						// Add one object with value1, and another with value2
+						DocumentElement flattenedObject1 = document.addObject( mainIndex.binding().flattenedObject.self );
+						flattenedObject1.addValue( mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
+						if ( docValues ) {
+							flattenedObject1.addValue( mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference, value1 );
+						}
+						DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
+						flattenedObject2.addValue( mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
+						if ( docValues ) {
+							flattenedObject2.addValue( mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference, value1 );
+						}
 
-		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName,
-				String document1Value, String document2Value, String document3Value) {
-			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( reference, document1Value );
-			this.document3Value = new ValueModel<>( reference, document3Value );
-			this.document2Value = new ValueModel<>( reference, document2Value );
-		}
-	}
+						// Same for the nested object
+						DocumentElement nestedObject1 = document.addObject( mainIndex.binding().nestedObject.self );
+						nestedObject1.addValue( mainIndex.binding().nestedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
+						if ( docValues ) {
+							nestedObject1.addValue( mainIndex.binding().nestedObject.fieldWithDocValues.get( fieldType ).reference, value1 );
+						}
+						DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+						nestedObject2.addValue( mainIndex.binding().nestedObject.fieldWithDefaults.get( fieldType ).reference, value1 );
+						if ( docValues ) {
+							nestedObject2.addValue( mainIndex.binding().nestedObject.fieldWithDocValues.get( fieldType ).reference, value1 );
+						}
+					} )
+					.add( docId( 1 ), routingKey, document -> {
+						document.addValue( mainIndex.binding().fieldWithDefaults.get( fieldType ).reference, value2 );
+						if ( docValues ) {
+							document.addValue( mainIndex.binding().fieldWithDocValues.get( fieldType ).reference, value2 );
+						}
 
-	private static class ByTypeFieldModel<F> {
-		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			ExistsPredicateExpectations<F> expectations = typeDescriptor.getExistsPredicateExpectations();
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					(reference, name) -> new ByTypeFieldModel<>( reference, name, expectations )
-			);
-		}
+						// Add one empty object, and another with value2
+						document.addObject( mainIndex.binding().flattenedObject.self );
+						DocumentElement flattenedObject2 = document.addObject( mainIndex.binding().flattenedObject.self );
+						flattenedObject2.addValue( mainIndex.binding().flattenedObject.fieldWithDefaults.get( fieldType ).reference, value2 );
+						if ( docValues ) {
+							flattenedObject2.addValue( mainIndex.binding().flattenedObject.fieldWithDocValues.get( fieldType ).reference, value2 );
+						}
 
-		final String relativeFieldName;
-		final ValueModel<F> document1Value;
-		final ValueModel<F> document2Value;
+						// Same for the nested object
+						document.addObject( mainIndex.binding().nestedObject.self );
+						DocumentElement nestedObject2 = document.addObject( mainIndex.binding().nestedObject.self );
+						nestedObject2.addValue( mainIndex.binding().nestedObject.fieldWithDefaults.get( fieldType ).reference, value2 );
+						if ( docValues ) {
+							nestedObject2.addValue( mainIndex.binding().nestedObject.fieldWithDocValues.get( fieldType ).reference, value2 );
+						}
+					} )
+					.add( docId( 2 ), routingKey, document -> {
+						// Add two empty objects
+						document.addObject( mainIndex.binding().flattenedObject.self );
+						document.addObject( mainIndex.binding().flattenedObject.self );
 
-		private ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName,
-				ExistsPredicateExpectations<F> expectations) {
-			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( reference, expectations.getDocument1Value() );
-			this.document2Value = new ValueModel<>( reference, expectations.getDocument2Value() );
-		}
-	}
-
-	private static class IncompatibleFieldModel {
-		static <F> StandardFieldMapper<?, IncompatibleFieldModel> mapper(
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, F>> configuration) {
-			return StandardFieldMapper.of( configuration, (reference, name) -> new IncompatibleFieldModel( name ) );
-		}
-
-		final String relativeFieldName;
-
-		private IncompatibleFieldModel(String relativeFieldName) {
-			this.relativeFieldName = relativeFieldName;
+						// Same for the nested object
+						document.addObject( mainIndex.binding().nestedObject.self );
+						document.addObject( mainIndex.binding().nestedObject.self );
+					} )
+					.add( docId( 3 ), routingKey, document -> { } );
 		}
 	}
 }
