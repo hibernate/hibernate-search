@@ -7,10 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
@@ -49,10 +46,10 @@ class ElasticsearchBigIntegerIndexFieldTypeOptionsStep
 			throw log.invalidDecimalScale( resolvedDecimalScale, buildContext.getEventContext() );
 		}
 
-		BigDecimal scalingFactor = BigDecimal.TEN.pow( resolvedDecimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
-		builder.mapping().setScalingFactor( scalingFactor.doubleValue() );
+		ElasticsearchBigIntegerFieldCodec codec = new ElasticsearchBigIntegerFieldCodec( resolvedDecimalScale );
+		builder.mapping().setScalingFactor( codec.scalingFactor().doubleValue() );
 
-		return new ElasticsearchBigIntegerFieldCodec( scalingFactor );
+		return codec;
 	}
 
 	@Override

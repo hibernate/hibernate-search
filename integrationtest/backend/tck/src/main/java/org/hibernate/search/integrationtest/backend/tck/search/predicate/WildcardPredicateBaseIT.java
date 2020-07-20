@@ -431,5 +431,10 @@ public class WildcardPredicateBaseIT {
 			return f.wildcard().field( field0Path ).field( field1Path )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:wildcard";
+		}
 	}
 }

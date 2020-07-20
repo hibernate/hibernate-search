@@ -68,16 +68,22 @@ public abstract class AbstractPredicateScaleCheckingIT {
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigDecimalFieldPath(), dataSet.bigDecimal0 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting implementations of '" + predicateNameInErrorMessage()
-						+ "' for field '" + bigDecimalFieldPath() + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + bigDecimalFieldPath() + "' in a search query across multiple indexes",
+						"Inconsistent support for '" + predicateNameInErrorMessage() + "'",
+						"Field codec differs:", "decimalScale=2", " vs. ", "decimalScale=7"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );
 
 		assertThatThrownBy( () -> predicate( scope.predicate(), bigIntegerFieldPath(), dataSet.bigInteger0 ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting implementations of '" + predicateNameInErrorMessage()
-						+ "' for field '" + bigIntegerFieldPath() + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + bigIntegerFieldPath() + "' in a search query across multiple indexes",
+						"Inconsistent support for '" + predicateNameInErrorMessage() + "'",
+						"Field codec differs:", "decimalScale=-2", " vs. ", "decimalScale=-7"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( index.name(), incompatibleIndex.name() )
 				) );

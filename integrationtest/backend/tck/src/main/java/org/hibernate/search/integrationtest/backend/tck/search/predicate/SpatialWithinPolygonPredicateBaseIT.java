@@ -350,5 +350,10 @@ public class SpatialWithinPolygonPredicateBaseIT {
 			return f.spatial().within().field( field0Path ).field( field1Path )
 					.polygon( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-polygon";
+		}
 	}
 }

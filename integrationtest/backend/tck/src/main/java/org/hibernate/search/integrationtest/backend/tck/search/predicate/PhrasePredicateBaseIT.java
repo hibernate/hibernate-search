@@ -504,5 +504,10 @@ public class PhrasePredicateBaseIT {
 			return f.phrase().field( field0Path ).field( field1Path )
 					.matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:phrase";
+		}
 	}
 }

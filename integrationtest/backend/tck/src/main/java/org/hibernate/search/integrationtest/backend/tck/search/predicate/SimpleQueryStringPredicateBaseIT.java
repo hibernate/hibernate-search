@@ -479,5 +479,10 @@ public class SimpleQueryStringPredicateBaseIT {
 				int matchingDocOrdinal) {
 			return f.simpleQueryString().field( field0Path ).field( field1Path ).matching( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:simple-query-string";
+		}
 	}
 }

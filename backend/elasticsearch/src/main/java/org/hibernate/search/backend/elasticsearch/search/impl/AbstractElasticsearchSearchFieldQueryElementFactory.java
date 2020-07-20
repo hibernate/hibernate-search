@@ -6,11 +6,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
 public abstract class AbstractElasticsearchSearchFieldQueryElementFactory<T, F>
 		implements ElasticsearchSearchFieldQueryElementFactory<T, F> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	@Override
-	public boolean isCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
-		return getClass().equals( other.getClass() );
+	public void checkCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			throw log.differentImplementationClassForQueryElement( getClass(), other.getClass() );
+		}
 	}
 }

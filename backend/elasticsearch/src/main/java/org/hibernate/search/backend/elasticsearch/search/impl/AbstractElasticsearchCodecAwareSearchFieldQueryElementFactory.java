@@ -6,10 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<T, F>
 		extends AbstractElasticsearchSearchFieldQueryElementFactory<T, F> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final ElasticsearchFieldCodec<F> codec;
 
@@ -18,12 +24,12 @@ public abstract class AbstractElasticsearchCodecAwareSearchFieldQueryElementFact
 	}
 
 	@Override
-	public boolean isCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
+	public void checkCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
+		super.checkCompatibleWith( other );
 		AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<?, ?> castedOther =
 				(AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<?, ?>) other;
-		return codec.isCompatibleWith( castedOther.codec );
+		if ( !codec.isCompatibleWith( castedOther.codec ) ) {
+			throw log.differentFieldCodecForQueryElement( codec, castedOther.codec );
+		}
 	}
 }

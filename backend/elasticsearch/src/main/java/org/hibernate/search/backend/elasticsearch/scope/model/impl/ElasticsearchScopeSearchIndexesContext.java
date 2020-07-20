@@ -89,7 +89,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 				converter = converterForIndex;
 			}
 			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
-				throw log.conflictingIdentifierTypesForSearch( converter, converterForIndex, indexesEventContext() );
+				throw log.inconsistentConfigurationForIdentifierForSearch( converter, converterForIndex, indexesEventContext() );
 			}
 		}
 		return converter;
@@ -105,7 +105,6 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 		}
 		else {
 			// Multi-index search
-			Class<?> fieldValueTypeForAllIndexes = null;
 			List<ElasticsearchSearchFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
@@ -113,16 +112,6 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( fieldForCurrentIndex == null ) {
 					continue;
-				}
-				Class<?> fieldValueTypeForCurrentIndex = fieldForCurrentIndex.type().valueClass();
-				if ( fieldValueTypeForAllIndexes == null ) {
-					fieldValueTypeForAllIndexes = fieldValueTypeForCurrentIndex;
-				}
-				else {
-					if ( !fieldValueTypeForAllIndexes.equals( fieldValueTypeForCurrentIndex ) ) {
-						throw log.conflictingFieldTypesForSearch( absoluteFieldPath, "valueType",
-								fieldValueTypeForAllIndexes, fieldValueTypeForCurrentIndex, indexesEventContext() );
-					}
 				}
 				fieldForEachIndex.add( fieldForCurrentIndex );
 			}

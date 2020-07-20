@@ -344,5 +344,10 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 			return f.spatial().within().field( field0Path ).field( field1Path )
 					.boundingBox( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-bounding-box";
+		}
 	}
 }

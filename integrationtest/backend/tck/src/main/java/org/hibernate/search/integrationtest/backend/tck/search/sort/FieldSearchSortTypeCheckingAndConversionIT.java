@@ -255,8 +255,10 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'dslConverter' differs", " vs. "
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), rawFieldCompatibleIndex.name() )
 				) );
@@ -287,7 +289,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndex_dslConverterEnabled() {
+	public void multiIndex_withIncompatibleIndex_dslConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
@@ -298,15 +300,17 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'sort:field'"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 				) );
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndex_dslConverterDisabled() {
+	public void multiIndex_withIncompatibleIndex_dslConverterDisabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
 		String fieldPath = getFieldPath();
@@ -317,8 +321,10 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types" )
-				.hasMessageContaining( "'" + fieldPath + "'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Inconsistent support for 'sort:field'"
+				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 				) );

@@ -377,5 +377,10 @@ public class SpatialWithinCirclePredicateBaseIT {
 					.circle( dataSet.values.matchingCenter( matchingDocOrdinal ),
 							dataSet.values.matchingRadius( matchingDocOrdinal ) );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-circle";
+		}
 	}
 }

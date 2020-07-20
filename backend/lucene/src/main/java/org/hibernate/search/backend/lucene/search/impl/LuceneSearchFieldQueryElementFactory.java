@@ -23,10 +23,10 @@ public interface LuceneSearchFieldQueryElementFactory<T, F> {
 	T create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field);
 
 	/**
-	 * Determines whether this factory and the given factory can be used interchangeably.
+	 * Checks whether this factory and the given factory can be used interchangeably.
 	 * @param other Another factory.
-	 * @return {@code true} if the two factories can be used interchangeably, {@code false} otherwise.
+	 * @throws org.hibernate.search.util.common.SearchException if the two factories cannot be used interchangeably.
 	 */
-	boolean isCompatibleWith(LuceneSearchFieldQueryElementFactory<?, ?> other);
+	void checkCompatibleWith(LuceneSearchFieldQueryElementFactory<?, ?> other);
 
 }
