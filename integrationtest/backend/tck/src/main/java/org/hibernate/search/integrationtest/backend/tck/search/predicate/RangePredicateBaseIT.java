@@ -55,6 +55,7 @@ public class RangePredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
+						AnalysisIT.index, AnalysisIT.compatibleIndex, AnalysisIT.incompatibleIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -74,6 +75,13 @@ public class RangePredicateBaseIT {
 		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
 		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
 
+		final BulkIndexer analysisMainIndexIndexer = AnalysisIT.index.bulkIndexer();
+		final BulkIndexer analysisCompatibleIndexIndexer = AnalysisIT.compatibleIndex.bulkIndexer();
+		final BulkIndexer analysisIncompatibleIndexIndexer = AnalysisIT.incompatibleIndex.bulkIndexer();
+		AnalysisIT.dataSet.contribute( AnalysisIT.index, analysisMainIndexIndexer,
+				AnalysisIT.compatibleIndex, analysisCompatibleIndexIndexer,
+				AnalysisIT.incompatibleIndex, analysisIncompatibleIndexIndexer );
+
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( ScoreIT.index, scoreIndexer ) );
 
@@ -91,6 +99,7 @@ public class RangePredicateBaseIT {
 
 		singleFieldIndexer.join(
 				multiFieldIndexer, nestingIndexer,
+				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
@@ -213,6 +222,25 @@ public class RangePredicateBaseIT {
 		}
 	}
 
+	public static class AnalysisIT extends AbstractPredicateSimpleAnalysisIT {
+		private static final DataSet dataSet = new DataSet();
+
+		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "analysis_main" );
+		private static final SimpleMappedIndex<IndexBinding> compatibleIndex = SimpleMappedIndex.of( IndexBinding::new )
+				.name( "analysis_compatible" );
+		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+				SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "analysis_incompatible" );
+
+		public AnalysisIT() {
+			super( index, compatibleIndex, incompatibleIndex, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, String matchingParam) {
+			return f.range().field( fieldPath ).range( Range.between( matchingParam, matchingParam ) );
+		}
+	}
 
 	@RunWith(Parameterized.class)
 	public static class ScoreIT<F> extends AbstractPredicateFieldScoreIT<RangePredicateTestValues<F>> {

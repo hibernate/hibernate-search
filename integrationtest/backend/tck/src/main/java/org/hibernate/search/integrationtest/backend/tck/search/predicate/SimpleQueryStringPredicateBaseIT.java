@@ -210,7 +210,7 @@ public class SimpleQueryStringPredicateBaseIT {
 		}
 	}
 
-	public static class AnalysisIT extends AbstractPredicateAnalysisIT {
+	public static class AnalysisIT extends AbstractPredicateConfigurableAnalysisIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new )
