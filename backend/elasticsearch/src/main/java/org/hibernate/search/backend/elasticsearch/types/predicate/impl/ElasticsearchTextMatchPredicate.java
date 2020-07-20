@@ -11,11 +11,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -61,41 +59,25 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 
 	public static class Factory
 			extends AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<MatchPredicateBuilder, String> {
-		private final String dataType;
-
-		public Factory(ElasticsearchFieldCodec<String> codec, String dataType) {
+		public Factory(ElasticsearchFieldCodec<String> codec) {
 			super( codec );
-			this.dataType = dataType;
-		}
-
-		@Override
-		public boolean isCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
-			if ( !super.isCompatibleWith( other ) ) {
-				return false;
-			}
-
-			Factory castedOther = (Factory) other;
-			return dataType.equals( castedOther.dataType );
 		}
 
 		@Override
 		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<String> field) {
-			return new Builder( codec, dataType, searchContext, field );
+			return new Builder( codec, searchContext, field );
 		}
 	}
 
 	private static class Builder extends ElasticsearchStandardMatchPredicate.Builder<String> {
-		private final String type;
-
 		private Integer fuzziness;
 		private Integer prefixLength;
 		private String analyzer;
 
-		private Builder(ElasticsearchFieldCodec<String> codec, String type, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchFieldContext<String> field) {
 			super( codec, searchContext, field );
-			this.type = type;
 		}
 
 		@Override
@@ -111,8 +93,8 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 
 		@Override
 		public void skipAnalysis() {
-			if ( DataTypes.KEYWORD.equals( type ) ) {
-				throw log.skipAnalysisOnKeywordField( absoluteFieldPath,
+			if ( field.type().hasNormalizerOnAtLeastOneIndex() ) {
+				throw log.skipAnalysisOnNormalizedField( absoluteFieldPath,
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 			}
 

@@ -143,6 +143,11 @@ public class ElasticsearchIndexFieldType<F>
 	}
 
 	@Override
+	public boolean hasNormalizerOnAtLeastOneIndex() {
+		return normalizerName().isPresent();
+	}
+
+	@Override
 	public Optional<String> searchAnalyzerName() {
 		return Optional.ofNullable( searchAnalyzerName );
 	}

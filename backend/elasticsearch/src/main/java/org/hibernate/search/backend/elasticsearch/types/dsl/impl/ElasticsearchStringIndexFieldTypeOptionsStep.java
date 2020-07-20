@@ -180,8 +180,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
-			builder.queryElementFactory( PredicateTypeKeys.MATCH,
-					new ElasticsearchTextMatchPredicate.Factory( codec, mapping.getType() ) );
+			builder.queryElementFactory( PredicateTypeKeys.MATCH, new ElasticsearchTextMatchPredicate.Factory( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new ElasticsearchTextPhrasePredicate.Factory() );
