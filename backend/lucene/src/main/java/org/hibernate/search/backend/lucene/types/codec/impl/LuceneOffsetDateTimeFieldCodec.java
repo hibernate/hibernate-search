@@ -30,9 +30,9 @@ public final class LuceneOffsetDateTimeFieldCodec extends AbstractLuceneNumericF
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneOffsetDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, OffsetDateTime indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneOffsetDateTimeFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			OffsetDateTime indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

@@ -9,7 +9,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.MonthDay;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneMonthDayFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 class LuceneMonthDayIndexFieldTypeOptionsStep
 		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneMonthDayIndexFieldTypeOptionsStep, MonthDay> {
@@ -24,11 +27,8 @@ class LuceneMonthDayIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<MonthDay, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			MonthDay indexNullAsValue) {
-		return new LuceneMonthDayFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<MonthDay, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, MonthDay indexNullAsValue) {
+		return new LuceneMonthDayFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }

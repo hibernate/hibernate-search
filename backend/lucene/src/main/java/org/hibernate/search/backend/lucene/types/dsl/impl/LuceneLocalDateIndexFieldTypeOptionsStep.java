@@ -9,7 +9,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.LocalDate;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalDateFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 
 class LuceneLocalDateIndexFieldTypeOptionsStep
@@ -25,11 +28,8 @@ class LuceneLocalDateIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<LocalDate, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			LocalDate indexNullAsValue) {
-		return new LuceneLocalDateFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<LocalDate, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, LocalDate indexNullAsValue) {
+		return new LuceneLocalDateFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }

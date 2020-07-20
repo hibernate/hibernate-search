@@ -29,9 +29,9 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 	private final BigDecimal minScaledValue;
 	private final BigDecimal maxScaledValue;
 
-	public LuceneBigDecimalFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, BigDecimal indexNullAsValue, int decimalScale) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneBigDecimalFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			BigDecimal indexNullAsValue, int decimalScale) {
+		super( indexing, docValues, storage, indexNullAsValue );
 		this.decimalScale = decimalScale;
 		this.minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
 		this.maxScaledValue = new BigDecimal( NumberScaleConstants.MAX_LONG_AS_BIGINTEGER, decimalScale );

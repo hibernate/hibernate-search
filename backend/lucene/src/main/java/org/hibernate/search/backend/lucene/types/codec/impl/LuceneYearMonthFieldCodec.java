@@ -38,9 +38,9 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 	 */
 	private static final YearMonth SOME_YEAR_MONTH = YearMonth.of( 0, 1 );
 
-	public LuceneYearMonthFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, YearMonth indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneYearMonthFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			YearMonth indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

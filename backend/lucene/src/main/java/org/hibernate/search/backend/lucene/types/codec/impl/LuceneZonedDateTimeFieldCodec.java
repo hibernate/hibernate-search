@@ -36,9 +36,9 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneZonedDateTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, ZonedDateTime indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneZonedDateTimeFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			ZonedDateTime indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

@@ -11,7 +11,10 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistance
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinBoundingBoxPredicate;
@@ -44,18 +47,20 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		// When projectable, we need distance projections; thus we need docValues.
-		boolean docValues = resolvedSortable || resolvedProjectable;
 
-		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
-		);
+		Indexing indexing = resolvedSearchable ? Indexing.ENABLED : Indexing.DISABLED;
+		// When projectable, we need distance projections; thus we need docValues.
+		// CAUTION: we don't enable docValues when aggregable at the moment, because there are no GeoPoint aggregations...
+		DocValues docValues = resolvedSortable || resolvedProjectable ? DocValues.ENABLED : DocValues.DISABLED;
+		Storage storage = resolvedProjectable ? Storage.ENABLED : Storage.DISABLED;
+
+		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec( indexing, docValues, storage, indexNullAsValue );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-					docValues ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+					DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
 					new LuceneGeoPointSpatialWithinCirclePredicate.Factory() );

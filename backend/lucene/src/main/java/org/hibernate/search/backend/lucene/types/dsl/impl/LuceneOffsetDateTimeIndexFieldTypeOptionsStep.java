@@ -9,7 +9,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.OffsetDateTime;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneOffsetDateTimeFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 class LuceneOffsetDateTimeIndexFieldTypeOptionsStep
 		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneOffsetDateTimeIndexFieldTypeOptionsStep, OffsetDateTime> {
@@ -24,11 +27,8 @@ class LuceneOffsetDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<OffsetDateTime, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			OffsetDateTime indexNullAsValue) {
-		return new LuceneOffsetDateTimeFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<OffsetDateTime, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, OffsetDateTime indexNullAsValue) {
+		return new LuceneOffsetDateTimeFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }

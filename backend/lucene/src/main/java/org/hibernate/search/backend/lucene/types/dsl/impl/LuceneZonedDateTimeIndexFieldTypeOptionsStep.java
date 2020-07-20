@@ -9,7 +9,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneZonedDateTimeFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 class LuceneZonedDateTimeIndexFieldTypeOptionsStep
 		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneZonedDateTimeIndexFieldTypeOptionsStep, ZonedDateTime> {
@@ -24,11 +27,8 @@ class LuceneZonedDateTimeIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<ZonedDateTime, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			ZonedDateTime indexNullAsValue) {
-		return new LuceneZonedDateTimeFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<ZonedDateTime, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, ZonedDateTime indexNullAsValue) {
+		return new LuceneZonedDateTimeFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }

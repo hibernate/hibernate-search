@@ -7,7 +7,10 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneIntegerFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 
 class LuceneIntegerIndexFieldTypeOptionsStep
@@ -23,11 +26,8 @@ class LuceneIntegerIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<Integer, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			Integer indexNullAsValue) {
-		return new LuceneIntegerFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<Integer, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, Integer indexNullAsValue) {
+		return new LuceneIntegerFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }

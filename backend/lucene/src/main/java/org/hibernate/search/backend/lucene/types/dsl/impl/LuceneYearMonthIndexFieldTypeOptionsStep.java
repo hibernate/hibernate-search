@@ -9,7 +9,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.time.YearMonth;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneYearMonthFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 class LuceneYearMonthIndexFieldTypeOptionsStep
 		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneYearMonthIndexFieldTypeOptionsStep, YearMonth> {
@@ -24,11 +27,8 @@ class LuceneYearMonthIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<YearMonth, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			YearMonth indexNullAsValue) {
-		return new LuceneYearMonthFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<YearMonth, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, YearMonth indexNullAsValue) {
+		return new LuceneYearMonthFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }
