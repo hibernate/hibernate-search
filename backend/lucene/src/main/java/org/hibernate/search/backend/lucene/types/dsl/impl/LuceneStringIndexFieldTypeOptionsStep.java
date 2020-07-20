@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldPro
 import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
 import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
@@ -119,7 +120,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 		boolean resolvedNorms = resolveNorms();
 		ResolvedTermVector resolvedTermVector = resolveTermVector();
 
-		boolean docValues = resolvedSortable || resolvedAggregable;
+		DocValues docValues = resolvedSortable || resolvedAggregable ? DocValues.ENABLED : DocValues.DISABLED;
 
 		if ( analyzer != null ) {
 			builder.analyzer( analyzerName, analyzer );
@@ -155,8 +156,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 		}
 
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
-				resolvedSearchable, resolvedSortable, resolvedAggregable,
 				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ),
+				docValues,
 				indexNullAsValue,
 				builder.indexingAnalyzerOrNormalizer()
 		);
@@ -171,7 +172,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			}
 			else {
 				builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-						docValues ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+						DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 								: new LuceneExistsPredicate.DefaultFactory<>() );
 			}
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
@@ -248,8 +249,11 @@ class LuceneStringIndexFieldTypeOptionsStep
 		FieldType fieldType = new FieldType();
 
 		if ( !searchable ) {
+			if ( !projectable ) {
+				return null;
+			}
 			fieldType.setIndexOptions( IndexOptions.NONE );
-			fieldType.setStored( projectable );
+			fieldType.setStored( true );
 			fieldType.freeze();
 			return fieldType;
 		}

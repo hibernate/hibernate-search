@@ -18,22 +18,15 @@ import org.apache.lucene.util.BytesRef;
 
 public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<String, String> {
 
-	private final boolean sortable;
-	private final boolean searchable;
-	private final boolean aggregable;
-
-	private final FieldType fieldType;
-
+	private final FieldType mainFieldType;
+	private final DocValues docValues;
 	private final String indexNullAsValue;
-
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneStringFieldCodec(boolean searchable, boolean sortable, boolean aggregable,
-			FieldType fieldType, String indexNullAsValue, Analyzer analyzerOrNormalizer) {
-		this.sortable = sortable;
-		this.searchable = searchable;
-		this.aggregable = aggregable;
-		this.fieldType = fieldType;
+	public LuceneStringFieldCodec(FieldType mainFieldType, DocValues docValues,
+			String indexNullAsValue, Analyzer analyzerOrNormalizer) {
+		this.mainFieldType = mainFieldType;
+		this.docValues = docValues;
 		this.indexNullAsValue = indexNullAsValue;
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
@@ -48,17 +41,16 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 			return;
 		}
 
-		if ( searchable || fieldType.stored() ) {
-			// searchable or projectable or both
-			documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
+		if ( mainFieldType != null ) {
+			documentBuilder.addField( new Field( absoluteFieldPath, value, mainFieldType ) );
 		}
 
-		if ( sortable || aggregable ) {
+		if ( DocValues.ENABLED.equals( docValues ) ) {
 			BytesRef normalized = normalize( absoluteFieldPath, value );
 			documentBuilder.addField( new SortedSetDocValuesField( absoluteFieldPath, normalized ) );
 		}
 
-		if ( !sortable && fieldType.omitNorms() ) {
+		if ( ( mainFieldType == null || mainFieldType.omitNorms() ) && DocValues.DISABLED.equals( docValues ) ) {
 			// For the "exists" predicate
 			documentBuilder.addFieldName( absoluteFieldPath );
 		}

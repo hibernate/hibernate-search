@@ -20,9 +20,9 @@ public final class LuceneInstantFieldCodec extends AbstractLuceneNumericFieldCod
 
 	static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
-	public LuceneInstantFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, Instant indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneInstantFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			Instant indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

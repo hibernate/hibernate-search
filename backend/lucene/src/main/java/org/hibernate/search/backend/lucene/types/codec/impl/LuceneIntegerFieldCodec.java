@@ -14,9 +14,9 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 
 public final class LuceneIntegerFieldCodec extends AbstractLuceneNumericFieldCodec<Integer, Integer> {
 
-	public LuceneIntegerFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, Integer indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneIntegerFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			Integer indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

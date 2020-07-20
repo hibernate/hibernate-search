@@ -11,7 +11,10 @@ import java.math.BigDecimal;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneBigDecimalFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,14 +46,13 @@ class LuceneBigDecimalIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<BigDecimal, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
+	protected AbstractLuceneNumericFieldCodec<BigDecimal, ?> createCodec(
+			Indexing indexing,
+			DocValues docValues,
+			Storage storage,
 			BigDecimal indexNullAsValue) {
 		int resolvedDecimalScale = resolveDecimalScale();
-		return new LuceneBigDecimalFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue,
-				resolvedDecimalScale
-		);
+		return new LuceneBigDecimalFieldCodec( indexing, docValues, storage, indexNullAsValue, resolvedDecimalScale );
 	}
 
 	private int resolveDecimalScale() {

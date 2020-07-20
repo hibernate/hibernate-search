@@ -12,19 +12,16 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 		implements LuceneStandardFieldCodec<F, E> {
 
-	private final boolean projectable;
-	private final boolean searchable;
-	private final boolean sortable;
-	private final boolean aggregable;
-
+	private final Indexing indexing;
+	private final DocValues docValues;
+	private final Storage storage;
 	private final F indexNullAsValue;
 
-	public AbstractLuceneNumericFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, F indexNullAsValue) {
-		this.projectable = projectable;
-		this.searchable = searchable;
-		this.sortable = sortable;
-		this.aggregable = aggregable;
+	public AbstractLuceneNumericFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			F indexNullAsValue) {
+		this.indexing = indexing;
+		this.docValues = docValues;
+		this.storage = storage;
 		this.indexNullAsValue = indexNullAsValue;
 	}
 
@@ -40,13 +37,13 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 
 		E encodedValue = encode( value );
 
-		if ( projectable ) {
-			addStoredToDocument( documentBuilder, absoluteFieldPath, value, encodedValue );
-		}
-
 		LuceneNumericDomain<E> domain = getDomain();
 
-		if ( sortable || aggregable ) {
+		if ( Indexing.ENABLED == indexing ) {
+			documentBuilder.addField( domain.createIndexField( absoluteFieldPath, encodedValue ) );
+		}
+
+		if ( DocValues.ENABLED == docValues ) {
 			documentBuilder.addField( domain.createSortedDocValuesField( absoluteFieldPath, encodedValue ) );
 		}
 		else {
@@ -54,8 +51,8 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 			documentBuilder.addFieldName( absoluteFieldPath );
 		}
 
-		if ( searchable ) {
-			documentBuilder.addField( domain.createIndexField( absoluteFieldPath, encodedValue ) );
+		if ( Storage.ENABLED == storage ) {
+			addStoredToDocument( documentBuilder, absoluteFieldPath, value, encodedValue );
 		}
 	}
 

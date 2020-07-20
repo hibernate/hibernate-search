@@ -7,7 +7,10 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDoubleFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 
 class LuceneDoubleIndexFieldTypeOptionsStep
 		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneDoubleIndexFieldTypeOptionsStep, Double> {
@@ -22,11 +25,8 @@ class LuceneDoubleIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	protected AbstractLuceneNumericFieldCodec<Double, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			Double indexNullAsValue) {
-		return new LuceneDoubleFieldCodec(
-				resolvedProjectable, resolvedSearchable, resolvedSortable, resolvedAggregable, indexNullAsValue
-		);
+	protected AbstractLuceneNumericFieldCodec<Double, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, Double indexNullAsValue) {
+		return new LuceneDoubleFieldCodec( indexing, docValues, storage, indexNullAsValue );
 	}
 }

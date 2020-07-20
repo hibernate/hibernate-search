@@ -32,9 +32,9 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneMonthDayFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, MonthDay indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneMonthDayFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			MonthDay indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

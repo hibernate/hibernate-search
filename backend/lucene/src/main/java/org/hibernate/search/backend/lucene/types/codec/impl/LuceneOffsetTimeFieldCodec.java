@@ -31,9 +31,9 @@ public final class LuceneOffsetTimeFieldCodec extends AbstractLuceneNumericField
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneOffsetTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, OffsetTime indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneOffsetTimeFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			OffsetTime indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override

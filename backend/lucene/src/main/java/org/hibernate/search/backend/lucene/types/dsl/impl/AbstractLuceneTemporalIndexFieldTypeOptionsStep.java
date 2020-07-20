@@ -16,6 +16,9 @@ import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
+import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
+import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
@@ -43,20 +46,16 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 
 	@Override
 	public LuceneIndexFieldType<F> toIndexFieldType() {
+		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
-		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		boolean docValues = resolvedSortable || resolvedAggregable;
+		Indexing indexing = resolvedSearchable ? Indexing.ENABLED : Indexing.DISABLED;
+		DocValues docValues = resolvedSortable || resolvedAggregable ? DocValues.ENABLED : DocValues.DISABLED;
+		Storage storage = resolvedProjectable ? Storage.ENABLED : Storage.DISABLED;
 
-		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec(
-				resolvedProjectable,
-				resolvedSearchable,
-				resolvedSortable,
-				resolvedAggregable,
-				indexNullAsValue
-		);
+		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec( indexing, docValues, storage, indexNullAsValue );
 		builder.codec( codec );
 
 		if ( resolvedSearchable ) {
@@ -64,7 +63,7 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneNumericMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneNumericRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
-					docValues ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
+					DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
 		}
 
@@ -88,7 +87,6 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 		return builder.build();
 	}
 
-	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(boolean resolvedProjectable,
-			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
-			F indexNullAsValue);
+	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(Indexing indexing, DocValues docValues,
+			Storage storage, F indexNullAsValue);
 }

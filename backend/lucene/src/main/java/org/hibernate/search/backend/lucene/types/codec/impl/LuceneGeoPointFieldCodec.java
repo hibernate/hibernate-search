@@ -18,16 +18,16 @@ import org.apache.lucene.util.BytesRef;
 
 public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
-	private final boolean projectable;
-	private final boolean searchable;
-	private final boolean sortable;
-
+	private final Indexing indexing;
+	private final DocValues docValues;
+	private final Storage storage;
 	private final GeoPoint indexNullAsValue;
 
-	public LuceneGeoPointFieldCodec(boolean projectable, boolean searchable, boolean sortable, GeoPoint indexNullAsValue) {
-		this.projectable = projectable;
-		this.searchable = searchable;
-		this.sortable = sortable;
+	public LuceneGeoPointFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			GeoPoint indexNullAsValue) {
+		this.indexing = indexing;
+		this.docValues = docValues;
+		this.storage = storage;
 		this.indexNullAsValue = indexNullAsValue;
 	}
 
@@ -41,13 +41,11 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 			return;
 		}
 
-		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, toStoredBytes( value ) ) );
+		if ( Indexing.ENABLED == indexing ) {
+			documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.latitude(), value.longitude() ) );
 		}
 
-		if ( sortable || projectable ) {
-			// The projectable term here is present only to support distance projections.
-			// Since distances are derived from a DocValuesField, see DistanceCollector.
+		if ( DocValues.ENABLED == docValues ) {
 			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.latitude(), value.longitude() ) );
 		}
 		else {
@@ -55,8 +53,8 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 			documentBuilder.addFieldName( absoluteFieldPath );
 		}
 
-		if ( searchable ) {
-			documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.latitude(), value.longitude() ) );
+		if ( Storage.ENABLED == storage ) {
+			documentBuilder.addField( new StoredField( absoluteFieldPath, toStoredBytes( value ) ) );
 		}
 	}
 

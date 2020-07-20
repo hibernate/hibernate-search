@@ -38,9 +38,9 @@ public final class LuceneLocalTimeFieldCodec extends AbstractLuceneNumericFieldC
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	public LuceneLocalTimeFieldCodec(boolean projectable, boolean searchable, boolean sortable,
-			boolean aggregable, LocalTime indexNullAsValue) {
-		super( projectable, searchable, sortable, aggregable, indexNullAsValue );
+	public LuceneLocalTimeFieldCodec(Indexing indexing, DocValues docValues, Storage storage,
+			LocalTime indexNullAsValue) {
+		super( indexing, docValues, storage, indexNullAsValue );
 	}
 
 	@Override
