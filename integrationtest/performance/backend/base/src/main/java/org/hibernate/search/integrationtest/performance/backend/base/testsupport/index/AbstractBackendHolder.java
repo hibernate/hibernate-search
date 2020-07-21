@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -50,13 +49,11 @@ public abstract class AbstractBackendHolder {
 		ConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap( baseProperties )
 				.withOverride(
 						getDefaultBackendProperties( temporaryFileHolder )
-								// Allow overrides at the backend level using system properties
+								// Allow overrides at the backend level using system properties.
 								.withOverride( ConfigurationPropertySource.system() )
-								// Allow multiple backend configurations to be tested using a benchmark parameter
-								// > Apply the configuration at the backend level
+								// Allow multiple backend configurations to be tested using a benchmark parameter.
+								// This configuration can set backend properties or set defaults for index properties.
 								.withOverride( configurationFromParameter )
-								// > Apply the configuration at the index level (for convenience)
-								.withOverride( configurationFromParameter.withPrefix( BackendSettings.INDEX_DEFAULTS ) )
 								.withPrefix( EngineSettings.BACKEND )
 				);
 

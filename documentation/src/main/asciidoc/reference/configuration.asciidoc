@@ -51,9 +51,8 @@ Backend properties are explained in the relevant parts of this documentation:
 Index properties::
 These properties affect either one or multiple indexes, depending on the root.
 +
-With the root `hibernate.search.backend.index_defaults`,
-they set defaults for all indexes of the referenced backend.
-The backend name must match the name defined in the mapping.
+With the root `hibernate.search.backend`,
+they set defaults for all indexes of the backend.
 +
 With the root `hibernate.search.backend.indexes.<index name>`,
 they set the value for a specific index, overriding the defaults (if any).
@@ -63,16 +62,16 @@ For ORM entities, the default index name is the name of the indexed class, witho
 Index names can be customized in the mapping.
 +
 Alternatively, the backend can also be referenced by name,
-i.e. the roots above can also be `hibernate.search.backends.<backend name>.index_defaults`
+i.e. the roots above can also be `hibernate.search.backends.<backend name>`
 or `hibernate.search.backends.<backend name>.indexes.<index name>`.
 +
 Examples:
 
-* `hibernate.search.backend.index_defaults.io.commit_interval = 500`
+* `hibernate.search.backend.io.commit_interval = 500`
 sets the `io.commit_interval` property for all indexes of the default backend.
 * `hibernate.search.backend.indexes.Product.io.commit_interval = 2000`
 sets the `io.commit_interval` property for the `Product` index of the default backend.
-* `hibernate.search.backends.myBackend.index_defaults.io.commit_interval = 500`
+* `hibernate.search.backends.myBackend.io.commit_interval = 500`
 sets the `io.commit_interval` property for all indexes of backend `myBackend`.
 * `hibernate.search.backends.myBackend.indexes.Product.io.commit_interval = 2000`
 sets the `io.commit_interval` property for the `Product` index of backend `myBackend`.
@@ -133,21 +132,15 @@ or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/Luce
 
 IndexSettings::
 +
-`IndexSettings.indexDefaultsKey(ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
-is equivalent to `hibernate.search.backend.index_defaults.indexing.queue_size`.
+`IndexSettings.indexKey("myIndex", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
+is equivalent to `hibernate.search.backend.indexes.myIndex.indexing.queue_size`.
 +
-`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
-is equivalent to `hibernate.search.backends.myBackend.index_defaults.indexing.queue_size`.
+`IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
+is equivalent to `hibernate.search.backends.myBackend.indexes.myIndex.indexing.queue_size`.
 +
 For a list of available property keys,
 see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[ElasticsearchIndexSettings]
 or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[LuceneIndexSettings]
-[TIP]
-====
-You can also use `IndexSettings.indexKey("myIndex", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
-or `IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
-to apply a configuration to a specific index.
-====
 
 .Using the helper to build hibernate configuration
 ====

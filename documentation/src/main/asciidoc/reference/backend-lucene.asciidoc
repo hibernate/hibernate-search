@@ -213,18 +213,19 @@ See `org.apache.lucene.store.NoLockFactory`.
 include::components/sharding-intro-note.asciidoc[]
 
 In the Lucene backend, sharding is disabled by default,
-but can be enabled by selecting a sharding strategy at the index level.
+but can be enabled by selecting a sharding strategy.
 Multiple strategies are available:
 
 `hash`::
 +
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.sharding.strategy = hash
+hibernate.search.backend.sharding.number_of_shards = 2 (no default)
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.sharding.strategy = hash
 hibernate.search.backend.indexes.<index name>.sharding.number_of_shards = 2 (no default)
-# OR
-hibernate.search.backend.index_defaults.sharding.strategy = hash
-hibernate.search.backend.index_defaults.sharding.number_of_shards = 2 (no default)
 ----
 +
 The `hash` strategy requires to set a number of shards through the `number_of_shards` property.
@@ -245,11 +246,12 @@ to be brought down to a smaller number (e.g. "all integers").
 +
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.sharding.strategy = explicit
+hibernate.search.backend.sharding.shard_identifiers = fr,en,de (no default)
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.sharding.strategy = explicit
 hibernate.search.backend.indexes.<index name>.sharding.shard_identifiers = fr,en,de (no default)
-# OR
-hibernate.search.backend.index_defaults.sharding.strategy = explicit
-hibernate.search.backend.index_defaults.sharding.shard_identifiers = fr,en,de (no default)
 ----
 +
 The `explicit` strategy requires to set a list of shard identifiers through the `shard_identifiers` property.
@@ -661,15 +663,16 @@ Indexing operations relative to the same document ID are always pushed to the sa
 
 It is possible to customize the queues in order to reduce resource consumption,
 or on the contrary to improve throughput.
-This is done through the following configuration properties, at the index level:
+This is done through the following configuration properties:
 
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.indexing.queue_count 10 (default)
+hibernate.search.backend.indexing.queue_size 1000 (default)
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.indexing.queue_count 10 (default)
 hibernate.search.backend.indexes.<index name>.indexing.queue_size 1000 (default)
-# OR
-hibernate.search.backend.index_defaults.indexing.queue_count 10 (default)
-hibernate.search.backend.index_defaults.indexing.queue_size 1000 (default)
 ----
 
 * `indexing.queue_count` defines the number of queues.
@@ -751,13 +754,14 @@ This dramatically reduces the amount of commits in write-intensive scenarios
 leading to much better performance.
 
 It is possible to control exactly how often Hibernate Search will commit
-by setting the commit interval (in milliseconds) at the index level:
+by setting the commit interval (in milliseconds):
 
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.commit_interval = 1000 (default)
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.io.commit_interval = 1000 (default)
-# OR
-hibernate.search.backend.index_defaults.io.commit_interval = 1000 (default)
 ----
 
 [WARNING]
@@ -801,13 +805,14 @@ When set to a value higher than 0, the index reader will no longer be refreshed 
 if, when a search query starts, the refresh occurred less than X milliseconds ago,
 then the index reader will not be refreshed, even though it may be out-of-date.
 
-The refresh interval is set at the index level:
+The refresh interval can be set this way:
 
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.refresh_interval = 0 (default)
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.io.refresh_interval = 0 (default)
-# OR
-hibernate.search.backend.index_defaults.io.refresh_interval = 0 (default)
 ----
 
 [[backend-lucene-io-writer]]
@@ -823,14 +828,15 @@ Hibernate Search exposes these settings through configuration properties prefixe
 at the index level.
 
 Below is a list of all index writer settings.
-They can be set through configuration properties, at the index level.
-For example, `io.writer.ram_buffer_size` can be set like this:
+They can all be set similarly through configuration properties;
+for example, `io.writer.ram_buffer_size` can be set like this:
 
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.writer.ram_buffer_size = 32
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.io.writer.ram_buffer_size = 32
-# OR
-hibernate.search.backend.index_defaults.io.writer.ram_buffer_size = 32
 ----
 
 [[table-performance-parameters]]
@@ -892,14 +898,15 @@ which exposes several settings that can be tweaked to better fit your applicatio
 and ultimately get better performance.
 
 Below is a list of all merge settings.
-They can be set through configuration properties, at the index level.
-For example, `io.merge.factor` can be set like this:
+They can all be set similarly through configuration properties;
+for example, `io.merge.factor` can be set like this:
 
 [source]
 ----
+# To configure the defaults for all indexes:
+hibernate.search.backend.io.merge.factor = 10
+# To configure a specific index:
 hibernate.search.backend.indexes.<index name>.io.merge.factor = 10
-# OR
-hibernate.search.backend.index_defaults.io.merge.factor = 10
 ----
 
 [cols="1,2a", options="header"]
@@ -987,9 +994,9 @@ use something like this:
 
 [source]
 ----
-hibernate.search.backend.index_defaults.io.writer.ram_buffer_size = 10
-hibernate.search.backend.index_defaults.io.merge.max_size = 7
-hibernate.search.backend.index_defaults.io.merge.max_forced_size = 7
+hibernate.search.backend.io.writer.ram_buffer_size = 10
+hibernate.search.backend.io.merge.max_size = 7
+hibernate.search.backend.io.merge.max_forced_size = 7
 ----
 ========
 

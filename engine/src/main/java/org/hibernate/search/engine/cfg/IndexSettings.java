@@ -12,9 +12,9 @@ import static java.lang.String.join;
  * Configuration properties common to all Hibernate Search indexes regardless of the underlying technology.
  * <p>
  * Constants in this class are to be appended to a prefix to form a property key.
- * The exact prefix will depend on the integration, but should generally look like
- * either "{@code hibernate.search.backend.<backend name>.indexes.<index name>.}" (for per-index settings)
- * or "{@code hibernate.search.backends.<backend name>.index_defaults.}" (for default index settings).
+ * The exact prefix will be either
+ * "{@code hibernate.search.backend.indexes.<index name>.}" (for per-index settings)
+ * or "{@code hibernate.search.backend.}" (for default index settings).
  */
 public final class IndexSettings {
 
@@ -32,7 +32,13 @@ public final class IndexSettings {
 	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
 	 * @return the concatenated default index settings key
+	 *
+	 * @deprecated To set defaults for a particular configuration property for all indexes in a backend,
+	 * just set the configuration property at the backend level.
+	 * E.g. instead of {@code IndexSettings.indexDefaultsKey( "indexing.queue_size" )}
+	 * use {@code BackendSettings.backendKey( "indexing.queue_size" )}.
 	 */
+	@Deprecated
 	public static String indexDefaultsKey(String radical) {
 		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEX_DEFAULTS, radical );
 	}
@@ -66,7 +72,13 @@ public final class IndexSettings {
 	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
 	 * @return the concatenated default index settings key
+	 *
+	 * @deprecated To set defaults for a particular configuration property for all indexes in a backend,
+	 * just set the configuration property at the backend level.
+	 * E.g. instead of {@code IndexSettings.indexDefaultsKey( "myBackend", "indexing.queue_size" )}
+	 * use {@code BackendSettings.backendKey( "myBackend", "indexing.queue_size" )}.
 	 */
+	@Deprecated
 	public static String indexDefaultsKey(String backendName, String radical) {
 		if ( backendName == null ) {
 			return indexDefaultsKey( radical );

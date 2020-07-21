@@ -30,7 +30,7 @@ public class ElasticsearchIndexLifecycleStrategyIT {
 		StubMappedIndex index = StubMappedIndex.withoutFields();
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
-						.withIndexDefaultsProperty(
+						.withBackendProperty(
 								"lifecycle.strategy",
 								"update"
 						)

@@ -37,10 +37,14 @@ public class ElasticsearchConfigurationIT {
 		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), "7.8" );
 		config.put(
 				BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
+		config.put(
+				BackendSettings.backendKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
+				IndexStatus.YELLOW.externalRepresentation()
+		);
 		// index configuration
 		config.put(
-				IndexSettings.indexDefaultsKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
-				IndexStatus.YELLOW.externalRepresentation()
+				IndexSettings.indexKey( "myIndex", ElasticsearchIndexSettings.INDEXING_MAX_BULK_SIZE ),
+				20
 		);
 		// orm configuration
 		config.put(
@@ -62,7 +66,8 @@ public class ElasticsearchConfigurationIT {
 						entry( "hibernate.search.backend.multi_tenancy.strategy", "discriminator" ),
 						entry( "hibernate.search.backend.version", "7.8" ),
 						entry( "hibernate.search.backend.version_check.enabled", "false" ),
-						entry( "hibernate.search.backend.index_defaults.schema_management.minimal_required_status", "yellow" ),
+						entry( "hibernate.search.backend.schema_management.minimal_required_status", "yellow" ),
+						entry( "hibernate.search.backend.indexes.myIndex.indexing.max_bulk_size", 20 ),
 						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
 						entry( "hibernate.search.background_failure_handler", "myFailureHandler" )
 				);

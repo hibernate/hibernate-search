@@ -184,9 +184,9 @@ public class LuceneIndexReaderRefreshIT {
 	private void setup(String ioStrategyName, Integer refreshIntervalMs) {
 		setupHelper.start()
 				.withIndex( index )
-				.withIndexDefaultsProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )
-				.withIndexDefaultsProperty( LuceneIndexSettings.IO_REFRESH_INTERVAL, refreshIntervalMs )
-				.withIndexDefaultsProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )
+				.withBackendProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )
+				.withBackendProperty( LuceneIndexSettings.IO_REFRESH_INTERVAL, refreshIntervalMs )
+				.withBackendProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )
 				.setup();
 	}
 
