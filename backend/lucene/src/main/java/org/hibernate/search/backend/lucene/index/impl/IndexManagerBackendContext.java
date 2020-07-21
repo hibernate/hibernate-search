@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.DebugIOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
@@ -52,7 +50,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -188,16 +185,13 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneIndexEntryFactory( model, multiTenancyStrategy );
 	}
 
-	IOStrategy createIOStrategy(DirectoryProvider directoryProvider, ConfigurationPropertySource propertySource) {
+	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {
 		switch ( IO_STRATEGY.get( propertySource ) ) {
 			case DEBUG:
-				return DebugIOStrategy.create( directoryProvider, threads, failureHandler );
+				return DebugIOStrategy.create( threads, failureHandler );
 			case NEAR_REAL_TIME:
 			default:
-				return NearRealTimeIOStrategy.create(
-						propertySource, directoryProvider,
-						timingSource, threads, failureHandler
-				);
+				return NearRealTimeIOStrategy.create( propertySource, timingSource, threads, failureHandler );
 		}
 	}
 
@@ -205,21 +199,19 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneIndexSchemaManager( workFactory, context );
 	}
 
-	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId,
-			ConfigurationPropertySource propertySource) {
+	Shard createShard(LuceneIndexModel model, EventContext shardEventContext, DirectoryHolder directoryHolder,
+			IOStrategy ioStrategy, ConfigurationPropertySource propertySource) {
 		LuceneParallelWorkOrchestratorImpl managementOrchestrator;
 		LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
 		String indexName = model.hibernateSearchName();
-		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.hibernateSearchName(), shardId );
 		IndexWriterConfigSource writerConfigSource = IndexWriterConfigSource.create(
 				similarity, model.getIndexingAnalyzer(), propertySource, shardEventContext
 		);
 
 		try {
 			indexAccessor = ioStrategy.createIndexAccessor(
-					indexName, shardEventContext,
-					shardId, writerConfigSource
+					indexName, shardEventContext, directoryHolder, writerConfigSource
 			);
 			managementOrchestrator = createIndexManagementOrchestrator( shardEventContext, indexAccessor );
 			indexingOrchestrator = createIndexingOrchestrator( shardEventContext, indexAccessor );

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.NearRealTimeIndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterConfigSource;
@@ -35,12 +34,11 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 					.build();
 
 	public static NearRealTimeIOStrategy create(ConfigurationPropertySource propertySource,
-			DirectoryProvider directoryProvider, TimingSource timingSource,
-			BackendThreads threads, FailureHandler failureHandler) {
+			TimingSource timingSource, BackendThreads threads, FailureHandler failureHandler) {
 		int commitInterval = COMMIT_INTERVAL.get( propertySource );
 		int refreshInterval = REFRESH_INTERVAL.get( propertySource );
 		return new NearRealTimeIOStrategy(
-				directoryProvider, timingSource, commitInterval, refreshInterval,
+				timingSource, commitInterval, refreshInterval,
 				threads, failureHandler
 		);
 	}
@@ -49,11 +47,10 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 	private final int commitInterval;
 	private final int refreshInterval;
 
-	private NearRealTimeIOStrategy(DirectoryProvider directoryProvider,
-			TimingSource timingSource, int commitInterval, int refreshInterval,
+	private NearRealTimeIOStrategy(TimingSource timingSource, int commitInterval, int refreshInterval,
 			BackendThreads threads,
 			FailureHandler failureHandler) {
-		super( directoryProvider, threads, failureHandler );
+		super( threads, failureHandler );
 		this.timingSource = timingSource;
 		this.commitInterval = commitInterval;
 		this.refreshInterval = refreshInterval;

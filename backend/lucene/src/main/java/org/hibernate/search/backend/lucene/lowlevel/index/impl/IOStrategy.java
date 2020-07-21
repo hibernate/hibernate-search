@@ -6,43 +6,27 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
-import java.util.Optional;
-
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterConfigSource;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class IOStrategy {
 
-	private final DirectoryProvider directoryProvider;
 	final BackendThreads threads;
 	final FailureHandler failureHandler;
 
-	protected IOStrategy(DirectoryProvider directoryProvider, BackendThreads threads,
-			FailureHandler failureHandler) {
-		this.directoryProvider = directoryProvider;
+	protected IOStrategy(BackendThreads threads, FailureHandler failureHandler) {
 		this.threads = threads;
 		this.failureHandler = failureHandler;
 	}
 
 	public IndexAccessorImpl createIndexAccessor(String indexName, EventContext eventContext,
-			Optional<String> shardId, IndexWriterConfigSource writerConfigSource) {
-		DirectoryHolder directoryHolder;
-		DirectoryCreationContext context = new DirectoryCreationContextImpl(
-				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
-				indexName,
-				shardId
-		);
-		directoryHolder = directoryProvider.createDirectoryHolder( context );
+			DirectoryHolder directoryHolder, IndexWriterConfigSource writerConfigSource) {
 		IndexWriterProvider indexWriterProvider = null;
 		IndexReaderProvider indexReaderProvider = null;
 		try {

@@ -191,10 +191,6 @@ public interface Log extends BasicLogger {
 			value = "Path '%1$s' exists but does not point to a writable directory.")
 	SearchException pathIsNotWriteableDirectory(Path rootDirectory);
 
-	@Message(id = ID_OFFSET_2 + 2,
-			value = "Unable to initialize root directory '%1$s': %2$s")
-	SearchException unableToInitializeRootDirectory(Path rootDirectory, String causeMessage, @Cause Exception cause);
-
 	@Message(id = ID_OFFSET_2 + 5,
 			value = "The Lucene extension can only be applied to objects"
 			+ " derived from the Lucene backend. Was applied to '%1$s' instead.")
