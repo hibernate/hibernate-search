@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.cfg;
 
+import static java.lang.String.join;
+
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
+import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -304,6 +308,12 @@ public final class LuceneIndexSettings {
 	public static final String SHARDING_SHARD_IDENTIFIERS = SHARDING_PREFIX + ShardingRadicals.SHARD_IDENTIFIERS;
 
 	/**
+	 * The root property whose children are shards, e.g. {@code shards.0.<some shard-scoped property> = bar}
+	 * or {@code shards.1.<some shard-scoped property> = bar} or {@code shards.main.<some shard-scoped property> = bar}.
+	 */
+	public static final String SHARDS = "shards";
+
+	/**
 	 * The prefix for indexing-related property keys.
 	 */
 	public static final String INDEXING_PREFIX = "indexing.";
@@ -333,6 +343,71 @@ public final class LuceneIndexSettings {
 	 * for more information about this setting and its implications.
 	 */
 	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
+
+	/**
+	 * Builds a configuration property key for the given shard of all indexes of the default backend,
+	 * with the given radical.
+	 * <p>
+	 * See constants in this class for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backend.shard.<shardId>.indexing.queue_count}"
+	 *
+	 * @param shardId The identifier of the shard to configure.
+	 * @param radical The radical of the configuration property (see constants in this class).
+	 *
+	 * @return the concatenated shard settings key
+	 */
+	public static String shardKey(String shardId, String radical) {
+		return join( ".", EngineSettings.BACKEND, SHARDS, shardId, radical );
+	}
+
+	/**
+	 * Builds a configuration property key for the given shard of the given index of the default backend,
+	 * with the given radical.
+	 * <p>
+	 * See constants in this class for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.shard.<shardId>.indexing.queue_count}"
+	 *
+	 * @param indexName The name of the index in which the shard to configure is located.
+	 * @param shardId The identifier of the shard to configure.
+	 * @param radical The radical of the configuration property (see constants in this class).
+	 *
+	 * @return the concatenated shard settings key
+	 */
+	public static String shardKey(String indexName, String shardId, String radical) {
+		if ( indexName == null ) {
+			return shardKey( shardId, radical );
+		}
+		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEXES, indexName,
+				SHARDS, shardId, radical );
+	}
+
+	/**
+	 * Builds a configuration property key for the given shard of the given index of the given backend,
+	 * with the given radical.
+	 * <p>
+	 * See constants in this class for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.shard.<shardId>.indexing.queue_count}"
+	 *
+	 * @param backendName The name of the backend in which the shard to configure is located.
+	 * @param indexName The name of the index in which the shard to configure is located.
+	 * @param shardId The identifier of the shard to configure.
+	 * @param radical The radical of the configuration property (see constants in this class).
+	 *
+	 * @return the concatenated shard settings key
+	 */
+	public static String shardKey(String backendName, String indexName, String shardId, String radical) {
+		if ( backendName == null ) {
+			return shardKey( indexName, shardId, radical );
+		}
+		if ( indexName == null ) {
+			return join( ".", EngineSettings.BACKENDS, backendName, SHARDS, shardId, radical );
+		}
+		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName,
+				SHARDS, shardId, radical );
+	}
 
 	/**
 	 * Configuration property keys for directories without the {@link #DIRECTORY_PREFIX prefix}.
