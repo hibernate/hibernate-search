@@ -45,6 +45,10 @@ public final class BackendSettings {
 
 	/**
 	 * Builds a configuration property key for the default backend, with the given radical.
+	 * <p>
+	 * See the javadoc of your backend for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backend.thread_pool.size}"
 	 *
 	 * @param radical The radical of the configuration property (see constants in
 	 * 	 * {@code ElasticsearchBackendSettings}, {@code ElasticsearchBackendSettings}, etc.)
@@ -56,8 +60,12 @@ public final class BackendSettings {
 
 	/**
 	 * Builds a configuration property key for the given backend, with the given radical.
+	 * <p>
+	 * See the javadoc of your backend for available radicals.
+	 * </p>
+	 * Example result: "{@code hibernate.search.backend.myBackend.thread_pool.size}"
 	 *
-	 * @param backendName Expect the backendName
+	 * @param backendName The name of the backend to configure.
 	 * @param radical The radical of the configuration property (see constants in
 	 * 	 * {@code ElasticsearchBackendSettings}, {@code ElasticsearchBackendSettings}, etc.)
 	 * @return the concatenated prefix + backend name + radical
