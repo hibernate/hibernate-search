@@ -6,13 +6,18 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class EngineConfigurationUtils {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private EngineConfigurationUtils() {
 	}
@@ -45,7 +50,8 @@ public final class EngineConfigurationUtils {
 			ConfigurationPropertySource backendSource = extractorForBackend.extract( engineSource );
 			return backendSource.withMask( BackendSettings.INDEXES ).withMask( indexName )
 					.withFallback( backendSource )
-					.withFallback( backendSource.withMask( BackendSettings.INDEX_DEFAULTS ) );
+					.withFallback( backendSource.withMask( BackendSettings.INDEX_DEFAULTS )
+							.onGet( log::deprecatedIndexDefaultsPrefix ) );
 		};
 	}
 

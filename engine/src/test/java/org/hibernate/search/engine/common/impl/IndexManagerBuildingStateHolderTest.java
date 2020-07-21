@@ -130,6 +130,11 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		assertThat( result ).contains( "bar" );
 
 		// Legacy "index_defaults"
+		logged.expectMessage( "Using configuration property 'hibernate.search.backend.index_defaults.foo'."
+				+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
+				+ " Instead, you should just set defaults for index properties at the backend level."
+				+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
+				+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'." );
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
 				.andReturn( Optional.empty() );
@@ -137,6 +142,8 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( (Optional) Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backend.index_defaults.foo" ) )
 				.andReturn( (Optional) Optional.of( "bar" ) );
+		EasyMock.expect( configurationSourceMock.resolve( "backend.index_defaults.foo" ) )
+				.andStubReturn( Optional.of( "hibernate.search.backend.index_defaults.foo" ) );
 		replayAll();
 		result = indexPropertySourceCapture.getValue().get( "foo" );
 		verifyAll();
@@ -250,6 +257,11 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		assertThat( result ).contains( "bar" );
 
 		// Legacy "index_defaults"
+		logged.expectMessage( "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
+						+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
+						+ " Instead, you should just set defaults for index properties at the backend level."
+						+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
+						+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'." );
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
 				.andReturn( (Optional) Optional.empty() );
@@ -260,9 +272,11 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.foo" ) )
 				.andReturn( (Optional) Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backend.index_defaults.foo" ) )
-				.andReturn( (Optional) Optional.empty() );
+				.andReturn( (Optional) Optional.empty() ).anyTimes();
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
-				.andReturn( (Optional) Optional.of( "bar" ) );
+				.andReturn( (Optional) Optional.of( "bar" ) ).anyTimes();
+		EasyMock.expect( configurationSourceMock.resolve( "backends.myBackend.index_defaults.foo" ) )
+				.andStubReturn( Optional.of( "hibernate.search.backends.myBackend.index_defaults.foo" ) );
 		replayAll();
 		result = indexPropertySourceCapture.getValue().get( "foo" );
 		verifyAll();
@@ -361,6 +375,11 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		assertThat( result ).contains( "bar" );
 
 		// Legacy "index_defaults"
+		logged.expectMessage( "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
+				+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
+				+ " Instead, you should just set defaults for index properties at the backend level."
+				+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
+				+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'." );
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
 				.andReturn( Optional.empty() );
@@ -368,6 +387,8 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
 				.andReturn( (Optional) Optional.of( "bar" ) );
+		EasyMock.expect( configurationSourceMock.resolve( "backends.myBackend.index_defaults.foo" ) )
+				.andStubReturn( Optional.of( "hibernate.search.backends.myBackend.index_defaults.foo" ) );
 		replayAll();
 		result = indexPropertySourceCapture.getValue().get( "foo" );
 		verifyAll();
