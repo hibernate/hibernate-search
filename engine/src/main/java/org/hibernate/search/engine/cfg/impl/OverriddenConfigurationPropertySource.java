@@ -39,7 +39,12 @@ public class OverriddenConfigurationPropertySource implements ConfigurationPrope
 
 	@Override
 	public Optional<String> resolve(String key) {
-		return main.resolve( key );
+		if ( override.get( key ).isPresent() ) {
+			return override.resolve( key );
+		}
+		else {
+			return main.resolve( key );
+		}
 	}
 
 	@Override

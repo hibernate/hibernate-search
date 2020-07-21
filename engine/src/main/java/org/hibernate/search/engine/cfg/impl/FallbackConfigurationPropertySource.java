@@ -32,7 +32,12 @@ public class FallbackConfigurationPropertySource implements ConfigurationPropert
 
 	@Override
 	public Optional<String> resolve(String key) {
-		return main.resolve( key );
+		if ( !main.get( key ).isPresent() && fallback.get( key ).isPresent() ) {
+			return fallback.resolve( key );
+		}
+		else {
+			return main.resolve( key );
+		}
 	}
 
 	@Override
