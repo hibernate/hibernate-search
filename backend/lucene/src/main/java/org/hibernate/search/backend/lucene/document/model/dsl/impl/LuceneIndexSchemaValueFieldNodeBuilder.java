@@ -11,12 +11,12 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldReference;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
@@ -26,22 +26,22 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class LuceneIndexSchemaFieldNodeBuilder<F>
-		implements IndexSchemaFieldOptionsStep<LuceneIndexSchemaFieldNodeBuilder<F>, IndexFieldReference<F>>,
-		LuceneIndexSchemaNodeContributor, IndexSchemaBuildContext {
+class LuceneIndexSchemaValueFieldNodeBuilder<F>
+		implements IndexSchemaFieldOptionsStep<LuceneIndexSchemaValueFieldNodeBuilder<F>, IndexFieldReference<F>>,
+				LuceneIndexSchemaNodeContributor, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final IndexFieldInclusion inclusion;
-	private final LuceneIndexFieldType<F> type;
+	private final LuceneIndexValueFieldType<F> type;
 	private boolean multiValued = false;
 
 	private LuceneIndexFieldReference<F> reference;
 
-	LuceneIndexSchemaFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
-			String relativeFieldName, IndexFieldInclusion inclusion, LuceneIndexFieldType<F> type) {
+	LuceneIndexSchemaValueFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+			String relativeFieldName, IndexFieldInclusion inclusion, LuceneIndexValueFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
@@ -56,7 +56,7 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 	}
 
 	@Override
-	public LuceneIndexSchemaFieldNodeBuilder<F> multiValued() {
+	public LuceneIndexSchemaValueFieldNodeBuilder<F> multiValued() {
 		this.multiValued = true;
 		return this;
 	}
@@ -76,7 +76,7 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
-		LuceneIndexSchemaFieldNode<F> fieldNode = new LuceneIndexSchemaFieldNode<>(
+		LuceneIndexSchemaValueFieldNode<F> fieldNode = new LuceneIndexSchemaValueFieldNode<>(
 				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 

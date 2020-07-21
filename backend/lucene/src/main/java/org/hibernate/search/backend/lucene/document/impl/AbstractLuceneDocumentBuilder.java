@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -47,7 +47,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
 		LuceneIndexFieldReference<F> luceneFieldReference = (LuceneIndexFieldReference<F>) fieldReference;
 
-		LuceneIndexSchemaFieldNode<F> fieldSchemaNode = luceneFieldReference.getSchemaNode();
+		LuceneIndexSchemaValueFieldNode<F> fieldSchemaNode = luceneFieldReference.getSchemaNode();
 
 		addValue( fieldSchemaNode, value );
 	}
@@ -73,7 +73,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		LuceneIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		LuceneIndexSchemaValueFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -152,11 +152,11 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		}
 	}
 
-	private <F> void addValue(LuceneIndexSchemaFieldNode<F> node, F value) {
+	private <F> void addValue(LuceneIndexSchemaValueFieldNode<F> node, F value) {
 		LuceneIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
-		LuceneIndexFieldType<F> type = node.type();
+		LuceneIndexValueFieldType<F> type = node.type();
 		String absolutePath = node.absolutePath();
 
 		if ( !node.multiValued() ) {
@@ -195,13 +195,13 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	}
 
 	@SuppressWarnings("unchecked") // We check types explicitly using reflection
-	private void addValueUnknownType(LuceneIndexSchemaFieldNode<?> node, Object value) {
+	private void addValueUnknownType(LuceneIndexSchemaValueFieldNode<?> node, Object value) {
 		if ( value == null ) {
 			addValue( node, null );
 		}
 		else {
 			@SuppressWarnings("rawtypes")
-			LuceneIndexSchemaFieldNode typeCheckedNode =
+			LuceneIndexSchemaValueFieldNode typeCheckedNode =
 					node.withValueType( value.getClass(), model.getEventContext() );
 			addValue( typeCheckedNode, value );
 		}

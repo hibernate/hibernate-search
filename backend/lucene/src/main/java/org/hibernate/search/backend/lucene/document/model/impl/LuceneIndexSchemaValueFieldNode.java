@@ -11,10 +11,10 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -22,17 +22,17 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFieldNode
-		implements IndexValueFieldDescriptor, LuceneSearchFieldContext<F> {
+public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchemaFieldNode
+		implements IndexValueFieldDescriptor, LuceneSearchValueFieldContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final List<String> nestedPathHierarchy;
 
-	private final LuceneIndexFieldType<F> type;
+	private final LuceneIndexValueFieldType<F> type;
 
-	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexFieldType<F> type) {
+	public LuceneIndexSchemaValueFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
+			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexValueFieldType<F> type) {
 		super( parent, relativeName, inclusion, multiValued );
 		this.nestedPathHierarchy = parent.nestedPathHierarchy();
 		this.type = type;
@@ -59,7 +59,7 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@Override
-	public LuceneIndexSchemaFieldNode<F> toValueField() {
+	public LuceneIndexSchemaValueFieldNode<F> toValueField() {
 		return this;
 	}
 
@@ -76,7 +76,7 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@Override
-	public LuceneIndexFieldType<F> type() {
+	public LuceneIndexValueFieldType<F> type() {
 		return type;
 	}
 
@@ -95,11 +95,11 @@ public class LuceneIndexSchemaFieldNode<F> extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> LuceneIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
+	public <T> LuceneIndexSchemaValueFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
 		if ( !type.valueClass().isAssignableFrom( expectedSubType ) ) {
 			throw log.invalidFieldValueType( type.valueClass(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
-		return (LuceneIndexSchemaFieldNode<? super T>) this;
+		return (LuceneIndexSchemaValueFieldNode<? super T>) this;
 	}
 }

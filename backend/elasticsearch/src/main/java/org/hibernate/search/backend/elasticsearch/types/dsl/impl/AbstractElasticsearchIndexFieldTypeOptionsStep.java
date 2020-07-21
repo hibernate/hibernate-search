@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
@@ -16,12 +16,12 @@ import org.hibernate.search.util.common.impl.Contracts;
 abstract class AbstractElasticsearchIndexFieldTypeOptionsStep<S extends AbstractElasticsearchIndexFieldTypeOptionsStep<?, F>, F>
 		implements IndexFieldTypeOptionsStep<S, F> {
 	protected final ElasticsearchIndexFieldTypeBuildContext buildContext;
-	protected final ElasticsearchIndexFieldType.Builder<F> builder;
+	protected final ElasticsearchIndexValueFieldType.Builder<F> builder;
 
 	AbstractElasticsearchIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			Class<F> valueType, PropertyMapping mapping) {
 		this.buildContext = buildContext;
-		this.builder = new ElasticsearchIndexFieldType.Builder<>( valueType, mapping );
+		this.builder = new ElasticsearchIndexValueFieldType.Builder<>( valueType, mapping );
 	}
 
 	@Override

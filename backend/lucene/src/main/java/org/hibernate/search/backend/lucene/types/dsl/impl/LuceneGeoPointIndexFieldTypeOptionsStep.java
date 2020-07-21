@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinBoundingBoxPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointSpatialWithinCirclePredicate;
@@ -41,7 +41,7 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	public LuceneIndexFieldType<GeoPoint> toIndexFieldType() {
+	public LuceneIndexValueFieldType<GeoPoint> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );

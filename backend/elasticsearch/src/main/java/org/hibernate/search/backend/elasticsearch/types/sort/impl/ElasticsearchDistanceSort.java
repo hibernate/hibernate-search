@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -50,7 +50,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
 		@Override
 		public DistanceSortBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<GeoPoint> field) {
+				ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );
 		}
 	}
@@ -58,7 +58,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	private static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
 		private GeoPoint center;
 
-		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext, field );
 		}
 

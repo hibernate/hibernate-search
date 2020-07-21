@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchReversibleSort;
@@ -109,13 +109,13 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 	abstract static class AbstractBuilder<F> extends AbstractElasticsearchReversibleSort.AbstractBuilder {
 		private final ElasticsearchSearchSyntax searchSyntax;
-		protected final ElasticsearchSearchFieldContext<F> field;
+		protected final ElasticsearchSearchValueFieldContext<F> field;
 		protected final List<String> nestedPathHierarchy;
 
 		private JsonPrimitive mode;
 		private ElasticsearchSearchPredicate filter;
 
-		AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+		AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
 			super( searchContext );
 			this.searchSyntax = searchContext.searchSyntax();
 			this.field = field;

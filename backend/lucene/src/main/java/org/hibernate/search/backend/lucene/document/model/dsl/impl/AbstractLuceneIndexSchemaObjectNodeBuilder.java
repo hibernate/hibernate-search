@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
@@ -49,8 +49,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
 			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
-		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
-		LuceneIndexSchemaFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaFieldNodeBuilder<>(
+		LuceneIndexValueFieldType<F> luceneIndexFieldType = (LuceneIndexValueFieldType<F>) indexFieldType;
+		LuceneIndexSchemaValueFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaValueFieldNodeBuilder<>(
 				this, relativeFieldName, inclusion, luceneIndexFieldType
 		);
 		putField( relativeFieldName, childBuilder );
@@ -70,8 +70,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
 			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		LuceneIndexFieldType<?> elasticsearchIndexFieldType = (LuceneIndexFieldType<?>) indexFieldType;
-		LuceneIndexSchemaFieldTemplateBuilder templateBuilder = new LuceneIndexSchemaFieldTemplateBuilder(
+		LuceneIndexValueFieldType<?> elasticsearchIndexFieldType = (LuceneIndexValueFieldType<?>) indexFieldType;
+		LuceneIndexSchemaValueFieldTemplateBuilder templateBuilder = new LuceneIndexSchemaValueFieldTemplateBuilder(
 				this, prefixedTemplateName, inclusion, elasticsearchIndexFieldType, prefix
 		);
 		putTemplate( prefixedTemplateName, templateBuilder );

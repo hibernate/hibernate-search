@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -104,7 +104,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, searchContext, field );
 		}
 	}
@@ -113,7 +113,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+				LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}
@@ -131,7 +131,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
-				LuceneSearchFieldContext<F> field, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				LuceneSearchValueFieldContext<F> field, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( searchContext, field, fromFieldValueConverter );
 			this.codec = codec;
 		}

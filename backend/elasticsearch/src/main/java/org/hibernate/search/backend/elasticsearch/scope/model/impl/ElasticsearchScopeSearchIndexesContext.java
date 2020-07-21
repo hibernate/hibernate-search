@@ -19,11 +19,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -97,18 +97,18 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 
 	@Override
 	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
-	public ElasticsearchSearchFieldContext<?> field(String absoluteFieldPath) {
-		ElasticsearchSearchFieldContext<?> resultOrNull = null;
+	public ElasticsearchSearchValueFieldContext<?> field(String absoluteFieldPath) {
+		ElasticsearchSearchValueFieldContext<?> resultOrNull = null;
 		if ( indexModels.size() == 1 ) {
 			// Single-index search
 			resultOrNull = indexModels.iterator().next().getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 		}
 		else {
 			// Multi-index search
-			List<ElasticsearchSearchFieldContext<?>> fieldForEachIndex = new ArrayList<>();
+			List<ElasticsearchSearchValueFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaFieldNode<?> fieldForCurrentIndex =
+				ElasticsearchIndexSchemaValueFieldNode<?> fieldForCurrentIndex =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( fieldForCurrentIndex == null ) {
 					continue;
@@ -117,7 +117,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 			}
 
 			if ( !fieldForEachIndex.isEmpty() ) {
-				resultOrNull = new ElasticsearchMultiIndexSearchFieldContext<>(
+				resultOrNull = new ElasticsearchMultiIndexSearchValueFieldContext<>(
 						hibernateSearchIndexNames(), absoluteFieldPath, (List) fieldForEachIndex
 				);
 			}
@@ -162,7 +162,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 		}
 		if ( !found ) {
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaFieldNode<?> schemaNode =
+				ElasticsearchIndexSchemaValueFieldNode<?> schemaNode =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery(

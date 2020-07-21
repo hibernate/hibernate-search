@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFac
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
@@ -98,13 +98,13 @@ public class LuceneTextTermsAggregation<K>
 	public static class Factory
 			extends AbstractLuceneSearchFieldQueryElementFactory<AbstractTypeSelector<?>, String> {
 		@Override
-		public TypeSelector create(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field) {
+		public TypeSelector create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
 			return new TypeSelector( searchContext, field );
 		}
 	}
 
 	public static class TypeSelector extends AbstractTypeSelector<String> {
-		private TypeSelector(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field) {
+		private TypeSelector(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
 			super( searchContext, field );
 		}
 
@@ -118,7 +118,7 @@ public class LuceneTextTermsAggregation<K>
 	public static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<String> field,
+		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field,
 				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
 			super( searchContext, field, fromFieldValueConverter );
 		}

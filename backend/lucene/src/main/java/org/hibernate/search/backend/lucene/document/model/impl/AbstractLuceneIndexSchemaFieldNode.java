@@ -37,7 +37,7 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 	public abstract LuceneIndexSchemaObjectFieldNode toObjectField();
 
 	@Override
-	public abstract LuceneIndexSchemaFieldNode<?> toValueField();
+	public abstract LuceneIndexSchemaValueFieldNode<?> toValueField();
 
 	@Override
 	public LuceneIndexSchemaObjectNode parent() {

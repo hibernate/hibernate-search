@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -57,7 +57,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	public static class Factory
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
-		public Builder create(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );
 		}
 	}
@@ -65,7 +65,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	private static class Builder extends AbstractBuilder implements SpatialWithinPolygonPredicateBuilder {
 		private double[] coordinates;
 
-		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext, field );
 		}
 

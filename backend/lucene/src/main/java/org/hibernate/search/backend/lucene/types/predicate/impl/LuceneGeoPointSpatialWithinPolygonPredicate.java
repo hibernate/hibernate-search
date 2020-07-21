@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -30,7 +30,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 	public static class Factory
 			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
-		public Builder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
+		public Builder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );
 		}
 	}
@@ -38,7 +38,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 	static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinPolygonPredicateBuilder {
 		protected GeoPolygon polygon;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
+		Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext, field );
 		}
 

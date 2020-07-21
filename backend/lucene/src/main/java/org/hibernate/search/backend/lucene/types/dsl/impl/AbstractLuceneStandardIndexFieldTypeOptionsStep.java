@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -56,7 +56,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	}
 
 	@Override
-	public abstract LuceneIndexFieldType<F> toIndexFieldType();
+	public abstract LuceneIndexValueFieldType<F> toIndexFieldType();
 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {

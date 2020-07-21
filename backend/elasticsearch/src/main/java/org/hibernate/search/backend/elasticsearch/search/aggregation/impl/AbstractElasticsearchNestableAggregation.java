@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -117,11 +117,11 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	public abstract static class AbstractBuilder<A> extends AbstractElasticsearchAggregation.AbstractBuilder<A> {
 
-		protected final ElasticsearchSearchFieldContext<?> field;
+		protected final ElasticsearchSearchValueFieldContext<?> field;
 		protected final List<String> nestedPathHierarchy;
 		private ElasticsearchSearchPredicate filter;
 
-		public AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<?> field) {
+		public AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<?> field) {
 			super( searchContext );
 			this.field = field;
 			this.nestedPathHierarchy = field.nestedPathHierarchy();

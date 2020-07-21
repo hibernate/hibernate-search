@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -38,9 +38,9 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 
 	public abstract static class AbstractBuilder<F>
 			extends AbstractLuceneSingleFieldPredicate.AbstractBuilder {
-		protected final LuceneSearchFieldContext<F> field;
+		protected final LuceneSearchValueFieldContext<F> field;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		protected AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
 			this.field = field;
 		}

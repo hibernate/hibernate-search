@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.Indexing;
 import org.hibernate.search.backend.lucene.types.codec.impl.Storage;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRangePredicate;
@@ -45,7 +45,7 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 	}
 
 	@Override
-	public LuceneIndexFieldType<F> toIndexFieldType() {
+	public LuceneIndexValueFieldType<F> toIndexFieldType() {
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );

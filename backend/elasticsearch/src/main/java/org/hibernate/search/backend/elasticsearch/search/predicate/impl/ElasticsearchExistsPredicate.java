@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
@@ -40,7 +40,7 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
 		}
 	}

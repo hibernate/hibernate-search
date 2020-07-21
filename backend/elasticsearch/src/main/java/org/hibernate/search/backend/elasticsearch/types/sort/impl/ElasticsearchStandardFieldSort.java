@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -65,7 +65,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public Builder<F> create(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+		public Builder<F> create(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
 			return new Builder<>( codec, searchContext, field );
 		}
 	}
@@ -76,7 +76,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		private JsonElement missing;
 
 		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}
@@ -116,14 +116,14 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 		@Override
 		public TemporalFieldBuilder<F> create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			return new TemporalFieldBuilder<>( codec, searchContext, field );
 		}
 	}
 
 	private static class TemporalFieldBuilder<F extends TemporalAccessor> extends Builder<F> {
 		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			super( codec, searchContext, field );
 		}
 
@@ -150,14 +150,14 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 		@Override
 		public TextFieldBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<String> field) {
+				ElasticsearchSearchValueFieldContext<String> field) {
 			return new TextFieldBuilder( codec, searchContext, field );
 		}
 	}
 
 	private static class TextFieldBuilder extends Builder<String> {
 		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<String> field) {
+				ElasticsearchSearchValueFieldContext<String> field) {
 			super( codec, searchContext, field );
 		}
 

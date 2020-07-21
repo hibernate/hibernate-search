@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -63,20 +63,20 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 		@Override
 		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			return new Builder<>( codec, searchContext, field );
 		}
 	}
 
 	static class Builder<F> extends AbstractBuilder implements MatchPredicateBuilder {
 
-		protected final ElasticsearchSearchFieldContext<F> field;
+		protected final ElasticsearchSearchValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonElement value;
 
 		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			super( searchContext, field );
 			this.field = field;
 			this.codec = codec;

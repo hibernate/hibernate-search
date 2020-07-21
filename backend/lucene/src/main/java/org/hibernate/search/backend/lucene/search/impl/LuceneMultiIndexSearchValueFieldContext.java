@@ -23,17 +23,17 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneMultiIndexSearchFieldContext<F>
-		implements LuceneSearchFieldContext<F>, LuceneSearchFieldTypeContext<F> {
+public class LuceneMultiIndexSearchValueFieldContext<F>
+		implements LuceneSearchValueFieldContext<F>, LuceneSearchValueFieldTypeContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> indexNames;
 	private final String absolutePath;
-	private final List<LuceneSearchFieldContext<F>> fieldForEachIndex;
+	private final List<LuceneSearchValueFieldContext<F>> fieldForEachIndex;
 
-	public LuceneMultiIndexSearchFieldContext(Set<String> indexNames, String absolutePath,
-			List<LuceneSearchFieldContext<F>> fieldForEachIndex) {
+	public LuceneMultiIndexSearchValueFieldContext(Set<String> indexNames, String absolutePath,
+			List<LuceneSearchValueFieldContext<F>> fieldForEachIndex) {
 		this.indexNames = indexNames;
 		this.absolutePath = absolutePath;
 		this.fieldForEachIndex = fieldForEachIndex;
@@ -46,19 +46,19 @@ public class LuceneMultiIndexSearchFieldContext<F>
 
 	@Override
 	public String nestedDocumentPath() {
-		return getFromFieldIfCompatible( LuceneSearchFieldContext::nestedDocumentPath, Object::equals,
+		return getFromFieldIfCompatible( LuceneSearchValueFieldContext::nestedDocumentPath, Object::equals,
 				"nestedDocumentPath" );
 	}
 
 	@Override
 	public List<String> nestedPathHierarchy() {
-		return getFromFieldIfCompatible( LuceneSearchFieldContext::nestedPathHierarchy, Object::equals,
+		return getFromFieldIfCompatible( LuceneSearchValueFieldContext::nestedPathHierarchy, Object::equals,
 				"nestedPathHierarchy" );
 	}
 
 	@Override
 	public boolean multiValuedInRoot() {
-		for ( LuceneSearchFieldContext<F> field : fieldForEachIndex ) {
+		for ( LuceneSearchValueFieldContext<F> field : fieldForEachIndex ) {
 			if ( field.multiValuedInRoot() ) {
 				return true;
 			}
@@ -67,7 +67,7 @@ public class LuceneMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
-	public LuceneSearchFieldTypeContext<F> type() {
+	public LuceneSearchValueFieldTypeContext<F> type() {
 		return this;
 	}
 
@@ -92,45 +92,45 @@ public class LuceneMultiIndexSearchFieldContext<F>
 
 	@Override
 	public DslConverter<?, F> dslConverter() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
+		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
 				"dslConverter" );
 	}
 
 	@Override
 	public DslConverter<F, F> rawDslConverter() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
+		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
 				"rawDslConverter" );
 	}
 
 	@Override
 	public ProjectionConverter<F, ?> projectionConverter() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::projectionConverter,
+		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::projectionConverter,
 				ProjectionConverter::isCompatibleWith, "projectionConverter" );
 	}
 
 	@Override
 	public ProjectionConverter<F, F> rawProjectionConverter() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::rawProjectionConverter,
+		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
 	}
 
 	@Override
 	public Optional<String> searchAnalyzerName() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::searchAnalyzerName, Object::equals,
+		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::searchAnalyzerName, Object::equals,
 				"searchAnalyzer" );
 	}
 
 	@Override
 	public Analyzer searchAnalyzerOrNormalizer() {
-		return getFromTypeIfCompatible( LuceneSearchFieldTypeContext::searchAnalyzerOrNormalizer, Object::equals,
+		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::searchAnalyzerOrNormalizer, Object::equals,
 				"searchAnalyzerOrNormalizer" );
 	}
 
 	@Override
 	public <T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		LuceneSearchFieldQueryElementFactory<T, F> factory = null;
-		for ( LuceneSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
-			LuceneSearchFieldTypeContext<F> fieldType = fieldContext.type();
+		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
+			LuceneSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
 			LuceneSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
 					fieldType.queryElementFactory( key );
 			if ( factory == null ) {
@@ -143,10 +143,10 @@ public class LuceneMultiIndexSearchFieldContext<F>
 		return factory;
 	}
 
-	private <T> T getFromFieldIfCompatible(Function<LuceneSearchFieldContext<F>, T> getter,
+	private <T> T getFromFieldIfCompatible(Function<LuceneSearchValueFieldContext<F>, T> getter,
 			BiPredicate<T, T> compatiblityChecker, String attributeName) {
 		T attribute = null;
-		for ( LuceneSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
+		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			T attributeForFieldContext = getter.apply( fieldContext );
 			if ( attribute == null ) {
 				attribute = attributeForFieldContext;
@@ -158,11 +158,11 @@ public class LuceneMultiIndexSearchFieldContext<F>
 		return attribute;
 	}
 
-	private <T> T getFromTypeIfCompatible(Function<LuceneSearchFieldTypeContext<F>, T> getter,
+	private <T> T getFromTypeIfCompatible(Function<LuceneSearchValueFieldTypeContext<F>, T> getter,
 			BiPredicate<T, T> compatiblityChecker, String attributeName) {
 		T attribute = null;
-		for ( LuceneSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
-			LuceneSearchFieldTypeContext<F> fieldType = fieldContext.type();
+		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
+			LuceneSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
 			T attributeForFieldContext = getter.apply( fieldType );
 			if ( attribute == null ) {
 				attribute = attributeForFieldContext;

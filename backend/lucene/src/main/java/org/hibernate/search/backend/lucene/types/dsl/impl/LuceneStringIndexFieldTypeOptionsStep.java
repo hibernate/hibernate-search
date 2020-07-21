@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextMatchPredicate;
@@ -112,7 +112,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 	}
 
 	@Override
-	public LuceneIndexFieldType<String> toIndexFieldType() {
+	public LuceneIndexValueFieldType<String> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 		boolean resolvedSearchable = resolveDefault( searchable );

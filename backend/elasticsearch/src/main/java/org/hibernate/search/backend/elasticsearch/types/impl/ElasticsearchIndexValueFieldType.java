@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
@@ -24,8 +24,8 @@ import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDo
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
-public class ElasticsearchIndexFieldType<F>
-		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchFieldTypeContext<F> {
+public class ElasticsearchIndexValueFieldType<F>
+		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchValueFieldTypeContext<F> {
 	private final Class<F> valueType;
 	private final DslConverter<F, F> rawDslConverter;
 	private final ProjectionConverter<F, F> rawProjectionConverter;
@@ -47,7 +47,7 @@ public class ElasticsearchIndexFieldType<F>
 
 	private final PropertyMapping mapping;
 
-	public ElasticsearchIndexFieldType(Builder<F> builder) {
+	public ElasticsearchIndexValueFieldType(Builder<F> builder) {
 		this.valueType = builder.valueType;
 		this.rawDslConverter = builder.rawDslConverter;
 		this.rawProjectionConverter = builder.rawProjectionConverter;
@@ -250,8 +250,8 @@ public class ElasticsearchIndexFieldType<F>
 			return mapping;
 		}
 
-		public ElasticsearchIndexFieldType<F> build() {
-			return new ElasticsearchIndexFieldType<>( this );
+		public ElasticsearchIndexValueFieldType<F> build() {
+			return new ElasticsearchIndexValueFieldType<>( this );
 		}
 	}
 }

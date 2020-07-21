@@ -19,7 +19,8 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescrip
 
 
 public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaFieldNode
-		implements IndexObjectFieldDescriptor, LuceneIndexSchemaObjectNode, IndexObjectFieldTypeDescriptor {
+		implements IndexObjectFieldDescriptor, LuceneIndexSchemaObjectNode,
+				IndexObjectFieldTypeDescriptor {
 
 	private final List<String> nestedPathHierarchy;
 
@@ -69,7 +70,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
-	public LuceneIndexSchemaFieldNode<?> toValueField() {
+	public LuceneIndexSchemaValueFieldNode<?> toValueField() {
 		throw log.invalidIndexElementTypeObjectFieldIsNotValueField( absolutePath );
 	}
 

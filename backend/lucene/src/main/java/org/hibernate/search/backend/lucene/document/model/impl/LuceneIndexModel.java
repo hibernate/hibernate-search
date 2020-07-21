@@ -38,12 +38,12 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	private final LuceneIndexSchemaObjectNode rootNode;
 	private final Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes;
-	private final Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes;
+	private final Map<String, LuceneIndexSchemaValueFieldNode<?>> valueFieldNodes;
 	private final List<IndexFieldDescriptor> staticFields;
 	private final List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates;
-	private final List<LuceneIndexSchemaFieldTemplate> fieldTemplates;
+	private final List<LuceneIndexSchemaValueFieldTemplate> valueFieldTemplates;
 	private final ConcurrentMap<String, LuceneIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
-	private final ConcurrentMap<String, LuceneIndexSchemaFieldNode<?>> dynamicFieldNodesCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, LuceneIndexSchemaValueFieldNode<?>> dynamicValueFieldNodesCache = new ConcurrentHashMap<>();
 
 	private final IndexingScopedAnalyzer indexingAnalyzer;
 	private final SearchScopedAnalyzer searchAnalyzer;
@@ -53,27 +53,27 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			LuceneIndexSchemaObjectNode rootNode,
 			Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes,
-			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes,
+			Map<String, LuceneIndexSchemaValueFieldNode<?>> valueFieldNodes,
 			List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates,
-			List<LuceneIndexSchemaFieldTemplate> fieldTemplates) {
+			List<LuceneIndexSchemaValueFieldTemplate> valueFieldTemplates) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;
 		this.objectFieldNodes = CollectionHelper.toImmutableMap( objectFieldNodes );
-		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodes );
+		this.valueFieldNodes = CollectionHelper.toImmutableMap( valueFieldNodes );
 		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
 		objectFieldNodes.values().stream()
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
-		fieldNodes.values().stream()
+		valueFieldNodes.values().stream()
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
 		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
 		this.indexingAnalyzer = new IndexingScopedAnalyzer();
 		this.searchAnalyzer = new SearchScopedAnalyzer();
 		this.objectFieldTemplates = objectFieldTemplates;
-		this.fieldTemplates = fieldTemplates;
+		this.valueFieldTemplates = valueFieldTemplates;
 	}
 
 	@Override
@@ -123,9 +123,9 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
-	public LuceneIndexSchemaFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
-		LuceneIndexSchemaFieldNode<?> node =
-				getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
+	public LuceneIndexSchemaValueFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
+		LuceneIndexSchemaValueFieldNode<?> node =
+				getNode( valueFieldNodes, valueFieldTemplates, dynamicValueFieldNodesCache, absolutePath );
 		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
@@ -186,7 +186,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
+			LuceneIndexSchemaValueFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
 			if ( field == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
@@ -212,7 +212,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			LuceneIndexSchemaFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
+			LuceneIndexSchemaValueFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
 			if ( field == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}

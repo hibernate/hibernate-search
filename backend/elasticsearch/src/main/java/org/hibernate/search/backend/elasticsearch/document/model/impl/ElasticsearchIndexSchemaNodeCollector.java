@@ -13,11 +13,11 @@ public interface ElasticsearchIndexSchemaNodeCollector {
 
 	void collect(String absolutePath, ElasticsearchIndexSchemaObjectFieldNode node);
 
-	void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node);
+	void collect(String absoluteFieldPath, ElasticsearchIndexSchemaValueFieldNode<?> node);
 
 	void collect(ElasticsearchIndexSchemaObjectFieldTemplate template);
 
-	void collect(ElasticsearchIndexSchemaFieldTemplate template);
+	void collect(ElasticsearchIndexSchemaValueFieldTemplate template);
 
 	void collect(NamedDynamicTemplate templateForMapping);
 

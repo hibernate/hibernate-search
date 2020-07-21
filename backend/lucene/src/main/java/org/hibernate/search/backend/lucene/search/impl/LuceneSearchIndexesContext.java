@@ -26,7 +26,7 @@ public interface LuceneSearchIndexesContext {
 
 	LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath);
 
-	LuceneSearchFieldContext<?> field(String absoluteFieldPath);
+	LuceneSearchValueFieldContext<?> field(String absoluteFieldPath);
 
 	void checkNestedField(String absoluteFieldPath);
 
