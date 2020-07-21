@@ -18,6 +18,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProviderInitializationContextImpl;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
@@ -28,8 +30,10 @@ import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionInde
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerContext,
 		SchemaManagementIndexManagerContext {
@@ -37,6 +41,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	private final IndexManagerBackendContext backendContext;
 	private final LuceneIndexModel model;
 
+	private BeanHolder<? extends DirectoryProvider> directoryProviderHolder;
 	private BeanHolder<? extends ShardingStrategy> shardingStrategyHolder;
 	private final Map<String, Shard> shards = new LinkedHashMap<>();
 	private final List<LuceneParallelWorkOrchestrator> managementOrchestrators = new ArrayList<>();
@@ -55,7 +60,9 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		ConfigurationPropertySource propertySource = startContext.configurationPropertySource();
 
 		try {
-			IOStrategy ioStrategy = backendContext.createIOStrategy( propertySource );
+			directoryProviderHolder = createDirectoryProvider( model.getEventContext(), startContext.beanResolver(),
+					propertySource );
+			IOStrategy ioStrategy = backendContext.createIOStrategy( directoryProviderHolder.get(), propertySource );
 			ShardingStrategyInitializationContextImpl initializationContext =
 					new ShardingStrategyInitializationContextImpl(
 							backendContext,
@@ -99,6 +106,8 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.pushAll( Shard::stop, shards.values() );
 			shards.clear();
+			closer.push( holder -> holder.get().close(), directoryProviderHolder );
+			closer.push( BeanHolder::close, directoryProviderHolder );
 			managementOrchestrators.clear();
 		}
 	}
@@ -144,6 +153,16 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 	public List<Shard> getShardsForTests() {
 		return new ArrayList<>( shards.values() );
+	}
+
+	private BeanHolder<? extends DirectoryProvider> createDirectoryProvider(EventContext backendContext,
+			BeanResolver beanResolver, ConfigurationPropertySource propertySource) {
+		DirectoryProviderInitializationContextImpl initializationContext = new DirectoryProviderInitializationContextImpl(
+				backendContext,
+				beanResolver,
+				propertySource.withMask( "directory" )
+		);
+		return initializationContext.createDirectoryProvider();
 	}
 
 	private Collection<Shard> toShards(Set<String> routingKeys) {

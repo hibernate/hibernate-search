@@ -21,15 +21,15 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.NearRealTimeIOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterConfigSource;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchedWorkProcessor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchedWorkProcessor;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
@@ -71,7 +71,6 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	private final EventContext eventContext;
 
 	private final BackendThreads threads;
-	private final DirectoryProvider directoryProvider;
 	private final Similarity similarity;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -83,7 +82,6 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public IndexManagerBackendContext(LuceneBackend backendAPI,
 			EventContext eventContext,
 			BackendThreads threads,
-			DirectoryProvider directoryProvider,
 			Similarity similarity,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -94,7 +92,6 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		this.backendAPI = backendAPI;
 		this.eventContext = eventContext;
 		this.threads = threads;
-		this.directoryProvider = directoryProvider;
 		this.similarity = similarity;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
@@ -191,7 +188,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneIndexEntryFactory( model, multiTenancyStrategy );
 	}
 
-	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {
+	IOStrategy createIOStrategy(DirectoryProvider directoryProvider, ConfigurationPropertySource propertySource) {
 		switch ( IO_STRATEGY.get( propertySource ) ) {
 			case DEBUG:
 				return DebugIOStrategy.create( directoryProvider, threads, failureHandler );

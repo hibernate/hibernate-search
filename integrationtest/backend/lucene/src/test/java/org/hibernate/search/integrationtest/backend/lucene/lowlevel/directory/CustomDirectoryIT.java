@@ -71,7 +71,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.indexContext( index.name() )
 						.failure(
 								"Unable to convert configuration property 'hibernate.search.backend.directory.type'"
 										+ " with value '" + invalidDirectoryType + "'",

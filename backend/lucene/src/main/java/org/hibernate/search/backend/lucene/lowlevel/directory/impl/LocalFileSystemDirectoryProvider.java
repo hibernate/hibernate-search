@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
@@ -33,15 +33,15 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 	public static final String NAME = "local-filesystem";
 
 	private static final ConfigurationProperty<Path> ROOT =
-			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.ROOT )
+			ConfigurationProperty.forKey( LuceneIndexSettings.DirectoryRadicals.ROOT )
 					.as( Path.class, Paths::get )
-					.withDefault( () -> Paths.get( LuceneBackendSettings.Defaults.DIRECTORY_ROOT ) )
+					.withDefault( () -> Paths.get( LuceneIndexSettings.Defaults.DIRECTORY_ROOT ) )
 					.build();
 
 	private static final ConfigurationProperty<FileSystemAccessStrategyName> FILESYSTEM_ACCESS_STRATEGY =
-			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY )
+			ConfigurationProperty.forKey( LuceneIndexSettings.DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY )
 					.as( FileSystemAccessStrategyName.class, FileSystemAccessStrategyName::of )
-					.withDefault( LuceneBackendSettings.Defaults.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY )
+					.withDefault( LuceneIndexSettings.Defaults.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY )
 					.build();
 
 	private Path directoryRoot;
