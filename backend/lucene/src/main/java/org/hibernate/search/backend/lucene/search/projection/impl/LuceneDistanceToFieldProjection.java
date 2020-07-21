@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDista
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -181,7 +181,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 		}
 
 		@Override
-		public Builder create(LuceneSearchContext searchContext, LuceneSearchFieldContext<GeoPoint> field) {
+		public Builder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( codec, searchContext, field );
 		}
 	}
@@ -193,13 +193,13 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 
 		private final LuceneFieldCodec<GeoPoint> codec;
 
-		private final LuceneSearchFieldContext<GeoPoint> field;
+		private final LuceneSearchValueFieldContext<GeoPoint> field;
 
 		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
 		private Builder(LuceneFieldCodec<GeoPoint> codec, LuceneSearchContext searchContext,
-				LuceneSearchFieldContext<GeoPoint> field) {
+				LuceneSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext );
 			this.codec = codec;
 			this.field = field;

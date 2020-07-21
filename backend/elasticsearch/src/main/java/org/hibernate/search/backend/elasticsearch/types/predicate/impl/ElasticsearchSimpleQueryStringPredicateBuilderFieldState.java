@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonPrimitive;
@@ -17,10 +17,10 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 		implements SimpleQueryStringPredicateBuilder.FieldState {
 	private static final String BOOST_OPERATOR = "^";
 
-	private final ElasticsearchSearchFieldContext<String> field;
+	private final ElasticsearchSearchValueFieldContext<String> field;
 	private Float boost;
 
-	private ElasticsearchSimpleQueryStringPredicateBuilderFieldState(ElasticsearchSearchFieldContext<String> field) {
+	private ElasticsearchSimpleQueryStringPredicateBuilderFieldState(ElasticsearchSearchValueFieldContext<String> field) {
 		this.field = field;
 	}
 
@@ -46,7 +46,7 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
 		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
-				ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field) {
+				ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<String> field) {
 			return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( field );
 		}
 	}

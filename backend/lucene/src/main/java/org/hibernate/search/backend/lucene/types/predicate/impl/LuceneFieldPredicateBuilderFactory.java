@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -41,29 +41,29 @@ public interface LuceneFieldPredicateBuilderFactory<F> {
 	boolean isCompatibleWith(LuceneFieldPredicateBuilderFactory<?> other);
 
 	MatchPredicateBuilder createMatchPredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	RangePredicateBuilder createRangePredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	PhrasePredicateBuilder createPhrasePredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	WildcardPredicateBuilder createWildcardPredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	ExistsPredicateBuilder createExistsPredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(LuceneSearchContext searchContext,
-			LuceneSearchFieldContext<F> field);
+			LuceneSearchValueFieldContext<F> field);
 
 	SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
-			LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field);
+			LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field);
 }

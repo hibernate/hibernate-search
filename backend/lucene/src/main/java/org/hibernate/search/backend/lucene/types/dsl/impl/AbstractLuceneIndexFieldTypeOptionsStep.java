@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
@@ -15,11 +15,11 @@ import org.hibernate.search.util.common.impl.Contracts;
 abstract class AbstractLuceneIndexFieldTypeOptionsStep<S extends AbstractLuceneIndexFieldTypeOptionsStep<?, F>, F>
 		implements IndexFieldTypeOptionsStep<S, F> {
 	protected final LuceneIndexFieldTypeBuildContext buildContext;
-	protected final LuceneIndexFieldType.Builder<F> builder;
+	protected final LuceneIndexValueFieldType.Builder<F> builder;
 
 	AbstractLuceneIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> valueType) {
 		this.buildContext = buildContext;
-		this.builder = new LuceneIndexFieldType.Builder<>( valueType );
+		this.builder = new LuceneIndexValueFieldType.Builder<>( valueType );
 	}
 
 	@Override

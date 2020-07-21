@@ -6,26 +6,26 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public class LuceneIndexSchemaFieldTemplate
-		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexSchemaFieldNode<?>> {
+public class LuceneIndexSchemaValueFieldTemplate
+		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexSchemaValueFieldNode<?>> {
 
-	private final LuceneIndexFieldType<?> type;
+	private final LuceneIndexValueFieldType<?> type;
 
-	public LuceneIndexSchemaFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
+	public LuceneIndexSchemaValueFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued,
-			LuceneIndexFieldType<?> type) {
+			LuceneIndexValueFieldType<?> type) {
 		super( declaringParent, inclusion, absolutePathGlob, multiValued );
 		this.type = type;
 	}
 
 	@Override
-	protected LuceneIndexSchemaFieldNode<?> createNode(LuceneIndexSchemaObjectNode parent,
+	protected LuceneIndexSchemaValueFieldNode<?> createNode(LuceneIndexSchemaObjectNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new LuceneIndexSchemaFieldNode<>( parent, relativePath, inclusion, multiValued, type );
+		return new LuceneIndexSchemaValueFieldNode<>( parent, relativePath, inclusion, multiValued, type );
 	}
 }

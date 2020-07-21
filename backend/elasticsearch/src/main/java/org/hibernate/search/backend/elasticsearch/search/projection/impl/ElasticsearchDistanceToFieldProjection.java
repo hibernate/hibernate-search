@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -223,7 +223,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
 		@Override
 		public Builder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<GeoPoint> field) {
+				ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );
 		}
 	}
@@ -231,12 +231,12 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	public static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<Double>
 			implements DistanceToFieldProjectionBuilder {
 
-		private final ElasticsearchSearchFieldContext<GeoPoint> field;
+		private final ElasticsearchSearchValueFieldContext<GeoPoint> field;
 
 		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
-		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext );
 			this.field = field;
 		}

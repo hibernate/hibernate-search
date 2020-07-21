@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -49,7 +49,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 			extends AbstractElasticsearchSearchFieldQueryElementFactory<WildcardPredicateBuilder, String> {
 		@Override
 		public WildcardPredicateBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<String> field) {
+				ElasticsearchSearchValueFieldContext<String> field) {
 			return new Builder( searchContext, field );
 		}
 	}
@@ -57,7 +57,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 	private static class Builder extends AbstractBuilder implements WildcardPredicateBuilder {
 		private JsonPrimitive pattern;
 
-		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<String> field) {
+		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<String> field) {
 			super( searchContext, field );
 		}
 

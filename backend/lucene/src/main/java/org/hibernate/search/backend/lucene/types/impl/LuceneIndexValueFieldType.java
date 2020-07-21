@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldTypeContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
@@ -25,8 +25,8 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 
 import org.apache.lucene.analysis.Analyzer;
 
-public class LuceneIndexFieldType<F>
-		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, LuceneSearchFieldTypeContext<F> {
+public class LuceneIndexValueFieldType<F>
+		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, LuceneSearchValueFieldTypeContext<F> {
 	private final Class<F> valueType;
 	private final DslConverter<F, F> rawDslConverter;
 	private final ProjectionConverter<F, F> rawProjectionConverter;
@@ -48,7 +48,7 @@ public class LuceneIndexFieldType<F>
 	private final String searchAnalyzerName;
 	private final String normalizerName;
 
-	private LuceneIndexFieldType(Builder<F> builder) {
+	private LuceneIndexValueFieldType(Builder<F> builder) {
 		this.valueType = builder.valueType;
 		this.rawDslConverter = builder.rawDslConverter;
 		this.rawProjectionConverter = builder.rawProjectionConverter;
@@ -255,8 +255,8 @@ public class LuceneIndexFieldType<F>
 			return analyzer != null ? analyzer : normalizer;
 		}
 
-		public LuceneIndexFieldType<F> build() {
-			return new LuceneIndexFieldType<>( this );
+		public LuceneIndexValueFieldType<F> build() {
+			return new LuceneIndexValueFieldType<>( this );
 		}
 	}
 }

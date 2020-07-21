@@ -14,7 +14,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.util.common.SearchException;
@@ -23,7 +23,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	private final String absoluteFieldPath;
 	private final List<String> nestedPathHierarchy;
-	private final Map<String, LuceneSearchFieldContext<?>> leafFields = new HashMap<>();
+	private final Map<String, LuceneSearchValueFieldContext<?>> leafFields = new HashMap<>();
 
 	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexSchemaObjectFieldNode objectNode) {
 		absoluteFieldPath = objectNode.absolutePath();
@@ -63,7 +63,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		LuceneObjectExistsPredicate.Builder builder = new LuceneObjectExistsPredicate.Builder(
 				searchContext, absoluteFieldPath, nestedPathHierarchy
 		);
-		for ( Map.Entry<String, LuceneSearchFieldContext<?>> entry : leafFields.entrySet() ) {
+		for ( Map.Entry<String, LuceneSearchValueFieldContext<?>> entry : leafFields.entrySet() ) {
 			ExistsPredicateBuilder existsPredicateBuilder =
 					entry.getValue().queryElement( PredicateTypeKeys.EXISTS, searchContext );
 			builder.addChild( existsPredicateBuilder.build() );
@@ -78,7 +78,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 				addLeafFields( child.toObjectField() );
 			}
 			else if ( child.isValueField() ) {
-				leafFields.put( child.absolutePath(), (LuceneSearchFieldContext<?>) child );
+				leafFields.put( child.absolutePath(), (LuceneSearchValueFieldContext<?>) child );
 			}
 		}
 	}

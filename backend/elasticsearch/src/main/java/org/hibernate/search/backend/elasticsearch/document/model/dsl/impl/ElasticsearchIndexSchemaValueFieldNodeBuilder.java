@@ -11,13 +11,13 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
@@ -27,23 +27,22 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class ElasticsearchIndexSchemaFieldNodeBuilder<F>
-		implements IndexSchemaFieldOptionsStep<ElasticsearchIndexSchemaFieldNodeBuilder<F>, IndexFieldReference<F>>,
-		ElasticsearchIndexSchemaNodeContributor,
-		IndexSchemaBuildContext {
+class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
+		implements IndexSchemaFieldOptionsStep<ElasticsearchIndexSchemaValueFieldNodeBuilder<F>, IndexFieldReference<F>>,
+				ElasticsearchIndexSchemaNodeContributor, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final IndexFieldInclusion inclusion;
-	private final ElasticsearchIndexFieldType<F> type;
+	private final ElasticsearchIndexValueFieldType<F> type;
 	private boolean multiValued = false;
 
 	private ElasticsearchIndexFieldReference<F> reference;
 
-	ElasticsearchIndexSchemaFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String relativeFieldName, IndexFieldInclusion inclusion, ElasticsearchIndexFieldType<F> type) {
+	ElasticsearchIndexSchemaValueFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+			String relativeFieldName, IndexFieldInclusion inclusion, ElasticsearchIndexValueFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = FieldPaths.compose( parent.getAbsolutePath(), relativeFieldName );
@@ -58,7 +57,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaFieldNodeBuilder<F> multiValued() {
+	public ElasticsearchIndexSchemaValueFieldNodeBuilder<F> multiValued() {
 		this.multiValued = true;
 		return this;
 	}
@@ -81,7 +80,7 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
-		ElasticsearchIndexSchemaFieldNode<F> fieldNode = new ElasticsearchIndexSchemaFieldNode<>(
+		ElasticsearchIndexSchemaValueFieldNode<F> fieldNode = new ElasticsearchIndexSchemaValueFieldNode<>(
 				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 

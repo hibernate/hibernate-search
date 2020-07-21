@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.scope.model.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 
 public interface IndexSchemaFieldNodeComponentRetrievalStrategy<T> {
 
-	T extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode);
+	T extractComponent(LuceneIndexSchemaValueFieldNode<?> schemaNode);
 
 	boolean hasCompatibleCodec(T component1, T component2);
 

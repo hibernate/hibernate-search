@@ -40,12 +40,12 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 	private final ElasticsearchIndexSchemaObjectNode rootNode;
 	private final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes;
-	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
+	private final Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes;
 	private final List<IndexFieldDescriptor> staticFields;
 	private final List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates;
-	private final List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates;
+	private final List<ElasticsearchIndexSchemaValueFieldTemplate> valueFieldTemplates;
 	private final ConcurrentMap<String, ElasticsearchIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
-	private final ConcurrentMap<String, ElasticsearchIndexSchemaFieldNode<?>> dynamicFieldNodesCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ElasticsearchIndexSchemaValueFieldNode<?>> dynamicValueFieldNodesCache = new ConcurrentHashMap<>();
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
@@ -53,9 +53,9 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaObjectNode rootNode,
 			Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes,
-			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes,
+			Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes,
 			List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates,
-			List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates) {
+			List<ElasticsearchIndexSchemaValueFieldTemplate> valueFieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchName() );
@@ -64,17 +64,17 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;
 		this.objectFieldNodes = objectFieldNodes;
-		this.fieldNodes = fieldNodes;
+		this.valueFieldNodes = valueFieldNodes;
 		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
 		objectFieldNodes.values().stream()
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
-		fieldNodes.values().stream()
+		valueFieldNodes.values().stream()
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.forEach( theStaticFields::add );
 		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
 		this.objectFieldTemplates = objectFieldTemplates;
-		this.fieldTemplates = fieldTemplates;
+		this.valueFieldTemplates = valueFieldTemplates;
 	}
 
 	@Override
@@ -123,9 +123,9 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
-	public ElasticsearchIndexSchemaFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
-		ElasticsearchIndexSchemaFieldNode<?> node =
-				getNode( fieldNodes, fieldTemplates, dynamicFieldNodesCache, absolutePath );
+	public ElasticsearchIndexSchemaValueFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
+		ElasticsearchIndexSchemaValueFieldNode<?> node =
+				getNode( valueFieldNodes, valueFieldTemplates, dynamicValueFieldNodesCache, absolutePath );
 		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 

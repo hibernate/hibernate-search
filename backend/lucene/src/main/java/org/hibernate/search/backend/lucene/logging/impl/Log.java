@@ -21,7 +21,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
@@ -481,7 +481,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 106,
 			value = "Multiple conflicting models for field '%1$s': '%2$s' vs. '%3$s'.")
 	SearchException conflictingFieldModel(String absoluteFieldPath,
-			LuceneIndexSchemaObjectFieldNode objectNode, LuceneIndexSchemaFieldNode fieldNode, @Param EventContext context);
+			LuceneIndexSchemaObjectFieldNode objectNode, LuceneIndexSchemaValueFieldNode fieldNode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 107, value = "Search query exceeded the timeout of %1$s: '%2$s'.")
 	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout, String queryDescription);

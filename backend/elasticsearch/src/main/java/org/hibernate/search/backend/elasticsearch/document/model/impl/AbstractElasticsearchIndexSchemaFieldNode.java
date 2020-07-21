@@ -47,7 +47,7 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 	public abstract ElasticsearchIndexSchemaObjectFieldNode toObjectField();
 
 	@Override
-	public abstract ElasticsearchIndexSchemaFieldNode<?> toValueField();
+	public abstract ElasticsearchIndexSchemaValueFieldNode<?> toValueField();
 
 	@Override
 	public ElasticsearchIndexSchemaObjectNode parent() {

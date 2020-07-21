@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -65,7 +65,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 
 		@Override
 		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<String> field) {
+				ElasticsearchSearchValueFieldContext<String> field) {
 			return new Builder( codec, searchContext, field );
 		}
 	}
@@ -76,7 +76,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		private String analyzer;
 
 		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<String> field) {
+				ElasticsearchSearchValueFieldContext<String> field) {
 			super( codec, searchContext, field );
 		}
 

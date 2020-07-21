@@ -15,12 +15,12 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.apache.lucene.analysis.Analyzer;
 
 /**
- * Information about a field targeted by search,
+ * Information about the type of a value (non-object) field targeted by search,
  * be it in a projection, a predicate, a sort, ...
  *
  * @param <F> The indexed field value type.
  */
-public interface LuceneSearchFieldTypeContext<F> {
+public interface LuceneSearchValueFieldTypeContext<F> {
 
 	DslConverter<?, F> dslConverter();
 

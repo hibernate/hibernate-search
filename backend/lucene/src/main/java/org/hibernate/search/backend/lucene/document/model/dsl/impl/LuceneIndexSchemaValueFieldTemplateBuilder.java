@@ -6,35 +6,35 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-class LuceneIndexSchemaFieldTemplateBuilder
+class LuceneIndexSchemaValueFieldTemplateBuilder
 		extends AbstractLuceneIndexSchemaFieldTemplateBuilder<
-						LuceneIndexSchemaFieldTemplateBuilder, LuceneIndexSchemaFieldTemplate
+						LuceneIndexSchemaValueFieldTemplateBuilder, LuceneIndexSchemaValueFieldTemplate
 				> {
 
-	private final LuceneIndexFieldType<?> type;
+	private final LuceneIndexValueFieldType<?> type;
 
-	LuceneIndexSchemaFieldTemplateBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
-			String templateName, IndexFieldInclusion inclusion, LuceneIndexFieldType<?> type, String prefix) {
+	LuceneIndexSchemaValueFieldTemplateBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+			String templateName, IndexFieldInclusion inclusion, LuceneIndexValueFieldType<?> type, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.type = type;
 	}
 
 	@Override
-	protected LuceneIndexSchemaFieldTemplateBuilder thisAsS() {
+	protected LuceneIndexSchemaValueFieldTemplateBuilder thisAsS() {
 		return this;
 	}
 
 	@Override
 	protected void doContribute(LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode, SimpleGlobPattern absolutePathGlob, boolean multiValued) {
-		LuceneIndexSchemaFieldTemplate fieldTemplate = new LuceneIndexSchemaFieldTemplate(
+		LuceneIndexSchemaValueFieldTemplate fieldTemplate = new LuceneIndexSchemaValueFieldTemplate(
 				parentNode, inclusion, absolutePathGlob, multiValued, type
 		);
 

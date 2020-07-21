@@ -14,8 +14,8 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
@@ -74,13 +74,13 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	public LuceneIndexModel build(String indexName) {
 		Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes = new HashMap<>();
-		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
+		Map<String, LuceneIndexSchemaValueFieldNode<?>> fieldNodes = new HashMap<>();
 		List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates = new ArrayList<>();
-		List<LuceneIndexSchemaFieldTemplate> fieldTemplates = new ArrayList<>();
+		List<LuceneIndexSchemaValueFieldTemplate> fieldTemplates = new ArrayList<>();
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
 			@Override
-			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node) {
+			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaValueFieldNode<?> node) {
 				fieldNodes.put( absoluteFieldPath, node );
 			}
 
@@ -95,7 +95,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 
 			@Override
-			public void collect(LuceneIndexSchemaFieldTemplate template) {
+			public void collect(LuceneIndexSchemaValueFieldTemplate template) {
 				fieldTemplates.add( template );
 			}
 		};

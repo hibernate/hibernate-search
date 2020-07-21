@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationEx
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -92,7 +92,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, searchContext, field );
 		}
 	}
@@ -100,10 +100,10 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	public static class TypeSelector<F> {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 		private final LuceneSearchContext searchContext;
-		private final LuceneSearchFieldContext<F> field;
+		private final LuceneSearchValueFieldContext<F> field;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+				LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			this.codec = codec;
 			this.searchContext = searchContext;
 			this.field = field;
@@ -126,7 +126,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
-				LuceneSearchContext searchContext, LuceneSearchFieldContext<?> field,
+				LuceneSearchContext searchContext, LuceneSearchValueFieldContext<?> field,
 				DslConverter<? super K, F> toFieldValueConverter) {
 			super( searchContext, field );
 			this.codec = codec;

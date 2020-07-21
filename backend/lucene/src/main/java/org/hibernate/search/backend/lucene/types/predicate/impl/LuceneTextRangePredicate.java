@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -35,7 +35,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			return new Builder<>( codec, searchContext, field );
 		}
 	}
@@ -46,7 +46,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 		private Range<String> range;
 
 		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext,
-				LuceneSearchFieldContext<F> field) {
+				LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 		}

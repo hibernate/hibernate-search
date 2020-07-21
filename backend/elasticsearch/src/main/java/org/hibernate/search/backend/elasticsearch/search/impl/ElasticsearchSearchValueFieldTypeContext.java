@@ -13,12 +13,12 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
- * Information about a field targeted by search,
+ * Information about the type of a value (non-object) field targeted by search,
  * be it in a projection, a predicate, a sort, ...
  *
  * @param <F> The indexed field value type.
  */
-public interface ElasticsearchSearchFieldTypeContext<F> {
+public interface ElasticsearchSearchValueFieldTypeContext<F> {
 
 	DslConverter<?, F> dslConverter();
 

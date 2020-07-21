@@ -75,7 +75,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaFieldNode<?> toValueField() {
+	public ElasticsearchIndexSchemaValueFieldNode<?> toValueField() {
 		throw log.invalidIndexElementTypeObjectFieldIsNotValueField( absolutePath );
 	}
 

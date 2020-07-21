@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.impl;
 /**
  * A factory for query elements (predicates, sorts, projections, aggregations, ...) targeting fields of a given type.
  *
- * @param <T> The type returned by {@link #create(LuceneSearchContext, LuceneSearchFieldContext)}.
+ * @param <T> The type returned by {@link #create(LuceneSearchContext, LuceneSearchValueFieldContext)}.
  * Can be the type of the query element, or an intermediary builder type.
  * @param <F> The type of values for the targeted field.
  */
@@ -20,7 +20,7 @@ public interface LuceneSearchFieldQueryElementFactory<T, F> {
 	 * @param field The targeted field.
 	 * @return The query element, or an intermediary builder (depending on the factory type).
 	 */
-	T create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field);
+	T create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field);
 
 	/**
 	 * Checks whether this factory and the given factory can be used interchangeably.

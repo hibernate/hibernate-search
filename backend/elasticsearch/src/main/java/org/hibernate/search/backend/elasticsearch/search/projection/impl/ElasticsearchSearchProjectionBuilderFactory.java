@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -50,7 +50,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
+		ElasticsearchSearchValueFieldContext<?> field = indexes.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
 		return indexes.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, searchContext )
@@ -74,7 +74,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		ElasticsearchSearchFieldContext<?> field = indexes.field( absoluteFieldPath );
+		ElasticsearchSearchValueFieldContext<?> field = indexes.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
 		return field.queryElement( ProjectionTypeKeys.DISTANCE, searchContext );

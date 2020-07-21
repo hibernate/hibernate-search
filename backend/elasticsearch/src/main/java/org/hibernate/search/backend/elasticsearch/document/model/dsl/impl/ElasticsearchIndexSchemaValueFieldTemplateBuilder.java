@@ -6,30 +6,30 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-class ElasticsearchIndexSchemaFieldTemplateBuilder
+class ElasticsearchIndexSchemaValueFieldTemplateBuilder
 		extends AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
-				ElasticsearchIndexSchemaFieldTemplateBuilder, ElasticsearchIndexSchemaFieldTemplate
+				ElasticsearchIndexSchemaValueFieldTemplateBuilder, ElasticsearchIndexSchemaValueFieldTemplate
 		> {
 
-	private final ElasticsearchIndexFieldType<?> type;
+	private final ElasticsearchIndexValueFieldType<?> type;
 
-	ElasticsearchIndexSchemaFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String templateName, IndexFieldInclusion inclusion, ElasticsearchIndexFieldType<?> type, String prefix) {
+	ElasticsearchIndexSchemaValueFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+			String templateName, IndexFieldInclusion inclusion, ElasticsearchIndexValueFieldType<?> type, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.type = type;
 	}
 
 	@Override
-	protected ElasticsearchIndexSchemaFieldTemplateBuilder thisAsS() {
+	protected ElasticsearchIndexSchemaValueFieldTemplateBuilder thisAsS() {
 		return this;
 	}
 
@@ -37,7 +37,7 @@ class ElasticsearchIndexSchemaFieldTemplateBuilder
 	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
-		ElasticsearchIndexSchemaFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaFieldTemplate(
+		ElasticsearchIndexSchemaValueFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaValueFieldTemplate(
 				parentNode, absolutePathGlob, inclusion, multiValued, type
 		);
 

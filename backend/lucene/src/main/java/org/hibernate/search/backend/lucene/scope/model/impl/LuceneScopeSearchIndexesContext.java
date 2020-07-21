@@ -16,11 +16,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchFieldContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
@@ -98,13 +98,13 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 		LuceneIndexSchemaObjectFieldNode objectNode = null;
 		String objectNodeIndexName = null;
-		LuceneIndexSchemaFieldNode<?> fieldNode = null;
+		LuceneIndexSchemaValueFieldNode<?> fieldNode = null;
 		String fieldNodeIndexName = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			String indexName = indexModel.hibernateSearchName();
 
-			LuceneIndexSchemaFieldNode<?> currentFieldNode =
+			LuceneIndexSchemaValueFieldNode<?> currentFieldNode =
 					indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( currentFieldNode != null ) {
 				fieldNode = currentFieldNode;
@@ -149,18 +149,18 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	@Override
 	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
-	public LuceneSearchFieldContext<?> field(String absoluteFieldPath) {
-		LuceneSearchFieldContext<?> resultOrNull = null;
+	public LuceneSearchValueFieldContext<?> field(String absoluteFieldPath) {
+		LuceneSearchValueFieldContext<?> resultOrNull = null;
 		if ( indexModels.size() == 1 ) {
 			// Single-index search
 			resultOrNull = indexModels.iterator().next().getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 		}
 		else {
 			// Multi-index search
-			List<LuceneSearchFieldContext<?>> fieldForEachIndex = new ArrayList<>();
+			List<LuceneSearchValueFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
 			for ( LuceneIndexModel indexModel : indexModels ) {
-				LuceneIndexSchemaFieldNode<?> fieldForCurrentIndex =
+				LuceneIndexSchemaValueFieldNode<?> fieldForCurrentIndex =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( fieldForCurrentIndex == null ) {
 					continue;
@@ -169,7 +169,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 
 			if ( !fieldForEachIndex.isEmpty() ) {
-				resultOrNull = new LuceneMultiIndexSearchFieldContext<>(
+				resultOrNull = new LuceneMultiIndexSearchValueFieldContext<>(
 						indexNames, absoluteFieldPath, (List) fieldForEachIndex
 				);
 			}
@@ -198,7 +198,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 		}
 		if ( !found ) {
 			for ( LuceneIndexModel indexModel : indexModels ) {
-				LuceneIndexSchemaFieldNode<?> schemaNode =
+				LuceneIndexSchemaValueFieldNode<?> schemaNode =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery(

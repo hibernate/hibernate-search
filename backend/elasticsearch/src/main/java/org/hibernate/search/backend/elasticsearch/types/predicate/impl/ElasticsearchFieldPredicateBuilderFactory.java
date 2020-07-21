@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -41,26 +41,26 @@ public interface ElasticsearchFieldPredicateBuilderFactory<F> {
 	boolean isCompatibleWith(ElasticsearchFieldPredicateBuilderFactory<?> other);
 
 	MatchPredicateBuilder createMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchValueFieldContext<F> field);
 
 	RangePredicateBuilder createRangePredicateBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchValueFieldContext<F> field);
 
 	PhrasePredicateBuilder createPhrasePredicateBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchValueFieldContext<F> field);
 
 	WildcardPredicateBuilder createWildcardPredicateBuilder(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchValueFieldContext<F> field);
 
 	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldState(
-			ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchValueFieldContext<F> field);
 
 	SpatialWithinCirclePredicateBuilder createSpatialWithinCirclePredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field);
 
 	SpatialWithinPolygonPredicateBuilder createSpatialWithinPolygonPredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field);
 
 	SpatialWithinBoundingBoxPredicateBuilder createSpatialWithinBoundingBoxPredicateBuilder(
-			ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field);
+			ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field);
 }

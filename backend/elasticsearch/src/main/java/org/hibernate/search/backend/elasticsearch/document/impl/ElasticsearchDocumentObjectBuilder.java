@@ -10,12 +10,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -52,7 +52,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
 		ElasticsearchIndexFieldReference<F> elasticsearchFieldReference = (ElasticsearchIndexFieldReference<F>) fieldReference;
 
-		ElasticsearchIndexSchemaFieldNode<F> fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
+		ElasticsearchIndexSchemaValueFieldNode<F> fieldSchemaNode = elasticsearchFieldReference.getSchemaNode();
 		addValue( fieldSchemaNode, value );
 	}
 
@@ -78,7 +78,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = FieldPaths.compose( schemaNode.absolutePath(), relativeFieldName );
-		ElasticsearchIndexSchemaFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		ElasticsearchIndexSchemaValueFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -120,7 +120,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		return content;
 	}
 
-	private <F> void addValue(ElasticsearchIndexSchemaFieldNode<F> node, F value) {
+	private <F> void addValue(ElasticsearchIndexSchemaValueFieldNode<F> node, F value) {
 		ElasticsearchIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
 
@@ -129,7 +129,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		}
 
 		JsonAccessor<JsonElement> accessor = node.relativeAccessor();
-		ElasticsearchIndexFieldType<F> type = node.type();
+		ElasticsearchIndexValueFieldType<F> type = node.type();
 
 		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
@@ -138,13 +138,13 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	}
 
 	@SuppressWarnings("unchecked") // We check types explicitly using reflection
-	private void addValueUnknownType(ElasticsearchIndexSchemaFieldNode<?> node, Object value) {
+	private void addValueUnknownType(ElasticsearchIndexSchemaValueFieldNode<?> node, Object value) {
 		if ( value == null ) {
 			addValue( node, null );
 		}
 		else {
 			@SuppressWarnings("rawtypes")
-			ElasticsearchIndexSchemaFieldNode typeCheckedNode =
+			ElasticsearchIndexSchemaValueFieldNode typeCheckedNode =
 					node.withValueType( value.getClass(), model.getEventContext() );
 			addValue( typeCheckedNode, value );
 		}

@@ -6,26 +6,26 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public class ElasticsearchIndexSchemaFieldTemplate
-		extends AbstractElasticsearchIndexSchemaFieldTemplate<ElasticsearchIndexSchemaFieldNode<?>> {
+public class ElasticsearchIndexSchemaValueFieldTemplate
+		extends AbstractElasticsearchIndexSchemaFieldTemplate<ElasticsearchIndexSchemaValueFieldNode<?>> {
 
-	private final ElasticsearchIndexFieldType<?> type;
+	private final ElasticsearchIndexValueFieldType<?> type;
 
-	public ElasticsearchIndexSchemaFieldTemplate(ElasticsearchIndexSchemaObjectNode declaringParent,
+	public ElasticsearchIndexSchemaValueFieldTemplate(ElasticsearchIndexSchemaObjectNode declaringParent,
 			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
-			boolean multiValued, ElasticsearchIndexFieldType<?> type) {
+			boolean multiValued, ElasticsearchIndexValueFieldType<?> type) {
 		super( declaringParent, absolutePathGlob, inclusion, multiValued );
 		this.type = type;
 	}
 
 	@Override
-	protected ElasticsearchIndexSchemaFieldNode<?> createNode(ElasticsearchIndexSchemaObjectNode parent,
+	protected ElasticsearchIndexSchemaValueFieldNode<?> createNode(ElasticsearchIndexSchemaObjectNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new ElasticsearchIndexSchemaFieldNode<>( parent, relativePath, inclusion, multiValued, type );
+		return new ElasticsearchIndexSchemaValueFieldNode<>( parent, relativePath, inclusion, multiValued, type );
 	}
 }

@@ -21,17 +21,17 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class ElasticsearchMultiIndexSearchFieldContext<F>
-		implements ElasticsearchSearchFieldContext<F>, ElasticsearchSearchFieldTypeContext<F> {
+public class ElasticsearchMultiIndexSearchValueFieldContext<F>
+		implements ElasticsearchSearchValueFieldContext<F>, ElasticsearchSearchValueFieldTypeContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> indexNames;
 	private final String absolutePath;
-	private final List<ElasticsearchSearchFieldContext<F>> fieldForEachIndex;
+	private final List<ElasticsearchSearchValueFieldContext<F>> fieldForEachIndex;
 
-	public ElasticsearchMultiIndexSearchFieldContext(Set<String> indexNames, String absolutePath,
-			List<ElasticsearchSearchFieldContext<F>> fieldForEachIndex) {
+	public ElasticsearchMultiIndexSearchValueFieldContext(Set<String> indexNames, String absolutePath,
+			List<ElasticsearchSearchValueFieldContext<F>> fieldForEachIndex) {
 		this.indexNames = indexNames;
 		this.absolutePath = absolutePath;
 		this.fieldForEachIndex = fieldForEachIndex;
@@ -50,13 +50,13 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 
 	@Override
 	public List<String> nestedPathHierarchy() {
-		return getFromFieldIfCompatible( ElasticsearchSearchFieldContext::nestedPathHierarchy, Object::equals,
+		return getFromFieldIfCompatible( ElasticsearchSearchValueFieldContext::nestedPathHierarchy, Object::equals,
 				"nestedPathHierarchy" );
 	}
 
 	@Override
 	public boolean multiValuedInRoot() {
-		for ( ElasticsearchSearchFieldContext<F> field : fieldForEachIndex ) {
+		for ( ElasticsearchSearchValueFieldContext<F> field : fieldForEachIndex ) {
 			if ( field.multiValuedInRoot() ) {
 				return true;
 			}
@@ -65,7 +65,7 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	}
 
 	@Override
-	public ElasticsearchSearchFieldTypeContext<F> type() {
+	public ElasticsearchSearchValueFieldTypeContext<F> type() {
 		return this;
 	}
 
@@ -90,43 +90,43 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 
 	@Override
 	public DslConverter<?, F> dslConverter() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
 				"dslConverter" );
 	}
 
 	@Override
 	public DslConverter<F, F> rawDslConverter() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
 				"rawDslConverter" );
 	}
 
 	@Override
 	public ProjectionConverter<F, ?> projectionConverter() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::projectionConverter,
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::projectionConverter,
 				ProjectionConverter::isCompatibleWith, "projectionConverter" );
 	}
 
 	@Override
 	public ProjectionConverter<F, F> rawProjectionConverter() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::rawProjectionConverter,
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
 	}
 
 	@Override
 	public Optional<String> searchAnalyzerName() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::searchAnalyzerName, Object::equals,
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::searchAnalyzerName, Object::equals,
 				"searchAnalyzer" );
 	}
 
 	@Override
 	public Optional<String> normalizerName() {
-		return getFromTypeIfCompatible( ElasticsearchSearchFieldTypeContext::normalizerName, Object::equals,
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::normalizerName, Object::equals,
 				"normalizer" );
 	}
 
 	@Override
 	public boolean hasNormalizerOnAtLeastOneIndex() {
-		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
+		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			if ( fieldContext.type().hasNormalizerOnAtLeastOneIndex() ) {
 				return true;
 			}
@@ -137,8 +137,8 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 	@Override
 	public <T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = null;
-		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
-			ElasticsearchSearchFieldTypeContext<F> fieldType = fieldContext.type();
+		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
+			ElasticsearchSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
 			ElasticsearchSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
 					fieldType.queryElementFactory( key );
 			if ( factory == null ) {
@@ -151,10 +151,10 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 		return factory;
 	}
 
-	private <T> T getFromFieldIfCompatible(Function<ElasticsearchSearchFieldContext<F>, T> getter,
+	private <T> T getFromFieldIfCompatible(Function<ElasticsearchSearchValueFieldContext<F>, T> getter,
 			BiPredicate<T, T> compatiblityChecker, String attributeName) {
 		T attribute = null;
-		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
+		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			T attributeForFieldContext = getter.apply( fieldContext );
 			if ( attribute == null ) {
 				attribute = attributeForFieldContext;
@@ -166,11 +166,11 @@ public class ElasticsearchMultiIndexSearchFieldContext<F>
 		return attribute;
 	}
 
-	private <T> T getFromTypeIfCompatible(Function<ElasticsearchSearchFieldTypeContext<F>, T> getter,
+	private <T> T getFromTypeIfCompatible(Function<ElasticsearchSearchValueFieldTypeContext<F>, T> getter,
 			BiPredicate<T, T> compatiblityChecker, String attributeName) {
 		T attribute = null;
-		for ( ElasticsearchSearchFieldContext<F> fieldContext : fieldForEachIndex ) {
-			ElasticsearchSearchFieldTypeContext<F> fieldType = fieldContext.type();
+		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
+			ElasticsearchSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
 			T attributeForFieldContext = getter.apply( fieldType );
 			if ( attribute == null ) {
 				attribute = attributeForFieldContext;

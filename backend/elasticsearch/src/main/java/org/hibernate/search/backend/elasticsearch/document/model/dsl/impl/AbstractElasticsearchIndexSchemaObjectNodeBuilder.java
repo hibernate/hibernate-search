@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
@@ -49,9 +49,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
 			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
-		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
-		ElasticsearchIndexSchemaFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, inclusion, elasticsearchIndexFieldType
+		ElasticsearchIndexValueFieldType<F> fieldType = (ElasticsearchIndexValueFieldType<F>) indexFieldType;
+		ElasticsearchIndexSchemaValueFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaValueFieldNodeBuilder<>(
+				this, relativeFieldName, inclusion, fieldType
 		);
 		putField( relativeFieldName, childBuilder );
 		return childBuilder;
@@ -70,9 +70,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	public IndexSchemaFieldTemplateOptionsStep<?> addFieldTemplate(String templateName,
 			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		ElasticsearchIndexFieldType<?> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<?>) indexFieldType;
-		ElasticsearchIndexSchemaFieldTemplateBuilder templateBuilder = new ElasticsearchIndexSchemaFieldTemplateBuilder(
-				this, prefixedTemplateName, inclusion, elasticsearchIndexFieldType, prefix
+		ElasticsearchIndexValueFieldType<?> fieldType = (ElasticsearchIndexValueFieldType<?>) indexFieldType;
+		ElasticsearchIndexSchemaValueFieldTemplateBuilder templateBuilder = new ElasticsearchIndexSchemaValueFieldTemplateBuilder(
+				this, prefixedTemplateName, inclusion, fieldType, prefix
 		);
 		putTemplate( prefixedTemplateName, templateBuilder );
 		return templateBuilder;

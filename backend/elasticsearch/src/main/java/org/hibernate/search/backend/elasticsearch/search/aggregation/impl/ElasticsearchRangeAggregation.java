@@ -16,7 +16,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
@@ -82,7 +82,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		@Override
 		public TypeSelector<?> create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, searchContext, field );
 		}
 	}
@@ -90,10 +90,10 @@ public class ElasticsearchRangeAggregation<F, K>
 	public static class TypeSelector<F> {
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchContext searchContext;
-		private final ElasticsearchSearchFieldContext<F> field;
+		private final ElasticsearchSearchValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<F> field) {
+				ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
 			this.codec = codec;
 			this.searchContext = searchContext;
 			this.field = field;
@@ -115,7 +115,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		private final JsonArray rangesJson = new JsonArray();
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
+				ElasticsearchSearchValueFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
 			super( searchContext, field );
 			this.codec = codec;
 			this.toFieldValueConverter = toFieldValueConverter;

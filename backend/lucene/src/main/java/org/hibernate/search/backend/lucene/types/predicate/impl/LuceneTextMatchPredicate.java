@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstant
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -45,7 +45,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			return new Builder<>( codec, searchContext, field );
 		}
 	}
@@ -61,7 +61,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		private Analyzer overrideAnalyzerOrNormalizer;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext, LuceneSearchFieldContext<F> field) {
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
 			this.codec = codec;
 			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();

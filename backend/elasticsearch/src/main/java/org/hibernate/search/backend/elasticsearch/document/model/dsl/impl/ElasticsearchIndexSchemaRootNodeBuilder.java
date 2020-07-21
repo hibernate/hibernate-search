@@ -14,8 +14,8 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
@@ -96,20 +96,20 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 		mapping.setDynamic( resolveSelfDynamicType() );
 
-		final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectNodes = new HashMap<>();
-		final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
+		final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes = new HashMap<>();
+		final Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes = new HashMap<>();
 		final List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates = new ArrayList<>();
-		final List<ElasticsearchIndexSchemaFieldTemplate> fieldTemplates = new ArrayList<>();
+		final List<ElasticsearchIndexSchemaValueFieldTemplate> valueFieldTemplates = new ArrayList<>();
 
 		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
 			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectFieldNode node) {
-				objectNodes.put( absolutePath, node );
+				objectFieldNodes.put( absolutePath, node );
 			}
 
 			@Override
-			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node) {
-				fieldNodes.put( absoluteFieldPath, node );
+			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaValueFieldNode<?> node) {
+				valueFieldNodes.put( absoluteFieldPath, node );
 			}
 
 			@Override
@@ -118,8 +118,8 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			}
 
 			@Override
-			public void collect(ElasticsearchIndexSchemaFieldTemplate template) {
-				fieldTemplates.add( template );
+			public void collect(ElasticsearchIndexSchemaValueFieldTemplate template) {
+				valueFieldTemplates.add( template );
 			}
 
 			@Override
@@ -138,8 +138,8 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 				analysisDefinitionRegistry,
 				mapping,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, objectNodes, fieldNodes,
-				objectFieldTemplates, fieldTemplates
+				rootNode, objectFieldNodes, valueFieldNodes,
+				objectFieldTemplates, valueFieldTemplates
 		);
 	}
 

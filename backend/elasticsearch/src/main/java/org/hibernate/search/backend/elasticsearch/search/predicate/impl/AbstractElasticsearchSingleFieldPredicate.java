@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 
 public abstract class AbstractElasticsearchSingleFieldPredicate extends AbstractElasticsearchNestablePredicate {
 
@@ -37,7 +37,7 @@ public abstract class AbstractElasticsearchSingleFieldPredicate extends Abstract
 		protected final String absoluteFieldPath;
 		private final List<String> nestedPathHierarchy;
 
-		protected AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchFieldContext<?> field) {
+		protected AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<?> field) {
 			this( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
 		}
 

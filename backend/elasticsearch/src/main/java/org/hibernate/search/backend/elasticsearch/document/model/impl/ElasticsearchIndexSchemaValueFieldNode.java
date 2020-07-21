@@ -9,25 +9,25 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchIndexSchemaFieldNode
-		implements IndexValueFieldDescriptor, ElasticsearchSearchFieldContext<F> {
+public class ElasticsearchIndexSchemaValueFieldNode<F> extends AbstractElasticsearchIndexSchemaFieldNode
+		implements IndexValueFieldDescriptor, ElasticsearchSearchValueFieldContext<F> {
 
 	private final List<String> nestedPathHierarchy;
 
-	private final ElasticsearchIndexFieldType<F> type;
+	private final ElasticsearchIndexValueFieldType<F> type;
 
-	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
-			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexFieldType<F> type) {
+	public ElasticsearchIndexSchemaValueFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
+			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexValueFieldType<F> type) {
 		super( parent, relativeFieldName, inclusion, multiValued );
 		this.nestedPathHierarchy = parent.nestedPathHierarchy();
 		this.type = type;
@@ -49,7 +49,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaFieldNode<F> toValueField() {
+	public ElasticsearchIndexSchemaValueFieldNode<F> toValueField() {
 		return this;
 	}
 
@@ -59,7 +59,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 	}
 
 	@Override
-	public ElasticsearchIndexFieldType<F> type() {
+	public ElasticsearchIndexValueFieldType<F> type() {
 		return type;
 	}
 
@@ -78,12 +78,12 @@ public class ElasticsearchIndexSchemaFieldNode<F> extends AbstractElasticsearchI
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> ElasticsearchIndexSchemaFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
+	public <T> ElasticsearchIndexSchemaValueFieldNode<? super T> withValueType(Class<T> expectedSubType, EventContext eventContext) {
 		if ( !type.valueClass().isAssignableFrom( expectedSubType ) ) {
 			throw log.invalidFieldValueType( type.valueClass(), expectedSubType,
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
-		return (ElasticsearchIndexSchemaFieldNode<? super T>) this;
+		return (ElasticsearchIndexSchemaValueFieldNode<? super T>) this;
 	}
 
 	@Override

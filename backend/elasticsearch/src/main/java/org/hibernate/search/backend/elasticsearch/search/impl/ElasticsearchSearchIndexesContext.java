@@ -31,7 +31,7 @@ public interface ElasticsearchSearchIndexesContext {
 
 	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	ElasticsearchSearchFieldContext<?> field(String absoluteFieldPath);
+	ElasticsearchSearchValueFieldContext<?> field(String absoluteFieldPath);
 
 	boolean hasSchemaObjectNodeComponent(String absoluteFieldPath);
 
