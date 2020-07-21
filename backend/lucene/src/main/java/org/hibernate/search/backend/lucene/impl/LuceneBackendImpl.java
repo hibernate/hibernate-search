@@ -10,30 +10,28 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
-import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
-import org.hibernate.search.engine.backend.Backend;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
-import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.backend.spi.BackendBuildContext;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
@@ -46,7 +44,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	private final EventContext eventContext;
 
 	private final BackendThreads threads;
-	private final BeanHolder<? extends DirectoryProvider> directoryProviderHolder;
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -58,7 +55,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	LuceneBackendImpl(EventContext eventContext,
 			BackendThreads threads,
-			BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -66,7 +62,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 			FailureHandler failureHandler) {
 		this.eventContext = eventContext;
 		this.threads = threads;
-		this.directoryProviderHolder = directoryProviderHolder;
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		Similarity similarity = analysisDefinitionRegistry.getSimilarity();
@@ -78,7 +73,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		this.timingSource = timingSource;
 
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
-				this, eventContext, threads, directoryProviderHolder.get(), similarity,
+				this, eventContext, threads, similarity,
 				workFactory, multiTenancyStrategy,
 				timingSource, analysisDefinitionRegistry,
 				failureHandler,
@@ -88,12 +83,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( eventContext.render() ).append( ", " )
-				.append( "directoryProvider=" ).append( directoryProviderHolder.get() )
-				.append( "]" )
-				.toString();
+		return getClass().getSimpleName() + "[" + eventContext.render() + "]";
 	}
 
 	@Override
@@ -111,8 +101,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( LuceneSyncWorkOrchestratorImpl::stop, readOrchestrator );
-			closer.push( holder -> holder.get().close(), directoryProviderHolder );
-			closer.push( BeanHolder::close, directoryProviderHolder );
 			closer.push( TimingSource::stop, timingSource );
 			closer.push( BackendThreads::onStop, threads );
 		}

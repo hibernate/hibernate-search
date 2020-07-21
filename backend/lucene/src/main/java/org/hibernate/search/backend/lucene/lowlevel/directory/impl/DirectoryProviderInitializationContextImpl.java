@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
@@ -32,13 +32,13 @@ import org.apache.lucene.store.SingleInstanceLockFactory;
 public class DirectoryProviderInitializationContextImpl implements DirectoryProviderInitializationContext {
 
 	private static final ConfigurationProperty<BeanReference<? extends DirectoryProvider>> TYPE =
-			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.TYPE )
+			ConfigurationProperty.forKey( LuceneIndexSettings.DirectoryRadicals.TYPE )
 					.asBeanReference( DirectoryProvider.class )
-					.withDefault( BeanReference.of( DirectoryProvider.class, LuceneBackendSettings.Defaults.DIRECTORY_TYPE ) )
+					.withDefault( BeanReference.of( DirectoryProvider.class, LuceneIndexSettings.Defaults.DIRECTORY_TYPE ) )
 					.build();
 
 	private static final OptionalConfigurationProperty<LockingStrategyName> LOCKING_STRATEGY =
-			ConfigurationProperty.forKey( LuceneBackendSettings.DirectoryRadicals.LOCKING_STRATEGY )
+			ConfigurationProperty.forKey( LuceneIndexSettings.DirectoryRadicals.LOCKING_STRATEGY )
 					.as( LockingStrategyName.class, LockingStrategyName::of )
 					.build();
 

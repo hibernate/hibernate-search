@@ -29,13 +29,16 @@ on the filesystem, in the JVM's heap, ...
 By default, the Lucene backend stores the indexes on the filesystem,
 in the JVM's working directory.
 
-The type of directory is set a the backend level:
+The type of directory can be configured as follows:
 
 // Search 5 anchors backward compatibility
 [[example-configuring-directory-providers]]
 [source]
 ----
+# To configure the defaults for all indexes:
 hibernate.search.backend.directory.type = local-filesystem
+# To configure a specific index:
+hibernate.search.backend.indexes.<index name>.directory.type = local-filesystem
 ----
 
 // Search 5 anchors backward compatibility
@@ -78,17 +81,20 @@ Refer to <<architecture>> for more information.
 Each index is assigned a subdirectory under a root directory.
 
 By default, the root directory is the JVM's working directory.
-It can be configured at the backend level:
+It can be configured as follows:
 
 [source]
 ----
+# To configure the defaults for all indexes:
 hibernate.search.backend.directory.root = /path/to/my/root
+# To configure a specific index:
+hibernate.search.backend.indexes.<index name>.directory.root = /path/to/my/root
 ----
 
 For example, with the configuration above,
-an entity of type `com.mycompany.Order` will be indexed in directory
-`/path/to/my/root/com.mycompany.Order/`.
-If that entity is explicitly assigned the index name "orders"
+an entity type named `Order` will be indexed in directory
+`/path/to/my/root/Order/`.
+If that entity is explicitly assigned the index name `orders`
 (see `@Indexed(index = ...)` in <<mapper-orm-entityindexmapping>>),
 it will instead be indexed in directory
 `/path/to/my/root/orders/`.
@@ -100,11 +106,14 @@ based on the operating system and architecture.
 It should work well in most situations.
 
 For situations where a different filesystem access strategy is needed,
-Hibernate Search exposes a configuration property at the backend level:
+Hibernate Search exposes a configuration property:
 
 [source]
 ----
+# To configure the defaults for all indexes:
 hibernate.search.backend.directory.filesystem_access.strategy = auto (default)
+# To configure a specific index:
+hibernate.search.backend.indexes.<index name>.directory.filesystem_access.strategy = auto (default)
 ----
 
 Allowed values are:
@@ -159,11 +168,14 @@ writes to the same index concurrently.
 Each directory type comes with a default locking strategy that should work well enough in most situations.
 
 For those (very) rare situations where a different locking strategy is needed,
-Hibernate Search exposes a configuration property at the backend level:
+Hibernate Search exposes a configuration property:
 
 [source]
 ----
+# To configure the defaults for all indexes:
 hibernate.search.backend.directory.locking.strategy = native-filesystem
+# To configure a specific index:
+hibernate.search.backend.indexes.<index name>.directory.locking.strategy = native-filesystem
 ----
 
 The following strategies are available:

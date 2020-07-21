@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
@@ -45,7 +45,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 				.doesNotExist();
 
 		setup( c -> c.withBackendProperty(
-				LuceneBackendSettings.DIRECTORY_ROOT,
+				LuceneIndexSettings.DIRECTORY_ROOT,
 				temporaryFolder.getRoot().getAbsolutePath()
 		) );
 
@@ -102,12 +102,12 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
 	public void filesystemAccessStrategy_invalid() {
 		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
-				LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
+				LuceneIndexSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				"some_invalid_name"
 		) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.indexContext( index.name() )
 						.failure(
 								"Invalid filesystem access strategy name",
 								"'some_invalid_name'",
@@ -135,7 +135,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	private void testFileSystemAccessStrategy(String strategyName,
 			Class<? extends Directory> expectedDirectoryClass) {
 		setup( c -> c.withBackendProperty(
-				LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
+				LuceneIndexSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				strategyName
 		) );
 

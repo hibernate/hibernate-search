@@ -15,30 +15,29 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryProviderInitializationContextImpl;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.impl.DefaultTimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactoryImpl;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.util.Version;
 
@@ -75,8 +74,6 @@ public class LuceneBackendFactory implements BackendFactory {
 
 			Version luceneVersion = getLuceneVersion( eventContext, propertySource );
 
-			directoryProviderHolder = getDirectoryProvider( eventContext, buildContext, propertySource );
-
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
@@ -86,7 +83,6 @@ public class LuceneBackendFactory implements BackendFactory {
 			return new LuceneBackendImpl(
 					eventContext,
 					backendThreads,
-					directoryProviderHolder,
 					new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 					analysisDefinitionRegistry,
 					multiTenancyStrategy,
@@ -122,16 +118,6 @@ public class LuceneBackendFactory implements BackendFactory {
 			luceneVersion = latestVersion;
 		}
 		return luceneVersion;
-	}
-
-	private BeanHolder<? extends DirectoryProvider> getDirectoryProvider(EventContext backendContext,
-			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
-		DirectoryProviderInitializationContextImpl initializationContext = new DirectoryProviderInitializationContextImpl(
-				backendContext,
-				buildContext.beanResolver(),
-				propertySource.withMask( "directory" )
-		);
-		return initializationContext.createDirectoryProvider();
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {

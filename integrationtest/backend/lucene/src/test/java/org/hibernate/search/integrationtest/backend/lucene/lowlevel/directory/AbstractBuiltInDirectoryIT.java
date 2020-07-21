@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
@@ -82,12 +82,12 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
 	public void lockingStrategy_invalid() {
 		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
-				LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+				LuceneIndexSettings.DIRECTORY_LOCKING_STRATEGY,
 				"some_invalid_name"
 		) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.indexContext( index.name() )
 						.failure(
 								"Invalid locking strategy name",
 								"'some_invalid_name'",
@@ -113,7 +113,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		setup( c -> {
 			if ( strategyName != null ) {
 				c.withBackendProperty(
-						LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+						LuceneIndexSettings.DIRECTORY_LOCKING_STRATEGY,
 						strategyName
 				);
 			}
@@ -139,7 +139,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
 	private void testInvalidFSLockingStrategy(String strategyName) {
 		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
-				LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+				LuceneIndexSettings.DIRECTORY_LOCKING_STRATEGY,
 				strategyName
 		) ) )
 				.isInstanceOf( SearchException.class )

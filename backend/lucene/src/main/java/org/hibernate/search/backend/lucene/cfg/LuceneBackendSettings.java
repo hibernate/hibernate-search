@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.cfg;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
-import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 
 import org.apache.lucene.util.Version;
@@ -47,52 +46,34 @@ public final class LuceneBackendSettings {
 	public static final String LUCENE_VERSION = "lucene_version";
 
 	/**
-	 * The prefix for directory-related property keys.
+	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_PREFIX} instead.
 	 */
+	@Deprecated
 	public static final String DIRECTORY_PREFIX = "directory.";
 
 	/**
-	 * The type of directory to use when reading from or writing to the index.
-	 * <p>
-	 * Expects a String, such as "local-filesystem".
-	 * See the reference documentation for a list of available values.
-	 * <p>
-	 * Defaults to {@link Defaults#DIRECTORY_TYPE}.
+	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_TYPE} instead.
 	 */
+	@Deprecated
 	public static final String DIRECTORY_TYPE = DIRECTORY_PREFIX + DirectoryRadicals.TYPE;
 
 	/**
-	 * The filesystem root for directories.
-	 * <p>
-	 * Only available for the "local-filesystem" directory type.
-	 * <p>
-	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local-filesystem".
-	 * <p>
-	 * The actual index files will be created in {@code <root>/<index name>}.
-	 * <p>
-	 * Defaults to the JVM's working directory ({@link Defaults#DIRECTORY_ROOT}).
+	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_ROOT} instead.
 	 */
+	@Deprecated
 	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
 
 	/**
-	 * The locking strategy for directories.
-	 * <p>
-	 * Expects a {@link LockingStrategyName} value, or a String representation of such value.
-	 * <p>
-	 * Defaults are specific to each directory type.
+	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_LOCKING_STRATEGY} instead.
 	 */
+	@Deprecated
 	public static final String DIRECTORY_LOCKING_STRATEGY =
 			DIRECTORY_PREFIX + DirectoryRadicals.LOCKING_STRATEGY;
 
 	/**
-	 * The filesystem access strategy for directories.
-	 * <p>
-	 * Only available for the "local-filesystem" directory type.
-	 * <p>
-	 * Expects a {@link FileSystemAccessStrategyName} value, or a String representation of such value.
-	 * <p>
-	 * Defaults to {@link Defaults#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY}.
+	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY} instead.
 	 */
+	@Deprecated
 	public static final String DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
 			DIRECTORY_PREFIX + DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY;
 
@@ -131,8 +112,9 @@ public final class LuceneBackendSettings {
 	public static final String THREAD_POOL_SIZE = "thread_pool.size";
 
 	/**
-	 * Configuration property keys for directories without the {@link #DIRECTORY_PREFIX prefix}.
+	 * @deprecated Use {@link LuceneIndexSettings.DirectoryRadicals} instead.
 	 */
+	@Deprecated
 	public static final class DirectoryRadicals {
 
 		private DirectoryRadicals() {
@@ -154,10 +136,22 @@ public final class LuceneBackendSettings {
 
 		public static final Version LUCENE_VERSION = Version.LATEST;
 
+		/**
+		 * @deprecated Use {@link LuceneIndexSettings.Defaults#DIRECTORY_TYPE} instead.
+		 */
+		@Deprecated
 		public static final String DIRECTORY_TYPE = "local-filesystem";
 
+		/**
+		 * @deprecated Use {@link LuceneIndexSettings.Defaults#DIRECTORY_ROOT} instead.
+		 */
+		@Deprecated
 		public static final String DIRECTORY_ROOT = ".";
 
+		/**
+		 * @deprecated Use {@link LuceneIndexSettings.Defaults#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY} instead.
+		 */
+		@Deprecated
 		public static final FileSystemAccessStrategyName DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
 				FileSystemAccessStrategyName.AUTO;
 

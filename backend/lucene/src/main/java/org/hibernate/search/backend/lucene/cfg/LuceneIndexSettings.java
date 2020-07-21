@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.cfg;
 
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
+import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
+import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
 
 import org.apache.lucene.index.IndexWriterConfig;
@@ -23,6 +25,55 @@ public final class LuceneIndexSettings {
 
 	private LuceneIndexSettings() {
 	}
+
+	/**
+	 * The prefix for directory-related property keys.
+	 */
+	public static final String DIRECTORY_PREFIX = "directory.";
+
+	/**
+	 * The type of directory to use when reading from or writing to the index.
+	 * <p>
+	 * Expects a String, such as "local-filesystem".
+	 * See the reference documentation for a list of available values.
+	 * <p>
+	 * Defaults to {@link Defaults#DIRECTORY_TYPE}.
+	 */
+	public static final String DIRECTORY_TYPE = DIRECTORY_PREFIX + DirectoryRadicals.TYPE;
+
+	/**
+	 * The filesystem root the directory.
+	 * <p>
+	 * Only available for the "local-filesystem" directory type.
+	 * <p>
+	 * Expects a String representing a path to an existing directory accessible in read and write mode, such as "local-filesystem".
+	 * <p>
+	 * The actual index files will be created in directory {@code <root>/<index name>}.
+	 * <p>
+	 * Defaults to the JVM's working directory ({@link Defaults#DIRECTORY_ROOT}).
+	 */
+	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
+
+	/**
+	 * The locking strategy the directory.
+	 * <p>
+	 * Expects a {@link LockingStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults are specific to each directory type.
+	 */
+	public static final String DIRECTORY_LOCKING_STRATEGY = DIRECTORY_PREFIX + DirectoryRadicals.LOCKING_STRATEGY;
+
+	/**
+	 * The filesystem access strategy for the directory.
+	 * <p>
+	 * Only available for the "local-filesystem" directory type.
+	 * <p>
+	 * Expects a {@link FileSystemAccessStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY}.
+	 */
+	public static final String DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
+			DIRECTORY_PREFIX + DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY;
 
 	/**
 	 * The prefix for I/O-related property keys.
@@ -284,6 +335,20 @@ public final class LuceneIndexSettings {
 	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
 
 	/**
+	 * Configuration property keys for directories without the {@link #DIRECTORY_PREFIX prefix}.
+	 */
+	public static final class DirectoryRadicals {
+
+		private DirectoryRadicals() {
+		}
+
+		public static final String TYPE = "type";
+		public static final String ROOT = "root";
+		public static final String LOCKING_STRATEGY = "locking.strategy";
+		public static final String FILESYSTEM_ACCESS_STRATEGY = "filesystem_access.strategy";
+	}
+
+	/**
 	 * Configuration property keys for I/O, without the {@link #IO_PREFIX prefix}.
 	 */
 	public static final class IORadicals {
@@ -360,6 +425,10 @@ public final class LuceneIndexSettings {
 		private Defaults() {
 		}
 
+		public static final String DIRECTORY_TYPE = "local-filesystem";
+		public static final String DIRECTORY_ROOT = ".";
+		public static final FileSystemAccessStrategyName DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
+				FileSystemAccessStrategyName.AUTO;
 		public static final String SHARDING_STRATEGY = "none";
 		public static final IOStrategyName IO_STRATEGY = IOStrategyName.NEAR_REAL_TIME;
 		public static final int IO_COMMIT_INTERVAL = 1000;

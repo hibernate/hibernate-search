@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -71,7 +71,7 @@ public abstract class AbstractDirectoryIT {
 				setupHelper.start()
 						.withIndex( index )
 						.withBackendProperty(
-								LuceneBackendSettings.DIRECTORY_TYPE, directoryType
+								LuceneIndexSettings.DIRECTORY_TYPE, directoryType
 						)
 		)
 				.setup();
