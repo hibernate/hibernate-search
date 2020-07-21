@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
@@ -178,6 +179,15 @@ public class SearchSetupHelper implements TestRule {
 				return withProperty( EngineSettings.BACKEND + "." + keyRadical, value );
 			}
 			return withProperty( EngineSettings.BACKENDS + "." + backendName + "." + keyRadical, value );
+		}
+
+		public SetupContext withIndexProperty(String indexName, String keyRadical, Object value) {
+			return withIndexProperty( null, indexName, keyRadical, value );
+		}
+
+		public SetupContext withIndexProperty(String backendName, String indexName, String keyRadical, Object value) {
+			return withBackendProperty( backendName,
+					BackendSettings.INDEXES + "." + indexName + "." + keyRadical, value );
 		}
 
 		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {
