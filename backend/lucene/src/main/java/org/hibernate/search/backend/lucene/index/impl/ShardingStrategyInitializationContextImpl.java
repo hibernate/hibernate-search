@@ -46,10 +46,14 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 					) )
 					.build();
 
+	private static final ConfigurationProperty<BeanReference<? extends DirectoryProvider>> DIRECTORY_TYPE =
+			ConfigurationProperty.forKey( LuceneIndexSettings.DIRECTORY_TYPE )
+					.asBeanReference( DirectoryProvider.class )
+					.withDefault( BeanReference.of( DirectoryProvider.class, LuceneIndexSettings.Defaults.DIRECTORY_TYPE ) )
+					.build();
+
 	private final IndexManagerBackendContext backendContext;
 	private final LuceneIndexModel model;
-	private final DirectoryProvider directoryProvider;
-	private final IOStrategy ioStrategy;
 	private final IndexManagerStartContext startContext;
 	private final ConfigurationPropertySource indexPropertySource;
 	private final ConfigurationPropertySource shardingPropertySource;
@@ -57,13 +61,10 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 	private Set<String> shardIdentifiers = new LinkedHashSet<>();
 
 	ShardingStrategyInitializationContextImpl(IndexManagerBackendContext backendContext,
-			LuceneIndexModel model, DirectoryProvider directoryProvider, IOStrategy ioStrategy,
-			IndexManagerStartContext startContext,
+			LuceneIndexModel model, IndexManagerStartContext startContext,
 			ConfigurationPropertySource indexPropertySource) {
 		this.backendContext = backendContext;
 		this.model = model;
-		this.directoryProvider = directoryProvider;
-		this.ioStrategy = ioStrategy;
 		this.startContext = startContext;
 		this.indexPropertySource = indexPropertySource;
 		this.shardingPropertySource = indexPropertySource.withMask( "sharding" );
@@ -121,15 +122,24 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 	}
 
 	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId) {
+		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( indexName(), shardId );
+		ConfigurationPropertySource shardPropertySource =
+				shardId.isPresent() ?
+						indexPropertySource.withMask( LuceneIndexSettings.SHARDS ).withMask( shardId.get() )
+								.withFallback( indexPropertySource )
+						: indexPropertySource;
+
 		DirectoryHolder directoryHolder = null;
-		try {
-			EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( indexName(), shardId );
+		try ( BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
+				DIRECTORY_TYPE.getAndTransform( shardPropertySource, startContext.beanResolver()::resolve ) ) {
 			DirectoryCreationContext context = new DirectoryCreationContextImpl( shardEventContext,
-					indexName(), shardId, beanResolver(), indexPropertySource.withMask( "directory" ) );
-			directoryHolder = directoryProvider.createDirectoryHolder( context );
+					indexName(), shardId, beanResolver(), shardPropertySource.withMask( "directory" ) );
+			directoryHolder = directoryProviderHolder.get().createDirectoryHolder( context );
+
+			IOStrategy ioStrategy = backendContext.createIOStrategy( shardPropertySource );
 
 			Shard shard = backendContext.createShard( model, shardEventContext, directoryHolder, ioStrategy,
-					indexPropertySource );
+					shardPropertySource );
 			shardCollector.put( shardId.orElse( null ), shard );
 		}
 		catch (RuntimeException e) {
