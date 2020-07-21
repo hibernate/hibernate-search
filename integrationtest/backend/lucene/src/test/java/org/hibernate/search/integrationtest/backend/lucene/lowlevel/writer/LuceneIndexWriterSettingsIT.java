@@ -158,7 +158,7 @@ public class LuceneIndexWriterSettingsIT {
 	private void setup(Consumer<BiConsumer<String, Object>> propertyContributor) {
 		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withIndex( index );
-		propertyContributor.accept( setupContext::withIndexDefaultsProperty );
+		propertyContributor.accept( setupContext::withBackendProperty );
 		setupContext.setup();
 	}
 }

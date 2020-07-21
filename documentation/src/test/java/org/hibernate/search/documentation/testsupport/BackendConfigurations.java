@@ -37,10 +37,10 @@ public final class BackendConfigurations {
 					public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 							String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 						return super.setup( setupContext, backendNameOrNull, configurationProvider )
-								.withIndexDefaultsProperty(
+								.withBackendProperty(
 										backendNameOrNull, LuceneIndexSettings.SHARDING_STRATEGY, "hash"
 								)
-								.withIndexDefaultsProperty(
+								.withBackendProperty(
 										backendNameOrNull, LuceneIndexSettings.SHARDING_NUMBER_OF_SHARDS, shardCount
 								);
 					}

@@ -122,6 +122,19 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
 				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backend.foo" ) )
+				.andReturn( (Optional) Optional.of( "bar" ) );
+		replayAll();
+		result = indexPropertySourceCapture.getValue().get( "foo" );
+		verifyAll();
+		assertThat( result ).contains( "bar" );
+
+		// Legacy "index_defaults"
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
+				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backend.foo" ) )
+				.andReturn( (Optional) Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backend.index_defaults.foo" ) )
 				.andReturn( (Optional) Optional.of( "bar" ) );
 		replayAll();
@@ -227,6 +240,25 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( (Optional) Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
 				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backend.foo" ) )
+				.andReturn( (Optional) Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.foo" ) )
+				.andReturn( (Optional) Optional.of( "bar" ) );
+		replayAll();
+		result = indexPropertySourceCapture.getValue().get( "foo" );
+		verifyAll();
+		assertThat( result ).contains( "bar" );
+
+		// Legacy "index_defaults"
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
+				.andReturn( (Optional) Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
+				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backend.foo" ) )
+				.andReturn( (Optional) Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.foo" ) )
+				.andReturn( (Optional) Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backend.index_defaults.foo" ) )
 				.andReturn( (Optional) Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
@@ -320,6 +352,19 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		// Index configuration defaults
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
+				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.foo" ) )
+				.andReturn( (Optional) Optional.of( "bar" ) );
+		replayAll();
+		result = indexPropertySourceCapture.getValue().get( "foo" );
+		verifyAll();
+		assertThat( result ).contains( "bar" );
+
+		// Legacy "index_defaults"
+		resetAll();
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
+				.andReturn( Optional.empty() );
+		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.foo" ) )
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
 				.andReturn( (Optional) Optional.of( "bar" ) );

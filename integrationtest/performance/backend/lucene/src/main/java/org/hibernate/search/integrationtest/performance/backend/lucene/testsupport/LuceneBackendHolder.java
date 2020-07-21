@@ -29,8 +29,7 @@ public class LuceneBackendHolder extends AbstractBackendHolder {
 	 * Multiple configurations can be tested by providing multiple values for this parameter,
 	 * e.g. {@code foo=1&bar=2,foo=2&bar=1} for two configurations setting {@code foo} and {@code bar} to different values.
 	 * <p>
-	 * Note that configuration properties are applied both at the backend level and at the index level,
-	 * so using the "index_defaults." prefix is optional when setting index-level properties.
+	 * Note that configuration properties are applied both at the backend level and at the index level.
 	 */
 	@Param({ "", "io.refresh_interval=1000" })
 	private String configuration;

@@ -32,8 +32,8 @@ public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 
 	@Override
 	protected void configure(SearchSetupHelper.SetupContext setupContext) {
-		setupContext.withIndexDefaultsProperty( LuceneIndexSettings.SHARDING_STRATEGY, "explicit" )
-				.withIndexDefaultsProperty(
+		setupContext.withBackendProperty( LuceneIndexSettings.SHARDING_STRATEGY, "explicit" )
+				.withBackendProperty(
 						LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS,
 						SHARD_ID_1 + "," + SHARD_ID_2 + "," + SHARD_ID_3
 				);

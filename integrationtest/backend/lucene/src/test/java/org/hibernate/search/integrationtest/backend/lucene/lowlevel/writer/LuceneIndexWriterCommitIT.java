@@ -159,8 +159,8 @@ public class LuceneIndexWriterCommitIT {
 		return setupHelper.start()
 				.withSchemaManagement( schemaManagementStrategy )
 				.withIndex( index )
-				.withIndexDefaultsProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )
-				.withIndexDefaultsProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )
+				.withBackendProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )
+				.withBackendProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )
 				.setup();
 	}
 }

@@ -20,7 +20,7 @@ public interface BackendFactory {
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
 	 * can be accessed at the root.
 	 * <strong>CAUTION:</strong> the property keys listed in {@link BackendSettings},
-	 * in particular {@value BackendSettings#TYPE}, {@value BackendSettings#INDEXES} and {@value BackendSettings#INDEX_DEFAULTS},
+	 * in particular {@value BackendSettings#TYPE} and {@value BackendSettings#INDEXES}
 	 * are reserved for use by the engine.
 	 * @return A backend.
 	 */

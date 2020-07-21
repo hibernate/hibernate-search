@@ -133,11 +133,11 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 						}
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndexDefaultsProperty(
+				.withBackendProperty(
 						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS,
 						IndexStatus.GREEN.externalRepresentation()
 				)
-				.withIndexDefaultsProperty(
+				.withBackendProperty(
 						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
 				)

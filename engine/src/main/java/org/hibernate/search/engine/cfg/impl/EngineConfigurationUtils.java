@@ -38,11 +38,13 @@ public final class EngineConfigurationUtils {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static ConfigurationPropertySourceExtractor extractorForIndex(
 			ConfigurationPropertySourceExtractor extractorForBackend, String indexName) {
 		return engineSource -> {
 			ConfigurationPropertySource backendSource = extractorForBackend.extract( engineSource );
 			return backendSource.withMask( BackendSettings.INDEXES ).withMask( indexName )
+					.withFallback( backendSource )
 					.withFallback( backendSource.withMask( BackendSettings.INDEX_DEFAULTS ) );
 		};
 	}

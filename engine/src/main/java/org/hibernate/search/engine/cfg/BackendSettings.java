@@ -35,7 +35,13 @@ public final class BackendSettings {
 
 	/**
 	 * The root property whose children are default properties to be applied to all indexes of this backend.
+	 *
+	 * @deprecated To set defaults for a particular configuration property for all indexes in a backend,
+	 * just set the configuration property at the backend level.
+	 * E.g. instead of {@code hibernate.search.backend.index_defaults.indexing.queue_size}
+	 * set {@code hibernate.search.backend.indexing.queue_size}.
 	 */
+	@Deprecated
 	public static final String INDEX_DEFAULTS = "index_defaults";
 
 	/**

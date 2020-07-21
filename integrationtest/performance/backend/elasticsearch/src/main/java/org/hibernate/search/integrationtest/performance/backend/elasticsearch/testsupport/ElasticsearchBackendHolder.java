@@ -12,7 +12,6 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
@@ -31,8 +30,7 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 	 * Multiple configurations can be tested by providing multiple values for this parameter,
 	 * e.g. {@code foo=1&bar=2,foo=2&bar=1} for two configurations setting {@code foo} and {@code bar} to different values.
 	 * <p>
-	 * Note that configuration properties are applied both at the backend level and at the index level,
-	 * so using the "index_defaults." prefix is optional when setting index-level properties.
+	 * Note that configuration properties are applied both at the backend level and at the index level.
 	 */
 	@Param({ "", "max_connections_per_route=1" })
 	private String configuration;
@@ -45,10 +43,7 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 		// e.g. "hosts" or "aws.signing.enabled".
 		map.put( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, ElasticsearchPerformanceAnalysisConfigurer.class );
 
-		map.put(
-				BackendSettings.INDEX_DEFAULTS + "." + ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS,
-				IndexStatus.YELLOW
-		);
+		map.put( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS, IndexStatus.YELLOW );
 
 		return ConfigurationPropertySource.fromMap( map );
 	}

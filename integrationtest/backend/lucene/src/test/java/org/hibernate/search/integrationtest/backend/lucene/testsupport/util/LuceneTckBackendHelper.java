@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
-import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
@@ -47,17 +46,13 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	@Override
 	public TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount) {
 		return new LuceneTckBackendSetupStrategy()
-				.setProperty( BackendSettings.INDEX_DEFAULTS + ".sharding.strategy", "hash" )
-				.setProperty( BackendSettings.INDEX_DEFAULTS + ".sharding.number_of_shards",
-						String.valueOf( shardCount ) );
+				.setProperty( "sharding.strategy", "hash" )
+				.setProperty( "sharding.number_of_shards", String.valueOf( shardCount ) );
 	}
 
 	@Override
 	public TckBackendSetupStrategy createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
 		return new LuceneTckBackendSetupStrategy()
-				.setProperty(
-						BackendSettings.INDEX_DEFAULTS + ".io.refresh_interval",
-						String.valueOf( refreshIntervalMs )
-				);
+				.setProperty( "io.refresh_interval", String.valueOf( refreshIntervalMs ) );
 	}
 }
