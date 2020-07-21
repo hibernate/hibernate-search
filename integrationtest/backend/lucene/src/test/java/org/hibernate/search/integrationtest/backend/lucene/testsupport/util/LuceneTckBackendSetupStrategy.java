@@ -21,17 +21,17 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 
 import org.junit.rules.TestRule;
 
-class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
+public class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
 
 	private final Map<String, Object> properties = new LinkedHashMap<>();
 
-	LuceneTckBackendSetupStrategy() {
+	public LuceneTckBackendSetupStrategy() {
 		setProperty( "directory.root", LuceneTestIndexesPathConfiguration.get().getPath()
 				+ "/#{test.startup.timestamp}/#{test.id}/" );
 		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
 	}
 
-	LuceneTckBackendSetupStrategy setProperty(String key, Object value) {
+	public LuceneTckBackendSetupStrategy setProperty(String key, Object value) {
 		properties.put( key, value );
 		return this;
 	}
