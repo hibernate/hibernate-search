@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
@@ -20,20 +19,10 @@ public class LocalHeapDirectoryProvider implements DirectoryProvider {
 
 	public static final String NAME = "local-heap";
 
-	private Supplier<LockFactory> lockFactorySupplier;
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
-
-	@Override
-	public void initialize(DirectoryProviderInitializationContext context) {
-		this.lockFactorySupplier = context.createConfiguredLockFactorySupplier().orElseGet( () -> SingleInstanceLockFactory::new );
-	}
-
 	@Override
 	public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
+		Supplier<LockFactory> lockFactorySupplier = context.createConfiguredLockFactorySupplier()
+				.orElseGet( () -> SingleInstanceLockFactory::new );
 		return new LocalHeapDirectoryHolder( lockFactorySupplier.get() );
 	}
 }

@@ -92,7 +92,6 @@ public class LuceneBackendFactory implements BackendFactory {
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), directoryProviderHolder )
 					.push( BeanHolder::close, directoryProviderHolder )
 					.push( BackendThreads::onStop, backendThreads );
 			throw e;

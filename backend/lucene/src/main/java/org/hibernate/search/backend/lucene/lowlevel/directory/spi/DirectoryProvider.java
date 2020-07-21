@@ -6,26 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.spi;
 
-public interface DirectoryProvider extends AutoCloseable {
-
-	/**
-	 * @param context The initialization context, giving access to configuration and environment.
-	 */
-	void initialize(DirectoryProviderInitializationContext context);
-
-	/**
-	 * Release any resource currently held by the {@link DirectoryProvider}.
-	 * <p>
-	 * Per-directory resources do not have to be released here,
-	 * as they will be released by calls to {@link DirectoryHolder#close()}.
-	 * <p>
-	 * After this method has been called, the result of calling any other method on the same instance is undefined.
-	 *
-	 * @throws RuntimeException If an error occurs while releasing resources.
-	 */
-	@Override
-	default void close() {
-	}
+public interface DirectoryProvider {
 
 	/**
 	 * Creates a {@link DirectoryHolder} for a given name,

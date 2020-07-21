@@ -14,7 +14,6 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.assertj.core.api.Assertions;
@@ -43,11 +42,9 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		) );
 
 		assertThat( staticCounters.get( CustomDirectoryProvider.CONSTRUCTOR_COUNTER_KEY ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CustomDirectoryProvider.INITIALIZE_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CREATE_DIRECTORY_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_START_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_CLOSE_COUNTER_KEY ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CustomDirectoryProvider.CLOSE_COUNTER_KEY ) ).isEqualTo( 0 );
 
 		checkIndexingAndQuerying();
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_GET_COUNTER_KEY ) ).isGreaterThan( 1 );
@@ -55,11 +52,9 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		searchIntegration.close();
 
 		assertThat( staticCounters.get( CustomDirectoryProvider.CONSTRUCTOR_COUNTER_KEY ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CustomDirectoryProvider.INITIALIZE_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CREATE_DIRECTORY_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_START_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_CLOSE_COUNTER_KEY ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CustomDirectoryProvider.CLOSE_COUNTER_KEY ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -84,35 +79,17 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 
 	public static class CustomDirectoryProvider implements DirectoryProvider {
 
-		private static String CONFIGURATION_PROPERTY_KEY_RADICAL = "myConfigurationProperty";
-		private static String CONFIGURATION_PROPERTY_EXPECTED_VALUE = "someValue";
+		private static final String CONFIGURATION_PROPERTY_KEY_RADICAL = "myConfigurationProperty";
+		private static final String CONFIGURATION_PROPERTY_EXPECTED_VALUE = "someValue";
 
 		private static final StaticCounters.Key CONSTRUCTOR_COUNTER_KEY = StaticCounters.createKey();
-		private static final StaticCounters.Key INITIALIZE_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key CREATE_DIRECTORY_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key DIRECTORY_HOLDER_START_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key DIRECTORY_HOLDER_GET_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key DIRECTORY_HOLDER_CLOSE_COUNTER_KEY = StaticCounters.createKey();
-		private static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
 
 		public CustomDirectoryProvider() {
 			StaticCounters.get().increment( CONSTRUCTOR_COUNTER_KEY );
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public void initialize(DirectoryProviderInitializationContext context) {
-			StaticCounters.get().increment( INITIALIZE_COUNTER_KEY );
-			assertThat( context ).isNotNull();
-			Optional<?> actualConfigurationPropertyValue = context.configurationPropertySource()
-					.get( CONFIGURATION_PROPERTY_KEY_RADICAL );
-			assertThat( (Optional) actualConfigurationPropertyValue )
-					.contains( CONFIGURATION_PROPERTY_EXPECTED_VALUE );
-		}
-
-		@Override
-		public void close() {
-			StaticCounters.get().increment( CLOSE_COUNTER_KEY );
 		}
 
 		@Override
@@ -120,6 +97,10 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 			StaticCounters.get().increment( CREATE_DIRECTORY_COUNTER_KEY );
 			assertThat( context ).isNotNull();
 			assertThat( context.indexName() ).isEqualTo( index.name() );
+			Optional<?> actualConfigurationPropertyValue = context.configurationPropertySource()
+					.get( CONFIGURATION_PROPERTY_KEY_RADICAL );
+			assertThat( (Optional) actualConfigurationPropertyValue )
+					.contains( CONFIGURATION_PROPERTY_EXPECTED_VALUE );
 			return new DirectoryHolder() {
 				Directory directory;
 				@Override

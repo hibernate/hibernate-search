@@ -17,6 +17,10 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategyInitializationContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -26,7 +30,9 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 class ShardingStrategyInitializationContextImpl implements ShardingStrategyInitializationContext {
 
@@ -41,22 +47,23 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 					.build();
 
 	private final IndexManagerBackendContext backendContext;
-	private final IOStrategy ioStrategy;
 	private final LuceneIndexModel model;
+	private final DirectoryProvider directoryProvider;
+	private final IOStrategy ioStrategy;
 	private final IndexManagerStartContext startContext;
 	private final ConfigurationPropertySource indexPropertySource;
 	private final ConfigurationPropertySource shardingPropertySource;
 
 	private Set<String> shardIdentifiers = new LinkedHashSet<>();
 
-	ShardingStrategyInitializationContextImpl(
-			IndexManagerBackendContext backendContext,
-			IOStrategy ioStrategy, LuceneIndexModel model,
+	ShardingStrategyInitializationContextImpl(IndexManagerBackendContext backendContext,
+			LuceneIndexModel model, DirectoryProvider directoryProvider, IOStrategy ioStrategy,
 			IndexManagerStartContext startContext,
 			ConfigurationPropertySource indexPropertySource) {
 		this.backendContext = backendContext;
-		this.ioStrategy = ioStrategy;
 		this.model = model;
+		this.directoryProvider = directoryProvider;
+		this.ioStrategy = ioStrategy;
 		this.startContext = startContext;
 		this.indexPropertySource = indexPropertySource;
 		this.shardingPropertySource = indexPropertySource.withMask( "sharding" );
@@ -114,13 +121,20 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 	}
 
 	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId) {
+		DirectoryHolder directoryHolder = null;
 		try {
-			Shard shard = backendContext.createShard(
-					ioStrategy, model, shardId, indexPropertySource
-			);
+			EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( indexName(), shardId );
+			DirectoryCreationContext context = new DirectoryCreationContextImpl( shardEventContext,
+					indexName(), shardId, beanResolver(), indexPropertySource.withMask( "directory" ) );
+			directoryHolder = directoryProvider.createDirectoryHolder( context );
+
+			Shard shard = backendContext.createShard( model, shardEventContext, directoryHolder, ioStrategy,
+					indexPropertySource );
 			shardCollector.put( shardId.orElse( null ), shard );
 		}
 		catch (RuntimeException e) {
+			new SuppressingCloser( e ).push( directoryHolder );
+
 			ContextualFailureCollector failureCollector = startContext.failureCollector();
 			if ( shardId.isPresent() ) {
 				failureCollector = failureCollector.withContext( EventContexts.fromShardId( shardId.get() ) );
