@@ -9,15 +9,20 @@ package org.hibernate.search.integrationtest.backend.lucene.sharding;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
+import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneTckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.sharding.AbstractShardingRoutingKeyIT;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
  * A basic test for explicit sharding with explicit routing keys.
  */
 public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
+
+	protected static LuceneTckBackendSetupStrategy explicitShardingBackendSetupStrategy(Set<String> shardIds) {
+		return new LuceneTckBackendSetupStrategy()
+				.setProperty( LuceneIndexSettings.SHARDING_STRATEGY, "explicit" )
+				.setProperty( LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS, String.join( ",", shardIds ) );
+	}
 
 	private static final String SHARD_ID_1 = "first";
 	private static final String SHARD_ID_2 = "second";
@@ -27,16 +32,7 @@ public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 	);
 
 	public ShardingExplicitIT() {
-		super( TckBackendHelper::createDefaultBackendSetupStrategy, SHARD_IDS );
-	}
-
-	@Override
-	protected void configure(SearchSetupHelper.SetupContext setupContext) {
-		setupContext.withBackendProperty( LuceneIndexSettings.SHARDING_STRATEGY, "explicit" )
-				.withBackendProperty(
-						LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS,
-						SHARD_ID_1 + "," + SHARD_ID_2 + "," + SHARD_ID_3
-				);
+		super( ignored -> explicitShardingBackendSetupStrategy( SHARD_IDS ), SHARD_IDS );
 	}
 
 }

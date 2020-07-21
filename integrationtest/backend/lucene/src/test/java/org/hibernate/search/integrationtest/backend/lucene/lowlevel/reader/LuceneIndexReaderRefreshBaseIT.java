@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized;
 import org.awaitility.Awaitility;
 
 @RunWith(Parameterized.class)
-public class LuceneIndexReaderRefreshIT {
+public class LuceneIndexReaderRefreshBaseIT {
 
 	/*
 	 * Pick a value that is:
@@ -63,7 +63,7 @@ public class LuceneIndexReaderRefreshIT {
 	private final DocumentCommitStrategy commitStrategy;
 	private final Integer commitInterval;
 
-	public LuceneIndexReaderRefreshIT(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+	public LuceneIndexReaderRefreshBaseIT(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
 		this.commitStrategy = commitStrategy;
 		this.commitInterval = commitInterval;
 	}
