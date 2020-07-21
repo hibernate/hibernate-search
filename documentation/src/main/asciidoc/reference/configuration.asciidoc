@@ -133,19 +133,19 @@ or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/Luce
 
 IndexSettings::
 +
-`IndexSettings.indexDefaultsKey(ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
-is equivalent to `hibernate.search.backend.index_defaults.lifecycle.minimal_required_status`.
+`IndexSettings.indexDefaultsKey(ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
+is equivalent to `hibernate.search.backend.index_defaults.indexing.queue_size`.
 +
-`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
-is equivalent to `hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status`.
+`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
+is equivalent to `hibernate.search.backends.myBackend.index_defaults.indexing.queue_size`.
 +
 For a list of available property keys,
 see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[ElasticsearchIndexSettings]
 or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[LuceneIndexSettings]
 [TIP]
 ====
-You can also use `IndexSettings.indexKey("myIndex", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
-or `IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)`
+You can also use `IndexSettings.indexKey("myIndex", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
+or `IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE)`
 to apply a configuration to a specific index.
 ====
 

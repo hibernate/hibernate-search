@@ -26,7 +26,7 @@ public final class IndexSettings {
 	 * <p>
 	 * See the javadoc of your backend for available radicals.
 	 * </p>
-	 * Example result: "{@code hibernate.search.backend.index_defaults.lifecycle.strategy}"
+	 * Example result: "{@code hibernate.search.backend.index_defaults.indexing.queue_size}"
 	 *
 	 * @param radical The radical of the configuration property (see constants in
 	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
@@ -42,9 +42,9 @@ public final class IndexSettings {
 	 * <p>
 	 * See the javadoc of your backend for available radicals.
 	 * </p>
-	 * Example result: "{@code hibernate.search.backend.indexes.<indexName>.lifecycle.strategy}"
+	 * Example result: "{@code hibernate.search.backend.indexes.myIndex.indexing.queue_size}"
 	 *
-	 * @param indexName Expect the specific targeted index name
+	 * @param indexName The name of the index to configure.
 	 * @param radical The radical of the configuration property (see constants in
 	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
@@ -59,9 +59,9 @@ public final class IndexSettings {
 	 * <p>
 	 * See the javadoc of your backend for available radicals.
 	 * </p>
-	 * Example result: "{@code hibernate.search.backends.<backendName>.index_defaults.lifecycle.strategy}"
+	 * Example result: "{@code hibernate.search.backends.myBackend.index_defaults.indexing.queue_size}"
 	 *
-	 * @param backendName Expect the backendName
+	 * @param backendName The name of the backend in which the indexes to configure are located.
 	 * @param radical The radical of the configuration property (see constants in
 	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
@@ -79,10 +79,10 @@ public final class IndexSettings {
 	 * <p>
 	 * See the javadoc of your backend for available radicals.
 	 * </p>
-	 * Example result: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.lifecycle.strategy}"
+	 * Example result: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.indexing.queue_size}"
 	 *
-	 * @param backendName Expect the backendName
-	 * @param indexName Expect the specific targeted index name
+	 * @param backendName The name of the backend in which the index to configure is located.
+	 * @param indexName The name of the index to configure.
 	 * @param radical The radical of the configuration property (see constants in
 	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
