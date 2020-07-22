@@ -233,7 +233,7 @@ public class ContainerExtractorBinder {
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
-	private class SingleExtractorContributor implements ExtractorContributor {
+	private static class SingleExtractorContributor implements ExtractorContributor {
 		private final ExtractingTypePatternMatcher typePatternMatcher;
 		private final String extractorName;
 		private final Class<? extends ContainerExtractor> extractorClass;
