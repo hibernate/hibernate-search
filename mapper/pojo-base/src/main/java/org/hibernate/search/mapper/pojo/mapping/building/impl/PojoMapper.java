@@ -121,7 +121,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
 		extractorBinder = new ContainerExtractorBinder( buildContext, containerExtractorRegistry, typePatternMatcherFactory );
 
-		BridgeResolver bridgeResolver = new BridgeResolver( typePatternMatcherFactory );
+		BridgeResolver.Builder bridgeResolverBuilder = new BridgeResolver.Builder( typePatternMatcherFactory );
+
+		BridgeResolver bridgeResolver = bridgeResolverBuilder.build();
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
 				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
