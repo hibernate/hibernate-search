@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+import org.hibernate.search.backend.lucene.common.timing.impl.TimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;

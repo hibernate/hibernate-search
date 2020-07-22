@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+import org.hibernate.search.backend.lucene.common.timing.impl.TimingSource;
 
 import org.apache.lucene.index.DirectoryReader;
 
