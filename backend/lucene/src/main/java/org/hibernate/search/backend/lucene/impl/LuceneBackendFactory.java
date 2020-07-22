@@ -86,7 +86,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 					analysisDefinitionRegistry,
 					multiTenancyStrategy,
-					new DefaultTimingSource(),
+					new DefaultTimingSource( backendThreads ),
 					buildContext.failureHandler()
 			);
 		}
