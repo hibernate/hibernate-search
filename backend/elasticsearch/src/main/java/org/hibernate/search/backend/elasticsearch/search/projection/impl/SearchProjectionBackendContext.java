@@ -23,11 +23,11 @@ public final class SearchProjectionBackendContext {
 	}
 
 	DocumentReferenceExtractionHelper createDocumentReferenceExtractionHelper(ElasticsearchSearchContext context) {
-		Set<String> mappedTypeNames = context.indexes().mappedTypeNames();
+		Set<String> mappedTypeNames = context.indexes().mappedTypeNameToIndex().keySet();
 		ProjectionExtractionHelper<String> mappedTypeNameHelper;
 		if ( mappedTypeNames.size() == 1 ) {
 			// Only one type targeted by the search: use a simpler implementation that will always work.
-			mappedTypeNameHelper = new SingleTypeNameExtractionHelper( context.indexes().mappedTypeNames().iterator().next() );
+			mappedTypeNameHelper = new SingleTypeNameExtractionHelper( mappedTypeNames.iterator().next() );
 		}
 		else {
 			mappedTypeNameHelper = complexMappedTypeNameProjectionExtractionHelper;

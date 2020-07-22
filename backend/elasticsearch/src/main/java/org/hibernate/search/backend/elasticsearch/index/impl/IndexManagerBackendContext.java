@@ -170,13 +170,13 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			ElasticsearchIndexLifecycleExecutionOptions lifecycleExecutionOptions) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
 				link.getIndexMetadataSyntax(),
-				model.getNames()
+				model.names()
 		);
 		model.contributeLowLevelMetadata( builder );
 		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexSchemaManager(
 				link.getWorkBuilderFactory(), generalPurposeOrchestrator,
-				indexLayoutStrategy, model.getNames(), expectedMetadata,
+				indexLayoutStrategy, model.names(), expectedMetadata,
 				lifecycleExecutionOptions
 		);
 	}

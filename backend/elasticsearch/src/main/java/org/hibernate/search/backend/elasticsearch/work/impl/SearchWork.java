@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -97,8 +96,8 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		@Override
-		public Builder<R> indexes(Collection<URLEncodedString> indexNames) {
-			indexes.addAll( indexNames );
+		public SearchWorkBuilder<R> index(URLEncodedString indexName) {
+			indexes.add( indexName );
 			return this;
 		}
 

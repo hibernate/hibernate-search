@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
@@ -21,13 +20,11 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  */
 public interface ElasticsearchSearchIndexesContext {
 
-	Set<String> mappedTypeNames();
+	Collection<ElasticsearchSearchIndexContext> elements();
 
 	Set<String> hibernateSearchIndexNames();
 
-	Collection<URLEncodedString> elasticsearchIndexNames();
-
-	Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames();
+	Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex();
 
 	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 

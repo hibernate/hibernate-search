@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -17,11 +16,14 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
@@ -105,16 +107,18 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
-		// TODO restore scrolling support. See HSEARCH-3323
-		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
-				.indexes( searchContext.indexes().elasticsearchIndexNames() )
-				.paging( defaultedLimit( limit, offset ), offset )
+		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
+				workFactory.search( payload, searchResultExtractor );
+		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
+			builder.index( index.names().getRead() );
+		}
+		builder.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
-				)
-				.build();
+				);
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = builder.build();
 
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
 				/*
@@ -135,14 +139,17 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		NonBulkableWork<Long> work = workFactory.count( searchContext.indexes().elasticsearchIndexNames() )
-				.query( filteredPayload )
+		CountWorkBuilder builder = workFactory.count();
+		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
+			builder.index( index.names().getRead() );
+		}
+		builder.query( filteredPayload )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
-				)
-				.build();
+				);
+		NonBulkableWork<Long> work = builder.build();
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
 	}
 
@@ -150,13 +157,13 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public JsonObject explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames =
-				searchContext.indexes().mappedTypeToElasticsearchIndexNames();
-		if ( mappedTypeNamesToIndexReadNames.size() != 1 ) {
-			throw log.explainRequiresTypeName( mappedTypeNamesToIndexReadNames.keySet() );
+		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
+				searchContext.indexes().mappedTypeNameToIndex();
+		if ( mappedTypeNameToIndex.size() != 1 ) {
+			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
-		return doExplain( mappedTypeNamesToIndexReadNames.values().iterator().next(), id );
+		return doExplain( mappedTypeNameToIndex.values().iterator().next(), id );
 	}
 
 	@Override
@@ -164,12 +171,14 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
-		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames = searchContext.indexes().mappedTypeToElasticsearchIndexNames();
-		if ( !mappedTypeNamesToIndexReadNames.containsKey( typeName ) ) {
-			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNamesToIndexReadNames.keySet(), typeName );
+		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
+				searchContext.indexes().mappedTypeNameToIndex();
+		ElasticsearchSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
+		if ( index == null ) {
+			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
 		}
 
-		return doExplain( mappedTypeNamesToIndexReadNames.get( typeName ), id );
+		return doExplain( index, id );
 	}
 
 	private Integer defaultedLimit(Integer limit, Integer offset) {
@@ -190,7 +199,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 	}
 
-	private JsonObject doExplain(URLEncodedString encodedIndexName, String id) {
+	private JsonObject doExplain(ElasticsearchSearchIndexContext index, String id) {
 		URLEncodedString elasticsearchId = URLEncodedString.fromString(
 				searchContext.documentIdHelper().toElasticsearchId( sessionContext.tenantIdentifier(), id )
 		);
@@ -201,7 +210,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			queryOnlyPayload.add( "query", query );
 		}
 
-		NonBulkableWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, queryOnlyPayload )
+		URLEncodedString indexName = index.names().getRead();
+		NonBulkableWork<ExplainResult> work = workFactory.explain( indexName, elasticsearchId, queryOnlyPayload )
 				.routingKeys( routingKeys )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
