@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -42,7 +43,7 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+	public <T> T submit(Set<String> indexNames, Collection<? extends ReadIndexManagerContext> indexManagerContexts,
 			Set<String> routingKeys, ReadWork<T> work) {
 		WorkExecution<T> workExecution = new WorkExecution<>(
 				similarity, indexNames, indexManagerContexts, routingKeys, work
@@ -100,7 +101,7 @@ public class LuceneSyncWorkOrchestratorImpl
 		private T result;
 
 		WorkExecution(Similarity similarity, Set<String> indexNames,
-				Set<? extends ReadIndexManagerContext> indexManagerContexts,
+				Collection<? extends ReadIndexManagerContext> indexManagerContexts,
 				Set<String> routingKeys, ReadWork<T> work) {
 			this.similarity = similarity;
 			this.indexNames = indexNames;

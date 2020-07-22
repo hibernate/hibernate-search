@@ -8,9 +8,12 @@ package org.hibernate.search.backend.lucene.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +23,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
@@ -40,29 +44,27 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	private static final StringToDocumentIdentifierValueConverter RAW_ID_CONVERTER =
 			new StringToDocumentIdentifierValueConverter();
 
-	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
-	private final Set<String> typeNames;
+	private final Map<String, LuceneScopeIndexManagerContext> mappedTypeNameToIndex;
 	private final Set<String> indexNames;
 
-	public LuceneScopeSearchIndexesContext(Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
-		this.indexManagerContexts = indexManagerContexts;
-		// Use LinkedHashSet to ensure stable order when generating requests
-		this.typeNames = new LinkedHashSet<>();
+	public LuceneScopeSearchIndexesContext(Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
+		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
+		this.mappedTypeNameToIndex = new LinkedHashMap<>();
 		this.indexNames = new LinkedHashSet<>();
 		for ( LuceneScopeIndexManagerContext indexManager : indexManagerContexts ) {
-			this.typeNames.add( indexManager.model().mappedTypeName() );
+			this.mappedTypeNameToIndex.put( indexManager.model().mappedTypeName(), indexManager );
 			this.indexNames.add( indexManager.model().hibernateSearchName() );
 		}
 	}
 
 	@Override
-	public Set<LuceneScopeIndexManagerContext> indexManagerContexts() {
-		return indexManagerContexts;
+	public Collection<LuceneScopeIndexManagerContext> elements() {
+		return mappedTypeNameToIndex.values();
 	}
 
 	@Override
-	public Set<String> typeNames() {
-		return typeNames;
+	public Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex() {
+		return mappedTypeNameToIndex;
 	}
 
 	@Override
@@ -76,7 +78,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			return RAW_ID_CONVERTER;
 		}
 		ToDocumentIdentifierValueConverter<?> converter = null;
-		for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+		for ( LuceneScopeIndexManagerContext index : elements() ) {
 			ToDocumentIdentifierValueConverter<?> converterForIndex = index.model().getIdDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
@@ -97,7 +99,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 		LuceneIndexSchemaValueFieldNode<?> fieldNode = null;
 		String fieldNodeIndexName = null;
 
-		for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+		for ( LuceneScopeIndexManagerContext index : elements() ) {
 			LuceneIndexModel indexModel = index.model();
 			String indexName = indexModel.hibernateSearchName();
 
@@ -148,16 +150,16 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
 	public LuceneSearchValueFieldContext<?> field(String absoluteFieldPath) {
 		LuceneSearchValueFieldContext<?> resultOrNull = null;
-		if ( indexManagerContexts.size() == 1 ) {
+		if ( elements().size() == 1 ) {
 			// Single-index search
-			resultOrNull = indexManagerContexts.iterator().next().model()
+			resultOrNull = elements().iterator().next().model()
 					.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 		}
 		else {
 			// Multi-index search
 			List<LuceneSearchValueFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
-			for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+			for ( LuceneScopeIndexManagerContext index : elements() ) {
 				LuceneIndexModel indexModel = index.model();
 				LuceneIndexSchemaValueFieldNode<?> fieldForCurrentIndex =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
@@ -183,7 +185,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	public void checkNestedField(String absoluteFieldPath) {
 		boolean found = false;
 
-		for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+		for ( LuceneScopeIndexManagerContext index : elements() ) {
 			LuceneIndexModel indexModel = index.model();
 			LuceneIndexSchemaObjectFieldNode schemaNode =
 					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
@@ -197,7 +199,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 		}
 		if ( !found ) {
-			for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+			for ( LuceneScopeIndexManagerContext index : elements() ) {
 				LuceneIndexModel indexModel = index.model();
 				LuceneIndexSchemaValueFieldNode<?> schemaNode =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
@@ -213,7 +215,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	@Override
 	public List<String> nestedPathHierarchyForObject(String absoluteFieldPath) {
-		Optional<List<String>> nestedDocumentPath = indexManagerContexts.stream()
+		Optional<List<String>> nestedDocumentPath = elements().stream()
 				.map( index -> index.model().getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
 				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class HibernateSearchMultiReader extends MultiReader {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static HibernateSearchMultiReader open(Set<String> indexNames,
-			Set<? extends ReadIndexManagerContext> indexManagerContexts, Set<String> routingKeys) {
+			Collection<? extends ReadIndexManagerContext> indexManagerContexts, Set<String> routingKeys) {
 		if ( indexManagerContexts.isEmpty() ) {
 			return null;
 		}

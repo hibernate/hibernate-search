@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
@@ -21,7 +22,7 @@ import org.hibernate.search.backend.lucene.work.impl.ReadWork;
  */
 public interface LuceneSyncWorkOrchestrator {
 
-	<T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+	<T> T submit(Set<String> indexNames, Collection<? extends ReadIndexManagerContext> indexManagerContexts,
 			Set<String> routingKeys, ReadWork<T> work);
 
 }

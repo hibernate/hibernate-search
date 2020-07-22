@@ -10,13 +10,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeSearchIndexesContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
-import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeSearchIndexesContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -48,10 +47,7 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 
 	@Override
 	public IndexScope<?> build() {
-		// Use LinkedHashSet to ensure stable order when generating requests
-		Set<LuceneScopeIndexManagerContext> indexManagerContexts = new LinkedHashSet<>( indexManagers );
-
-		LuceneScopeSearchIndexesContext model = new LuceneScopeSearchIndexesContext( indexManagerContexts );
+		LuceneScopeSearchIndexesContext model = new LuceneScopeSearchIndexesContext( indexManagers );
 
 		return new LuceneIndexScope( backendContext, mappingContext, model );
 	}
