@@ -15,7 +15,7 @@ public final class DefaultThreadProvider implements ThreadProvider {
 	private final String commonThreadNamePrefix;
 
 	public DefaultThreadProvider() {
-		this( "Hibernate Search: " );
+		this( "Hibernate Search - " );
 	}
 
 	public DefaultThreadProvider(String commonThreadNamePrefix) {
