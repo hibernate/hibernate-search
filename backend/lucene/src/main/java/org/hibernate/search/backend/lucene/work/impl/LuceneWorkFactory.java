@@ -43,5 +43,5 @@ public interface LuceneWorkFactory {
 	ReadWork<Integer> count(LuceneSearcher<?> searcher);
 
 	ReadWork<Explanation> explain(LuceneSearcher<?> searcher,
-			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter);
+			String explainedDocumentTypeName, String explainedDocumentId, Query explainedDocumentFilter);
 }

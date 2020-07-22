@@ -432,9 +432,9 @@ public interface Log extends BasicLogger {
 	SearchException multipleValuesForSingleValuedField(String absolutePath);
 
 	@Message(id = ID_OFFSET_3 + 64,
-			value = "explain(String id) cannot be used when the query targets multiple indexes."
-					+ " Use explain(String indexName, String id) and pass one of %1$s as the index name." )
-	SearchException explainRequiresIndexName(Set<String> targetedIndexNames);
+			value = "explain(String id) cannot be used when the query targets multiple types."
+					+ " Use explain(String typeName, String id) and pass one of %1$s as the type name." )
+	SearchException explainRequiresTypeName(Set<String> targetedTypeNames);
 
 	@Message(id = ID_OFFSET_3 + 65,
 			value = "The given mapped type name '%2$s' is not among the mapped type targeted by this query: %1$s." )

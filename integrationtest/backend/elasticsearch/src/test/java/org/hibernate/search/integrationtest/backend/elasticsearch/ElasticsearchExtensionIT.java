@@ -267,7 +267,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes_missingIndexName() {
+	public void query_explain_multipleIndexes_missingTypeName() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
@@ -278,8 +278,8 @@ public class ElasticsearchExtensionIT {
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
-				.hasMessageContaining( "pass one of [" + mainIndex.name() + ", " + otherIndex.name() + "]" );
+				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple types" )
+				.hasMessageContaining( "pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]" );
 	}
 
 	@Test

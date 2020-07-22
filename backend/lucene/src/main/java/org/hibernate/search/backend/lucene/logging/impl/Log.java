@@ -380,8 +380,8 @@ public interface Log extends BasicLogger {
 
 	// TODO HSEARCH-3899 avoiding merging index concepts (e.g.: documentId) and entity concepts (e.g.: mapped type)
 	@Message(id = ID_OFFSET_2 + 75,
-			value = "explain(String id) cannot be used when the query targets multiple mapped types."
-					+ " Use explain(String typeName, String id) and pass one of %1$s as the mapped type name." )
+			value = "explain(String id) cannot be used when the query targets multiple types."
+					+ " Use explain(String typeName, String id) and pass one of %1$s as the type name." )
 	SearchException explainRequiresTypeName(Set<String> targetedTypeNames);
 
 	@Message(id = ID_OFFSET_2 + 76,
@@ -391,7 +391,7 @@ public interface Log extends BasicLogger {
 	// TODO HSEARCH-3899 avoiding merging index concepts (e.g.: documentId) and entity concepts (e.g.: mapped type)
 	@Message(id = ID_OFFSET_2 + 77,
 			value = "Document with id '%2$s' does not exist for the mapped type '%1$s' and thus its match cannot be explained." )
-	SearchException explainUnkownDocument(String typeName, String id);
+	SearchException explainUnknownDocument(String typeName, String id);
 
 	@Message(id = ID_OFFSET_2 + 78,
 			value = "Unable to merge index segments.")
