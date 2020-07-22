@@ -7,12 +7,14 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
@@ -116,12 +118,13 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	public Explanation explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Set<String> targetedTypeNames = searchContext.indexes().typeNames();
-		if ( targetedTypeNames.size() != 1 ) {
-			throw log.explainRequiresTypeName( targetedTypeNames );
+		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
+				searchContext.indexes().mappedTypeNameToIndex();
+		if ( mappedTypeNameToIndex.size() != 1 ) {
+			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
-		return doExplain( targetedTypeNames.iterator().next(), id );
+		return doExplain( mappedTypeNameToIndex.keySet().iterator().next(), id );
 	}
 
 	@Override
@@ -129,9 +132,10 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
-		Set<String> targetedIndexNames = searchContext.indexes().typeNames();
-		if ( !targetedIndexNames.contains( typeName ) ) {
-			throw log.explainRequiresTypeTargetedByQuery( targetedIndexNames, typeName );
+		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
+				searchContext.indexes().mappedTypeNameToIndex();
+		if ( !mappedTypeNameToIndex.containsKey( typeName ) ) {
+			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
 		}
 
 		return doExplain( typeName, id );
@@ -145,7 +149,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private <T> T doSubmit(ReadWork<T> work) {
 		return queryOrchestrator.submit(
 				searchContext.indexes().indexNames(),
-				searchContext.indexes().indexManagerContexts(),
+				searchContext.indexes().elements(),
 				routingKeys,
 				work
 		);
