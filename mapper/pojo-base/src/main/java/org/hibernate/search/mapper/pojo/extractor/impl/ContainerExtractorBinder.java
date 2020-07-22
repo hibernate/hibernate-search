@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
@@ -68,10 +67,10 @@ public class ContainerExtractorBinder {
 			new FirstMatchingExtractorContributor();
 	private final Map<String, SingleExtractorContributor> extractorContributorCache = new HashMap<>();
 
-	public ContainerExtractorBinder(MappingBuildContext buildContext,
+	public ContainerExtractorBinder(BeanResolver beanResolver,
 			ContainerExtractorRegistry containerExtractorRegistry,
 			TypePatternMatcherFactory typePatternMatcherFactory) {
-		this.beanResolver = buildContext.beanResolver();
+		this.beanResolver = beanResolver;
 		this.containerExtractorRegistry = containerExtractorRegistry;
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
 		for ( String extractorName : containerExtractorRegistry.defaults() ) {

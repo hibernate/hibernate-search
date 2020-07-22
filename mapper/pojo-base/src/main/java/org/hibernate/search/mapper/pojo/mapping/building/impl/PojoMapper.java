@@ -38,7 +38,6 @@ import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoAsso
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
-import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -55,7 +54,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
@@ -97,7 +95,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	public PojoMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
-			ContainerExtractorRegistry containerExtractorRegistry,
+			ContainerExtractorBinder extractorBinder,
+			BridgeResolver bridgeResolver,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
 			boolean multiTenancyEnabled, ReindexOnUpdate defaultReindexOnUpdate,
 			PojoMapperDelegate<MPBS> delegate) {
@@ -118,12 +117,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				beanResolver, failureCollector, contributorProvider
 		);
 
-		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
-		extractorBinder = new ContainerExtractorBinder( buildContext, containerExtractorRegistry, typePatternMatcherFactory );
+		this.extractorBinder = extractorBinder;
 
-		BridgeResolver.Builder bridgeResolverBuilder = new BridgeResolver.Builder( typePatternMatcherFactory );
-
-		BridgeResolver bridgeResolver = bridgeResolverBuilder.build();
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(
 				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
