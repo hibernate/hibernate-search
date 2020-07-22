@@ -247,7 +247,7 @@ public class LuceneExtensionIT {
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple types" )
+				.hasMessageContaining( "explain(Object id) cannot be used when the query targets multiple types" )
 				.hasMessageContaining(
 						"pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
 				);

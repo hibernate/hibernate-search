@@ -94,6 +94,11 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	}
 
 	@Override
+	public ToDocumentIdentifierValueConverter<?> idDslConverter() {
+		return idDslConverter;
+	}
+
+	@Override
 	public ElasticsearchIndexSchemaObjectNode root() {
 		return rootNode;
 	}
@@ -114,10 +119,6 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	public EventContext getEventContext() {
 		return eventContext;
-	}
-
-	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
-		return idDslConverter;
 	}
 
 	public ElasticsearchIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {

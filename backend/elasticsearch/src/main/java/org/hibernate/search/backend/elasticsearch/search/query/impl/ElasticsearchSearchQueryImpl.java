@@ -28,6 +28,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -154,7 +156,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public JsonObject explain(String id) {
+	public JsonObject explain(Object id) {
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
@@ -167,7 +169,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public JsonObject explain(String typeName, String id) {
+	public JsonObject explain(String typeName, Object id) {
 		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
@@ -199,16 +201,14 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 	}
 
-	private JsonObject doExplain(ElasticsearchSearchIndexContext index, String id) {
-		URLEncodedString elasticsearchId = URLEncodedString.fromString(
-				searchContext.documentIdHelper().toElasticsearchId( sessionContext.tenantIdentifier(), id )
-		);
-
+	private JsonObject doExplain(ElasticsearchSearchIndexContext index, Object id) {
 		JsonObject queryOnlyPayload = new JsonObject();
 		JsonElement query = payload.get( "query" );
 		if ( query != null ) {
 			queryOnlyPayload.add( "query", query );
 		}
+
+		URLEncodedString elasticsearchId = toElasticsearchId( index, id );
 
 		URLEncodedString indexName = index.names().getRead();
 		NonBulkableWork<ExplainResult> work = workFactory.explain( indexName, elasticsearchId, queryOnlyPayload )
@@ -220,6 +220,15 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
 		return explainResult.getJsonObject();
+	}
+
+	private URLEncodedString toElasticsearchId(ElasticsearchSearchIndexContext index, Object id) {
+		ToDocumentIdentifierValueConverter<?> converter = index.idDslConverter();
+		ToDocumentIdentifierValueConvertContext convertContext =
+				searchContext.toDocumentIdentifierValueConvertContext();
+		String documentId = converter.convertUnknown( id, convertContext );
+		return URLEncodedString.fromString( searchContext.documentIdHelper()
+				.toElasticsearchId( sessionContext.tenantIdentifier(), documentId ) );
 	}
 
 	@Override

@@ -21,6 +21,8 @@ import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -115,7 +117,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	@Override
-	public Explanation explain(String id) {
+	public Explanation explain(Object id) {
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
@@ -124,21 +126,36 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
-		return doExplain( mappedTypeNameToIndex.keySet().iterator().next(), id );
+		Map.Entry<String, ? extends LuceneSearchIndexContext> entry = mappedTypeNameToIndex.entrySet().iterator().next();
+		String typeName = entry.getKey();
+		LuceneSearchIndexContext index = entry.getValue();
+		String documentId = toDocumentId( index, id );
+
+		return doExplain( typeName, documentId );
 	}
 
 	@Override
-	public Explanation explain(String typeName, String id) {
+	public Explanation explain(String typeName, Object id) {
 		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
 				searchContext.indexes().mappedTypeNameToIndex();
+		LuceneSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( !mappedTypeNameToIndex.containsKey( typeName ) ) {
 			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
 		}
 
-		return doExplain( typeName, id );
+		String documentId = toDocumentId( index, id );
+
+		return doExplain( typeName, documentId );
+	}
+
+	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
+		ToDocumentIdentifierValueConverter<?> converter = index.idDslConverter();
+		ToDocumentIdentifierValueConvertContext convertContext =
+				searchContext.toDocumentIdentifierValueConvertContext();
+		return converter.convertUnknown( id, convertContext );
 	}
 
 	@Override

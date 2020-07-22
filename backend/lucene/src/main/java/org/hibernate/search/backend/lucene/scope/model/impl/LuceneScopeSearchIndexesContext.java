@@ -79,7 +79,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 		}
 		ToDocumentIdentifierValueConverter<?> converter = null;
 		for ( LuceneScopeIndexManagerContext index : elements() ) {
-			ToDocumentIdentifierValueConverter<?> converterForIndex = index.model().getIdDslConverter();
+			ToDocumentIdentifierValueConverter<?> converterForIndex = index.model().idDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
 			}
