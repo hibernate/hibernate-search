@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.timeout.impl;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 
 /**
@@ -22,10 +22,16 @@ public final class DefaultTimingSource implements TimingSource {
 
 	private static final long INVALID_TIME = -1;
 
+	private final BackendThreads threads;
+
 	//lazily initialize it, so we don't start a thread for those who don't use timeouts
 	//guarded by synchronization on this
-	private Timer timer = null;
+	private ScheduledFuture<?> future;
 	private volatile long currentTimeApproximation = INVALID_TIME;
+
+	public DefaultTimingSource(BackendThreads threads) {
+		this.threads = threads;
+	}
 
 	@Override
 	public long monotonicTimeEstimate() {
@@ -42,29 +48,34 @@ public final class DefaultTimingSource implements TimingSource {
 	}
 
 	@Override
-	public synchronized void ensureInitialized() {
-		if ( timer == null ) {
-			timer = new Timer( "HibernateSearch_QueryTimeoutMonitor", true );
-			timer.schedule( new TriggerTask(), 5, 5 );
+	public void ensureInitialized() {
+		if ( future != null ) {
+			return;
+		}
+		synchronized ( this ) {
+			if ( future != null ) {
+				return;
+			}
+			future = threads.getTimingExecutor()
+					.scheduleAtFixedRate( new TriggerTask(), 5, 5, TimeUnit.MILLISECONDS );
 			currentTimeApproximation = currentTime();
 		}
 	}
 
 	@Override
 	public synchronized void stop() {
-		if ( timer != null ) {
-			timer.cancel();
+		if ( future != null ) {
+			future.cancel( false );
+			future = null;
 		}
 		currentTimeApproximation = INVALID_TIME;
 	}
 
-	private class TriggerTask extends TimerTask {
-
+	private class TriggerTask implements Runnable {
 		@Override
 		public void run() {
 			DefaultTimingSource.this.currentTimeApproximation = currentTime();
 		}
-
 	}
 
 	private static long currentTime() {
