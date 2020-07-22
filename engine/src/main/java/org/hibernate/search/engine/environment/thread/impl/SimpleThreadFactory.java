@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 final class SimpleThreadFactory implements ThreadFactory {
 	private final ThreadGroup group;
 	private final String namePrefix;
-	private final AtomicInteger threadNumber = new AtomicInteger( 1 );
+	private final AtomicInteger threadNumber = new AtomicInteger( 0 );
 
 	SimpleThreadFactory(ThreadGroup group, String namePrefix) {
 		this.group = group;
