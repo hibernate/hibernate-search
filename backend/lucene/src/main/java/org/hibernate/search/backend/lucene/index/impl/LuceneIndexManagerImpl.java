@@ -154,6 +154,11 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
+	public LuceneIndexModel model() {
+		return model;
+	}
+
+	@Override
 	public IndexManager toAPI() {
 		return this;
 	}
@@ -191,10 +196,6 @@ public class LuceneIndexManagerImpl
 
 	public final List<Shard> getShardsForTests() {
 		return shardHolder.getShardsForTests();
-	}
-
-	LuceneIndexModel getModel() {
-		return model;
 	}
 
 	private EventContext getBackendAndIndexEventContext() {

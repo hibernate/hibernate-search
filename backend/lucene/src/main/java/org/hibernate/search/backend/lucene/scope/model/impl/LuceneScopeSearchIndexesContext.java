@@ -40,23 +40,24 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	private static final StringToDocumentIdentifierValueConverter RAW_ID_CONVERTER =
 			new StringToDocumentIdentifierValueConverter();
 
-	private final Set<LuceneIndexModel> indexModels;
+	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
 	private final Set<String> typeNames;
 	private final Set<String> indexNames;
-	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
 
-	public LuceneScopeSearchIndexesContext(Set<LuceneIndexModel> indexModels,
-			Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
-		this.indexModels = indexModels;
+	public LuceneScopeSearchIndexesContext(Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
+		this.indexManagerContexts = indexManagerContexts;
 		// Use LinkedHashSet to ensure stable order when generating requests
 		this.typeNames = new LinkedHashSet<>();
 		this.indexNames = new LinkedHashSet<>();
-		this.indexManagerContexts = indexManagerContexts;
-
-		for ( LuceneIndexModel model : indexModels ) {
-			this.typeNames.add( model.getMappedTypeName() );
-			this.indexNames.add( model.hibernateSearchName() );
+		for ( LuceneScopeIndexManagerContext indexManager : indexManagerContexts ) {
+			this.typeNames.add( indexManager.model().mappedTypeName() );
+			this.indexNames.add( indexManager.model().hibernateSearchName() );
 		}
+	}
+
+	@Override
+	public Set<LuceneScopeIndexManagerContext> indexManagerContexts() {
+		return indexManagerContexts;
 	}
 
 	@Override
@@ -70,18 +71,13 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public Set<LuceneScopeIndexManagerContext> indexManagerContexts() {
-		return indexManagerContexts;
-	}
-
-	@Override
 	public ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
 		if ( ValueConvert.NO.equals( valueConvert ) ) {
 			return RAW_ID_CONVERTER;
 		}
 		ToDocumentIdentifierValueConverter<?> converter = null;
-		for ( LuceneIndexModel indexModel : indexModels ) {
-			ToDocumentIdentifierValueConverter<?> converterForIndex = indexModel.getIdDslConverter();
+		for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+			ToDocumentIdentifierValueConverter<?> converterForIndex = index.model().getIdDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
 			}
@@ -101,7 +97,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 		LuceneIndexSchemaValueFieldNode<?> fieldNode = null;
 		String fieldNodeIndexName = null;
 
-		for ( LuceneIndexModel indexModel : indexModels ) {
+		for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+			LuceneIndexModel indexModel = index.model();
 			String indexName = indexModel.hibernateSearchName();
 
 			LuceneIndexSchemaValueFieldNode<?> currentFieldNode =
@@ -151,15 +148,17 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
 	public LuceneSearchValueFieldContext<?> field(String absoluteFieldPath) {
 		LuceneSearchValueFieldContext<?> resultOrNull = null;
-		if ( indexModels.size() == 1 ) {
+		if ( indexManagerContexts.size() == 1 ) {
 			// Single-index search
-			resultOrNull = indexModels.iterator().next().getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			resultOrNull = indexManagerContexts.iterator().next().model()
+					.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 		}
 		else {
 			// Multi-index search
 			List<LuceneSearchValueFieldContext<?>> fieldForEachIndex = new ArrayList<>();
 
-			for ( LuceneIndexModel indexModel : indexModels ) {
+			for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+				LuceneIndexModel indexModel = index.model();
 				LuceneIndexSchemaValueFieldNode<?> fieldForCurrentIndex =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( fieldForCurrentIndex == null ) {
@@ -184,7 +183,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	public void checkNestedField(String absoluteFieldPath) {
 		boolean found = false;
 
-		for ( LuceneIndexModel indexModel : indexModels ) {
+		for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+			LuceneIndexModel indexModel = index.model();
 			LuceneIndexSchemaObjectFieldNode schemaNode =
 					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 			if ( schemaNode != null ) {
@@ -197,7 +197,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 		}
 		if ( !found ) {
-			for ( LuceneIndexModel indexModel : indexModels ) {
+			for ( LuceneScopeIndexManagerContext index : indexManagerContexts ) {
+				LuceneIndexModel indexModel = index.model();
 				LuceneIndexSchemaValueFieldNode<?> schemaNode =
 						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
 				if ( schemaNode != null ) {
@@ -212,8 +213,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	@Override
 	public List<String> nestedPathHierarchyForObject(String absoluteFieldPath) {
-		Optional<List<String>> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
+		Optional<List<String>> nestedDocumentPath = indexManagerContexts.stream()
+				.map( index -> index.model().getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
 				.filter( Objects::nonNull )
 				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
