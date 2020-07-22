@@ -18,7 +18,10 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgesConfigurationContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
@@ -28,6 +31,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.Annot
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 
 public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBuildState>
 		implements MappingInitiator<PojoTypeMetadataContributor, MPBS> {
@@ -40,7 +44,9 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	private final AnnotationMappingConfigurationContextImpl annotationMappingConfiguration;
 
+	private final TypePatternMatcherFactory typePatternMatcherFactory;
 	private final ContainerExtractorRegistry.Builder containerExtractorRegistryBuilder;
+	private final BridgeResolver.Builder bridgeResolverBuilder;
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
@@ -57,7 +63,9 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		annotationMappingConfiguration = new AnnotationMappingConfigurationContextImpl( introspector );
 		addConfigurationContributor( annotationMappingConfiguration );
 
+		typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
 		containerExtractorRegistryBuilder = ContainerExtractorRegistry.builder();
+		bridgeResolverBuilder = new BridgeResolver.Builder( typePatternMatcherFactory );
 	}
 
 	public ProgrammaticMappingConfigurationContext programmaticMapping() {
@@ -72,6 +80,10 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	public ContainerExtractorConfigurationContext containerExtractors() {
 		return containerExtractorRegistryBuilder;
+	}
+
+	public BridgesConfigurationContext bridges() {
+		return bridgeResolverBuilder;
 	}
 
 	public void providedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
@@ -101,10 +113,16 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	@Override
 	public Mapper<MPBS> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
+		ContainerExtractorRegistry containerExtractorRegistry = containerExtractorRegistryBuilder.build();
+		ContainerExtractorBinder extractorBinder = new ContainerExtractorBinder( buildContext.beanResolver(),
+				containerExtractorRegistry, typePatternMatcherFactory );
+
+		BridgeResolver bridgeResolver = bridgeResolverBuilder.build();
+
 		return new PojoMapper<>(
 				buildContext, contributorProvider,
 				introspector,
-				containerExtractorRegistryBuilder.build(),
+				extractorBinder, bridgeResolver,
 				providedIdentifierBridge,
 				multiTenancyEnabled,
 				defaultReindexOnUpdate,
