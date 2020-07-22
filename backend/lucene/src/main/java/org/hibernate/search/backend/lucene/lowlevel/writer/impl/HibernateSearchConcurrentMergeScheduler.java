@@ -69,7 +69,7 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 		thread.setDaemon( true );
 		thread.setName(
 				threadProvider.createThreadName(
-						"Lucene Merge Thread for " + contextDescription,
+						contextDescription + " - Lucene Merge Thread",
 						mergeThreadCount++
 				)
 		);
