@@ -105,7 +105,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return staticFields;
 	}
 
-	public String getMappedTypeName() {
+	public String mappedTypeName() {
 		return mappedTypeName;
 	}
 

@@ -9,11 +9,9 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeSearchIndexesContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
@@ -51,12 +49,9 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 	@Override
 	public IndexScope<?> build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
-		Set<LuceneIndexModel> indexModels = indexManagers.stream().map( LuceneIndexManagerImpl::getModel )
-				.collect( Collectors.toCollection( LinkedHashSet::new ) );
-
 		Set<LuceneScopeIndexManagerContext> indexManagerContexts = new LinkedHashSet<>( indexManagers );
 
-		LuceneScopeSearchIndexesContext model = new LuceneScopeSearchIndexesContext( indexModels, indexManagerContexts );
+		LuceneScopeSearchIndexesContext model = new LuceneScopeSearchIndexesContext( indexManagerContexts );
 
 		return new LuceneIndexScope( backendContext, mappingContext, model );
 	}
