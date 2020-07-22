@@ -79,7 +79,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 		}
 		ToDocumentIdentifierValueConverter<?> converter = null;
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ToDocumentIdentifierValueConverter<?> converterForIndex = indexModel.getIdDslConverter();
+			ToDocumentIdentifierValueConverter<?> converterForIndex = indexModel.idDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
 			}

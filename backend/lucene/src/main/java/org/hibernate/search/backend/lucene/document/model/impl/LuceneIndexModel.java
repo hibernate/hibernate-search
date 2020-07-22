@@ -113,7 +113,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return EventContexts.fromIndexName( indexName );
 	}
 
-	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
+	public ToDocumentIdentifierValueConverter<?> idDslConverter() {
 		return idDslConverter;
 	}
 

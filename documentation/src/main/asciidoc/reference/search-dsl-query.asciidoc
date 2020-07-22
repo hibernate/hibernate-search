@@ -642,10 +642,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/LuceneQuery
 <1> Build the query as usual,
 but using the Lucene extension so that the retrieved query exposes Lucene-specific operations.
 <2> Retrieve a `SearchQuery` object.
-<3> Retrieve the explanation of the score of the document with ID `1`.
+<3> Retrieve the explanation of the score of the entity with ID `1`.
 The explanation is of type `Explanation`, but you can convert it to a readable string using `toString()`.
-<4> For multi-index queries, it is necessary to refer to the document not only by its ID,
-but also by the name of the corresponding entity type.
+<4> For multi-index queries, it is necessary to refer to the entity not only by its ID,
+but also by the name of its type.
 <5> If you cannot change the code building the query to use the Lucene extension,
 you can instead use the Lucene extension on the `SearchQuery` to convert it after its creation.
 ====
@@ -659,9 +659,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/Elasticsear
 <1> Build the query as usual,
 but using the Elasticsearch extension so that the retrieved query exposes Elasticsearch-specific operations.
 <2> Retrieve a `SearchQuery` object.
-<3> Retrieve the explanation of the score of the document with ID `1`.
-<4> For multi-index queries, it is necessary to refer to the document not only by its ID,
-but also by the name of the corresponding entity type.
+<3> Retrieve the explanation of the score of the entity with ID `1`.
+<4> For multi-index queries, it is necessary to refer to the entity not only by its ID,
+but also by the name of its type.
 <5> If you cannot change the code building the query to use the Elasticsearch extension,
 you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
 ====

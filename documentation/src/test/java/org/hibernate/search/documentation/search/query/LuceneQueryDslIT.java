@@ -59,8 +59,8 @@ public class LuceneQueryDslIT {
 							.matching( "robot" ) )
 					.toQuery(); // <2>
 
-			Explanation explanation1 = query.explain( "1" ); // <3>
-			Explanation explanation2 = query.explain( "Book", "1" ); // <4>
+			Explanation explanation1 = query.explain( 1 ); // <3>
+			Explanation explanation2 = query.explain( "Book", 1 ); // <4>
 
 			LuceneSearchQuery<Book> luceneQuery = query.extension( LuceneExtension.get() ); // <5>
 			// end::explain-lucene[]

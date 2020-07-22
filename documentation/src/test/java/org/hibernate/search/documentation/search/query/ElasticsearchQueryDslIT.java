@@ -60,8 +60,8 @@ public class ElasticsearchQueryDslIT {
 							.matching( "robot" ) )
 					.toQuery(); // <2>
 
-			JsonObject explanation1 = query.explain( "1" ); // <3>
-			JsonObject explanation2 = query.explain( "Book", "1" ); // <4>
+			JsonObject explanation1 = query.explain( 1 ); // <3>
+			JsonObject explanation2 = query.explain( "Book", 1 ); // <4>
 
 			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <5>
 			// end::explain-elasticsearch[]
