@@ -150,19 +150,19 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public JsonObject explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Collection<URLEncodedString> targetedIndexNames = searchContext.indexes().elasticsearchIndexNames();
-		if ( targetedIndexNames.size() != 1 ) {
-			throw log.explainRequiresIndexName( searchContext.indexes().hibernateSearchIndexNames() );
+		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames =
+				searchContext.indexes().mappedTypeToElasticsearchIndexNames();
+		if ( mappedTypeNamesToIndexReadNames.size() != 1 ) {
+			throw log.explainRequiresTypeName( mappedTypeNamesToIndexReadNames.keySet() );
 		}
 
-		return doExplain( targetedIndexNames.iterator().next(), id );
+		return doExplain( mappedTypeNamesToIndexReadNames.values().iterator().next(), id );
 	}
 
 	@Override
 	public JsonObject explain(String typeName, String id) {
 		Contracts.assertNotNull( typeName, "typeName" );
 		Contracts.assertNotNull( id, "id" );
-
 
 		Map<String, URLEncodedString> mappedTypeNamesToIndexReadNames = searchContext.indexes().mappedTypeToElasticsearchIndexNames();
 		if ( !mappedTypeNamesToIndexReadNames.containsKey( typeName ) ) {

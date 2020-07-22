@@ -236,7 +236,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void query_explain_multipleIndexes_missingIndexName() {
+	public void query_explain_multipleIndexes_missingTypeName() {
 		StubMappingScope scope = mainIndex.createScope( otherIndex );
 
 		LuceneSearchQuery<DocumentReference> query = scope.query().extension( LuceneExtension.get() )
@@ -247,7 +247,7 @@ public class LuceneExtensionIT {
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple mapped types" )
+				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple types" )
 				.hasMessageContaining(
 						"pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
 				);

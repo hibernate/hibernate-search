@@ -29,14 +29,14 @@ class ExplainWork implements ReadWork<Explanation> {
 
 	private final LuceneSearcher<?> searcher;
 
-	private final String explainedDocumentIndexName;
+	private final String explainedDocumentTypeName;
 	private final String explainedDocumentId;
 	private final Query explainedDocumentFilter;
 
 	ExplainWork(LuceneSearcher<?> searcher,
-			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter) {
+			String explainedDocumentTypeName, String explainedDocumentId, Query explainedDocumentFilter) {
 		this.searcher = searcher;
-		this.explainedDocumentIndexName = explainedDocumentIndexName;
+		this.explainedDocumentTypeName = explainedDocumentTypeName;
 		this.explainedDocumentId = explainedDocumentId;
 		this.explainedDocumentFilter = explainedDocumentFilter;
 	}
@@ -65,7 +65,7 @@ class ExplainWork implements ReadWork<Explanation> {
 
 		TopDocs topDocs = indexSearcher.search( explainedDocumentQuery, 2 );
 		if ( topDocs.scoreDocs.length < 1 ) {
-			throw log.explainUnkownDocument( explainedDocumentIndexName, explainedDocumentId );
+			throw log.explainUnknownDocument( explainedDocumentTypeName, explainedDocumentId );
 		}
 		if ( topDocs.scoreDocs.length > 1 ) {
 			throw new AssertionFailure(
@@ -80,7 +80,7 @@ class ExplainWork implements ReadWork<Explanation> {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder()
 				.add( Queries.mainDocumentQuery(), BooleanClause.Occur.FILTER )
 				.add( Queries.term( MetadataFields.idFieldName(), explainedDocumentId ), BooleanClause.Occur.FILTER )
-				.add( new MappedTypeNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentIndexName ), BooleanClause.Occur.FILTER );
+				.add( new MappedTypeNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentTypeName ), BooleanClause.Occur.FILTER );
 		if ( explainedDocumentFilter != null ) {
 			builder.add( explainedDocumentFilter, BooleanClause.Occur.FILTER );
 		}
@@ -92,7 +92,7 @@ class ExplainWork implements ReadWork<Explanation> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "searcher=" ).append( searcher )
-				.append( ", explainedDocumentIndexName=" ).append( explainedDocumentIndexName )
+				.append( ", explainedDocumentIndexName=" ).append( explainedDocumentTypeName )
 				.append( ", explainedDocumentId=" ).append( explainedDocumentId )
 				.append( ", explainedDocumentFilter=" ).append( explainedDocumentFilter )
 				.append( "]" );
