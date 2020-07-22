@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
@@ -28,7 +29,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class ElasticsearchIndexModel implements IndexDescriptor {
+public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSearchIndexContext {
 
 	private final IndexNames names;
 	private final String mappedTypeName;
@@ -83,6 +84,16 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 	}
 
 	@Override
+	public IndexNames names() {
+		return names;
+	}
+
+	@Override
+	public String mappedTypeName() {
+		return mappedTypeName;
+	}
+
+	@Override
 	public ElasticsearchIndexSchemaObjectNode root() {
 		return rootNode;
 	}
@@ -99,14 +110,6 @@ public class ElasticsearchIndexModel implements IndexDescriptor {
 	@Override
 	public Collection<IndexFieldDescriptor> staticFields() {
 		return staticFields;
-	}
-
-	public IndexNames getNames() {
-		return names;
-	}
-
-	public String getMappedTypeName() {
-		return mappedTypeName;
 	}
 
 	public EventContext getEventContext() {

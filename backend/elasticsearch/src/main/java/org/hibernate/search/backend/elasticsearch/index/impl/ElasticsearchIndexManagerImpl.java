@@ -96,7 +96,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "names=" ).append( model.getNames() )
+				.append( "names=" ).append( model.names() )
 				.append( "]" )
 				.toString();
 	}
@@ -149,12 +149,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	@Override
 	public String getMappedTypeName() {
-		return model.getMappedTypeName();
+		return model.mappedTypeName();
 	}
 
 	@Override
 	public URLEncodedString getElasticsearchIndexWriteName() {
-		return model.getNames().getWrite();
+		return model.names().getWrite();
 	}
 
 	@Override
@@ -176,7 +176,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		return document;
 	}
 
-	public ElasticsearchIndexModel getModel() {
+	public ElasticsearchIndexModel model() {
 		return model;
 	}
 

@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
@@ -27,8 +26,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkB
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexAliasesWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
@@ -64,7 +63,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 
-	CountWorkBuilder count(Collection<URLEncodedString> indexNames);
+	CountWorkBuilder count();
 
 	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload);
 

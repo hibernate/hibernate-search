@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -44,9 +43,14 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		private TimeUnit timeoutUnit;
 		private boolean exceptionOnTimeout;
 
-		public Builder(Collection<URLEncodedString> indexNames) {
+		public Builder() {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
-			this.indexNames.addAll( indexNames );
+		}
+
+		@Override
+		public Builder index(URLEncodedString indexName) {
+			indexNames.add( indexName );
+			return this;
 		}
 
 		@Override

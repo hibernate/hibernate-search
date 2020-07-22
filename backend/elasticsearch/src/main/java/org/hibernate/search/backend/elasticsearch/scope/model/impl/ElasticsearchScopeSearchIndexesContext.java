@@ -19,21 +19,21 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSearchIndexesContext {
 
@@ -44,22 +44,22 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Set<String> hibernateSearchIndexNames;
-	private final Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames;
+	private final Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex;
 
 	public ElasticsearchScopeSearchIndexesContext(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNames = new LinkedHashSet<>();
-		this.mappedTypeToElasticsearchIndexNames = new LinkedHashMap<>();
+		this.mappedTypeNameToIndex = new LinkedHashMap<>();
 		for ( ElasticsearchIndexModel model : indexModels ) {
 			hibernateSearchIndexNames.add( model.hibernateSearchName() );
-			mappedTypeToElasticsearchIndexNames.put( model.getMappedTypeName(), model.getNames().getRead() );
+			mappedTypeNameToIndex.put( model.mappedTypeName(), model );
 		}
 	}
 
 	@Override
-	public Set<String> mappedTypeNames() {
-		return mappedTypeToElasticsearchIndexNames.keySet();
+	public Collection<ElasticsearchSearchIndexContext> elements() {
+		return mappedTypeNameToIndex.values();
 	}
 
 	@Override
@@ -68,13 +68,8 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	public Collection<URLEncodedString> elasticsearchIndexNames() {
-		return mappedTypeToElasticsearchIndexNames.values();
-	}
-
-	@Override
-	public Map<String, URLEncodedString> mappedTypeToElasticsearchIndexNames() {
-		return mappedTypeToElasticsearchIndexNames;
+	public Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex() {
+		return mappedTypeNameToIndex;
 	}
 
 	@Override

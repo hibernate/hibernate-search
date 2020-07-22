@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -18,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkableWork<R>> {
 
-	SearchWorkBuilder<R> indexes(Collection<URLEncodedString> indexNames);
+	SearchWorkBuilder<R> index(URLEncodedString indexName);
 
 	SearchWorkBuilder<R> paging(Integer limit, Integer offset);
 

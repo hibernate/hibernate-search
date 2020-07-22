@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
@@ -28,8 +27,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkB
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexAliasesWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
@@ -49,10 +48,10 @@ import org.hibernate.search.backend.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.FlushWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ForceMergeWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ForceMergeWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexAliasesWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexSettingsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
@@ -120,8 +119,8 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public CountWorkBuilder count(Collection<URLEncodedString> indexNames) {
-		return new CountWork.Builder( indexNames );
+	public CountWorkBuilder count() {
+		return new CountWork.Builder();
 	}
 
 	@Override
