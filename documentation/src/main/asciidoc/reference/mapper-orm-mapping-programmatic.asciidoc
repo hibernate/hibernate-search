@@ -45,7 +45,7 @@ This solution doesn't require a mapping configurer.
 See <<mapper-orm-custom-annotations>> for more information.
 ====
 
-See below for an example. The following sections also provides one example of programmatic mapping for each feature.
+See below for an example. The following sections also provide one example of programmatic mapping for each feature.
 
 .Implementing a mapping configurer
 ====
