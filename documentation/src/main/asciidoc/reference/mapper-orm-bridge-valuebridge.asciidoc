@@ -357,6 +357,7 @@ The `Session` is not available here.
 <4> Retrieve the `Session` from the extended context.
 ====
 
+[[mapper-orm-bridge-valuebridge-injection]]
 == Injecting beans into the value bridge or value binder
 
 With <<configuration-bean-frameworks,compatible frameworks>>,
@@ -396,6 +397,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valueb
 ----
 ====
 
+[[mapper-orm-bridge-valuebridge-incubating]]
 == Incubating features
 
 include::components/incubating-warning.asciidoc[]
