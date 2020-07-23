@@ -43,7 +43,7 @@ import org.easymock.Capture;
  * Test default identifier bridges for the {@code @DocumentId} annotation.
  */
 @RunWith(Parameterized.class)
-public class DocumentIdDefaultBridgeIT<I> {
+public class DocumentIdDefaultBridgeBaseIT<I> {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] types() {
@@ -63,7 +63,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 	private StubIndexSchemaNode index1RootSchemaNode;
 	private StubIndexSchemaNode index2RootSchemaNode;
 
-	public DocumentIdDefaultBridgeIT(PropertyTypeDescriptor<I> typeDescriptor,
+	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
 		Assume.assumeTrue(
 				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()

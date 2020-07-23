@@ -51,7 +51,7 @@ import org.easymock.Capture;
  * Test default value bridges for the {@code @GenericField} annotation.
  */
 @RunWith(Parameterized.class)
-public class FieldDefaultBridgeIT<V, F> {
+public class FieldDefaultBridgeBaseIT<V, F> {
 	private static final String FIELD_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_NAME;
 	private static final String FIELD_INDEXNULLAS_NAME = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME;
 
@@ -74,7 +74,7 @@ public class FieldDefaultBridgeIT<V, F> {
 	private StubIndexSchemaNode index1FieldSchemaNode;
 	private StubIndexSchemaNode index2FieldSchemaNode;
 
-	public FieldDefaultBridgeIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
+	public FieldDefaultBridgeBaseIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
 		Assume.assumeTrue(
 				"Type " + typeDescriptor + " does not have a default value bridge", expectations.isPresent()
 		);

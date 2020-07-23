@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * Test common use cases of the {@code @GenericField} annotation.
  * <p>
- * Does not test default bridges, which are tested in {@link FieldDefaultBridgeIT}.
+ * Does not test default bridges, which are tested in {@link FieldDefaultBridgeBaseIT}.
  * <p>
  * Does not test uses of container value extractors, which are tested in {@link FieldContainerExtractorBaseIT}
  * (and others, see javadoc on that class).
