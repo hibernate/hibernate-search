@@ -110,7 +110,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				.setup();
 		backendMock.verifyExpectationsMet();
 		index1FieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );
-		index2FieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );
+		index2FieldSchemaNode = schemaCapture2.getValue().getChildren().get( FIELD_NAME ).get( 0 );
 	}
 
 	@Test
