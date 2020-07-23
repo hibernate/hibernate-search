@@ -65,7 +65,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 		typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
 		containerExtractorRegistryBuilder = ContainerExtractorRegistry.builder();
-		bridgeResolverBuilder = new BridgeResolver.Builder( typePatternMatcherFactory );
+		bridgeResolverBuilder = new BridgeResolver.Builder( introspector, typePatternMatcherFactory );
 	}
 
 	public ProgrammaticMappingConfigurationContext programmaticMapping() {
