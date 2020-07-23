@@ -172,7 +172,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	protected List<R> doList() {
-		// TODO HSEARCH-3093 apply the result transformer?
 		return delegate.fetchHits( firstResult, maxResults );
 	}
 
@@ -344,8 +343,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	private UnsupportedOperationException resultTransformerNotImplemented() {
-		// TODO HSEARCH-3093 result transformer
-		return new UnsupportedOperationException( "Not implemented yet" );
+		return new UnsupportedOperationException( "Result transformers are not supported in Hibernate Search queries" );
 	}
 
 	@Override
