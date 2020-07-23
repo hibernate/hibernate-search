@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgesConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -31,5 +32,11 @@ public interface HibernateOrmMappingConfigurationContext {
 	 */
 	@Incubating
 	ContainerExtractorConfigurationContext containerExtractors();
+
+	/**
+	 * Start the definition of bridges to apply by default in mappings.
+	 * @return A context to define default bridges.
+	 */
+	BridgesConfigurationContext bridges();
 
 }

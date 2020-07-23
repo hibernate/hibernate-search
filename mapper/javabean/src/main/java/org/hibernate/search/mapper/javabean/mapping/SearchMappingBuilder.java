@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospe
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgesConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -66,6 +67,10 @@ public final class SearchMappingBuilder {
 
 	public ContainerExtractorConfigurationContext containerExtractors() {
 		return mappingInitiator.containerExtractors();
+	}
+
+	public BridgesConfigurationContext bridges() {
+		return mappingInitiator.bridges();
 	}
 
 	/**
