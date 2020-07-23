@@ -70,6 +70,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.DefaultBridgeDefinitionSt
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
@@ -157,6 +158,7 @@ public final class BridgeResolver {
 	}
 
 	public static class Builder implements BridgesConfigurationContext {
+		private final PojoBootstrapIntrospector introspector;
 		private final TypePatternMatcherFactory typePatternMatcherFactory;
 
 		private final Map<PojoRawTypeIdentifier<?>, IdentifierBinder> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
@@ -165,14 +167,15 @@ public final class BridgeResolver {
 		private final List<TypePatternBinderMapping<IdentifierBinder>> typePatternIdentifierBridgeMappings = new ArrayList<>();
 		private final List<TypePatternBinderMapping<ValueBinder>> typePatternValueBridgeMappings = new ArrayList<>();
 
-		public Builder(TypePatternMatcherFactory typePatternMatcherFactory) {
+		public Builder(PojoBootstrapIntrospector introspector, TypePatternMatcherFactory typePatternMatcherFactory) {
+			this.introspector = introspector;
 			this.typePatternMatcherFactory = typePatternMatcherFactory;
 			addDefaults();
 		}
 
 		@Override
 		public <T> DefaultBridgeDefinitionStep<?, T> exactType(Class<T> clazz) {
-			return new ExactTypeDefaultBridgeDefinitionStep<>( clazz );
+			return new ExactTypeDefaultBridgeDefinitionStep<>( introspector.typeModel( clazz ).typeIdentifier() );
 		}
 
 		@Override
@@ -310,32 +313,32 @@ public final class BridgeResolver {
 
 		private class ExactTypeDefaultBridgeDefinitionStep<T>
 				implements DefaultBridgeDefinitionStep<ExactTypeDefaultBridgeDefinitionStep<T>, T> {
-			private final Class<T> clazz;
+			private final PojoRawTypeIdentifier<T> typeIdentifier;
 
-			private ExactTypeDefaultBridgeDefinitionStep(Class<T> clazz) {
-				this.clazz = clazz;
+			private ExactTypeDefaultBridgeDefinitionStep(PojoRawTypeIdentifier<T> typeIdentifier) {
+				this.typeIdentifier = typeIdentifier;
 			}
 
 			@Override
 			public ExactTypeDefaultBridgeDefinitionStep<T> identifierBinder(IdentifierBinder binder) {
-				exactRawTypeIdentifierBridgeMappings.put( PojoRawTypeIdentifier.of( clazz ), binder );
+				exactRawTypeIdentifierBridgeMappings.put( typeIdentifier, binder );
 				return this;
 			}
 
 			@Override
 			public ExactTypeDefaultBridgeDefinitionStep<T> valueBinder(ValueBinder binder) {
-				exactRawTypeValueBridgeMappings.put( PojoRawTypeIdentifier.of( clazz ), binder );
+				exactRawTypeValueBridgeMappings.put( typeIdentifier, binder );
 				return this;
 			}
 
 			@Override
 			public ExactTypeDefaultBridgeDefinitionStep<T> identifierBridge(IdentifierBridge<T> bridge) {
-				return identifierBinder( new StaticIdentifierBinder<>( clazz, bridge ) );
+				return identifierBinder( new StaticIdentifierBinder<>( typeIdentifier.javaClass(), bridge ) );
 			}
 
 			@Override
 			public ExactTypeDefaultBridgeDefinitionStep<T> valueBridge(ValueBridge<T, ?> bridge) {
-				return valueBinder( new StaticValueBinder<>( clazz, bridge ) );
+				return valueBinder( new StaticValueBinder<>( typeIdentifier.javaClass(), bridge ) );
 			}
 		}
 	}
