@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * Test common use cases of the {@code @DocumentId} annotation.
  *
- * Does not test default bridges, which are tested in {@link DocumentIdDefaultBridgeIT}.
+ * Does not test default bridges, which are tested in {@link DocumentIdDefaultBridgeBaseIT}.
  */
 @SuppressWarnings("unused")
 public class DocumentIdBaseIT {
