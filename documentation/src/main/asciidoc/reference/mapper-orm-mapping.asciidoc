@@ -21,6 +21,8 @@ include::mapper-orm-mapping-containerextractor.asciidoc[]
 
 include::mapper-orm-mapping-geopoint.asciidoc[]
 
+include::mapper-orm-mapping-alternatives.asciidoc[]
+
 include::mapper-orm-mapping-reindexing.asciidoc[]
 
 include::mapper-orm-mapping-changes.asciidoc[]

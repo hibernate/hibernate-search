@@ -52,5 +52,29 @@ class ElasticsearchSimpleMappingAnalysisConfigurer implements ElasticsearchAnaly
 		context.charFilter( "removeHyphens" ).type( "pattern_replace" )
 				.param( "pattern", "-+" )
 				.param( "replacement", "" );
+
+		// For AlternativeBinderIT
+
+		context.analyzer( "text_en" ).custom()
+				.tokenizer( "standard" )
+				.tokenFilters( "lowercase", "snowball_english", "asciifolding" );
+		context.analyzer( "text_fr" ).custom()
+				.tokenizer( "standard" )
+				.tokenFilters( "lowercase", "snowball_french", "asciifolding" );
+		context.analyzer( "text_de" ).custom()
+				.tokenizer( "standard" )
+				.tokenFilters( "lowercase", "decompounder_german", "snowball_german", "asciifolding" );
+
+		context.tokenFilter( "snowball_french" )
+				.type( "snowball" )
+				.param( "language", "French" );
+
+		context.tokenFilter( "decompounder_german" )
+				.type( "dictionary_decompounder" )
+				.param( "word_list", "wieder", "vereinigung" );
+
+		context.tokenFilter( "snowball_german" )
+				.type( "snowball" )
+				.param( "language", "German" );
 	}
 }
