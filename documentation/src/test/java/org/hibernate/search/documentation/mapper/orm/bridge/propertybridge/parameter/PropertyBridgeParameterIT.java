@@ -34,9 +34,9 @@ public class PropertyBridgeParameterIT {
 				BackendConfigurations.simple(),
 				mapping -> {
 					//tag::programmatic[]
-					TypeMappingStep bookMapping = mapping.type( Invoice.class );
-					bookMapping.indexed();
-					bookMapping.property( "lineItems" )
+					TypeMappingStep invoiceMapping = mapping.type( Invoice.class );
+					invoiceMapping.indexed();
+					invoiceMapping.property( "lineItems" )
 							.binder( new InvoiceLineItemsSummaryBinder().fieldName( "itemSummary" ) );
 					//end::programmatic[]
 				} );
