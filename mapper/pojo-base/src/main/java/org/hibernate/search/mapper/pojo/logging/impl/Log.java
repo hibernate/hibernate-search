@@ -422,4 +422,12 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 70,
 			value = "Index field name '%1$s' is invalid: field names cannot contain a dot ('.').")
 	SearchException invalidFieldNameDotNotAllowed(String relativeFieldName);
+
+	@Message(id = ID_OFFSET_2 + 71, value = "Could not find any property marked with @Alternative(id = %1$s)."
+			+ " There must be exactly one such property in order to map property '%2$s' to multi-alternative fields.")
+	SearchException cannotFindAlternativeDiscriminator(String alternativeId, String fieldValueSourcePropertyName);
+
+	@Message(id = ID_OFFSET_2 + 72, value = "Found multiple properties marked with @Alternative(id = %1$s)."
+			+ " There must be exactly one such property in order to map property '%2$s' to multi-alternative fields.")
+	SearchException conflictingAlternativeDiscriminators(String alternativeId, String fieldValueSourcePropertyName);
 }
