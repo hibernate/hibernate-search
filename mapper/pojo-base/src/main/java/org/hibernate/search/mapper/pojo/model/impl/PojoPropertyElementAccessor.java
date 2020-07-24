@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.impl;
 
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 /**
@@ -16,10 +17,20 @@ class PojoPropertyElementAccessor<P> implements PojoElementAccessor<P> {
 
 	private final PojoElementAccessor<?> parent;
 	private final ValueReadHandle<P> handle;
+	private final PojoModelPathValueNode path;
 
-	PojoPropertyElementAccessor(PojoElementAccessor<?> parent, ValueReadHandle<P> handle) {
+	PojoPropertyElementAccessor(PojoElementAccessor<?> parent, ValueReadHandle<P> handle,
+			PojoModelPathValueNode path) {
 		this.parent = parent;
 		this.handle = handle;
+		this.path = path;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "path=" + path
+				+ "]";
 	}
 
 	@Override

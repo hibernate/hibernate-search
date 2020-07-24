@@ -62,7 +62,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 
 	@Override
 	PojoElementAccessor<P> doCreateAccessor() {
-		return new PojoPropertyElementAccessor<>( parent.createAccessor(), getHandle() );
+		return new PojoPropertyElementAccessor<>( parent.createAccessor(), getHandle(), modelPath.toUnboundPath() );
 	}
 
 	@Override

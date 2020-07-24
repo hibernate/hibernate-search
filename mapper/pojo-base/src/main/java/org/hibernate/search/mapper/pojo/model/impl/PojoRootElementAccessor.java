@@ -17,6 +17,11 @@ class PojoRootElementAccessor<T> implements PojoElementAccessor<T> {
 	}
 
 	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked") // By construction, this accessor will only be passed PojoElement returning type T
 	public T read(Object parentElement) {
 		return (T) parentElement;
