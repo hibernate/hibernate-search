@@ -28,6 +28,12 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public interface PropertyMappingStep {
 
 	/**
+	 * @return A DSL step where the mapping can be defined
+	 * for the type hosting this property.
+	 */
+	TypeMappingStep hostingType();
+
+	/**
 	 * Maps the property to the identifier of documents in the index.
 	 * <p>
 	 * This is only taken into account on {@link Indexed} types.

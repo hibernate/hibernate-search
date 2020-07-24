@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -39,6 +40,11 @@ class InitialPropertyMappingStep
 	InitialPropertyMappingStep(TypeMappingStepImpl parent, PojoPropertyModel<?> propertyModel) {
 		this.parent = parent;
 		this.propertyModel = propertyModel;
+	}
+
+	@Override
+	public TypeMappingStep hostingType() {
+		return parent;
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 
@@ -28,6 +29,11 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 
 	DelegatingPropertyMappingStep(PropertyMappingStep delegate) {
 		this.delegate = delegate;
+	}
+
+	@Override
+	public TypeMappingStep hostingType() {
+		return delegate.hostingType();
 	}
 
 	@Override
