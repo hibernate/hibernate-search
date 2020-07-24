@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.testsupport;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 
+import org.apache.lucene.analysis.compound.DictionaryCompoundWordTokenFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
@@ -63,5 +64,28 @@ class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer 
 				.charFilter( PatternReplaceCharFilterFactory.class )
 						.param( "pattern", "-+" )
 						.param( "replacement", "" );
+
+		// For AlternativeBinderIT
+
+		context.analyzer( "text_en" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "English" )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
+		context.analyzer( "text_fr" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "French" )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
+		context.analyzer( "text_de" ).custom()
+				.tokenizer( StandardTokenizerFactory.class )
+				.tokenFilter( LowerCaseFilterFactory.class )
+				.tokenFilter( DictionaryCompoundWordTokenFilterFactory.class )
+						.param( "dictionary", "AlternativeBinderIT/dictionary_de.txt" )
+				.tokenFilter( SnowballPorterFilterFactory.class )
+						.param( "language", "German" )
+				.tokenFilter( ASCIIFoldingFilterFactory.class );
 	}
 }
