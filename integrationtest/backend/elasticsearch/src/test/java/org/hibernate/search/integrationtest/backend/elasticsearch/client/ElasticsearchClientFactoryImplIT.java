@@ -82,6 +82,7 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.ssl.SSLContexts;
+import org.apache.log4j.Level;
 
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
 public class ElasticsearchClientFactoryImplIT {
@@ -623,7 +624,7 @@ public class ElasticsearchClientFactoryImplIT {
 		String username = "ironman";
 		String password = "j@rV1s";
 
-		logged.expectMessage( "The password will be sent in clear text over the network" );
+		logged.expectEvent( Level.WARN, "The password will be sent in clear text over the network" );
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {

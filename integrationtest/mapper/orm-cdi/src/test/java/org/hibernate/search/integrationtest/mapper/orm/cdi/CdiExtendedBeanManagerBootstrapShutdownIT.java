@@ -37,6 +37,8 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.log4j.Level;
+
 /**
  * Check that Hibernate Search will be able to boot and shut down
  * when using an {@link org.hibernate.resource.beans.container.spi.ExtendedBeanManager} in Hibernate ORM.
@@ -260,7 +262,7 @@ public class CdiExtendedBeanManagerBootstrapShutdownIT {
 
 			// The bean manager shuts down.
 			// Hibernate Search should fail to shut down, and report the failure through the logs.
-			logged.expectMessage( "Simulated shutdown failure" );
+			logged.expectEvent( Level.ERROR, "Simulated shutdown failure" );
 			extendedBeanManager.simulateShutdown();
 
 			assertThat( StaticCounters.get().get( DependentBean.KEYS.preDestroy ) ).isEqualTo( 1 );

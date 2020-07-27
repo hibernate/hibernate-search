@@ -23,6 +23,8 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.log4j.Level;
+
 public class UnusedPropertiesIT {
 
 	@Rule
@@ -37,11 +39,9 @@ public class UnusedPropertiesIT {
 	@Test
 	public void checkDisabled_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
-		logged.expectMessage(
-				"Some properties in the Hibernate Search configuration were not used"
-		)
+		logged.expectMessage( "Some properties in the Hibernate Search configuration were not used" )
 				.never();
-		logged.expectMessage( "Configuration property tracking is disabled" )
+		logged.expectEvent( Level.INFO, "Configuration property tracking is disabled" )
 				.once();
 		setup( builder -> {
 			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "ignore" );
@@ -52,12 +52,11 @@ public class UnusedPropertiesIT {
 	@Test
 	public void checkEnabledByDefault_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
-		logged.expectMessage(
+		logged.expectEvent( Level.WARN,
 				"Some properties in the Hibernate Search configuration were not used",
 				"[" + unusedPropertyKey + "]",
 				"To disable this warning, set the property '"
-						+ EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY + "' to 'ignore'"
-		)
+						+ EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY + "' to 'ignore'" )
 				.once();
 		logged.expectMessage( "Configuration property tracking is disabled" )
 				.never();

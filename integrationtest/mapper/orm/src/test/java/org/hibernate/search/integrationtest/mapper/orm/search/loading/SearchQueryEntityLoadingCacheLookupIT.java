@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.persistence.SharedCacheMode;
 
 import org.hibernate.Hibernate;
@@ -29,6 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.apache.log4j.Level;
 
 /**
  * Test cache lookup as part of entity loading when executing a search query
@@ -219,10 +220,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	private void testLoadingCacheLookupExpectingPersistenceContextOnlyLookup(
 			EntityLoadingCacheLookupStrategy overriddenLookupStrategy) {
 		if ( !primitives.isCacheLookupSupported() ) {
-			logged.expectMessage(
-					"The entity loader for '" + primitives.getIndexedEntityName()
-					+ "' will ignore the cache lookup strategy"
-			);
+			logged.expectEvent( Level.DEBUG, "The entity loader for '" + primitives.getIndexedEntityName()
+					+ "' will ignore the cache lookup strategy" );
 			testLoadingCacheLookupExpectingSkipCacheLookup( overriddenLookupStrategy );
 			return;
 		}
@@ -247,10 +246,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	private void testLoadingCacheLookupExpectingSecondLevelCacheLookup(
 			EntityLoadingCacheLookupStrategy overriddenLookupStrategy) {
 		if ( !primitives.isCacheLookupSupported() ) {
-			logged.expectMessage(
-					"The entity loader for '" + primitives.getIndexedEntityName()
-					+ "' will ignore the cache lookup strategy"
-			);
+			logged.expectEvent( Level.DEBUG, "The entity loader for '" + primitives.getIndexedEntityName()
+					+ "' will ignore the cache lookup strategy" );
 			testLoadingCacheLookupExpectingSkipCacheLookup( overriddenLookupStrategy );
 			return;
 		}
