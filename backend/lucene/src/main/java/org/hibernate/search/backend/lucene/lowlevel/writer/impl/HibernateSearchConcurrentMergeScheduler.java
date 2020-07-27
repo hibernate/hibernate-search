@@ -15,9 +15,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.ConcurrentMergeScheduler;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MergePolicy;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.ThreadInterruptedException;
 
 /**
@@ -48,9 +46,9 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 	}
 
 	@Override
-	protected void handleMergeException(Directory dir, Throwable t) {
+	protected void handleMergeException(Throwable t) {
 		try {
-			super.handleMergeException( dir, t );
+			super.handleMergeException( t );
 		}
 		catch (ThreadInterruptedException ie) {
 			Thread.currentThread().interrupt();
@@ -64,8 +62,8 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 	}
 
 	@Override
-	protected synchronized MergeThread getMergeThread(IndexWriter writer, MergePolicy.OneMerge merge) {
-		final MergeThread thread = new MergeThread( writer, merge );
+	protected synchronized MergeThread getMergeThread(MergeSource mergeSource, MergePolicy.OneMerge merge) {
+		final MergeThread thread = new MergeThread( mergeSource, merge );
 		thread.setDaemon( true );
 		thread.setName(
 				threadProvider.createThreadName(
