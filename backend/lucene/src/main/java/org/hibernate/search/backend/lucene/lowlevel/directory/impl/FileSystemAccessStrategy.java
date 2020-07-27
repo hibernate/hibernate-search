@@ -20,21 +20,25 @@ import org.apache.lucene.store.SimpleFSDirectory;
 
 enum FileSystemAccessStrategy {
 	AUTO {
+		@Override
 		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
 			return FSDirectory.open( indexDir, factory );
 		}
 	},
 	SIMPLE {
+		@Override
 		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
 			return new SimpleFSDirectory( indexDir, factory );
 		}
 	},
 	NIO {
+		@Override
 		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
 			return new NIOFSDirectory( indexDir, factory );
 		}
 	},
 	MMAP {
+		@Override
 		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
 			return new MMapDirectory( indexDir, factory );
 		}
