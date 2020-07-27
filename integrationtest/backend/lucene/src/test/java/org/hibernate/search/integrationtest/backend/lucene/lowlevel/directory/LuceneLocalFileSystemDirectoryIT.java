@@ -28,7 +28,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
-import org.apache.lucene.store.SimpleFSDirectory;
 
 public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT {
 
@@ -79,8 +78,9 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
+	@SuppressWarnings("deprecation")
 	public void filesystemAccessStrategy_simple() {
-		testFileSystemAccessStrategy( "simple", SimpleFSDirectory.class );
+		testFileSystemAccessStrategy( "simple", org.apache.lucene.store.SimpleFSDirectory.class );
 	}
 
 	@Test

@@ -16,7 +16,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
-import org.apache.lucene.store.SimpleFSDirectory;
 
 enum FileSystemAccessStrategy {
 	AUTO {
@@ -27,8 +26,9 @@ enum FileSystemAccessStrategy {
 	},
 	SIMPLE {
 		@Override
+		@SuppressWarnings("deprecation")
 		public FSDirectory createDirectory(Path indexDir, LockFactory factory) throws IOException {
-			return new SimpleFSDirectory( indexDir, factory );
+			return new org.apache.lucene.store.SimpleFSDirectory( indexDir, factory );
 		}
 	},
 	NIO {
