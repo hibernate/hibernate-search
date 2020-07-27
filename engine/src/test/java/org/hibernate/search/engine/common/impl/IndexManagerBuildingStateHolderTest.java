@@ -30,6 +30,7 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.log4j.Level;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
@@ -130,7 +131,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		assertThat( result ).contains( "bar" );
 
 		// Legacy "index_defaults"
-		logged.expectMessage( "Using configuration property 'hibernate.search.backend.index_defaults.foo'."
+		logged.expectEvent( Level.WARN, "Using configuration property 'hibernate.search.backend.index_defaults.foo'."
 				+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
 				+ " Instead, you should just set defaults for index properties at the backend level."
 				+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
@@ -257,7 +258,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		assertThat( result ).contains( "bar" );
 
 		// Legacy "index_defaults"
-		logged.expectMessage( "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
+		logged.expectEvent( Level.WARN, "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
 						+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
 						+ " Instead, you should just set defaults for index properties at the backend level."
 						+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
@@ -375,7 +376,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		assertThat( result ).contains( "bar" );
 
 		// Legacy "index_defaults"
-		logged.expectMessage( "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
+		logged.expectEvent( Level.WARN, "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
 				+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
 				+ " Instead, you should just set defaults for index properties at the backend level."
 				+ " For example, set 'hibernate.search.backend.indexing.queue_size'"

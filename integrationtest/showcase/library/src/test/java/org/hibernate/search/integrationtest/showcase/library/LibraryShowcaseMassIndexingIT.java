@@ -20,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.apache.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -102,8 +103,8 @@ public class LibraryShowcaseMassIndexingIT {
 			int batchSize = 49;
 			indexer.batchSizeToLoadObjects( batchSize );
 			int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
-			logged.expectMessage( "documents indexed in" ).times( expectedNumberOfLogs );
-			logged.expectMessage( "Indexing speed: " ).times( expectedNumberOfLogs );
+			logged.expectEvent( Level.INFO, "documents indexed in" ).times( expectedNumberOfLogs );
+			logged.expectEvent( Level.INFO, "Indexing speed: " ).times( expectedNumberOfLogs );
 
 			indexer.startAndWait();
 		}

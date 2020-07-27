@@ -22,6 +22,8 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.log4j.Level;
+
 /**
  * Check that a failing boot correctly propagates exceptions,
  * despite the complex asynchronous code used during boot.
@@ -42,7 +44,7 @@ public class ShutdownFailureIT {
 		backendMock.expectAnySchema( FailingIndexedEntity.NAME );
 		SessionFactory sessionFactory = ormSetupHelper.start().setup( FailingIndexedEntity.class );
 
-		logged.expectMessage( "Simulated shutdown failure" );
+		logged.expectEvent( Level.ERROR, "Simulated shutdown failure" );
 		sessionFactory.close();
 	}
 
