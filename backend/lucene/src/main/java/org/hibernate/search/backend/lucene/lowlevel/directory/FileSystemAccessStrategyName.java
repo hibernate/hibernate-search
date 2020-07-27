@@ -15,6 +15,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public enum FileSystemAccessStrategyName {
 
 	AUTO( "auto" ),
+	/**
+	 * @deprecated This strategy will be removed in a future version of Lucene.
+	 */
+	@Deprecated
 	SIMPLE( "simple" ),
 	NIO( "nio" ),
 	MMAP( "mmap" );
@@ -40,7 +44,7 @@ public enum FileSystemAccessStrategyName {
 	/**
 	 * @return The expected string representation in configuration properties.
 	 */
-	private String externalRepresentation() {
+	public String externalRepresentation() {
 		return externalRepresentation;
 	}
 

@@ -122,6 +122,7 @@ Allowed values are:
 based on the operating system and architecture.
 * `simple`: a straightforward strategy based on `Files.newByteChannel`.
 See `org.apache.lucene.store.SimpleFSDirectory`.
+**This strategy is deprecated and will be removed in a future version of Lucene.**
 * `mmap`: uses `mmap` for reading, and `FSDirectory.FSIndexOutput` for writing.
 See `org.apache.lucene.store.MMapDirectory`.
 * `nio`: uses ``java.nio.channels.FileChannel``'s positional read for concurrent reading,
