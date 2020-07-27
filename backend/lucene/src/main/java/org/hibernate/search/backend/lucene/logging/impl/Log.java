@@ -617,4 +617,10 @@ public interface Log extends BasicLogger {
 					+ " and that the field has the same type in all indexes.")
 	SearchException partialSupportForQueryElement(String queryElementName);
 
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_2 + 138, value = "Using deprecated filesystem access strategy '%1$s',"
+			+ " which will be removed in a future version of Lucene."
+			+ " %2$s")
+	void deprecatedFileSystemAccessStrategy(String accessStrategyName,
+			@FormatWith(EventContextFormatter.class) EventContext eventContext);
 }

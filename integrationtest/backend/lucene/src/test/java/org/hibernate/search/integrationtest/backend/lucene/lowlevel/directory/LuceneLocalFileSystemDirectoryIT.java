@@ -18,10 +18,14 @@ import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+
+import org.apache.log4j.Level;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.lucene.store.Directory;
@@ -30,6 +34,9 @@ import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 
 public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT {
+
+	@Rule
+	public final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	/**
 	 * Test that the index is created in the configured root.
@@ -65,14 +72,14 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	public void filesystemAccessStrategy_default() {
 		// The actual class used here is OS-dependent
-		testFileSystemAccessStrategy( null, FSDirectory.class );
+		testFileSystemAccessStrategy( null, FSDirectory.class, false );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	public void filesystemAccessStrategy_auto() {
 		// The actual class used here is OS-dependent
-		testFileSystemAccessStrategy( "auto", FSDirectory.class );
+		testFileSystemAccessStrategy( "auto", FSDirectory.class, false );
 	}
 
 	@Test
@@ -80,21 +87,21 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testSimpleDirectoryType")
 	@SuppressWarnings("deprecation")
 	public void filesystemAccessStrategy_simple() {
-		testFileSystemAccessStrategy( "simple", org.apache.lucene.store.SimpleFSDirectory.class );
+		testFileSystemAccessStrategy( "simple", org.apache.lucene.store.SimpleFSDirectory.class, true );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testNIODirectoryType")
 	public void filesystemAccessStrategy_nio() {
-		testFileSystemAccessStrategy( "nio", NIOFSDirectory.class );
+		testFileSystemAccessStrategy( "nio", NIOFSDirectory.class, false );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testMMapDirectoryType")
 	public void filesystemAccessStrategy_mmap() {
-		testFileSystemAccessStrategy( "mmap", MMapDirectory.class );
+		testFileSystemAccessStrategy( "mmap", MMapDirectory.class, false );
 	}
 
 	@Test
@@ -133,7 +140,17 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	}
 
 	private void testFileSystemAccessStrategy(String strategyName,
-			Class<? extends Directory> expectedDirectoryClass) {
+			Class<? extends Directory> expectedDirectoryClass,
+			boolean expectDeprecationWarning) {
+		if ( expectDeprecationWarning ) {
+			logged.expectEvent( Level.WARN,
+					"Using deprecated filesystem access strategy '" + strategyName + "'",
+					"will be removed", "Context: index '" + index.name() + "'" );
+		}
+		else {
+			logged.expectMessage( "Using deprecated filesystem access strategy" ).never();
+		}
+
 		setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				strategyName
