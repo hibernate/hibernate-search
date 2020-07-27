@@ -66,6 +66,22 @@ public class ExpectedLog4jLog implements TestRule {
 
 	/**
 	 * Expect a logging event matching the given level or higher,
+	 * and with a message containing the given strings.
+	 * <p>
+	 * Defaults to expecting the event once or more.
+	 */
+	public LogExpectation expectEvent(Level level,
+			String containedString, String... otherContainedStrings) {
+		return expectEvent( CoreMatchers.allOf(
+				eventLevelMatcher( level ),
+				eventMessageMatcher( containsAllStrings( containedString, otherContainedStrings ) )
+		) );
+	}
+
+	/**
+	 * Expect a logging event matching the given level or higher,
+	 * with a throwable matching the given matcher,
+	 * and with a message containing the given strings.
 	 * <p>
 	 * Defaults to expecting the event once or more.
 	 */
