@@ -19,10 +19,10 @@ public interface MarkerBinder {
 	/**
 	 * Binds a marker to a POJO property.
 	 * <p>
-	 * Implementations are to call one of the {@code setMarker(...)} methods on the context
+	 * Implementations are to call one of the {@code marker(...)} methods on the context
 	 * to set the marker.
 	 *
-	 * @param context A context object expecting a call to one of its {@code setMarker(...)} methods.
+	 * @param context A context object expecting a call to one of its {@code marker(...)} methods.
 	 */
 	void bind(MarkerBindingContext context);
 

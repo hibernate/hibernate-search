@@ -364,12 +364,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 58,
 			value = "The bind() method of binder '%1$s' is not implemented correctly:"
-					+ " it did not call context.setBridge().")
+					+ " it did not call context.bridge().")
 	SearchException missingBridgeForBinder(Object binder);
 
 	@Message(id = ID_OFFSET_2 + 59,
 			value = "The bind() method of binder '%1$s' is not implemented correctly:"
-					+ " it did not call context.setMarker(...).")
+					+ " it did not call context.marker(...).")
 	SearchException missingMarkerForBinder(Object binder);
 
 	@Message(id = ID_OFFSET_2 + 60,

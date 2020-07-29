@@ -26,7 +26,7 @@ public interface TypeBinder {
 	 * <p>
 	 * The context passed in parameter provides various information about the type being bound.
 	 * Implementations are expected to take advantage of that information
-	 * and to call one of the {@code setBridge(...)} methods on the context
+	 * and to call one of the {@code bridge(...)} methods on the context
 	 * to set the bridge.
 	 * <p>
 	 * Implementations are also expected to declare dependencies, i.e. the properties
@@ -36,7 +36,7 @@ public interface TypeBinder {
 	 * Failing that, Hibernate Search will not reindex entities properly when an indexed property is modified.
 	 *
 	 * @param context A context object providing information about the type being bound,
-	 * and expecting a call to one of its {@code setBridge(...)} methods.
+	 * and expecting a call to one of its {@code bridge(...)} methods.
 	 */
 	void bind(TypeBindingContext context);
 
