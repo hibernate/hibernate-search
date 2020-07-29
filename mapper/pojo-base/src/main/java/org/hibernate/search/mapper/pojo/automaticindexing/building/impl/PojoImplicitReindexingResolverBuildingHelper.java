@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.Closer;
@@ -47,12 +46,11 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	public PojoImplicitReindexingResolverBuildingHelper(
 			ContainerExtractorBinder extractorBinder,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
-			PojoAssociationPathInverter pathInverter,
 			Set<PojoRawTypeModel<?>> entityTypes,
 			ReindexOnUpdate defaultReindexOnUpdate) {
 		this.extractorBinder = extractorBinder;
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
-		this.pathInverter = pathInverter;
+		this.pathInverter = new PojoAssociationPathInverter( typeAdditionalMetadataProvider, extractorBinder );
 		this.entityTypes = entityTypes;
 		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 
@@ -141,11 +139,6 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	ContainerExtractorBinder getExtractorBinder() {
 		return extractorBinder;
-	}
-
-	<T> BoundContainerExtractorPath<T, ?> bindExtractorPath(
-			PojoGenericTypeModel<T> typeModel, ContainerExtractorPath extractorPath) {
-		return extractorBinder.bindPath( typeModel, extractorPath );
 	}
 
 	<V, T> ContainerExtractorHolder<T, V> createExtractors(

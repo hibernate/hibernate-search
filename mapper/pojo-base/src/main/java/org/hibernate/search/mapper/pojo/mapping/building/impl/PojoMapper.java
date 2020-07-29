@@ -34,7 +34,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoAssociationPathInverter;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
@@ -234,12 +233,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				PojoIndexedTypeManagerContainer.builder();
 		PojoContainedTypeManagerContainer.Builder containedTypeManagerContainerBuilder =
 				PojoContainedTypeManagerContainer.builder();
-		PojoAssociationPathInverter pathInverter = new PojoAssociationPathInverter(
-				typeAdditionalMetadataProvider, extractorBinder
-		);
 		PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper =
 				new PojoImplicitReindexingResolverBuildingHelper(
-						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes,
+						extractorBinder, typeAdditionalMetadataProvider, entityTypes,
 						defaultReindexOnUpdate
 				);
 
