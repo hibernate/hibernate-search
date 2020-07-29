@@ -39,13 +39,13 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * An object responsible for inverting an association path,
  * i.e. a chain of properties and container value extractors going from one entity to another.
  */
-public final class PojoAssociationPathInverter {
+final class PojoAssociationPathInverter {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerExtractorBinder extractorBinder;
 
-	public PojoAssociationPathInverter(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
+	PojoAssociationPathInverter(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
 			ContainerExtractorBinder extractorBinder) {
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 		this.extractorBinder = extractorBinder;
