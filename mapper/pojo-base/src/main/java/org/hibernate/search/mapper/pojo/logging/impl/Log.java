@@ -430,4 +430,21 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 72, value = "Found multiple properties marked with @Alternative(id = %1$s)."
 			+ " There must be exactly one such property in order to map property '%2$s' to multi-alternative fields.")
 	SearchException conflictingAlternativeDiscriminators(String alternativeId, String fieldValueSourcePropertyName);
+
+	@Message(id = ID_OFFSET_2 + 73,
+			value = "Routing bridge '%1$s' cannot be applied to entity type '%2$s'.")
+	SearchException invalidInputTypeForRoutingBridge(Object routingBridge,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
+
+	@Message(id = ID_OFFSET_2 + 74,
+			value = "Routing bridge '%1$s' is already assigned to this entity; cannot assign routing key bridge'%2$s'.")
+	SearchException conflictingRoutingBridgeAndRoutingKeyBinder(Object routingBridge, Object binder);
+
+	@Message(id = ID_OFFSET_2 + 75,
+			value = "Routing bridge '%1$s' did not define any route. Exactly one route must be defined.")
+	SearchException noIndexingRoute(Object routingBridge);
+
+	@Message(id = ID_OFFSET_2 + 76,
+			value = "Routing bridge '%1$s' defined multiple routes. Exactly one route must be defined.")
+	SearchException multipleIndexingRoutes(Object routingBridge);
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 /**
@@ -35,5 +36,12 @@ public interface TypeMappingIndexedStep {
 	 * @see Indexed#enabled()
 	 */
 	TypeMappingIndexedStep enabled(boolean enabled);
+
+	/**
+	 * @param binder A {@link RoutingBinder} responsible for creating a bridge.
+	 * @return {@code this}, for method chaining.
+	 * @see Indexed#routingBinder()
+	 */
+	TypeMappingIndexedStep routingBinder(RoutingBinder binder);
 
 }

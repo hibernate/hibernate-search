@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
@@ -21,6 +22,7 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 	private String backendName;
 	private String indexName;
 	private boolean enabled = true;
+	private RoutingBinder binder;
 
 	TypeMappingIndexedStepImpl(PojoRawTypeIdentifier<?> typeIdentifier) {
 		this.typeIdentifier = typeIdentifier;
@@ -45,10 +47,19 @@ class TypeMappingIndexedStepImpl implements TypeMappingIndexedStep, PojoTypeMeta
 	}
 
 	@Override
+	public TypeMappingIndexedStep routingBinder(RoutingBinder binder) {
+		this.binder = binder;
+		return this;
+	}
+
+	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorIndexedTypeNode indexedCollector = collector.markAsIndexed( enabled );
 		if ( backendName != null ) {
 			indexedCollector.backendName( backendName );
+		}
+		if ( binder != null ) {
+			indexedCollector.routingBinder( binder );
 		}
 		// The fact that an entity is indexed is inherited, but not the index name.
 		if ( typeIdentifier.equals( collector.typeIdentifier() ) && indexName != null ) {

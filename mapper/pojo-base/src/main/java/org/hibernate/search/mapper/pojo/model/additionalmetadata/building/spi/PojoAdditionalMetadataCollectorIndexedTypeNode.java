@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
+
 public interface PojoAdditionalMetadataCollectorIndexedTypeNode extends PojoAdditionalMetadataCollector {
 
 	/**
@@ -26,5 +28,10 @@ public interface PojoAdditionalMetadataCollectorIndexedTypeNode extends PojoAddi
 	 * {@code false} if it must not (in which case metadata provided through other methods is ignored).
 	 */
 	void enabled(boolean enabled);
+
+	/**
+	 * @param binder The routing binder.
+	 */
+	void routingBinder(RoutingBinder binder);
 
 }
