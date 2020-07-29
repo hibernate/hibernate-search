@@ -24,11 +24,11 @@ public interface IdentifierBinder {
 	 * <p>
 	 * The context passed in parameter provides various information about the identifier being bound.
 	 * Implementations are expected to take advantage of that information
-	 * and to call one of the {@code setBridge(...)} methods on the context
+	 * and to call one of the {@code bridge(...)} methods on the context
 	 * to set the bridge.
 	 *
 	 * @param context A context object providing information about the identifier being bound,
-	 * and expecting a call to one of its {@code setBridge(...)} methods.
+	 * and expecting a call to one of its {@code bridge(...)} methods.
 	 */
 	void bind(IdentifierBindingContext<?> context);
 
