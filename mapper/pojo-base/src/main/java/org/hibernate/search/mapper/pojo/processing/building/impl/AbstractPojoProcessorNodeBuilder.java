@@ -40,7 +40,7 @@ abstract class AbstractPojoProcessorNodeBuilder {
 	public final ContextualFailureCollector failureCollector() {
 		BoundPojoModelPath modelPath = getModelPath();
 
-		ContextualFailureCollector failureCollector = mappingHelper.getFailureCollector()
+		ContextualFailureCollector failureCollector = mappingHelper.failureCollector()
 				.withContext(
 						PojoEventContexts.fromType( modelPath.getRootType().rawType() )
 				);

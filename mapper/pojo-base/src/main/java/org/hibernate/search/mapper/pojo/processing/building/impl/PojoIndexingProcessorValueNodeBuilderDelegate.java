@@ -72,7 +72,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			defaultedRelativeFieldName = modelPath.getParent().getPropertyModel().name();
 		}
 
-		mappingHelper.getIndexModelBinder().bindValue(
+		mappingHelper.indexModelBinder().bindValue(
 				bindingContext, modelPath, multiValuedFromContainerExtractor,
 				binder, defaultedRelativeFieldName,
 				fieldModelContributor
@@ -109,7 +109,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				);
 			}
 			else {
-				PojoRawTypeModel<?> castedType = mappingHelper.getIntrospector().typeModel( targetType );
+				PojoRawTypeModel<?> castedType = mappingHelper.introspector().typeModel( targetType );
 				nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(
 						modelPath.castedType( castedType ), mappingHelper, nestedBindingContext,
 						// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
@@ -121,7 +121,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 			PojoTypeModel<?> targetTypeModel = nestedProcessorBuilder.getModelPath().getTypeModel();
 
-			Set<PojoTypeMetadataContributor> contributors = mappingHelper.getContributorProvider()
+			Set<PojoTypeMetadataContributor> contributors = mappingHelper.contributorProvider()
 					.get( targetTypeModel.rawType() );
 			if ( contributors.isEmpty() ) {
 				throw log.invalidIndexedEmbedded( targetTypeModel );

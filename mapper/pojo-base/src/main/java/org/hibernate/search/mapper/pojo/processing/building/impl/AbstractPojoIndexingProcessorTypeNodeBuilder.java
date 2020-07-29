@@ -60,7 +60,7 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 
 	@Override
 	public void typeBinder(TypeBinder builder) {
-		mappingHelper.getIndexModelBinder().bindType( bindingContext, getModelPath(), builder )
+		mappingHelper.indexModelBinder().bindType( bindingContext, getModelPath(), builder )
 			.ifPresent( boundBridges::add );
 	}
 
