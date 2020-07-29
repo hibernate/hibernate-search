@@ -97,7 +97,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			);
 		}
 
-		LoadingResult<?> loadingResult = actualProjectionHitMapper.loadBlocking();
+		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking();
 
 		List<H> hits = new ArrayList<>( rawHits.size() );
 

@@ -59,7 +59,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */
-	P transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context);
+	P transform(LoadingResult<?, ?> loadingResult, E extractedData, SearchProjectionTransformContext context);
 
 	static <P> ElasticsearchSearchProjection<?, P> from(ElasticsearchSearchContext searchContext, SearchProjection<P> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
@@ -79,7 +79,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * This should be used with care as it's unsafe.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static <Z> Z transformUnsafe(ElasticsearchSearchProjection<?, Z> projection, LoadingResult<?> loadingResult,
+	static <Z> Z transformUnsafe(ElasticsearchSearchProjection<?, Z> projection, LoadingResult<?, ?> loadingResult,
 			Object extractedData, SearchProjectionTransformContext context) {
 		return (Z) ( (ElasticsearchSearchProjection) projection ).transform( loadingResult, extractedData, context );
 	}

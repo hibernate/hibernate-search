@@ -30,7 +30,7 @@ class StubDefaultSearchProjection<T> implements StubSearchProjection<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		return (T) extractedData;
 	}

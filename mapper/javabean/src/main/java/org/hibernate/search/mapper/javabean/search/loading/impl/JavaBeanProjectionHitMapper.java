@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.javabean.search.loading.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -28,33 +28,35 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 	}
 
 	@Override
-	public EntityReference convertReference(DocumentReference reference) {
-		return documentReferenceConverter.fromDocumentReference( reference );
-	}
-
-	@Override
 	public Object planLoading(DocumentReference reference) {
 		throw log.cannotLoadEntity( reference );
 	}
 
 	@Override
-	public LoadingResult<Void> loadBlocking() {
-		return JavaBeanUnusuableLoadingResult.INSTANCE;
+	public LoadingResult<EntityReference, Void> loadBlocking() {
+		return new JavaBeanUnusuableGetLoadingResult( documentReferenceConverter );
 	}
 
-	private static class JavaBeanUnusuableLoadingResult implements LoadingResult<Void> {
+	private static class JavaBeanUnusuableGetLoadingResult implements LoadingResult<EntityReference, Void> {
 
-		private static final JavaBeanUnusuableLoadingResult INSTANCE = new JavaBeanUnusuableLoadingResult();
+		private final DocumentReferenceConverter<EntityReference> documentReferenceConverter;
 
-		private JavaBeanUnusuableLoadingResult() {
+		private JavaBeanUnusuableGetLoadingResult(DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+			this.documentReferenceConverter = documentReferenceConverter;
 		}
 
 		@Override
 		public Void get(Object key) {
 			throw new AssertionFailure(
 					"Attempt to load an entity with a key that was never issued."
-					+ " There is probably a bug in Hibernate Search, please report it."
+							+ " There is probably a bug in Hibernate Search, please report it."
 			);
 		}
+
+		@Override
+		public EntityReference convertReference(DocumentReference reference) {
+			return documentReferenceConverter.fromDocumentReference( reference );
+		}
+
 	}
 }

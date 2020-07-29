@@ -30,7 +30,7 @@ public class StubCompositeFunctionSearchProjection<P1, P> implements StubComposi
 	}
 
 	@Override
-	public P transform(LoadingResult<?> loadingResult, Object extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		return transformer.apply( projection.transform( loadingResult, extractedData, context ) );
 	}

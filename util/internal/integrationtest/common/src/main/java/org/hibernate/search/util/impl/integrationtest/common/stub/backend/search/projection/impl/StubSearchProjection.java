@@ -15,5 +15,5 @@ public interface StubSearchProjection<P> extends SearchProjection<P> {
 	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			StubSearchProjectionContext context);
 
-	P transform(LoadingResult<?> loadingResult, Object extractedData, StubSearchProjectionContext context);
+	P transform(LoadingResult<?, ?> loadingResult, Object extractedData, StubSearchProjectionContext context);
 }

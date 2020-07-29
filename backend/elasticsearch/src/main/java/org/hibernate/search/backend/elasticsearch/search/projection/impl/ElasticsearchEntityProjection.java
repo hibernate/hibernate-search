@@ -42,7 +42,7 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public E transform(LoadingResult<?> loadingResult, Object extractedData,
+	public E transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			SearchProjectionTransformContext context) {
 		E loaded = (E) loadingResult.get( extractedData );
 		if ( loaded == null ) {

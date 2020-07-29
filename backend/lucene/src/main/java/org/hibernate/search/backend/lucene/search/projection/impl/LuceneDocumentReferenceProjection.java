@@ -38,7 +38,7 @@ class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<Documen
 	}
 
 	@Override
-	public DocumentReference transform(LoadingResult<?> loadingResult, DocumentReference extractedData,
+	public DocumentReference transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
 	}

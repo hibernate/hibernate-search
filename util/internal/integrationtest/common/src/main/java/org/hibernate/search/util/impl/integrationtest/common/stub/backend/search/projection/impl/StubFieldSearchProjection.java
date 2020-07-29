@@ -28,7 +28,7 @@ class StubFieldSearchProjection<T> implements StubSearchProjection<T> {
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		return expectedType.cast( extractedData );
 	}

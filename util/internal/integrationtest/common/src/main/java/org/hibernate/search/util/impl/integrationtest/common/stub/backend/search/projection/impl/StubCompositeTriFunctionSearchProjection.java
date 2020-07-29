@@ -44,7 +44,7 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements 
 	}
 
 	@Override
-	public P transform(LoadingResult<?> loadingResult, Object extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		Object[] extractedElements = (Object[]) extractedData;
 

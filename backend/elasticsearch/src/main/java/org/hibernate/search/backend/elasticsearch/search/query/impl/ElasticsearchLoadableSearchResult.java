@@ -57,7 +57,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 	ElasticsearchSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
-		LoadingResult<?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
+		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
 
 		int readIndex = 0;
 		int writeIndex = 0;

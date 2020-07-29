@@ -39,7 +39,7 @@ public class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubC
 	}
 
 	@Override
-	public P transform(LoadingResult<?> loadingResult, Object extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		Object[] extractedElements = (Object[]) extractedData;
 

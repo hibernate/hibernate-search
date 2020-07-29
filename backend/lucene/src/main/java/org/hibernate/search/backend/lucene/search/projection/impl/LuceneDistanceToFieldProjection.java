@@ -122,7 +122,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	}
 
 	@Override
-	public P transform(LoadingResult<?> loadingResult, E extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );

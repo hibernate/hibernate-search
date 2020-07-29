@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 
-public class LuceneEntityReferenceProjection<R> extends AbstractLuceneProjection<R, R> {
+public class LuceneEntityReferenceProjection<R> extends AbstractLuceneProjection<DocumentReference, R> {
 
 	private LuceneEntityReferenceProjection(LuceneSearchContext searchContext) {
 		super( searchContext );
@@ -33,17 +33,15 @@ public class LuceneEntityReferenceProjection<R> extends AbstractLuceneProjection
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		DocumentReference documentReference =
-				context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
-		return (R) mapper.convertReference( documentReference );
+		return context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
 	}
 
 	@Override
-	public R transform(LoadingResult<?> loadingResult, R extractedData,
+	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
 			SearchProjectionTransformContext context) {
-		return extractedData;
+		return (R) loadingResult.convertReference( extractedData );
 	}
 
 	public static class Builder<R> extends AbstractLuceneProjection.AbstractBuilder<R>
