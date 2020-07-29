@@ -15,17 +15,18 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
@@ -49,7 +50,7 @@ public class PojoIndexedTypeManager<I, E>
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoCaster<E> caster;
 	private final IdentifierMappingImplementor<I, E> identifierMapping;
-	private final RoutingKeyProvider<E> routingKeyProvider;
+	private final BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
@@ -57,13 +58,13 @@ public class PojoIndexedTypeManager<I, E>
 	public PojoIndexedTypeManager(PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			IdentifierMappingImplementor<I, E> identifierMapping,
-			RoutingKeyProvider<E> routingKeyProvider,
+			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.identifierMapping = identifierMapping;
-		this.routingKeyProvider = routingKeyProvider;
+		this.routingBridgeHolder = routingBridgeHolder;
 		this.processor = processor;
 		this.indexManager = indexManager;
 		this.reindexingResolver = reindexingResolver;
@@ -78,7 +79,8 @@ public class PojoIndexedTypeManager<I, E>
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( RoutingKeyProvider::close, routingKeyProvider );
+			closer.push( holder -> holder.get().close(), routingBridgeHolder );
+			closer.push( BeanHolder::close, routingBridgeHolder );
 			closer.push( PojoIndexingProcessor::close, processor );
 			closer.push( PojoImplicitReindexingResolver::close, reindexingResolver );
 		}
@@ -89,7 +91,7 @@ public class PojoIndexedTypeManager<I, E>
 		builder.attribute( "typeIdentifier", typeIdentifier )
 				.attribute( "indexManager", indexManager )
 				.attribute( "identifierMapping", identifierMapping )
-				.attribute( "routingKeyProvider", routingKeyProvider )
+				.attribute( "routingBridgeHolder", routingBridgeHolder )
 				.attribute( "processor", processor )
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
@@ -116,15 +118,12 @@ public class PojoIndexedTypeManager<I, E>
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.mappingContext()
 		);
-		String routingKey = ( providedRoutingKey != null ) ? providedRoutingKey :
-				routingKeyProvider.toRoutingKey(
-						identifier,
-						entitySupplier,
-						sessionContext
-				);
-		return new PojoDocumentReferenceProvider(
-				documentIdentifier, routingKey, identifier
-		);
+		String routingKey = providedRoutingKey;
+		if ( routingKey == null && routingBridgeHolder != null ) {
+			routingKey = new DocumentRoutesImpl<>( routingBridgeHolder.get(), identifier, entitySupplier.get() )
+					.toRoutingKey( sessionContext.routingBridgeRouteContext() );
+		}
+		return new PojoDocumentReferenceProvider( documentIdentifier, routingKey, identifier );
 	}
 
 	@Override
@@ -133,9 +132,7 @@ public class PojoIndexedTypeManager<I, E>
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.mappingContext()
 		);
-		return new PojoDocumentReferenceProvider(
-				documentIdentifier, providedRoutingKey, identifier
-		);
+		return new PojoDocumentReferenceProvider( documentIdentifier, providedRoutingKey, identifier );
 	}
 
 	@Override

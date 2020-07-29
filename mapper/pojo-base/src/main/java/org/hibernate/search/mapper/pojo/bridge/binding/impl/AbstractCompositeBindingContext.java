@@ -14,11 +14,11 @@ import org.hibernate.search.mapper.pojo.model.dependency.impl.AbstractPojoBridge
 import org.hibernate.search.mapper.pojo.model.impl.AbstractPojoModelCompositeElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractCompositeBindingContext extends AbstractBindingContext {
+public abstract class AbstractCompositeBindingContext extends AbstractBindingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	AbstractCompositeBindingContext(BeanResolver beanResolver) {
+	protected AbstractCompositeBindingContext(BeanResolver beanResolver) {
 		super( beanResolver );
 	}
 

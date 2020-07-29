@@ -6,19 +6,31 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +53,9 @@ public class IndexedIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper multiBackendSetupHelper;
+
+	@Rule
+	public StaticCounters staticCounters = new StaticCounters();
 
 	public IndexedIT() {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
@@ -486,4 +501,66 @@ public class IndexedIT {
 				);
 	}
 
+	@Test
+	public void routingBinder() {
+		@Indexed(routingBinder = @RoutingBinderRef(type = StaticCounterRoutingBinder.class))
+		class IndexedEntity {
+			Integer id;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+		}
+
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> { } );
+
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		defaultBackendMock.verifyExpectationsMet();
+
+		assertThat( staticCounters.get( StaticCounterRoutingBinder.KEY ) ).isEqualTo( 1 );
+	}
+
+	@Test
+	public void routingBinder_failure() {
+		@Indexed(routingBinder = @RoutingBinderRef(type = FailingRoutingBinder.class))
+		class IndexedEntity {
+			Integer id;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+		}
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure( "Simulated failure" )
+						.build() );
+	}
+
+	public static class StaticCounterRoutingBinder implements RoutingBinder {
+		private static final StaticCounters.Key KEY = StaticCounters.createKey();
+
+		@Override
+		public void bind(RoutingBindingContext context) {
+			assertThat( context ).isNotNull();
+			assertThat( context.beanResolver() ).isNotNull();
+			assertThat( context.bridgedElement() ).isNotNull();
+			context.bridge( Object.class, new RoutingBridge<Object>() {
+				@Override
+				public void route(DocumentRoutes routes, Object entityIdentifier, Object indexedEntity,
+						RoutingBridgeRouteContext context) {
+					throw new AssertionFailure( "This method should not be called." );
+				}
+			} );
+			StaticCounters.get().increment( KEY );
+		}
+	}
+
+	public static class FailingRoutingBinder implements RoutingBinder {
+		@Override
+		public void bind(RoutingBindingContext context) {
+			throw new RuntimeException( "Simulated failure" );
+		}
+	}
 }

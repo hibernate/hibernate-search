@@ -6,9 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
+import java.util.Optional;
+
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed> {
@@ -24,7 +31,17 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 		if ( backendName.isEmpty() ) {
 			backendName = null;
 		}
-		mappingContext.indexed().backend( backendName ).index( indexName )
+		TypeMappingIndexedStep indexedStep = mappingContext.indexed().backend( backendName ).index( indexName )
 				.enabled( annotation.enabled() );
+
+		RoutingBinderRef routingBinderReferenceAnnotation = annotation.routingBinder();
+		Optional<BeanReference<? extends RoutingBinder>> routingBinderReference = context.toBeanReference(
+				RoutingBinder.class,
+				RoutingBinderRef.UndefinedRoutingBinderImplementationType.class,
+				routingBinderReferenceAnnotation.type(), routingBinderReferenceAnnotation.name()
+		);
+		if ( routingBinderReference.isPresent() ) {
+			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ) );
+		}
 	}
 }

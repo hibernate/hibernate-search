@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorIndexedTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoIndexedTypeAdditionalMetadata;
 
@@ -18,6 +19,7 @@ class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadata
 	private Optional<String> backendName = Optional.empty();
 	private Optional<String> indexName = Optional.empty();
 	private boolean enabled = true;
+	private Optional<RoutingBinder> routingBinder = Optional.empty();
 
 	PojoIndexedTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder) {
 		this.rootBuilder = rootBuilder;
@@ -44,9 +46,14 @@ class PojoIndexedTypeAdditionalMetadataBuilder implements PojoAdditionalMetadata
 		this.enabled = enabled;
 	}
 
+	@Override
+	public void routingBinder(RoutingBinder binder) {
+		this.routingBinder = Optional.ofNullable( binder );
+	}
+
 	public Optional<PojoIndexedTypeAdditionalMetadata> build() {
 		if ( enabled ) {
-			return Optional.of( new PojoIndexedTypeAdditionalMetadata( backendName, indexName ) );
+			return Optional.of( new PojoIndexedTypeAdditionalMetadata( backendName, indexName, routingBinder ) );
 		}
 		else {
 			return Optional.empty();

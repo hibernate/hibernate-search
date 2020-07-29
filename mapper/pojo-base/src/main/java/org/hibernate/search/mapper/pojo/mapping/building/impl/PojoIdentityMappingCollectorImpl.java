@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
@@ -20,8 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBi
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ProvidedIdentifierMapping;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyBridgeRoutingKeyProvider;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyProvider;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyBridgeRoutingBridgeAdapter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -46,13 +47,14 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 
 	IdentifierMappingImplementor<?, E> identifierMapping;
 	Optional<PojoPropertyModel<?>> documentIdSourceProperty;
-	RoutingKeyProvider<E> routingKeyProvider;
+	BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
 
 	PojoIdentityMappingCollectorImpl(PojoRawTypeModel<E> typeModel,
 			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
+			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
 			BeanResolver beanResolver) {
 		this.typeModel = typeModel;
 		this.mappingHelper = mappingHelper;
@@ -67,12 +69,14 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 		else {
 			this.entityIdPropertyPath = null;
 		}
+		this.routingBridgeHolder = routingBridgeHolder;
 	}
 
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( RoutingKeyProvider::close, routingKeyProvider );
+			closer.push( holder -> holder.get().close(), routingBridgeHolder );
+			closer.push( BeanHolder::close, routingBridgeHolder );
 		}
 	}
 
@@ -93,9 +97,12 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	@Override
 	public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
 			RoutingKeyBinder binder) {
+		if ( routingBridgeHolder != null ) {
+			throw log.conflictingRoutingBridgeAndRoutingKeyBinder( routingBridgeHolder.get(), binder );
+		}
 		BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.indexModelBinder()
 				.bindRoutingKey( bindingContext, modelPath, binder );
-		this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( boundRoutingKeyBridge.getBridgeHolder() );
+		this.routingBridgeHolder = BeanHolder.of( new RoutingKeyBridgeRoutingBridgeAdapter<>( boundRoutingKeyBridge.getBridgeHolder() ) );
 		return boundRoutingKeyBridge;
 	}
 
@@ -113,10 +120,6 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 			else {
 				throw log.missingIdentifierMapping( typeModel );
 			}
-		}
-
-		if ( routingKeyProvider == null ) {
-			routingKeyProvider = RoutingKeyProvider.alwaysNull();
 		}
 	}
 

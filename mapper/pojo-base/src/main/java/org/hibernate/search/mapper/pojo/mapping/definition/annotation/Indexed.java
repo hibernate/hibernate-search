@@ -12,6 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.IndexedProcessor;
@@ -43,5 +44,11 @@ public @interface Indexed {
 	 * Useful to disable indexing when subclassing an indexed type.
 	 */
 	boolean enabled() default true;
+
+	/**
+	 * @return A reference to the routing binder to use to assign a routing bridge to this indexed entity.
+	 * @see RoutingBinderRef
+	 */
+	RoutingBinderRef routingBinder() default @RoutingBinderRef;
 
 }

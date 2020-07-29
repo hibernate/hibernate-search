@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
@@ -19,9 +20,10 @@ import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImpl
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
@@ -55,6 +57,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 			MappedIndexManagerBuilder indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
+			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
 			BeanResolver beanResolver) {
 		this.typeModel = typeModel;
 		this.indexManagerBuilder = indexManagerBuilder;
@@ -64,7 +67,8 @@ class PojoIndexedTypeManagerBuilder<E> {
 				entityTypeMetadata,
 				mappingHelper,
 				indexManagerBuilder.rootBindingContext(),
-				providedIdentifierBridge, beanResolver
+				providedIdentifierBridge, routingBridgeHolder,
+				beanResolver
 		);
 		this.processorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
@@ -135,7 +139,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.typeIdentifier(), typeModel.caster(),
 				identityMappingCollector.identifierMapping,
-				identityMappingCollector.routingKeyProvider,
+				identityMappingCollector.routingBridgeHolder,
 				preBuiltIndexingProcessor,
 				indexManager,
 				reindexingResolver
@@ -146,5 +150,4 @@ class PojoIndexedTypeManagerBuilder<E> {
 
 		closed = true;
 	}
-
 }

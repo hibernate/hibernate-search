@@ -22,6 +22,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -44,14 +46,15 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
  */
 public final class HibernateOrmExtension
 		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
-		IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
-		RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
-		TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
-		PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
-		ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
-		ValueBridgeFromIndexedValueContextExtension<HibernateOrmSessionContext>,
-		ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
-		FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext> {
+				IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
+				RoutingBridgeRouteContextExtension<HibernateOrmSessionContext>,
+				RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
+				TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
+				PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
+				ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
+				ValueBridgeFromIndexedValueContextExtension<HibernateOrmSessionContext>,
+				ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
+				FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext> {
 
 	private static final HibernateOrmExtension INSTANCE = new HibernateOrmExtension();
 
@@ -77,6 +80,15 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(IdentifierBridgeFromDocumentIdentifierContext original,
+			BridgeSessionContext sessionContext) {
+		return extendToOrmSessionContext( sessionContext );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<HibernateOrmSessionContext> extendOptional(RoutingBridgeRouteContext original,
 			BridgeSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}

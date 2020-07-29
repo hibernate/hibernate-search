@@ -6,18 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
-import java.util.function.Supplier;
-
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.util.common.impl.Closer;
 
-public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider<E> {
+public class RoutingKeyBridgeRoutingBridgeAdapter<E> implements RoutingBridge<E> {
 
 	private final BeanHolder<? extends RoutingKeyBridge> bridgeHolder;
 
-	public RoutingKeyBridgeRoutingKeyProvider(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+	public RoutingKeyBridgeRoutingBridgeAdapter(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
 		this.bridgeHolder = bridgeHolder;
 	}
 
@@ -37,12 +38,9 @@ public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider
 	}
 
 	@Override
-	public String toRoutingKey(Object identifier, Supplier<E> entitySupplier,
-			BridgeSessionContext context) {
-		return bridgeHolder.get().toRoutingKey(
-				context.tenantIdentifier(), identifier,
-				entitySupplier.get(),
-				context.routingKeyBridgeToRoutingKeyContext()
-		);
+	public void route(DocumentRoutes routes, Object entityIdentifier, E indexedEntity, RoutingBridgeRouteContext context) {
+		String routingKey = bridgeHolder.get().toRoutingKey( context.tenantIdentifier(), entityIdentifier,
+				indexedEntity, (RoutingKeyBridgeToRoutingKeyContext) context );
+		routes.addRoute().routingKey( routingKey );
 	}
 }

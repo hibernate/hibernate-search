@@ -12,12 +12,14 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -27,7 +29,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
  * then delegates to that binder.
  */
 public final class BeanDelegatingBinder
-		implements TypeBinder, PropertyBinder, RoutingKeyBinder, MarkerBinder, IdentifierBinder, ValueBinder {
+		implements TypeBinder, PropertyBinder, RoutingBinder, RoutingKeyBinder,
+				MarkerBinder, IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> delegateReference;
 
@@ -52,6 +55,14 @@ public final class BeanDelegatingBinder
 	public void bind(PropertyBindingContext context) {
 		try ( BeanHolder<? extends PropertyBinder> delegateHolder =
 				createDelegate( context.beanResolver(), PropertyBinder.class ) ) {
+			delegateHolder.get().bind( context );
+		}
+	}
+
+	@Override
+	public void bind(RoutingBindingContext context) {
+		try ( BeanHolder<? extends RoutingBinder> delegateHolder =
+				createDelegate( context.beanResolver(), RoutingBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}

@@ -15,13 +15,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
@@ -33,9 +33,12 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
@@ -50,6 +53,8 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoIndexedTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -68,7 +73,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
-	private final BeanResolver beanResolver;
 	private final boolean multiTenancyEnabled;
 	private final ReindexOnUpdate defaultReindexOnUpdate;
 
@@ -110,10 +114,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.delegate = delegate;
 
 		this.providedIdentifierBridge = providedIdentifierBridge;
-		this.beanResolver = buildContext.beanResolver();
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
-				beanResolver, failureCollector, contributorProvider
+				buildContext.beanResolver(), failureCollector, contributorProvider
 		);
 
 		this.extractorBinder = extractorBinder;
@@ -122,9 +125,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				buildContext, introspector, extractorBinder, bridgeResolver, typeAdditionalMetadataProvider
 		);
 
-		mappingHelper = new PojoMappingHelper(
-				failureCollector, contributorProvider, introspector, indexModelBinder
-		);
+		mappingHelper = new PojoMappingHelper( buildContext.beanResolver(), failureCollector, contributorProvider,
+				introspector, indexModelBinder );
 	}
 
 	@Override
@@ -177,7 +179,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw log.missingEntityTypeMetadata( rawTypeModel );
 			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();
-			backendNameCollector.accept( indexedTypeMetadata.getBackendName() );
+			backendNameCollector.accept( indexedTypeMetadata.backendName() );
 			indexedEntityTypes.add( rawTypeModel );
 		}
 	}
@@ -199,25 +201,34 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 	}
 
-	private void mapIndexedType(PojoRawTypeModel<?> indexedEntityType,
+	private <E> void mapIndexedType(PojoRawTypeModel<E> indexedEntityType,
 			MappedIndexManagerFactory indexManagerFactory) {
 		PojoTypeAdditionalMetadata metadata = typeAdditionalMetadataProvider.get( indexedEntityType );
 		// This metadata is guaranteed to exist; see prepareEntityOrIndexedType()
-		PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = metadata.getIndexedTypeMetadata().get();
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = metadata.getEntityTypeMetadata().get();
-
+		PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = metadata.getIndexedTypeMetadata().get();
 		String entityName = entityTypeMetadata.getEntityName();
-		MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
-				this,
-				indexedTypeMetadata.getBackendName(),
-				indexedTypeMetadata.getIndexName()
-						.orElse( entityName ),
-				entityName,
-				multiTenancyEnabled
-		);
-		PojoIndexedTypeManagerBuilder<?> builder = createIndexedTypeManagerBuilder(
-				indexedEntityType, entityTypeMetadata, indexManagerBuilder
-		);
+		String indexName = indexedTypeMetadata.indexName().orElse( entityName );
+
+		MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager( this,
+				indexedTypeMetadata.backendName(), indexName, entityName, multiTenancyEnabled );
+
+		Optional<RoutingBinder> routingBinderOptional = indexedTypeMetadata.routingBinder();
+		BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder = null;
+		if ( routingBinderOptional.isPresent() ) {
+			PojoModelTypeRootElement<E> pojoModelRootElement = new PojoModelTypeRootElement<>(
+					BoundPojoModelPath.root( indexedEntityType ), mappingHelper.introspector(),
+					typeAdditionalMetadataProvider );
+			routingBridgeHolder = new RoutingBindingContextImpl<>( mappingHelper.beanResolver(),
+					mappingHelper.introspector(), indexedEntityType, pojoModelRootElement )
+					.applyBinder( routingBinderOptional.get() );
+		}
+
+		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( indexedEntityType,
+				entityTypeMetadata, mappingHelper, indexManagerBuilder,
+				delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName, indexName ),
+				providedIdentifierBridge, routingBridgeHolder, mappingHelper.beanResolver() );
+
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( indexedEntityType, builder );
 
@@ -364,21 +375,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			log.createdPojoContainedTypeManager( typeManager );
 			containedTypeManagerContainerBuilder.add( entityType, typeManager );
 		}
-	}
-
-	private <E> PojoIndexedTypeManagerBuilder<E> createIndexedTypeManagerBuilder(
-			PojoRawTypeModel<E> entityTypeModel, PojoEntityTypeAdditionalMetadata entityTypeMetadata,
-			MappedIndexManagerBuilder indexManagerBuilder) {
-		return new PojoIndexedTypeManagerBuilder<>(
-				entityTypeModel,
-				entityTypeMetadata,
-				mappingHelper,
-				indexManagerBuilder,
-				delegate.createIndexedTypeExtendedMappingCollector(
-						entityTypeModel, entityTypeMetadata.getEntityName(), indexManagerBuilder.indexName()
-				),
-				providedIdentifierBridge, beanResolver
-		);
 	}
 
 }

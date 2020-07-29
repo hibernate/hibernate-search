@@ -55,8 +55,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityReference>
-		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext, SearchIndexingPlanSessionContext,
-		DocumentReferenceConverter<EntityReference>, EntityReferenceFactory<EntityReference> {
+		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext,
+				SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference>,
+				EntityReferenceFactory<EntityReference> {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
