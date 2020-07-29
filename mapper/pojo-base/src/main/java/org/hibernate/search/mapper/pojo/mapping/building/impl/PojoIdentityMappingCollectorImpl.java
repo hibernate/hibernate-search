@@ -79,7 +79,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	@Override
 	public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
 			IdentifierBinder binder) {
-		BoundIdentifierBridge<T> boundIdentifierBridge = mappingHelper.getIndexModelBinder()
+		BoundIdentifierBridge<T> boundIdentifierBridge = mappingHelper.indexModelBinder()
 				.bindIdentifier( bindingContext, modelPath, binder );
 		PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 		this.identifierMapping = new PropertyIdentifierMapping<>(
@@ -93,7 +93,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	@Override
 	public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
 			RoutingKeyBinder binder) {
-		BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
+		BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.indexModelBinder()
 				.bindRoutingKey( bindingContext, modelPath, binder );
 		this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( boundRoutingKeyBridge.getBridgeHolder() );
 		return boundRoutingKeyBridge;

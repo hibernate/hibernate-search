@@ -28,19 +28,19 @@ public class PojoMappingHelper {
 		this.indexModelBinder = indexModelBinder;
 	}
 
-	public FailureCollector getFailureCollector() {
+	public FailureCollector failureCollector() {
 		return failureCollector;
 	}
 
-	public TypeMetadataContributorProvider<PojoTypeMetadataContributor> getContributorProvider() {
+	public TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider() {
 		return contributorProvider;
 	}
 
-	public PojoBootstrapIntrospector getIntrospector() {
+	public PojoBootstrapIntrospector introspector() {
 		return introspector;
 	}
 
-	public PojoIndexModelBinder getIndexModelBinder() {
+	public PojoIndexModelBinder indexModelBinder() {
 		return indexModelBinder;
 	}
 

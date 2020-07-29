@@ -72,7 +72,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 	@Override
 	public void propertyBinder(PropertyBinder binder) {
-		mappingHelper.getIndexModelBinder().bindProperty( bindingContext, modelPath, binder )
+		mappingHelper.indexModelBinder().bindProperty( bindingContext, modelPath, binder )
 				.ifPresent( boundPropertyBridges::add );
 	}
 
@@ -90,7 +90,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 					containerElementNodeBuilders.get( extractorPath );
 			if ( containerElementNodeBuilder == null && !containerElementNodeBuilders.containsKey( extractorPath ) ) {
 				BoundContainerExtractorPath<P, ?> boundExtractorPath =
-						mappingHelper.getIndexModelBinder().bindExtractorPath(
+						mappingHelper.indexModelBinder().bindExtractorPath(
 								modelPath.getPropertyModel().typeModel(),
 								extractorPath
 						);
@@ -120,7 +120,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			BoundContainerExtractorPath<P, V> boundExtractorPath) {
 		BoundPojoModelPathValueNode<T, P, V> containerElementPath = modelPath.value( boundExtractorPath );
 		ContainerExtractorHolder<P, V> extractorHolder =
-				mappingHelper.getIndexModelBinder().createExtractors( boundExtractorPath );
+				mappingHelper.indexModelBinder().createExtractors( boundExtractorPath );
 		return new PojoIndexingProcessorContainerElementNodeBuilder<>(
 				containerElementPath, extractorHolder,
 				mappingHelper, bindingContext
