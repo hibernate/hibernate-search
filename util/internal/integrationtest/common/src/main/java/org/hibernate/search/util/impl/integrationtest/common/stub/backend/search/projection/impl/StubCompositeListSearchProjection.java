@@ -40,7 +40,7 @@ public class StubCompositeListSearchProjection<P> implements StubCompositeSearch
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public P transform(LoadingResult<?> loadingResult, Object extractedData,
+	public P transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		List<Object> extractedElements = (List<Object>) extractedData;
 		List<Object> results = new ArrayList<>( extractedElements.size() );

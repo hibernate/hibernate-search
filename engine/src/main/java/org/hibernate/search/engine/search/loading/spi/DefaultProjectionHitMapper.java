@@ -27,32 +27,34 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 	}
 
 	@Override
-	public R convertReference(DocumentReference reference) {
-		return documentReferenceConverter.fromDocumentReference( reference );
-	}
-
-	@Override
 	public Object planLoading(DocumentReference reference) {
 		referencesToLoad.add( documentReferenceConverter.fromDocumentReference( reference ) );
 		return referencesToLoad.size() - 1;
 	}
 
 	@Override
-	public LoadingResult<E> loadBlocking() {
-		return new DefaultLoadingResult<>( objectLoader.loadBlocking( referencesToLoad ) );
+	public LoadingResult<R, E> loadBlocking() {
+		return new DefaultLoadingResult<>( objectLoader.loadBlocking( referencesToLoad ), documentReferenceConverter );
 	}
 
-	private static class DefaultLoadingResult<E> implements LoadingResult<E> {
+	private static class DefaultLoadingResult<R, E> implements LoadingResult<R, E> {
 
 		private final List<? extends E> loadedObjects;
+		private final DocumentReferenceConverter<R> documentReferenceConverter;
 
-		private DefaultLoadingResult(List<? extends E> loadedObjects) {
+		private DefaultLoadingResult(List<? extends E> loadedObjects, DocumentReferenceConverter<R> documentReferenceConverter) {
 			this.loadedObjects = CollectionHelper.toImmutableList( loadedObjects );
+			this.documentReferenceConverter = documentReferenceConverter;
 		}
 
 		@Override
 		public E get(Object key) {
 			return loadedObjects.get( (int) key );
+		}
+
+		@Override
+		public R convertReference(DocumentReference reference) {
+			return documentReferenceConverter.fromDocumentReference( reference );
 		}
 	}
 }

@@ -41,7 +41,7 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 	}
 
 	@Override
-	public Float transform(LoadingResult<?> loadingResult, Float extractedData,
+	public Float transform(LoadingResult<?, ?> loadingResult, Float extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
 	}

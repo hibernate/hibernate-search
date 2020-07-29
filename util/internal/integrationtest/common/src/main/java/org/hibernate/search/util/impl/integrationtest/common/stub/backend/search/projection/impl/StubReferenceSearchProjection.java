@@ -26,13 +26,14 @@ public class StubReferenceSearchProjection<T> implements StubSearchProjection<T>
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			StubSearchProjectionContext context) {
-		return projectionHitMapper.convertReference( (DocumentReference) projectionFromIndex );
+		return projectionFromIndex;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
-		return (T) extractedData;
+		DocumentReference data = (DocumentReference) extractedData;
+		return (T) loadingResult.convertReference( data );
 	}
 }

@@ -52,7 +52,7 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	}
 
 	@Override
-	public JsonObject transform(LoadingResult<?> loadingResult, JsonObject extractedData,
+	public JsonObject transform(LoadingResult<?, ?> loadingResult, JsonObject extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
 	}

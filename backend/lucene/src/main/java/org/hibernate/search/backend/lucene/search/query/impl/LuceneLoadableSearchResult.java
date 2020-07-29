@@ -57,7 +57,7 @@ public class LuceneLoadableSearchResult<H> {
 	LuceneSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
-		LoadingResult<?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
+		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
 
 		int readIndex = 0;
 		int writeIndex = 0;

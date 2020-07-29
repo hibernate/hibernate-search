@@ -58,7 +58,7 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 	}
 
 	@Override
-	public final P transform(LoadingResult<?> loadingResult, Object[] extractedData,
+	public final P transform(LoadingResult<?, ?> loadingResult, Object[] extractedData,
 			SearchProjectionTransformContext context) {
 		// Transform in-place
 		for ( int i = 0; i < extractedData.length; i++ ) {

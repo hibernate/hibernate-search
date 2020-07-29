@@ -31,7 +31,7 @@ public class StubEntitySearchProjection<T> implements StubSearchProjection<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData,
+	public T transform(LoadingResult<?, ?> loadingResult, Object extractedData,
 			StubSearchProjectionContext context) {
 		T loaded = (T) loadingResult.get( extractedData );
 		if ( loaded == null ) {

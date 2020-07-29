@@ -17,14 +17,6 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 public interface ProjectionHitMapper<R, E> {
 
 	/**
-	 * Convert a document reference to the reference specific to the mapper.
-	 *
-	 * @param reference The document reference.
-	 * @return The reference specific to the mapper.
-	 */
-	R convertReference(DocumentReference reference);
-
-	/**
 	 * Plan the loading of an entity.
 	 *
 	 * @param reference The document reference.
@@ -37,6 +29,6 @@ public interface ProjectionHitMapper<R, E> {
 	 *
 	 * @return The loaded entities.
 	 */
-	LoadingResult<E> loadBlocking();
+	LoadingResult<R, E> loadBlocking();
 
 }

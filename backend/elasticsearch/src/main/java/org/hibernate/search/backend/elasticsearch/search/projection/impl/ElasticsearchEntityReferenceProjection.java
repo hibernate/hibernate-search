@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -14,7 +15,7 @@ import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjecti
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticsearchProjection<R, R> {
+public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticsearchProjection<DocumentReference, R> {
 
 	private final DocumentReferenceExtractionHelper helper;
 
@@ -35,15 +36,15 @@ public class ElasticsearchEntityReferenceProjection<R> extends AbstractElasticse
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
+	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return (R) projectionHitMapper.convertReference( helper.extract( hit, context ) );
+		return helper.extract( hit, context );
 	}
 
 	@Override
-	public R transform(LoadingResult<?> loadingResult, R extractedData,
+	public R transform(LoadingResult<?, ?> loadingResult, DocumentReference extractedData,
 			SearchProjectionTransformContext context) {
-		return extractedData;
+		return (R) loadingResult.convertReference( extractedData );
 	}
 
 	static class Builder<R> extends AbstractElasticsearchProjection.AbstractBuilder<R>
