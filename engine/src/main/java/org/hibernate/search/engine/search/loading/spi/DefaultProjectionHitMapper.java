@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.loading.spi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
@@ -18,7 +19,7 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 	private final DocumentReferenceConverter<R> documentReferenceConverter;
 	private final EntityLoader<R, ? extends E> objectLoader;
 
-	private final List<R> referencesToLoad = new ArrayList<>();
+	private final List<DocumentReference> referencesToLoad = new ArrayList<>();
 
 	public DefaultProjectionHitMapper(DocumentReferenceConverter<R> documentReferenceConverter,
 			EntityLoader<R, ? extends E> objectLoader) {
@@ -28,13 +29,14 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 
 	@Override
 	public Object planLoading(DocumentReference reference) {
-		referencesToLoad.add( documentReferenceConverter.fromDocumentReference( reference ) );
+		referencesToLoad.add( reference );
 		return referencesToLoad.size() - 1;
 	}
 
 	@Override
 	public LoadingResult<R, E> loadBlocking() {
-		return new DefaultLoadingResult<>( objectLoader.loadBlocking( referencesToLoad ), documentReferenceConverter );
+		List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference ).collect( Collectors.toList() );
+		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted ), documentReferenceConverter );
 	}
 
 	private static class DefaultLoadingResult<R, E> implements LoadingResult<R, E> {
