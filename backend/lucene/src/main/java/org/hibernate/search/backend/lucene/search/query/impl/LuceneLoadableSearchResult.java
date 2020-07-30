@@ -35,7 +35,6 @@ public class LuceneLoadableSearchResult<H> {
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private final long hitCount;
-	private final boolean hasHits;
 
 	private List<Object> extractedData;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
@@ -51,8 +50,6 @@ public class LuceneLoadableSearchResult<H> {
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
 		this.extractedData = extractedData;
-		// compute this value before the loading
-		this.hasHits = !extractedData.isEmpty();
 		this.extractedAggregations = extractedAggregations;
 		this.took = took;
 		this.timedOut = timedOut;
@@ -93,9 +90,5 @@ public class LuceneLoadableSearchResult<H> {
 		extractedData = null;
 
 		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut, extractContext.getTopDocs() );
-	}
-
-	public boolean hasHits() {
-		return hasHits;
 	}
 }

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -42,6 +43,8 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 	private final int pageSize;
 
 	private int scrollIndex = 0;
+	private int queryFetchSize;
+	private LuceneExtractableSearchResult<H> search;
 
 	public LuceneSearchScroll(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
@@ -58,6 +61,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 		this.searcher = searcher;
 		this.indexReader = indexReader;
 		this.pageSize = pageSize;
+		this.queryFetchSize = pageSize;
 	}
 
 	@Override
@@ -74,23 +78,43 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 	public SearchScrollResult<H> next() {
 		timeoutManager.start();
 
-		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, scrollIndex, pageSize );
-		LuceneLoadableSearchResult<H> search = doSubmitWithIndexReader( work, indexReader );
-		LuceneSearchResult<H> result = search
-				/*
-				 * WARNING: the following call must run in the user thread.
-				 * If we introduce async processing, we will have to add a nextAsync method here,
-				 * as well as in ProjectionHitMapper and EntityLoader.
-				 * This method may not be easy to implement for blocking mappers,
-				 * so we may choose to throw exceptions for those.
-				 */
-				.loadBlocking();
+		if ( search == null || scrollIndex + pageSize > queryFetchSize ) {
+			if ( search != null ) {
+				queryFetchSize *= 2;
+			}
+			search = doSubmitWithIndexReader( workFactory.scroll( searcher, 0, queryFetchSize ), indexReader );
+		}
+
+		// no more results check
+		if ( scrollIndex >= search.totalHitCount() ) {
+			return new SimpleSearchScrollResult<>( false, Collections.emptyList() );
+		}
+
+		int lastIndex = Math.min( scrollIndex + pageSize - 1, Math.toIntExact( search.totalHitCount() ) - 1 );
+
+		LuceneLoadableSearchResult<H> loadableSearchResult;
+		try {
+			loadableSearchResult = search.extract( scrollIndex, lastIndex );
+		}
+		catch (IOException e) {
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(),
+					EventContexts.fromIndexNames( searchContext.indexes().indexNames() ), e );
+		}
+
+		/*
+		 * WARNING: the following call must run in the user thread.
+		 * If we introduce async processing, we will have to add a nextAsync method here,
+		 * as well as in ProjectionHitMapper and EntityLoader.
+		 * This method may not be easy to implement for blocking mappers,
+		 * so we may choose to throw exceptions for those.
+		 */
+		LuceneSearchResult<H> result = loadableSearchResult.loadBlocking();
 
 		timeoutManager.stop();
 
 		// increasing the index for further next(s)
 		scrollIndex += pageSize;
-		return new SimpleSearchScrollResult<>( search.hasHits(), result.hits() );
+		return new SimpleSearchScrollResult<>( true, result.hits() );
 	}
 
 	private <T> T doSubmitWithIndexReader(ReadWork<T> work, HibernateSearchMultiReader indexReader) {

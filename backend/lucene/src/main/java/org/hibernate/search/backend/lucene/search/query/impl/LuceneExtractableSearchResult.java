@@ -67,6 +67,10 @@ public class LuceneExtractableSearchResult<H> {
 		);
 	}
 
+	public long totalHitCount() {
+		return extractContext.getLuceneCollectors().getTotalHitCount();
+	}
+
 	private List<Object> extractHits(int startIndex, int lastIndex) {
 		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
 
