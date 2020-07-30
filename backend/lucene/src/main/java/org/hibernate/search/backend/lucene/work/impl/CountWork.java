@@ -19,9 +19,9 @@ public class CountWork implements ReadWork<Integer> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearcher<?> searcher;
+	private final LuceneSearcher<?, ?> searcher;
 
-	CountWork(LuceneSearcher<?> searcher) {
+	CountWork(LuceneSearcher<?, ?> searcher) {
 		this.searcher = searcher;
 	}
 

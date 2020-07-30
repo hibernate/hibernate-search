@@ -35,7 +35,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 	private final LuceneSearchContext searchContext;
 	private final Set<String> routingKeys;
 	private final TimeoutManager timeoutManager;
-	private final LuceneSearcher<LuceneLoadableSearchResult<H>> searcher;
+	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
 
 	// specific to this scroll instance:
 	private final HibernateSearchMultiReader indexReader;
@@ -47,7 +47,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
-			LuceneSearcher<LuceneLoadableSearchResult<H>> searcher,
+			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
 			HibernateSearchMultiReader indexReader, int pageSize
 			) {
 		this.queryOrchestrator = queryOrchestrator;

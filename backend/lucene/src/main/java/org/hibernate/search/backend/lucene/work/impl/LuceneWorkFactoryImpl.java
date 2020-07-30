@@ -94,17 +94,17 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public <R> ReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit) {
+	public <R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit) {
 		return new SearchWork<>( searcher, offset, limit );
 	}
 
 	@Override
-	public ReadWork<Integer> count(LuceneSearcher<?> searcher) {
+	public ReadWork<Integer> count(LuceneSearcher<?, ?> searcher) {
 		return new CountWork( searcher );
 	}
 
 	@Override
-	public ReadWork<Explanation> explain(LuceneSearcher<?> searcher,
+	public ReadWork<Explanation> explain(LuceneSearcher<?, ?> searcher,
 			String explainedDocumentTypeName, String explainedDocumentId, Query explainedDocumentFilter) {
 		return new ExplainWork(
 				searcher,

@@ -15,9 +15,13 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
-public interface LuceneSearcher<R> {
+public interface LuceneSearcher<R, ER> {
 
 	R search(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
+			int offset, Integer limit) throws IOException;
+
+	// TODO HSEARCH-3323 expose it from LuceneWorkFactory
+	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
 			int offset, Integer limit) throws IOException;
 
 	int count(IndexSearcher indexSearcher) throws IOException;

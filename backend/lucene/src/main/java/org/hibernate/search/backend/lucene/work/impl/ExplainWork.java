@@ -27,13 +27,13 @@ class ExplainWork implements ReadWork<Explanation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearcher<?> searcher;
+	private final LuceneSearcher<?, ?> searcher;
 
 	private final String explainedDocumentTypeName;
 	private final String explainedDocumentId;
 	private final Query explainedDocumentFilter;
 
-	ExplainWork(LuceneSearcher<?> searcher,
+	ExplainWork(LuceneSearcher<?, ?> searcher,
 			String explainedDocumentTypeName, String explainedDocumentId, Query explainedDocumentFilter) {
 		this.searcher = searcher;
 		this.explainedDocumentTypeName = explainedDocumentTypeName;
