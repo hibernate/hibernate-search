@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQue
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
-import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -64,7 +63,15 @@ public class LuceneCollectors {
 		this.timeoutManager = timeoutManager;
 	}
 
-	public void collect(int offset, Integer limit) throws IOException {
+	/**
+	 * Phase 1: collect matching docs.
+	 * Collects the total hit count, aggregations, and top docs.
+	 *
+	 * @param offset The index of the first collected top doc.
+	 * @param limit The maximum amount of top docs to collect.
+	 * @throws IOException If Lucene throws an {@link IOException}.
+	 */
+	public void collectMatchingDocs(int offset, Integer limit) throws IOException {
 		if ( timeoutManager.checkTimedOut() ) {
 			// in case of timeout before the query execution, skip the query
 			return;
@@ -89,21 +96,33 @@ public class LuceneCollectors {
 		if ( requireFieldDocRescoring ) {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
-
-		// Phase 2: apply collectors to top docs
-		if ( collectorsForTopDocsFactories.isEmpty() ) {
-			return;
-		}
-		try {
-			applyCollectorsToTopDocs();
-		}
-		catch (TimeLimitingCollector.TimeExceededException e) {
-			timeoutManager.forceTimedOut();
-		}
 	}
 
 	public CollectorSet getCollectorsForAllMatchingDocs() {
 		return collectorsForAllMatchingDocs;
+	}
+
+	/**
+	 * Phase 2: collect data relative to top docs.
+	 *
+	 * @param startInclusive The index of the first top doc whose data to collect.
+	 * @param endExclusive The index after the last top doc whose data to collect.
+	 * @throws IOException If Lucene throws an {@link IOException}.
+	 */
+	public void collectTopDocsData(int startInclusive, int endExclusive) throws IOException {
+		if ( collectorsForTopDocsFactories.isEmpty() || topDocs == null ) {
+			this.collectorsForTopDocs = null;
+			return;
+		}
+		try {
+			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+			ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( scoreDocs, startInclusive, endExclusive );
+			this.collectorsForTopDocs = buildTopdDocsDataCollectors( topDocsQuery );
+			indexSearcher.search( topDocsQuery, collectorsForTopDocs.getComposed() );
+		}
+		catch (TimeLimitingCollector.TimeExceededException e) {
+			timeoutManager.forceTimedOut();
+		}
 	}
 
 	public CollectorSet getCollectorsForTopDocs() {
@@ -142,9 +161,7 @@ public class LuceneCollectors {
 		}
 	}
 
-	private void applyCollectorsToTopDocs() throws IOException {
-		ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( topDocs.scoreDocs );
-
+	private CollectorSet buildTopdDocsDataCollectors(Query topDocsQuery) throws IOException {
 		CollectorExecutionContext executionContext = new CollectorExecutionContext(
 				metadataResolver, indexSearcher,
 				// Only join nested documents for the top documents (not for all documents matching this.luceneQuery).
@@ -156,11 +173,6 @@ public class LuceneCollectors {
 		CollectorSet.Builder collectorForTopDocsBuilder =
 				new CollectorSet.Builder( executionContext, timeoutManager );
 		collectorForTopDocsBuilder.addAll( collectorsForTopDocsFactories );
-		this.collectorsForTopDocs = collectorForTopDocsBuilder.build();
-
-		Collector collector = this.collectorsForTopDocs.getComposed();
-
-		// This will collect data
-		indexSearcher.search( topDocsQuery, collector );
+		return collectorForTopDocsBuilder.build();
 	}
 }

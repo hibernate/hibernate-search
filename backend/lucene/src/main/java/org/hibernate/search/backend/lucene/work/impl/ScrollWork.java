@@ -45,7 +45,6 @@ public class ScrollWork<ER> implements ReadWork<ER> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "searcher=" ).append( searcher )
-				.append( ", offset=" ).append( offset )
 				.append( ", limit=" ).append( limit )
 				.append( "]" );
 		return sb.toString();

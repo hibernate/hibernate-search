@@ -71,6 +71,8 @@ public class LuceneExtractableSearchResult<H> {
 			endExclusive = Math.min( endExclusive, scoreDocs.length );
 		}
 
+		luceneCollectors.collectTopDocsData( startInclusive, endExclusive );
+
 		ProjectionHitMapper<?, ?> projectionHitMapper = requestContext.getLoadingContext().createProjectionHitMapper();
 		List<Object> extractedData = extractHits( projectionHitMapper, startInclusive, endExclusive );
 
