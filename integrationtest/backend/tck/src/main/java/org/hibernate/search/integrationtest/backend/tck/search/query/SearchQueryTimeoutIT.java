@@ -97,6 +97,17 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
+	public void timeout_slowScrolling_smallTimeout_raiseAnException() {
+		SearchQuery<DocumentReference> query = startSlowQuery()
+				.failAfter( 1, TimeUnit.NANOSECONDS )
+				.toQuery();
+
+		Assertions.assertThatThrownBy( () -> query.scroll( 5 ).next() )
+				.isInstanceOf( SearchTimeoutException.class )
+				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
+	}
+
+	@Test
 	public void timeout_slowQuery_smallTimeout_limitFetching() {
 		Assume.assumeTrue(
 				"backend should have a fast timeout resolution in order to run this test correctly",

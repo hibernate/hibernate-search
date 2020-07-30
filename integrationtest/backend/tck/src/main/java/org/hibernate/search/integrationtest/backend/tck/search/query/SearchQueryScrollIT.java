@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.Locale;
@@ -122,6 +124,17 @@ public class SearchQueryScrollIT {
 	public void firstHalf_largerPage() {
 		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( DOCUMENT_COUNT / 2 + 10 ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT / 2, DOCUMENT_COUNT / 2 );
+		}
+	}
+
+	@Test
+	public void tookAndTimedOut() {
+		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( PAGE_SIZE ) ) {
+			SearchScrollResult<DocumentReference> result = scroll.next();
+
+			assertNotNull( result.took() );
+			assertNotNull( result.timedOut() );
+			assertFalse( result.timedOut() );
 		}
 	}
 
