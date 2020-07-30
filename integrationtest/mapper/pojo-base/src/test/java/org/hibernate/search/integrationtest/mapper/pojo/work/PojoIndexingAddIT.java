@@ -8,18 +8,11 @@ package org.hibernate.search.integrationtest.mapper.pojo.work;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 public class PojoIndexingAddIT extends AbstractPojoIndexingOperationIT {
-
-	public PojoIndexingAddIT(DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy, String tenantId) {
-		super( commitStrategy, refreshStrategy, tenantId );
-	}
 
 	@Override
 	protected void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
