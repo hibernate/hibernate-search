@@ -50,6 +50,10 @@ class LuceneSearchQueryExtractContext {
 		return luceneCollectors.getTopDocs();
 	}
 
+	LuceneCollectors getLuceneCollectors() {
+		return luceneCollectors;
+	}
+
 	SearchProjectionExtractContext createProjectionExtractContext() {
 		return new SearchProjectionExtractContext(
 				indexSearcher, luceneQuery,
