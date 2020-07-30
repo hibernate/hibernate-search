@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Set;
 
@@ -87,7 +88,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 
 		// no more results check
 		if ( scrollIndex >= search.totalHitCount() ) {
-			return new SimpleSearchScrollResult<>( false, Collections.emptyList() );
+			return new SimpleSearchScrollResult<>( false, Collections.emptyList(), Duration.ZERO, false );
 		}
 
 		int lastIndex = Math.min( scrollIndex + pageSize - 1, Math.toIntExact( search.totalHitCount() ) - 1 );
@@ -114,7 +115,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 
 		// increasing the index for further next(s)
 		scrollIndex += pageSize;
-		return new SimpleSearchScrollResult<>( true, result.hits() );
+		return new SimpleSearchScrollResult<>( true, result.hits(), result.took(), result.timedOut() );
 	}
 
 	private <T> T doSubmitWithIndexReader(ReadWork<T> work, HibernateSearchMultiReader indexReader) {

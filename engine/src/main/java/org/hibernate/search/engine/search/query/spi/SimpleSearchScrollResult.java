@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.hibernate.search.engine.search.query.SearchScrollResult;
@@ -14,10 +15,14 @@ public class SimpleSearchScrollResult<H> implements SearchScrollResult<H> {
 
 	private final boolean hasHits;
 	private final List<H> hits;
+	private final Duration took;
+	private final boolean timedOut;
 
-	public SimpleSearchScrollResult(boolean hasHits, List<H> hits) {
+	public SimpleSearchScrollResult(boolean hasHits, List<H> hits, Duration took, Boolean timedOut) {
 		this.hasHits = hasHits;
 		this.hits = hits;
+		this.took = took;
+		this.timedOut = timedOut;
 	}
 
 	@Override
@@ -28,5 +33,15 @@ public class SimpleSearchScrollResult<H> implements SearchScrollResult<H> {
 	@Override
 	public List<H> hits() {
 		return hits;
+	}
+
+	@Override
+	public Duration took() {
+		return took;
+	}
+
+	@Override
+	public boolean timedOut() {
+		return timedOut;
 	}
 }
