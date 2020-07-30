@@ -20,7 +20,6 @@ public interface LuceneSearcher<R, ER> {
 	R search(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
 			int offset, Integer limit) throws IOException;
 
-	// TODO HSEARCH-3323 expose it from LuceneWorkFactory
 	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
 			int offset, Integer limit) throws IOException;
 
