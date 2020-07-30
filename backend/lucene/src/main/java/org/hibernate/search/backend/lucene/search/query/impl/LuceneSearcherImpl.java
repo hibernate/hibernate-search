@@ -72,7 +72,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs );
 
-		luceneCollectors.collect( offset, limit );
+		luceneCollectors.collectMatchingDocs( offset, limit );
 
 		LuceneExtractableSearchResult<H> extractableSearchResult = new LuceneExtractableSearchResult<>(
 				requestContext, indexSearcher,
@@ -93,7 +93,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs );
 
-		luceneCollectors.collect( offset, limit );
+		luceneCollectors.collectMatchingDocs( offset, limit );
 
 		return new LuceneExtractableSearchResult<>(
 				requestContext, indexSearcher,

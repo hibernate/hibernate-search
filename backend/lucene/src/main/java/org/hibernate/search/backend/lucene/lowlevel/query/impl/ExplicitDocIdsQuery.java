@@ -22,10 +22,11 @@ import org.apache.lucene.search.Weight;
 public final class ExplicitDocIdsQuery extends Query {
 	private final int[] sortedDocIds;
 
-	public ExplicitDocIdsQuery(ScoreDoc[] scoreDocs) {
-		int[] docIds = new int[scoreDocs.length];
-		for ( int i = 0; i < scoreDocs.length; i++ ) {
-			docIds[i] = scoreDocs[i].doc;
+	public ExplicitDocIdsQuery(ScoreDoc[] scoreDocs, int start, int end) {
+		int size = end - start;
+		int[] docIds = new int[size];
+		for ( int i = 0; i < size; i++ ) {
+			docIds[i] = scoreDocs[start + i].doc;
 		}
 		Arrays.sort( docIds );
 		this.sortedDocIds = docIds;
