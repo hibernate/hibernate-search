@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.query;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -30,8 +31,14 @@ public interface SearchScrollResult<H> {
 	 */
 	List<H> hits();
 
-	// TODO Restore took/timeout for scrolling results
-	//	Duration took();
-	//	boolean timedOut();
+	/**
+	 * @return the time taken to process the request, as a {@link Duration}
+	 */
+	Duration took();
+
+	/**
+	 * @return whether or not a timeout occurred processing the request.
+	 */
+	boolean timedOut();
 
 }

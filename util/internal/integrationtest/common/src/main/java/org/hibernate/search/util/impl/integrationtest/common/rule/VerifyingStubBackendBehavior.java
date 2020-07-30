@@ -298,7 +298,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return nextScrollCalls.verify(
 				new NextScrollWorkCall( indexNames, projectionContext, loadingContext, rootProjection ),
 				(call1, call2) -> call1.verify( call2 ),
-				noExpectationsBehavior( () -> new SimpleSearchScrollResult( false, Collections.emptyList() ) )
+				noExpectationsBehavior( () ->
+						new SimpleSearchScrollResult( false, Collections.emptyList(), Duration.ZERO, false ) )
 		);
 	}
 

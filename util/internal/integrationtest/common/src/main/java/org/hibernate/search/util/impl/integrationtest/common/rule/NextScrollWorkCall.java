@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 
@@ -55,7 +56,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
 				behavior.getRawHits()
-		) );
+		), Duration.ZERO, false );
 	}
 
 	@Override

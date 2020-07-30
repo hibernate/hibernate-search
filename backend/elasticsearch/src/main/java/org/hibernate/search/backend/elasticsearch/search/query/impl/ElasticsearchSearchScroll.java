@@ -56,6 +56,7 @@ public class ElasticsearchSearchScroll<H> implements SearchScroll<H> {
 			throw new AssertionFailure( "Elasticsearch response lacked a value for scroll id" );
 		}
 
-		return new SimpleSearchScrollResult<>( loadableSearchResult.hasHits(), searchResult.hits() );
+		return new SimpleSearchScrollResult<>( loadableSearchResult.hasHits(), searchResult.hits(),
+				searchResult.took(), searchResult.timedOut() );
 	}
 }
