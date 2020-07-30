@@ -6,19 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 
 /**
  * The context holding all the useful information pertaining to the Lucene search query,
- * to be used when extracting data from the response,
- * to get an "extract" context linked to the session/loading context
- * ({@link #createExtractContext(IndexSearcher, LuceneCollectors)}.
+ * to be used when extracting data from the response.
  */
 class LuceneSearchQueryRequestContext {
 
@@ -38,23 +34,20 @@ class LuceneSearchQueryRequestContext {
 		this.luceneSort = luceneSort;
 	}
 
+	BackendSessionContext getSessionContext() {
+		return sessionContext;
+	}
+
+	LoadingContext<?, ?> getLoadingContext() {
+		return loadingContext;
+	}
+
 	Query getLuceneQuery() {
 		return luceneQuery;
 	}
 
 	Sort getLuceneSort() {
 		return luceneSort;
-	}
-
-	LuceneSearchQueryExtractContext createExtractContext(IndexSearcher indexSearcher,
-			LuceneCollectors luceneCollectors) {
-		return new LuceneSearchQueryExtractContext(
-				sessionContext,
-				loadingContext,
-				indexSearcher,
-				luceneQuery,
-				luceneCollectors
-		);
 	}
 
 }

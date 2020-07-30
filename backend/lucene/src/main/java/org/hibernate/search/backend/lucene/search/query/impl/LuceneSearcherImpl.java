@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -72,12 +71,12 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		luceneCollectors.collect( offset, limit );
 
-		LuceneSearchQueryExtractContext extractContext = requestContext.createExtractContext(
-				indexSearcher, luceneCollectors
+		LuceneExtractableSearchResult<H> extractableSearchResult = new LuceneExtractableSearchResult<>(
+				requestContext, indexSearcher,
+				luceneCollectors,
+				rootProjection, aggregations, timeoutManager
 		);
 
-		LuceneExtractableSearchResult<H> extractableSearchResult =
-				new LuceneExtractableSearchResult<>( extractContext, rootProjection, aggregations, timeoutManager );
 		return extractableSearchResult.extract();
 	}
 
@@ -91,12 +90,11 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		luceneCollectors.collect( offset, limit );
 
-		LuceneSearchQueryExtractContext extractContext = requestContext.createExtractContext(
-				indexSearcher, luceneCollectors
+		return new LuceneExtractableSearchResult<>(
+				requestContext, indexSearcher,
+				luceneCollectors,
+				rootProjection, aggregations, timeoutManager
 		);
-
-		return new LuceneExtractableSearchResult<>( extractContext, rootProjection, Collections.emptyMap(),
-				timeoutManager );
 	}
 
 	@Override
