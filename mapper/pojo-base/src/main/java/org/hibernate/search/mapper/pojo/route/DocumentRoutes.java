@@ -18,11 +18,21 @@ public interface DocumentRoutes {
 	 * Instructs Hibernate Search to index the entity using a specific route.
 	 * <p>
 	 * At the moment, only one route can be added per indexed entity.
-	 * <p>
-	 * This method cannot be called if {@link #skip()} is called.
 	 *
 	 * @return A new route, to be defined in more details.
 	 */
 	DocumentRoute addRoute();
+
+	/**
+	 * Instructs Hibernate Search not to index the entity.
+	 * <p>
+	 * Used to exclude a subset of entities from being indexed.
+	 * <p><strong>Warning:</strong> Calling this will not cause existing document to be removed!
+	 * This method should only be used to exclude entities from being indexed during their
+	 * <strong>entire lifespan</strong>, from their creation to their deletion.
+	 * <p>
+	 * Calling this method will lead to the {@link #addRoute() route} being ignored.
+	 */
+	void notIndexed();
 
 }

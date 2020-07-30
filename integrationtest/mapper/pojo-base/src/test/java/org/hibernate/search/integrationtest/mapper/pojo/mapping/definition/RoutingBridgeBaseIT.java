@@ -156,7 +156,8 @@ public class RoutingBridgeBaseIT {
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Routing bridge 'NoRouteRoutingBridge' did not define any route",
-							"Exactly one route must be defined" );
+							"Exactly one route must be defined",
+							"or you can call notIndexed() to explicitly indicate no route is necessary" );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -209,7 +210,7 @@ public class RoutingBridgeBaseIT {
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Routing bridge 'TwoRoutesRoutingBridge' defined multiple routes",
-							"Exactly one route must be defined" );
+							"At most one route must be defined" );
 		}
 		backendMock.verifyExpectationsMet();
 	}

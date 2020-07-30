@@ -235,27 +235,33 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 		void sendCommandsToDelegate() {
 			if ( add ) {
 				if ( delete ) {
-					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing(
-							dirtyPaths ) ) {
-						delegate.update(
-								typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey, entitySupplier ),
-								typeContext.toDocumentContributor( entitySupplier, sessionContext )
-						);
+					if ( considerAllDirty || updatedBecauseOfContained
+							|| typeContext.requiresSelfReindexing( dirtyPaths ) ) {
+						DocumentReferenceProvider referenceProvider = referenceProvider();
+						if ( referenceProvider == null ) {
+							// Skipped by the routing bridge
+							return;
+						}
+						delegate.update( referenceProvider,
+								typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
 					}
 				}
 				else {
-					delegate.add(
-							typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey, entitySupplier ),
-							typeContext.toDocumentContributor( entitySupplier, sessionContext )
-					);
+					DocumentReferenceProvider referenceProvider = referenceProvider();
+					if ( referenceProvider == null ) {
+						// Skipped by the routing bridge
+						return;
+					}
+					delegate.add( referenceProvider,
+							typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
 				}
 			}
 			else if ( delete ) {
-				DocumentReferenceProvider referenceProvider =
-						entitySupplier == null
-								? typeContext.toDocumentReferenceProvider(
-								sessionContext, identifier, providedRoutingKey )
-								: typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey, entitySupplier );
+				DocumentReferenceProvider referenceProvider = referenceProvider();
+				if ( referenceProvider == null ) {
+					// Skipped by the routing bridge
+					return;
+				}
 				delegate.delete( referenceProvider );
 			}
 		}
@@ -278,6 +284,16 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 				dirtyPaths = new HashSet<>();
 			}
 			dirtyPaths.add( dirtyPath );
+		}
+
+		private DocumentReferenceProvider referenceProvider() {
+			if ( entitySupplier == null ) {
+				return typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey );
+			}
+			else {
+				return typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey,
+						entitySupplier );
+			}
 		}
 	}
 

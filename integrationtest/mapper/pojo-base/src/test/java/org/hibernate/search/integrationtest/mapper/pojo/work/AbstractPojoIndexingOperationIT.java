@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.test.FutureAssert;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -94,6 +97,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();
+
+		MyRoutingBridge.indexed = true;
 	}
 
 	@Test
@@ -140,6 +145,22 @@ public abstract class AbstractPojoIndexingOperationIT {
 			FutureAssert.assertThat( returnedFuture ).isPending();
 
 			futureFromBackend.complete( null );
+			FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexer_notIndexed() {
+		assumeRoutingBridgeEnabled();
+
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			MyRoutingBridge.indexed = false;
+			// No expected operation: the operation should be skipped.
+			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isSuccessful();
 		}
 	}
@@ -251,6 +272,20 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.isSameAs( error );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexingPlan_notIndexed() {
+		assumeRoutingBridgeEnabled();
+
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			MyRoutingBridge.indexed = false;
+			// No expected operation: the operation should be skipped.
+			addTo( indexingPlan, 1 );
+		}
+	}
+
 	protected boolean isPurge() {
 		return false;
 	}
@@ -290,6 +325,12 @@ public abstract class AbstractPojoIndexingOperationIT {
 		builder.identifier( identifier );
 		builder.routingKey( routingKey );
 		builder.document( StubDocumentNode.document().field( "value", value ).build() );
+	}
+
+	private void assumeRoutingBridgeEnabled() {
+		assumeTrue( "This test only makes sense when a routing bridge is configured and "
+				+ "the operation takes the routing bridge into account",
+				routingBinder != null && !isPurge() );
 	}
 
 	private SearchSession createSession() {
@@ -361,6 +402,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	private static final class MyRoutingBridge implements RoutingBridge<IndexedEntity> {
+		private static boolean indexed = false;
+
 		public static String toRoutingKey(String tenantIdentifier, Object entityIdentifier, String value) {
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {
@@ -374,6 +417,10 @@ public abstract class AbstractPojoIndexingOperationIT {
 		@Override
 		public void route(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
 				RoutingBridgeRouteContext context) {
+			if ( !indexed ) {
+				routes.notIndexed();
+				return;
+			}
 			String tenantIdentifier = context.tenantIdentifier();
 			routes.addRoute()
 					.routingKey( toRoutingKey( tenantIdentifier, entityIdentifier, indexedEntity.value ) );

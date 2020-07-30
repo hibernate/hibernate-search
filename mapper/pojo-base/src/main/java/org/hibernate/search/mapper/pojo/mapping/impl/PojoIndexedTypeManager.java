@@ -118,12 +118,13 @@ public class PojoIndexedTypeManager<I, E>
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.mappingContext()
 		);
-		String routingKey = providedRoutingKey;
-		if ( routingKey == null && routingBridgeHolder != null ) {
-			routingKey = new DocumentRoutesImpl<>( routingBridgeHolder.get(), identifier, entitySupplier.get() )
-					.toRoutingKey( sessionContext.routingBridgeRouteContext() );
+		if ( providedRoutingKey == null && routingBridgeHolder != null ) {
+			return new DocumentRoutesImpl<>( routingBridgeHolder.get(), identifier, entitySupplier.get() )
+					.toDocumentReferenceProvider( documentIdentifier, sessionContext.routingBridgeRouteContext() );
 		}
-		return new PojoDocumentReferenceProvider( documentIdentifier, routingKey, identifier );
+		else {
+			return new PojoDocumentReferenceProvider( documentIdentifier, providedRoutingKey, identifier );
+		}
 	}
 
 	@Override

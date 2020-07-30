@@ -37,6 +37,9 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, providedRoutingKey, entitySupplier
 		);
+		if ( referenceProvider == null ) {
+			return CompletableFuture.completedFuture( null );
+		}
 		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
 				commitStrategy, refreshStrategy );
 	}
@@ -48,6 +51,9 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, providedRoutingKey, entitySupplier
 		);
+		if ( referenceProvider == null ) {
+			return CompletableFuture.completedFuture( null );
+		}
 		return delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
 				commitStrategy, refreshStrategy );
 	}
@@ -59,6 +65,9 @@ public class PojoTypeIndexer<I, E> {
 		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
 				sessionContext, identifier, providedRoutingKey, entitySupplier
 		);
+		if ( referenceProvider == null ) {
+			return CompletableFuture.completedFuture( null );
+		}
 		return delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
 	}
 
