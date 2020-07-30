@@ -38,8 +38,8 @@ public class LuceneLoadableSearchResult<H> {
 
 	private List<Object> extractedData;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
-	private Duration took;
-	private Boolean timedOut;
+	private final Duration took;
+	private final Boolean timedOut;
 
 	LuceneLoadableSearchResult(LuceneSearchQueryExtractContext extractContext,
 			LuceneSearchProjection<?, H> rootProjection,
