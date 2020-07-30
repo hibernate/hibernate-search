@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @SuppressWarnings("unused")
-public class IndexedIT {
+public class IndexedBaseIT {
 
 	@Rule
 	public BackendMock defaultBackendMock = new BackendMock();
@@ -57,7 +57,7 @@ public class IndexedIT {
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();
 
-	public IndexedIT() {
+	public IndexedBaseIT() {
 		Map<String, BackendMock> namedBackendMocks = new LinkedHashMap<>();
 		namedBackendMocks.put( "backend2", backend2Mock );
 		namedBackendMocks.put( "backend3", backend3Mock );
@@ -502,6 +502,7 @@ public class IndexedIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void routingBinder() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = StaticCounterRoutingBinder.class))
 		class IndexedEntity {
@@ -521,6 +522,7 @@ public class IndexedIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void routingBinder_failure() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = FailingRoutingBinder.class))
 		class IndexedEntity {

@@ -437,7 +437,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET_2 + 74,
-			value = "Routing bridge '%1$s' is already assigned to this entity; cannot assign routing key bridge'%2$s'.")
+			value = "Routing bridge '%1$s' is already assigned to this entity; cannot apply routing key binder '%2$s'.")
 	SearchException conflictingRoutingBridgeAndRoutingKeyBinder(Object routingBridge, Object binder);
 
 	@Message(id = ID_OFFSET_2 + 75,

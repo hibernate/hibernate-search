@@ -14,15 +14,16 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
+import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
+import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
@@ -32,7 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RoutingBaseIT {
+public class RoutingRoutingKeyBridgeIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -44,7 +45,10 @@ public class RoutingBaseIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "value", String.class ) );
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+				.explicitRouting()
+				.field( "value", String.class )
+		);
 
 		mapping = setupHelper.start()
 				.setup( IndexedEntity.class );
@@ -141,7 +145,8 @@ public class RoutingBaseIT {
 		CATEGORY_2;
 	}
 
-	@Indexed(index = IndexedEntity.INDEX, routingBinder = @RoutingBinderRef(type = MyRoutingBinder.class))
+	@Indexed(index = IndexedEntity.INDEX)
+	@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = MyRoutingKeyBridge.Binder.class))
 	public static final class IndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
@@ -180,21 +185,19 @@ public class RoutingBaseIT {
 
 	}
 
-	public static final class MyRoutingBinder implements RoutingBinder {
-		@Override
-		public void bind(RoutingBindingContext context) {
-			context.bridge( IndexedEntity.class, new MyRoutingBridge() );
+	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
+
+		private final PojoElementAccessor<EntityCategory> categoryAccessor;
+
+		private MyRoutingKeyBridge(PojoElementAccessor<EntityCategory> categoryAccessor) {
+			this.categoryAccessor = categoryAccessor;
 		}
-	}
-
-	private static final class MyRoutingBridge implements RoutingBridge<IndexedEntity> {
 
 		@Override
-		public void route(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
-				RoutingBridgeRouteContext context) {
-			EntityCategory category = indexedEntity.category;
+		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
+				RoutingKeyBridgeToRoutingKeyContext context) {
+			EntityCategory category = categoryAccessor.read( bridgedElement );
 			StringBuilder keyBuilder = new StringBuilder();
-			String tenantIdentifier = context.tenantIdentifier();
 			if ( tenantIdentifier != null ) {
 				keyBuilder.append( tenantIdentifier ).append( "/" );
 			}
@@ -208,7 +211,17 @@ public class RoutingBaseIT {
 				default:
 					throw new RuntimeException( "Unknown category: " + category );
 			}
-			routes.addRoute().routingKey( keyBuilder.toString() );
+			return keyBuilder.toString();
+		}
+
+		public static class Binder implements RoutingKeyBinder {
+			@Override
+			public void bind(RoutingKeyBindingContext context) {
+				PojoElementAccessor<EntityCategory> categoryAccessor =
+						context.bridgedElement().property( "category" )
+								.createAccessor( EntityCategory.class );
+				context.bridge( new MyRoutingKeyBridge( categoryAccessor ) );
+			}
 		}
 	}
 
