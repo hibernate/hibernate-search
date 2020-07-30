@@ -16,8 +16,12 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+
+import org.apache.lucene.search.TopDocs;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
@@ -31,34 +35,39 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
  * @param <H> The type of hits in the search result.
  */
 public class LuceneLoadableSearchResult<H> {
-	private final LuceneSearchQueryExtractContext extractContext;
+	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private final long hitCount;
+	private final TopDocs topDocs;
 
 	private List<Object> extractedData;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final Duration took;
 	private final Boolean timedOut;
 
-	LuceneLoadableSearchResult(LuceneSearchQueryExtractContext extractContext,
+	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext convertContext,
 			LuceneSearchProjection<?, H> rootProjection,
-			long hitCount, List<Object> extractedData,
+			long hitCount, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
+			ProjectionHitMapper<?, ?> projectionHitMapper,
 			Duration took, boolean timedOut) {
-		this.extractContext = extractContext;
+		this.convertContext = convertContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
+		this.topDocs = topDocs;
 		this.extractedData = extractedData;
 		this.extractedAggregations = extractedAggregations;
+		this.projectionHitMapper = projectionHitMapper;
 		this.took = took;
 		this.timedOut = timedOut;
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
-		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
+		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( convertContext );
 
-		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
+		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking();
 
 		int readIndex = 0;
 		int writeIndex = 0;
@@ -89,6 +98,6 @@ public class LuceneLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;
 
-		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut, extractContext.getTopDocs() );
+		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut, topDocs );
 	}
 }
