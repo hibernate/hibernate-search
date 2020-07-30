@@ -35,8 +35,8 @@ import org.junit.Test;
 /**
  * Test common use cases of (custom) routing bridges.
  * <p>
- * Does not test routing in depth; this is tested in
- * {@link org.hibernate.search.integrationtest.mapper.pojo.routing.RoutingBaseIT}.
+ * Does not test the effect of routing in depth for all operations; this is tested in
+ * {@link org.hibernate.search.integrationtest.mapper.pojo.work.AbstractPojoIndexingOperationIT}.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3108")

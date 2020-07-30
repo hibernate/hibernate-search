@@ -18,9 +18,14 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -41,13 +46,16 @@ import org.assertj.core.api.Assertions;
 @RunWith(Parameterized.class)
 public abstract class AbstractPojoIndexingOperationIT {
 
-	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}, tenantID: {2}")
+	@Parameterized.Parameters(name = "commit: {0}, refresh: {1}, tenantID: {2}, routing: {3}")
 	public static List<Object[]> parameters() {
 		List<Object[]> params = new ArrayList<>();
+		MyRoutingBinder routingBinder = new MyRoutingBinder();
 		for ( DocumentCommitStrategy commitStrategy : DocumentCommitStrategy.values() ) {
 			for ( DocumentRefreshStrategy refreshStrategy : DocumentRefreshStrategy.values() ) {
-				params.add( new Object[] { commitStrategy, refreshStrategy, null } );
-				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1" } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, null, null } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, null, routingBinder } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", null } );
+				params.add( new Object[] { commitStrategy, refreshStrategy, "tenant1", routingBinder } );
 			}
 		}
 		return params;
@@ -60,26 +68,30 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public final JavaBeanMappingSetupHelper setupHelper =
 			JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private final DocumentCommitStrategy commitStrategy;
-	private final DocumentRefreshStrategy refreshStrategy;
-	private final String tenantId;
+	@Parameterized.Parameter(0)
+	public DocumentCommitStrategy commitStrategy;
+	@Parameterized.Parameter(1)
+	public DocumentRefreshStrategy refreshStrategy;
+	@Parameterized.Parameter(2)
+	public String tenantId;
+	@Parameterized.Parameter(3)
+	public MyRoutingBinder routingBinder;
 
 	protected SearchMapping mapping;
-
-	protected AbstractPojoIndexingOperationIT(DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy, String tenantId) {
-		this.commitStrategy = commitStrategy;
-		this.refreshStrategy = refreshStrategy;
-		this.tenantId = tenantId;
-	}
 
 	@Before
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				.field( "value", String.class )
-		);
+				.field( "value", String.class ) );
 
-		mapping = setupHelper.start().setup( IndexedEntity.class );
+		mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					if ( routingBinder != null ) {
+						b.programmaticMapping().type( IndexedEntity.class )
+								.indexed().routingBinder( routingBinder );
+					}
+				} )
+				.setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -239,6 +251,10 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.isSameAs( error );
 	}
 
+	protected boolean isPurge() {
+		return false;
+	}
+
 	protected abstract void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
 			String id, String routingKey, String value);
 
@@ -284,11 +300,22 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.build();
 	}
 
-	private void expectOperation(CompletableFuture<?> futureFromBackend, int id, String routingKey, String value) {
+	private void expectOperation(CompletableFuture<?> futureFromBackend, int id, String providedRoutingKey, String value) {
 		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
 				IndexedEntity.INDEX, commitStrategy, refreshStrategy
 		);
-		expectOperation( context, tenantId, String.valueOf( id ), routingKey, value );
+		String expectedRoutingKey;
+		if ( providedRoutingKey != null ) {
+			expectedRoutingKey = providedRoutingKey;
+		}
+		// We don't apply the routing bridge to purge() operations
+		else if ( routingBinder != null && !isPurge() ) {
+			expectedRoutingKey = MyRoutingBridge.toRoutingKey( tenantId, id, value );
+		}
+		else {
+			expectedRoutingKey = null;
+		}
+		expectOperation( context, tenantId, String.valueOf( id ), expectedRoutingKey, value );
 		context.processedThenExecuted( futureFromBackend );
 	}
 
@@ -320,4 +347,37 @@ public abstract class AbstractPojoIndexingOperationIT {
 		}
 
 	}
+
+	public static final class MyRoutingBinder implements RoutingBinder {
+		@Override
+		public String toString() {
+			return getClass().getSimpleName();
+		}
+
+		@Override
+		public void bind(RoutingBindingContext context) {
+			context.bridge( IndexedEntity.class, new MyRoutingBridge() );
+		}
+	}
+
+	private static final class MyRoutingBridge implements RoutingBridge<IndexedEntity> {
+		public static String toRoutingKey(String tenantIdentifier, Object entityIdentifier, String value) {
+			StringBuilder keyBuilder = new StringBuilder();
+			if ( tenantIdentifier != null ) {
+				keyBuilder.append( tenantIdentifier ).append( "/" );
+			}
+			keyBuilder.append( entityIdentifier ).append( "/" );
+			keyBuilder.append( value );
+			return keyBuilder.toString();
+		}
+
+		@Override
+		public void route(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
+				RoutingBridgeRouteContext context) {
+			String tenantIdentifier = context.tenantIdentifier();
+			routes.addRoute()
+					.routingKey( toRoutingKey( tenantIdentifier, entityIdentifier, indexedEntity.value ) );
+		}
+	}
+
 }
