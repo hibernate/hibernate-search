@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjecti
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 import org.apache.lucene.search.IndexSearcher;
@@ -25,21 +26,28 @@ import org.apache.lucene.search.TopDocs;
  */
 class LuceneSearchQueryExtractContext {
 
-	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final FromDocumentFieldValueConvertContext convertContext;
+	private final LoadingContext<?, ?> loadingContext;
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
 	private final LuceneCollectors luceneCollectors;
 
+	private ProjectionHitMapper<?, ?> projectionHitMapper;
+
 	LuceneSearchQueryExtractContext(BackendSessionContext sessionContext,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LoadingContext<?, ?> loadingContext,
 			IndexSearcher indexSearcher, Query luceneQuery,
 			LuceneCollectors luceneCollectors) {
-		this.projectionHitMapper = projectionHitMapper;
 		this.convertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
+		this.loadingContext = loadingContext;
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
 		this.luceneCollectors = luceneCollectors;
+	}
+
+	ProjectionHitMapper<?, ?> createProjectionHitMapper() {
+		projectionHitMapper = loadingContext.createProjectionHitMapper();
+		return projectionHitMapper;
 	}
 
 	ProjectionHitMapper<?, ?> getProjectionHitMapper() {

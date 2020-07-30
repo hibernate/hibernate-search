@@ -72,7 +72,7 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	private List<Object> extractHits(int startIndex, int lastIndex) {
-		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
+		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.createProjectionHitMapper();
 
 		TopDocs topDocs = extractContext.getTopDocs();
 		if ( topDocs == null ) {
