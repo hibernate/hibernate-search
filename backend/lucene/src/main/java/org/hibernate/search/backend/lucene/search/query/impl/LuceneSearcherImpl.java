@@ -67,7 +67,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			int offset, Integer limit) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, offset, limit );
+		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
+		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
+
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs );
 
 		luceneCollectors.collect( offset, limit );
 
@@ -77,16 +80,18 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 				rootProjection, aggregations, timeoutManager
 		);
 
-		return extractableSearchResult.extract();
+		return extractableSearchResult.extract( 0, maxDocs );
 	}
 
 	@Override
 	public LuceneExtractableSearchResult<H> scroll(IndexSearcher indexSearcher,
-			IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit) throws IOException {
+			IndexReaderMetadataResolver metadataResolver, int limit) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, offset, limit );
+		int offset = 0;
+		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
+
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs );
 
 		luceneCollectors.collect( offset, limit );
 
@@ -127,10 +132,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit) throws IOException {
-		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
-		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
-
+			int maxDocs) throws IOException {
 		return extractionRequirements.createCollectors(
 				indexSearcher, requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
 				metadataResolver, maxDocs, timeoutManager
