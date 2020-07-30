@@ -43,7 +43,16 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	public LuceneLoadableSearchResult<H> extract() throws IOException {
-		List<Object> extractedData = extractHits();
+		TopDocs topDocs = extractContext.getTopDocs();
+		if ( topDocs == null ) {
+			return extract( 0, -1 );
+		}
+
+		return extract( 0, topDocs.scoreDocs.length - 1 );
+	}
+
+	public LuceneLoadableSearchResult<H> extract(int startIndex, int lastIndex) throws IOException {
+		List<Object> extractedData = extractHits( startIndex, lastIndex );
 
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
 				Collections.emptyMap() : extractAggregations();
@@ -58,7 +67,7 @@ public class LuceneExtractableSearchResult<H> {
 		);
 	}
 
-	private List<Object> extractHits() {
+	private List<Object> extractHits(int startIndex, int lastIndex) {
 		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
 
 		TopDocs topDocs = extractContext.getTopDocs();
@@ -73,7 +82,7 @@ public class LuceneExtractableSearchResult<H> {
 		StoredFieldsCollector storedFieldsCollector =
 				projectionExtractContext.getCollector( StoredFieldsCollector.KEY );
 
-		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
+		for ( int i = startIndex; i <= lastIndex; i++ ) {
 			// Check for timeout every 16 elements.
 			// Do this *before* the element, so that we don't fail after the last element.
 			if ( i % 16 == 0 && timeoutManager.checkTimedOut() ) {
