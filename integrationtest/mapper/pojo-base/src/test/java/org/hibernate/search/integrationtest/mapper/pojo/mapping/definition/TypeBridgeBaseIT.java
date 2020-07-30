@@ -952,7 +952,7 @@ public class TypeBridgeBaseIT {
 	}
 
 	@Test
-	public void incompatibleRequestedType() {
+	public void accessors_incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;

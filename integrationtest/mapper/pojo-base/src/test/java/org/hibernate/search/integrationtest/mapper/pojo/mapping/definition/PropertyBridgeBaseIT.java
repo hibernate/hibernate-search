@@ -1022,7 +1022,7 @@ public class PropertyBridgeBaseIT {
 	}
 
 	@Test
-	public void incompatibleRequestedType() {
+	public void accessors_incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;
