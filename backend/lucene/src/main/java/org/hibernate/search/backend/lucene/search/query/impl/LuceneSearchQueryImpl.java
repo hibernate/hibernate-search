@@ -51,7 +51,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Set<String> routingKeys;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
-	private final LuceneSearcher<LuceneLoadableSearchResult<H>> searcher;
+	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
 
 	private TimeoutManager timeoutManager;
 
@@ -62,7 +62,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
-			LuceneSearcher<LuceneLoadableSearchResult<H>> searcher) {
+			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;

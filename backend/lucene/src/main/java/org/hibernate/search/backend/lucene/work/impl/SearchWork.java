@@ -19,12 +19,12 @@ public class SearchWork<R> implements ReadWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearcher<R> searcher;
+	private final LuceneSearcher<R, ?> searcher;
 
 	private final int offset;
 	private final Integer limit;
 
-	SearchWork(LuceneSearcher<R> searcher,
+	SearchWork(LuceneSearcher<R, ?> searcher,
 			Integer offset,
 			Integer limit) {
 		this.offset = offset == null ? 0 : offset;

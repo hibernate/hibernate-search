@@ -38,10 +38,10 @@ public interface LuceneWorkFactory {
 
 	IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 
-	<R> ReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
+	<R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit);
 
-	ReadWork<Integer> count(LuceneSearcher<?> searcher);
+	ReadWork<Integer> count(LuceneSearcher<?, ?> searcher);
 
-	ReadWork<Explanation> explain(LuceneSearcher<?> searcher,
+	ReadWork<Explanation> explain(LuceneSearcher<?, ?> searcher,
 			String explainedDocumentTypeName, String explainedDocumentId, Query explainedDocumentFilter);
 }
