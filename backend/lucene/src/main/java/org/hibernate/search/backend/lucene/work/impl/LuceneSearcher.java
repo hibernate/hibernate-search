@@ -20,8 +20,7 @@ public interface LuceneSearcher<R, ER> {
 	R search(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
 			int offset, Integer limit) throws IOException;
 
-	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit) throws IOException;
+	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver, int limit) throws IOException;
 
 	int count(IndexSearcher indexSearcher) throws IOException;
 

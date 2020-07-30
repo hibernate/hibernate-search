@@ -56,17 +56,23 @@ public class LuceneExtractableSearchResult<H> {
 	}
 
 	public LuceneLoadableSearchResult<H> extract() throws IOException {
-		TopDocs topDocs = luceneCollectors.getTopDocs();
-		if ( topDocs == null ) {
-			return extract( 0, -1 );
-		}
-
-		return extract( 0, topDocs.scoreDocs.length - 1 );
+		return extract( 0, Integer.MAX_VALUE );
 	}
 
-	public LuceneLoadableSearchResult<H> extract(int startIndex, int lastIndex) throws IOException {
+	public LuceneLoadableSearchResult<H> extract(int startInclusive, int endExclusive) throws IOException {
+		TopDocs topDocs = luceneCollectors.getTopDocs();
+		if ( topDocs == null ) {
+			startInclusive = 0;
+			endExclusive = 0;
+		}
+		else {
+			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+			startInclusive = Math.min( startInclusive, scoreDocs.length );
+			endExclusive = Math.min( endExclusive, scoreDocs.length );
+		}
+
 		ProjectionHitMapper<?, ?> projectionHitMapper = requestContext.getLoadingContext().createProjectionHitMapper();
-		List<Object> extractedData = extractHits( projectionHitMapper, startIndex, lastIndex );
+		List<Object> extractedData = extractHits( projectionHitMapper, startInclusive, endExclusive );
 
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
 				Collections.emptyMap() : extractAggregations();
@@ -84,7 +90,8 @@ public class LuceneExtractableSearchResult<H> {
 		return luceneCollectors.getTotalHitCount();
 	}
 
-	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper, int startIndex, int lastIndex) {
+	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper, int startInclusive,
+			int endExclusive) {
 		TopDocs topDocs = luceneCollectors.getTopDocs();
 		if ( topDocs == null ) {
 			return Collections.emptyList();
@@ -100,7 +107,7 @@ public class LuceneExtractableSearchResult<H> {
 		StoredFieldsCollector storedFieldsCollector =
 				projectionExtractContext.getCollector( StoredFieldsCollector.KEY );
 
-		for ( int i = startIndex; i <= lastIndex; i++ ) {
+		for ( int i = startInclusive; i < endExclusive; i++ ) {
 			// Check for timeout every 16 elements.
 			// Do this *before* the element, so that we don't fail after the last element.
 			if ( i % 16 == 0 && timeoutManager.checkTimedOut() ) {

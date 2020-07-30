@@ -21,13 +21,9 @@ public class ScrollWork<ER> implements ReadWork<ER> {
 
 	private final LuceneSearcher<?, ER> searcher;
 
-	private final int offset;
-	private final Integer limit;
+	private final int limit;
 
-	ScrollWork(LuceneSearcher<?, ER> searcher,
-			Integer offset,
-			Integer limit) {
-		this.offset = offset == null ? 0 : offset;
+	ScrollWork(LuceneSearcher<?, ER> searcher, int limit) {
 		this.limit = limit;
 		this.searcher = searcher;
 	}
@@ -37,9 +33,7 @@ public class ScrollWork<ER> implements ReadWork<ER> {
 		try {
 			IndexSearcher indexSearcher = context.createSearcher();
 
-			return searcher.scroll(
-					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit
-			);
+			return searcher.scroll( indexSearcher, context.getIndexReaderMetadataResolver(), limit );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );

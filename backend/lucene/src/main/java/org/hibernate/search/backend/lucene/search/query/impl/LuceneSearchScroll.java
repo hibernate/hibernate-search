@@ -83,7 +83,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 			if ( search != null ) {
 				queryFetchSize *= 2;
 			}
-			search = doSubmitWithIndexReader( workFactory.scroll( searcher, 0, queryFetchSize ), indexReader );
+			search = doSubmitWithIndexReader( workFactory.scroll( searcher, queryFetchSize ), indexReader );
 		}
 
 		// no more results check
@@ -91,11 +91,11 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 			return new SimpleSearchScrollResult<>( false, Collections.emptyList(), Duration.ZERO, false );
 		}
 
-		int lastIndex = Math.min( scrollIndex + pageSize - 1, Math.toIntExact( search.totalHitCount() ) - 1 );
+		int endIndexExclusive = scrollIndex + pageSize;
 
 		LuceneLoadableSearchResult<H> loadableSearchResult;
 		try {
-			loadableSearchResult = search.extract( scrollIndex, lastIndex );
+			loadableSearchResult = search.extract( scrollIndex, endIndexExclusive );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(),
