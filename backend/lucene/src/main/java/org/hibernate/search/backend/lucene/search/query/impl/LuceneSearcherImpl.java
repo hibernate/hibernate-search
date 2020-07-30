@@ -7,37 +7,25 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 
 class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult<H>> {
 
@@ -87,19 +75,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 				indexSearcher, luceneCollectors
 		);
 
-		List<Object> extractedData = extractHits( extractContext );
-
-		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
-				Collections.emptyMap() : extractAggregations( extractContext );
-
-		return new LuceneLoadableSearchResult<>(
-				extractContext, rootProjection,
-				luceneCollectors.getTotalHitCount(),
-				extractedData,
-				extractedAggregations,
-				timeoutManager.getTookTime(),
-				timeoutManager.isTimedOut()
-		);
+		LuceneExtractableSearchResult<H> extractableSearchResult =
+				new LuceneExtractableSearchResult<>( extractContext, rootProjection, aggregations, timeoutManager );
+		return extractableSearchResult.extract();
 	}
 
 	@Override
@@ -152,62 +130,5 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		else {
 			return Math.min( offset + limit, reader.maxDoc() );
 		}
-	}
-
-	private List<Object> extractHits(LuceneSearchQueryExtractContext extractContext) {
-		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
-
-		TopDocs topDocs = extractContext.getTopDocs();
-		if ( topDocs == null ) {
-			return Collections.emptyList();
-		}
-
-		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
-
-		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
-
-		StoredFieldsCollector storedFieldsCollector =
-				projectionExtractContext.getCollector( StoredFieldsCollector.KEY );
-
-		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
-			// Check for timeout every 16 elements.
-			// Do this *before* the element, so that we don't fail after the last element.
-			if ( i % 16 == 0 && timeoutManager.checkTimedOut() ) {
-				break;
-			}
-
-			ScoreDoc hit = topDocs.scoreDocs[i];
-			Document document = storedFieldsCollector == null ? null : storedFieldsCollector.getDocument( hit.doc );
-
-			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
-
-			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
-		}
-
-		return extractedData;
-	}
-
-	private Map<AggregationKey<?>, ?> extractAggregations(LuceneSearchQueryExtractContext extractContext)
-			throws IOException {
-		AggregationExtractContext aggregationExtractContext =
-				extractContext.createAggregationExtractContext();
-
-		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
-
-		for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
-			// Check for timeout before every element.
-			// Do this *before* the element, so that we don't fail after the last element.
-			if ( timeoutManager.checkTimedOut() ) {
-				break;
-			}
-
-			AggregationKey<?> key = entry.getKey();
-			LuceneSearchAggregation<?> aggregation = entry.getValue();
-
-			Object extracted = aggregation.extract( aggregationExtractContext );
-			extractedMap.put( key, extracted );
-		}
-
-		return extractedMap;
 	}
 }
