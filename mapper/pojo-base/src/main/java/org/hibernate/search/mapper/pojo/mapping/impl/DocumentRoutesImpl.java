@@ -8,12 +8,14 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRoute;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
+import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentReferenceProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class DocumentRoutesImpl<E> implements DocumentRoutes {
@@ -25,6 +27,7 @@ public final class DocumentRoutesImpl<E> implements DocumentRoutes {
 	private final E entity;
 
 	private DocumentRouteImpl route = null;
+	private boolean skip = false;
 
 	public DocumentRoutesImpl(RoutingBridge<E> routingBridge, Object entityIdentifier, E entity) {
 		this.routingBridge = routingBridge;
@@ -42,13 +45,23 @@ public final class DocumentRoutesImpl<E> implements DocumentRoutes {
 		return route;
 	}
 
-	public String toRoutingKey(RoutingBridgeRouteContext context) {
+	@Override
+	public void notIndexed() {
+		skip = true;
+	}
+
+	public DocumentReferenceProvider toDocumentReferenceProvider(String documentIdentifier,
+			RoutingBridgeRouteContext context) {
 		routingBridge.route( this, entityIdentifier, entity, context );
+
+		if ( skip ) {
+			return null;
+		}
 
 		if ( route == null ) {
 			throw log.noIndexingRoute( routingBridge );
 		}
 
-		return route.routingKey();
+		return new PojoDocumentReferenceProvider( documentIdentifier, route.routingKey(), entityIdentifier );
 	}
 }
