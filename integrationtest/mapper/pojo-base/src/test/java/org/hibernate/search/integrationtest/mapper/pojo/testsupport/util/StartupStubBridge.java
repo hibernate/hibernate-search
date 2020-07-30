@@ -10,25 +10,26 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -45,7 +46,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
  */
 public class StartupStubBridge<T>
 		implements TypeBridge, PropertyBridge, ValueBridge<T, String>,
-		RoutingKeyBridge, IdentifierBridge<T> {
+				RoutingBridge<T>, IdentifierBridge<T> {
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
 		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();
@@ -107,8 +108,8 @@ public class StartupStubBridge<T>
 	}
 
 	@Override
-	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
-			RoutingKeyBridgeToRoutingKeyContext context) {
+	public void route(DocumentRoutes routes, Object entityIdentifier, T indexedEntity,
+			RoutingBridgeRouteContext context) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -132,15 +133,19 @@ public class StartupStubBridge<T>
 		);
 	}
 
-	public static class Binder<T> implements TypeBinder,
-			PropertyBinder, RoutingKeyBinder,
-			IdentifierBinder, ValueBinder {
+	public static class Binder<T>
+			implements RoutingBinder, TypeBinder, PropertyBinder, IdentifierBinder, ValueBinder {
 		private final Class<T> bridgeInputType;
 		private final StartupStubBridge.CounterKeys counterKeys;
 
 		private Binder(Class<T> bridgeInputType, StartupStubBridge.CounterKeys counterKeys) {
 			this.bridgeInputType = bridgeInputType;
 			this.counterKeys = counterKeys;
+		}
+
+		@Override
+		public void bind(RoutingBindingContext context) {
+			context.bridge( bridgeInputType, build() );
 		}
 
 		@Override
@@ -170,12 +175,6 @@ public class StartupStubBridge<T>
 		@Override
 		public void bind(IdentifierBindingContext<?> context) {
 			context.bridge( bridgeInputType, build() );
-		}
-
-		@Override
-		public void bind(RoutingKeyBindingContext context) {
-			context.dependencies().useRootOnly();
-			context.bridge( build() );
 		}
 
 		@Override
