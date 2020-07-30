@@ -52,7 +52,7 @@ import org.junit.Test;
  */
 public class CleanupIT {
 	private static final StartupStubBridge.CounterKeys IDENTIFIER_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
-	private static final StartupStubBridge.CounterKeys ROUTING_KEY_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
+	private static final StartupStubBridge.CounterKeys ROUTING_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys TYPE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys PROPERTY_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubContainerExtractor.CounterKeys CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS =
@@ -77,8 +77,8 @@ public class CleanupIT {
 
 		startup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
-			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
+					.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId()
@@ -100,7 +100,7 @@ public class CleanupIT {
 		assertEquals( 0, counters.get( StubIndexManager.STOP_COUNTER_KEY ) );
 
 		assertEquals( 2, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertEquals( 2, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertEquals( 2, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 
 		// Extra type and property bridges should have been created...
 		assertEquals( 2 + 1, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -143,7 +143,7 @@ public class CleanupIT {
 		// We must have instantiated objects...
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -161,8 +161,8 @@ public class CleanupIT {
 	public void failingTypeBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
-			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
+					.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId()
 							.identifierBinder( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) );
@@ -178,7 +178,7 @@ public class CleanupIT {
 		// We must have instantiated objects...
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -196,8 +196,8 @@ public class CleanupIT {
 	public void failingIdentifierBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
-			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
+					.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "text" )
 					.binder( StartupStubBridge.binder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
@@ -213,7 +213,7 @@ public class CleanupIT {
 		// We must have instantiated objects...
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -231,8 +231,8 @@ public class CleanupIT {
 	public void failingPropertyBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
-			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
+					.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId()
@@ -248,7 +248,7 @@ public class CleanupIT {
 		// We must have instantiated objects...
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -266,8 +266,8 @@ public class CleanupIT {
 	public void failingValueBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
-			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
+					.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId().identifierBinder( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) );
@@ -286,7 +286,7 @@ public class CleanupIT {
 		// We must have instantiated objects...
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -304,8 +304,8 @@ public class CleanupIT {
 	public void failingContainerExtractorBuilding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
-			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
-			otherIndexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
+			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX )
+					.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
 			otherIndexedEntityMapping.property( "id" )
 					.documentId().identifierBinder( StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS ) );
@@ -328,7 +328,7 @@ public class CleanupIT {
 		// We must have instantiated objects...
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
-		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
@@ -380,9 +380,9 @@ public class CleanupIT {
 
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
 							TypeMappingStep indexedEntityMapping = mappingDefinition.type( IndexedEntity.class );
-							indexedEntityMapping.indexed().index( IndexedEntity.INDEX );
+							indexedEntityMapping.indexed().index( IndexedEntity.INDEX )
+									.routingBinder( StartupStubBridge.binder( ROUTING_BRIDGE_COUNTER_KEYS ) );
 							indexedEntityMapping.binder( StartupStubBridge.binder( TYPE_BRIDGE_COUNTER_KEYS ) );
-							indexedEntityMapping.routingKeyBinder( StartupStubBridge.binder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) );
 							indexedEntityMapping.property( "id" )
 									.documentId().identifierBinder(
 											StartupStubBridge.binder( Integer.class, IDENTIFIER_BRIDGE_COUNTER_KEYS )
@@ -424,10 +424,10 @@ public class CleanupIT {
 				- counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.close ) );
 		assertEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance )
 				- counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.holderClose ) );
-		assertEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.close ) );
-		assertEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance )
-				- counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.holderClose ) );
+		assertEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( ROUTING_BRIDGE_COUNTER_KEYS.close ) );
+		assertEquals( 0, counters.get( ROUTING_BRIDGE_COUNTER_KEYS.instance )
+				- counters.get( ROUTING_BRIDGE_COUNTER_KEYS.holderClose ) );
 		assertEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance )
 				- counters.get( TYPE_BRIDGE_COUNTER_KEYS.close ) );
 		assertEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance )
