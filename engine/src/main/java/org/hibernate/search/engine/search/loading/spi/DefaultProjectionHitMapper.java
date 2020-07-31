@@ -34,8 +34,10 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 	}
 
 	@Override
-	public LoadingResult<R, E> loadBlocking() {
+	public LoadingResult<R, E> loadBlocking(Integer timeout) {
 		List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference ).collect( Collectors.toList() );
+
+		// TODO HSEARCH-3352 pass timeout to objectLoader
 		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted ), documentReferenceConverter );
 	}
 

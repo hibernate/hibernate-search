@@ -97,7 +97,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			);
 		}
 
-		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking();
+		// TODO HSEARCH-3352 pass timeout
+		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( null );
 
 		List<H> hits = new ArrayList<>( rawHits.size() );
 

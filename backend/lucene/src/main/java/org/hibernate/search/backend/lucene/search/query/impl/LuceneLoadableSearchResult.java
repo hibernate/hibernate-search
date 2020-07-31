@@ -66,8 +66,8 @@ public class LuceneLoadableSearchResult<H> {
 
 	LuceneSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( convertContext );
-
-		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking();
+		// TODO HSEARCH-3352 pass timeout
+		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( null );
 
 		int readIndex = 0;
 		int writeIndex = 0;
