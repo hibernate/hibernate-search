@@ -62,7 +62,8 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 				.as( "Scroll work pageSize did not match: " )
 				.isEqualTo( pageSize );
 
-		return () -> new StubSearchScroll( actualCall.behavior, indexNames, actualCall.projectionContext, actualCall.loadingContext, actualCall.rootProjection );
+		return () -> new StubSearchScroll<>( actualCall.behavior, indexNames, actualCall.projectionContext,
+				actualCall.loadingContext, actualCall.rootProjection );
 	}
 
 	@Override
