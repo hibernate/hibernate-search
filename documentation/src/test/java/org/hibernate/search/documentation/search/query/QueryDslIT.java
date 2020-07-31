@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,8 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchScroll;
+import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -244,6 +247,32 @@ public class QueryDslIT {
 			// end::fetching-pagination-hits[]
 
 			assertThat( hits ).isEmpty();
+		} );
+	}
+
+	@Test
+	public void scrolling() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			List<Integer> collectedIds = new ArrayList<>();
+			// tag::fetching-scrolling[]
+			try ( SearchScroll<Book> scroll = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.scroll( 20 ) ) { // <1>
+				for ( SearchScrollResult<Book> chunk = scroll.next(); // <2>
+						chunk.hasHits(); chunk = scroll.next() ) { // <3>
+					for ( Book hit : chunk.hits() ) { // <4>
+						// ... do something with the hits ...
+						// end::fetching-scrolling[]
+						collectedIds.add( hit.getId() );
+						// tag::fetching-scrolling[]
+					}
+					entityManager.flush(); // <5>
+					entityManager.clear(); // <5>
+				}
+			}
+			// end::fetching-scrolling[]
+			assertThat( collectedIds ).hasSize( 4 );
 		} );
 	}
 

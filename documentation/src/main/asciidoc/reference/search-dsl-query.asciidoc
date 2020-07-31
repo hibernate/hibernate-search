@@ -247,14 +247,57 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 <1> Set the offset to `40` and the limit to `20`.
 ====
 
+[NOTE]
+====
+The index may be modified between the retrieval of two pages.
+As a result of that modification, it is possible that some hits change position,
+and end up being present on two subsequent pages.
+
+If you're running a batch process and want to avoid this, use <<search-dsl-query-fetching-results-scrolling>>.
+====
+
 [[search-dsl-query-fetching-results-scrolling]]
 === Scrolling
 // Search 5 anchors backward compatibility
 [[_performance_considerations]]
 
-include::todo-placeholder.asciidoc[]
+Scrolling is the concept of keeping a cursor on the search query at the lowest level,
+and advancing that cursor progressively to collect subsequent "chunks" of search hits.
 
-// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_performance_considerations
+Scrolling relies on the internal state of the cursor (which must be closed at some point),
+and thus is not appropriate for stateless operations such as displaying a page of results to a user in a webpage.
+However, thanks to this internal state, scrolling is able to guarantee that all returned hits are consistent:
+there is absolutely no way for a given hit to appear twice.
+
+Scrolling is therefore most useful when processing a large result set as small chunks.
+
+Below is an example of using scrolling in Hibernate Search.
+
+CAUTION: `SearchScroll` exposes a `close()` method that *must* be called to avoid resource leaks.
+
+[NOTE]
+====
+With the Elasticsearch backend, scrolls can time out and become unusable after some time;
+See <<backend-elasticsearch-search-scroll-timeout,here>> for more information.
+====
+
+.Scrolling to retrieve search results in small chunks
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-scrolling]
+----
+<1> Start a scroll that will return chunks of `20` hits.
+Note the scroll is used in a `try-with-resource` block to avoid resource leaks.
+<2> Retrieve the first chunk by calling `next()`.
+Each chunk will include at most 20 hits, since that was the selected chunk size.
+<3> Detect the end of the scroll by calling `hasHits()` on the last retrieved chunk,
+and retrieve the next chunk by calling `next()` again on the scroll.
+<4> Retrieve the hits of a chunk.
+<5> Optionally, if using Hibernate ORM and retrieving entities,
+you might want to use the link:{hibernateDocUrl}#batch-session-batch-insert[periodic "flush-clear" pattern]
+to ensure entities don't stay in the session taking more and more memory.
+====
 
 [[search-dsl-query-routing]]
 == Routing
