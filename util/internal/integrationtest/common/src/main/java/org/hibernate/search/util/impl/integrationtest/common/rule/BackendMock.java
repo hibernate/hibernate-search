@@ -242,7 +242,7 @@ public class BackendMock implements TestRule {
 	}
 
 	private BackendMock expectScroll(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWork.ResultType resultType, Integer chunkSize) {
+			StubSearchWork.ResultType resultType, int chunkSize) {
 		CallQueue<ScrollWorkCall<?>> callQueue = backendBehavior().getScrollCalls();
 		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
 		contributor.accept( builder );

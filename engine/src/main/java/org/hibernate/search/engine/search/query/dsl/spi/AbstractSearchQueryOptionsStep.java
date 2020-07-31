@@ -202,7 +202,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public SearchScroll<H> scroll(Integer chunkSize) {
+	public SearchScroll<H> scroll(int chunkSize) {
 		return toQuery().scroll( chunkSize );
 	}
 

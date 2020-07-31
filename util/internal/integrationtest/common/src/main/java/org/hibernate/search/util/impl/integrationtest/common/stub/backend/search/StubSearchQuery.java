@@ -67,7 +67,7 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	}
 
 	@Override
-	public SearchScroll<H> scroll(Integer chunkSize) {
+	public SearchScroll<H> scroll(int chunkSize) {
 		return backend.getBehavior().executeScrollWork(
 				indexNames, workBuilder.build(), chunkSize, projectionContext, loadingContext, rootProjection
 		);
