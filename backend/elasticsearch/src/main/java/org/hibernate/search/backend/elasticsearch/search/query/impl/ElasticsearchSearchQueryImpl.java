@@ -112,18 +112,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
-		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
-				workFactory.search( payload, searchResultExtractor );
-		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
-			builder.index( index.names().getRead() );
-		}
-		builder.paging( defaultedLimit( limit, offset ), offset )
-				.routingKeys( routingKeys )
-				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
-				.requestTransformer(
-						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
-				);
-		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = builder.build();
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = searchWorkBuilder()
+				.paging( defaultedLimit( limit, offset ), offset )
+				.build();
 
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
 				/*
@@ -162,12 +153,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public SearchScroll<H> scroll(Integer chunkSize) {
 		String scrollTimeoutString = this.scrollTimeout + "s";
 
-		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = workFactory.search( payload, searchResultExtractor )
-				.routingKeys( routingKeys )
-				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
-				.requestTransformer(
-						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
-				)
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()
 				.scrolling( chunkSize, scrollTimeoutString )
 				.build();
 
@@ -200,6 +186,21 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 
 		return doExplain( index, id );
+	}
+
+	private SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> searchWorkBuilder() {
+		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
+				workFactory.search( payload, searchResultExtractor );
+		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
+			builder.index( index.names().getRead() );
+		}
+		builder
+				.routingKeys( routingKeys )
+				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
+				.requestTransformer(
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+				);
+		return builder;
 	}
 
 	private Integer defaultedLimit(Integer limit, Integer offset) {
