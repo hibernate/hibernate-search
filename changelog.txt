@@ -1,6 +1,71 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta9 (31-07-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3977 Scroll always targets all indexes
+    * HSEARCH-3941 ClassCastException: org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory cannot be cast to org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory
+    * HSEARCH-3938 HibernateOrmIntegrationBooterImpl confuses the startup event for a shutdown event, and vice-versa
+    * HSEARCH-3937 Error messages on boot/shutdown are hidden or unclear when using an EnvironmentSynchronizer
+    * HSEARCH-1895 Projection over embedded collection returns only the first element
+
+** Improvement
+    * HSEARCH-3972 Upgrade to ORM 5.4.19.Final
+    * HSEARCH-3967 Specify defaults for index-level configuration properties at the backend level
+    * HSEARCH-3965 Upgrade to Lucene 8.6.0
+    * HSEARCH-3960 Validation failure messages should mention that they are related to Elasticsearch schema validation
+    * HSEARCH-3957 Upgrade to Hibernate ORM 5.4.18.Final
+    * HSEARCH-3956 Upgrade to Elasticsearch 7.8
+    * HSEARCH-3950 Simpler configuration syntax for single-backend applications
+    * HSEARCH-3936 Projectable fields in the Elasticsearch schema should have "store = false"
+    * HSEARCH-3506 Implement and test boosts on matchAll, matchId, boolean, nested predicates
+    * HSEARCH-3476 Make re-use of predicate/sort/fieldtype easier and safer
+    * HSEARCH-3307 Take into account how the field is being used when determining cross-index field compatibility
+    * HSEARCH-3102 Simpler configuration when only one backend type is available
+
+** New Feature
+    * HSEARCH-3944 Distance projection on multi-valued fields
+    * HSEARCH-3391 Projection on multi-valued field values
+
+** Remove Feature
+    * HSEARCH-3055 Remove support for the @Factory annotation and document the migration path
+
+** Sub-task
+    * HSEARCH-3962 Document possible architectures
+    * HSEARCH-3710 Document declaration of dependencies in bridges
+    * HSEARCH-3709 Document routing key bridges
+    * HSEARCH-3680 Document the programmatic mapping
+    * HSEARCH-3668 Document the aggregation DSL in details
+    * HSEARCH-3600 Document the projection DSL in details
+    * HSEARCH-3599 Document the sort DSL in details
+    * HSEARCH-3598 Document the predicate DSL in details
+
+** Task
+    * HSEARCH-3976 Document scrolling
+    * HSEARCH-3970 Clean up timing-related code
+    * HSEARCH-3964 Build and run tests against JDK16
+    * HSEARCH-3961 Test the default sort
+    * HSEARCH-3958 Factorize tests applied to various predicates
+    * HSEARCH-3954 Move the technical documentation to a separate document
+    * HSEARCH-3953 Document that zero-downtime reindexing is only doable if the schema did not change (for now)
+    * HSEARCH-3951 Upgrade to Elasticsearch 6.8 for AWS tests
+    * HSEARCH-3949 Remove OSGi and Wildfly support and integration tests from legacy code
+    * HSEARCH-3948 Rename ObjectFieldStorage to ObjectStructure and move it to a more appropriate package
+    * HSEARCH-3946 Remove the reference to SearchContext in reusable builders
+    * HSEARCH-3945 Refactor ElasticsearchScopedIndexFieldComponent / LuceneScopedIndexFieldComponent
+    * HSEARCH-3942 Stop testing Elasticsearch 6.2 in periodic CI builds
+    * HSEARCH-3940 Restore sort by distance on (nested) field in the Library showcase
+    * HSEARCH-3939 Use a single field for GeoPoint storage in Lucene
+    * HSEARCH-3935 Upgrade to Elasticsearch 6.8.9
+    * HSEARCH-3929 Use JDK11 by default when building Hibernate Search
+    * HSEARCH-3899 Change the explain API so that the entity id is used, instead of document id
+    * HSEARCH-3891 Allow POJO mapper implementations to pass explicit routing keys when indexing
+    * HSEARCH-3882 Test explicit and implicit nesting for all relevant predicates
+    * HSEARCH-3677 Complete all missing sections of the documentation
+    * HSEARCH-3636 Restore the ability to configure Lucene directories on a per-index or per-shard basis
+
 6.0.0.Beta8 (02-06-2020)
 -------------------------
 
