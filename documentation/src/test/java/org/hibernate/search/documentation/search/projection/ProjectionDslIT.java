@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +29,6 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -106,7 +106,7 @@ public class ProjectionDslIT {
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::documentReference[]
-			SearchHitsAssert.assertThat( hits ).hasDocRefHitsAnyOrder(
+			assertThatHits( hits ).hasDocRefHitsAnyOrder(
 					BOOK_INDEX_NAME,
 					String.valueOf( BOOK1_ID ),
 					String.valueOf( BOOK2_ID ),

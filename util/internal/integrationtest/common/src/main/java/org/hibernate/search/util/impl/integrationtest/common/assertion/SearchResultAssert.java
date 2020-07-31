@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -38,7 +40,7 @@ public class SearchResultAssert<H> {
 	}
 
 	public static <H> SearchHitsAssert<H> assertThat(List<? extends H> actual) {
-		return SearchHitsAssert.assertThat( actual );
+		return assertThatHits( actual );
 	}
 
 	private final SearchResult<? extends H> actual;
@@ -59,7 +61,7 @@ public class SearchResultAssert<H> {
 	}
 
 	public SearchHitsAssert<H> hits() {
-		return SearchHitsAssert.<H>assertThat( actual.hits() ).as( "Hits of " + queryDescription );
+		return SearchHitsAssert.<H>assertThatHits( actual.hits() ).as( "Hits of " + queryDescription );
 	}
 
 	public <A> ObjectAssert<A> aggregation(AggregationKey<A> key) {
