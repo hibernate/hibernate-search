@@ -23,7 +23,7 @@ import org.assertj.core.internal.Failures;
 
 public class SearchHitsAssert<H> {
 
-	public static <H> SearchHitsAssert<H> assertThat(List<? extends H> actual) {
+	public static <H> SearchHitsAssert<H> assertThatHits(List<? extends H> actual) {
 		return new SearchHitsAssert<>( actual );
 	}
 
