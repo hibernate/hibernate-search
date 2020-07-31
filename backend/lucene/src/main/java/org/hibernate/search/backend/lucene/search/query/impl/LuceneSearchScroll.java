@@ -62,7 +62,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 		this.searcher = searcher;
 		this.indexReader = indexReader;
 		this.pageSize = pageSize;
-		this.queryFetchSize = pageSize;
+		this.queryFetchSize = pageSize * 4; // Will fetch the topdocs for the first 4 pages initially
 	}
 
 	@Override
