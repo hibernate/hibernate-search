@@ -24,27 +24,27 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
-	private final Integer pageSize;
+	private final Integer chunkSize;
 	private final StubBackendBehavior behavior;
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 
-	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, Integer pageSize, StubBackendBehavior behavior,
+	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, Integer chunkSize, StubBackendBehavior behavior,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.pageSize = pageSize;
+		this.chunkSize = chunkSize;
 		this.behavior = behavior;
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 	}
 
-	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, Integer pageSize) {
+	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, Integer chunkSize) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.pageSize = pageSize;
+		this.chunkSize = chunkSize;
 		this.behavior = null;
 		this.projectionContext = null;
 		this.loadingContext = null;
@@ -58,9 +58,9 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 		StubSearchWorkAssert.assertThat( actualCall.work )
 				.as( "Scroll work on indexes " + indexNames + " did not match: " )
 				.matches( work );
-		assertThat( actualCall.pageSize )
-				.as( "Scroll work pageSize did not match: " )
-				.isEqualTo( pageSize );
+		assertThat( actualCall.chunkSize )
+				.as( "Scroll work chunkSize did not match: " )
+				.isEqualTo( chunkSize );
 
 		return () -> new StubSearchScroll<>( actualCall.behavior, indexNames, actualCall.projectionContext,
 				actualCall.loadingContext, actualCall.rootProjection );

@@ -41,7 +41,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 
 	// specific to this scroll instance:
 	private final HibernateSearchMultiReader indexReader;
-	private final int pageSize;
+	private final int chunkSize;
 
 	private int scrollIndex = 0;
 	private int queryFetchSize;
@@ -52,8 +52,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
-			HibernateSearchMultiReader indexReader, int pageSize
-			) {
+			HibernateSearchMultiReader indexReader, int chunkSize) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;
@@ -61,8 +60,8 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 		this.timeoutManager = timeoutManager;
 		this.searcher = searcher;
 		this.indexReader = indexReader;
-		this.pageSize = pageSize;
-		this.queryFetchSize = pageSize * 4; // Will fetch the topdocs for the first 4 pages initially
+		this.chunkSize = chunkSize;
+		this.queryFetchSize = chunkSize * 4; // Will fetch the topdocs for the first 4 pages initially
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 	public SearchScrollResult<H> next() {
 		timeoutManager.start();
 
-		if ( search == null || scrollIndex + pageSize > queryFetchSize ) {
+		if ( search == null || scrollIndex + chunkSize > queryFetchSize ) {
 			if ( search != null ) {
 				queryFetchSize *= 2;
 			}
@@ -91,7 +90,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 			return new SimpleSearchScrollResult<>( false, Collections.emptyList(), Duration.ZERO, false );
 		}
 
-		int endIndexExclusive = scrollIndex + pageSize;
+		int endIndexExclusive = scrollIndex + chunkSize;
 
 		LuceneLoadableSearchResult<H> loadableSearchResult;
 		try {
@@ -114,7 +113,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 		timeoutManager.stop();
 
 		// increasing the index for further next(s)
-		scrollIndex += pageSize;
+		scrollIndex += chunkSize;
 		return new SimpleSearchScrollResult<>( true, result.hits(), result.took(), result.timedOut() );
 	}
 
