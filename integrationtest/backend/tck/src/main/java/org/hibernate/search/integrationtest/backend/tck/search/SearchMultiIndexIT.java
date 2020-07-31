@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -21,12 +24,11 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchMultiIndexIT {
 
@@ -78,6 +80,28 @@ public class SearchMultiIndexIT {
 		initData();
 	}
 
+	/**
+	 * Test that searching on a single index will only target that index.
+	 *
+	 * Non-regression test for HSEARCH-3977, where the Elasticsearch backend was ignoring the index selection.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3977")
+	public void search_singleIndex() {
+		SearchQuery<DocumentReference> query = index_1_1.query()
+				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
+				.toQuery();
+
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( c -> {
+			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
+		} );
+
+		assertThatHits( query.scroll( 20 ).next().hits() )
+				.hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1 );
+
+		assertThat( query.fetchTotalHitCount() ).isEqualTo( 1L );
+	}
+
 	@Test
 	public void search_across_multiple_indexes() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
@@ -86,7 +110,7 @@ public class SearchMultiIndexIT {
 				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( c -> {
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( c -> {
 			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
 			c.doc( index_1_2.typeName(), DOCUMENT_1_2_1 );
 		} );
@@ -101,7 +125,7 @@ public class SearchMultiIndexIT {
 				.sort( f -> f.field( "sortField" ).asc() )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
+		assertThatQuery( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
 			c.doc( index_1_1.typeName(), DOCUMENT_1_1_2 );
 			c.doc( index_1_2.typeName(), DOCUMENT_1_2_1 );
@@ -112,7 +136,7 @@ public class SearchMultiIndexIT {
 				.sort( f -> f.field( "sortField" ).desc() )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
+		assertThatQuery( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( index_1_2.typeName(), DOCUMENT_1_2_1 );
 			c.doc( index_1_1.typeName(), DOCUMENT_1_1_2 );
 			c.doc( index_1_1.typeName(), DOCUMENT_1_1_1 );
@@ -128,7 +152,7 @@ public class SearchMultiIndexIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				SORT_FIELD_1_1_1,
 				SORT_FIELD_1_1_2,
 				SORT_FIELD_1_2_1
@@ -144,7 +168,7 @@ public class SearchMultiIndexIT {
 				.where( f -> f.match().field( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index_1_1.typeName(), DOCUMENT_1_1_1 );
 
 		// Sort
 
@@ -159,7 +183,7 @@ public class SearchMultiIndexIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( projectionQuery ).hasHitsAnyOrder(
+		assertThatQuery( projectionQuery ).hasHitsAnyOrder(
 			ADDITIONAL_FIELD_1_1_1,
 			ADDITIONAL_FIELD_1_1_2,
 			null
@@ -171,7 +195,7 @@ public class SearchMultiIndexIT {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
 		// Predicate
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.predicate().match().field( "unknownField" ),
 				"predicate on unknown field with multiple targeted indexes"
 		)
@@ -186,7 +210,7 @@ public class SearchMultiIndexIT {
 
 		// Sort
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.sort().field( "unknownField" ),
 				"sort on unknown field with multiple targeted indexes"
 		)
@@ -201,7 +225,7 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.projection().field( "unknownField", Object.class ),
 				"projection on unknown field with multiple targeted indexes"
 		)
@@ -220,7 +244,7 @@ public class SearchMultiIndexIT {
 	public void search_with_incompatible_types_throws_exception() {
 		StubMappingScope scope = index_1_1.createScope( index_1_2 );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.predicate().match().field( "differentTypesField" )
 						.matching( DIFFERENT_TYPES_FIELD_1_1_1 ),
 				"predicate on field with different type among the targeted indexes"
@@ -228,14 +252,14 @@ public class SearchMultiIndexIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Inconsistent configuration", "'differentTypesField'" );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.projection().field( "differentTypesField" ).toProjection(),
 				"projection on field with different type among the targeted indexes"
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Inconsistent configuration", "'differentTypesField'" );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.sort().field( "differentTypesField" ),
 				"sort on field with different type among the targeted indexes"
 		)
@@ -245,7 +269,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_across_backends_throws_exception() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> index_1_1.createScope( index_2_1 ),
 				"search across multiple backends"
 		)
