@@ -60,7 +60,8 @@ public class ElasticsearchLoadableSearchResult<H> {
 	ElasticsearchSearchResultImpl<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
-		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking();
+		// TODO HSEARCH-3352 pass timeout
+		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper().loadBlocking( null );
 
 		int readIndex = 0;
 		int writeIndex = 0;

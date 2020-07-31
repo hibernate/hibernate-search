@@ -27,8 +27,10 @@ public interface ProjectionHitMapper<R, E> {
 	/**
 	 * Loads the entities planned for loading in one go, blocking the current thread while doing so.
 	 *
+	 * @param timeout The timeout to apply to the loading in milliseconds.
+	 * It can be {@code null}. If {@code null}, no timeout will be applied.
 	 * @return The loaded entities.
 	 */
-	LoadingResult<R, E> loadBlocking();
+	LoadingResult<R, E> loadBlocking(Integer timeout);
 
 }
