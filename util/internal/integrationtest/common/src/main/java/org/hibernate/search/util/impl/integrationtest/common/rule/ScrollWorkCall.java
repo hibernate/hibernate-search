@@ -24,13 +24,13 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
-	private final Integer chunkSize;
+	private final int chunkSize;
 	private final StubBackendBehavior behavior;
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 
-	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, Integer chunkSize, StubBackendBehavior behavior,
+	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, int chunkSize, StubBackendBehavior behavior,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
 		this.work = work;
@@ -41,7 +41,7 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 		this.rootProjection = rootProjection;
 	}
 
-	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, Integer chunkSize) {
+	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, int chunkSize) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.chunkSize = chunkSize;

@@ -150,7 +150,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public SearchScroll<H> scroll(Integer chunkSize) {
+	public SearchScroll<H> scroll(int chunkSize) {
 		String scrollTimeoutString = this.scrollTimeout + "s";
 
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()

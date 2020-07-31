@@ -149,6 +149,6 @@ public interface SearchFetchable<H> {
 	 * @return The {@link SearchScroll}.
 	 * @throws IllegalArgumentException if passed 0 or less for {@code chunkSize}.
 	 */
-	SearchScroll<H> scroll(Integer chunkSize);
+	SearchScroll<H> scroll(int chunkSize);
 
 }

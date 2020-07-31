@@ -32,7 +32,7 @@ public interface SearchScroll<H> extends AutoCloseable {
 	 * May return a result with less than {@code chunkSize} elements if only that many hits are left.
 	 *
 	 * @return The next {@link SearchScrollResult}.
-	 * @see SearchFetchable#scroll(Integer)
+	 * @see SearchFetchable#scroll(int)
 	 */
 	SearchScrollResult<H> next();
 

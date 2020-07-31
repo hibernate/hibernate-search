@@ -272,7 +272,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, Integer chunkSize,
+	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		return scrollCalls.verify(
 				new ScrollWorkCall<>( indexNames, work, chunkSize, this, projectionContext, loadingContext, rootProjection ),
