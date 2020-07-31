@@ -880,6 +880,27 @@ By default, the index reader is refreshed every second,
 but this can be customized on the Elasticsearch side through index settings:
 see the `refresh_interval` setting on link:{elasticsearchDocUrl}/index-modules.html[this page].
 
+[[backend-elasticsearch-search]]
+== Searching
+
+Searching with the Elasticsearch backend relies on the <<search-dsl,same APIs as any other backend>>.
+
+This section details Elasticsearch-specific configuration related to searching.
+
+[[backend-elasticsearch-search-scroll-timeout]]
+=== Scroll timeout
+
+With the Elasticsearch backend, <<search-dsl-query-fetching-results-scrolling,scrolls>> are subject to timeout.
+If `next()` is not called for a long period of time (default: 60 seconds),
+the scroll will be closed automatically and the next call to `next()` will fail.
+
+Use the following configuration property at the backend level to configure the timeout (in seconds):
+
+[source]
+----
+hibernate.search.backend.scroll_timeout 60 (default)
+----
+
 [[backend-elasticsearch-access-client]]
 == Retrieving the REST client
 // Search 5 anchors backward compatibility
