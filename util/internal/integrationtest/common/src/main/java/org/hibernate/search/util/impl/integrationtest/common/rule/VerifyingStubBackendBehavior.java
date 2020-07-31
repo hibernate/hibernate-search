@@ -275,7 +275,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, Integer pageSize,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		return scrollCalls.verify(
-				new ScrollWorkCall( indexNames, work, pageSize, this, projectionContext, loadingContext, rootProjection ),
+				new ScrollWorkCall<>( indexNames, work, pageSize, this, projectionContext, loadingContext, rootProjection ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () -> new StubSearchScroll<>(
 						this, indexNames, null, null, null
@@ -296,10 +296,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	public <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		return nextScrollCalls.verify(
-				new NextScrollWorkCall( indexNames, projectionContext, loadingContext, rootProjection ),
+				new NextScrollWorkCall<>( indexNames, projectionContext, loadingContext, rootProjection ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () ->
-						new SimpleSearchScrollResult( false, Collections.emptyList(), Duration.ZERO, false ) )
+						new SimpleSearchScrollResult<>( false, Collections.emptyList(), Duration.ZERO, false ) )
 		);
 	}
 

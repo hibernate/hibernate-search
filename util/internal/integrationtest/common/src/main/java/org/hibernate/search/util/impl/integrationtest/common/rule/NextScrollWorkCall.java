@@ -51,7 +51,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 				.as( "NextScroll work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
 
-		return () -> new SimpleSearchScrollResult( behavior.getTotalHitCount() > 0, SearchWorkCall.getResults(
+		return () -> new SimpleSearchScrollResult<>( behavior.getTotalHitCount() > 0, SearchWorkCall.getResults(
 				actualCall.projectionContext,
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
