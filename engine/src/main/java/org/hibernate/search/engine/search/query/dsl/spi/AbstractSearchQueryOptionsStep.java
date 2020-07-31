@@ -202,8 +202,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public SearchScroll<H> scroll(Integer pageSize) {
-		return toQuery().scroll( pageSize );
+	public SearchScroll<H> scroll(Integer chunkSize) {
+		return toQuery().scroll( chunkSize );
 	}
 
 	private void contribute(SearchPredicateBuilderFactory<? super C> factory, SearchPredicate predicate) {

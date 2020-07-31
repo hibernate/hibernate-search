@@ -119,11 +119,12 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	@Override
-	public SearchScroll<H> scroll(Integer pageSize) {
+	public SearchScroll<H> scroll(Integer chunkSize) {
 		Set<String> indexNames = searchContext.indexes().indexNames();
 		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
 				indexNames, searchContext.indexes().elements(), routingKeys );
-		return new LuceneSearchScroll<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager, searcher, indexReader, pageSize );
+		return new LuceneSearchScroll<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
+				searcher, indexReader, chunkSize );
 	}
 
 	@Override

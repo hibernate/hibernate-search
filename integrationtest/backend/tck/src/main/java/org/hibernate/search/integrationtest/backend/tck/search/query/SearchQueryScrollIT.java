@@ -37,8 +37,8 @@ import org.assertj.core.api.Assertions;
 public class SearchQueryScrollIT {
 
 	private static final int DOCUMENT_COUNT = 200;
-	private static final int PAGE_SIZE = 30;
-	private static final int EXACT_DIVISOR_PAGE_SIZE = 25;
+	private static final int CHUNK_SIZE = 30;
+	private static final int EXACT_DIVISOR_CHUNK_SIZE = 25;
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -54,7 +54,7 @@ public class SearchQueryScrollIT {
 
 	@Test
 	public void none() {
-		try ( SearchScroll<DocumentReference> scroll = matchNoneQuery().scroll( PAGE_SIZE ) ) {
+		try ( SearchScroll<DocumentReference> scroll = matchNoneQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			Assertions.assertThat( scrollResult.hasHits() ).isFalse();
 			Assertions.assertThat( scrollResult.hits() ).isEmpty();
@@ -63,7 +63,7 @@ public class SearchQueryScrollIT {
 
 	@Test
 	public void one() {
-		try ( SearchScroll<DocumentReference> scroll = matchOneQuery( 4 ).scroll( PAGE_SIZE ) ) {
+		try ( SearchScroll<DocumentReference> scroll = matchOneQuery( 4 ).scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			Assertions.assertThat( scrollResult.hasHits() ).isTrue();
 			assertThat( scrollResult.hits() ).hasDocRefHitsExactOrder( index.typeName(), docId( 4 ) );
@@ -75,21 +75,21 @@ public class SearchQueryScrollIT {
 
 	@Test
 	public void all() {
-		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( PAGE_SIZE ) ) {
-			checkScrolling( scroll, DOCUMENT_COUNT, PAGE_SIZE );
+		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( CHUNK_SIZE ) ) {
+			checkScrolling( scroll, DOCUMENT_COUNT, CHUNK_SIZE );
 		}
 	}
 
 	@Test
 	public void all_exactDivisorPageSize() {
-		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( EXACT_DIVISOR_PAGE_SIZE ) ) {
-			checkScrolling( scroll, DOCUMENT_COUNT, EXACT_DIVISOR_PAGE_SIZE );
+		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( EXACT_DIVISOR_CHUNK_SIZE ) ) {
+			checkScrolling( scroll, DOCUMENT_COUNT, EXACT_DIVISOR_CHUNK_SIZE );
 		}
 	}
 
 	@Test
 	public void all_failAfter() {
-		Assertions.assertThatThrownBy( () -> matchAllQuery().failAfter( 1L, TimeUnit.NANOSECONDS ).scroll( PAGE_SIZE ).next() )
+		Assertions.assertThatThrownBy( () -> matchAllQuery().failAfter( 1L, TimeUnit.NANOSECONDS ).scroll( CHUNK_SIZE ).next() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -108,8 +108,8 @@ public class SearchQueryScrollIT {
 
 	@Test
 	public void firstHalf() {
-		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( PAGE_SIZE ) ) {
-			checkScrolling( scroll, DOCUMENT_COUNT / 2, PAGE_SIZE );
+		try ( SearchScroll<DocumentReference> scroll = matchFirstHalfQuery().scroll( CHUNK_SIZE ) ) {
+			checkScrolling( scroll, DOCUMENT_COUNT / 2, CHUNK_SIZE );
 		}
 	}
 
@@ -129,7 +129,7 @@ public class SearchQueryScrollIT {
 
 	@Test
 	public void tookAndTimedOut() {
-		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( PAGE_SIZE ) ) {
+		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> result = scroll.next();
 
 			assertNotNull( result.took() );
@@ -138,23 +138,23 @@ public class SearchQueryScrollIT {
 		}
 	}
 
-	private void checkScrolling(SearchScroll<DocumentReference> scroll, int documentCount, int pageSize) {
+	private void checkScrolling(SearchScroll<DocumentReference> scroll, int documentCount, int chunkSize) {
 		int docIndex = 0;
-		int quotient = documentCount / pageSize;
+		int quotient = documentCount / chunkSize;
 
 		for ( int i = 0; i < quotient; i++ ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			Assertions.assertThat( scrollResult.hasHits() ).isTrue();
 
 			List<DocumentReference> hits = scrollResult.hits();
-			Assertions.assertThat( hits ).hasSize( pageSize );
-			for ( int j = 0; j < pageSize; j++ ) {
+			Assertions.assertThat( hits ).hasSize( chunkSize );
+			for ( int j = 0; j < chunkSize; j++ ) {
 				Assertions.assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
 				Assertions.assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
 			}
 		}
 
-		int remainder = documentCount % pageSize;
+		int remainder = documentCount % chunkSize;
 		SearchScrollResult<DocumentReference> scrollResult;
 
 		if ( remainder != 0 ) {

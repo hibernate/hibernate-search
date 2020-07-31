@@ -55,7 +55,7 @@ public abstract class StubBackendBehavior {
 
 	public abstract long executeCountWork(Set<String> indexNames);
 
-	public abstract <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, Integer pageSize,
+	public abstract <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, Integer chunkSize,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
 
 	public abstract void executeCloseScrollWork(Set<String> indexNames);

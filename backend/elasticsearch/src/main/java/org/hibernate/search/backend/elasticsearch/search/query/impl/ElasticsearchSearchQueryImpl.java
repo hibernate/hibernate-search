@@ -159,7 +159,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public SearchScroll<H> scroll(Integer pageSize) {
+	public SearchScroll<H> scroll(Integer chunkSize) {
 		String scrollTimeoutString = this.scrollTimeout + "s";
 
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = workFactory.search( payload, searchResultExtractor )
@@ -168,7 +168,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				)
-				.scrolling( pageSize, scrollTimeoutString )
+				.scrolling( chunkSize, scrollTimeoutString )
 				.build();
 
 		return new ElasticsearchSearchScroll<>( queryOrchestrator, workFactory, searchResultExtractor, scrollTimeoutString, firstScroll );

@@ -226,24 +226,27 @@ public class BackendMock implements TestRule {
 		return backendBehavior;
 	}
 
-	public BackendMock expectScrollObjects(Collection<String> indexNames, int pageSize, Consumer<StubSearchWork.Builder> contributor) {
-		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, pageSize );
+	public BackendMock expectScrollObjects(Collection<String> indexNames, int chunkSize,
+			Consumer<StubSearchWork.Builder> contributor) {
+		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, chunkSize );
 	}
 
-	public BackendMock expectScrollProjections(Collection<String> indexNames, int pageSize, Consumer<StubSearchWork.Builder> contributor) {
-		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, pageSize );
+	public BackendMock expectScrollProjections(Collection<String> indexNames, int chunkSize,
+			Consumer<StubSearchWork.Builder> contributor) {
+		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, chunkSize );
 	}
 
-	public BackendMock expectScrollProjection(Collection<String> indexNames, int pageSize, Consumer<StubSearchWork.Builder> contributor) {
-		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, pageSize );
+	public BackendMock expectScrollProjection(Collection<String> indexNames, int chunkSize,
+			Consumer<StubSearchWork.Builder> contributor) {
+		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, chunkSize );
 	}
 
 	private BackendMock expectScroll(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWork.ResultType resultType, Integer pageSize) {
+			StubSearchWork.ResultType resultType, Integer chunkSize) {
 		CallQueue<ScrollWorkCall<?>> callQueue = backendBehavior().getScrollCalls();
 		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
 		contributor.accept( builder );
-		callQueue.expectInOrder( new ScrollWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), pageSize ) );
+		callQueue.expectInOrder( new ScrollWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), chunkSize ) );
 		return this;
 	}
 

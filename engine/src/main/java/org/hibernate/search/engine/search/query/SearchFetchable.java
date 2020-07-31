@@ -145,10 +145,10 @@ public interface SearchFetchable<H> {
 	 * <p>
 	 * Useful to process large datasets.
 	 *
-	 * @param pageSize The maximum number of hits to be returned for each call to {@link SearchScroll#next()}
+	 * @param chunkSize The maximum number of hits to be returned for each call to {@link SearchScroll#next()}
 	 * @return The {@link SearchScroll}.
-	 * @throws IllegalArgumentException if passed 0 or less for pageSize.
+	 * @throws IllegalArgumentException if passed 0 or less for {@code chunkSize}.
 	 */
-	SearchScroll<H> scroll(Integer pageSize);
+	SearchScroll<H> scroll(Integer chunkSize);
 
 }
