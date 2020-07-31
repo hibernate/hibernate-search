@@ -77,9 +77,6 @@ public class Author {
     @ManyToMany(mappedBy = "authors")
     private Set<Book> books = new HashSet<>();
 
-    public Author() {
-    }
-
     // Getters and setters
     // ...
 }
@@ -115,12 +112,11 @@ SearchResult<Book> result = Search.session( entityManager )
         .search( Book.class )
         .where( f -> f.match()
                 .fields( "title", "authors.name" )
-                .matching( "Isaac" )
-        )
+                .matching( "Isaac" ) )
         .fetch( 20 );
 
-long totalHitCount = result.getTotalHitCount();
-List<Book> hits = result.getHits();
+long totalHitCount = result.totalHitCount();
+List<Book> hits = result.hits();
 ```
 
 ## License
