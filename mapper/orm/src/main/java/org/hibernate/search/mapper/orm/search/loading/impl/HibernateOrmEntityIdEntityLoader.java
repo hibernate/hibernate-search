@@ -57,19 +57,20 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	}
 
 	@Override
-	public List<E> loadBlocking(List<EntityReference> references) {
+	public List<E> loadBlocking(List<EntityReference> references, Integer timeout) {
 		if ( cacheLookupStrategyImplementor == null ) {
 			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
-			return doLoadEntities( references );
+			return doLoadEntities( references, timeout );
 		}
 		else {
-			return HibernateOrmComposableEntityLoader.super.loadBlocking( references );
+			return HibernateOrmComposableEntityLoader.super.loadBlocking( references, timeout );
 		}
 	}
 
 	@Override
-	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference) {
-		List<? extends E> loadedEntities = doLoadEntities( references );
+	public void loadBlocking(List<EntityReference> references,
+			Map<? super EntityReference, ? super E> entitiesByReference, Integer timeout) {
+		List<? extends E> loadedEntities = doLoadEntities( references, timeout );
 		Iterator<EntityReference> referencesIterator = references.iterator();
 		Iterator<? extends E> loadedEntityIterator = loadedEntities.iterator();
 		while ( referencesIterator.hasNext() ) {
@@ -81,12 +82,12 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		}
 	}
 
-	private List<E> doLoadEntities(List<EntityReference> references) {
+	private List<E> doLoadEntities(List<EntityReference> references, Integer timeout) {
 		EntityKey[] keys = toEntityKeys( references );
 		List<E> loadedEntities = createListContainingNulls( references.size() );
 
 		int fetchSize = loadingOptions.fetchSize();
-		Query<?> query = createQuery( fetchSize );
+		Query<?> query = createQuery( fetchSize, timeout );
 
 		List<Object> ids = new ArrayList<>( fetchSize );
 		for ( int i = 0; i < keys.length; i++ ) {
@@ -142,12 +143,15 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		return (E) loadedEntity;
 	}
 
-	private Query<?> createQuery(int fetchSize) {
+	private Query<?> createQuery(int fetchSize, Integer timeout) {
 		Query<?> query = HibernateOrmUtils.createQueryForLoadByUniqueProperty(
 				session, entityPersister, entityPersister.getIdentifierPropertyName(), IDS_PARAMETER_NAME
 		);
 
 		query.setFetchSize( fetchSize );
+		if ( timeout != null ) {
+			query.setTimeout( HibernateOrmComposableEntityLoader.getTimeoutInSeconds( timeout ) );
+		}
 
 		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
 		if ( entityGraphHint != null ) {

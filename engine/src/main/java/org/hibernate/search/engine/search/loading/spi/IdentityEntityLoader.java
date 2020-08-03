@@ -18,7 +18,7 @@ class IdentityEntityLoader<E> implements EntityLoader<E, E> {
 	}
 
 	@Override
-	public List<E> loadBlocking(List<E> references) {
+	public List<E> loadBlocking(List<E> references, Integer timeout) {
 		return references;
 	}
 }

@@ -64,13 +64,14 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 	}
 
 	@Override
-	public void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference) {
+	public void loadBlocking(List<EntityReference> references,
+			Map<? super EntityReference, ? super E> entitiesByReference, Integer timeout) {
 		Map<Object, EntityReference> documentIdSourceValueToReference = new HashMap<>();
 		for ( EntityReference reference : references ) {
 			documentIdSourceValueToReference.put( reference.id(), reference );
 		}
 
-		List<? extends E> loadedEntities = loadEntities( documentIdSourceValueToReference.keySet() );
+		List<? extends E> loadedEntities = loadEntities( documentIdSourceValueToReference.keySet(), timeout );
 
 		for ( E loadedEntity : loadedEntities ) {
 			// The handle may point to a field, in which case it won't work on a proxy. Unproxy first.
@@ -83,9 +84,9 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 		}
 	}
 
-	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues) {
+	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues, Integer timeout) {
 		int fetchSize = loadingOptions.fetchSize();
-		Query<? extends E> query = createQuery( fetchSize );
+		Query<? extends E> query = createQuery( fetchSize, timeout );
 
 		if ( fetchSize >= documentIdSourceValues.size() ) {
 			query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, documentIdSourceValues );
@@ -113,13 +114,16 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 	}
 
 	@SuppressWarnings("unchecked") // Cast is safe because entityPersister represents type E. See Factory.doCreate().
-	private Query<? extends E> createQuery(int fetchSize) {
+	private Query<? extends E> createQuery(int fetchSize, Integer timeout) {
 		Query<? extends E> query = (Query<? extends E>) HibernateOrmUtils.createQueryForLoadByUniqueProperty(
 				session, entityPersister, documentIdSourcePropertyName,
 				DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME
 		);
 
 		query.setFetchSize( fetchSize );
+		if ( timeout != null ) {
+			query.setTimeout( HibernateOrmComposableEntityLoader.getTimeoutInSeconds( timeout ) );
+		}
 
 		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
 		if ( entityGraphHint != null ) {

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 
@@ -65,7 +66,7 @@ public final class MapperEasyMockUtils {
 		}
 
 		expect( objectLoaderMock.loadBlocking(
-				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) )
+				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) ), anyObject()
 		) )
 				.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
 						.map( context.loadingMap::get )
