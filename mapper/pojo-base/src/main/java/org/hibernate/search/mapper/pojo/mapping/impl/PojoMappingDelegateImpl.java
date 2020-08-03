@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -33,15 +34,17 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
+	private final TimingSource timingSource;
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 
 	public PojoMappingDelegateImpl(ThreadPoolProvider threadPoolProvider,
-			FailureHandler failureHandler,
+			FailureHandler failureHandler, TimingSource timingSource,
 			PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers) {
 		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
+		this.timingSource = timingSource;
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 	}
@@ -62,6 +65,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public FailureHandler failureHandler() {
 		return failureHandler;
+	}
+
+	@Override
+	public TimingSource timingSource() {
+		return timingSource;
 	}
 
 	@Override

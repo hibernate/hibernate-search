@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
@@ -16,6 +17,8 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingCont
 public interface HibernateOrmSearchSessionMappingContext extends PojoSearchSessionMappingContext {
 
 	FailureHandler failureHandler();
+
+	TimingSource timingSource();
 
 	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 
