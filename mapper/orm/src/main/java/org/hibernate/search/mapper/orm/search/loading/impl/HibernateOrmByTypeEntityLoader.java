@@ -13,6 +13,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
@@ -23,13 +25,21 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName;
+	private final TimingSource timingSource;
 
-	HibernateOrmByTypeEntityLoader(Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName) {
+	HibernateOrmByTypeEntityLoader(Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName,
+			TimingSource timingSource) {
 		this.delegatesByEntityName = delegatesByEntityName;
+		this.timingSource = timingSource;
 	}
 
 	@Override
 	public List<T> loadBlocking(List<EntityReference> references, Integer timeout) {
+		TimeoutManager timeoutManager = null;
+		if ( timeout != null ) {
+			timeoutManager = new TimeoutManager( timingSource, Long.valueOf( timeout ) );
+		}
+
 		LinkedHashMap<EntityReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
 		Map<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 
@@ -47,8 +57,14 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 				referencesByDelegate.entrySet() ) {
 			HibernateOrmComposableEntityLoader<? extends T> delegate = entry.getKey();
 			List<EntityReference> referencesForDelegate = entry.getValue();
-			// FIXME Use a deadline instead of a timeout
-			delegate.loadBlocking( referencesForDelegate, objectsByReference, timeout );
+
+			Integer currentTimeout = ( timeoutManager == null ) ? null :
+					Math.toIntExact( timeoutManager.checkTimeLeftInMilliseconds() );
+			delegate.loadBlocking( referencesForDelegate, objectsByReference, currentTimeout );
+		}
+
+		if ( timeoutManager != null ) {
+			timeoutManager.stop();
 		}
 
 		// Re-create the list of objects in the same order

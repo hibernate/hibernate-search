@@ -83,7 +83,7 @@ public class EntityLoaderBuilder<E> {
 					delegateByEntityName.put( type.jpaEntityName(), loader );
 				}
 			}
-			return new HibernateOrmByTypeEntityLoader<>( delegateByEntityName );
+			return new HibernateOrmByTypeEntityLoader<>( delegateByEntityName, timingSource );
 		}
 	}
 

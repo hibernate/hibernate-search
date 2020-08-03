@@ -33,7 +33,7 @@ public class TimeoutManager {
 	private Long start;
 	boolean timedOut = false;
 
-	protected TimeoutManager(TimingSource timingSource, Long timeoutMs, Type type) {
+	public TimeoutManager(TimingSource timingSource, Long timeoutMs, Type type) {
 		this.timingSource = timingSource;
 		this.timeoutMs = timeoutMs;
 		this.type = type;
