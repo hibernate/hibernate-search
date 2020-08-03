@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchA
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
@@ -37,13 +37,13 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private final ExtractionRequirements extractionRequirements;
 
-	private TimeoutManager timeoutManager;
+	private LuceneTimeoutManager timeoutManager;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
 			ExtractionRequirements extractionRequirements,
-			TimeoutManager timeoutManager) {
+			LuceneTimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
 		this.rootProjection = rootProjection;
 		this.aggregations = aggregations;
@@ -127,7 +127,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	@Override
-	public void setTimeoutManager(TimeoutManager timeoutManager) {
+	public void setTimeoutManager(LuceneTimeoutManager timeoutManager) {
 		this.timeoutManager = timeoutManager;
 	}
 

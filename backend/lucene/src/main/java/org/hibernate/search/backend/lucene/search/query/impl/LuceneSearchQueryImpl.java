@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
@@ -53,14 +53,14 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Sort luceneSort;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
 
-	private TimeoutManager timeoutManager;
+	private LuceneTimeoutManager timeoutManager;
 
 	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
-			TimeoutManager timeoutManager,
+			LuceneTimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher) {
 		this.queryOrchestrator = queryOrchestrator;

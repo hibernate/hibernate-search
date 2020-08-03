@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExec
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
@@ -44,7 +44,7 @@ public final class ExtractionRequirements {
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
-			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager)
+			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager)
 			throws IOException {
 		TopDocsCollector<?> topDocsCollector;
 		Integer scoreSortFieldIndexForRescoring = null;

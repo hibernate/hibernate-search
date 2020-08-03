@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScrollResult;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
@@ -35,7 +35,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchContext searchContext;
 	private final Set<String> routingKeys;
-	private final TimeoutManager timeoutManager;
+	private final LuceneTimeoutManager timeoutManager;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
 
 	// specific to this scroll instance:
@@ -49,7 +49,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			Set<String> routingKeys,
-			TimeoutManager timeoutManager,
+			LuceneTimeoutManager timeoutManager,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
 			HibernateSearchMultiReader indexReader, int chunkSize) {
 		this.queryOrchestrator = queryOrchestrator;

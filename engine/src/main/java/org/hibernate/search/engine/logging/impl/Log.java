@@ -21,6 +21,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
@@ -360,4 +361,7 @@ public interface Log extends BasicLogger {
 					+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
 					+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'.")
 	void deprecatedIndexDefaultsPrefix(String key);
+
+	@Message(id = ID_OFFSET_2 + 86, value = "Search query loading exceeded the timeout of %1$s milliseconds.")
+	SearchTimeoutException timedOut(Long timeoutMs);
 }

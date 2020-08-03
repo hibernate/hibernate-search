@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFact
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
@@ -43,7 +43,7 @@ public class LuceneCollectors {
 	private final Set<CollectorFactory<?>> collectorsForTopDocsFactories;
 	private CollectorSet collectorsForTopDocs;
 
-	private final TimeoutManager timeoutManager;
+	private final LuceneTimeoutManager timeoutManager;
 
 	private long totalHitCount = 0;
 	private TopDocs topDocs = null;
@@ -52,7 +52,7 @@ public class LuceneCollectors {
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			CollectorSet collectorsForAllMatchingDocs,
 			Set<CollectorFactory<?>> collectorsForTopDocsFactories,
-			TimeoutManager timeoutManager) {
+			LuceneTimeoutManager timeoutManager) {
 		this.metadataResolver = metadataResolver;
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;

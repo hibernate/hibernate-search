@@ -28,7 +28,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementC
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -209,7 +209,7 @@ public class LuceneSearchQueryBuilder<H>
 		}
 		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
 
-		TimeoutManager timeoutManager = searchContext.createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
+		LuceneTimeoutManager timeoutManager = searchContext.createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
