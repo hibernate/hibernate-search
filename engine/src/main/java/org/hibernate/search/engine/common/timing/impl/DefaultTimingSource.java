@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.common.timing.impl;
+package org.hibernate.search.engine.common.timing.impl;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
+import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 
 /**
  * Default implementation for a {@link TimingSource}
@@ -21,14 +21,14 @@ public final class DefaultTimingSource implements TimingSource {
 
 	private static final long INVALID_TIME = -1;
 
-	private final BackendThreads threads;
+	private final EngineThreads threads;
 
 	//lazily initialize it, so we don't start a thread for those who don't use timeouts
 	//guarded by synchronization on this
 	private ScheduledFuture<?> future;
 	private volatile long currentTimeApproximation = INVALID_TIME;
 
-	public DefaultTimingSource(BackendThreads threads) {
+	public DefaultTimingSource(EngineThreads threads) {
 		this.threads = threads;
 	}
 
@@ -80,5 +80,4 @@ public final class DefaultTimingSource implements TimingSource {
 	private static long currentTime() {
 		return TimeUnit.MILLISECONDS.convert( System.nanoTime(), TimeUnit.NANOSECONDS );
 	}
-
 }

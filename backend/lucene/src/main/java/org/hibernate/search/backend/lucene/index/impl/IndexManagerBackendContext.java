@@ -31,7 +31,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContex
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.backend.lucene.common.timing.impl.TimingSource;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexer;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkspace;
@@ -49,6 +48,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;

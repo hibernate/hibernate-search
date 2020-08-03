@@ -4,13 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.common.timing.impl;
+package org.hibernate.search.engine.common.timing.impl;
 
 /**
- * Lucene delegates responsibility for efficient time tracking to an external service;
- * this is needed for example by the
- * {@link org.apache.lucene.search.TimeLimitingCollector#TimeLimitingCollector(org.apache.lucene.search.Collector, org.apache.lucene.util.Counter, long)}
- * used by Hibernate Search when time limits are enabled on fulltext queries.
  *
  * @author Sanne Grinovero (C) 2012 Red Hat Inc.
  * @since 4.1
@@ -27,7 +23,7 @@ public interface TimingSource {
 	long monotonicTimeEstimate();
 
 	/**
-	 * Invoked on backend shutdown. There is no start method as it's expected to be lazily initialized
+	 * Invoked on engine integration shutdown. There is no start method as it's expected to be lazily initialized
 	 */
 	void stop();
 

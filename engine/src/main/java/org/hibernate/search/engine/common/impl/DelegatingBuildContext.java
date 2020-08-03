@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.resources.impl.EngineThreads;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
@@ -43,5 +45,13 @@ class DelegatingBuildContext {
 
 	public FailureHandler failureHandler() {
 		return delegate.getFailureHandler();
+	}
+
+	public EngineThreads engineThreads() {
+		return delegate.getEngineThreads();
+	}
+
+	public TimingSource timingSource() {
+		return delegate.getTimingSource();
 	}
 }

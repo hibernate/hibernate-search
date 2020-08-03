@@ -14,7 +14,9 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
@@ -41,18 +43,24 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private final Map<String, BackendImplementor> backends;
 	private final Map<String, IndexManagerImplementor> indexManagers;
 
+	private final EngineThreads engineThreads;
+	private final TimingSource timingSource;
+
 	SearchIntegrationImpl(BeanProvider beanProvider,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
 			ThreadPoolProviderImpl threadPoolProvider,
 			Map<MappingKey<?, ?>, MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor> backends,
-			Map<String, IndexManagerImplementor> indexManagers) {
+			Map<String, IndexManagerImplementor> indexManagers,
+			EngineThreads engineThreads, TimingSource timingSource) {
 		this.beanProvider = beanProvider;
 		this.failureHandlerHolder = failureHandlerHolder;
 		this.threadPoolProvider = threadPoolProvider;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
+		this.engineThreads = engineThreads;
+		this.timingSource = timingSource;
 	}
 
 	@Override
@@ -95,6 +103,8 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( ThreadPoolProviderImpl::close, threadPoolProvider );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
+			closer.pushAll( EngineThreads::onStop, engineThreads );
+			closer.pushAll( TimingSource::stop, timingSource );
 		}
 		catch (RuntimeException e) {
 			failureCollector.withContext( EventContexts.defaultContext() ).add( e );
