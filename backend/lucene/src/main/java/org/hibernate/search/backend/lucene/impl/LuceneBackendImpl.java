@@ -19,7 +19,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
-import org.hibernate.search.backend.lucene.common.timing.impl.TimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -27,6 +26,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -49,7 +49,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final LuceneSyncWorkOrchestratorImpl readOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final TimingSource timingSource;
 
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
@@ -70,7 +69,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 				"Lucene read work orchestrator - " + eventContext.render(), similarity
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.timingSource = timingSource;
 
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, similarity,
@@ -101,7 +99,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( LuceneSyncWorkOrchestratorImpl::stop, readOrchestrator );
-			closer.push( TimingSource::stop, timingSource );
 			closer.push( BackendThreads::onStop, threads );
 		}
 	}

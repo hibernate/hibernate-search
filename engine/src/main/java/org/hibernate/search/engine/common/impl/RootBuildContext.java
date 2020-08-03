@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.resources.impl.EngineThreads;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -26,11 +28,15 @@ class RootBuildContext {
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 
+	private final EngineThreads engineThreads;
+	private final TimingSource timingSource;
+
 	RootBuildContext(ConfigurationPropertySource propertySource,
 			ClassResolver classResolver, ResourceResolver resourceResolver,
 			BeanResolver beanResolver,
 			FailureCollector failureCollector,
-			ThreadPoolProvider threadPoolProvider, FailureHandler failureHandler) {
+			ThreadPoolProvider threadPoolProvider, FailureHandler failureHandler,
+			EngineThreads engineThreads, TimingSource timingSource) {
 		this.propertySource = propertySource;
 		this.classResolver = classResolver;
 		this.resourceResolver = resourceResolver;
@@ -38,6 +44,8 @@ class RootBuildContext {
 		this.failureCollector = failureCollector;
 		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
+		this.engineThreads = engineThreads;
+		this.timingSource = timingSource;
 	}
 
 	ConfigurationPropertySource getConfigurationPropertySource() {
@@ -66,5 +74,13 @@ class RootBuildContext {
 
 	FailureHandler getFailureHandler() {
 		return failureHandler;
+	}
+
+	EngineThreads getEngineThreads() {
+		return engineThreads;
+	}
+
+	TimingSource getTimingSource() {
+		return timingSource;
 	}
 }

@@ -14,9 +14,11 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -52,6 +54,9 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final Map<String, IndexManagerImplementor> startedIndexManagers = new LinkedHashMap<>();
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltStartedMappings = new LinkedHashMap<>();
 
+	private final EngineThreads engineThreads;
+	private final TimingSource timingSource;
+
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
@@ -59,7 +64,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
 			Map<String, BackendNonStartedState> nonStartedBackends,
 			Map<String, IndexManagerNonStartedState> nonStartedIndexManagers,
-			ConfigurationPropertyChecker partialConfigurationPropertyChecker) {
+			ConfigurationPropertyChecker partialConfigurationPropertyChecker,
+			EngineThreads engineThreads, TimingSource timingSource) {
 		this.beanProvider = beanProvider;
 		this.beanResolver = beanResolver;
 		this.failureHandlerHolder = failureHandlerHolder;
@@ -68,6 +74,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		this.nonStartedBackends = nonStartedBackends;
 		this.nonStartedIndexManagers = nonStartedIndexManagers;
 		this.partialConfigurationPropertyChecker = partialConfigurationPropertyChecker;
+		this.engineThreads = engineThreads;
+		this.timingSource = timingSource;
 	}
 
 	@Override
@@ -83,6 +91,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			closer.pushAll( ThreadPoolProviderImpl::close, threadPoolProvider );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
+			closer.pushAll( EngineThreads::onStop, engineThreads );
+			closer.pushAll( TimingSource::stop, timingSource );
 		}
 	}
 
@@ -183,7 +193,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					threadPoolProvider,
 					fullyBuiltStartedMappings,
 					startedBackends,
-					startedIndexManagers
+					startedIndexManagers,
+					engineThreads, timingSource
 			);
 		}
 	}

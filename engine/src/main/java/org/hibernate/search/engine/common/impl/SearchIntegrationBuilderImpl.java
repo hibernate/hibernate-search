@@ -25,6 +25,9 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.common.resources.impl.EngineThreads;
+import org.hibernate.search.engine.common.timing.impl.DefaultTimingSource;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -155,6 +158,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings = new HashMap<>();
 		RootFailureCollector failureCollector = new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 		boolean checkingRootFailures = false;
+		EngineThreads engineThreads = null;
+		TimingSource timingSource = null;
 
 		try {
 			frozen = true;
@@ -194,11 +199,14 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			threadProviderHolder = THREAD_PROVIDER.getAndTransform( propertySource, beanResolver::resolve );
 			ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl( threadProviderHolder );
+			engineThreads = new EngineThreads( threadPoolProvider );
+			timingSource = new DefaultTimingSource( engineThreads );
 
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
 					classResolver, resourceResolver, beanResolver,
-					failureCollector, threadPoolProvider, failureHandler
+					failureCollector, threadPoolProvider, failureHandler,
+					engineThreads, timingSource
 			);
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
@@ -266,7 +274,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendNonStartedStates(),
 					indexManagerBuildingStateHolder.getIndexManagersNonStartedStates(),
-					propertyChecker
+					propertyChecker,
+					engineThreads, timingSource
 			);
 		}
 		catch (RuntimeException e) {
@@ -307,6 +316,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			// Close environment resources before aborting
 			closer.pushAll( BeanHolder::close, threadProviderHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
+			closer.push( EngineThreads::onStop, engineThreads );
+			closer.push( TimingSource::stop, timingSource );
 
 			throw rethrownException;
 		}

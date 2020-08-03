@@ -28,8 +28,6 @@ public class BackendThreads {
 	private final String prefix;
 
 	private ThreadPoolProvider threadPoolProvider;
-
-	private ScheduledExecutorService timingExecutor;
 	private ScheduledExecutorService writeExecutor;
 
 	public BackendThreads(String prefix) {
@@ -55,31 +53,12 @@ public class BackendThreads {
 	public void onStop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ExecutorService::shutdownNow, writeExecutor );
-			closer.push( ExecutorService::shutdownNow, timingExecutor );
 		}
 	}
 
 	public ThreadProvider getThreadProvider() {
 		checkStarted();
 		return threadPoolProvider.threadProvider();
-	}
-
-	public ScheduledExecutorService getTimingExecutor() {
-		checkStarted();
-		// Lazy initialization - not all configurations need this executor
-		ScheduledExecutorService executor = timingExecutor;
-		if ( executor != null ) {
-			return executor;
-		}
-		synchronized (this) {
-			if ( timingExecutor != null ) {
-				return timingExecutor;
-			}
-			this.timingExecutor = threadPoolProvider.newScheduledExecutor(
-					1, prefix + " - Timing thread"
-			);
-			return timingExecutor;
-		}
 	}
 
 	public ScheduledExecutorService getWriteExecutor() {
