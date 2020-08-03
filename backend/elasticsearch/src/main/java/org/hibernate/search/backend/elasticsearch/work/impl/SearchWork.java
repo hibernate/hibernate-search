@@ -28,10 +28,14 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
+	// TODO HSEARCH-3787 Use hardTimeoutInMilliseconds
+	private final Long hardTimeoutInMilliseconds;
 
 	protected SearchWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
+		this.hardTimeoutInMilliseconds = ( builder.exceptionOnTimeout && builder.timeoutUnit != null
+				&& builder.timeoutValue != null ) ? builder.timeoutUnit.toMillis( builder.timeoutValue ) : null;
 	}
 
 	@Override
