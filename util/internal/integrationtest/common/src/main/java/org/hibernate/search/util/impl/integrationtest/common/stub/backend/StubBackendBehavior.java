@@ -60,7 +60,8 @@ public abstract class StubBackendBehavior {
 
 	public abstract void executeCloseScrollWork(Set<String> indexNames);
 
-	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchProjectionContext projectionContext,
-			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
+	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjection<T> rootProjection);
 
 }

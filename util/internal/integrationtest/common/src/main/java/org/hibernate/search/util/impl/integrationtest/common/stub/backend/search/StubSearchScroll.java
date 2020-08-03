@@ -19,14 +19,17 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 
 	private final StubBackendBehavior behavior;
 	private final Set<String> indexNames;
+	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 
-	public StubSearchScroll(StubBackendBehavior behavior, Set<String> indexNames,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+	public StubSearchScroll(StubBackendBehavior behavior, Set<String> indexNames, StubSearchWork work,
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjection<T> rootProjection) {
 		this.behavior = behavior;
 		this.indexNames = indexNames;
+		this.work = work;
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
@@ -39,6 +42,6 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 
 	@Override
 	public SearchScrollResult<T> next() {
-		return behavior.executeNextScrollWork( indexNames, projectionContext, loadingContext, rootProjection );
+		return behavior.executeNextScrollWork( indexNames, work, projectionContext, loadingContext, rootProjection );
 	}
 }
