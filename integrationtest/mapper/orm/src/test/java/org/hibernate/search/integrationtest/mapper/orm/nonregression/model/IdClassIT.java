@@ -26,7 +26,6 @@ import org.junit.Test;
 /**
  * Tests behavior when an entity uses {@link javax.persistence.IdClass},
  */
-@TestForIssue(jiraKey = "HSEARCH-2496")
 public class IdClassIT {
 
 	@Rule
