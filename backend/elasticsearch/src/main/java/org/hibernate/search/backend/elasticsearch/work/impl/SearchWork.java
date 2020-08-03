@@ -28,7 +28,6 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-	// TODO HSEARCH-3787 Use hardTimeoutInMilliseconds
 	private final Long hardTimeoutInMilliseconds;
 
 	protected SearchWork(Builder<R> builder) {
@@ -51,7 +50,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body );
+		return resultExtractor.extract( body, hardTimeoutInMilliseconds );
 	}
 
 	public static class Builder<R>

@@ -10,6 +10,6 @@ import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchResultExtractor<R> {
 
-	R extract(JsonObject responseBody);
+	R extract(JsonObject responseBody, Long hardTimeoutInMilliseconds);
 
 }

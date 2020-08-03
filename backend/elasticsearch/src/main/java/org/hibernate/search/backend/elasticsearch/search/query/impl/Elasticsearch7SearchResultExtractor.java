@@ -63,7 +63,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	}
 
 	@Override
-	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody) {
+	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody, Long hardTimeoutInMilliseconds) {
 		ElasticsearchSearchQueryExtractContext extractContext = requestContext.createExtractContext(
 				responseBody
 		);
@@ -81,13 +81,17 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
 		Boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
 
+		Integer remainingTimeToHardTimeout = ( hardTimeoutInMilliseconds == null ) ? null :
+				Math.toIntExact( hardTimeoutInMilliseconds ) - took;
+
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
 				rootProjection,
 				hitCount,
 				extractedHits,
 				extractedAggregations,
-				took, timedOut, scrollId
+				took, timedOut, scrollId,
+				remainingTimeToHardTimeout
 		);
 	}
 
