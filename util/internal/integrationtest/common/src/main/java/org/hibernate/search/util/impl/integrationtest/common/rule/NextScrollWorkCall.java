@@ -15,22 +15,25 @@ import java.util.Set;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 
 	private final Set<String> indexNames;
+	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubNextScrollWorkBehavior<?> behavior;
 
-	NextScrollWorkCall(Set<String> indexNames,
+	NextScrollWorkCall(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
+		this.work = work;
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
@@ -40,6 +43,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	NextScrollWorkCall(Set<String> indexNames,
 			StubNextScrollWorkBehavior<?> behavior) {
 		this.indexNames = indexNames;
+		this.work = null;
 		this.projectionContext = null;
 		this.loadingContext = null;
 		this.rootProjection = null;
@@ -56,6 +60,10 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 				.as( "NextScroll work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
 
+		// work is expected to be filled only on from the actualCall
+		assertThat( work ).isNull();
+
+		// TODO HSEARCH-3787 Use actualCall.work#failAfterTimeout and actualCall.work#failAfterTimeUnit
 		return () -> new SimpleSearchScrollResult<>( behavior.hasHits(), SearchWorkCall.getResults(
 				actualCall.projectionContext,
 				actualCall.loadingContext.createProjectionHitMapper(),
