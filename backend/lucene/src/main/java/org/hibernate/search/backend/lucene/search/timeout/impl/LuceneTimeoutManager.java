@@ -64,12 +64,12 @@ public final class LuceneTimeoutManager extends TimeoutManager {
 	 *
 	 * @return the remaining time to hard timeout in milliseconds
 	 */
-	public Integer remainingTimeToHardTimeout() {
+	public Long remainingTimeToHardTimeout() {
 		if ( !Type.EXCEPTION.equals( type ) ) {
 			return null;
 		}
 
-		return Math.toIntExact( timeoutMs - getElapsedTimeInMilliseconds() );
+		return checkTimeLeftInMilliseconds();
 	}
 }
 

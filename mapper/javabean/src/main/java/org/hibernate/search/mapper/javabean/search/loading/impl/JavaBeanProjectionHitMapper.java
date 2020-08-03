@@ -33,7 +33,7 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 	}
 
 	@Override
-	public LoadingResult<EntityReference, Void> loadBlocking(Integer timeout) {
+	public LoadingResult<EntityReference, Void> loadBlocking(Long timeout) {
 		return new JavaBeanUnusuableGetLoadingResult( documentReferenceConverter );
 	}
 

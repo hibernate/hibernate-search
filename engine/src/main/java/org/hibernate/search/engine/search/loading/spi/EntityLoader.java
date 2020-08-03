@@ -25,7 +25,7 @@ public interface EntityLoader<R, E> {
 	 * @return A list of entities, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found.
 	 */
-	List<E> loadBlocking(List<R> references, Integer timeout);
+	List<E> loadBlocking(List<R> references, Long timeout);
 
 	static <T> EntityLoader<T, T> identity() {
 		return IdentityEntityLoader.get();

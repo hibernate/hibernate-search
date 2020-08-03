@@ -81,8 +81,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
 		Boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
 
-		Integer remainingTimeToHardTimeout = ( hardTimeoutInMilliseconds == null ) ? null :
-				Math.toIntExact( hardTimeoutInMilliseconds ) - took;
+		Long remainingTimeToHardTimeout = ( hardTimeoutInMilliseconds == null ) ? null :
+				hardTimeoutInMilliseconds - took;
 
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,

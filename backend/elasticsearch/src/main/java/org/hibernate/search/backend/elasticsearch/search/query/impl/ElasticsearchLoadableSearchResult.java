@@ -39,7 +39,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final Boolean timedOut;
 	private final boolean hasHits;
 	private final String scrollId;
-	private final Integer remainingTimeToHardTimeout;
+	private final Long remainingTimeToHardTimeout;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
@@ -47,7 +47,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 			List<Object> extractedHits,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			Integer took, Boolean timedOut, String scrollId,
-			Integer remainingTimeToHardTimeout) {
+			Long remainingTimeToHardTimeout) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
