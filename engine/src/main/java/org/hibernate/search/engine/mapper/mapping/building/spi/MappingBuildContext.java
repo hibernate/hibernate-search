@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.timing.impl.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
@@ -47,5 +48,7 @@ public interface MappingBuildContext {
 	ThreadPoolProvider threadPoolProvider();
 
 	ConfigurationPropertySource configurationPropertySource();
+
+	TimingSource timingSource();
 
 }
