@@ -57,7 +57,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	}
 
 	@Override
-	public List<E> loadBlocking(List<EntityReference> references, Integer timeout) {
+	public List<E> loadBlocking(List<EntityReference> references, Long timeout) {
 		if ( cacheLookupStrategyImplementor == null ) {
 			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
 			return doLoadEntities( references, timeout );
@@ -69,7 +69,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 
 	@Override
 	public void loadBlocking(List<EntityReference> references,
-			Map<? super EntityReference, ? super E> entitiesByReference, Integer timeout) {
+			Map<? super EntityReference, ? super E> entitiesByReference, Long timeout) {
 		List<? extends E> loadedEntities = doLoadEntities( references, timeout );
 		Iterator<EntityReference> referencesIterator = references.iterator();
 		Iterator<? extends E> loadedEntityIterator = loadedEntities.iterator();
@@ -82,7 +82,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		}
 	}
 
-	private List<E> doLoadEntities(List<EntityReference> references, Integer timeout) {
+	private List<E> doLoadEntities(List<EntityReference> references, Long timeout) {
 		EntityKey[] keys = toEntityKeys( references );
 		List<E> loadedEntities = createListContainingNulls( references.size() );
 
@@ -143,7 +143,7 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		return (E) loadedEntity;
 	}
 
-	private Query<?> createQuery(int fetchSize, Integer timeout) {
+	private Query<?> createQuery(int fetchSize, Long timeout) {
 		Query<?> query = HibernateOrmUtils.createQueryForLoadByUniqueProperty(
 				session, entityPersister, entityPersister.getIdentifierPropertyName(), IDS_PARAMETER_NAME
 		);

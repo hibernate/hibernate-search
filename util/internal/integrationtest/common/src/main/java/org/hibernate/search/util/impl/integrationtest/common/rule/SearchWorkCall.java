@@ -89,7 +89,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
 			StubSearchProjection<H> actualRootProjection,
-			List<?> rawHits, Integer loadingTimeout) {
+			List<?> rawHits, Long loadingTimeout) {
 		List<Object> extractedElements = new ArrayList<>( rawHits.size() );
 
 		for ( Object rawHit : rawHits ) {
@@ -123,7 +123,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		return "search work execution on indexes '" + indexNames + "'; work = " + work;
 	}
 
-	static Integer getLoadingTimeout(StubSearchWork work) {
+	static Long getLoadingTimeout(StubSearchWork work) {
 		Long timeout = work.getFailAfterTimeout();
 		TimeUnit timeUnit = work.getFailAfterTimeUnit();
 		if ( timeout == null || timeUnit == null ) {
@@ -131,7 +131,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		}
 
 		long nanos = timeUnit.toNanos( timeout );
-		int millis = Math.toIntExact( nanos / 1000000 );
+		long millis = nanos / 1000000;
 		return ( nanos % 1000000 == 0 ) ? millis : millis + 1;
 	}
 

@@ -65,7 +65,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 	@Override
 	public void loadBlocking(List<EntityReference> references,
-			Map<? super EntityReference, ? super E> entitiesByReference, Integer timeout) {
+			Map<? super EntityReference, ? super E> entitiesByReference, Long timeout) {
 		Map<Object, EntityReference> documentIdSourceValueToReference = new HashMap<>();
 		for ( EntityReference reference : references ) {
 			documentIdSourceValueToReference.put( reference.id(), reference );
@@ -84,7 +84,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 		}
 	}
 
-	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues, Integer timeout) {
+	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues, Long timeout) {
 		int fetchSize = loadingOptions.fetchSize();
 		Query<? extends E> query = createQuery( fetchSize, timeout );
 
@@ -114,7 +114,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 	}
 
 	@SuppressWarnings("unchecked") // Cast is safe because entityPersister represents type E. See Factory.doCreate().
-	private Query<? extends E> createQuery(int fetchSize, Integer timeout) {
+	private Query<? extends E> createQuery(int fetchSize, Long timeout) {
 		Query<? extends E> query = (Query<? extends E>) HibernateOrmUtils.createQueryForLoadByUniqueProperty(
 				session, entityPersister, documentIdSourcePropertyName,
 				DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME

@@ -31,6 +31,6 @@ public interface ProjectionHitMapper<R, E> {
 	 * It can be {@code null}. If {@code null}, no timeout will be applied.
 	 * @return The loaded entities.
 	 */
-	LoadingResult<R, E> loadBlocking(Integer timeout);
+	LoadingResult<R, E> loadBlocking(Long timeout);
 
 }

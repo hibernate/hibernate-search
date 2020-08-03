@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<EntityReference, E> {
 
 	@Override
-	default List<E> loadBlocking(List<EntityReference> references, Integer timeout) {
+	default List<E> loadBlocking(List<EntityReference> references, Long timeout) {
 		// Load all references
 		Map<EntityReference, E> objectsByReference = new HashMap<>();
 		loadBlocking( references, objectsByReference, timeout );
@@ -51,11 +51,12 @@ public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<Enti
 	 * It can be {@code null}. If {@code null}, no timeout will be applied.
 	 */
 	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference,
-			Integer timeout);
+			Long timeout);
 
-	static Integer getTimeoutInSeconds(Integer timeout) {
-		int result = ( timeout / 1000 );
-		return ( timeout % 1000 == 0 ) ? result : result + 1;
+	static Integer getTimeoutInSeconds(Long timeout) {
+		long result = ( timeout / 1000 );
+		long longResult = ( timeout % 1000 == 0 ) ? result : result + 1;
+		return Math.toIntExact( longResult );
 	}
 
 }
