@@ -129,8 +129,9 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public <T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return new ScrollWork.Builder<>( scrollId, scrollTimeout, searchResultExtractor );
+	public <T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout,
+			ElasticsearchSearchResultExtractor<T> searchResultExtractor, Long hardTimeoutInMilliseconds) {
+		return new ScrollWork.Builder<>( scrollId, scrollTimeout, searchResultExtractor, hardTimeoutInMilliseconds );
 	}
 
 	@Override

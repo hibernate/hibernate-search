@@ -17,10 +17,13 @@ import com.google.gson.JsonObject;
 public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
+	// TODO HSEARCH-3787 Use hardTimeoutInMilliseconds
+	private final Long hardTimeoutInMilliseconds;
 
 	protected ScrollWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
+		this.hardTimeoutInMilliseconds = builder.hardTimeoutInMilliseconds;
 	}
 
 	@Override
@@ -35,12 +38,15 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 		private final String scrollId;
 		private final String scrollTimeout;
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
+		private final Long hardTimeoutInMilliseconds;
 
-		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor) {
+		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor,
+				Long hardTimeoutInMilliseconds) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
 			this.resultExtractor = resultExtractor;
+			this.hardTimeoutInMilliseconds = hardTimeoutInMilliseconds;
 		}
 
 		@Override

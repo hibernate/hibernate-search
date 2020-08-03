@@ -67,7 +67,8 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload);
 
-	<T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
+	<T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout,
+			ElasticsearchSearchResultExtractor<T> searchResultExtractor, Long hardTimeoutInMilliseconds);
 
 	ClearScrollWorkBuilder clearScroll(String scrollId);
 

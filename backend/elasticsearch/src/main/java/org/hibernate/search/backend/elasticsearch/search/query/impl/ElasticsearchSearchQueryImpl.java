@@ -157,7 +157,11 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.scrolling( chunkSize, scrollTimeoutString )
 				.build();
 
-		return new ElasticsearchSearchScrollImpl<>( queryOrchestrator, workFactory, searchResultExtractor, scrollTimeoutString, firstScroll );
+		Long hardTimeoutInMilliseconds = ( exceptionOnTimeout && timeoutUnit != null && timeoutValue != null ) ?
+				timeoutUnit.toMillis( timeoutValue ) : null;
+
+		return new ElasticsearchSearchScrollImpl<>( queryOrchestrator, workFactory, searchResultExtractor,
+				scrollTimeoutString, firstScroll, hardTimeoutInMilliseconds );
 	}
 
 	@Override
