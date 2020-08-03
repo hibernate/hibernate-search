@@ -22,17 +22,21 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final String scrollTimeoutString;
 	private final NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll;
+	private final Long hardTimeoutInMilliseconds;
 
 	private String scrollId;
 
-	public ElasticsearchSearchScrollImpl(ElasticsearchParallelWorkOrchestrator queryOrchestrator, ElasticsearchWorkBuilderFactory workFactory,
-			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor, String scrollTimeoutString,
-			NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll) {
+	public ElasticsearchSearchScrollImpl(ElasticsearchParallelWorkOrchestrator queryOrchestrator,
+			ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
+			String scrollTimeoutString,
+			NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll, Long hardTimeoutInMilliseconds) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchResultExtractor = searchResultExtractor;
 		this.scrollTimeoutString = scrollTimeoutString;
 		this.firstScroll = firstScroll;
+		this.hardTimeoutInMilliseconds = hardTimeoutInMilliseconds;
 	}
 
 	@Override
@@ -45,7 +49,8 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	@Override
 	public ElasticsearchSearchScrollResult<H> next() {
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> scroll = ( scrollId == null ) ? firstScroll :
-				workFactory.scroll( scrollId, scrollTimeoutString, searchResultExtractor ).build();
+				workFactory.scroll( scrollId, scrollTimeoutString, searchResultExtractor, hardTimeoutInMilliseconds )
+						.build();
 
 		ElasticsearchLoadableSearchResult<H> loadableSearchResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( scroll ) );
 		ElasticsearchSearchResultImpl<H> searchResult = loadableSearchResult.loadBlocking();
