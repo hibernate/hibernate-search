@@ -14,7 +14,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
@@ -42,11 +42,11 @@ public class CollectorSet {
 	public static class Builder {
 
 		private final CollectorExecutionContext executionContext;
-		private final TimeoutManager timeoutManager;
+		private final LuceneTimeoutManager timeoutManager;
 
 		private final Map<CollectorKey<?>, Collector> components = new LinkedHashMap<>();
 
-		public Builder(CollectorExecutionContext executionContext, TimeoutManager timeoutManager) {
+		public Builder(CollectorExecutionContext executionContext, LuceneTimeoutManager timeoutManager) {
 			this.executionContext = executionContext;
 			this.timeoutManager = timeoutManager;
 		}
@@ -71,7 +71,7 @@ public class CollectorSet {
 			return new CollectorSet( composed, components );
 		}
 
-		private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, TimeoutManager timeoutManager) {
+		private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, LuceneTimeoutManager timeoutManager) {
 			final Long timeoutLeft = timeoutManager.checkTimeLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
 				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(), timeoutLeft );

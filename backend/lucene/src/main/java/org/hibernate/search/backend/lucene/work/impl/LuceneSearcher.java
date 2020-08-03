@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
@@ -28,5 +28,5 @@ public interface LuceneSearcher<R, ER> {
 
 	Query getLuceneQueryForExceptions();
 
-	void setTimeoutManager(TimeoutManager timeoutManager);
+	void setTimeoutManager(LuceneTimeoutManager timeoutManager);
 }

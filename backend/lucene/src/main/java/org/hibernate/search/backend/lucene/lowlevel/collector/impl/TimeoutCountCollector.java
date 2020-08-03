@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
@@ -18,9 +18,9 @@ import org.apache.lucene.search.SimpleCollector;
  */
 public class TimeoutCountCollector extends SimpleCollector {
 
-	private final TimeoutManager timeoutManager;
+	private final LuceneTimeoutManager timeoutManager;
 
-	public TimeoutCountCollector(TimeoutManager timeoutManager) {
+	public TimeoutCountCollector(LuceneTimeoutManager timeoutManager) {
 		this.timeoutManager = timeoutManager;
 	}
 
