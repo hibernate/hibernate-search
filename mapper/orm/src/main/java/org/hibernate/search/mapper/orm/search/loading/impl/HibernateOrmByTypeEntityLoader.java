@@ -29,7 +29,7 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 	}
 
 	@Override
-	public List<T> loadBlocking(List<EntityReference> references) {
+	public List<T> loadBlocking(List<EntityReference> references, Integer timeout) {
 		LinkedHashMap<EntityReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
 		Map<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 
@@ -47,7 +47,8 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 				referencesByDelegate.entrySet() ) {
 			HibernateOrmComposableEntityLoader<? extends T> delegate = entry.getKey();
 			List<EntityReference> referencesForDelegate = entry.getValue();
-			delegate.loadBlocking( referencesForDelegate, objectsByReference );
+			// FIXME Use a deadline instead of a timeout
+			delegate.loadBlocking( referencesForDelegate, objectsByReference, timeout );
 		}
 
 		// Re-create the list of objects in the same order
