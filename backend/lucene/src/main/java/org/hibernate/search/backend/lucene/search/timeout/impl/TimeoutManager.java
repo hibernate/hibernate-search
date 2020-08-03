@@ -138,6 +138,19 @@ public final class TimeoutManager {
 		return this.type == Type.EXCEPTION;
 	}
 
+	/**
+	 * If no hard timeout is defined, returns {@code null}.
+	 *
+	 * @return the remaining time to hard timeout in milliseconds
+	 */
+	public Integer remainingTimeToHardTimeout() {
+		if ( !Type.EXCEPTION.equals( type ) ) {
+			return null;
+		}
+
+		return Math.toIntExact( timeoutMs - getElapsedTimeInMilliseconds() );
+	}
+
 	public Duration getTookTime() {
 		return Duration.ofMillis( getElapsedTimeInMilliseconds() );
 	}

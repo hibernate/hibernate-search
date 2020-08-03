@@ -84,7 +84,8 @@ public class LuceneExtractableSearchResult<H> {
 				luceneCollectors.getTotalHitCount(), luceneCollectors.getTopDocs(),
 				extractedData, extractedAggregations, projectionHitMapper,
 				timeoutManager.getTookTime(),
-				timeoutManager.isTimedOut()
+				timeoutManager.isTimedOut(),
+				timeoutManager.remainingTimeToHardTimeout()
 		);
 	}
 

@@ -46,13 +46,14 @@ public class LuceneLoadableSearchResult<H> {
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final Duration took;
 	private final Boolean timedOut;
+	private final Integer remainingTimeToHardTimeout;
 
 	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext convertContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			long hitCount, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			Duration took, boolean timedOut) {
+			Duration took, boolean timedOut, Integer remainingTimeToHardTimeout) {
 		this.convertContext = convertContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
@@ -62,12 +63,12 @@ public class LuceneLoadableSearchResult<H> {
 		this.projectionHitMapper = projectionHitMapper;
 		this.took = took;
 		this.timedOut = timedOut;
+		this.remainingTimeToHardTimeout = remainingTimeToHardTimeout;
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( convertContext );
-		// TODO HSEARCH-3352 pass timeout
-		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( null );
+		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( remainingTimeToHardTimeout );
 
 		int readIndex = 0;
 		int writeIndex = 0;
