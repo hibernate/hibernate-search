@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-	// TODO HSEARCH-3787 Use hardTimeoutInMilliseconds
 	private final Long hardTimeoutInMilliseconds;
 
 	protected ScrollWork(Builder<R> builder) {
@@ -29,7 +28,7 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body );
+		return resultExtractor.extract( body, hardTimeoutInMilliseconds );
 	}
 
 	public static class Builder<R>
