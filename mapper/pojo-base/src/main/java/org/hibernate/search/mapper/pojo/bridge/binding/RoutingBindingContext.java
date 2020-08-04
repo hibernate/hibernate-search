@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.binding;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoRoutingIndexingDependencyConfigurationContext;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 public interface RoutingBindingContext extends BindingContext {
@@ -37,5 +38,10 @@ public interface RoutingBindingContext extends BindingContext {
 	 */
 	@Incubating
 	PojoModelType bridgedElement();
+
+	/**
+	 * @return An entry point allowing to declare the parts of the entity graph that the bridge will depend on.
+	 */
+	PojoRoutingIndexingDependencyConfigurationContext dependencies();
 
 }

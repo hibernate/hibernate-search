@@ -397,6 +397,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 		@Override
 		public void bind(RoutingBindingContext context) {
+			context.dependencies().use( "value" );
 			context.bridge( IndexedEntity.class, new MyRoutingBridge() );
 		}
 	}

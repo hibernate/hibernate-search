@@ -15,6 +15,8 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
+import org.hibernate.search.mapper.pojo.model.dependency.PojoRoutingIndexingDependencyConfigurationContext;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoRoutingIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -29,15 +31,18 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 
 	private final PojoRawTypeModel<E> indexedEntityType;
 	private final PojoModelTypeRootElement<E> pojoModelTypeRootElement;
+	private final PojoRoutingIndexingDependencyConfigurationContextImpl<E> dependencyContext;
 
 	private BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
 
 	public RoutingBindingContextImpl(BeanResolver beanResolver, PojoBootstrapIntrospector introspector,
-			PojoRawTypeModel<E> indexedEntityType, PojoModelTypeRootElement<E> pojoModelTypeRootElement) {
+			PojoRawTypeModel<E> indexedEntityType, PojoModelTypeRootElement<E> pojoModelTypeRootElement,
+			PojoRoutingIndexingDependencyConfigurationContextImpl<E> dependencyContext) {
 		super( beanResolver );
 		this.introspector = introspector;
 		this.indexedEntityType = indexedEntityType;
 		this.pojoModelTypeRootElement = pojoModelTypeRootElement;
+		this.dependencyContext = dependencyContext;
 	}
 
 	@Override
@@ -60,13 +65,20 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 		return pojoModelTypeRootElement;
 	}
 
-	public BeanHolder<? extends RoutingBridge<? super E>> applyBinder(RoutingBinder binder) {
+	@Override
+	public PojoRoutingIndexingDependencyConfigurationContext dependencies() {
+		return dependencyContext;
+	}
+
+	public BoundRoutingBridge<E> applyBinder(RoutingBinder binder) {
 		binder.bind( this );
 
 		if ( routingBridgeHolder == null ) {
 			throw log.missingBridgeForBinder( binder );
 		}
 
-		return routingBridgeHolder;
+		checkBridgeDependencies( pojoModelTypeRootElement, dependencyContext );
+
+		return new BoundRoutingBridge<>( routingBridgeHolder, pojoModelTypeRootElement, dependencyContext );
 	}
 }

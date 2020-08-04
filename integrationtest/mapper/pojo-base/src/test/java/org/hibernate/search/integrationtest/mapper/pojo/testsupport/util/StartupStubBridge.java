@@ -145,6 +145,7 @@ public class StartupStubBridge<T>
 
 		@Override
 		public void bind(RoutingBindingContext context) {
+			context.dependencies().useRootOnly();
 			context.bridge( bridgeInputType, build() );
 		}
 
