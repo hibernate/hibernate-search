@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public final class ConvertUtils {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final int ONE_MILLION = 1_000_000;
 
 	private ConvertUtils() {
 		// Private constructor, do not use
@@ -330,5 +333,24 @@ public final class ConvertUtils {
 		else {
 			return value;
 		}
+	}
+
+	/**
+	 * Converts in milliseconds a time duration expressed with {@code time} and {@code timeUnit}.
+	 * The result value is rounded up.
+	 * If either of the parameters is null, it will return null.
+	 *
+	 * @param time a time duration
+	 * @param timeUnit the time unit used to express the duration
+	 * @return rounded up duration in milliseconds
+	 */
+	public static Long toMilliseconds(Long time, TimeUnit timeUnit) {
+		if ( time == null || timeUnit == null ) {
+			return null;
+		}
+
+		long nanos = timeUnit.toNanos( time );
+		long millis = nanos / ONE_MILLION;
+		return ( nanos % ONE_MILLION == 0 ) ? millis : millis + 1;
 	}
 }

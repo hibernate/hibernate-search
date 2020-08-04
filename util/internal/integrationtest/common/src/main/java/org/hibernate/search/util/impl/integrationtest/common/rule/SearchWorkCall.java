@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -74,7 +74,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 						actualCall.loadingContext.createProjectionHitMapper(),
 						actualCall.rootProjection,
 						behavior.getRawHits(),
-						getLoadingTimeout( work )
+						ConvertUtils.toMilliseconds( actualCall.work.getFailAfterTimeout(),
+								actualCall.work.getFailAfterTimeUnit() )
 				),
 				Collections.emptyMap(),
 				Duration.ZERO, false
@@ -122,17 +123,4 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	public String toString() {
 		return "search work execution on indexes '" + indexNames + "'; work = " + work;
 	}
-
-	static Long getLoadingTimeout(StubSearchWork work) {
-		Long timeout = work.getFailAfterTimeout();
-		TimeUnit timeUnit = work.getFailAfterTimeUnit();
-		if ( timeout == null || timeUnit == null ) {
-			return null;
-		}
-
-		long nanos = timeUnit.toNanos( timeout );
-		long millis = nanos / 1000000;
-		return ( nanos % 1000000 == 0 ) ? millis : millis + 1;
-	}
-
 }
