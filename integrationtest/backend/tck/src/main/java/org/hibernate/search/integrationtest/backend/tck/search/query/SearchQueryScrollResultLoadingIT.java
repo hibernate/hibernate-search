@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
+import java.util.concurrent.TimeUnit;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -67,6 +69,56 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 		verifyAll();
 
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, false );
+	}
+
+	@Test
+	public void resultLoadingOnScrolling_entityLoadingTimeout() {
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = createMock( LoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = createMock( StubDocumentReferenceConverter.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = createMock( StubEntityLoader.class );
+
+		resetAll();
+		// No calls expected on the mocks
+		replayAll();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
+		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( "integer" ) )
+				.failAfter( 1000, TimeUnit.HOURS )
+				.toQuery();
+		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
+		verifyAll();
+
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, true );
+	}
+
+	@Test
+	public void resultLoadingOnScrolling_softTimeout() {
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = createMock( LoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = createMock( StubDocumentReferenceConverter.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = createMock( StubEntityLoader.class );
+
+		resetAll();
+		// No calls expected on the mocks
+		replayAll();
+		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
+		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( "integer" ) )
+				.truncateAfter( 1000, TimeUnit.HOURS )
+				.toQuery();
+		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
+		verifyAll();
+
+		// softTimeout is not passed to the entity loading
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, false );
+	}
+
+	private void verifyLoading(LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
+			DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock,
+			EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock,
+			SearchScroll<StubLoadedObject> scroll, boolean entityLoadingTimeout) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {
 			int base = j * 5;
@@ -78,7 +130,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 						for ( int i = 0; i < 5; i++ ) {
 							c.load( references[base + i].reference, references[base + i].transformedReference, references[base + i].loadedObject );
 						}
-					}
+					}, entityLoadingTimeout
 			);
 			replayAll();
 			assertThat( scroll.next().hits() ).hasHitsAnyOrder(
@@ -96,7 +148,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 					for ( int i = 35; i <= 36; i++ ) {
 						c.load( references[i].reference, references[i].transformedReference, references[i].loadedObject );
 					}
-				}
+				}, entityLoadingTimeout
 		);
 		replayAll();
 		assertThat( scroll.next().hits() ).hasHitsAnyOrder(
