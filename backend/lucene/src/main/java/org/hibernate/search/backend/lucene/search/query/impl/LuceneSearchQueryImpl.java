@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -107,6 +108,12 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				.loadBlocking();
 		timeoutManager.stop();
 		return result;
+	}
+
+	@Override
+	public List<H> fetchHits(Integer offset, Integer limit) {
+		// TODO HSEARCH-3517 Optimize this call
+		return fetch( offset, limit ).hits();
 	}
 
 	@Override

@@ -54,11 +54,6 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 	}
 
 	@Override
-	public List<H> fetchHits(Integer offset, Integer limit) {
-		return fetch( offset, limit ).hits();
-	}
-
-	@Override
 	public Optional<H> fetchSingleHit() {
 		// We don't need to fetch more than two elements to detect a problem
 		List<H> hits = fetchHits( 2 );
