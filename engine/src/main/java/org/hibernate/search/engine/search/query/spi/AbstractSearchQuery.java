@@ -61,14 +61,13 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 	@Override
 	public Optional<H> fetchSingleHit() {
 		// We don't need to fetch more than two elements to detect a problem
-		R result = fetch( 2 );
-		List<H> hits = result.hits();
-		int fetchedHitCount = result.hits().size();
+		List<H> hits = fetchHits( 2 );
+		int fetchedHitCount = hits.size();
 		if ( fetchedHitCount == 0 ) {
 			return Optional.empty();
 		}
 		else if ( fetchedHitCount > 1 ) {
-			throw log.nonSingleHit( result.totalHitCount() );
+			throw log.nonSingleHit();
 		}
 		else {
 			return Optional.of( hits.get( 0 ) );
