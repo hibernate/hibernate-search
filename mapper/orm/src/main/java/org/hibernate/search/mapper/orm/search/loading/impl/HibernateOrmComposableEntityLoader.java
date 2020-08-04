@@ -53,10 +53,4 @@ public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<Enti
 	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference,
 			Long timeout);
 
-	static Integer getTimeoutInSeconds(Long timeout) {
-		long result = ( timeout / 1000 );
-		long longResult = ( timeout % 1000 == 0 ) ? result : result + 1;
-		return Math.toIntExact( longResult );
-	}
-
 }

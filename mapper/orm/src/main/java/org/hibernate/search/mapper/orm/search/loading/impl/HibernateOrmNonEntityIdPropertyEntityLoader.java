@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -122,7 +123,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 		query.setFetchSize( fetchSize );
 		if ( timeout != null ) {
-			query.setTimeout( HibernateOrmComposableEntityLoader.getTimeoutInSeconds( timeout ) );
+			query.setHint( QueryHints.SPEC_HINT_TIMEOUT, Math.toIntExact( timeout ) );
 		}
 
 		EntityGraphHint<?> entityGraphHint = loadingOptions.entityGraphHintOrNullForType( entityPersister );
