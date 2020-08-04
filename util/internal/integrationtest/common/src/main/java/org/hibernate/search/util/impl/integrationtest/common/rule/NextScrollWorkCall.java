@@ -7,12 +7,12 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.SearchWorkCall.getLoadingTimeout;
 
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
@@ -69,7 +69,8 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
 				behavior.getRawHits(),
-				getLoadingTimeout( actualCall.work )
+				ConvertUtils.toMilliseconds( actualCall.work.getFailAfterTimeout(),
+						actualCall.work.getFailAfterTimeUnit() )
 		), Duration.ZERO, false );
 	}
 
