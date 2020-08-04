@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -68,6 +69,11 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 
 		timeoutManager.stop();
 		return result;
+	}
+
+	@Override
+	public List<H> fetchHits(Integer offset, Integer limit) {
+		return fetch( offset, limit ).hits();
 	}
 
 	@Override

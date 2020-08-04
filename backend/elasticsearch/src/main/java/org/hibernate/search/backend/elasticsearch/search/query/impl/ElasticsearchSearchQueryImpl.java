@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -126,6 +127,12 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.loadBlocking();
 		timeoutManager.stop();
 		return result;
+	}
+
+	@Override
+	public List<H> fetchHits(Integer offset, Integer limit) {
+		// TODO HSEARCH-3517 Optimize this call
+		return fetch( offset, limit ).hits();
 	}
 
 	@Override
