@@ -548,6 +548,8 @@ public class IndexedBaseIT {
 			assertThat( context ).isNotNull();
 			assertThat( context.beanResolver() ).isNotNull();
 			assertThat( context.bridgedElement() ).isNotNull();
+			assertThat( context.dependencies() ).isNotNull();
+			context.dependencies().useRootOnly();
 			context.bridge( Object.class, new RoutingBridge<Object>() {
 				@Override
 				public void route(DocumentRoutes routes, Object entityIdentifier, Object indexedEntity,

@@ -9,19 +9,17 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ProvidedIdentifierMapping;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyBridgeRoutingBridgeAdapter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -30,7 +28,6 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIdentityMappingCollector;
-import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -47,14 +44,14 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 
 	IdentifierMappingImplementor<?, E> identifierMapping;
 	Optional<PojoPropertyModel<?>> documentIdSourceProperty;
-	BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
+	BoundRoutingBridge<E> routingBridge;
 
 	PojoIdentityMappingCollectorImpl(PojoRawTypeModel<E> typeModel,
 			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
-			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
+			BoundRoutingBridge<E> routingBridge,
 			BeanResolver beanResolver) {
 		this.typeModel = typeModel;
 		this.mappingHelper = mappingHelper;
@@ -69,14 +66,14 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 		else {
 			this.entityIdPropertyPath = null;
 		}
-		this.routingBridgeHolder = routingBridgeHolder;
+		this.routingBridge = routingBridge;
 	}
 
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( holder -> holder.get().close(), routingBridgeHolder );
-			closer.push( BeanHolder::close, routingBridgeHolder );
+			closer.push( boundBridge -> boundBridge.getBridgeHolder().get().close(), routingBridge );
+			closer.push( boundBridge -> boundBridge.getBridgeHolder().close(), routingBridge );
 		}
 	}
 
@@ -95,15 +92,16 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	}
 
 	@Override
-	public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
+	// In practice T and E are always the same, because the routing key bridge can only be applied at the root.
+	// Leaving this case temporarily, but we'll remove it along with RoutingKeyBridge.
+	@SuppressWarnings("unchecked")
+	public <T> void routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
 			RoutingKeyBinder binder) {
-		if ( routingBridgeHolder != null ) {
-			throw log.conflictingRoutingBridgeAndRoutingKeyBinder( routingBridgeHolder.get(), binder );
+		if ( routingBridge != null ) {
+			throw log.conflictingRoutingBridgeAndRoutingKeyBinder( routingBridge.getBridgeHolder().get(), binder );
 		}
-		BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.indexModelBinder()
+		this.routingBridge = (BoundRoutingBridge<E>) mappingHelper.indexModelBinder()
 				.bindRoutingKey( bindingContext, modelPath, binder );
-		this.routingBridgeHolder = BeanHolder.of( new RoutingKeyBridgeRoutingBridgeAdapter<>( boundRoutingKeyBridge.getBridgeHolder() ) );
-		return boundRoutingKeyBridge;
 	}
 
 	void applyDefaults() {

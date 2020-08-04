@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
@@ -17,6 +16,6 @@ public interface PojoIdentityMappingCollector {
 	<T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
 			IdentifierBinder binder);
 
-	<T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
+	<T> void routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
 			RoutingKeyBinder binder);
 }

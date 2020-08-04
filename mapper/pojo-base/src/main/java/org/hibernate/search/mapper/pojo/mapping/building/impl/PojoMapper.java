@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -33,7 +32,7 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
@@ -53,6 +52,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoIndexedTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoRoutingIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -214,20 +214,23 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				indexedTypeMetadata.backendName(), indexName, entityName, multiTenancyEnabled );
 
 		Optional<RoutingBinder> routingBinderOptional = indexedTypeMetadata.routingBinder();
-		BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder = null;
+		BoundRoutingBridge<E> routingBridge = null;
 		if ( routingBinderOptional.isPresent() ) {
+			PojoBootstrapIntrospector introspector = mappingHelper.introspector();
 			PojoModelTypeRootElement<E> pojoModelRootElement = new PojoModelTypeRootElement<>(
-					BoundPojoModelPath.root( indexedEntityType ), mappingHelper.introspector(),
-					typeAdditionalMetadataProvider );
-			routingBridgeHolder = new RoutingBindingContextImpl<>( mappingHelper.beanResolver(),
-					mappingHelper.introspector(), indexedEntityType, pojoModelRootElement )
+					BoundPojoModelPath.root( indexedEntityType ), introspector, typeAdditionalMetadataProvider );
+			PojoRoutingIndexingDependencyConfigurationContextImpl<E> dependencyContext =
+					new PojoRoutingIndexingDependencyConfigurationContextImpl<>( introspector, extractorBinder,
+							typeAdditionalMetadataProvider, indexedEntityType );
+			routingBridge = new RoutingBindingContextImpl<>( mappingHelper.beanResolver(),
+					introspector, indexedEntityType, pojoModelRootElement, dependencyContext )
 					.applyBinder( routingBinderOptional.get() );
 		}
 
 		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( indexedEntityType,
 				entityTypeMetadata, mappingHelper, indexManagerBuilder,
 				delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName, indexName ),
-				providedIdentifierBridge, routingBridgeHolder, mappingHelper.beanResolver() );
+				providedIdentifierBridge, routingBridge, mappingHelper.beanResolver() );
 
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( indexedEntityType, builder );

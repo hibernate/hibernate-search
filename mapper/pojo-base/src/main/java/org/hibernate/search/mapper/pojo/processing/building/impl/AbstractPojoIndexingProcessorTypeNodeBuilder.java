@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -43,7 +42,6 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	private final Optional<PojoIdentityMappingCollector> identityMappingCollector;
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
-	private BoundRoutingKeyBridge<U> boundRoutingKeyBridge;
 	private final Collection<BoundTypeBridge<U>> boundBridges = new ArrayList<>();
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoIndexingProcessorPropertyNodeBuilder<U, ?>> propertyNodeBuilders =
@@ -67,7 +65,7 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	@Override
 	public void routingKeyBinder(RoutingKeyBinder builder) {
 		if ( identityMappingCollector.isPresent() ) {
-			boundRoutingKeyBridge = identityMappingCollector.get().routingKeyBridge( getModelPath(), builder );
+			identityMappingCollector.get().routingKeyBridge( getModelPath(), builder );
 		}
 	}
 
@@ -118,10 +116,6 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 			PojoIndexingProcessor<? super U> nested);
 
 	private Optional<PojoIndexingProcessor<T>> doBuild(PojoIndexingDependencyCollectorTypeNode<U> dependencyCollector) {
-		if ( boundRoutingKeyBridge != null ) {
-			boundRoutingKeyBridge.contributeDependencies( dependencyCollector );
-		}
-
 		Collection<PojoIndexingProcessor<? super U>> nestedNodes = new ArrayList<>();
 		try {
 			for ( BoundTypeBridge<U> boundBridge : boundBridges ) {

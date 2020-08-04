@@ -95,6 +95,7 @@ public class RoutingBridgeBaseIT {
 				.withConfiguration( b -> {
 					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
 					typeMapping.indexed().routingBinder( context -> {
+						context.dependencies().useRootOnly(); // Irrelevant
 						context.bridge( IndexedEntity.class, new UnusedRoutingBridge<>() );
 					} );
 					typeMapping.routingKeyBinder( new UnusedRoutingKeyBinder() );
@@ -141,6 +142,7 @@ public class RoutingBridgeBaseIT {
 					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
 					typeMapping.indexed()
 							.routingBinder( context -> {
+								context.dependencies().useRootOnly(); // Irrelevant
 								context.bridge( IndexedEntity.class, new NoRouteRoutingBridge() );
 							} );
 				} )
@@ -195,6 +197,7 @@ public class RoutingBridgeBaseIT {
 					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
 					typeMapping.indexed()
 							.routingBinder( context -> {
+								context.dependencies().useRootOnly(); // Irrelevant
 								context.bridge( IndexedEntity.class, new TwoRoutesRoutingBridge() );
 							} );
 				} )
@@ -268,7 +271,9 @@ public class RoutingBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			entity.stringProperty = "some string 2";
-			session.indexingPlan().addOrUpdate( entity );
+			// A change to "stringProperty" should be considered as a change requiring reindexing,
+			// since it's used in routing.
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
@@ -320,6 +325,259 @@ public class RoutingBridgeBaseIT {
 						)
 						.build()
 				);
+	}
+
+	/**
+	 * Basic test checking that a "normal" custom type bridge will work as expected
+	 * when relying on explicit dependency declaration.
+	 * <p>
+	 * Note that reindexing is tested in depth in the ORM mapper integration tests.
+	 */
+	@Test
+	public void explicitDependencies() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> { } );
+
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
+					typeMapping.indexed().routingBinder( context -> {
+						context.dependencies().use( "stringProperty" );
+						context.bridge(
+								IndexedEntity.class,
+								(DocumentRoutes routes, Object entityId, IndexedEntity entity,
+										RoutingBridgeRouteContext context1) -> {
+									routes.addRoute().routingKey( entity.getStringProperty() );
+								}
+						);
+					} );
+				} )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.stringProperty = "some string";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
+							.document( StubDocumentNode.document().build() ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.stringProperty = "some string 2";
+			// A change to "stringProperty" should be considered as a change requiring reindexing,
+			// since it's used in routing.
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
+							.document( StubDocumentNode.document().build() ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().delete( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.delete( b -> b.identifier( "1" ).routingKey( entity.stringProperty ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void explicitDependencies_error_invalidProperty() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withConfiguration( b -> {
+					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
+					typeMapping.indexed().routingBinder( context -> {
+						context.dependencies().use( "doesNotExist" );
+						context.bridge( IndexedEntity.class, new UnusedRoutingBridge<>() );
+					} );
+				} )
+				.setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure( "Unable to find property 'doesNotExist' on type '" + IndexedEntity.class.getName()
+								+ "'" )
+						.build() );
+	}
+
+	@Test
+	public void missingDependencyDeclaration() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withConfiguration( b -> {
+					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
+					typeMapping.indexed().routingBinder( context -> {
+						// Do not declare any dependency
+						context.bridge( IndexedEntity.class, new UnusedRoutingBridge<>() );
+					} );
+				} )
+				.setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure( "The binder did not declare any dependency to the entity model during binding."
+								+ " Declare dependencies using context.dependencies().use(...) or,"
+								+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()" )
+						.build() );
+	}
+
+	@Test
+	public void inconsistentDependencyDeclaration() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		assertThatThrownBy( () -> setupHelper.start()
+				.withConfiguration( b -> {
+					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
+					typeMapping.indexed().routingBinder( context -> {
+						// Declare no dependency, but also a dependency: this is inconsistent.
+						context.dependencies()
+								.use( "stringProperty" )
+								.useRootOnly();
+						context.bridge( IndexedEntity.class, new UnusedRoutingBridge<>() );
+					} );
+				} )
+				.setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure( "The binder called context.dependencies().useRootOnly() during binding,"
+								+ " but also declared extra dependencies to the entity model." )
+						.build() );
+	}
+
+	@Test
+	public void useRootOnly() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> { } );
+
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
+					typeMapping.indexed().routingBinder( context -> {
+						context.dependencies().useRootOnly();
+						context.bridge(
+								IndexedEntity.class,
+								(DocumentRoutes routes, Object entityId, IndexedEntity entity,
+										RoutingBridgeRouteContext context1) -> {
+									routes.addRoute().routingKey( "route/" + entityId );
+								}
+						);
+					} );
+				} )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.stringProperty = "some string";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( b -> b.identifier( "1" ).routingKey( "route/1" )
+							.document( StubDocumentNode.document().build() ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.stringProperty = "some string 2";
+			// A change to "stringProperty" should be ignored,
+			// since it's not used for routing or indexing.
+			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().addOrUpdate( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.update( b -> b.identifier( "1" ).routingKey( "route/1" )
+							.document( StubDocumentNode.document().build() ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().delete( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.delete( b -> b.identifier( "1" ).routingKey( "route/1" ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	private static class UnusedRoutingBridge<T> implements RoutingBridge<T> {
