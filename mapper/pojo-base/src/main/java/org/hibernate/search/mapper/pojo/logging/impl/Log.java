@@ -312,13 +312,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 49,
 			value = "The binder did not declare any dependency to the entity model during binding."
-					+ " Declare dependencies using context.getDependencies().use(...) or,"
-					+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()."
+					+ " Declare dependencies using context.dependencies().use(...) or,"
+					+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()."
 	)
 	SearchException missingBridgeDependencyDeclaration();
 
 	@Message(id = ID_OFFSET_2 + 50,
-			value = "The binder called context.getDependencies().useRootOnly() during binding,"
+			value = "The binder called context.dependencies().useRootOnly() during binding,"
 					+ " but also declared extra dependencies to the entity model."
 	)
 	SearchException inconsistentBridgeDependencyDeclaration();
