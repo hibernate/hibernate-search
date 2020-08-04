@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isNull;
+import static org.easymock.EasyMock.notNull;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 
 import java.util.ArrayList;
@@ -39,12 +40,21 @@ public final class MapperEasyMockUtils {
 	 * @param <R> The reference type.
 	 * @param <E> The entity type.
 	 */
-	@SuppressWarnings({"unchecked"})
 	public static <R, E> void expectHitMapping(
 			LoadingContext<R, E> loadingContextMock,
 			DocumentReferenceConverter<R> referenceTransformerMock,
 			EntityLoader<R, E> objectLoaderMock,
 			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
+		expectHitMapping( loadingContextMock, referenceTransformerMock, objectLoaderMock, hitMappingDefinition, false );
+	}
+
+	@SuppressWarnings({"unchecked"})
+	public static <R, E> void expectHitMapping(
+			LoadingContext<R, E> loadingContextMock,
+			DocumentReferenceConverter<R> referenceTransformerMock,
+			EntityLoader<R, E> objectLoaderMock,
+			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition,
+			boolean entityLoadingTimeout) {
 		/*
 		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
 		 * so that the mapper can check its state (session is open in ORM, for example).
@@ -65,12 +75,12 @@ public final class MapperEasyMockUtils {
 			}
 		}
 
-		expect( objectLoaderMock.loadBlocking(
-				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) ), anyObject()
-		) )
-				.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
-						.map( context.loadingMap::get )
-						.collect( Collectors.toList() ) );
+		if ( entityLoadingTimeout ) {
+			loadWithTimeout( objectLoaderMock, context );
+		}
+		else {
+			loadWithoutTimeout( objectLoaderMock, context );
+		}
 	}
 
 	public static class HitMappingDefinitionContext<R, E> {
@@ -90,5 +100,23 @@ public final class MapperEasyMockUtils {
 			loadingMap.put( transformedReference, loadedObject );
 			return this;
 		}
+	}
+
+	private static <R, E> void loadWithoutTimeout(EntityLoader<R, E> objectLoaderMock,
+			HitMappingDefinitionContext<R, E> context) {
+		expect( objectLoaderMock.loadBlocking(
+				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) ), isNull() ) )
+				.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
+						.map( context.loadingMap::get )
+						.collect( Collectors.toList() ) );
+	}
+
+	private static <R, E> void loadWithTimeout(EntityLoader<R, E> objectLoaderMock,
+			HitMappingDefinitionContext<R, E> context) {
+		expect( objectLoaderMock.loadBlocking(
+				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) ), notNull() ) )
+				.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
+						.map( context.loadingMap::get )
+						.collect( Collectors.toList() ) );
 	}
 }
