@@ -591,8 +591,8 @@ public class TypeBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"The binder did not declare any dependency to the entity model during binding."
-								+ " Declare dependencies using context.getDependencies().use(...) or,"
-								+ " if the bridge really does not depend on the entity model, context.getDependencies().useRootOnly()"
+								+ " Declare dependencies using context.dependencies().use(...) or,"
+								+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()"
 						)
 						.build()
 				);
@@ -631,7 +631,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The binder called context.getDependencies().useRootOnly() during binding,"
+								"The binder called context.dependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
 						)
 						.build()
