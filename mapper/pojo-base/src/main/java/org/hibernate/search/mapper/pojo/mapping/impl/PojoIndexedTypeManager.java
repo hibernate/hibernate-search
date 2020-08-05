@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -30,10 +29,10 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
-import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexedTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexer;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkRouter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
@@ -113,27 +112,18 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
-			I identifier, String providedRoutingKey, Supplier<E> entitySupplier) {
-		String documentIdentifier = identifierMapping.toDocumentIdentifier(
-				identifier, sessionContext.mappingContext()
-		);
-		if ( providedRoutingKey == null && routingBridgeHolder != null ) {
-			return new DocumentRoutesImpl<>( routingBridgeHolder.get(), identifier, entitySupplier.get() )
-					.toDocumentReferenceProvider( documentIdentifier, sessionContext.routingBridgeRouteContext() );
-		}
-		else {
-			return new PojoDocumentReferenceProvider( documentIdentifier, providedRoutingKey, identifier );
-		}
+	public String toDocumentIdentifier(PojoWorkSessionContext<?> sessionContext, I identifier) {
+		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
 	}
 
 	@Override
-	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
-			I identifier, String providedRoutingKey) {
-		String documentIdentifier = identifierMapping.toDocumentIdentifier(
-				identifier, sessionContext.mappingContext()
-		);
-		return new PojoDocumentReferenceProvider( documentIdentifier, providedRoutingKey, identifier );
+	public PojoWorkRouter createRouter(PojoWorkSessionContext<?> sessionContext, I identifier,
+			Supplier<E> entitySupplier) {
+		if ( routingBridgeHolder == null ) {
+			return NoOpDocumentRouter.INSTANCE;
+		}
+		return new RoutingBridgeDocumentRouter<>( sessionContext.routingBridgeRouteContext(), routingBridgeHolder.get(),
+				identifier, entitySupplier.get() );
 	}
 
 	@Override

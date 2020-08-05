@@ -15,6 +15,11 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 public class PojoIndexingAddIT extends AbstractPojoIndexingOperationIT {
 
 	@Override
+	protected boolean isAdd() {
+		return true;
+	}
+
+	@Override
 	protected void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
 			String id, String routingKey, String value) {
 		context.add( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value ) );

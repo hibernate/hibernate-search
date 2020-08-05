@@ -556,6 +556,12 @@ public class IndexedBaseIT {
 						RoutingBridgeRouteContext context) {
 					throw new AssertionFailure( "This method should not be called." );
 				}
+
+				@Override
+				public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, Object indexedEntity,
+						RoutingBridgeRouteContext context) {
+					throw new AssertionFailure( "This method should not be called." );
+				}
 			} );
 			StaticCounters.get().increment( KEY );
 		}

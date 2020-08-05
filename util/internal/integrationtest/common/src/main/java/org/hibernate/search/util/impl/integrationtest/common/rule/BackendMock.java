@@ -363,6 +363,7 @@ public class BackendMock implements TestRule {
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
+			works.clear();
 			return BackendMock.this;
 		}
 
@@ -375,6 +376,7 @@ public class BackendMock implements TestRule {
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
+			works.clear();
 			return BackendMock.this;
 		}
 

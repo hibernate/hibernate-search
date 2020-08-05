@@ -10,8 +10,10 @@ import static org.junit.Assume.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -21,9 +23,9 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -99,6 +101,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 		backendMock.verifyExpectationsMet();
 
 		MyRoutingBridge.indexed = true;
+		MyRoutingBridge.previouslyIndexed = true;
+		MyRoutingBridge.previousValues = null;
 	}
 
 	@Test
@@ -139,7 +143,19 @@ public abstract class AbstractPojoIndexingOperationIT {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
-			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			expectOperation( futureFromBackend,
+					worksBefore -> {
+						if ( routingBinder != null && !isPurge() && !isAdd() ) {
+							// If a routing bridge is enabled, and for operations other than add and purge,
+							// expect a delete for the default route (if different).
+							worksBefore
+									.delete( b -> addWorkInfo( b, tenantId, "42",
+											MyRoutingBridge.toRoutingKey( tenantId, 42, "1" ) ) )
+									.processedThenExecuted( futureFromBackend );
+						}
+					},
+					// And only then, expect the actual operation.
+					42, "UE-123", "1" );
 			CompletableFuture<?> returnedFuture = execute( indexer, 42, "UE-123", 1 );
 			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isPending();
@@ -151,14 +167,140 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void indexer_notIndexed() {
+	public void indexer_previouslyIndexedWithDifferentRoute() {
+		assumeRoutingBridgeEnabled();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			MyRoutingBridge.previousValues = Arrays.asList( "foo" );
+			expectOperation( futureFromBackend,
+					worksBefore -> {
+						if ( !isAdd() ) {
+							// For operations other than add, expect a delete for the previous route.
+							worksBefore
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+									.processedThenExecuted( futureFromBackend );
+						}
+					},
+					// And only then, expect the actual operation.
+					1, null, "1"
+			);
+			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			backendMock.verifyExpectationsMet();
+			FutureAssert.assertThat( returnedFuture ).isPending();
+
+			futureFromBackend.complete( null );
+			FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexer_previouslyIndexedWithMultipleRoutes() {
+		assumeRoutingBridgeEnabled();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
+			expectOperation( futureFromBackend,
+					worksBefore -> {
+						if ( !isAdd() ) {
+							// For operations other than add, expect a delete for every previous route distinct from the current one.
+							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+									.processedThenExecuted();
+							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
+									.processedThenExecuted();
+						}
+					},
+					// And only then, expect the actual operation.
+					1, null, "1"
+			);
+			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			backendMock.verifyExpectationsMet();
+			FutureAssert.assertThat( returnedFuture ).isPending();
+
+			futureFromBackend.complete( null );
+			FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexer_notIndexed_notPreviouslyIndexed() {
 		assumeRoutingBridgeEnabled();
 
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
 			MyRoutingBridge.indexed = false;
-			// No expected operation: the operation should be skipped.
+			MyRoutingBridge.previouslyIndexed = false;
+			// We don't expect the actual operation, which should be skipped because the entity is not indexed.
+			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			backendMock.verifyExpectationsMet();
+			FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexer_notIndexed_previouslyIndexedWithDifferentRoute() {
+		assumeRoutingBridgeEnabled();
+
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			MyRoutingBridge.indexed = false;
+			MyRoutingBridge.previouslyIndexed = true;
+			if ( !isAdd() ) {
+				// For operations other than add, expect a delete for the previous route.
+				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
+						.processedThenExecuted();
+			}
+			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
+			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			backendMock.verifyExpectationsMet();
+			FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexer_notIndexed_previouslyIndexedWithMultipleRoutes() {
+		assumeRoutingBridgeEnabled();
+
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			MyRoutingBridge.indexed = false;
+			MyRoutingBridge.previouslyIndexed = true;
+			MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
+			if ( !isAdd() ) {
+				// For operations other than add, expect a delete for every previous route.
+				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
+						.processedThenExecuted();
+				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+						.processedThenExecuted();
+				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
+						.processedThenExecuted();
+			}
+			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			FutureAssert.assertThat( returnedFuture ).isSuccessful();
@@ -230,7 +372,20 @@ public abstract class AbstractPojoIndexingOperationIT {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
-			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+
+			expectOperation(
+					futureFromBackend,
+					worksBeforeInSamePlan -> {
+						if ( routingBinder != null && !isPurge() && !isAdd() ) {
+							// If a routing bridge is enabled, and for operations other than add and purge,
+							// expect a delete for the default route (if different).
+							worksBeforeInSamePlan
+									.delete( b -> addWorkInfo( b, tenantId, "42",
+											MyRoutingBridge.toRoutingKey( tenantId, 42, "1" ) ) );
+						}
+					},
+					42, "UE-123", "1"
+			);
 			addTo( indexingPlan, 42, "UE-123", 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
@@ -239,6 +394,141 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexingPlan_previouslyIndexedWithDifferentRoute() {
+		assumeRoutingBridgeEnabled();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			MyRoutingBridge.previousValues = Arrays.asList( "foo" );
+			expectOperation(
+					futureFromBackend,
+					worksBeforeInSamePlan -> {
+						if ( !isAdd() ) {
+							// For operations other than add, expect a delete for the previous route.
+							worksBeforeInSamePlan
+									.delete( b -> addWorkInfo( b, tenantId, "1",
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) );
+						}
+					},
+					// And only then, expect the actual operation.
+					1, null, "1"
+			);
+			addTo( indexingPlan, 1 );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexingPlan_previouslyIndexedWithMultipleRoutes() {
+		assumeRoutingBridgeEnabled();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
+			expectOperation(
+					futureFromBackend,
+					worksBeforeInSamePlan -> {
+							if ( !isAdd() ) {
+								// For operations other than add, expect a delete for every previous route distinct from the current one.
+								worksBeforeInSamePlan
+										.delete( b -> addWorkInfo( b, tenantId, "1",
+												MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "1",
+												MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
+							}
+					},
+					// And only then, expect the actual operation.
+					1, null, "1"
+			);
+			addTo( indexingPlan, 1 );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexingPlan_notIndexed_notPreviouslyIndexed() {
+		assumeRoutingBridgeEnabled();
+
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			MyRoutingBridge.indexed = false;
+			MyRoutingBridge.previouslyIndexed = false;
+			// We don't expect the actual operation, which should be skipped because the entity is not indexed.
+			addTo( indexingPlan, 1 );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexingPlan_notIndexed_previouslyIndexedWithDifferentRoute() {
+		assumeRoutingBridgeEnabled();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			MyRoutingBridge.indexed = false;
+			MyRoutingBridge.previouslyIndexed = true;
+			if ( !isAdd() ) {
+				// For operations other than add, expect a delete for the previous route.
+				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
+						.processedThenExecuted( futureFromBackend );
+			}
+			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
+			addTo( indexingPlan, 1 );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
+	public void indexingPlan_notIndexed_previouslyIndexedWithMultipleRoutes() {
+		assumeRoutingBridgeEnabled();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			MyRoutingBridge.indexed = false;
+			MyRoutingBridge.previouslyIndexed = true;
+			MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
+			if ( !isAdd() ) {
+				// For operations other than add, expect a delete for every previous route.
+				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
+						.delete( b -> addWorkInfo( b, tenantId, "1",
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
+						.processedThenExecuted( futureFromBackend );
+			}
+			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
+			addTo( indexingPlan, 1 );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void indexingPlan_runtimeException() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		RuntimeException exception = new RuntimeException();
@@ -272,18 +562,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.isSameAs( error );
 	}
 
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3108")
-	public void indexingPlan_notIndexed() {
-		assumeRoutingBridgeEnabled();
-
-		try ( SearchSession session = createSession() ) {
-			SearchIndexingPlan indexingPlan = session.indexingPlan();
-
-			MyRoutingBridge.indexed = false;
-			// No expected operation: the operation should be skipped.
-			addTo( indexingPlan, 1 );
-		}
+	protected boolean isAdd() {
+		return false;
 	}
 
 	protected boolean isPurge() {
@@ -342,9 +622,16 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	private void expectOperation(CompletableFuture<?> futureFromBackend, int id, String providedRoutingKey, String value) {
+		expectOperation( futureFromBackend, ignored -> { }, id, providedRoutingKey, value );
+	}
+
+	private void expectOperation(CompletableFuture<?> futureFromBackend,
+			Consumer<BackendMock.DocumentWorkCallListContext> worksBefore,
+			int id, String providedRoutingKey, String value) {
 		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
 				IndexedEntity.INDEX, commitStrategy, refreshStrategy
 		);
+		worksBefore.accept( context );
 		String expectedRoutingKey;
 		if ( providedRoutingKey != null ) {
 			expectedRoutingKey = providedRoutingKey;
@@ -404,6 +691,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	private static final class MyRoutingBridge implements RoutingBridge<IndexedEntity> {
 		private static boolean indexed = false;
+		private static boolean previouslyIndexed = false;
+		private static List<String> previousValues = null;
 
 		public static String toRoutingKey(String tenantIdentifier, Object entityIdentifier, String value) {
 			StringBuilder keyBuilder = new StringBuilder();
@@ -425,6 +714,26 @@ public abstract class AbstractPojoIndexingOperationIT {
 			String tenantIdentifier = context.tenantIdentifier();
 			routes.addRoute()
 					.routingKey( toRoutingKey( tenantIdentifier, entityIdentifier, indexedEntity.value ) );
+		}
+
+		@Override
+		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
+				RoutingBridgeRouteContext context) {
+			if ( !previouslyIndexed ) {
+				routes.notIndexed();
+				return;
+			}
+			String tenantIdentifier = context.tenantIdentifier();
+			if ( previousValues == null ) {
+				routes.addRoute()
+						.routingKey( toRoutingKey( tenantIdentifier, entityIdentifier, indexedEntity.value ) );
+			}
+			else {
+				for ( String previousValue : previousValues ) {
+					routes.addRoute()
+							.routingKey( toRoutingKey( tenantIdentifier, entityIdentifier, previousValue ) );
+				}
+			}
 		}
 	}
 
