@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query;
 
-import org.hibernate.search.engine.search.query.ExtendedSearchFetchable;
+import org.hibernate.search.engine.search.query.ExtendedSearchScroll;
 
-public interface ElasticsearchSearchFetchable<H>
-		extends ExtendedSearchFetchable<H, ElasticsearchSearchResult<H>, ElasticsearchSearchScroll<H>> {
+public interface ElasticsearchSearchScroll<H>
+		extends ExtendedSearchScroll<H, ElasticsearchSearchScrollResult<H>> {
 
 }

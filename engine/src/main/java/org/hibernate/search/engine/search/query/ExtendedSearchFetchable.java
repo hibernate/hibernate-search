@@ -12,8 +12,10 @@ package org.hibernate.search.engine.search.query;
  *
  * @param <H> The type of query hits.
  * @param <R> The result type (extending {@link SearchResult}).
+ * @param <SC> The scroll type (extending {@link SearchScroll}).
  */
-public interface ExtendedSearchFetchable<H, R extends SearchResult<H>> extends SearchFetchable<H> {
+public interface ExtendedSearchFetchable<H, R extends SearchResult<H>, SC extends SearchScroll<H>>
+		extends SearchFetchable<H> {
 
 	@Override
 	R fetch(Integer limit);
@@ -23,5 +25,8 @@ public interface ExtendedSearchFetchable<H, R extends SearchResult<H>> extends S
 
 	@Override
 	R fetchAll();
+
+	@Override
+	SC scroll(int chunkSize);
 
 }

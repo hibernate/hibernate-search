@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
@@ -33,7 +34,6 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
@@ -150,14 +150,14 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public SearchScroll<H> scroll(int chunkSize) {
+	public ElasticsearchSearchScroll<H> scroll(int chunkSize) {
 		String scrollTimeoutString = this.scrollTimeout + "s";
 
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()
 				.scrolling( chunkSize, scrollTimeoutString )
 				.build();
 
-		return new ElasticsearchSearchScroll<>( queryOrchestrator, workFactory, searchResultExtractor, scrollTimeoutString, firstScroll );
+		return new ElasticsearchSearchScrollImpl<>( queryOrchestrator, workFactory, searchResultExtractor, scrollTimeoutString, firstScroll );
 	}
 
 	@Override

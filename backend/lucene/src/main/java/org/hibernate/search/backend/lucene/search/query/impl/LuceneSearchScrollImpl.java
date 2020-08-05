@@ -17,17 +17,16 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchM
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchScrollResult;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.query.SearchScroll;
-import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class LuceneSearchScroll<H> implements SearchScroll<H> {
+public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -47,7 +46,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 	private int queryFetchSize;
 	private LuceneExtractableSearchResult<H> search;
 
-	public LuceneSearchScroll(LuceneSyncWorkOrchestrator queryOrchestrator,
+	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
@@ -75,7 +74,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 	}
 
 	@Override
-	public SearchScrollResult<H> next() {
+	public LuceneSearchScrollResult<H> next() {
 		timeoutManager.start();
 
 		if ( search == null || scrollIndex + chunkSize > queryFetchSize ) {
@@ -87,7 +86,8 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 
 		// no more results check
 		if ( scrollIndex >= search.totalHitCount() ) {
-			return new SimpleSearchScrollResult<>( false, Collections.emptyList(), Duration.ZERO, false );
+			return new LuceneSearchScrollResultImpl<>( false, Collections.emptyList(), Duration.ZERO,
+					false );
 		}
 
 		int endIndexExclusive = scrollIndex + chunkSize;
@@ -114,7 +114,7 @@ public class LuceneSearchScroll<H> implements SearchScroll<H> {
 
 		// increasing the index for further next(s)
 		scrollIndex += chunkSize;
-		return new SimpleSearchScrollResult<>( true, result.hits(), result.took(), result.timedOut() );
+		return new LuceneSearchScrollResultImpl<>( true, result.hits(), result.took(), result.timedOut() );
 	}
 
 	private <T> T doSubmitWithIndexReader(ReadWork<T> work, HibernateSearchMultiReader indexReader) {
