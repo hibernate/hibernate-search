@@ -41,14 +41,14 @@ the following table may help:
 |<<mapper-orm-bridge-propertybridge,`PropertyBridge`>>
 |<<mapper-orm-bridge-typebridge,`TypeBridge`>>
 |<<mapper-orm-bridge-identifierbridge,`IdentifierBridge`>>
-|<<mapper-orm-bridge-routingkeybridge,`RoutingKeyBridge`>>
+|<<mapper-orm-bridge-routingbridge,`RoutingBridge`>>
 
 |Built-in annotation(s)
 |<<mapper-orm-directfieldmapping,`@GenericField`, `@FullTextField`, ...>>
 |`@PropertyBinding`
 |`@TypeBinding`
 |<<mapper-orm-identifiermapping,`@DocumentId`>>
-|`@RoutingKeyBinding`
+|`@Indexed(routingBinder = ...)`
 
 |Maps from...
 |One property
@@ -62,7 +62,7 @@ the following table may help:
 |One index field or more
 |One index field or more
 |Document identifier
-|<<concepts-sharding-routing,Routing key>>
+|Route (conditional indexing, <<concepts-sharding-routing,routing key>>)
 
 |Supports <<mapper-orm-containerextractor,container extractors>>
 |Yes

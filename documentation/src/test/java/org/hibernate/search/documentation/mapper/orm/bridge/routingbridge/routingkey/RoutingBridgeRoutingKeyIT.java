@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.simple;
+package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.routingkey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class RoutingKeyBridgeSimpleIT {
+public class RoutingBridgeRoutingKeyIT {
 
 	private static final int SHARD_COUNT = 4;
 
@@ -42,8 +42,8 @@ public class RoutingKeyBridgeSimpleIT {
 				mapping -> {
 					//tag::programmatic[]
 					TypeMappingStep bookMapping = mapping.type( Book.class );
-					bookMapping.indexed();
-					bookMapping.routingKeyBinder( new BookGenreRoutingKeyBinder() );
+					bookMapping.indexed()
+							.routingBinder( new BookGenreRoutingBinder() );
 					bookMapping.property( "genre" ).keywordField();
 					//end::programmatic[]
 				} );

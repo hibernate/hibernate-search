@@ -15,7 +15,7 @@ include::mapper-orm-bridge-typebridge.asciidoc[]
 
 include::mapper-orm-bridge-identifierbridge.asciidoc[]
 
-include::mapper-orm-bridge-routingkeybridge.asciidoc[]
+include::mapper-orm-bridge-routingbridge.asciidoc[]
 
 include::mapper-orm-bridge-bridgeelement-dependencies.asciidoc[]
 

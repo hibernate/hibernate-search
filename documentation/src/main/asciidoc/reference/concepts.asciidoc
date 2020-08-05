@@ -256,7 +256,7 @@ which can be handled by separate threads and located on different disks (Lucene)
 or be located on different servers (Elasticsearch).
 * When searching: if one property, let's call it `category`,
 is often used to select a subset of documents,
-this property can be <<mapper-orm-bridge-routingkeybridge,defined as a routing key in the mapping>>,
+this property can be <<mapper-orm-bridge-routingbridge-routingkey,defined as a routing key in the mapping>>,
 so that it's used to route documents instead of the document ID.
 As a result, documents with the same value for `category` will be indexed in the same shard.
 Then when searching, if a query already filters documents so that it is known that the hits
@@ -274,7 +274,7 @@ This does not allow taking advantage of routing when searching,
 which requires multiple documents to share the same routing key.
 Applying routing to a search query in that case will not return any result.
 To define the routing key to assign to each document,
-assign <<mapper-orm-bridge-routingkeybridge,routing key bridges>> to your entities.
+assign <<mapper-orm-bridge-routingbridge-routingkey,routing bridges>> to your entities.
 
 [WARNING]
 ====

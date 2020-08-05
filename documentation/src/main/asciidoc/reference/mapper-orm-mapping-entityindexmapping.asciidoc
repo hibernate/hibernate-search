@@ -77,6 +77,27 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 ----
 ====
 
+[[mapper-orm-entityindexmapping-conditional-and-routing]]
+== Conditional indexing and routing
+// Search 5 anchors backward compatibility
+[[search-mapping-indexinginterceptor]]
+
+The mapping of an entity to an index is not always as straightforward as "this entity type goes to this index".
+For many reasons, but mainly for performance reasons,
+you may want to customize when and where a given entity is indexed:
+
+* You may not want to index all entities of a given type: for example,
+prevent indexing of entities when their `status` property is set to `DRAFT` or `ARCHIVED`,
+because users are not supposed to search for those entities.
+* You may want to <<concepts-sharding-routing,route entities to a specific shard of the index>>: for example,
+route entities based on their `language` property,
+because each user has a specific language and only searches for entities in their language.
+
+These behaviors can be implemented in Hibernate Search by assigning a routing bridge
+to the indexed entity type through `@Indexed(routingBinder = ...)`.
+
+For more information about routing bridges, see <<mapper-orm-bridge-routingbridge>>.
+
 [[mapper-orm-entityindexmapping-programmatic]]
 == Programmatic mapping
 

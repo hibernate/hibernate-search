@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.ormcontext;
+package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.ormcontext;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RoutingKeyBridgeOrmContextIT {
+public class RoutingBridgeOrmContextIT {
 
 	private static final int SHARD_COUNT = 4;
 
@@ -44,6 +44,7 @@ public class RoutingKeyBridgeOrmContextIT {
 			entityManager.setProperty( "test.data.indexed", MyData.INDEXED );
 
 			MyEntity myEntity = new MyEntity();
+			myEntity.setId( 1 );
 			entityManager.persist( myEntity );
 		} );
 
@@ -52,10 +53,28 @@ public class RoutingKeyBridgeOrmContextIT {
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )
 					.where( f -> f.matchAll() )
-					.routing( "INDEXED" )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// See MyDataPropertyBinder
+			entityManager.setProperty( "test.data.indexed", MyData.NOT_INDEXED );
+
+			MyEntity myEntity = entityManager.getReference( MyEntity.class, 1 );
+			// Force the update, otherwise Hibernate Search will assume nothing changed
+			Search.session( entityManager ).indexingPlan().addOrUpdate( myEntity );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+
+			List<MyEntity> result = searchSession.search( MyEntity.class )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+
+			assertThat( result ).isEmpty();
 		} );
 	}
 
