@@ -112,7 +112,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void missingRoute() {
+	public void currentRoute_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -122,14 +122,79 @@ public class RoutingBridgeBaseIT {
 			}
 		}
 
-		class NoRouteRoutingBridge implements RoutingBridge<IndexedEntity> {
+		class NoCurrentRouteRoutingBridge implements RoutingBridge<IndexedEntity> {
 			@Override
 			public String toString() {
-				return "NoRouteRoutingBridge";
+				return "NoCurrentRouteRoutingBridge";
 			}
 
 			@Override
 			public void route(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
+					RoutingBridgeRouteContext context) {
+				// Do nothing
+			}
+
+			@Override
+			public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
+					RoutingBridgeRouteContext context) {
+				routes.addRoute();
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> { } );
+
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
+					typeMapping.indexed()
+							.routingBinder( context -> {
+								context.dependencies().useRootOnly(); // Irrelevant
+								context.bridge( IndexedEntity.class, new NoCurrentRouteRoutingBridge() );
+							} );
+				} )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			assertThatThrownBy( session::close )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Routing bridge 'NoCurrentRouteRoutingBridge' did not define any current route",
+							"Exactly one current route must be defined",
+							"or you can call notIndexed() to explicitly indicate no route is necessary" );
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void previousRoutes_missing() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+		}
+
+		class NoPreviousRouteRoutingBridge implements RoutingBridge<IndexedEntity> {
+			@Override
+			public String toString() {
+				return "NoPreviousRouteRoutingBridge";
+			}
+
+			@Override
+			public void route(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
+					RoutingBridgeRouteContext context) {
+				routes.addRoute();
+			}
+
+			@Override
+			public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
 					RoutingBridgeRouteContext context) {
 				// Do nothing
 			}
@@ -143,7 +208,7 @@ public class RoutingBridgeBaseIT {
 					typeMapping.indexed()
 							.routingBinder( context -> {
 								context.dependencies().useRootOnly(); // Irrelevant
-								context.bridge( IndexedEntity.class, new NoRouteRoutingBridge() );
+								context.bridge( IndexedEntity.class, new NoPreviousRouteRoutingBridge() );
 							} );
 				} )
 				.setup( IndexedEntity.class );
@@ -153,20 +218,30 @@ public class RoutingBridgeBaseIT {
 		entity.id = 1;
 
 		try ( SearchSession session = mapping.createSession() ) {
-			session.indexingPlan().add( entity );
+			session.indexingPlan().addOrUpdate( entity );
 
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Routing bridge 'NoRouteRoutingBridge' did not define any route",
-							"Exactly one route must be defined",
-							"or you can call notIndexed() to explicitly indicate no route is necessary" );
+					.hasMessageContainingAll( "Routing bridge 'NoPreviousRouteRoutingBridge' did not define any previous route",
+							"At least one previous route must be defined",
+							"or you can call notIndexed() to explicitly indicate no route was necessary" );
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().delete( entity );
+
+			assertThatThrownBy( session::close )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Routing bridge 'NoPreviousRouteRoutingBridge' did not define any previous route",
+							"At least one previous route must be defined",
+							"or you can call notIndexed() to explicitly indicate no route was necessary" );
 		}
 		backendMock.verifyExpectationsMet();
 	}
 
-
 	@Test
-	public void multipleRoutes() {
+	public void currentRoute_multiple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
@@ -176,16 +251,22 @@ public class RoutingBridgeBaseIT {
 			}
 		}
 
-		class TwoRoutesRoutingBridge implements RoutingBridge<IndexedEntity> {
+		class TwoCurrentRoutesRoutingBridge implements RoutingBridge<IndexedEntity> {
 			@Override
 			public String toString() {
-				return "TwoRoutesRoutingBridge";
+				return "TwoCurrentRoutesRoutingBridge";
 			}
 
 			@Override
 			public void route(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
 					RoutingBridgeRouteContext context) {
 				routes.addRoute().routingKey( "foo" );
+				routes.addRoute();
+			}
+
+			@Override
+			public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, IndexedEntity indexedEntity,
+					RoutingBridgeRouteContext context) {
 				routes.addRoute();
 			}
 		}
@@ -198,7 +279,7 @@ public class RoutingBridgeBaseIT {
 					typeMapping.indexed()
 							.routingBinder( context -> {
 								context.dependencies().useRootOnly(); // Irrelevant
-								context.bridge( IndexedEntity.class, new TwoRoutesRoutingBridge() );
+								context.bridge( IndexedEntity.class, new TwoCurrentRoutesRoutingBridge() );
 							} );
 				} )
 				.setup( IndexedEntity.class );
@@ -212,8 +293,8 @@ public class RoutingBridgeBaseIT {
 
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Routing bridge 'TwoRoutesRoutingBridge' defined multiple routes",
-							"At most one route must be defined" );
+					.hasMessageContainingAll( "Routing bridge 'TwoCurrentRoutesRoutingBridge' defined multiple current routes",
+							"At most one current route must be defined" );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -243,13 +324,23 @@ public class RoutingBridgeBaseIT {
 								PojoElementAccessor<String> pojoPropertyAccessor =
 										context.bridgedElement().property( "stringProperty" )
 												.createAccessor( String.class );
-								context.bridge(
-										IndexedEntity.class,
-										(DocumentRoutes routes, Object entityId, IndexedEntity entity,
-												RoutingBridgeRouteContext context1) -> {
-											routes.addRoute().routingKey( pojoPropertyAccessor.read( entity ) );
-										}
-								);
+								context.bridge( IndexedEntity.class,
+										new RoutingBridge<IndexedEntity>() {
+											@Override
+											public void route(DocumentRoutes routes, Object entityIdentifier,
+													IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
+												routes.addRoute().routingKey( pojoPropertyAccessor.read( indexedEntity ) );
+											}
+
+											@Override
+											public void previousRoutes(DocumentRoutes routes, Object entityIdentifier,
+													IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
+												// Assume "stringProperty" can only take values from a finite set
+												routes.addRoute().routingKey( "some string" );
+												routes.addRoute().routingKey( "some string 2" );
+												routes.addRoute().routingKey( "some string 3" );
+											}
+										} );
 							} );
 				} )
 				.setup( IndexedEntity.class );
@@ -276,6 +367,8 @@ public class RoutingBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string" ) )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.update( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
 							.document( StubDocumentNode.document().build() ) )
 					.processedThenExecuted();
@@ -286,6 +379,8 @@ public class RoutingBridgeBaseIT {
 			session.indexingPlan().delete( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string" ) )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.delete( b -> b.identifier( "1" ).routingKey( entity.stringProperty ) )
 					.processedThenExecuted();
 		}
@@ -357,9 +452,21 @@ public class RoutingBridgeBaseIT {
 						context.dependencies().use( "stringProperty" );
 						context.bridge(
 								IndexedEntity.class,
-								(DocumentRoutes routes, Object entityId, IndexedEntity entity,
-										RoutingBridgeRouteContext context1) -> {
-									routes.addRoute().routingKey( entity.getStringProperty() );
+								new RoutingBridge<IndexedEntity>() {
+									@Override
+									public void route(DocumentRoutes routes, Object entityIdentifier,
+											IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
+										routes.addRoute().routingKey( indexedEntity.getStringProperty() );
+									}
+
+									@Override
+									public void previousRoutes(DocumentRoutes routes, Object entityIdentifier,
+											IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
+										// Assume "stringProperty" can only take values from a finite set
+										routes.addRoute().routingKey( "some string" );
+										routes.addRoute().routingKey( "some string 2" );
+										routes.addRoute().routingKey( "some string 3" );
+									}
 								}
 						);
 					} );
@@ -388,6 +495,8 @@ public class RoutingBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string" ) )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.update( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
 							.document( StubDocumentNode.document().build() ) )
 					.processedThenExecuted();
@@ -398,6 +507,8 @@ public class RoutingBridgeBaseIT {
 			session.indexingPlan().delete( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string" ) )
+					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.delete( b -> b.identifier( "1" ).routingKey( entity.stringProperty ) )
 					.processedThenExecuted();
 		}
@@ -526,13 +637,21 @@ public class RoutingBridgeBaseIT {
 					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
 					typeMapping.indexed().routingBinder( context -> {
 						context.dependencies().useRootOnly();
-						context.bridge(
-								IndexedEntity.class,
-								(DocumentRoutes routes, Object entityId, IndexedEntity entity,
-										RoutingBridgeRouteContext context1) -> {
-									routes.addRoute().routingKey( "route/" + entityId );
-								}
-						);
+						context.bridge( IndexedEntity.class,
+								new RoutingBridge<IndexedEntity>() {
+									@Override
+									public void route(DocumentRoutes routes, Object entityIdentifier,
+											IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
+										routes.addRoute().routingKey( "route/" + entityIdentifier );
+									}
+
+									@Override
+									public void previousRoutes(DocumentRoutes routes, Object entityIdentifier,
+											IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
+										// The route never changes
+										route( routes, entityIdentifier, indexedEntity, context );
+									}
+								} );
 					} );
 				} )
 				.setup( IndexedEntity.class );
@@ -590,6 +709,12 @@ public class RoutingBridgeBaseIT {
 
 		@Override
 		public void route(DocumentRoutes routes, Object entityIdentifier, Object indexedEntity,
+				RoutingBridgeRouteContext context) {
+			throw new AssertionFailure( "Should not be called" );
+		}
+
+		@Override
+		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, T indexedEntity,
 				RoutingBridgeRouteContext context) {
 			throw new AssertionFailure( "Should not be called" );
 		}

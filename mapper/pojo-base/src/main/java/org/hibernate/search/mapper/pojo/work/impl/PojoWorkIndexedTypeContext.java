@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
@@ -32,11 +31,9 @@ public interface PojoWorkIndexedTypeContext<I, E> {
 
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 
-	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
-			I identifier, String providedRoutingKey, Supplier<E> entitySupplier);
+	String toDocumentIdentifier(PojoWorkSessionContext<?> sessionContext, I identifier);
 
-	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
-			I identifier, String providedRoutingKey);
+	PojoWorkRouter createRouter(PojoWorkSessionContext<?> sessionContext, I identifier, Supplier<E> entitySupplier);
 
 	PojoDocumentContributor<E> toDocumentContributor(Supplier<E> entitySupplier,
 			PojoWorkSessionContext<?> sessionContext);

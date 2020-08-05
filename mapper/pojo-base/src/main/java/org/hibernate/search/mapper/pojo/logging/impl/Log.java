@@ -441,11 +441,16 @@ public interface Log extends BasicLogger {
 	SearchException conflictingRoutingBridgeAndRoutingKeyBinder(Object routingBridge, Object binder);
 
 	@Message(id = ID_OFFSET_2 + 75,
-			value = "Routing bridge '%1$s' did not define any route. Exactly one route must be defined," +
+			value = "Routing bridge '%1$s' did not define any current route. Exactly one current route must be defined," +
 					" or you can call notIndexed() to explicitly indicate no route is necessary.")
-	SearchException noIndexingRoute(Object routingBridge);
+	SearchException noCurrentRoute(Object routingBridge);
 
 	@Message(id = ID_OFFSET_2 + 76,
-			value = "Routing bridge '%1$s' defined multiple routes. At most one route must be defined.")
-	SearchException multipleIndexingRoutes(Object routingBridge);
+			value = "Routing bridge '%1$s' defined multiple current routes. At most one current route must be defined.")
+	SearchException multipleCurrentRoutes(Object routingBridge);
+
+	@Message(id = ID_OFFSET_2 + 77,
+			value = "Routing bridge '%1$s' did not define any previous route. At least one previous route must be defined," +
+					" or you can call notIndexed() to explicitly indicate no route was necessary.")
+	SearchException noPreviousRoute(Object routingBridge);
 }

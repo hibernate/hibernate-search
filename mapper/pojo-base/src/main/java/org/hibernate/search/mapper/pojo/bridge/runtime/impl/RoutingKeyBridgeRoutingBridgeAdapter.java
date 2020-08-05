@@ -43,4 +43,11 @@ public class RoutingKeyBridgeRoutingBridgeAdapter<E> implements RoutingBridge<E>
 				indexedEntity, (RoutingKeyBridgeToRoutingKeyContext) context );
 		routes.addRoute().routingKey( routingKey );
 	}
+
+	@Override
+	public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, E indexedEntity,
+			RoutingBridgeRouteContext context) {
+		// The route never changes.
+		route( routes, entityIdentifier, indexedEntity, context );
+	}
 }

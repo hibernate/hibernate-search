@@ -15,21 +15,17 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 public interface DocumentRoutes {
 
 	/**
-	 * Instructs Hibernate Search to index the entity using a specific route.
+	 * Add a route that indexing operations for this entity should take,
+	 * based on its current state.
 	 * <p>
-	 * At the moment, only one route can be added per indexed entity.
+	 * At the moment, only one current route can be added per indexed entity.
 	 *
 	 * @return A new route, to be defined in more details.
 	 */
 	DocumentRoute addRoute();
 
 	/**
-	 * Instructs Hibernate Search not to index the entity.
-	 * <p>
-	 * Used to exclude a subset of entities from being indexed.
-	 * <p><strong>Warning:</strong> Calling this will not cause existing document to be removed!
-	 * This method should only be used to exclude entities from being indexed during their
-	 * <strong>entire lifespan</strong>, from their creation to their deletion.
+	 * Instructs Hibernate Search that the entity should not be indexed.
 	 * <p>
 	 * Calling this method will lead to the {@link #addRoute() route} being ignored.
 	 */

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.route.impl;
 
+import java.util.Objects;
+
 import org.hibernate.search.mapper.pojo.route.DocumentRoute;
 
 public class DocumentRouteImpl implements DocumentRoute {
@@ -18,5 +20,22 @@ public class DocumentRouteImpl implements DocumentRoute {
 
 	public String routingKey() {
 		return routingKey;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		DocumentRouteImpl that = (DocumentRouteImpl) o;
+		return Objects.equals( routingKey, that.routingKey );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( routingKey );
 	}
 }

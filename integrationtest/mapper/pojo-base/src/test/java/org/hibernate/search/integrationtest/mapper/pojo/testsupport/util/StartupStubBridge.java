@@ -114,6 +114,12 @@ public class StartupStubBridge<T>
 	}
 
 	@Override
+	public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, T indexedEntity,
+			RoutingBridgeRouteContext context) {
+		throw unexpectedRuntimeUse();
+	}
+
+	@Override
 	public String toDocumentIdentifier(Object propertyValue,
 			IdentifierBridgeToDocumentIdentifierContext context) {
 		throw unexpectedRuntimeUse();
