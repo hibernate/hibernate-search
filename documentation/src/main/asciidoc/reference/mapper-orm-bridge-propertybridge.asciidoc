@@ -193,7 +193,7 @@ As a rule of thumb, if you need to call `new MyBinder()` at some point,
 the binder won't get auto-magically injected.
 
 The context passed to the property binder's `bind` method
-also exposes a `getBeanResolver` method to access the bean resolver and instantiate beans explicitly.
+also exposes a `beanResolver()` method to access the bean resolver and instantiate beans explicitly.
 
 See <<configuration-bean-injection>> for more details.
 
