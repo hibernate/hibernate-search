@@ -12,7 +12,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Sort;
 
 public interface LuceneSearchQuery<H>
-		extends ExtendedSearchQuery<H, LuceneSearchResult<H>>, LuceneSearchFetchable<H> {
+		extends ExtendedSearchQuery<H, LuceneSearchResult<H>, LuceneSearchScroll<H>>, LuceneSearchFetchable<H> {
 
 	/**
 	 * Explain score computation of this query for the document with the given id.

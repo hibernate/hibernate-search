@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -28,7 +29,6 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
-import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -119,11 +119,11 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	@Override
-	public SearchScroll<H> scroll(int chunkSize) {
+	public LuceneSearchScroll<H> scroll(int chunkSize) {
 		Set<String> indexNames = searchContext.indexes().indexNames();
 		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
 				indexNames, searchContext.indexes().elements(), routingKeys );
-		return new LuceneSearchScroll<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
+		return new LuceneSearchScrollImpl<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
 				searcher, indexReader, chunkSize );
 	}
 

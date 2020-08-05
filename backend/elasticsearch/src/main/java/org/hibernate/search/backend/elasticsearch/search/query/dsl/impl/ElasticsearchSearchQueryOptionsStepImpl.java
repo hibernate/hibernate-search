@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
@@ -29,6 +30,7 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 						ElasticsearchSearchQueryOptionsStep<H, LOS>,
 						H,
 						ElasticsearchSearchResult<H>,
+						ElasticsearchSearchScroll<H>,
 						LOS,
 						ElasticsearchSearchPredicateFactory,
 						ElasticsearchSearchSortFactory,

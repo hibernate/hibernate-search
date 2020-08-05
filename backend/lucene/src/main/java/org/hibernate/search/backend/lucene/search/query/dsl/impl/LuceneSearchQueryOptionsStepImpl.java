@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.dsl.impl;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
@@ -28,6 +29,7 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 						LuceneSearchQueryOptionsStep<H, LOS>,
 						H,
 						LuceneSearchResult<H>,
+						LuceneSearchScroll<H>,
 						LOS,
 						LuceneSearchPredicateFactory,
 						LuceneSearchSortFactory,

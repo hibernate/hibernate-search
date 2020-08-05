@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.query;
 
-import org.hibernate.search.engine.search.query.ExtendedSearchFetchable;
+import org.hibernate.search.engine.search.query.SearchScrollResult;
 
-public interface LuceneSearchFetchable<H>
-		extends ExtendedSearchFetchable<H, LuceneSearchResult<H>, LuceneSearchScroll<H>> {
+public interface LuceneSearchScrollResult<H> extends SearchScrollResult<H> {
 
 }
