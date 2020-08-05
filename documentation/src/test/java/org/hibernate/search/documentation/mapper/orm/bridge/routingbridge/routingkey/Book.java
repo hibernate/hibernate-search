@@ -4,21 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.bridge.routingkeybridge.simple;
+package org.hibernate.search.documentation.mapper.orm.bridge.routingbridge.routingkey;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
 
 // tag::include[]
 @Entity
-@Indexed
-@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = BookGenreRoutingKeyBinder.class)) // <1>
+@Indexed(routingBinder = @RoutingBinderRef(type = BookGenreRoutingBinder.class)) // <1>
 public class Book {
 
 	@Id
@@ -29,9 +27,6 @@ public class Book {
 	@Basic(optional = false)
 	@KeywordField // <2>
 	private Genre genre;
-
-	public Book() {
-	}
 
 	// Getters and setters
 	// ...
