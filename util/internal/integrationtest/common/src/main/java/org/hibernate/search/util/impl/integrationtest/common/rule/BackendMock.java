@@ -256,7 +256,7 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
-	public BackendMock expectNextScroll(Collection<String> indexNames, StubSearchWorkBehavior<?> behavior) {
+	public BackendMock expectNextScroll(Collection<String> indexNames, StubNextScrollWorkBehavior<?> behavior) {
 		CallQueue<NextScrollWorkCall<?>> callQueue = backendBehavior().getNextScrollCalls();
 		callQueue.expectInOrder( new NextScrollWorkCall<>( new LinkedHashSet<>( indexNames ), behavior ) );
 		return this;

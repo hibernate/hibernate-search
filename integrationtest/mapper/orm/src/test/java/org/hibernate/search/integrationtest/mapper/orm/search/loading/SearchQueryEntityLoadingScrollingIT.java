@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 
 public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadingBaseIT {
 
@@ -28,13 +28,7 @@ public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadin
 				b -> { }
 		);
 
-		backendMock.expectNextScroll(
-				targetIndexes,
-				StubSearchWorkBehavior.of(
-						hitDocumentReferences.size(),
-						hitDocumentReferences
-				)
-		);
+		backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior.of( hitDocumentReferences ) );
 
 		backendMock.expectCloseScroll( targetIndexes );
 
