@@ -617,11 +617,12 @@ or Hibernate ORM `Query` in some cases
 * `setFirstResult`/`setMaxResults` and getters.
 * `setFetchSize`
 * `unwrap`
+* `setHint`
 
 The following operations are known not to work correctly,
 with no plan to fix them at the moment:
 
-* Hints: `setHint`, ...
+* `getHints`
 * Parameter-related methods: `setParameter`, ...
 * Result transformer: `setResultTransformer`, ...
 Use <<search-dsl-projection-composite,composite projections>> instead.
