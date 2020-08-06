@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;

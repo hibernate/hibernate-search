@@ -27,7 +27,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.timing.impl.DefaultTimingSource;
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
