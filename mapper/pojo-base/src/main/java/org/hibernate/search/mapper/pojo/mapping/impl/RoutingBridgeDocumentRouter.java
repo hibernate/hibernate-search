@@ -25,14 +25,14 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRoutes, Poj
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final RoutingBridgeRouteContext context;
-	private final RoutingBridge<E> routingBridge;
+	private final RoutingBridge<? super E> routingBridge;
 	private final Object entityIdentifier;
 	private final E entity;
 
 	private DocumentRouteImpl currentRoute = null;
 	private boolean skip = false;
 
-	public RoutingBridgeDocumentRouter(RoutingBridgeRouteContext context, RoutingBridge<E> routingBridge,
+	public RoutingBridgeDocumentRouter(RoutingBridgeRouteContext context, RoutingBridge<? super E> routingBridge,
 			Object entityIdentifier, E entity) {
 		this.context = context;
 		this.routingBridge = routingBridge;
