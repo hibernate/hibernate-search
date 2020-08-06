@@ -159,6 +159,35 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
+	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
+		switch ( hintName ) {
+			case QueryHints.SPEC_HINT_TIMEOUT:
+				delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
+				break;
+			case QueryHints.HINT_TIMEOUT:
+				setTimeout( hintValueToInteger( value ) );
+				break;
+			case "javax.persistence.fetchgraph":
+				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
+				break;
+			case "javax.persistence.loadgraph":
+				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
+				break;
+			default:
+				handleUnrecognizedHint( hintName, value );
+				break;
+		}
+		return this;
+	}
+
+	@Override
+	public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
+		delegate.failAfter( timeout, TimeUnit.SECONDS );
+		return this;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public Query<R> applyGraph(RootGraph graph, GraphSemantic semantic) {
 		loadingOptions.entityGraphHint( new EntityGraphHint<>( graph, semantic ), true );
@@ -201,29 +230,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	private UnsupportedOperationException resultStreamingNotImplemented() {
 		// TODO HSEARCH-3323 result streaming
 		return new UnsupportedOperationException( "Not implemented yet" );
-	}
-
-	@Override
-	@SuppressWarnings("deprecation")
-	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		switch ( hintName ) {
-			case QueryHints.SPEC_HINT_TIMEOUT:
-				delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
-				break;
-			case QueryHints.HINT_TIMEOUT:
-				setTimeout( hintValueToInteger( value ) );
-				break;
-			case "javax.persistence.fetchgraph":
-				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.FETCH );
-				break;
-			case "javax.persistence.loadgraph":
-				applyGraph( hintValueToEntityGraph( value ), GraphSemantic.LOAD );
-				break;
-			default:
-				handleUnrecognizedHint( hintName, value );
-				break;
-		}
-		return this;
 	}
 
 	@Override
@@ -375,12 +381,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setLockMode(String alias, LockMode lockMode) {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
-	}
-
-	@Override
-	public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
-		delegate.failAfter( timeout, TimeUnit.SECONDS );
-		return this;
 	}
 
 	@Deprecated
