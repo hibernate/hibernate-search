@@ -139,7 +139,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 		@OneToOne
 		private IndexedEntity parent;
 
-		@IndexedEmbedded(maxDepth = 1)
+		@IndexedEmbedded(includeDepth = 1)
 		@OneToOne(mappedBy = "parent")
 		private IndexedEntity child;
 

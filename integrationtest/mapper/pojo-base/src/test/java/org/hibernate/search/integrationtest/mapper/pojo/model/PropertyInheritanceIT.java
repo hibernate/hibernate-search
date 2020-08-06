@@ -100,7 +100,7 @@ public class PropertyInheritanceIT {
 			this.parentDeclaredProperty = parentDeclaredProperty;
 		}
 
-		@IndexedEmbedded(maxDepth = 1)
+		@IndexedEmbedded(includeDepth = 1)
 		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue( propertyName = "embedding")))
 		public abstract ParentIndexedEntity getEmbedded();
 	}

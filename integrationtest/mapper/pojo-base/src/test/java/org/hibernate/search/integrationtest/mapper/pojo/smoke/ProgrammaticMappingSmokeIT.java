@@ -150,7 +150,7 @@ public class ProgrammaticMappingSmokeIT {
 							.genericField( "myTextField" );
 					indexedEntityMapping.property( "embedded" )
 							.indexedEmbedded( "myEmbedded" )
-									.maxDepth( 1 )
+									.includeDepth( 1 )
 									.includePaths( "customBridgeOnClass.text", "myEmbedded.customBridgeOnClass.text" );
 
 					ProgrammaticMappingConfigurationContext secondMappingDefinition = builder.programmaticMapping();

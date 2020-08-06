@@ -47,7 +47,7 @@ import org.junit.Test;
  * Test common use cases of the {@code @IndexedEmbedded} annotation.
  * <p>
  * Does not test all the corner cases of filtering when using {@link IndexedEmbedded#includePaths()} and
- * {@link IndexedEmbedded#maxDepth()}, which are tested in a unit test in the engine module
+ * {@link IndexedEmbedded#includeDepth()}, which are tested in a unit test in the engine module
  * (the test is named {@code ConfiguredIndexSchemaNestingContextTest} at the time of this writing).
  * <p>
  * Does not test uses of container value extractors (for now). Some of them are tested in
@@ -701,11 +701,77 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	/**
-	 * Check that the "maxDepth" parameter is at least taken into account.
+	 * Check that the "includeDepth" parameter is at least taken into account.
 	 * <p>
 	 * Details of how filtering handles all corner cases is tested in the engine (see this class' javadoc).
 	 */
 	@Test
+	public void includeDepth() {
+		class IndexedEmbeddedLevel2 {
+			String level2Property;
+			@GenericField
+			public String getLevel2Property() {
+				return level2Property;
+			}
+		}
+		class IndexedEmbeddedLevel1 {
+			String level1Property;
+			IndexedEmbeddedLevel2 level2;
+			@GenericField
+			public String getLevel1Property() {
+				return level1Property;
+			}
+			@IndexedEmbedded
+			public IndexedEmbeddedLevel2 getLevel2() {
+				return level2;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String level1Value, String level2Value) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.level1Property = level1Value;
+				this.level1.level2 = new IndexedEmbeddedLevel2();
+				this.level1.level2.level2Property = level2Value;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(includeDepth = 1)
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.field( "level1Property", String.class )
+				)
+		);
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Value", "level2Value" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "level1Property", "level1Value" )
+				)
+		);
+	}
+
+	/**
+	 * Check that the "maxDepth" parameter is at least taken into account.
+	 */
+	@Test
+	@SuppressWarnings("deprecation")
 	public void maxDepth() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
@@ -999,7 +1065,7 @@ public class IndexedEmbeddedBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IndexedEmbedded(maxDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
+			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			public IndexedEmbeddedLevel1 getLevel1() {
 				return level1;
 			}
@@ -1070,7 +1136,7 @@ public class IndexedEmbeddedBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IndexedEmbedded(maxDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
+			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			public IndexedEmbeddedLevel1 getLevel1() {
 				return level1;
 			}

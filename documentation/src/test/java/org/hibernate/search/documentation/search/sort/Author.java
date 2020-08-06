@@ -41,7 +41,7 @@ public class Author {
 	private EmbeddableGeoPoint placeOfBirth;
 
 	@ManyToMany(mappedBy = "authors")
-	@IndexedEmbedded(maxDepth = 1, structure = ObjectStructure.NESTED)
+	@IndexedEmbedded(includeDepth = 1, structure = ObjectStructure.NESTED)
 	private List<Book> books = new ArrayList<>();
 
 	public Author() {

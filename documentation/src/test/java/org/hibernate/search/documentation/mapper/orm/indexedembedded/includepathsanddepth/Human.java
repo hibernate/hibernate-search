@@ -31,7 +31,7 @@ public class Human {
 	private String nickname;
 
 	@ManyToMany
-	@IndexedEmbedded(maxDepth = 2, includePaths = { "parents.parents.name" })
+	@IndexedEmbedded(includeDepth = 2, includePaths = { "parents.parents.name" })
 	private List<Human> parents = new ArrayList<>();
 
 	@ManyToMany(mappedBy = "parents")

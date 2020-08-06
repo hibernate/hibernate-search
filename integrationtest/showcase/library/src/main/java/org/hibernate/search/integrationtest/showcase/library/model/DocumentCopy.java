@@ -37,7 +37,7 @@ public abstract class DocumentCopy<D extends Document<?>> extends AbstractEntity
 	private D document;
 
 	@ManyToOne
-	@IndexedEmbedded(maxDepth = 1)
+	@IndexedEmbedded(includeDepth = 1)
 	private Library library;
 
 	@OneToMany(mappedBy = "copy")

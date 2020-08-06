@@ -20,33 +20,33 @@ public final class IndexedEmbeddedDefinition {
 	private final String relativePrefix;
 	private final ObjectStructure structure;
 	private final Set<String> includePaths;
-	private final Integer maxDepth;
+	private final Integer includeDepth;
 
 	/**
 	 * @param definingTypeModel The model representing the type on which the indexed-embedded was defined.
 	 * @param relativePrefix The prefix to apply to all index fields created in the context of the indexed-embedded.
 	 * @param structure The structure of all object fields created as part of the {@code relativePrefix}.
-	 * @param maxDepth The maximum depth beyond which all created fields will be ignored. {@code null} for no limit.
+	 * @param includeDepth The maximum depth beyond which all created fields will be ignored. {@code null} for no limit.
 	 * @param includePaths The exhaustive list of paths of fields that are to be included. {@code null} for no limit.
 	 */
 	public IndexedEmbeddedDefinition(MappableTypeModel definingTypeModel, String relativePrefix,
-			ObjectStructure structure, Integer maxDepth,
+			ObjectStructure structure, Integer includeDepth,
 			Set<String> includePaths) {
 		this.definingTypeModel = definingTypeModel;
 		this.relativePrefix = relativePrefix;
 		this.structure = structure;
 		this.includePaths = includePaths == null ? Collections.emptySet() : new LinkedHashSet<>( includePaths );
-		if ( maxDepth == null && !this.includePaths.isEmpty() ) {
+		if ( includeDepth == null && !this.includePaths.isEmpty() ) {
 			/*
 			 * If no max depth was provided and included paths were provided,
 			 * the remaining composition depth is implicitly set to 0,
 			 * meaning no composition is allowed and paths are excluded unless
 			 * explicitly listed in "includePaths".
 			 */
-			this.maxDepth = 0;
+			this.includeDepth = 0;
 		}
 		else {
-			this.maxDepth = maxDepth;
+			this.includeDepth = includeDepth;
 		}
 	}
 
@@ -61,13 +61,13 @@ public final class IndexedEmbeddedDefinition {
 		IndexedEmbeddedDefinition that = (IndexedEmbeddedDefinition) o;
 		return definingTypeModel.equals( that.definingTypeModel ) &&
 				relativePrefix.equals( that.relativePrefix ) &&
-				Objects.equals( maxDepth, that.maxDepth ) &&
+				Objects.equals( includeDepth, that.includeDepth ) &&
 				includePaths.equals( that.includePaths );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( definingTypeModel, relativePrefix, maxDepth, includePaths );
+		return Objects.hash( definingTypeModel, relativePrefix, includeDepth, includePaths );
 	}
 
 	public MappableTypeModel definingTypeModel() {
@@ -86,8 +86,8 @@ public final class IndexedEmbeddedDefinition {
 		return includePaths;
 	}
 
-	public Integer maxDepth() {
-		return maxDepth;
+	public Integer includeDepth() {
+		return includeDepth;
 	}
 
 }

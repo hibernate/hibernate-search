@@ -122,7 +122,7 @@ public class PropertyInheritanceIT {
 		}
 
 		@ManyToOne
-		@IndexedEmbedded(maxDepth = 1)
+		@IndexedEmbedded(includeDepth = 1)
 		public abstract ParentIndexedEntity getEmbedded();
 
 		// Not declaring the setter will make Hibernate Annotation Commons ignore the property, so we need this.

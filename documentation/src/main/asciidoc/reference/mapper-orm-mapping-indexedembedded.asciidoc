@@ -274,24 +274,24 @@ Provided paths must be relative to the indexed-embedded element,
 i.e. they must not include its <<mapper-orm-indexedembedded-name,name>>
 or <<mapper-orm-indexedembedded-prefix,prefix>>.
 +
-This takes precedence over `maxDepth` (see below).
-`maxDepth`::
-The max recursion depth for indexed-embedded processing.
+This takes precedence over `includeDepth` (see below).
+`includeDepth`::
+The number of levels of indexed-embedded that will have all their fields included by default.
 +
-`maxDepth` is the number of `@IndexedEmbedded` that will be traversed
+`includeDepth` is the number of `@IndexedEmbedded` that will be traversed
 and for which all fields of the indexed-embedded element will be included,
 even if these fields are not included explicitly through `includePaths`:
 +
- * `maxDepth=0` means fields of the indexed-embedded element are *not* included,
+ * `includeDepth=0` means fields of the indexed-embedded element are *not* included,
 nor is any field of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
- * `maxDepth=1` means fields of the indexed-embedded element *are* included,
+ * `includeDepth=1` means fields of the indexed-embedded element *are* included,
 but *not* fields of nested indexed-embedded elements,
 unless these fields are included explicitly through `includePaths`.
  * And so on.
 +
 The default value depends on the value of the `includePaths` attribute:
-if `includePaths` is empty, the default is `Integer.MAX_VALUE` (no limit)
+if `includePaths` is empty, the default is `Integer.MAX_VALUE` (include all fields at every level)
 if `includePaths` is *not* empty, the default is `0`
 (only include fields included explicitly).
 
@@ -301,13 +301,13 @@ if `includePaths` is *not* empty, the default is `0`
 <<mapper-orm-bridge-index-field-dsl-dynamic,Dynamic fields>> are not directly affected by filtering rules:
 a dynamic field will be included if and only if its parent is included.
 
-This means in particular that `maxDepth` and `includePaths`
+This means in particular that `includeDepth` and `includePaths`
 constraints only need to match the nearest static parent of a dynamic field
 in order for that field to be included.
 ====
 
 Below are two examples: one leveraging `includePaths` only,
-and one leveraging `includePaths` and `maxDepth`.
+and one leveraging `includePaths` and `includeDepth`.
 
 [[indexedembedded-includePath]]
 .Filtering indexed-embedded fields with `includePaths`
@@ -322,9 +322,9 @@ This mapping will declare the following fields in the `Human` index:
 
 The following fields in particular are excluded:
 
-* `parents.parents.nickname`: *not* implicitly included because `maxDepth` is not set and defaults to `0`,
+* `parents.parents.nickname`: *not* implicitly included because `includeDepth` is not set and defaults to `0`,
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.nickname`.
-* `parents.parents.parents.name`: *not* implicitly included because `maxDepth` is not set and defaults to `0`,
+* `parents.parents.parents.name`: *not* implicitly included because `includeDepth` is not set and defaults to `0`,
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.name`.
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -334,31 +334,31 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexedembedd
 ====
 
 [[indexedembedded-includePathsAndDepth]]
-.Filtering indexed-embedded fields with `includePaths` and `maxDepth`
+.Filtering indexed-embedded fields with `includePaths` and `includeDepth`
 ====
 This mapping will declare the following fields in the `Human` index:
 
 * `name`
 * `surname`
-* `parents.name`: implicitly at depth `0` because `maxDepth > 0`
+* `parents.name`: implicitly at depth `0` because `includeDepth > 0`
 (so `parents.*` is included implicitly).
-* `parents.nickname`: implicitly included at depth `0` because `maxDepth > 0`
+* `parents.nickname`: implicitly included at depth `0` because `includeDepth > 0`
 (so `parents.*` is included implicitly).
-* `parents.parents.name`: implicitly included at depth `1` because `maxDepth > 1`
+* `parents.parents.name`: implicitly included at depth `1` because `includeDepth > 1`
 (so `parents.parents.*` is included implicitly).
-* `parents.parents.nickname`: implicitly included at depth `1` because `maxDepth > 1`
+* `parents.parents.nickname`: implicitly included at depth `1` because `includeDepth > 1`
 (so `parents.parents.*` is included implicitly).
-* `parents.parents.parents.name`: *not* implicitly included at depth `2` because `maxDepth = 2`
+* `parents.parents.parents.name`: *not* implicitly included at depth `2` because `includeDepth = 2`
 (so `parents.parents.parents` is included implicitly,
 but sub-fields can only be included explicitly)
 but explicitly included because `includePaths` on `parents` includes `parents.parents.name`.
 
 The following fields in particular are excluded:
 
-* `parents.parents.parents.nickname`: *not* implicitly included at depth `2` because `maxDepth = 2`
+* `parents.parents.parents.nickname`: *not* implicitly included at depth `2` because `includeDepth = 2`
 (so `parents.parents.parents` is included implicitly, but sub-fields must be included explicitly)
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.nickname`.
-* `parents.parents.parents.parents.name`: *not* implicitly included at depth `3` because `maxDepth = 2`
+* `parents.parents.parents.parents.name`: *not* implicitly included at depth `3` because `includeDepth = 2`
 (so `parents.parents.parents` is included implicitly,
 but `parents.parents.parents.parents` and sub-fields can only be included explicitly)
 and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.parents.name`.

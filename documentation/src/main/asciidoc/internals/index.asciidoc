@@ -332,7 +332,7 @@ Ultimately, the created indexing process tree will follow approximately the same
 The indexing processor tree may be a bit different from the builder tree, due to optimizations.
 In particular, some nodes may be trimmed down if we detect that the node will not contribute anything to documents at runtime,
 which may happen for some property nodes when using `@IndexedEmbedded` with path filtering (`includePaths`)
-or depth filtering (`maxDepth`).
+or depth filtering (`includeDepth`).
 
 This is the case in our example for the "embedded" node near the bottom.
 The builder node was created when applying and interpreting metadata,

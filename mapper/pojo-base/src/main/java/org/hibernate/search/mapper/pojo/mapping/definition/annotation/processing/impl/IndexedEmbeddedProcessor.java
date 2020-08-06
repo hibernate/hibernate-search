@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProcessor<IndexedEmbedded> {
 
 	@Override
-	@SuppressWarnings("deprecation") // For ObjectFieldStorage
+	@SuppressWarnings("deprecation") // For IndexedEmbedded.maxDepth, IndexedEmbedded.storage, ObjectFieldStorage
 	public void process(PropertyMappingStep mappingContext, IndexedEmbedded annotation,
 			PropertyMappingAnnotationProcessorContext context) {
 		String cleanedUpPrefix = annotation.prefix();
@@ -33,9 +33,16 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 			cleanedUpName = null;
 		}
 
-		Integer cleanedUpMaxDepth = annotation.maxDepth();
-		if ( cleanedUpMaxDepth.equals( -1 ) ) {
-			cleanedUpMaxDepth = null;
+		Integer cleanedUpIncludeDepth = annotation.includeDepth();
+		if ( cleanedUpIncludeDepth.equals( -1 ) ) {
+			int maxDepth = annotation.maxDepth();
+			// Support for the deprecated @IndexedEmbedded.maxDepth
+			if ( maxDepth != -1 ) {
+				cleanedUpIncludeDepth = maxDepth;
+			}
+			else {
+				cleanedUpIncludeDepth = null;
+			}
 		}
 
 		String[] includePathsArray = annotation.includePaths();
@@ -74,7 +81,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 				.extractors( extractorPath )
 				.prefix( cleanedUpPrefix )
 				.structure( structure )
-				.maxDepth( cleanedUpMaxDepth )
+				.includeDepth( cleanedUpIncludeDepth )
 				.includePaths( cleanedUpIncludePaths )
 				.targetType( cleanedUpTargetType );
 	}
