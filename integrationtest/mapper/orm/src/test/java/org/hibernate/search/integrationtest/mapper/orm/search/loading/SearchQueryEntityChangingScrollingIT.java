@@ -25,7 +25,7 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.sing
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
@@ -74,9 +74,10 @@ public class SearchQueryEntityChangingScrollingIT {
 			backendMock.expectScrollObjects( targetIndexes, 3, b -> {
 			} );
 			for ( int base = 0; base < 12; base += 3 ) {
-				backendMock.expectNextScroll( targetIndexes, StubSearchWorkBehavior.of( 3, documentReferences( base, base + 1, base + 2 ) ) );
+				backendMock.expectNextScroll( targetIndexes,
+						StubNextScrollWorkBehavior.of( documentReferences( base, base + 1, base + 2 ) ) );
 			}
-			backendMock.expectNextScroll( targetIndexes, StubSearchWorkBehavior.of( 0, documentReferences() ) );
+			backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior.afterLast() );
 			backendMock.expectCloseScroll( targetIndexes );
 
 			int index = 0;

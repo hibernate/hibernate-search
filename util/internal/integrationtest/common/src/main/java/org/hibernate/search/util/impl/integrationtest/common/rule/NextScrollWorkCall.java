@@ -24,7 +24,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
-	private final StubSearchWorkBehavior<?> behavior;
+	private final StubNextScrollWorkBehavior<?> behavior;
 
 	NextScrollWorkCall(Set<String> indexNames,
 			StubSearchProjectionContext projectionContext,
@@ -38,7 +38,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	}
 
 	NextScrollWorkCall(Set<String> indexNames,
-			StubSearchWorkBehavior<?> behavior) {
+			StubNextScrollWorkBehavior<?> behavior) {
 		this.indexNames = indexNames;
 		this.projectionContext = null;
 		this.loadingContext = null;
@@ -51,7 +51,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 				.as( "NextScroll work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
 
-		return () -> new SimpleSearchScrollResult<>( behavior.getTotalHitCount() > 0, SearchWorkCall.getResults(
+		return () -> new SimpleSearchScrollResult<>( behavior.hasHits(), SearchWorkCall.getResults(
 				actualCall.projectionContext,
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
