@@ -29,11 +29,11 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	PropertyMappingIndexedEmbeddedStep prefix(String prefix);
 
 	/**
-	 * @param depth The max recursion depth for indexed-embedded processing.
+	 * @param depth The number of levels of indexed-embedded that will have all their fields included by default.
 	 * @return {@code this}, for method chaining.
-	 * @see IndexedEmbedded#maxDepth()
+	 * @see IndexedEmbedded#includeDepth()
 	 */
-	PropertyMappingIndexedEmbeddedStep maxDepth(Integer depth);
+	PropertyMappingIndexedEmbeddedStep includeDepth(Integer depth);
 
 	/**
 	 * @param paths The paths of index fields to include explicitly.

@@ -31,7 +31,7 @@ public class IndexedEmbeddedDepthIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1467")
-	public void maxDepth_differentDepths() {
+	public void includeDepth_differentDepths() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
 			@GenericField
@@ -67,11 +67,11 @@ public class IndexedEmbeddedDepthIT {
 			public Integer getId() {
 				return id;
 			}
-			@IndexedEmbedded(maxDepth = 1)
+			@IndexedEmbedded(includeDepth = 1)
 			public IndexedEmbeddedLevel1 getLevel1Depth1() {
 				return level1Depth1;
 			}
-			@IndexedEmbedded(maxDepth = 2)
+			@IndexedEmbedded(includeDepth = 2)
 			public IndexedEmbeddedLevel1 getLevel1Depth2() {
 				return level1Depth2;
 			}

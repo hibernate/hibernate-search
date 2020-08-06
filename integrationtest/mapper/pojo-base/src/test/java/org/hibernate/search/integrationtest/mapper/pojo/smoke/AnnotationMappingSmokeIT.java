@@ -564,7 +564,7 @@ public class AnnotationMappingSmokeIT {
 		}
 
 		@Override
-		@IndexedEmbedded(name = "myEmbedded", maxDepth = 1,
+		@IndexedEmbedded(name = "myEmbedded", includeDepth = 1,
 				includePaths = { "customBridgeOnClass.text", "myEmbedded.customBridgeOnClass.text" })
 		public IndexedEntity getEmbedded() {
 			return super.getEmbedded();

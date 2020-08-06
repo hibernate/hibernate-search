@@ -37,7 +37,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private ObjectStructure structure = ObjectStructure.DEFAULT;
 
-	private Integer maxDepth;
+	private Integer includeDepth;
 
 	private final Set<String> includePaths = new HashSet<>();
 
@@ -70,7 +70,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			actualPrefix = prefix;
 		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, actualPrefix, structure, maxDepth, includePaths, targetType
+				definingTypeModel, actualPrefix, structure, includeDepth, includePaths, targetType
 		);
 	}
 
@@ -91,8 +91,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	}
 
 	@Override
-	public PropertyMappingIndexedEmbeddedStep maxDepth(Integer depth) {
-		this.maxDepth = depth;
+	public PropertyMappingIndexedEmbeddedStep includeDepth(Integer depth) {
+		this.includeDepth = depth;
 		return this;
 	}
 

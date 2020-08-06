@@ -125,7 +125,7 @@ class IndexSchemaFilter {
 		boolean includedByParent = true;
 		/*
 		 * The parent can filter out paths that are considered as included by a child,
-		 * by reducing the maxDepth in particular,
+		 * by reducing the includeDepth in particular,
 		 * but it cannot include paths that are filtered out by a child.
 		 */
 		if ( parent != null ) {
@@ -177,8 +177,8 @@ class IndexSchemaFilter {
 		 * They may be excluded by the given filter (which is either this or a descendant),
 		 * but they may also be included.
 		 * This can happen for example
-		 * if @IndexedEmbedded(maxDepth = 0, includePaths = "embedded.foo")
-		 * embeds @IndexedEmbedded(maxDepth = 42):
+		 * if @IndexedEmbedded(includeDepth = 0, includePaths = "embedded.foo")
+		 * embeds @IndexedEmbedded(includeDepth = 42):
 		 * the paths explicitly included by the parent will be included
 		 * even though they are not explicitly included by the child
 		 */
@@ -223,8 +223,8 @@ class IndexSchemaFilter {
 			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, definition.definingTypeModel() );
 		}
 
-		// The new depth filter according to the new max depth
-		DepthFilter newDepthFilter = DepthFilter.of( definition.maxDepth() );
+		// The new depth filter according to the given includeDepth
+		DepthFilter newDepthFilter = DepthFilter.of( definition.includeDepth() );
 
 		// The new path filter according to the given includedPaths
 		PathFilter newPathFilter = PathFilter.of( definition.includePaths() );

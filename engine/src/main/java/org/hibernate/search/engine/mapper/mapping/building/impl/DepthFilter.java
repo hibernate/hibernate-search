@@ -14,29 +14,29 @@ class DepthFilter {
 		return UNCONSTRAINED;
 	}
 
-	static DepthFilter of(Integer maxDepth) {
-		return new DepthFilter( maxDepth );
+	static DepthFilter of(Integer includeDepth) {
+		return new DepthFilter( includeDepth );
 	}
 
-	private final Integer maxDepth;
+	private final Integer includeDepth;
 
-	private DepthFilter(Integer maxDepth) {
-		this.maxDepth = maxDepth;
+	private DepthFilter(Integer includeDepth) {
+		this.includeDepth = includeDepth;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "["
-				+ "maxDepth=" + maxDepth
+				+ "includeDepth=" + includeDepth
 				+ "]";
 	}
 
 	boolean isEveryPathIncludedAtDepth(int relativeDepth) {
-		return maxDepth == null || maxDepth > relativeDepth;
+		return includeDepth == null || includeDepth > relativeDepth;
 	}
 
 	boolean hasDepthLimit() {
-		return maxDepth != null;
+		return includeDepth != null;
 	}
 
 }

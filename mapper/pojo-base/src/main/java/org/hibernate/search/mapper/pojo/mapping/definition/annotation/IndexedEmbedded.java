@@ -121,9 +121,9 @@ public @interface IndexedEmbedded {
 	/**
 	 * The paths of index fields from the indexed-embedded element that should be embedded.
 	 * <p>
-	 * This takes precedence over {@link #maxDepth()}.
+	 * This takes precedence over {@link #includeDepth()}.
 	 * <p>
-	 * By default, if neither {@code includePaths} nor {@link #maxDepth()} is defined,
+	 * By default, if neither {@code includePaths} nor {@link #includeDepth()} is defined,
 	 * all index fields are included.
 	 *
 	 * @return The paths of index fields to include explicitly.
@@ -133,27 +133,35 @@ public @interface IndexedEmbedded {
 	String[] includePaths() default {};
 
 	/**
-	 * The max recursion depth for indexed-embedded processing.
+	 * The number of levels of indexed-embedded that will have all their fields included by default.
 	 * <p>
-	 * {@code maxDepth} is the number of `@IndexedEmbedded` that will be traversed
+	 * {@code includeDepth} is the number of `@IndexedEmbedded` that will be traversed
 	 * and for which all fields of the indexed-embedded element will be included,
 	 * even if these fields are not included explicitly through {@code includePaths}:
 	 * <ul>
-	 * <li>{@code maxDepth=0} means fields of the indexed-embedded element are <strong>not</strong> included,
+	 * <li>{@code includeDepth=0} means fields of the indexed-embedded element are <strong>not</strong> included,
 	 * nor is any field of nested indexed-embedded elements,
 	 * unless these fields are included explicitly through {@link #includePaths()}.
-	 * <li>{@code maxDepth=1} means fields of the indexed-embedded element <strong>are</strong> included,
+	 * <li>{@code includeDepth=1} means fields of the indexed-embedded element <strong>are</strong> included,
 	 * but <strong>not</strong> fields of nested indexed-embedded elements,
 	 * unless these fields are included explicitly through {@link #includePaths()}.
 	 * <li>And so on.
 	 * </ul>
 	 * The default value depends on the value of the {@link #includePaths()} attribute:
-	 * if {@link #includePaths()} is empty, the default is {@code Integer.MAX_VALUE} (no limit)
+	 * if {@link #includePaths()} is empty, the default is {@code Integer.MAX_VALUE} (include all fields at every level)
 	 * if {@link #includePaths()} is <strong>not</strong> empty, the default is {@code 0}
 	 * (only include fields included explicitly).
 	 *
-	 * @return The max depth size.
+	 * @return The number of levels of indexed-embedded that will have all their fields included by default.
 	 */
+	int includeDepth() default -1;
+
+	/**
+	 * @return The number of levels of indexed-embedded that will have all their fields included by default.
+	 * @see #includeDepth()
+	 * @deprecated Use {@link #includeDepth()} instead.
+	 */
+	@Deprecated
 	int maxDepth() default -1;
 
 	/**
@@ -170,7 +178,6 @@ public @interface IndexedEmbedded {
 	 * @deprecated Use {@link #structure()} instead.
 	 */
 	@Deprecated
-	@SuppressWarnings("deprecation")
 	org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage storage()
 			default org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.DEFAULT;
 
