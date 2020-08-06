@@ -46,6 +46,11 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 		this.behavior = behavior;
 	}
 
+	@Override
+	public String toString() {
+		return "scroll.next() work execution on indexes '" + indexNames + "'";
+	}
+
 	public <U> CallBehavior<SearchScrollResult<U>> verify(NextScrollWorkCall<U> actualCall) {
 		assertThat( actualCall.indexNames )
 				.as( "NextScroll work did not target the expected indexes: " )
