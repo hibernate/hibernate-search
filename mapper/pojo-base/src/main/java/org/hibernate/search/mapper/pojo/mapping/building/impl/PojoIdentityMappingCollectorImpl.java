@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ProvidedIdentifierMapping;
@@ -94,9 +93,9 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	@Override
 	// In practice T and E are always the same, because the routing key bridge can only be applied at the root.
 	// Leaving this case temporarily, but we'll remove it along with RoutingKeyBridge.
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "deprecation"})
 	public <T> void routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			RoutingKeyBinder binder) {
+			org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
 		if ( routingBridge != null ) {
 			throw log.conflictingRoutingBridgeAndRoutingKeyBinder( routingBridge.getBridgeHolder().get(), binder );
 		}

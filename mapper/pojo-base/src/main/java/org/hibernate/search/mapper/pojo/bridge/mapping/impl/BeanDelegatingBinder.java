@@ -13,14 +13,12 @@ import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 
@@ -28,8 +26,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
  * A binder that upon building retrieves a delegate binder from the bean provider,
  * then delegates to that binder.
  */
+@SuppressWarnings("deprecation")
 public final class BeanDelegatingBinder
-		implements TypeBinder, PropertyBinder, RoutingBinder, RoutingKeyBinder,
+		implements TypeBinder, PropertyBinder, RoutingBinder,
+				org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder,
 				MarkerBinder, IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> delegateReference;
@@ -68,9 +68,9 @@ public final class BeanDelegatingBinder
 	}
 
 	@Override
-	public void bind(RoutingKeyBindingContext context) {
-		try ( BeanHolder<? extends RoutingKeyBinder> delegateHolder =
-				createDelegate( context.beanResolver(), RoutingKeyBinder.class ) ) {
+	public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
+		try ( BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder> delegateHolder =
+				createDelegate( context.beanResolver(), org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}

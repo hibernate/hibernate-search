@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -78,6 +77,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void conflictingRoutingBridgeAndRoutingKeyBinder() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -720,7 +720,8 @@ public class RoutingBridgeBaseIT {
 		}
 	}
 
-	private static class UnusedRoutingKeyBinder implements RoutingKeyBinder {
+	@SuppressWarnings("deprecation")
+	private static class UnusedRoutingKeyBinder implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
 		public static final String TOSTRING = "UnusedRoutingKeyBinder";
 
 		@Override

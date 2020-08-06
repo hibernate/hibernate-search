@@ -15,13 +15,11 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -58,8 +56,10 @@ public interface PojoIndexModelBinder {
 			IndexedEntityBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder);
 
-	<T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder);
+	@SuppressWarnings("deprecation")
+	<T> org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge<T> bindRoutingKey(
+			IndexedEntityBindingContext bindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath, org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder);
 
 	<T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder);

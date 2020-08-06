@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
-
 /**
  * A bridge from a POJO entity to a document routing key.
+ *
+ * @deprecated Implement {@link RoutingBridge} instead.
+ * See the reference documentation for how to implement it and use it.
  */
+@Deprecated
 public interface RoutingKeyBridge extends AutoCloseable {
 
 	/**
@@ -21,9 +20,9 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * as input and transforming them as necessary.
 	 * <p>
 	 * <strong>Warning:</strong> Reading from {@code bridgedElement} should be done with care.
-	 * Any read that was not declared during {@link RoutingKeyBinder#bind(RoutingKeyBindingContext) binding}
-	 * (by declaring dependencies using {@link RoutingKeyBindingContext#dependencies()}
-	 * or (advanced use) creating an accessor using {@link RoutingKeyBindingContext#bridgedElement()})
+	 * Any read that was not declared during {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder#bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext) binding}
+	 * (by declaring dependencies using {@link org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext#dependencies()}
+	 * or (advanced use) creating an accessor using {@link org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext#bridgedElement()})
 	 * may lead to out-of-sync indexes,
 	 * because Hibernate Search will consider the read property irrelevant to indexing
 	 * and will not reindex entities when that property changes.
@@ -33,12 +32,12 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * i.e. the same value that was passed to {@link IdentifierBridge#toDocumentIdentifier(Object, org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext)}.
 	 * @param bridgedElement The element this bridge is applied to, from which data should be read.
 	 * @param context A context that can be
-	 * {@link RoutingKeyBridgeToRoutingKeyContext#extension(RoutingKeyBridgeToRoutingKeyContextExtension) extended}
+	 * {@link org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext#extension(org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The resulting routing key. Never null.
 	 */
 	String toRoutingKey(String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
-			RoutingKeyBridgeToRoutingKeyContext context);
+			org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext context);
 
 	/**
 	 * Close any resource before the bridge is discarded.

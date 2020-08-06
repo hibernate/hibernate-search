@@ -11,16 +11,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
-
 /**
- * References a {@link RoutingKeyBinder}.
+ * References a {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder}.
  * <p>
  * References can use either a name, a type, or both.
+ *
+ * @deprecated Only useful in {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding},
+ * which is deprecated.
  */
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface RoutingKeyBinderRef {
 
 	/**
@@ -33,12 +35,12 @@ public @interface RoutingKeyBinderRef {
 	 * Reference a routing key binder by its bean type.
 	 * @return The type of the routing key binder.
 	 */
-	Class<? extends RoutingKeyBinder> type() default UndefinedBinderImplementationType.class;
+	Class<? extends org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder> type() default UndefinedBinderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedBinderImplementationType implements RoutingKeyBinder {
+	abstract class UndefinedBinderImplementationType implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
 		private UndefinedBinderImplementationType() {
 		}
 	}

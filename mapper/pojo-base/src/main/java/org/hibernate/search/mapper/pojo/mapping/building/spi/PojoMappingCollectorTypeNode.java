@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
 public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
 	void typeBinder(TypeBinder builder);
 
-	void routingKeyBinder(RoutingKeyBinder reference);
+	@Deprecated
+	void routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder reference);
 
 	PojoMappingCollectorPropertyNode property(String propertyName);
 

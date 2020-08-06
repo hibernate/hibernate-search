@@ -6,18 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 
 
-
+@SuppressWarnings("deprecation")
 class RoutingKeyBridgeMappingContributor implements PojoTypeMetadataContributor {
 
-	private final RoutingKeyBinder routingKeyBinder;
+	private final org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder routingKeyBinder;
 
-	RoutingKeyBridgeMappingContributor(RoutingKeyBinder routingKeyBinder) {
+	RoutingKeyBridgeMappingContributor(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder routingKeyBinder) {
 		this.routingKeyBinder = routingKeyBinder;
 	}
 

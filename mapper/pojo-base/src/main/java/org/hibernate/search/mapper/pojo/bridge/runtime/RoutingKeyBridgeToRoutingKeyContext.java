@@ -11,7 +11,11 @@ import org.hibernate.search.util.common.SearchException;
 /**
  * The context passed to
  * {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge#toRoutingKey(String, Object, Object, RoutingKeyBridgeToRoutingKeyContext)}.
+ *
+ * @deprecated This is only useful in {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge},
+ * which is deprecated.
  */
+@Deprecated
 public interface RoutingKeyBridgeToRoutingKeyContext {
 
 	/**

@@ -11,12 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -27,9 +23,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test common use cases of the {@link RoutingKeyBinding} annotation.
+ * Test common use cases of the {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding} annotation.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"})
 @TestForIssue(jiraKey = "HSEARCH-3135")
 public class RoutingKeyBindingBaseIT {
 
@@ -56,7 +52,8 @@ public class RoutingKeyBindingBaseIT {
 	}
 
 	@Indexed(index = INDEX_NAME)
-	@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = WorkingRoutingKeyBinder.class))
+	@org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding(
+			binder = @org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef(type = WorkingRoutingKeyBinder.class))
 	private static class IndexedEntityWithWorkingRoutingKeyBinding {
 		Integer id;
 		@DocumentId
@@ -65,12 +62,12 @@ public class RoutingKeyBindingBaseIT {
 		}
 	}
 
-	public static class WorkingRoutingKeyBinder implements RoutingKeyBinder {
+	public static class WorkingRoutingKeyBinder implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
 		@Override
 		public void bind(RoutingKeyBindingContext context) {
 			context.dependencies().useRootOnly();
 			context.bridge( (String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
-						RoutingKeyBridgeToRoutingKeyContext context1) -> {
+					org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext context1) -> {
 				throw new UnsupportedOperationException( "Should not be called " );
 			} );
 		}
@@ -79,7 +76,8 @@ public class RoutingKeyBindingBaseIT {
 	@Test
 	public void missingBinderReference() {
 		@Indexed
-		@RoutingKeyBinding(binder = @RoutingKeyBinderRef)
+		@org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding(
+				binder = @org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef)
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -93,7 +91,7 @@ public class RoutingKeyBindingBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.annotationContextAnyParameters( RoutingKeyBinding.class )
+						.annotationContextAnyParameters( org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding.class )
 						.failure( "The binder reference is empty." )
 						.build()
 				);
