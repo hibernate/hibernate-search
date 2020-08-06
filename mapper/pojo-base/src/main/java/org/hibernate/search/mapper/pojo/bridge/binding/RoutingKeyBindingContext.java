@@ -7,15 +7,17 @@
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context provided to the {@link RoutingKeyBinder#bind(RoutingKeyBindingContext)} method.
+ * The context provided to the {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder#bind(RoutingKeyBindingContext)} method.
+ *
+ * @deprecated This is only useful in {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder},
+ * which is deprecated.
  */
+@Deprecated
 public interface RoutingKeyBindingContext extends BindingContext {
 
 	/**
@@ -25,16 +27,16 @@ public interface RoutingKeyBindingContext extends BindingContext {
 	 */
 	// FIXME also require the caller to pass the expected raw type here, and validate it.
 	//  We'll need to add generic type parameters to TypeBridge, however.
-	void bridge(RoutingKeyBridge bridge);
+	void bridge(org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge bridge);
 
 	/**
 	 * Sets the bridge implementing the type/routing key binding.
 	 *
 	 * @param bridge The bridge to use at runtime to generate a routing key.
-	 * @deprecated Use {@link #bridge(RoutingKeyBridge)} instead.
+	 * @deprecated Use {@link #bridge(org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge)} instead.
 	 */
 	@Deprecated
-	default void setBridge(RoutingKeyBridge bridge) {
+	default void setBridge(org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge bridge) {
 		bridge( bridge );
 	}
 
@@ -47,7 +49,7 @@ public interface RoutingKeyBindingContext extends BindingContext {
 	 */
 	// FIXME also require the caller to pass the expected raw type here, and validate it.
 	//  We'll need to add generic type parameters to TypeBridge, however.
-	void bridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder);
+	void bridge(BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge> bridgeHolder);
 
 	/**
 	 * Sets the bridge implementing the type/routing key binding.
@@ -58,7 +60,7 @@ public interface RoutingKeyBindingContext extends BindingContext {
 	 * @deprecated Use {@link #bridge(BeanHolder)} instead.
 	 */
 	@Deprecated
-	default void setBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+	default void setBridge(BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge> bridgeHolder) {
 		bridge( bridgeHolder );
 	}
 

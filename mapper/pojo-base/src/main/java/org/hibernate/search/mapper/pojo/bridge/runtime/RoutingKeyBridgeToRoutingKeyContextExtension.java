@@ -23,7 +23,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
  * @param <T> The type of extended contexts.
  *
  * @see RoutingKeyBridgeToRoutingKeyContext#extension(RoutingKeyBridgeToRoutingKeyContextExtension)
+ * @deprecated This is only useful in {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge},
+ * which is deprecated.
  */
+@Deprecated
 public interface RoutingKeyBridgeToRoutingKeyContextExtension<T> {
 
 	/**

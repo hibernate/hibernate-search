@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -24,11 +23,14 @@ public interface TypeMappingStep {
 	TypeMappingIndexedStep indexed();
 
 	/**
-	 * @param binder A {@link RoutingKeyBinder} responsible for creating a bridge.
+	 * @param binder A {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
-	 * @see RoutingKeyBinder
+	 * @see org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder
+	 * @deprecated Apply a {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder}
+	 * with {@code indexed().routingBinder(...)} instead.
 	 */
-	TypeMappingStep routingKeyBinder(RoutingKeyBinder binder);
+	@Deprecated
+	TypeMappingStep routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder);
 
 	/**
 	 * @param binder A {@link TypeBinder} responsible for creating a bridge.

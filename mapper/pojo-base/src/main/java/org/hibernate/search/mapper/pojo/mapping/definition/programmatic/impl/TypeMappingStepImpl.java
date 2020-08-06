@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -56,7 +55,8 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public TypeMappingStep routingKeyBinder(RoutingKeyBinder binder) {
+	@Deprecated
+	public TypeMappingStep routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
 		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
 		return this;
 	}

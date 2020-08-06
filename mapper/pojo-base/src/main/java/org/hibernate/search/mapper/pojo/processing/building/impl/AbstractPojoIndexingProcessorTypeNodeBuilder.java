@@ -17,7 +17,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
@@ -63,7 +62,8 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	}
 
 	@Override
-	public void routingKeyBinder(RoutingKeyBinder builder) {
+	@Deprecated
+	public void routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder builder) {
 		if ( identityMappingCollector.isPresent() ) {
 			identityMappingCollector.get().routingKeyBridge( getModelPath(), builder );
 		}

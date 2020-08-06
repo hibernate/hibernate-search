@@ -24,8 +24,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContextExtension;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
@@ -44,11 +42,12 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
  *
  * @see #get()
  */
+@SuppressWarnings("deprecation")
 public final class HibernateOrmExtension
 		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
 				IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
 				RoutingBridgeRouteContextExtension<HibernateOrmSessionContext>,
-				RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
+				org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
 				TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
 				PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
 				ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
@@ -97,7 +96,8 @@ public final class HibernateOrmExtension
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<HibernateOrmSessionContext> extendOptional(RoutingKeyBridgeToRoutingKeyContext original,
+	public Optional<HibernateOrmSessionContext> extendOptional(
+			org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext original,
 			BridgeSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}

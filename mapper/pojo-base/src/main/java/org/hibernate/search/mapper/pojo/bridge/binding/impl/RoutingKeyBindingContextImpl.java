@@ -11,9 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
@@ -23,8 +20,9 @@ import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+@SuppressWarnings("deprecation")
 public class RoutingKeyBindingContextImpl<T> extends AbstractCompositeBindingContext
-		implements RoutingKeyBindingContext {
+		implements org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -45,12 +43,12 @@ public class RoutingKeyBindingContextImpl<T> extends AbstractCompositeBindingCon
 	}
 
 	@Override
-	public void bridge(RoutingKeyBridge bridge) {
+	public void bridge(org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge bridge) {
 		bridge( BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public void bridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+	public void bridge(BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge> bridgeHolder) {
 		this.partialBinding = new PartialBinding<>( bridgeHolder );
 	}
 
@@ -64,7 +62,7 @@ public class RoutingKeyBindingContextImpl<T> extends AbstractCompositeBindingCon
 		return dependencyContext;
 	}
 
-	public BoundRoutingKeyBridge<T> applyBinder(RoutingKeyBinder binder) {
+	public BoundRoutingKeyBridge<T> applyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
 		try {
 			// This call should set the partial binding
 			binder.bind( this );
@@ -90,9 +88,9 @@ public class RoutingKeyBindingContextImpl<T> extends AbstractCompositeBindingCon
 	}
 
 	private static class PartialBinding<T> {
-		private final BeanHolder<? extends RoutingKeyBridge> bridgeHolder;
+		private final BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge> bridgeHolder;
 
-		private PartialBinding(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+		private PartialBinding(BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge> bridgeHolder) {
 			this.bridgeHolder = bridgeHolder;
 		}
 

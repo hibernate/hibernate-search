@@ -13,21 +13,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.RoutingKeyBindingProcessor;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * Maps an indexed type to its routing keys using a {@link RoutingKeyBinder},
- * which will define a {@link RoutingKeyBridge}.
+ * Maps an indexed type to its routing keys using a {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder},
+ * which will define a {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
  * <p>
  * See the reference documentation for more information about bridges in general,
  * and routing key bridges in particular.
+ * @deprecated Apply a {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder}
+ * with {@link Indexed#routingBinder()} instead.
  */
+@Deprecated
 @Documented
 @Incubating
 @Target({ ElementType.TYPE })
@@ -38,9 +38,9 @@ public @interface RoutingKeyBinding {
 
 	/**
 	 * @return A reference to the binder to use.
-	 * @see RoutingKeyBinderRef
+	 * @see org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef
 	 */
-	RoutingKeyBinderRef binder();
+	org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef binder();
 
 	@Documented
 	@Target({ ElementType.TYPE })

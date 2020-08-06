@@ -7,17 +7,17 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyBridgeRoutingBridgeAdapter;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 
+@SuppressWarnings("deprecation")
 public final class BoundRoutingKeyBridge<T> extends BoundRoutingBridge<T> {
 	private final PojoModelTypeRootElement<T> pojoModelRootElement;
 	private final PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext;
 
-	BoundRoutingKeyBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder,
+	BoundRoutingKeyBridge(BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge> bridgeHolder,
 			PojoModelTypeRootElement<T> pojoModelRootElement,
 			PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext) {
 		super( BeanHolder.of( new RoutingKeyBridgeRoutingBridgeAdapter<>( bridgeHolder ) ),

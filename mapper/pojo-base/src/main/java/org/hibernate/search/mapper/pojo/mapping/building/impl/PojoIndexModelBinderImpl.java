@@ -15,7 +15,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.IdentifierBindingContextImpl;
@@ -26,7 +25,6 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBindingContextI
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
@@ -100,8 +98,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext indexedEntityBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder) {
+	@SuppressWarnings("deprecation")
+	public <T> org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge<T> bindRoutingKey(
+			IndexedEntityBindingContext indexedEntityBindingContext,
+			BoundPojoModelPathTypeNode<T> modelPath,
+			org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
