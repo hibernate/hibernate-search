@@ -77,7 +77,7 @@ public class CollectorSet {
 				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(), timeoutLeft );
 				// The timeout starts from the given baseline, not from when the collector is first used.
 				// This is important because some collectors are applied during a second search.
-				wrapped.setBaseline( timeoutManager.getTimeoutBaseline() );
+				wrapped.setBaseline( timeoutManager.timeoutBaseline() );
 				return wrapped;
 			}
 			return collector;

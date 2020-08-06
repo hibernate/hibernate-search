@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvi
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
 

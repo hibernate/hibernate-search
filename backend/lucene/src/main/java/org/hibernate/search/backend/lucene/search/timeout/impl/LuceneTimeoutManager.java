@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -72,4 +72,3 @@ public final class LuceneTimeoutManager extends TimeoutManager {
 		return checkTimeLeftInMilliseconds();
 	}
 }
-

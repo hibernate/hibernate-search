@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.timeout.impl;
 
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 
 import org.apache.lucene.util.Counter;
 

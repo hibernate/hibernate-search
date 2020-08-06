@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;

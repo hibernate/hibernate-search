@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.reporting.FailureHandler;

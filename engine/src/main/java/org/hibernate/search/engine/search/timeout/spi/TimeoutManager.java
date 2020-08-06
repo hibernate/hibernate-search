@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.timeout.spi;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class TimeoutManager {
 		this.start = null;
 	}
 
-	public long getTimeoutBaseline() {
+	public long timeoutBaseline() {
 		return start;
 	}
 
@@ -66,7 +66,7 @@ public class TimeoutManager {
 			return null;
 		}
 		else {
-			final long elapsedTime = getElapsedTimeInMilliseconds();
+			final long elapsedTime = elapsedTimeInMilliseconds();
 			long timeLeft = timeoutMs - elapsedTime;
 			if ( timeLeft <= 0 ) {
 				forceTimedOut();
@@ -106,15 +106,15 @@ public class TimeoutManager {
 		return this.type == Type.EXCEPTION;
 	}
 
-	public Duration getTookTime() {
-		return Duration.ofMillis( getElapsedTimeInMilliseconds() );
+	public Duration tookTime() {
+		return Duration.ofMillis( elapsedTimeInMilliseconds() );
 	}
 
 	protected void onTimedOut() {
 		throw log.timedOut( timeoutMs );
 	}
 
-	protected long getElapsedTimeInMilliseconds() {
+	protected long elapsedTimeInMilliseconds() {
 		return timingSource.monotonicTimeEstimate() - start;
 	}
 }

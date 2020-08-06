@@ -18,7 +18,7 @@ import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
-import org.hibernate.search.engine.common.timing.impl.TimingSource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;

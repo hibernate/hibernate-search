@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 
 /**
  * Default implementation for a {@link TimingSource}
