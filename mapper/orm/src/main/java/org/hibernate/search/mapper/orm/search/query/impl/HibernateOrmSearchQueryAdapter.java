@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -38,9 +39,11 @@ import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityGraphHint;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
@@ -49,6 +52,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	public static <R> HibernateOrmSearchQueryAdapter<R> create(SearchQuery<R> query) {
 		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
 	}
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchQueryImplementor<R> delegate;
 	private final MutableEntityLoadingOptions loadingOptions;
@@ -195,6 +200,21 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
+	public ScrollableResultsImplementor scroll() {
+		return scroll( ScrollMode.FORWARD_ONLY );
+	}
+
+	@Override
+	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
+		if ( !ScrollMode.FORWARD_ONLY.equals( scrollMode ) ) {
+			throw log.canOnlyUseScrollWithScrollModeForwardsOnly( scrollMode );
+		}
+
+		int chunkSize = loadingOptions.fetchSize();
+		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults() );
+	}
+
+	@Override
 	protected boolean isNativeQuery() {
 		return false;
 	}
@@ -214,22 +234,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	 */
 	@Override
 	public Iterator<R> iterate() {
-		throw resultStreamingNotImplemented();
-	}
-
-	@Override
-	public ScrollableResultsImplementor scroll() {
-		throw resultStreamingNotImplemented();
-	}
-
-	@Override
-	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
-		throw resultStreamingNotImplemented();
-	}
-
-	private UnsupportedOperationException resultStreamingNotImplemented() {
-		// TODO HSEARCH-3323 result streaming
-		return new UnsupportedOperationException( "Not implemented yet" );
+		throw new UnsupportedOperationException( "iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
 	}
 
 	@Override

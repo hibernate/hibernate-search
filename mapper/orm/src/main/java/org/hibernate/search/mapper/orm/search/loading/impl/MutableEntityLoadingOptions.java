@@ -21,7 +21,7 @@ public class MutableEntityLoadingOptions {
 		this.fetchSize = mappingContext.fetchSize();
 	}
 
-	int fetchSize() {
+	public int fetchSize() {
 		return fetchSize;
 	}
 
