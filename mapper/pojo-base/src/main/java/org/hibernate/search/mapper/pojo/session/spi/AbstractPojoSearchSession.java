@@ -47,11 +47,6 @@ public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionCon
 	}
 
 	@Override
-	public final RoutingKeyBridgeToRoutingKeyContext routingKeyBridgeToRoutingKeyContext() {
-		return sessionBasedBridgeOperationContext;
-	}
-
-	@Override
 	public final TypeBridgeWriteContext typeBridgeWriteContext() {
 		return sessionBasedBridgeOperationContext;
 	}

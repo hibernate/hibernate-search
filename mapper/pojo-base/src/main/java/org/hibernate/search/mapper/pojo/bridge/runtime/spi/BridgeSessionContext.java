@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.spi;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContextExtension;
@@ -30,8 +29,6 @@ public interface BridgeSessionContext {
 	IdentifierBridgeFromDocumentIdentifierContext identifierBridgeFromDocumentIdentifierContext();
 
 	RoutingBridgeRouteContext routingBridgeRouteContext();
-
-	RoutingKeyBridgeToRoutingKeyContext routingKeyBridgeToRoutingKeyContext();
 
 	TypeBridgeWriteContext typeBridgeWriteContext();
 
