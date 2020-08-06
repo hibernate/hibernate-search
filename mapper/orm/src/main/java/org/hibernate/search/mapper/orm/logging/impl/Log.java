@@ -15,6 +15,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.util.Collection;
 import java.util.List;
 
+import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -47,6 +48,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 31, max = 31),
 		@ValidIdRange(min = 34, max = 34),
 		@ValidIdRange(min = 36, max = 36),
+		@ValidIdRange(min = 39, max = 39),
 		@ValidIdRange(min = 62, max = 62),
 		@ValidIdRange(min = 65, max = 65),
 		@ValidIdRange(min = 116, max = 116),
@@ -88,6 +90,10 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 36, value = "Cannot guess the Transaction Status: not starting a JTA transaction")
 	void cannotGuessTransactionStatus(@Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_1 + 39, value = "Unable to properly close scroll in ScrollableResults")
+	void unableToCloseSearcherInScrollableResult(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
 	@Message(id = ID_OFFSET_1 + 62, value = "Mass indexing was interrupted")
@@ -277,4 +283,18 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 35, value = "Hibernate Search shutdown failed: %1$s")
 	void shutdownFailed(String causeMessage, @Cause Throwable cause);
 
+	@Message(id = ID_OFFSET_2 + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"
+			+ " only ScrollMode.FORWARDS_ONLY is supported.")
+	SearchException canOnlyUseScrollWithScrollModeForwardsOnly(ScrollMode scrollMode);
+
+	@Message(id = ID_OFFSET_2 + 37, value = "Cannot scroll backwards with Hibernate Search scrolls: they are forwards-only."
+			+ " Ensure you always increment the scroll position, and never decrement it.")
+	SearchException cannotScrollBackwards();
+
+	@Message(id = ID_OFFSET_2 + 38, value = "Cannot set the scroll position relative to the end with Hibernate Search scrolls."
+			+ " Ensure you always pass a positive number to setRowNumber().")
+	SearchException cannotSetScrollPositionRelativeToEnd();
+
+	@Message(id = ID_OFFSET_2 + 39, value = "Cannot use this ScrollableResults instance: it is closed.")
+	SearchException cannotUseClosedScrollableResults();
 }
