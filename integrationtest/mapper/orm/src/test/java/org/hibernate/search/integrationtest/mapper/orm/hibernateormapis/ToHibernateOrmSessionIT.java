@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinSession;
 
 import java.util.Arrays;
 import javax.persistence.Entity;
@@ -24,14 +26,11 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Test the compatibility layer between our APIs and Hibernate ORM APIs
@@ -62,7 +61,7 @@ public class ToHibernateOrmSessionIT {
 
 	@Test
 	public void toHibernateOrmSession() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			assertThat( searchSession.toOrmSession() ).isSameAs( session );
 		} );
@@ -81,7 +80,7 @@ public class ToHibernateOrmSessionIT {
 		}
 
 		Session closedSession = session;
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 			Search.session( closedSession );
 		} )
 				.isInstanceOf( SearchException.class )
@@ -98,9 +97,7 @@ public class ToHibernateOrmSessionIT {
 		createSimpleQuery( searchSession );
 		session.close();
 
-		Assertions.assertThatThrownBy( () -> {
-			createSimpleQuery( searchSession );
-		} )
+		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
@@ -112,16 +109,14 @@ public class ToHibernateOrmSessionIT {
 		SearchSession searchSession = Search.session( session );
 		session.close();
 
-		Assertions.assertThatThrownBy( () -> {
-			createSimpleQuery( searchSession );
-		} )
+		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1857" )
-	public void reuseSearchQueryAfterOrmSessionIsClosed_noMatching() {
+	@TestForIssue(jiraKey = "HSEARCH-1857")
+	public void reuseSearchQueryAfterOrmSessionIsClosed() {
 		Session session = sessionFactory.openSession();
 		SearchSession searchSession = Search.session( session );
 		SearchQuery<IndexedEntity> query = createSimpleQuery( searchSession );
@@ -134,9 +129,7 @@ public class ToHibernateOrmSessionIT {
 				StubSearchWorkBehavior.empty()
 		);
 
-		Assertions.assertThatThrownBy( () -> {
-			query.fetchAllHits();
-		} )
+		assertThatThrownBy( () -> query.fetchAllHits() )
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}

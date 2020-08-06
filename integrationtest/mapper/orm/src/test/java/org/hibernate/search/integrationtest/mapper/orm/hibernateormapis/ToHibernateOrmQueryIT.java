@@ -7,8 +7,11 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinSession;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,14 +39,11 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Test the compatibility layer between our APIs and Hibernate ORM APIs
@@ -65,7 +65,7 @@ public class ToHibernateOrmQueryIT {
 		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class, ContainedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinTransaction( sessionFactory, session -> {
+		withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );
@@ -127,7 +127,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void toHibernateOrmQuery() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -136,7 +136,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void list() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -161,7 +161,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void uniqueResult() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -196,9 +196,7 @@ public class ToHibernateOrmQueryIT {
 							reference( IndexedEntity.NAME, "2" )
 					)
 			);
-			Assertions.assertThatThrownBy( () -> {
-				query.uniqueResult();
-			} )
+			assertThatThrownBy( () -> query.uniqueResult() )
 					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
 
@@ -220,7 +218,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void pagination() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -247,7 +245,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void timeout_dsl() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -265,7 +263,7 @@ public class ToHibernateOrmQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.list() )
+			assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -273,7 +271,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void timeout_jpaHint() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -288,7 +286,7 @@ public class ToHibernateOrmQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.list() )
+			assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -296,7 +294,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void timeout_ormHint() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -311,7 +309,7 @@ public class ToHibernateOrmQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.list() )
+			assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -319,7 +317,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void timeout_setter() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -334,7 +332,7 @@ public class ToHibernateOrmQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.list() )
+			assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -342,7 +340,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void timeout_override_ormHint() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -362,7 +360,7 @@ public class ToHibernateOrmQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.list() )
+			assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -370,7 +368,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void timeout_override_setter() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -390,7 +388,7 @@ public class ToHibernateOrmQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.list() )
+			assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -399,7 +397,7 @@ public class ToHibernateOrmQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_fetch() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -415,7 +413,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -436,7 +434,7 @@ public class ToHibernateOrmQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_load() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -452,7 +450,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -473,7 +471,7 @@ public class ToHibernateOrmQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_setter_fetch() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -489,7 +487,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -510,7 +508,7 @@ public class ToHibernateOrmQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_setter_load() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -526,7 +524,7 @@ public class ToHibernateOrmQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -546,7 +544,7 @@ public class ToHibernateOrmQueryIT {
 
 	@Test
 	public void graph_override_jpaHint() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
@@ -572,7 +570,7 @@ public class ToHibernateOrmQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_override_setter() {
-		OrmUtils.withinSession( sessionFactory, session -> {
+		withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )

@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinEntityManager;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -22,14 +24,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Test the compatibility layer between our APIs and JPA APIs
@@ -61,7 +60,7 @@ public class ToJpaEntityManagerIT {
 
 	@Test
 	public void toJpaEntityManager() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );
@@ -80,9 +79,7 @@ public class ToJpaEntityManagerIT {
 		}
 
 		EntityManager closedEntityManager = entityManager;
-		Assertions.assertThatThrownBy( () -> {
-			Search.session( closedEntityManager );
-		} )
+		assertThatThrownBy( () -> Search.session( closedEntityManager ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
@@ -97,9 +94,7 @@ public class ToJpaEntityManagerIT {
 		createSimpleQuery( searchSession );
 		entityManager.close();
 
-		Assertions.assertThatThrownBy( () -> {
-			createSimpleQuery( searchSession );
-		} )
+		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
@@ -111,9 +106,7 @@ public class ToJpaEntityManagerIT {
 		SearchSession searchSession = Search.session( entityManager );
 		entityManager.close();
 
-		Assertions.assertThatThrownBy( () -> {
-			createSimpleQuery( searchSession );
-		} )
+		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}

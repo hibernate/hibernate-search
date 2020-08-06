@@ -7,8 +7,11 @@
 package org.hibernate.search.integrationtest.mapper.orm.hibernateormapis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinEntityManager;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinJPATransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,14 +42,11 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Test the compatibility layer between our APIs and JPA APIs
@@ -70,7 +70,7 @@ public class ToJpaQueryIT {
 				.setup( IndexedEntity.class, ContainedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		withinJPATransaction( entityManagerFactory, entityManager -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );
@@ -132,7 +132,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void toJpaQuery() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
@@ -141,7 +141,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void getResultList() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -166,7 +166,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void getSingleResult() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -188,9 +188,7 @@ public class ToJpaQueryIT {
 					b -> { },
 					StubSearchWorkBehavior.empty()
 			);
-			Assertions.assertThatThrownBy( () -> {
-				query.getSingleResult();
-			} )
+			assertThatThrownBy( () -> query.getSingleResult() )
 					.isInstanceOf( NoResultException.class );
 			backendMock.verifyExpectationsMet();
 
@@ -203,9 +201,7 @@ public class ToJpaQueryIT {
 							reference( IndexedEntity.NAME, "2" )
 					)
 			);
-			Assertions.assertThatThrownBy( () -> {
-				query.getSingleResult();
-			} )
+			assertThatThrownBy( () -> query.getSingleResult() )
 					.isInstanceOf( NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
 
@@ -227,7 +223,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void pagination() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -254,7 +250,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_dsl() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -272,7 +268,7 @@ public class ToJpaQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.getResultList() )
+			assertThatThrownBy( () -> query.getResultList() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -280,7 +276,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_jpaHint() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
@@ -295,7 +291,7 @@ public class ToJpaQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.getResultList() )
+			assertThatThrownBy( () -> query.getResultList() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -303,7 +299,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void timeout_override() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
@@ -323,7 +319,7 @@ public class ToJpaQueryIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.getResultList() )
+			assertThatThrownBy( () -> query.getResultList() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -332,7 +328,7 @@ public class ToJpaQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_fetch() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -348,7 +344,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -369,7 +365,7 @@ public class ToJpaQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_load() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -385,7 +381,7 @@ public class ToJpaQueryIT {
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
@@ -405,7 +401,7 @@ public class ToJpaQueryIT {
 
 	@Test
 	public void graph_override_jpaHint() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+		withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
