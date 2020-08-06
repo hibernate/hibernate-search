@@ -14,12 +14,9 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -144,8 +141,9 @@ public class RoutingRoutingKeyBridgeIT {
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
-	@RoutingKeyBinding(binder = @org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef(
-			type = MyRoutingKeyBridge.Binder.class))
+	@org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding(
+			binder = @org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef(
+					type = MyRoutingKeyBridge.Binder.class))
 	public static final class IndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
@@ -213,9 +211,9 @@ public class RoutingRoutingKeyBridgeIT {
 			return keyBuilder.toString();
 		}
 
-		public static class Binder implements RoutingKeyBinder {
+		public static class Binder implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
 			@Override
-			public void bind(RoutingKeyBindingContext context) {
+			public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =
 						context.bridgedElement().property( "category" )
 								.createAccessor( EntityCategory.class );

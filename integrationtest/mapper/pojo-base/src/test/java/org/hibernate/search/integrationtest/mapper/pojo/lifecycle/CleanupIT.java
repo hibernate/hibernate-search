@@ -21,12 +21,10 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.Startup
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -543,7 +541,7 @@ public class CleanupIT {
 	}
 
 	private static class FailingBinder implements TypeBinder,
-			PropertyBinder, RoutingKeyBinder,
+			PropertyBinder, org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder,
 			IdentifierBinder, ValueBinder {
 		@Override
 		public void bind(TypeBindingContext context) {
@@ -561,7 +559,7 @@ public class CleanupIT {
 		}
 
 		@Override
-		public void bind(RoutingKeyBindingContext context) {
+		public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
 			throw new SimulatedFailure();
 		}
 

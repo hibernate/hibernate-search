@@ -14,7 +14,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -730,7 +729,7 @@ public class RoutingBridgeBaseIT {
 		}
 
 		@Override
-		public void bind(RoutingKeyBindingContext context) {
+		public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
 			throw new AssertionFailure( "Should not be called" );
 		}
 	}

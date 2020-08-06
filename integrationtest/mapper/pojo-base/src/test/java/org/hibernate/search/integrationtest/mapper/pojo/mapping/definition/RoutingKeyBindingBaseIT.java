@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -64,7 +63,7 @@ public class RoutingKeyBindingBaseIT {
 
 	public static class WorkingRoutingKeyBinder implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
 		@Override
-		public void bind(RoutingKeyBindingContext context) {
+		public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
 			context.dependencies().useRootOnly();
 			context.bridge( (String tenantIdentifier, Object entityIdentifier, Object bridgedElement,
 					org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext context1) -> {
