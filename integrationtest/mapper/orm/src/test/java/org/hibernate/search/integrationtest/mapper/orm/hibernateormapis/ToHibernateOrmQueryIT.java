@@ -15,45 +15,41 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedEntityGraph;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.QueryTimeoutException;
-import javax.persistence.TypedQuery;
 
-import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.SessionFactory;
 import org.hibernate.graph.GraphSemantic;
-import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.assertj.core.api.Assertions;
+
 /**
- * Test the compatibility layer between our APIs and JPA APIs.
+ * Test the compatibility layer between our APIs and Hibernate ORM APIs
+ * for the {@link Query} class.
  */
-public class ToJpaIT {
+public class ToHibernateOrmQueryIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -61,17 +57,15 @@ public class ToJpaIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	private EntityManagerFactory entityManagerFactory;
+	private SessionFactory sessionFactory;
 
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( IndexedEntity.NAME );
-		entityManagerFactory = ormSetupHelper.start()
-				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
-				.setup( IndexedEntity.class, ContainedEntity.class );
+		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class, ContainedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexed1 = new IndexedEntity();
 			indexed1.setId( 1 );
 			indexed1.setText( "this is text (1)" );
@@ -100,12 +94,12 @@ public class ToJpaIT {
 			indexed2.getContainedLazy().add( contained2_2 );
 			contained2_2.setContainingLazy( indexed2 );
 
-			entityManager.persist( contained1_1 );
-			entityManager.persist( contained1_2 );
-			entityManager.persist( indexed1 );
-			entityManager.persist( contained2_1 );
-			entityManager.persist( contained2_2 );
-			entityManager.persist( indexed2 );
+			session.persist( contained1_1 );
+			session.persist( contained1_2 );
+			session.persist( indexed1 );
+			session.persist( contained2_1 );
+			session.persist( contained2_2 );
+			session.persist( indexed2 );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
@@ -132,53 +126,19 @@ public class ToJpaIT {
 	}
 
 	@Test
-	public void toJpaEntityManagerFactory() {
-		SearchMapping searchMapping = Search.mapping( entityManagerFactory );
-		assertThat( searchMapping.toEntityManagerFactory() ).isSameAs( entityManagerFactory );
-	}
-
-	@Test
-	public void toJpaEntityManager() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
-		} );
-	}
-
-	@Test
-	public void toJpaEntityManager_withClosedEntityManager() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try {
-			entityManager = entityManagerFactory.createEntityManager();
-		}
-		finally {
-			if ( entityManager != null ) {
-				entityManager.close();
-			}
-		}
-
-		EntityManager closedEntityManager = entityManager;
-		Assertions.assertThatThrownBy( () -> {
-			Search.session( closedEntityManager );
-		} )
-				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
-	}
-
-	@Test
-	public void toJpaQuery() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
+	public void toHibernateOrmQuery() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 			assertThat( query ).isNotNull();
 		} );
 	}
 
 	@Test
-	public void getResultList() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
+	public void list() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
@@ -189,21 +149,21 @@ public class ToJpaIT {
 							reference( IndexedEntity.NAME, "2" )
 					)
 			);
-			List<IndexedEntity> result = query.getResultList();
+			List<IndexedEntity> result = query.list();
 			backendMock.verifyExpectationsMet();
 			assertThat( result )
 					.containsExactly(
-							entityManager.getReference( IndexedEntity.class, 1 ),
-							entityManager.getReference( IndexedEntity.class, 2 )
+							session.getReference( IndexedEntity.class, 1 ),
+							session.getReference( IndexedEntity.class, 2 )
 					);
 		} );
 	}
 
 	@Test
-	public void getSingleResult() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
+	public void uniqueResult() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
@@ -213,21 +173,19 @@ public class ToJpaIT {
 							reference( IndexedEntity.NAME, "1" )
 					)
 			);
-			IndexedEntity result = query.getSingleResult();
+			IndexedEntity result = query.uniqueResult();
 			backendMock.verifyExpectationsMet();
 			assertThat( result )
-					.isEqualTo( entityManager.getReference( IndexedEntity.class, 1 ) );
+					.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.empty()
 			);
-			Assertions.assertThatThrownBy( () -> {
-				query.getSingleResult();
-			} )
-					.isInstanceOf( NoResultException.class );
+			result = query.uniqueResult();
 			backendMock.verifyExpectationsMet();
+			assertThat( result ).isNull();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
@@ -239,9 +197,9 @@ public class ToJpaIT {
 					)
 			);
 			Assertions.assertThatThrownBy( () -> {
-				query.getSingleResult();
+				query.uniqueResult();
 			} )
-					.isInstanceOf( NonUniqueResultException.class );
+					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
@@ -253,18 +211,18 @@ public class ToJpaIT {
 							reference( IndexedEntity.NAME, "1" )
 					)
 			);
-			result = query.getSingleResult();
+			result = query.uniqueResult();
 			backendMock.verifyExpectationsMet();
 			assertThat( result )
-					.isEqualTo( entityManager.getReference( IndexedEntity.class, 1 ) );
+					.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
 		} );
 	}
 
 	@Test
 	public void pagination() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
 			assertThat( query.getMaxResults() ).isEqualTo( Integer.MAX_VALUE );
@@ -282,16 +240,16 @@ public class ToJpaIT {
 							.limit( 2 ),
 					StubSearchWorkBehavior.empty()
 			);
-			query.getResultList();
+			query.list();
 			backendMock.verifyExpectationsMet();
 		} );
 	}
 
 	@Test
 	public void timeout_dsl() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
 							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
@@ -307,7 +265,7 @@ public class ToJpaIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.getResultList() )
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -315,9 +273,9 @@ public class ToJpaIT {
 
 	@Test
 	public void timeout_jpaHint() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			query.setHint( "javax.persistence.query.timeout", 200 );
 
@@ -330,35 +288,109 @@ public class ToJpaIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.getResultList() )
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
 	}
 
 	@Test
-	public void timeout_override() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
+	public void timeout_ormHint() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "org.hibernate.timeout", 4 );
+
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.NAME ),
+					b -> b.failAfter( 4, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			Assertions.assertThatThrownBy( () -> query.list() )
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_setter() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setTimeout( 3 );
+
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.NAME ),
+					b -> b.failAfter( 3, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			Assertions.assertThatThrownBy( () -> query.list() )
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_override_ormHint() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
 							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
 							.toQuery()
 			);
 
-			query.setHint( "javax.persistence.query.timeout", 200 );
+			query.setHint( "org.hibernate.timeout", 4 );
 
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ),
-					b -> b.failAfter( 200, TimeUnit.MILLISECONDS ),
+					b -> b.failAfter( 4, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.getResultList() )
+			Assertions.assertThatThrownBy( () -> query.list() )
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_override_setter() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.where( f -> f.matchAll() )
+							.failAfter( 2, TimeUnit.SECONDS )
+							.toQuery()
+			);
+
+			query.setTimeout( 3 );
+
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.NAME ),
+					b -> b.failAfter( 3, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			Assertions.assertThatThrownBy( () -> query.list() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -367,34 +399,34 @@ public class ToJpaIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_fetch() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.setHint( "javax.persistence.fetchgraph", entityManager.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+			query.setHint( "javax.persistence.fetchgraph", session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 
-			IndexedEntity loaded = query.getSingleResult();
+			IndexedEntity loaded = query.uniqueResult();
 			assertThatManaged( loaded.getContainedEager() ).isInitialized();
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.setHint( "javax.persistence.fetchgraph", entityManager.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			query.setHint( "javax.persistence.fetchgraph", session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 
-			IndexedEntity loaded = query.getResultList().get( 0 );
+			IndexedEntity loaded = query.uniqueResult();
 			// FETCH graph => associations can be forced to lazy even if eager in the mapping
 			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
 			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
@@ -404,34 +436,108 @@ public class ToJpaIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_jpaHint_load() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.setHint( "javax.persistence.loadgraph", entityManager.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+			query.setHint( "javax.persistence.loadgraph", session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.NAME ), b -> { },
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 
-			IndexedEntity loaded = query.getSingleResult();
+			IndexedEntity loaded = query.uniqueResult();
 			assertThatManaged( loaded.getContainedEager() ).isInitialized();
 			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
 		} );
 
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
-			query.setHint( "javax.persistence.loadgraph", entityManager.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			query.setHint( "javax.persistence.loadgraph", session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 
-			IndexedEntity loaded = query.getSingleResult();
+			IndexedEntity loaded = query.uniqueResult();
+			// LOAD graph => associations cannot be forced to lazy if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_setter_fetch() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			// FETCH graph => associations can be forced to lazy even if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_setter_load() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_EAGER ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
+			assertThatManaged( loaded.getContainedEager() ).isInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isInitialized();
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.applyLoadGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
+
+			IndexedEntity loaded = query.uniqueResult();
 			// LOAD graph => associations cannot be forced to lazy if eager in the mapping
 			assertThatManaged( loaded.getContainedEager() ).isInitialized();
 			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
@@ -440,23 +546,23 @@ public class ToJpaIT {
 
 	@Test
 	public void graph_override_jpaHint() {
-		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-			TypedQuery<IndexedEntity> query = Search.toOrmQuery(
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
 							.where( f -> f.matchAll() )
 							.loading( o -> o.graph( IndexedEntity.GRAPH_EAGER, GraphSemantic.LOAD ) )
 							.toQuery()
 			);
 
-			query.setHint( "javax.persistence.fetchgraph", entityManager.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
+			query.setHint( "javax.persistence.fetchgraph", session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
 
 			backendMock.expectSearchObjects(
 					IndexedEntity.NAME,
 					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
 			);
 
-			IndexedEntity loaded = query.getSingleResult();
+			IndexedEntity loaded = query.uniqueResult();
 			// FETCH graph => associations can be forced to lazy even if eager in the mapping
 			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
 			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
@@ -464,34 +570,29 @@ public class ToJpaIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-1857" )
-	public void reuseSearchSessionAfterEntityManagerIsClosed_noMatching() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		SearchSession searchSession = Search.session( entityManager );
-		// a SearchSession instance is created lazily,
-		// so we need to use it to have an instance of it
-		createSimpleQuery( searchSession );
-		entityManager.close();
+	@TestForIssue(jiraKey = "HSEARCH-3628")
+	public void graph_override_setter() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.where( f -> f.matchAll() )
+							.loading( o -> o.graph( IndexedEntity.GRAPH_EAGER, GraphSemantic.LOAD ) )
+							.toQuery()
+			);
 
-		Assertions.assertThatThrownBy( () -> {
-			createSimpleQuery( searchSession );
-		} )
-				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
-	}
+			query.applyFetchGraph( session.getEntityGraph( IndexedEntity.GRAPH_LAZY ) );
 
-	@Test
-	public void lazyCreateSearchSessionAfterEntityManagerIsClosed() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		// Search session is not created, since we don't use it
-		SearchSession searchSession = Search.session( entityManager );
-		entityManager.close();
+			backendMock.expectSearchObjects(
+					IndexedEntity.NAME,
+					StubSearchWorkBehavior.of( 1, reference( IndexedEntity.NAME, "1" ) )
+			);
 
-		Assertions.assertThatThrownBy( () -> {
-			createSimpleQuery( searchSession );
-		} )
-				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+			IndexedEntity loaded = query.uniqueResult();
+			// FETCH graph => associations can be forced to lazy even if eager in the mapping
+			assertThatManaged( loaded.getContainedEager() ).isNotInitialized();
+			assertThatManaged( loaded.getContainedLazy() ).isNotInitialized();
+		} );
 	}
 
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
