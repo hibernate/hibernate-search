@@ -51,6 +51,11 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 		this.rootProjection = null;
 	}
 
+	@Override
+	public String toString() {
+		return "scroll work execution on indexes '" + indexNames + "'; work = " + work;
+	}
+
 	public <U> CallBehavior<SearchScroll<U>> verify(ScrollWorkCall<U> actualCall) {
 		assertThat( actualCall.indexNames )
 				.as( "Scroll work did not target the expected indexes: " )

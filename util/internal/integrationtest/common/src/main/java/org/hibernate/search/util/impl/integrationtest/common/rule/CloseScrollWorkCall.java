@@ -19,6 +19,11 @@ public class CloseScrollWorkCall extends Call<CloseScrollWorkCall> {
 		this.indexNames = indexNames;
 	}
 
+	@Override
+	public String toString() {
+		return "scroll.close() work execution on indexes '" + indexNames + "'";
+	}
+
 	public CallBehavior<Void> verify(CloseScrollWorkCall actualCall) {
 		assertThat( actualCall.indexNames )
 				.as( "CloseScroll work did not target the expected indexes: " )
