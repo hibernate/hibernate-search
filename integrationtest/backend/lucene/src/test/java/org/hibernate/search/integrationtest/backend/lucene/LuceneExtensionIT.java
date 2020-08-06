@@ -9,8 +9,10 @@ package org.hibernate.search.integrationtest.backend.lucene;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +39,8 @@ import org.assertj.core.api.Assertions;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchScrollResult;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
@@ -73,6 +77,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -269,6 +274,45 @@ public class LuceneExtensionIT {
 						"mapped type name 'NotAnIndexName' is not among the mapped types targeted by this query: ["
 								+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3974")
+	public void scroll_onFetchable() {
+		// Check the scroll has the extended type and works correctly
+		try ( LuceneSearchScroll<DocumentReference> scroll = mainIndex.query()
+				.extension( LuceneExtension.get() ) // Call extension() on the DSL step
+				.where( f -> f.matchAll() )
+				.scroll( 20 ) ) { // Call scroll() on the fetchable
+			List<DocumentReference> hits = new ArrayList<>();
+			// Check the scroll result has the extended type and works correctly
+			for ( LuceneSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				hits.addAll( chunk.hits() );
+			}
+			assertThatHits( hits )
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3974")
+	public void scroll_onQuery() {
+		// Check the scroll has the extended type and works correctly
+		try ( LuceneSearchScroll<DocumentReference> scroll = mainIndex.query()
+				.where( f -> f.matchAll() )
+				.toQuery()
+				.extension( LuceneExtension.get() ) // Call extension() on the query
+				.scroll( 20 ) ) { // Call scroll() on the query
+			List<DocumentReference> hits = new ArrayList<>();
+			// Check the scroll result has the extended type and works correctly
+			for ( LuceneSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				hits.addAll( chunk.hits() );
+			}
+			assertThatHits( hits )
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+		}
 	}
 
 	@Test

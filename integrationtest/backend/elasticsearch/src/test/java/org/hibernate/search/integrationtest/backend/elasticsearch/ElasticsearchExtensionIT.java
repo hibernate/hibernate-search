@@ -9,9 +9,11 @@ package org.hibernate.search.integrationtest.backend.elasticsearch;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScrollResult;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQuerySelectStep;
@@ -159,7 +163,7 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Unsupported extension
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -231,7 +235,7 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Non-existing document
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.explain( "InvalidId" )
 		)
 				.has( new HamcrestCondition<>(
@@ -274,7 +278,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
@@ -290,7 +294,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.explain( "NotAMappedName", FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
@@ -298,6 +302,47 @@ public class ElasticsearchExtensionIT {
 						"type name 'NotAMappedName' is not among the mapped type targeted by this query: ["
 						+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3974")
+	public void scroll_onFetchable() {
+		// Check the scroll has the extended type and works correctly
+		try ( ElasticsearchSearchScroll<DocumentReference> scroll = mainIndex.query()
+				.extension( ElasticsearchExtension.get() ) // Call extension() on the DSL step
+				.where( f -> f.matchAll() )
+				.scroll( 20 ) ) { // Call scroll() on the fetchable
+			List<DocumentReference> hits = new ArrayList<>();
+			// Check the scroll result has the extended type and works correctly
+			for ( ElasticsearchSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				hits.addAll( chunk.hits() );
+			}
+			assertThatHits( hits )
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(),
+							FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3974")
+	public void scroll_onQuery() {
+		// Check the scroll has the extended type and works correctly
+		try ( ElasticsearchSearchScroll<DocumentReference> scroll = mainIndex.query()
+				.where( f -> f.matchAll() )
+				.toQuery()
+				.extension( ElasticsearchExtension.get() ) // Call extension() on the query
+				.scroll( 20 ) ) { // Call scroll() on the query
+			List<DocumentReference> hits = new ArrayList<>();
+			// Check the scroll result has the extended type and works correctly
+			for ( ElasticsearchSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				hits.addAll( chunk.hits() );
+			}
+			assertThatHits( hits )
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(),
+							FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID );
+		}
 	}
 
 	@Test
