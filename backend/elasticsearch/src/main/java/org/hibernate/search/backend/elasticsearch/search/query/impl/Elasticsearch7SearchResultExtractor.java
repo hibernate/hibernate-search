@@ -90,7 +90,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				extractedHits,
 				extractedAggregations,
 				took, timedOut, scrollId,
-				timeoutManager.remainingTimeToHardTimeout()
+				timeoutManager
 		);
 	}
 

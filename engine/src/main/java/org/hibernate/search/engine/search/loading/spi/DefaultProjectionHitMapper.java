@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
@@ -34,11 +35,13 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 	}
 
 	@Override
-	public LoadingResult<R, E> loadBlocking(Long timeout) {
+	public LoadingResult<R, E> loadBlocking(TimeoutManager timeoutManager) {
 		List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference )
 				.collect( Collectors.toList() );
-		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted, timeout ),
-				documentReferenceConverter );
+
+		// TODO HSEARCH-3787 Pass the timeout exception to the mapper object loader
+		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted,
+				timeoutManager.checkTimeLeftInMilliseconds() ), documentReferenceConverter );
 	}
 
 	private static class DefaultLoadingResult<R, E> implements LoadingResult<R, E> {

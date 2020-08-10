@@ -111,8 +111,8 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 		verifyAll();
 
-		// softTimeout is not passed to the entity loading
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, false );
+		// softTimeout is passed to the entity loading too
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, true );
 	}
 
 	private void verifyLoading(LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,

@@ -16,6 +16,7 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -46,14 +47,14 @@ public class LuceneLoadableSearchResult<H> {
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final Duration took;
 	private final Boolean timedOut;
-	private final Long remainingTimeToHardTimeout;
+	private final LuceneTimeoutManager timeoutManager;
 
 	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext convertContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			long hitCount, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			Duration took, boolean timedOut, Long remainingTimeToHardTimeout) {
+			Duration took, boolean timedOut, LuceneTimeoutManager timeoutManager) {
 		this.convertContext = convertContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
@@ -63,12 +64,12 @@ public class LuceneLoadableSearchResult<H> {
 		this.projectionHitMapper = projectionHitMapper;
 		this.took = took;
 		this.timedOut = timedOut;
-		this.remainingTimeToHardTimeout = remainingTimeToHardTimeout;
+		this.timeoutManager = timeoutManager;
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( convertContext );
-		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( remainingTimeToHardTimeout );
+		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager );
 
 		int readIndex = 0;
 		int writeIndex = 0;
