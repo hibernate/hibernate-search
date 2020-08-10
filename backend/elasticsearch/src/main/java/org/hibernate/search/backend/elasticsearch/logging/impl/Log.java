@@ -647,4 +647,8 @@ public interface Log extends BasicLogger {
 					+ " and that the field has the same type in all indexes.")
 	SearchException inconsistentSupportForQueryElement(String queryElementName);
 
+	@Message(id = ID_OFFSET_3 + 120, value = "Request exceeded the timeout of %1$s: '%2$s'.")
+	SearchTimeoutException clientSideTimedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
+			String query);
+
 }

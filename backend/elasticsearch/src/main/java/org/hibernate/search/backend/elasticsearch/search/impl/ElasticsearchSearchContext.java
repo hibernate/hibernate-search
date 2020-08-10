@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import java.util.concurrent.TimeUnit;
+
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -28,6 +32,7 @@ public final class ElasticsearchSearchContext {
 	private final Gson userFacingGson;
 	private final ElasticsearchSearchSyntax searchSyntax;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final TimingSource timingSource;
 
 	// Targeted indexes
 	private final ElasticsearchSearchIndexesContext indexes;
@@ -35,12 +40,15 @@ public final class ElasticsearchSearchContext {
 	public ElasticsearchSearchContext(BackendMappingContext mappingContext,
 			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
 			MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchSearchIndexesContext indexes) {
-		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
+			ElasticsearchSearchIndexesContext indexes,
+			TimingSource timingSource) {
+		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl(
+				mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.userFacingGson = userFacingGson;
 		this.searchSyntax = searchSyntax;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.timingSource = timingSource;
 		this.indexes = indexes;
 	}
 
@@ -70,5 +78,18 @@ public final class ElasticsearchSearchContext {
 
 	public JsonObject filterOrNull(String tenantId) {
 		return multiTenancyStrategy.filterOrNull( tenantId );
+	}
+
+	public ElasticsearchTimeoutManager createTimeoutManager(JsonObject definitiveQuery, Long timeout,
+			TimeUnit timeUnit, boolean exceptionOnTimeout) {
+		if ( timeout != null && timeUnit != null ) {
+			if ( exceptionOnTimeout ) {
+				return ElasticsearchTimeoutManager.hardTimeout( timingSource, definitiveQuery, timeout, timeUnit );
+			}
+			else {
+				return ElasticsearchTimeoutManager.softTimeout( timingSource, definitiveQuery, timeout, timeUnit );
+			}
+		}
+		return ElasticsearchTimeoutManager.noTimeout( timingSource, definitiveQuery );
 	}
 }

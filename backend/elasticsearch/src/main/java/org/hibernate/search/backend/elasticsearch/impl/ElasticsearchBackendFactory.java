@@ -165,7 +165,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					getMultiTenancyStrategy( propertySource ),
 					indexLayoutStrategyHolder,
 					createTypeNameMapping( propertySource, indexLayoutStrategyHolder.get() ),
-					buildContext.failureHandler()
+					buildContext.failureHandler(), buildContext.timingSource()
 			);
 		}
 		catch (RuntimeException e) {
