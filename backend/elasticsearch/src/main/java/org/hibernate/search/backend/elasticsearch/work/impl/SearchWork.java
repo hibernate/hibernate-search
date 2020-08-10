@@ -49,7 +49,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body, timeoutManager.timeoutInMilliseconds() );
+		return resultExtractor.extract( body, timeoutManager );
 	}
 
 	public static class Builder<R>

@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -63,7 +64,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	}
 
 	@Override
-	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody, Long hardTimeoutInMilliseconds) {
+	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody,
+			ElasticsearchTimeoutManager timeoutManager) {
 		ElasticsearchSearchQueryExtractContext extractContext = requestContext.createExtractContext(
 				responseBody
 		);
@@ -81,9 +83,6 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
 		Boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
 
-		Long remainingTimeToHardTimeout = ( hardTimeoutInMilliseconds == null ) ? null :
-				hardTimeoutInMilliseconds - took;
-
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
 				rootProjection,
@@ -91,7 +90,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				extractedHits,
 				extractedAggregations,
 				took, timedOut, scrollId,
-				remainingTimeToHardTimeout
+				timeoutManager.remainingTimeToHardTimeout()
 		);
 	}
 
