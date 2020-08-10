@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 		implements SearchQuery<H> {
@@ -56,9 +57,17 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	@Override
 	public SearchResult<H> fetch(Integer offset, Integer limit) {
 		workBuilder.limit( limit ).offset( offset );
-		return backend.getBehavior().executeSearchWork(
-				indexNames, workBuilder.build(), projectionContext, loadingContext, rootProjection
+		StubSearchWork work = workBuilder.build();
+		StubTimeoutManager timeoutManager = new StubTimeoutManager(
+				backend.timingSource(), work.getFailAfterTimeout(), work.getFailAfterTimeUnit() );
+		timeoutManager.start();
+
+		SearchResult<H> result = backend.getBehavior().executeSearchWork(
+				indexNames, work, projectionContext, loadingContext, rootProjection, timeoutManager
 		);
+
+		timeoutManager.stop();
+		return result;
 	}
 
 	@Override
@@ -69,7 +78,8 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	@Override
 	public SearchScroll<H> scroll(int chunkSize) {
 		return backend.getBehavior().executeScrollWork(
-				indexNames, workBuilder.build(), chunkSize, projectionContext, loadingContext, rootProjection
+				indexNames, workBuilder.build(), chunkSize, projectionContext, loadingContext, rootProjection,
+				backend.timingSource()
 		);
 	}
 

@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
@@ -29,9 +30,11 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
+	private final TimingSource timingSource;
 
 	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, int chunkSize, StubBackendBehavior behavior,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.chunkSize = chunkSize;
@@ -39,6 +42,7 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
+		this.timingSource = timingSource;
 	}
 
 	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, int chunkSize) {
@@ -49,6 +53,7 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 		this.projectionContext = null;
 		this.loadingContext = null;
 		this.rootProjection = null;
+		this.timingSource = null;
 	}
 
 	@Override
@@ -68,7 +73,8 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 				.isEqualTo( chunkSize );
 
 		return () -> new StubSearchScroll<>( actualCall.behavior, indexNames, actualCall.work,
-				actualCall.projectionContext, actualCall.loadingContext, actualCall.rootProjection );
+				actualCall.projectionContext, actualCall.loadingContext, actualCall.rootProjection,
+				actualCall.timingSource );
 	}
 
 	@Override

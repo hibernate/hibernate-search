@@ -12,13 +12,13 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.engine.cfg.spi.ConvertUtils;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 
@@ -28,17 +28,20 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubNextScrollWorkBehavior<?> behavior;
+	private final StubTimeoutManager timeoutManager;
 
 	NextScrollWorkCall(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection) {
+			StubSearchProjection<T> rootProjection,
+			StubTimeoutManager timeoutManager) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 		this.behavior = null;
+		this.timeoutManager = timeoutManager;
 	}
 
 	NextScrollWorkCall(Set<String> indexNames,
@@ -49,6 +52,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 		this.loadingContext = null;
 		this.rootProjection = null;
 		this.behavior = behavior;
+		this.timeoutManager = null;
 	}
 
 	@Override
@@ -68,9 +72,7 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 				actualCall.projectionContext,
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
-				behavior.getRawHits(),
-				ConvertUtils.toMilliseconds( actualCall.work.getFailAfterTimeout(),
-						actualCall.work.getFailAfterTimeUnit() )
+				behavior.getRawHits(), actualCall.timeoutManager
 		), Duration.ZERO, false );
 	}
 

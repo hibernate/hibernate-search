@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -22,6 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 public abstract class StubBackendBehavior {
 
@@ -48,20 +50,21 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext,
-			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjection<T> rootProjection, StubTimeoutManager timeoutManager);
 
 	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
 
 	public abstract long executeCountWork(Set<String> indexNames);
 
 	public abstract <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
+			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjection<T> rootProjection, TimingSource timingSource);
 
 	public abstract void executeCloseScrollWork(Set<String> indexNames);
 
 	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection);
+			StubSearchProjection<T> rootProjection, StubTimeoutManager timeoutManager);
 
 }

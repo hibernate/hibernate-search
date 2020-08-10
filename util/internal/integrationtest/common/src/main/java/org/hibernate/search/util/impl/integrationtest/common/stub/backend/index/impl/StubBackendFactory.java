@@ -24,6 +24,6 @@ public class StubBackendFactory implements BackendFactory {
 	@Override
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext context,
 			ConfigurationPropertySource propertySource) {
-		return new StubBackend( eventContext, context, behavior );
+		return new StubBackend( eventContext, context, behavior, context.timingSource() );
 	}
 }
