@@ -17,7 +17,9 @@ import java.util.stream.Collectors;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
@@ -25,6 +27,7 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
@@ -72,7 +75,15 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 			documentIdSourceValueToReference.put( reference.id(), reference );
 		}
 
-		List<? extends E> loadedEntities = loadEntities( documentIdSourceValueToReference.keySet(), timeout );
+		List<? extends E> loadedEntities;
+		try {
+			loadedEntities = loadEntities( documentIdSourceValueToReference.keySet(), timeout );
+		}
+		catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
+				javax.persistence.LockTimeoutException e) {
+			throw new SearchTimeoutException( "Search query loading exceeded the timeout of " + timeout +
+					" milliseconds", e );
+		}
 
 		for ( E loadedEntity : loadedEntities ) {
 			// The handle may point to a field, in which case it won't work on a proxy. Unproxy first.
@@ -186,8 +197,8 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 								+ " Expected entity name: " + entityPersister.getEntityName()
 								+ " Targeted entity names: "
 								+ targetEntityTypeContexts.stream()
-										.map( HibernateOrmLoadingIndexedTypeContext::hibernateOrmEntityName )
-										.collect( Collectors.toList() )
+								.map( HibernateOrmLoadingIndexedTypeContext::hibernateOrmEntityName )
+								.collect( Collectors.toList() )
 				);
 			}
 

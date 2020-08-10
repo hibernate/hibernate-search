@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
@@ -23,6 +25,7 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.util.common.SearchTimeoutException;
 
 /**
  * An entity loader for indexed entities whose document ID is the entity ID.
@@ -61,7 +64,14 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	public List<E> loadBlocking(List<EntityReference> references, Long timeout) {
 		if ( cacheLookupStrategyImplementor == null ) {
 			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
-			return doLoadEntities( references, timeout );
+			try {
+				return doLoadEntities( references, timeout );
+			}
+			catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
+					javax.persistence.LockTimeoutException e) {
+				throw new SearchTimeoutException( "Search query loading exceeded the timeout of " + timeout
+						+ " milliseconds", e );
+			}
 		}
 		else {
 			return HibernateOrmComposableEntityLoader.super.loadBlocking( references, timeout );
@@ -71,7 +81,16 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	@Override
 	public void loadBlocking(List<EntityReference> references,
 			Map<? super EntityReference, ? super E> entitiesByReference, Long timeout) {
-		List<? extends E> loadedEntities = doLoadEntities( references, timeout );
+
+		List<? extends E> loadedEntities;
+		try {
+			loadedEntities = doLoadEntities( references, timeout );
+		}
+		catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
+				javax.persistence.LockTimeoutException e) {
+			throw new SearchTimeoutException( "Search query loading exceeded the timeout of " + timeout +
+					" milliseconds", e );
+		}
 		Iterator<EntityReference> referencesIterator = references.iterator();
 		Iterator<? extends E> loadedEntityIterator = loadedEntities.iterator();
 		while ( referencesIterator.hasNext() ) {
