@@ -171,8 +171,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject ),
-				true
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
 		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
@@ -184,8 +183,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject ),
-				true
+						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
 		assertThat( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );

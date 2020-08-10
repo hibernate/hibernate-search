@@ -39,9 +39,8 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 		List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference )
 				.collect( Collectors.toList() );
 
-		// TODO HSEARCH-3787 Pass the timeout exception to the mapper object loader
-		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted,
-				timeoutManager.checkTimeLeftInMilliseconds() ), documentReferenceConverter );
+		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted, timeoutManager ),
+				documentReferenceConverter );
 	}
 
 	private static class DefaultLoadingResult<R, E> implements LoadingResult<R, E> {

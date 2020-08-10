@@ -23,6 +23,7 @@ import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -69,13 +70,14 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 	@Override
 	public void loadBlocking(List<EntityReference> references,
-			Map<? super EntityReference, ? super E> entitiesByReference, Long timeout) {
+			Map<? super EntityReference, ? super E> entitiesByReference, TimeoutManager timeoutManager) {
 		Map<Object, EntityReference> documentIdSourceValueToReference = new HashMap<>();
 		for ( EntityReference reference : references ) {
 			documentIdSourceValueToReference.put( reference.id(), reference );
 		}
 
 		List<? extends E> loadedEntities;
+		Long timeout = timeoutManager.remainingTimeToHardTimeout();
 		try {
 			loadedEntities = loadEntities( documentIdSourceValueToReference.keySet(), timeout );
 		}

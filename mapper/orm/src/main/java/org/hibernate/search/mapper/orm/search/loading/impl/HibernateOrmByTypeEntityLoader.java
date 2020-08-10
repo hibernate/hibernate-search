@@ -34,13 +34,7 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 	}
 
 	@Override
-	public List<T> loadBlocking(List<EntityReference> references, Long timeout) {
-		TimeoutManager timeoutManager = null;
-		if ( timeout != null ) {
-			timeoutManager = new TimeoutManager( timingSource, timeout, TimeoutManager.Type.EXCEPTION );
-			timeoutManager.start();
-		}
-
+	public List<T> loadBlocking(List<EntityReference> references, TimeoutManager timeoutManager) {
 		LinkedHashMap<EntityReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
 		Map<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 
@@ -59,12 +53,7 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 			HibernateOrmComposableEntityLoader<? extends T> delegate = entry.getKey();
 			List<EntityReference> referencesForDelegate = entry.getValue();
 
-			Long currentTimeout = ( timeoutManager == null ) ? null : timeoutManager.checkTimeLeftInMilliseconds();
-			delegate.loadBlocking( referencesForDelegate, objectsByReference, currentTimeout );
-		}
-
-		if ( timeoutManager != null ) {
-			timeoutManager.stop();
+			delegate.loadBlocking( referencesForDelegate, objectsByReference, timeoutManager );
 		}
 
 		// Re-create the list of objects in the same order
