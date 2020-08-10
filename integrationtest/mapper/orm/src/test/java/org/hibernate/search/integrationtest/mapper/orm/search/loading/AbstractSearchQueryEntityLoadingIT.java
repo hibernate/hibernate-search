@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -51,7 +53,8 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 		testLoading(
 				sessionSetup, targetClasses, targetIndexes,
 				loadingOptionsContributor, hitDocumentReferencesContributor, expectedLoadedEntitiesContributor,
-				(assertions, ignored) -> assertionsContributor.accept( assertions )
+				(assertions, ignored) -> assertionsContributor.accept( assertions ),
+				null, null
 		);
 	}
 
@@ -62,7 +65,8 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
-			BiConsumer<OrmSoftAssertions, List<T>> assertionsContributor) {
+			BiConsumer<OrmSoftAssertions, List<T>> assertionsContributor,
+			Integer timeout, TimeUnit timeUnit) {
 		OrmSoftAssertions.withinSession( sessionFactory(), (session, softAssertions) -> {
 			sessionSetup.accept( session );
 
@@ -70,16 +74,22 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 			SearchSession searchSession = Search.session( session );
 
-			SearchQuery<T> query = searchSession.search( targetClasses )
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?> optionsStep = searchSession.search( targetClasses )
 					.where( f -> f.matchAll() )
-					.loading( loadingOptionsContributor )
+					.loading( loadingOptionsContributor );
+
+			if ( timeout != null && timeUnit != null ) {
+				optionsStep.failAfter( timeout, timeUnit );
+			}
+
+			SearchQuery<T> query = optionsStep
 					.toQuery();
 
 			DocumentReferenceCollector documentReferenceCollector = new DocumentReferenceCollector();
 			hitDocumentReferencesContributor.accept( documentReferenceCollector );
 			List<DocumentReference> hitDocumentReferences = documentReferenceCollector.collected;
 
-			List<T> loadedEntities = getHits( targetIndexes, query, hitDocumentReferences );
+			List<T> loadedEntities = getHits( targetIndexes, query, hitDocumentReferences, timeout, timeUnit );
 
 			softAssertions.assertThat( loadedEntities )
 					.as(
@@ -116,10 +126,15 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 		} );
 	}
 
-	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences) {
+	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences,
+			Integer timeout, TimeUnit timeUnit) {
 		backendMock.expectSearchObjects(
 				targetIndexes,
-				b -> { },
+				b -> {
+					if ( timeout != null && timeUnit != null ) {
+						b.failAfter( timeout, timeUnit );
+					}
+				},
 				StubSearchWorkBehavior.of(
 						hitDocumentReferences.size(),
 						hitDocumentReferences
