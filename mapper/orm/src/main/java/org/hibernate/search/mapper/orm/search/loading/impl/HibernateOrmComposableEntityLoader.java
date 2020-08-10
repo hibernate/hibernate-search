@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
 /**
@@ -24,10 +25,10 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<EntityReference, E> {
 
 	@Override
-	default List<E> loadBlocking(List<EntityReference> references, Long timeout) {
+	default List<E> loadBlocking(List<EntityReference> references, TimeoutManager timeoutManager) {
 		// Load all references
 		Map<EntityReference, E> objectsByReference = new HashMap<>();
-		loadBlocking( references, objectsByReference, timeout );
+		loadBlocking( references, objectsByReference, timeoutManager );
 
 		// Re-create the list of objects in the same order
 		List<E> result = new ArrayList<>( references.size() );
@@ -47,10 +48,9 @@ public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<Enti
 	 * @param references A list of references to the objects to load.
 	 * @param entitiesByReference A map with references as keys and loaded entities as values.
 	 * Initial values are undefined and the loader must not rely on them.
-	 * @param timeout The timeout to apply to the loading in milliseconds.
-	 * It can be {@code null}. If {@code null}, no timeout will be applied.
+	 * @param timeoutManager The timeout manager to apply to the loading in milliseconds.
 	 */
 	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference,
-			Long timeout);
+			TimeoutManager timeoutManager);
 
 }

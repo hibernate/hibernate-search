@@ -22,6 +22,7 @@ import org.hibernate.jpa.QueryHints;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -61,8 +62,9 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	}
 
 	@Override
-	public List<E> loadBlocking(List<EntityReference> references, Long timeout) {
+	public List<E> loadBlocking(List<EntityReference> references, TimeoutManager timeoutManager) {
 		if ( cacheLookupStrategyImplementor == null ) {
+			Long timeout = timeoutManager.remainingTimeToHardTimeout();
 			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
 			try {
 				return doLoadEntities( references, timeout );
@@ -74,15 +76,16 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			}
 		}
 		else {
-			return HibernateOrmComposableEntityLoader.super.loadBlocking( references, timeout );
+			return HibernateOrmComposableEntityLoader.super.loadBlocking( references, timeoutManager );
 		}
 	}
 
 	@Override
 	public void loadBlocking(List<EntityReference> references,
-			Map<? super EntityReference, ? super E> entitiesByReference, Long timeout) {
+			Map<? super EntityReference, ? super E> entitiesByReference, TimeoutManager timeoutManager) {
 
 		List<? extends E> loadedEntities;
+		Long timeout = timeoutManager.remainingTimeToHardTimeout();
 		try {
 			loadedEntities = doLoadEntities( references, timeout );
 		}

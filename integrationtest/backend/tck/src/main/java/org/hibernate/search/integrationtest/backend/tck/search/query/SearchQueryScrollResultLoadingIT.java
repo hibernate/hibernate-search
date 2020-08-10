@@ -69,7 +69,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 		verifyAll();
 
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, false );
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 		verifyAll();
 
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, true );
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
 	}
 
 	@Test
@@ -112,13 +112,13 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 		verifyAll();
 
 		// softTimeout is passed to the entity loading too
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll, true );
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
 	}
 
 	private void verifyLoading(LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
 			DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock,
 			EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock,
-			SearchScroll<StubLoadedObject> scroll, boolean entityLoadingTimeout) {
+			SearchScroll<StubLoadedObject> scroll) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {
 			int base = j * 5;
@@ -130,7 +130,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 						for ( int i = 0; i < 5; i++ ) {
 							c.load( references[base + i].reference, references[base + i].transformedReference, references[base + i].loadedObject );
 						}
-					}, entityLoadingTimeout
+					}
 			);
 			replayAll();
 			assertThat( scroll.next().hits() ).hasHitsAnyOrder(
@@ -148,7 +148,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 					for ( int i = 35; i <= 36; i++ ) {
 						c.load( references[i].reference, references[i].transformedReference, references[i].loadedObject );
 					}
-				}, entityLoadingTimeout
+				}
 		);
 		replayAll();
 		assertThat( scroll.next().hits() ).hasHitsAnyOrder(
