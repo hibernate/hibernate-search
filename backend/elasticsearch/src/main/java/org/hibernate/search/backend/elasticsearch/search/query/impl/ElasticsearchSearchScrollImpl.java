@@ -50,6 +50,8 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 
 	@Override
 	public ElasticsearchSearchScrollResult<H> next() {
+		timeoutManager.start();
+
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> scroll = ( scrollId == null ) ? firstScroll :
 				workFactory.scroll( scrollId, scrollTimeoutString, searchResultExtractor, timeoutManager )
 						.build();
@@ -61,6 +63,8 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 		if ( scrollId == null ) {
 			throw new AssertionFailure( "Elasticsearch response lacked a value for scroll id" );
 		}
+
+		timeoutManager.stop();
 
 		return new ElasticsearchSearchScrollResultImpl<>( loadableSearchResult.hasHits(), searchResult.hits(),
 				searchResult.took(), searchResult.timedOut() );
