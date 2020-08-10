@@ -79,30 +79,6 @@ public final class ElasticsearchTimeoutManager extends TimeoutManager {
 	}
 
 	public String timeoutString() {
-		StringBuilder builder = new StringBuilder( timeoutValue.toString() );
-		switch ( timeoutUnit ) {
-			case DAYS:
-				builder.append( "d" );
-				break;
-			case HOURS:
-				builder.append( "h" );
-				break;
-			case MINUTES:
-				builder.append( "m" );
-				break;
-			case SECONDS:
-				builder.append( "s" );
-				break;
-			case MILLISECONDS:
-				builder.append( "ms" );
-				break;
-			case MICROSECONDS:
-				builder.append( "micros" );
-				break;
-			case NANOSECONDS:
-				builder.append( "nanos" );
-				break;
-		}
-		return builder.toString();
+		return checkTimeLeftInMilliseconds() + "ms";
 	}
 }
