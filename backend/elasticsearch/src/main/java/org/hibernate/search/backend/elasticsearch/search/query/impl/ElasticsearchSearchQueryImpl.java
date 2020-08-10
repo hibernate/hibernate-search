@@ -109,11 +109,13 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
+		timeoutManager.start();
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = searchWorkBuilder()
 				.paging( defaultedLimit( limit, offset ), offset )
 				.build();
 
-		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
+		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(
+				queryOrchestrator.submit( work ) )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async query execution, we will have to add a loadAsync method here,
@@ -122,10 +124,14 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				 * so we may choose to throw exceptions for those.
 				 */
 				.loadBlocking();
+		timeoutManager.stop();
+		return result;
 	}
 
 	@Override
 	public long fetchTotalHitCount() {
+		timeoutManager.start();
+
 		JsonObject filteredPayload = new JsonObject();
 		Optional<JsonObject> querySubTree = JsonAccessor.root().property( "query" ).asObject().get( payload );
 		if ( querySubTree.isPresent() ) {
@@ -143,7 +149,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);
 		NonBulkableWork<Long> work = builder.build();
-		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
+		Long result = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
+		timeoutManager.stop();
+		return result;
 	}
 
 	@Override
