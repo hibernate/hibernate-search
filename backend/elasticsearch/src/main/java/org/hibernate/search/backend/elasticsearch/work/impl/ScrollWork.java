@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 
 import com.google.gson.JsonObject;
@@ -17,18 +18,18 @@ import com.google.gson.JsonObject;
 public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-	private final Long hardTimeoutInMilliseconds;
+	private final ElasticsearchTimeoutManager timeoutManager;
 
 	protected ScrollWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
-		this.hardTimeoutInMilliseconds = builder.hardTimeoutInMilliseconds;
+		this.timeoutManager = builder.timeoutManager;
 	}
 
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body, hardTimeoutInMilliseconds );
+		return resultExtractor.extract( body, timeoutManager.timeoutInMilliseconds() );
 	}
 
 	public static class Builder<R>
@@ -37,15 +38,15 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 		private final String scrollId;
 		private final String scrollTimeout;
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-		private final Long hardTimeoutInMilliseconds;
+		private final ElasticsearchTimeoutManager timeoutManager;
 
 		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor,
-				Long hardTimeoutInMilliseconds) {
+				ElasticsearchTimeoutManager timeoutManager) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
 			this.resultExtractor = resultExtractor;
-			this.hardTimeoutInMilliseconds = hardTimeoutInMilliseconds;
+			this.timeoutManager = timeoutManager;
 		}
 
 		@Override

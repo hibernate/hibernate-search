@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -212,6 +213,9 @@ public class ElasticsearchSearchQueryBuilder<H>
 			REQUEST_SOURCE_ACCESSOR.set( payload, new JsonPrimitive( Boolean.FALSE ) );
 		}
 
+		ElasticsearchTimeoutManager timeoutManager = searchContext.createTimeoutManager(
+				payload, timeoutValue, timeoutUnit, exceptionOnTimeout );
+
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
@@ -224,7 +228,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 				searchContext, sessionContext, loadingContext, routingKeys,
 				payload, requestTransformer,
 				searchResultExtractor,
-				timeoutValue, timeoutUnit, exceptionOnTimeout,
+				timeoutManager,
 				scrollTimeout
 		);
 	}

@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
@@ -26,6 +26,6 @@ public interface CountWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWo
 
 	CountWorkBuilder requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
-	CountWorkBuilder timeout(Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout);
+	CountWorkBuilder timeout(ElasticsearchTimeoutManager timeoutManager);
 
 }

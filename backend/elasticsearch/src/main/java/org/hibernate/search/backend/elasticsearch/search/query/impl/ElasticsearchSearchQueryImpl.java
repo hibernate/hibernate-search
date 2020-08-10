@@ -21,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
@@ -64,9 +65,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final Integer scrollTimeout;
 
-	private Long timeoutValue;
-	private TimeUnit timeoutUnit;
-	private boolean exceptionOnTimeout;
+	private ElasticsearchTimeoutManager timeoutManager;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
@@ -77,7 +76,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout, Integer scrollTimeout) {
+			ElasticsearchTimeoutManager timeoutManager, Integer scrollTimeout) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
@@ -87,9 +86,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.payload = payload;
 		this.requestTransformer = requestTransformer;
 		this.searchResultExtractor = searchResultExtractor;
-		this.timeoutValue = timeoutValue;
-		this.timeoutUnit = timeoutUnit;
-		this.exceptionOnTimeout = exceptionOnTimeout;
+		this.timeoutManager = timeoutManager;
 		this.scrollTimeout = scrollTimeout;
 	}
 
@@ -141,7 +138,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 		builder.query( filteredPayload )
 				.routingKeys( routingKeys )
-				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
+				.timeout( timeoutManager )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);
@@ -157,11 +154,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.scrolling( chunkSize, scrollTimeoutString )
 				.build();
 
-		Long hardTimeoutInMilliseconds = ( exceptionOnTimeout && timeoutUnit != null && timeoutValue != null ) ?
-				timeoutUnit.toMillis( timeoutValue ) : null;
-
 		return new ElasticsearchSearchScrollImpl<>( queryOrchestrator, workFactory, searchResultExtractor,
-				scrollTimeoutString, firstScroll, hardTimeoutInMilliseconds );
+				scrollTimeoutString, firstScroll, timeoutManager );
 	}
 
 	@Override
@@ -200,7 +194,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 		builder
 				.routingKeys( routingKeys )
-				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
+				.timeout( timeoutManager )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);
@@ -257,8 +251,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
-		timeoutValue = timeout;
-		timeoutUnit = timeUnit;
-		exceptionOnTimeout = true;
+		// replace the timeout manager on already created query instance
+		timeoutManager = searchContext.createTimeoutManager( payload, timeout, timeUnit, true );
 	}
 }

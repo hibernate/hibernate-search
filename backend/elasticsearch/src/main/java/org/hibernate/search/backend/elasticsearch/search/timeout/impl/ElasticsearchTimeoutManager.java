@@ -54,16 +54,55 @@ public final class ElasticsearchTimeoutManager extends TimeoutManager {
 		}
 	}
 
-	/**
-	 * If no hard timeout is defined, returns {@code null}.
-	 *
-	 * @return the remaining time to hard timeout in milliseconds
-	 */
-	public Long remainingTimeToHardTimeout() {
-		if ( !Type.EXCEPTION.equals( type ) ) {
+	public boolean exceptionOnTimeout() {
+		return Type.EXCEPTION.equals( type );
+	}
+
+	public Long timeoutValue() {
+		return timeoutValue;
+	}
+
+	public TimeUnit timeoutUnit() {
+		return timeoutUnit;
+	}
+
+	public Long timeoutInMilliseconds() {
+		if ( !Type.EXCEPTION.equals( type ) || !defined() ) {
 			return null;
 		}
 
-		return checkTimeLeftInMilliseconds();
+		return timeoutUnit.toMillis( timeoutValue );
+	}
+
+	public boolean defined() {
+		return timeoutValue != null && timeoutUnit != null;
+	}
+
+	public String timeoutString() {
+		StringBuilder builder = new StringBuilder( timeoutValue.toString() );
+		switch ( timeoutUnit ) {
+			case DAYS:
+				builder.append( "d" );
+				break;
+			case HOURS:
+				builder.append( "h" );
+				break;
+			case MINUTES:
+				builder.append( "m" );
+				break;
+			case SECONDS:
+				builder.append( "s" );
+				break;
+			case MILLISECONDS:
+				builder.append( "ms" );
+				break;
+			case MICROSECONDS:
+				builder.append( "micros" );
+				break;
+			case NANOSECONDS:
+				builder.append( "nanos" );
+				break;
+		}
+		return builder.toString();
 	}
 }

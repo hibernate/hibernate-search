@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScrollResult;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
@@ -22,7 +23,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final String scrollTimeoutString;
 	private final NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll;
-	private final Long hardTimeoutInMilliseconds;
+	private final ElasticsearchTimeoutManager timeoutManager;
 
 	private String scrollId;
 
@@ -30,13 +31,14 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
 			String scrollTimeoutString,
-			NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll, Long hardTimeoutInMilliseconds) {
+			NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll,
+			ElasticsearchTimeoutManager timeoutManager) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchResultExtractor = searchResultExtractor;
 		this.scrollTimeoutString = scrollTimeoutString;
 		this.firstScroll = firstScroll;
-		this.hardTimeoutInMilliseconds = hardTimeoutInMilliseconds;
+		this.timeoutManager = timeoutManager;
 	}
 
 	@Override
@@ -49,7 +51,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	@Override
 	public ElasticsearchSearchScrollResult<H> next() {
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> scroll = ( scrollId == null ) ? firstScroll :
-				workFactory.scroll( scrollId, scrollTimeoutString, searchResultExtractor, hardTimeoutInMilliseconds )
+				workFactory.scroll( scrollId, scrollTimeoutString, searchResultExtractor, timeoutManager )
 						.build();
 
 		ElasticsearchLoadableSearchResult<H> loadableSearchResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( scroll ) );

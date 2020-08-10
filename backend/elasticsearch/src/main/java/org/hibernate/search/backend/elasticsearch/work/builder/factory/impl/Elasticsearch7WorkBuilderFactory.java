@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
@@ -130,8 +131,8 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public <T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout,
-			ElasticsearchSearchResultExtractor<T> searchResultExtractor, Long hardTimeoutInMilliseconds) {
-		return new ScrollWork.Builder<>( scrollId, scrollTimeout, searchResultExtractor, hardTimeoutInMilliseconds );
+			ElasticsearchSearchResultExtractor<T> searchResultExtractor, ElasticsearchTimeoutManager timeoutManager) {
+		return new ScrollWork.Builder<>( scrollId, scrollTimeout, searchResultExtractor, timeoutManager );
 	}
 
 	@Override

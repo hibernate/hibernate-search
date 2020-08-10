@@ -9,12 +9,12 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
 
@@ -39,9 +39,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 		private JsonObject query;
 		private Set<String> routingKeys;
-		private Long timeoutValue;
-		private TimeUnit timeoutUnit;
-		private boolean exceptionOnTimeout;
+		private ElasticsearchTimeoutManager timeoutManager;
 
 		public Builder() {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -66,10 +64,8 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		}
 
 		@Override
-		public CountWorkBuilder timeout(Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
-			this.timeoutValue = timeoutValue;
-			this.timeoutUnit = timeoutUnit;
-			this.exceptionOnTimeout = exceptionOnTimeout;
+		public CountWorkBuilder timeout(ElasticsearchTimeoutManager timeoutManager) {
+			this.timeoutManager = timeoutManager;
 			return this;
 		}
 
@@ -89,9 +85,9 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
 
-			if ( exceptionOnTimeout ) {
+			if ( timeoutManager.exceptionOnTimeout() ) {
 				// set timeoutValue and timeoutUnit only for hard timeout
-				builder.timeout( timeoutValue, timeoutUnit );
+				builder.timeout( timeoutManager.timeoutValue(), timeoutManager.timeoutUnit() );
 			}
 
 			return builder.build();
