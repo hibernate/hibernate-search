@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javax.persistence.SharedCacheMode;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Hierarchy1_A__Abstract;
@@ -45,8 +49,10 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface1;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface2;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -225,6 +231,53 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.entity( Hierarchy3_A_C.class, 3 ),
 				c -> c.assertStatementExecutionCount().isEqualTo( 3 ) // Optimized: only one query per entity hierarchy
 		);
+	}
+
+	@Test
+	public void mixedHierarchies_entityLoadingTimeout() {
+		assertThatThrownBy( () -> testLoading(
+				Arrays.asList(
+						Hierarchy1_A_B.class,
+						Hierarchy1_A_C.class,
+						Hierarchy2_A__NonAbstract_Indexed.class,
+						Hierarchy2_A_B.class,
+						Hierarchy2_A_C.class,
+						Hierarchy3_A_B.class,
+						Hierarchy3_A_C.class
+				),
+				Arrays.asList(
+						Hierarchy1_A_B.NAME,
+						Hierarchy1_A_C.NAME,
+						Hierarchy2_A__NonAbstract_Indexed.NAME,
+						Hierarchy2_A_B.NAME,
+						Hierarchy2_A_C.NAME,
+						Hierarchy3_A_B.NAME,
+						Hierarchy3_A_C.NAME
+				),
+				c -> c
+						.doc( Hierarchy1_A_B.NAME, "2" )
+						.doc( Hierarchy1_A_C.NAME, "3" )
+						.doc( Hierarchy2_A__NonAbstract_Indexed.NAME, "1" )
+						.doc( Hierarchy2_A_B.NAME, "2" )
+						.doc( Hierarchy2_A_C.NAME, "3" )
+						.doc( Hierarchy3_A_B.NAME, "2" )
+						.doc( Hierarchy3_A_C.NAME, "3" ),
+				c -> c
+						.entity( Hierarchy1_A_B.class, 2 )
+						.entity( Hierarchy1_A_C.class, 3 )
+						.entity( Hierarchy2_A__NonAbstract_Indexed.class, 1 )
+						.entity( Hierarchy2_A_B.class, 2 )
+						.entity( Hierarchy2_A_C.class, 3 )
+						.entity( Hierarchy3_A_B.class, 2 )
+						.entity( Hierarchy3_A_C.class, 3 ),
+				c -> c.assertStatementExecutionCount().isEqualTo( 3 ) // Optimized: only one query per entity hierarchy
+				, 1, TimeUnit.MICROSECONDS,
+				session -> SlowerLoadingListener.registerSlowerLoadingListener( session, 100 )
+		) )
+				.isInstanceOf( SearchTimeoutException.class )
+				.hasMessageContaining(
+						"Search query loading exceeded the timeout of 1 milliseconds"
+				);
 	}
 
 	/**
@@ -437,6 +490,22 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
 				assertionsContributor
+		);
+	}
+
+	protected <T> void testLoading(List<? extends Class<? extends T>> targetClasses,
+			List<String> targetIndexes,
+			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
+			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
+			Consumer<OrmSoftAssertions> assertionsContributor,
+			Integer timeout, TimeUnit timeUnit, Consumer<Session> sessionSetup) {
+		testLoading(
+				sessionSetup, targetClasses, targetIndexes,
+				o -> { }, // We don't use any particular loading option
+				hitDocumentReferencesContributor,
+				expectedLoadedEntitiesContributor,
+				(assertions, ignored) -> assertionsContributor.accept( assertions ),
+				timeout, timeUnit
 		);
 	}
 
