@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
+
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchResultExtractor<R> {
 
-	R extract(JsonObject responseBody, Long hardTimeoutInMilliseconds);
+	R extract(JsonObject responseBody, ElasticsearchTimeoutManager timeoutManager);
 
 }

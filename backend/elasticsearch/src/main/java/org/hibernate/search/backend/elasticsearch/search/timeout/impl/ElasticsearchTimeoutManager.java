@@ -66,12 +66,17 @@ public final class ElasticsearchTimeoutManager extends TimeoutManager {
 		return timeoutUnit;
 	}
 
-	public Long timeoutInMilliseconds() {
-		if ( !Type.EXCEPTION.equals( type ) || !defined() ) {
+	/**
+	 * If no hard timeout is defined, returns {@code null}.
+	 *
+	 * @return the remaining time to hard timeout in milliseconds
+	 */
+	public Long remainingTimeToHardTimeout() {
+		if ( !Type.EXCEPTION.equals( type ) ) {
 			return null;
 		}
 
-		return timeoutUnit.toMillis( timeoutValue );
+		return checkTimeLeftInMilliseconds();
 	}
 
 	public boolean defined() {
