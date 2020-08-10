@@ -50,6 +50,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SlowerLoadingListener;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -182,10 +183,39 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void target_byClass_multipleTypes_entityLoadingTimeout() {
+	public void target_byClass_multipleTypes_entityLoadingTimeout_clientSideTimeout() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			SlowerLoadingListener.registerSlowerLoadingListener( session, 100 );
+
+			SearchQuery<Object> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
+					.where( f -> f.matchAll() )
+					.failAfter( 1L, TimeUnit.MILLISECONDS )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME, Author.NAME ),
+					b -> b.failAfter( 1L, TimeUnit.MILLISECONDS ),
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( Book.NAME, "1" ),
+							reference( Author.NAME, "2" )
+					)
+			);
+
+			Assertions.assertThatThrownBy( () -> query.fetchAllHits() )
+					.isInstanceOf( SearchTimeoutException.class )
+					.hasMessageContaining(
+							"Search query loading exceeded the timeout of 1 milliseconds"
+					);
+		} );
+	}
+
+	@Test
+	public void target_byClass_multipleTypes_entityLoadingTimeout_jdbcTimeout() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			TimeoutLoadingListener.registerTimingOutLoadingListener( session );
 
 			SearchQuery<Object> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
 					.where( f -> f.matchAll() )

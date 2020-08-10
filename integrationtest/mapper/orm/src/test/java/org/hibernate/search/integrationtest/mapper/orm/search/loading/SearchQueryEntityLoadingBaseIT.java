@@ -11,12 +11,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Basic tests of entity loading when executing a search query
@@ -77,6 +81,26 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 ),
 				1, TimeUnit.DAYS
 		);
+	}
+
+	@Test
+	public void simple_entityLoadingTimeout() {
+		final int entityCount = 3;
+
+		persistThatManyEntities( entityCount );
+
+		Assertions.assertThatThrownBy( () -> testLoadingThatManyEntities(
+				session -> TimeoutLoadingListener.registerTimingOutLoadingListener( session ),
+				o -> { }, // No particular loading option
+				entityCount,
+				// Only one entity type means only one statement should be executed, even if there are multiple hits
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 ),
+				1, TimeUnit.MICROSECONDS
+		) )
+				.isInstanceOf( SearchTimeoutException.class )
+				.hasMessageContaining(
+						"Search query loading exceeded the timeout of 1 milliseconds"
+				);
 	}
 
 	/**
