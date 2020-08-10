@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
@@ -68,7 +69,7 @@ public interface ElasticsearchWorkBuilderFactory {
 	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload);
 
 	<T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout,
-			ElasticsearchSearchResultExtractor<T> searchResultExtractor, Long hardTimeoutInMilliseconds);
+			ElasticsearchSearchResultExtractor<T> searchResultExtractor, ElasticsearchTimeoutManager timeoutManager);
 
 	ClearScrollWorkBuilder clearScroll(String scrollId);
 

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -101,34 +100,6 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 		public B requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer) {
 			this.requestTransformer = requestTransformer;
 			return (B) this;
-		}
-
-		protected static String getTimeoutString(Long timeoutValue, TimeUnit timeoutUnit) {
-			StringBuilder builder = new StringBuilder( timeoutValue.toString() );
-			switch ( timeoutUnit ) {
-				case DAYS:
-					builder.append( "d" );
-					break;
-				case HOURS:
-					builder.append( "h" );
-					break;
-				case MINUTES:
-					builder.append( "m" );
-					break;
-				case SECONDS:
-					builder.append( "s" );
-					break;
-				case MILLISECONDS:
-					builder.append( "ms" );
-					break;
-				case MICROSECONDS:
-					builder.append( "micros" );
-					break;
-				case NANOSECONDS:
-					builder.append( "nanos" );
-					break;
-			}
-			return builder.toString();
 		}
 
 		private ElasticsearchRequest buildRequestAndTransformIfNecessary() {

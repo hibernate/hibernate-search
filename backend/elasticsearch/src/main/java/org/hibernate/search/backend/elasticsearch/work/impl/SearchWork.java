@@ -9,12 +9,12 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
@@ -28,13 +28,12 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-	private final Long hardTimeoutInMilliseconds;
+	private final ElasticsearchTimeoutManager timeoutManager;
 
 	protected SearchWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
-		this.hardTimeoutInMilliseconds = ( builder.exceptionOnTimeout && builder.timeoutUnit != null
-				&& builder.timeoutValue != null ) ? builder.timeoutUnit.toMillis( builder.timeoutValue ) : null;
+		this.timeoutManager = builder.timeoutManager;
 	}
 
 	@Override
@@ -50,7 +49,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body, hardTimeoutInMilliseconds );
+		return resultExtractor.extract( body, timeoutManager.timeoutInMilliseconds() );
 	}
 
 	public static class Builder<R>
@@ -85,9 +84,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		private Integer scrollSize;
 		private String scrollTimeout;
 		private Set<String> routingKeys;
-		private Long timeoutValue;
-		private TimeUnit timeoutUnit;
-		private boolean exceptionOnTimeout;
+		private ElasticsearchTimeoutManager timeoutManager;
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
 				boolean allowPartialSearchResultsSupported) {
@@ -125,10 +122,8 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		@Override
-		public SearchWorkBuilder<R> timeout(Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
-			this.timeoutValue = timeoutValue;
-			this.timeoutUnit = timeoutUnit;
-			this.exceptionOnTimeout = exceptionOnTimeout;
+		public SearchWorkBuilder<R> timeout(ElasticsearchTimeoutManager timeoutManager) {
+			this.timeoutManager = timeoutManager;
 			return this;
 		}
 
@@ -161,11 +156,11 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 				builder.param( "track_total_hits", trackTotalHits );
 			}
 
-			if ( timeoutValue != null && timeoutUnit != null ) {
+			if ( timeoutManager.defined() ) {
 				// Server-side timeout: the search will truncate results or fail on timeout.
-				builder.param( "timeout", getTimeoutString( timeoutValue, timeoutUnit ) );
+				builder.param( "timeout", timeoutManager.timeoutString() );
 				if ( allowPartialSearchResultsSupported ) {
-					if ( exceptionOnTimeout ) {
+					if ( timeoutManager.exceptionOnTimeout() ) {
 						// Ask the server to fail on timeout.
 						// Functionally, this does not matter, because we also have a client-side timeout.
 						// The server-side timeout is just an optimization so that Elasticsearch doesn't continue
@@ -182,8 +177,8 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 				// Client-side timeout: the search will fail on timeout.
 				// This is necessary to address network problems: the server-side timeout would not detect that.
-				if ( exceptionOnTimeout ) {
-					builder.timeout( timeoutValue, timeoutUnit );
+				if ( timeoutManager.exceptionOnTimeout() ) {
+					builder.timeout( timeoutManager.timeoutValue(), timeoutManager.timeoutUnit() );
 				}
 			}
 
