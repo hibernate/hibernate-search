@@ -8,12 +8,14 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.Set;
 
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 public class StubSearchScroll<T> implements SearchScroll<T> {
 
@@ -23,16 +25,19 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 	private final StubSearchProjectionContext projectionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
+	private final StubTimeoutManager timeoutManager;
 
 	public StubSearchScroll(StubBackendBehavior behavior, Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection) {
+			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		this.behavior = behavior;
 		this.indexNames = indexNames;
 		this.work = work;
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
+		this.timeoutManager = new StubTimeoutManager( timingSource, work.getFailAfterTimeout(),
+				work.getFailAfterTimeUnit() );
 	}
 
 	@Override
@@ -42,6 +47,13 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 
 	@Override
 	public SearchScrollResult<T> next() {
-		return behavior.executeNextScrollWork( indexNames, work, projectionContext, loadingContext, rootProjection );
+		timeoutManager.start();
+
+		SearchScrollResult<T> result = behavior.executeNextScrollWork( indexNames, work, projectionContext,
+				loadingContext, rootProjection, timeoutManager
+		);
+
+		timeoutManager.stop();
+		return result;
 	}
 }

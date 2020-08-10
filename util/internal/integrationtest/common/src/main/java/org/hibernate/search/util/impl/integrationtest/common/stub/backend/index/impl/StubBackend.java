@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
@@ -22,10 +23,13 @@ public class StubBackend implements BackendImplementor, Backend {
 
 	private final EventContext eventContext;
 	private final StubBackendBehavior behavior;
+	private final TimingSource timingSource;
 
-	StubBackend(EventContext eventContext, BackendBuildContext context, StubBackendBehavior behavior) {
+	StubBackend(EventContext eventContext, BackendBuildContext context, StubBackendBehavior behavior,
+			TimingSource timingSource) {
 		this.eventContext = eventContext;
 		this.behavior = behavior;
+		this.timingSource = timingSource;
 		behavior.onCreateBackend( context );
 	}
 
@@ -66,6 +70,10 @@ public class StubBackend implements BackendImplementor, Backend {
 
 	public StubBackendBehavior getBehavior() {
 		return behavior;
+	}
+
+	public TimingSource timingSource() {
+		return timingSource;
 	}
 
 	@Override
