@@ -103,8 +103,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			);
 		}
 
-		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( timeoutManager == null ? null :
-				timeoutManager.checkTimeLeftInMilliseconds() );
+		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( timeoutManager );
 
 		List<H> hits = new ArrayList<>( rawHits.size() );
 

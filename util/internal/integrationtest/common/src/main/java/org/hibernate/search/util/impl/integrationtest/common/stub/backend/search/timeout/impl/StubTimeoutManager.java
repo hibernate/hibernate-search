@@ -18,17 +18,4 @@ public class StubTimeoutManager extends TimeoutManager {
 		super( timingSource, ConvertUtils.toMilliseconds( timeoutValue, timeoutUnit ),
 				timeoutUnit == null ? null : Type.EXCEPTION );
 	}
-
-	/**
-	 * If no hard timeout is defined, returns {@code null}.
-	 *
-	 * @return the remaining time to hard timeout in milliseconds
-	 */
-	public Long remainingTimeToHardTimeout() {
-		if ( !Type.EXCEPTION.equals( type ) ) {
-			return null;
-		}
-
-		return checkTimeLeftInMilliseconds();
-	}
 }

@@ -58,17 +58,4 @@ public final class LuceneTimeoutManager extends TimeoutManager {
 			throw log.timedOut( Duration.ofNanos( timeoutUnit.toNanos( timeoutValue ) ), query.toString() );
 		}
 	}
-
-	/**
-	 * If no hard timeout is defined, returns {@code null}.
-	 *
-	 * @return the remaining time to hard timeout in milliseconds
-	 */
-	public Long remainingTimeToHardTimeout() {
-		if ( !Type.EXCEPTION.equals( type ) ) {
-			return null;
-		}
-
-		return checkTimeLeftInMilliseconds();
-	}
 }

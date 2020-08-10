@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.loading.spi;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 /**
  * Contract binding result hits and the mapper.
@@ -27,10 +28,9 @@ public interface ProjectionHitMapper<R, E> {
 	/**
 	 * Loads the entities planned for loading in one go, blocking the current thread while doing so.
 	 *
-	 * @param timeout The timeout to apply to the loading in milliseconds.
-	 * It can be {@code null}. If {@code null}, no timeout will be applied.
+	 * @param timeout The timeout manager to apply to the loading in milliseconds.
 	 * @return The loaded entities.
 	 */
-	LoadingResult<R, E> loadBlocking(Long timeout);
+	LoadingResult<R, E> loadBlocking(TimeoutManager timeout);
 
 }

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
+import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 
@@ -39,7 +40,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final Boolean timedOut;
 	private final boolean hasHits;
 	private final String scrollId;
-	private final Long remainingTimeToHardTimeout;
+	private final ElasticsearchTimeoutManager timeoutManager;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
@@ -47,7 +48,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 			List<Object> extractedHits,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			Integer took, Boolean timedOut, String scrollId,
-			Long remainingTimeToHardTimeout) {
+			ElasticsearchTimeoutManager timeoutManager) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
@@ -57,14 +58,14 @@ public class ElasticsearchLoadableSearchResult<H> {
 		this.timedOut = timedOut;
 		this.hasHits = !extractedHits.isEmpty();
 		this.scrollId = scrollId;
-		this.remainingTimeToHardTimeout = remainingTimeToHardTimeout;
+		this.timeoutManager = timeoutManager;
 	}
 
 	ElasticsearchSearchResultImpl<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
 		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper()
-				.loadBlocking( remainingTimeToHardTimeout );
+				.loadBlocking( timeoutManager );
 
 		int readIndex = 0;
 		int writeIndex = 0;
