@@ -39,6 +39,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -55,6 +56,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final IndexLayoutStrategy indexLayoutStrategy;
 	private final FailureHandler failureHandler;
+	private final TimingSource timingSource;
 	private final ElasticsearchParallelWorkOrchestrator generalPurposeOrchestrator;
 
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
@@ -66,6 +68,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			IndexLayoutStrategy indexLayoutStrategy,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler,
+			TimingSource timingSource,
 			ElasticsearchParallelWorkOrchestrator generalPurposeOrchestrator) {
 		this.backendAPI = backendAPI;
 		this.eventContext = eventContext;
@@ -75,6 +78,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.indexLayoutStrategy = indexLayoutStrategy;
 		this.failureHandler = failureHandler;
+		this.timingSource = timingSource;
 		this.generalPurposeOrchestrator = generalPurposeOrchestrator;
 
 		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
@@ -140,7 +144,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				mappingContext,
 				userFacingGson, link.getSearchSyntax(),
 				multiTenancyStrategy,
-				indexes
+				indexes, timingSource
 		);
 	}
 

@@ -33,6 +33,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -74,7 +75,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			MultiTenancyStrategy multiTenancyStrategy,
 			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
 			TypeNameMapping typeNameMapping,
-			FailureHandler failureHandler) {
+			FailureHandler failureHandler, TimingSource timingSource) {
 		this.eventContext = eventContext;
 		this.threads = threads;
 		this.link = link;
@@ -95,7 +96,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				multiTenancyStrategy,
 				indexLayoutStrategyHolder.get(),
 				typeNameMapping,
-				failureHandler,
+				failureHandler, timingSource,
 				generalPurposeOrchestrator
 		);
 		this.indexNamesRegistry = new IndexNamesRegistry();
