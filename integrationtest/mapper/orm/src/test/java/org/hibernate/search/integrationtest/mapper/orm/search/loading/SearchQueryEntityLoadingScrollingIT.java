@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -21,11 +22,16 @@ public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadin
 	}
 
 	@Override
-	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences) {
+	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences,
+			Integer timeout, TimeUnit timeUnit) {
 		backendMock.expectScrollObjects(
 				targetIndexes,
 				hitDocumentReferences.size(),
-				b -> { }
+				b -> {
+					if ( timeout != null && timeUnit != null ) {
+						b.failAfter( timeout, timeUnit );
+					}
+				}
 		);
 
 		backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior.of( hitDocumentReferences ) );

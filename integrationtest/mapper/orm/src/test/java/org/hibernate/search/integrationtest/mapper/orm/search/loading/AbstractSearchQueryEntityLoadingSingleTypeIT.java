@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -50,6 +51,16 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
 			int entityCount,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
+		testLoadingThatManyEntities( sessionSetup, loadingOptionsContributor, entityCount, assertionsContributor,
+				null, null );
+	}
+
+	protected final void testLoadingThatManyEntities(
+			Consumer<Session> sessionSetup,
+			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
+			int entityCount,
+			Consumer<OrmSoftAssertions> assertionsContributor,
+			Integer timeout, TimeUnit timeUnit) {
 		testLoading(
 				sessionSetup,
 				Collections.singletonList( primitives.getIndexedClass() ),
@@ -65,7 +76,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 						c.entity( primitives.getIndexedClass(), i );
 					}
 				},
-				assertionsContributor
+				(assertions, ignored) -> assertionsContributor.accept( assertions ),
+				timeout, timeUnit
 		);
 	}
 
@@ -99,7 +111,8 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 				loadingOptionsContributor,
 				hitDocumentReferencesContributor,
 				expectedLoadedEntitiesContributor,
-				assertionsContributor
+				assertionsContributor,
+				null, null
 		);
 	}
 

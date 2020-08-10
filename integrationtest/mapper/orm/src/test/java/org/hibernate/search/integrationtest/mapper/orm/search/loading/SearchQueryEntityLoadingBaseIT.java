@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.SessionFactory;
@@ -59,6 +60,22 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
+		);
+	}
+
+	@Test
+	public void simple_withVeryLargeTimeout() {
+		final int entityCount = 3;
+
+		persistThatManyEntities( entityCount );
+
+		testLoadingThatManyEntities(
+				session -> { }, // No particular session setup
+				o -> { }, // No particular loading option
+				entityCount,
+				// Only one entity type means only one statement should be executed, even if there are multiple hits
+				c -> c.assertStatementExecutionCount().isEqualTo( 1 ),
+				1, TimeUnit.DAYS
 		);
 	}
 
