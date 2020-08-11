@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -79,7 +78,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 	private final FailureHandler failureHandler;
 	private final ThreadPoolProvider threadPoolProvider;
-	private final TimingSource timingSource;
 
 	private final PojoMapperDelegate<MPBS> delegate;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -112,7 +110,6 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 		this.failureHandler = buildContext.failureHandler();
 		this.threadPoolProvider = buildContext.threadPoolProvider();
-		this.timingSource = buildContext.timingSource();
 
 		this.delegate = delegate;
 
@@ -302,7 +299,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			mappingDelegate = new PojoMappingDelegateImpl(
-					threadPoolProvider, failureHandler, timingSource,
+					threadPoolProvider, failureHandler,
 					indexedTypeManagerContainerBuilder.build(),
 					containedTypeManagerContainerBuilder.build()
 			);

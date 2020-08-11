@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -22,7 +21,6 @@ public class EntityLoaderBuilder<E> {
 
 	private final SessionImplementor session;
 	private final Set<? extends HibernateOrmLoadingIndexedTypeContext> concreteIndexedTypes;
-	private final TimingSource timingSource;
 
 	private EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
@@ -32,7 +30,6 @@ public class EntityLoaderBuilder<E> {
 		this.session = sessionContext.session();
 		this.concreteIndexedTypes = concreteIndexedTypes;
 		this.cacheLookupStrategy = mappingContext.cacheLookupStrategy();
-		this.timingSource = sessionContext.timingSource();
 	}
 
 	public void cacheLookupStrategy(EntityLoadingCacheLookupStrategy cacheLookupStrategy) {
@@ -83,7 +80,7 @@ public class EntityLoaderBuilder<E> {
 					delegateByEntityName.put( type.jpaEntityName(), loader );
 				}
 			}
-			return new HibernateOrmByTypeEntityLoader<>( delegateByEntityName, timingSource );
+			return new HibernateOrmByTypeEntityLoader<>( delegateByEntityName );
 		}
 	}
 

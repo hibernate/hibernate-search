@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -25,12 +24,9 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName;
-	private final TimingSource timingSource;
 
-	HibernateOrmByTypeEntityLoader(Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName,
-			TimingSource timingSource) {
+	HibernateOrmByTypeEntityLoader(Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName) {
 		this.delegatesByEntityName = delegatesByEntityName;
-		this.timingSource = timingSource;
 	}
 
 	@Override

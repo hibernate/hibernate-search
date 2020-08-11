@@ -24,7 +24,6 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
@@ -254,11 +253,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	@Override
 	public PojoRuntimeIntrospector runtimeIntrospector() {
 		return runtimeIntrospector;
-	}
-
-	@Override
-	public TimingSource timingSource() {
-		return mappingContext.timingSource();
 	}
 
 	@Override
