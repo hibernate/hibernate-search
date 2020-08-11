@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public interface HibernateOrmLoadingSessionContext {
@@ -16,7 +15,5 @@ public interface HibernateOrmLoadingSessionContext {
 	SessionImplementor session();
 
 	DocumentReferenceConverter<EntityReference> referenceHitMapper();
-
-	TimingSource timingSource();
 
 }
