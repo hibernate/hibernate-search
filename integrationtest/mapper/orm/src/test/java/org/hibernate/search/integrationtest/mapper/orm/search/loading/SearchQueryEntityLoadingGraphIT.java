@@ -20,7 +20,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -96,7 +95,6 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	@Ignore
 	public void lazy_fetch() {
 		testLoadingWithEntityGraph(
 				// Use a graph that doesn't force loading of any association,
