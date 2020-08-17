@@ -96,9 +96,6 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3628")
-	// TODO HSEARCH-3973 re-enable this test,
-	//  which was disabled due to a regression in Hibernate ORM: HHH-14124
-	//  (fetch graph handling is buggy beyond the first hit)
 	@Ignore
 	public void lazy_fetch() {
 		testLoadingWithEntityGraph(
