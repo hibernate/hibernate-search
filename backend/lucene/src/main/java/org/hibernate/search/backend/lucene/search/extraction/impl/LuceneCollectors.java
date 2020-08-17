@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQue
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -45,7 +46,7 @@ public class LuceneCollectors {
 
 	private final LuceneTimeoutManager timeoutManager;
 
-	private long totalHitCount = 0;
+	private Long totalHitCount;
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher, Query luceneQuery,
@@ -79,13 +80,19 @@ public class LuceneCollectors {
 
 		// Phase 1: collect top docs and aggregations
 		try {
-			indexSearcher.search( luceneQuery, collectorsForAllMatchingDocs.getComposed() );
+			Collector composed = collectorsForAllMatchingDocs.getComposed();
+			if ( composed != null ) {
+				indexSearcher.search( luceneQuery, composed );
+			}
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			timeoutManager.forceTimedOut();
 		}
 
-		this.totalHitCount = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY ).getTotalHits();
+		TotalHitCountCollector totalHitCountCollector = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY );
+		if ( totalHitCountCollector != null ) {
+			totalHitCount = Long.valueOf( totalHitCountCollector.getTotalHits() );
+		}
 
 		TopDocsCollector<?> topDocsCollector = collectorsForAllMatchingDocs.get( TOP_DOCS_KEY );
 		if ( topDocsCollector == null ) {
@@ -107,6 +114,7 @@ public class LuceneCollectors {
 	 *
 	 * @param startInclusive The index of the first top doc whose data to collect.
 	 * @param endExclusive The index after the last top doc whose data to collect.
+	 *
 	 * @throws IOException If Lucene throws an {@link IOException}.
 	 */
 	public void collectTopDocsData(int startInclusive, int endExclusive) throws IOException {
@@ -129,7 +137,7 @@ public class LuceneCollectors {
 		return collectorsForTopDocs;
 	}
 
-	public long getTotalHitCount() {
+	public Long getTotalHitCount() {
 		return totalHitCount;
 	}
 

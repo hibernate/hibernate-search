@@ -64,13 +64,15 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit) throws IOException {
+			int offset, Integer limit, boolean skipTotalHitCount) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs );
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs,
+				skipTotalHitCount
+		);
 
 		luceneCollectors.collectMatchingDocs( offset, limit );
 
@@ -91,7 +93,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		int offset = 0;
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs );
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs, false );
 
 		luceneCollectors.collectMatchingDocs( offset, limit );
 
@@ -110,7 +112,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		// Soft timeout has no sense in case of count,
 		// since there is no possible to have partial result.
 		if ( timeoutManager.hasHardTimeout() ) {
-			return indexSearcher.search( requestContext.getLuceneQuery(), new TimeoutCountCollectorManager( timeoutManager ) );
+			return indexSearcher.search(
+					requestContext.getLuceneQuery(), new TimeoutCountCollectorManager( timeoutManager ) );
 		}
 
 		return indexSearcher.count( requestContext.getLuceneQuery() );
@@ -132,10 +135,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int maxDocs) throws IOException {
+			int maxDocs, boolean skipTotalHitCount) throws IOException {
 		return extractionRequirements.createCollectors(
 				indexSearcher, requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
-				metadataResolver, maxDocs, timeoutManager
+				metadataResolver, maxDocs, timeoutManager, skipTotalHitCount
 		);
 	}
 

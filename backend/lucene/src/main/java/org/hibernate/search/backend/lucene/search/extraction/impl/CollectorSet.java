@@ -63,6 +63,10 @@ public class CollectorSet {
 		}
 
 		public CollectorSet build() {
+			if ( components.isEmpty() ) {
+				return new CollectorSet( null, components );
+			}
+
 			Collector composed = wrapTimeLimitingCollectorIfNecessary(
 					MultiCollector.wrap( components.values() ),
 					timeoutManager

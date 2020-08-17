@@ -21,9 +21,10 @@ class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 
 	private final TopDocs topDocs;
 
-	LuceneSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
+	LuceneSearchResultImpl(Long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
 			Duration took, Boolean timedOut, TopDocs topDocs) {
-		super( hitCount, hits, aggregationResults, took, timedOut );
+		// hitCount is null in case of fetchHits
+		super( ( hitCount != null ) ? hitCount : 0L, hits, aggregationResults, took, timedOut );
 		this.topDocs = topDocs;
 	}
 

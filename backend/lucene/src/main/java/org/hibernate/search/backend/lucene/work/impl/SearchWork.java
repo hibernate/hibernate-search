@@ -23,13 +23,15 @@ public class SearchWork<R> implements ReadWork<R> {
 
 	private final int offset;
 	private final Integer limit;
+	private final boolean skipTotalHitCount;
 
 	SearchWork(LuceneSearcher<R, ?> searcher,
-			Integer offset,
-			Integer limit) {
+			Integer offset, Integer limit,
+			boolean skipTotalHitCount) {
 		this.offset = offset == null ? 0 : offset;
 		this.limit = limit;
 		this.searcher = searcher;
+		this.skipTotalHitCount = skipTotalHitCount;
 	}
 
 	@Override
@@ -38,7 +40,7 @@ public class SearchWork<R> implements ReadWork<R> {
 			IndexSearcher indexSearcher = context.createSearcher();
 
 			return searcher.search(
-					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit
+					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit, skipTotalHitCount
 			);
 		}
 		catch (IOException e) {
