@@ -54,10 +54,6 @@ public final class ElasticsearchTimeoutManager extends TimeoutManager {
 		}
 	}
 
-	public boolean exceptionOnTimeout() {
-		return Type.EXCEPTION.equals( type );
-	}
-
 	public Long timeoutValue() {
 		return timeoutValue;
 	}

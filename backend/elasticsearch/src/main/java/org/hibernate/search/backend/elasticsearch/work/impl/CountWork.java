@@ -85,7 +85,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
 
-			if ( timeoutManager.exceptionOnTimeout() ) {
+			if ( timeoutManager.hasHardTimeout() ) {
 				// set timeoutValue and timeoutUnit only for hard timeout
 				builder.timeout( timeoutManager.timeoutValue(), timeoutManager.timeoutUnit() );
 			}
