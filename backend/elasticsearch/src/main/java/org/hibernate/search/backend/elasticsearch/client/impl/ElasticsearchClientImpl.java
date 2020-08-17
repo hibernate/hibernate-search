@@ -131,10 +131,10 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				}
 				);
 
-		long currentTimeoutValue = ( elasticsearchRequest.timeoutValue() == null ) ?
-				globalTimeoutValue : elasticsearchRequest.timeoutValue();
-		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.timeoutUnit() == null ) ?
-				globalTimeoutUnit : elasticsearchRequest.timeoutUnit();
+		long currentTimeoutValue = ( elasticsearchRequest.timeoutManager() == null ) ?
+				globalTimeoutValue : elasticsearchRequest.timeoutManager().remainingTimeToHardTimeout();
+		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.timeoutManager() == null ) ?
+				globalTimeoutUnit : TimeUnit.MILLISECONDS;
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?

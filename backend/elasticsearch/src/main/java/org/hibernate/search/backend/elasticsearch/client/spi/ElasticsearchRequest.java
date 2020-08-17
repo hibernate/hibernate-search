@@ -13,9 +13,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import com.google.gson.JsonObject;
 
@@ -46,16 +46,14 @@ public final class ElasticsearchRequest {
 	private final String path;
 	private final Map<String, String> parameters;
 	private final List<JsonObject> bodyParts;
-	private final Long timeoutValue;
-	private final TimeUnit timeoutUnit;
+	private final TimeoutManager timeoutManager;
 
 	private ElasticsearchRequest(Builder builder) {
 		this.method = builder.method;
 		this.path = builder.pathBuilder.toString();
 		this.parameters = builder.parameters == null ? Collections.emptyMap() : Collections.unmodifiableMap( builder.parameters );
 		this.bodyParts = builder.bodyParts == null ? Collections.emptyList() : Collections.unmodifiableList( builder.bodyParts );
-		this.timeoutValue = builder.timeoutValue;
-		this.timeoutUnit = builder.timeoutUnit;
+		this.timeoutManager = builder.timeoutManager;
 	}
 
 	public String method() {
@@ -74,12 +72,8 @@ public final class ElasticsearchRequest {
 		return bodyParts;
 	}
 
-	public Long timeoutValue() {
-		return timeoutValue;
-	}
-
-	public TimeUnit timeoutUnit() {
-		return timeoutUnit;
+	public TimeoutManager timeoutManager() {
+		return timeoutManager;
 	}
 
 	@Override
@@ -89,8 +83,7 @@ public final class ElasticsearchRequest {
 				.add( "path='" + path + "'" )
 				.add( "parameters=" + parameters )
 				.add( "bodyParts=" + bodyParts )
-				.add( "timeoutValue=" + timeoutValue )
-				.add( "timeoutUnit=" + timeoutUnit )
+				.add( "timeoutManager=" + timeoutManager )
 				.toString();
 	}
 
@@ -102,8 +95,7 @@ public final class ElasticsearchRequest {
 
 		private Map<String, String> parameters;
 		private List<JsonObject> bodyParts;
-		private Long timeoutValue;
-		private TimeUnit timeoutUnit;
+		private TimeoutManager timeoutManager;
 
 		private Builder(String method) {
 			super();
@@ -168,9 +160,8 @@ public final class ElasticsearchRequest {
 			return this;
 		}
 
-		public Builder timeout(Long timeoutValue, TimeUnit timeoutUnit) {
-			this.timeoutValue = timeoutValue;
-			this.timeoutUnit = timeoutUnit;
+		public Builder timeout(TimeoutManager timeoutManager) {
+			this.timeoutManager = timeoutManager;
 			return this;
 		}
 

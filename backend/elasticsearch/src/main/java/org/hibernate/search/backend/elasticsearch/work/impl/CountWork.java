@@ -87,7 +87,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 
 			if ( timeoutManager.hasHardTimeout() ) {
 				// set timeoutValue and timeoutUnit only for hard timeout
-				builder.timeout( timeoutManager.timeoutValue(), timeoutManager.timeoutUnit() );
+				builder.timeout( timeoutManager );
 			}
 
 			return builder.build();
