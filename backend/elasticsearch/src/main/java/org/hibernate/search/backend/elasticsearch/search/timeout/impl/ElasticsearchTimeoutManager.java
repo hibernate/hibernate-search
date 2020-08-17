@@ -54,14 +54,6 @@ public final class ElasticsearchTimeoutManager extends TimeoutManager {
 		}
 	}
 
-	public Long timeoutValue() {
-		return timeoutValue;
-	}
-
-	public TimeUnit timeoutUnit() {
-		return timeoutUnit;
-	}
-
 	public boolean defined() {
 		return timeoutValue != null && timeoutUnit != null;
 	}
