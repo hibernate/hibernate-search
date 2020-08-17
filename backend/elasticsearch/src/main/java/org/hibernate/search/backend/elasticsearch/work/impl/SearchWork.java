@@ -170,12 +170,12 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 					// Ask the server to truncate results on timeout.
 					// This is normally the default behavior, but can be overridden with server-side settings,
 					// so we set it just to be safe.
-					builder.param( "allow_partial_search_results", !timeoutManager.exceptionOnTimeout() );
+					builder.param( "allow_partial_search_results", !timeoutManager.hasHardTimeout() );
 				}
 
 				// Client-side timeout: the search will fail on timeout.
 				// This is necessary to address network problems: the server-side timeout would not detect that.
-				if ( timeoutManager.exceptionOnTimeout() ) {
+				if ( timeoutManager.hasHardTimeout() ) {
 					builder.timeout( timeoutManager.timeoutValue(), timeoutManager.timeoutUnit() );
 				}
 			}
