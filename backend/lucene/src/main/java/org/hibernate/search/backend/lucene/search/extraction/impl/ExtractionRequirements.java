@@ -44,7 +44,8 @@ public final class ExtractionRequirements {
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
-			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager)
+			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager,
+			boolean skipTotalHitCount)
 			throws IOException {
 		TopDocsCollector<?> topDocsCollector;
 		Integer scoreSortFieldIndexForRescoring = null;
@@ -60,10 +61,9 @@ public final class ExtractionRequirements {
 			if ( sort == null ) {
 				topDocsCollector = TopScoreDocCollector.create(
 						maxDocs,
-						// TODO HSEARCH-3517 Avoid tracking the total hit count when possible
-						// Note this will also require to change how we combine collectors,
+						// TODO HSEARCH-3517 Change how we combine collectors,
 						// as MultiCollector explicitly ignores the total hit count optimization
-						Integer.MAX_VALUE
+						( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
 				);
 			}
 			else {
@@ -78,18 +78,18 @@ public final class ExtractionRequirements {
 				topDocsCollector = TopFieldCollector.create(
 						sort,
 						maxDocs,
-						// TODO HSEARCH-3517 Avoid tracking the total hit count when possible
-						// Note this will also require to change how we combine collectors,
+						// TODO HSEARCH-3517 Change how we combine collectors,
 						// as MultiCollector explicitly ignores the total hit count optimization
-						Integer.MAX_VALUE
+						( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
 				);
 			}
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
 		}
 
-		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-		collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollector );
-
+		if ( !skipTotalHitCount ) {
+			TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
+			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollector );
+		}
 		collectorsForAllMatchingDocsBuilder.addAll( requiredCollectorForAllMatchingDocsFactories );
 		CollectorSet collectorsForAllMatchingDocs = collectorsForAllMatchingDocsBuilder.build();
 

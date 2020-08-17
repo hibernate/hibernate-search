@@ -39,7 +39,7 @@ public class LuceneLoadableSearchResult<H> {
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
-	private final long hitCount;
+	private final Long hitCount;
 	private final TopDocs topDocs;
 
 	private List<Object> extractedData;
@@ -51,7 +51,7 @@ public class LuceneLoadableSearchResult<H> {
 
 	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext convertContext,
 			LuceneSearchProjection<?, H> rootProjection,
-			long hitCount, TopDocs topDocs, List<Object> extractedData,
+			Long hitCount, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			Duration took, boolean timedOut, LuceneTimeoutManager timeoutManager) {

@@ -89,7 +89,7 @@ public class LuceneExtractableSearchResult<H> {
 		);
 	}
 
-	public long totalHitCount() {
+	public Long totalHitCount() {
 		return luceneCollectors.getTotalHitCount();
 	}
 

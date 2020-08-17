@@ -95,25 +95,12 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchResult<H> fetch(Integer offset, Integer limit) {
-		timeoutManager.start();
-		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit );
-		LuceneSearchResult<H> result = doSubmit( work )
-				/*
-				 * WARNING: the following call must run in the user thread.
-				 * If we introduce async processing, we will have to add a loadAsync method here,
-				 * as well as in ProjectionHitMapper and EntityLoader.
-				 * This method may not be easy to implement for blocking mappers,
-				 * so we may choose to throw exceptions for those.
-				 */
-				.loadBlocking();
-		timeoutManager.stop();
-		return result;
+		return doFetch( offset, limit, false );
 	}
 
 	@Override
 	public List<H> fetchHits(Integer offset, Integer limit) {
-		// TODO HSEARCH-3517 Optimize this call
-		return fetch( offset, limit ).hits();
+		return doFetch( offset, limit, true ).hits();
 	}
 
 	@Override
@@ -179,6 +166,22 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public Sort luceneSort() {
 		return luceneSort;
+	}
+
+	private LuceneSearchResult<H> doFetch(Integer offset, Integer limit, boolean skipTotalHitCount) {
+		timeoutManager.start();
+		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit, skipTotalHitCount );
+		LuceneSearchResult<H> result = doSubmit( work )
+				/*
+				 * WARNING: the following call must run in the user thread.
+				 * If we introduce async processing, we will have to add a loadAsync method here,
+				 * as well as in ProjectionHitMapper and EntityLoader.
+				 * This method may not be easy to implement for blocking mappers,
+				 * so we may choose to throw exceptions for those.
+				 */
+				.loadBlocking();
+		timeoutManager.stop();
+		return result;
 	}
 
 	private <T> T doSubmit(ReadWork<T> work) {
