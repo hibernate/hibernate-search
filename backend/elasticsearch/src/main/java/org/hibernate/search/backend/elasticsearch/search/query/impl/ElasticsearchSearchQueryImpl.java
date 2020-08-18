@@ -158,9 +158,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public ElasticsearchSearchScroll<H> scroll(int chunkSize) {
 		String scrollTimeoutString = this.scrollTimeout + "s";
 
-		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()
-				.scrolling( chunkSize, scrollTimeoutString )
-				.build();
+		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll = searchWorkBuilder()
+				.scrolling( chunkSize, scrollTimeoutString );
 
 		return new ElasticsearchSearchScrollImpl<>( queryOrchestrator, workFactory, searchResultExtractor,
 				scrollTimeoutString, firstScroll, timeoutManager );

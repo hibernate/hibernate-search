@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScrollResult;
 import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -22,7 +23,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final String scrollTimeoutString;
-	private final NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll;
+	private final SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll;
 	private final ElasticsearchTimeoutManager timeoutManager;
 
 	private String scrollId;
@@ -31,7 +32,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
 			String scrollTimeoutString,
-			NonBulkableWork<ElasticsearchLoadableSearchResult<H>> firstScroll,
+			SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll,
 			ElasticsearchTimeoutManager timeoutManager) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -52,7 +53,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	public ElasticsearchSearchScrollResult<H> next() {
 		timeoutManager.start();
 
-		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> scroll = ( scrollId == null ) ? firstScroll :
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> scroll = ( scrollId == null ) ? firstScroll.build() :
 				workFactory.scroll( scrollId, scrollTimeoutString, searchResultExtractor, timeoutManager )
 						.build();
 
