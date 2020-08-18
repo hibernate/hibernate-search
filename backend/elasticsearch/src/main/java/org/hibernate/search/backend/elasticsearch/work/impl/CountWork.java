@@ -86,7 +86,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 			}
 
 			if ( timeoutManager.hasHardTimeout() ) {
-				// set timeoutValue and timeoutUnit only for hard timeout
+				// soft timeout has no meaning for a count work
 				builder.timeout( timeoutManager );
 			}
 
