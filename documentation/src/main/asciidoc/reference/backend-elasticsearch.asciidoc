@@ -712,6 +712,23 @@ include::{resourcesdir}/analysis/elasticsearch-simple.properties[]
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
 
+[NOTE]
+====
+A different analysis configurer can be assign to each index:
+
+[source]
+----
+# To set the default configurer for all indexes:
+hibernate.search.backend.analysis.configurer com.mycompany.MyAnalysisConfigurer
+# To assign a specific configurer to a specific index:
+hibernate.search.backend.indexes.<index name>.analysis.configurer com.mycompany.MySpecificAnalysisConfigurer
+----
+
+If a specific configurer is assigned to an index,
+the default configurer will be ignored for that index:
+only definitions from the specific configurer will be taken into account.
+====
+
 It is also possible to assign a name to a parameterized built-in analyzer:
 
 .Naming a parameterized built-in analyzer in the Elasticsearch backend
