@@ -674,9 +674,9 @@ analysis must be configured explicitly.
 ====
 Elasticsearch analysis configuration is not applied immediately on startup:
 it needs to be pushed to the Elasticsearch cluster.
-Hibernate Search will only push the configuration to the cluster if specific conditions are met,
-and only if instructed to do so
-through the <<backend-elasticsearch-index-lifecycle,lifecycle configuration>>.
+
+Hibernate Search will only push the configuration to the cluster if instructed to do so
+through <<mapper-orm-schema-management,schema management>>.
 ====
 
 To configure analysis in an Elasticsearch backend, you will need to:
