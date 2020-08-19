@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.cfg;
 
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 
 /**
@@ -18,6 +19,18 @@ public final class ElasticsearchIndexSettings {
 
 	private ElasticsearchIndexSettings() {
 	}
+
+	/**
+	 * The analysis configurer applied to this index.
+	 * <p>
+	 * Expects a reference to a bean of type {@link ElasticsearchAnalysisConfigurer}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
 	 * The minimal required status of an index on startup, before Hibernate Search can start using it.

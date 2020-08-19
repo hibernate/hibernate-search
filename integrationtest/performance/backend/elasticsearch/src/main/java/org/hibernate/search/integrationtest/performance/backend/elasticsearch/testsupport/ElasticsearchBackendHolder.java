@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.performance.backend.elasticsearch.t
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -41,7 +40,7 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 
 		// Custom connection info is provided by setting system properties,
 		// e.g. "hosts" or "aws.signing.enabled".
-		map.put( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, ElasticsearchPerformanceAnalysisConfigurer.class );
+		map.put( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER, ElasticsearchPerformanceAnalysisConfigurer.class );
 
 		map.put( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS, IndexStatus.YELLOW );
 

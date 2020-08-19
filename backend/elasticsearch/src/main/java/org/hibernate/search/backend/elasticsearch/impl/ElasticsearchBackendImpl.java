@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
@@ -32,9 +35,13 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -50,6 +57,11 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER )
+					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
+					.build();
+
 	private final EventContext eventContext;
 
 	private final BackendThreads threads;
@@ -58,7 +70,6 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private final ElasticsearchSimpleWorkOrchestrator generalPurposeOrchestrator;
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
-	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
@@ -71,7 +82,6 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			ElasticsearchLinkImpl link,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			Gson userFacingGson,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
 			TypeNameMapping typeNameMapping,
@@ -84,7 +94,6 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				"Elasticsearch general purpose orchestrator - " + eventContext.render(),
 				link
 		);
-		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexLayoutStrategyHolder = indexLayoutStrategyHolder;
@@ -164,9 +173,13 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 		IndexNames indexNames = createIndexNames( indexEventContext, hibernateSearchIndexName, mappedTypeName );
 
+		ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
+				createAnalysisDefinitionRegistry( buildContext, indexEventContext, propertySource );
+
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
-				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName ),
+				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName,
+						analysisDefinitionRegistry ),
 				createDocumentMetadataContributors( mappedTypeName )
 		);
 	}
@@ -196,7 +209,9 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	}
 
 	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			IndexNames indexNames, String mappedTypeName) {
+			IndexNames indexNames, String mappedTypeName,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+
 		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
 				typeFactoryProvider,
 				indexEventContext,
@@ -212,6 +227,28 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				.ifPresent( builder::addSchemaRootContributor );
 
 		return builder;
+	}
+
+	private ElasticsearchAnalysisDefinitionRegistry createAnalysisDefinitionRegistry(BackendBuildContext buildContext,
+			EventContext indexEventContext, ConfigurationPropertySource propertySource) {
+		try {
+			BeanResolver beanResolver = buildContext.beanResolver();
+			// Apply the user-provided analysis configurer if necessary
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
+					.map( holder -> {
+						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
+							ElasticsearchAnalysisConfigurationContextImpl collector =
+									new ElasticsearchAnalysisConfigurationContextImpl();
+							configurerHolder.get().configure( collector );
+							return new ElasticsearchAnalysisDefinitionRegistry( collector );
+						}
+					} )
+					// Otherwise just use an empty registry
+					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );
+		}
+		catch (Exception e) {
+			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e, indexEventContext );
+		}
 	}
 
 	private List<DocumentMetadataContributor> createDocumentMetadataContributors(String mappedTypeName) {

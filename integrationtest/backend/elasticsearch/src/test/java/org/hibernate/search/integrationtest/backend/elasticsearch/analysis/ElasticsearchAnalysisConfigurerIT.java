@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -26,6 +26,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
 
+	private static final String TYPE_NAME = "mainType";
+	private static final String INDEX_NAME = "mainIndex";
+
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -36,11 +39,12 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Unable to convert configuration property 'hibernate.search.backend."
-										+ ElasticsearchBackendSettings.ANALYSIS_CONFIGURER + "'",
+										+ ElasticsearchIndexSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'",
 								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
@@ -55,7 +59,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								FailingConfigurer.FAILURE_MESSAGE
@@ -85,7 +90,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple analyzer definitions with the same name",
@@ -111,7 +117,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple normalizer definitions with the same name",
@@ -137,7 +144,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple tokenizer definitions with the same name",
@@ -162,7 +170,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid tokenizer definition for name 'tokenizerName'",
@@ -186,7 +195,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple char filter definitions with the same name",
@@ -211,7 +221,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid char filter definition for name 'charFilterName'",
@@ -235,7 +246,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple token filter definitions with the same name",
@@ -260,7 +272,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid token filter definition for name 'tokenFilterName'",
@@ -284,7 +297,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Multiple parameters with the same name",
@@ -312,8 +326,9 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
 		setupHelper.start()
-				.withBackendProperty( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
-				.withIndex( StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor ) )
+				.withBackendProperty( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
+				.withIndex( StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor )
+						.name( INDEX_NAME ).typeName( TYPE_NAME ) )
 				.setup();
 	}
 }

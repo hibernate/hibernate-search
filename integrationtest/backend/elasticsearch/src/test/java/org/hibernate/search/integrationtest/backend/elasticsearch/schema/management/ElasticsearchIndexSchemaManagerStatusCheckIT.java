@@ -12,7 +12,6 @@ import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.util.common.impl.Futures;
@@ -127,7 +126,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 		setupHelper.start()
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, validation of those is tested in another test class
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}

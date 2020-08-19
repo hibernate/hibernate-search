@@ -11,7 +11,7 @@ import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.
 
 import java.util.EnumSet;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -128,7 +128,7 @@ public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer()
 				)
 				.withIndex( index )
