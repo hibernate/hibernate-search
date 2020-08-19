@@ -15,20 +15,23 @@ import java.util.StringJoiner;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SimpleSearchResult<H> implements SearchResult<H> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final boolean hitExact;
 	private final long hitCount;
 	private final List<H> hits;
 	private final Map<AggregationKey<?>, ?> aggregationResults;
 	private final Duration took;
 	private final boolean timedOut;
 
-	public SimpleSearchResult(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
+	public SimpleSearchResult(boolean hitExact, long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
 			Duration took, Boolean timedOut) {
+		this.hitExact = hitExact;
 		this.hitCount = hitCount;
 		this.hits = hits;
 		this.aggregationResults = aggregationResults;
@@ -37,8 +40,9 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	}
 
 	@Override
-	public long totalHitCount() {
-		return hitCount;
+	public SearchResultTotal total() {
+		return ( hitExact ) ? SimpleSearchResultTotal.exact( hitCount ) :
+				SimpleSearchResultTotal.lowerBound( hitCount );
 	}
 
 	@Override

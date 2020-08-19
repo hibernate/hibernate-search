@@ -73,6 +73,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 				.matches( work );
 
 		return () -> new SimpleSearchResult<>(
+				true,
 				behavior.getTotalHitCount(),
 				getResults(
 						actualCall.projectionContext,

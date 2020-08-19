@@ -15,6 +15,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -137,5 +138,17 @@ public interface SearchQueryOptionsStep<
 	 * @return {@code this}, for method chaining.
 	 */
 	<T> S aggregation(AggregationKey<T> key, Function<? super AF, ? extends AggregationFinalStep<T>> aggregationContributor);
+
+	/**
+	 * Sometime we don't need the exact total hit count number but a reasonable lower bound of it could be enough.
+	 * <p>
+	 * So that we can skip to collect the hits for the count when a given {@code totalHitCountMinimum} is reached,
+	 * potentially improving the performance.
+	 *
+	 * @param totalHitCountMinimum the value below which the hit count is always exact
+	 * @return {@code this}, for method chaining.
+	 * @see SearchResultTotal
+	 */
+	S totalHitCountMinimum(int totalHitCountMinimum);
 
 }

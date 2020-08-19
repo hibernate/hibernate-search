@@ -364,4 +364,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 86, value = "Search query loading exceeded the timeout of %1$s milliseconds.")
 	SearchTimeoutException timedOut(Long timeoutMs);
+
+	@Message(id = ID_OFFSET_2 + 87, value = "Trying to get the exact total hit count, but it is a lower bound.")
+	SearchException notExactTotalHitCount();
 }

@@ -24,7 +24,9 @@ class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 
 	ElasticsearchSearchResultImpl(JsonObject responseBody,
 			long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut, String scrollId) {
-		super( hitCount, hits, aggregationResults, ( took == null ) ? null : Duration.ofMillis( took ), timedOut );
+		// TODO HSEARCH-3517 Use lowerBound if the total hits relation is GE
+		super( true, hitCount, hits, aggregationResults, ( took == null ) ? null : Duration.ofMillis( took ),
+				timedOut );
 		this.responseBody = responseBody;
 		this.scrollId = scrollId;
 	}
