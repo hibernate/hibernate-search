@@ -19,7 +19,14 @@ public interface SearchResult<H> {
 	/**
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 */
-	long totalHitCount();
+	default long totalHitCount() {
+		return total().hitCount();
+	}
+
+	/**
+	 * @return A result related to all matched documents. E.g.: exact or a lower bound of total hit count.
+	 */
+	SearchResultTotal total();
 
 	/**
 	 * @return The total number of matching entities, ignoring pagination settings.

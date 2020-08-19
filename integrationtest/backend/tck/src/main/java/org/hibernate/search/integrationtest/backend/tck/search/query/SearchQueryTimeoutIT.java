@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -118,9 +119,14 @@ public class SearchQueryTimeoutIT {
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetchAll();
 
-		assertThat( result.totalHitCount() ).isLessThan( TOTAL_DOCUMENT_COUNT );
 		assertThat( result.took() ).isNotNull(); // May be 0 due to low resolution
 		assertThat( result.timedOut() ).isTrue();
+
+		// we cannot have an exact hit count in case of limitFetching-timeout event
+		assertThat( result.total().hitCountLowerBound() ).isLessThan( TOTAL_DOCUMENT_COUNT );
+		Assertions.assertThatThrownBy( () -> result.totalHitCount() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound" );
 	}
 
 	@Test

@@ -251,7 +251,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 						timeoutManager ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () -> new SimpleSearchResult<>(
-						0L, Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false
+						true, 0L, Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false
 				) )
 		);
 	}

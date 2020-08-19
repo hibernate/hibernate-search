@@ -107,6 +107,12 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
+	public S totalHitCountMinimum(int totalHitCountMinimum) {
+		// TODO HSEARCH-3517 Support this
+		return thisAsS();
+	}
+
+	@Override
 	public S loading(Consumer<? super LOS> loadingOptionsContributor) {
 		loadingOptionsContributor.accept( loadingContextBuilder.toAPI() );
 		return thisAsS();

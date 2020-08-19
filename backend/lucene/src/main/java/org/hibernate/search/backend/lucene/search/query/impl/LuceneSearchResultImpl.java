@@ -23,8 +23,9 @@ class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 
 	LuceneSearchResultImpl(Long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
 			Duration took, Boolean timedOut, TopDocs topDocs) {
+		// TODO HSEARCH-3517 Use #lowerBound if the total hits relation is GE
 		// hitCount is null in case of fetchHits
-		super( ( hitCount != null ) ? hitCount : 0L, hits, aggregationResults, took, timedOut );
+		super( hitCount != null, ( hitCount != null ) ? hitCount : 0L, hits, aggregationResults, took, timedOut );
 		this.topDocs = topDocs;
 	}
 
