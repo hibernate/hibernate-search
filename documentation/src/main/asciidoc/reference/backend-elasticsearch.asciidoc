@@ -296,11 +296,11 @@ For Elasticsearch specifically, some fine-tuning is available through the follow
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.schema_management.minimal_required_status green (default)
-hibernate.search.backend.schema_management.minimal_required_status_wait_timeout 10000 (default)
+hibernate.search.backend.schema_management.minimal_required_status = green (default)
+hibernate.search.backend.schema_management.minimal_required_status_wait_timeout = 10000 (default)
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status green (default)
-hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status_wait_timeout 10000 (default)
+hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status = green (default)
+hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status_wait_timeout = 10000 (default)
 ----
 
 * `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
@@ -719,9 +719,9 @@ A different analysis configurer can be assign to each index:
 [source]
 ----
 # To set the default configurer for all indexes:
-hibernate.search.backend.analysis.configurer com.mycompany.MyAnalysisConfigurer
+hibernate.search.backend.analysis.configurer = com.mycompany.MyAnalysisConfigurer
 # To assign a specific configurer to a specific index:
-hibernate.search.backend.indexes.<index name>.analysis.configurer com.mycompany.MySpecificAnalysisConfigurer
+hibernate.search.backend.indexes.<index name>.analysis.configurer = com.mycompany.MySpecificAnalysisConfigurer
 ----
 
 If a specific configurer is assigned to an index,
@@ -814,13 +814,13 @@ This is done through the following configuration properties:
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.indexing.queue_count 10 (default)
-hibernate.search.backend.indexing.queue_size 1000 (default)
-hibernate.search.backend.indexing.max_bulk_size 100 (default)
+hibernate.search.backend.indexing.queue_count = 10 (default)
+hibernate.search.backend.indexing.queue_size = 1000 (default)
+hibernate.search.backend.indexing.max_bulk_size = 100 (default)
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.indexing.queue_count 10 (default)
-hibernate.search.backend.indexes.<index name>.indexing.queue_size 1000 (default)
-hibernate.search.backend.indexes.<index name>.indexing.max_bulk_size 100 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000 (default)
+hibernate.search.backend.indexes.<index name>.indexing.max_bulk_size = 100 (default)
 ----
 
 * `indexing.queue_count` defines the number of queues.
@@ -915,7 +915,7 @@ Use the following configuration property at the backend level to configure the t
 
 [source]
 ----
-hibernate.search.backend.scroll_timeout 60 (default)
+hibernate.search.backend.scroll_timeout = 60 (default)
 ----
 
 [[backend-elasticsearch-access-client]]

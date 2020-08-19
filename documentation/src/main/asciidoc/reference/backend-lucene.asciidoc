@@ -718,11 +718,11 @@ This is done through the following configuration properties:
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.indexing.queue_count 10 (default)
-hibernate.search.backend.indexing.queue_size 1000 (default)
+hibernate.search.backend.indexing.queue_count = 10 (default)
+hibernate.search.backend.indexing.queue_size = 1000 (default)
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.indexing.queue_count 10 (default)
-hibernate.search.backend.indexes.<index name>.indexing.queue_size 1000 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000 (default)
 ----
 
 * `indexing.queue_count` defines the number of queues.
