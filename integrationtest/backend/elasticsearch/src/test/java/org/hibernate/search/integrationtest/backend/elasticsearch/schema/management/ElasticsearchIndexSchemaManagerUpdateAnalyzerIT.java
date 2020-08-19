@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -485,7 +485,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAnalyzerIT {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer()
 				)
 				.withIndex( index )

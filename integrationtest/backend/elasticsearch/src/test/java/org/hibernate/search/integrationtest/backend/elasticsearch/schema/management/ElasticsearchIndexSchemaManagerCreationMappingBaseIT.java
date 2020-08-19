@@ -12,7 +12,7 @@ import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -174,7 +174,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingBaseIT {
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}

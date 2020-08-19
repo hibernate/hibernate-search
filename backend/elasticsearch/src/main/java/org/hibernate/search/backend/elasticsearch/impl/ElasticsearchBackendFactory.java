@@ -11,9 +11,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
@@ -84,11 +81,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSpiSettings.Defaults.CLIENT_FACTORY )
 					.build();
 
-	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER )
-					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
-					.build();
-
 	private static final ConfigurationProperty<TypeNameMappingStrategyName> MAPPING_TYPE_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY )
 					.as( TypeNameMappingStrategyName.class, TypeNameMappingStrategyName::of )
@@ -151,9 +143,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider =
 					dialect.createIndexTypeFieldFactoryProvider( userFacingGson );
 
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
-					getAnalysisDefinitionRegistry( buildContext, propertySource );
-
 			indexLayoutStrategyHolder = createIndexLayoutStrategy( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
@@ -161,7 +150,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					threads, link,
 					typeFactoryProvider,
 					userFacingGson,
-					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( propertySource ),
 					indexLayoutStrategyHolder,
 					createTypeNameMapping( propertySource, indexLayoutStrategyHolder.get() ),
@@ -231,25 +219,4 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private ElasticsearchAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(
-			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
-		try {
-			// Apply the user-provided analysis configurer if necessary
-			final BeanResolver beanResolver = buildContext.beanResolver();
-			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
-					.map( holder -> {
-						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
-							ElasticsearchAnalysisConfigurationContextImpl collector =
-									new ElasticsearchAnalysisConfigurationContextImpl();
-							configurerHolder.get().configure( collector );
-							return new ElasticsearchAnalysisDefinitionRegistry( collector );
-						}
-					} )
-					// Otherwise just use an empty registry
-					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );
-		}
-		catch (Exception e) {
-			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
-		}
-	}
 }

@@ -13,7 +13,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
@@ -35,7 +35,7 @@ public class ElasticsearchAnalysisIT {
 	public void advanced() {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						ElasticsearchIndexSettings.ANALYSIS_CONFIGURER,
 						new AdvancedElasticsearchAnalysisConfigurer()
 				)
 				.withProperty(
