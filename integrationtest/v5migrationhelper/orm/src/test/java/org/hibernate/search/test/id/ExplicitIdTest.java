@@ -8,8 +8,8 @@ package org.hibernate.search.test.id;
 
 import java.util.List;
 
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -143,7 +143,7 @@ public class ExplicitIdTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				NumericRangeQuery.newLongRange( "articleId", hello.getArticleId(), hello.getArticleId(), true, true )
+				LongPoint.newExactQuery( "articleId", hello.getArticleId() )
 		).list();
 		assertEquals( 1, results.size() );
 		tx.commit();

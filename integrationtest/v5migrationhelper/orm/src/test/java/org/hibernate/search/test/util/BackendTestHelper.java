@@ -71,7 +71,7 @@ public class BackendTestHelper {
 				IndexReader reader = DirectoryReader.open( directory ) ) {
 			IndexSearcher searcher = new IndexSearcher( reader );
 			TopDocs topDocs = searcher.search( query, 100 );
-			return topDocs.totalHits;
+			return Math.toIntExact( topDocs.totalHits.value );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( e );

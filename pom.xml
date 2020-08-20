@@ -162,7 +162,6 @@
         <module>mapper/pojo-base</module>
         <module>mapper/javabean</module>
         <module>mapper/orm</module>
-        <module>v5migrationhelper/bom</module>
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>

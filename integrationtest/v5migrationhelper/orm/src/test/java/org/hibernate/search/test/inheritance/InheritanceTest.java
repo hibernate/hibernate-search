@@ -9,8 +9,8 @@ package org.hibernate.search.test.inheritance;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Transaction;
@@ -90,7 +90,7 @@ public class InheritanceTest extends SearchTestBase {
 		assertNotNull( result );
 		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
 
-		query = NumericRangeQuery.newIntRange( "weight", 4000, 5000, true, true );
+		query = IntPoint.newRangeQuery( "weight", 4000, 5000 );
 		hibQuery = s.createFullTextQuery( query, Animal.class );
 		assertItsTheElephant( hibQuery.list() );
 
@@ -143,13 +143,13 @@ public class InheritanceTest extends SearchTestBase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
-		Query query = NumericRangeQuery.newIntRange( "numberOfEggs", 2, 2, true, true );
+		Query query = IntPoint.newExactQuery( "numberOfEggs", 2 );
 		org.hibernate.query.Query hibQuery = s.createFullTextQuery( query, Eagle.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of hits. There should be two birds.", 1, result.size() );
 
-		query = NumericRangeQuery.newIntRange( "numberOfEggs", 2, 2, true, true );
+		query = IntPoint.newExactQuery( "numberOfEggs", 2 );
 		hibQuery = s.createFullTextQuery( query, Bird.class );
 		result = hibQuery.list();
 		assertNotNull( result );

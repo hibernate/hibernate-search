@@ -27,11 +27,14 @@ import org.junit.Test;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.document.DoublePoint;
+import org.apache.lucene.document.FloatPoint;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -74,10 +77,10 @@ public class BridgeTest extends SearchTestBase {
 		List result;
 
 		BooleanQuery booleanQuery = new BooleanQuery.Builder()
-				.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newLongRange( "long2", 2L, 3L, true, true ), BooleanClause.Occur.MUST )
+				.add( DoublePoint.newExactQuery( "double2", 2.1 ), BooleanClause.Occur.MUST )
+				.add( FloatPoint.newExactQuery( "float2", 2.1f ), BooleanClause.Occur.MUST )
+				.add( IntPoint.newRangeQuery( "integerv2", 2, 3 ), BooleanClause.Occur.MUST )
+				.add( LongPoint.newRangeQuery( "long2", 2L, 3L ), BooleanClause.Occur.MUST )
 				.add( new TermQuery( new Term( "type", "dog" ) ), BooleanClause.Occur.MUST )
 				.add( new TermQuery( new Term( "storm", "false" ) ), BooleanClause.Occur.MUST )
 				.build();
@@ -86,10 +89,10 @@ public class BridgeTest extends SearchTestBase {
 		assertEquals( "find primitives and do not fail on null", 1, result.size() );
 
 		booleanQuery = new BooleanQuery.Builder()
-				.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newLongRange( "long1", 2L, 3L, true, true ), BooleanClause.Occur.MUST )
+				.add( DoublePoint.newRangeQuery( "double1", 2.1, 2.1 ), BooleanClause.Occur.MUST )
+				.add( FloatPoint.newRangeQuery( "float1", 2.1f, 2.1f ), BooleanClause.Occur.MUST )
+				.add( IntPoint.newRangeQuery( "integerv1", 2, 3 ), BooleanClause.Occur.MUST )
+				.add( LongPoint.newRangeQuery( "long1", 2L, 3L ), BooleanClause.Occur.MUST )
 				.build();
 
 		result = session.createFullTextQuery( booleanQuery ).list();
@@ -155,50 +158,50 @@ public class BridgeTest extends SearchTestBase {
 		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 
 		Date myDate = DateTools.round( date, DateTools.Resolution.MILLISECOND );
-		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange(
-				"myDate", myDate.getTime(), myDate.getTime(), true, true
+		Query numericRangeQuery = LongPoint.newRangeQuery(
+				"myDate", myDate.getTime(), myDate.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateDay = DateTools.round( date, DateTools.Resolution.DAY );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateDay", dateDay.getTime(), dateDay.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateDay", dateDay.getTime(), dateDay.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMonth = DateTools.round( date, DateTools.Resolution.MONTH );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateMonth", dateMonth.getTime(), dateMonth.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateYear = DateTools.round( date, DateTools.Resolution.YEAR );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateYear", dateYear.getTime(), dateYear.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateYear", dateYear.getTime(), dateYear.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateHour = DateTools.round( date, DateTools.Resolution.HOUR );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateHour", dateHour.getTime(), dateHour.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateHour", dateHour.getTime(), dateHour.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMinute = DateTools.round( date, DateTools.Resolution.MINUTE );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateMinute", dateMinute.getTime(), dateMinute.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateSecond = DateTools.round( date, DateTools.Resolution.SECOND );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateSecond", dateSecond.getTime(), dateSecond.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMillisecond = DateTools.round( date, DateTools.Resolution.MILLISECOND );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"dateMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"dateMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
@@ -238,50 +241,50 @@ public class BridgeTest extends SearchTestBase {
 		Date date = calendar.getTime();
 		BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
 		Date myDate = DateTools.round( date, DateTools.Resolution.MILLISECOND );
-		NumericRangeQuery numericRangeQuery = NumericRangeQuery.newLongRange(
-				"myCalendar", myDate.getTime(), myDate.getTime(), true, true
+		Query numericRangeQuery = LongPoint.newRangeQuery(
+				"myCalendar", myDate.getTime(), myDate.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateDay = DateTools.round( date, DateTools.Resolution.DAY );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarDay", dateDay.getTime(), dateDay.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarDay", dateDay.getTime(), dateDay.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMonth = DateTools.round( date, DateTools.Resolution.MONTH );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarMonth", dateMonth.getTime(), dateMonth.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarMonth", dateMonth.getTime(), dateMonth.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateYear = DateTools.round( date, DateTools.Resolution.YEAR );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarYear", dateYear.getTime(), dateYear.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarYear", dateYear.getTime(), dateYear.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateHour = DateTools.round( date, DateTools.Resolution.HOUR );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarHour", dateHour.getTime(), dateHour.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarHour", dateHour.getTime(), dateHour.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMinute = DateTools.round( date, DateTools.Resolution.MINUTE );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarMinute", dateMinute.getTime(), dateMinute.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarMinute", dateMinute.getTime(), dateMinute.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateSecond = DateTools.round( date, DateTools.Resolution.SECOND );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarSecond", dateSecond.getTime(), dateSecond.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarSecond", dateSecond.getTime(), dateSecond.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
 		Date dateMillisecond = DateTools.round( date, DateTools.Resolution.MILLISECOND );
-		numericRangeQuery = NumericRangeQuery.newLongRange(
-				"calendarMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime(), true, true
+		numericRangeQuery = LongPoint.newRangeQuery(
+				"calendarMillisecond", dateMillisecond.getTime(), dateMillisecond.getTime()
 		);
 		booleanQueryBuilder.add( numericRangeQuery, BooleanClause.Occur.MUST );
 
