@@ -28,4 +28,6 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkab
 	SearchWorkBuilder<R> requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
 	SearchWorkBuilder<R> timeout(ElasticsearchTimeoutManager timeoutManager);
+
+	SearchWorkBuilder<R> disableTrackTotalHits();
 }
