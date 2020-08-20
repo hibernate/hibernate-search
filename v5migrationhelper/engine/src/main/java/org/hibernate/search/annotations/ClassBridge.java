@@ -74,11 +74,6 @@ public @interface ClassBridge {
 	Normalizer normalizer() default @Normalizer;
 
 	/**
-	 * @return Returns a {@code Boost} annotation defining a float index time boost value
-	 */
-	Boost boost() default @Boost(value = 1.0F);
-
-	/**
 	 * @return Custom implementation of class bridge
 	 */
 	Class<?> impl();
