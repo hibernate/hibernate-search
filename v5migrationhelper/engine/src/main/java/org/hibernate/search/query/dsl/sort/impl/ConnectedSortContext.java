@@ -44,13 +44,6 @@ public class ConnectedSortContext extends AbstractConnectedSortContext implement
 	}
 
 	@Override
-	public SortFieldContext byField(String field, SortField.Type sortFieldType) {
-		states.setCurrentName( field );
-		states.setCurrentType( sortFieldType );
-		return new ConnectedSortFieldContext( queryContext, states );
-	}
-
-	@Override
 	public SortDistanceNoFieldContext byDistance() {
 		return new ConnectedSortDistanceNoFieldContext( queryContext, states );
 	}

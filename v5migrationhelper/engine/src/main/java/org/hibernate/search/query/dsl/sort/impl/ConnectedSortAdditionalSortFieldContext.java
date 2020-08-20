@@ -33,14 +33,6 @@ public abstract class ConnectedSortAdditionalSortFieldContext extends AbstractCo
 	}
 
 	@Override
-	public SortFieldContext andByField(String field, SortField.Type sortFieldType) {
-		states.closeSortField();
-		states.setCurrentName( field );
-		states.setCurrentType( sortFieldType );
-		return new ConnectedSortFieldContext( queryContext, states );
-	}
-
-	@Override
 	public SortScoreContext andByScore() {
 		states.closeSortField();
 		states.setCurrentType( SortField.Type.SCORE );

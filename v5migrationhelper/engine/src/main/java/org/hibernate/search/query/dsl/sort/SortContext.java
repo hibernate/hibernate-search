@@ -7,7 +7,6 @@
 package org.hibernate.search.query.dsl.sort;
 
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
 import org.hibernate.search.exception.SearchException;
 
 /**
@@ -32,34 +31,11 @@ public interface SortContext {
 	 * Order elements by the value of a specific field.
 	 *
 	 * <p>The default order is <strong>ascending</strong>.
-	 * <p>The sort field type will be determined automatically if possible, and an exception will be thrown
-	 * if it is not possible. Automatically determining the type is impossible in particular if
-	 * a custom field bridge is defined on the given field and if this bridge doesn't implement
-	 * {@link MetadataProvidingFieldBridge}.
 	 *
 	 * @param fieldName The name of the index field to sort by
 	 * @throws SearchException If the sort field type could not be automatically determined.
-	 * @see #byField(String, SortField.Type) The alternative for
-	 * numeric fields with custom field bridges that don't implement {@link MetadataProvidingFieldBridge}.
 	 */
 	SortFieldContext byField(String fieldName);
-
-	/**
-	 * Order elements by value of a specific field, with the sort field type provided.
-	 *
-	 * <p>The default order is <strong>ascending</strong>.
-	 * <p><strong>Note:</strong> using this method is only required when sorting on a
-	 * field on which a custom field bridge that doesn't implement
-	 * {@link MetadataProvidingFieldBridge} is defined.
-	 * Otherwise, one may simply use {@link #byField(String)}.
-	 *
-	 * @param fieldName The name of the index field to sort by
-	 * @param sortFieldType The sort field type
-	 * @deprecated Using this method shouldn't be needed if your custom field bridges
-	 * implement {@link MetadataProvidingFieldBridge}. Use {@link #byField(String)} instead.
-	 */
-	@Deprecated
-	SortFieldContext byField(String fieldName, SortField.Type sortFieldType);
 
 	/**
 	 * Order elements by distance.
