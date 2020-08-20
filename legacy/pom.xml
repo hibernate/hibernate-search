@@ -23,7 +23,6 @@
     <modules>
         <module>legacy</module>
         <module>engine</module>
-        <module>serialization/avro</module>
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>
         <module>orm</module>
@@ -106,10 +105,6 @@
         <!-- >>> Infinispan -->
         <version.org.infinispan>9.2.2.Final</version.org.infinispan>
 
-        <!-- >>> Avro -->
-        <version.org.apache.avro>1.7.6</version.org.apache.avro>
-        <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
-
         <!-- >>> OSGi ranges for some primary dependencies -->
         <!-- Warning:
             Ranges are maintained as best effort on our knowledge but only the
@@ -120,7 +115,6 @@
         <osgi.version-range.org.hibernate.commons.annotations>[5,6)</osgi.version-range.org.hibernate.commons.annotations>
         <osgi.version-range.org.jboss.logging.jboss-logging>[3.3,4.0.0)</osgi.version-range.org.jboss.logging.jboss-logging>
         <osgi.version-range.org.apache.tika>[1.4,2.0)</osgi.version-range.org.apache.tika>
-        <osgi.version-range.org.apache.avro>[${version.org.apache.avro},1.8.0)</osgi.version-range.org.apache.avro>
 
         <!-- Test dependencies -->
 
@@ -344,33 +338,6 @@
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
                 <version>${version.org.apache.pdfbox}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro</artifactId>
-                <version>${version.org.apache.avro}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.xerial.snappy</groupId>
-                        <artifactId>snappy-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.tukaani</groupId>
-                        <artifactId>xz</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <!-- To force testing of Apache Avro integration with the version of Jackson used in WildFly -->
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${version.org.codehaus.jackson}</version>
-            </dependency>
-            <dependency>
-                <!-- To force testing of Apache Avro integration with the version of Jackson used in WildFly -->
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${version.org.codehaus.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
