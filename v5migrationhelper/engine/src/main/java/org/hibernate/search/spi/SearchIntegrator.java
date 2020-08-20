@@ -7,8 +7,6 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.IndexFamily;
-import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -145,12 +143,5 @@ public interface SearchIntegrator extends AutoCloseable {
 	 */
 	@Override
 	void close();
-
-	/**
-	 * Get an {@link IndexFamily} using the index family type.
-	 * @param indexFamilyType the type of index family to retrieve
-	 * @return the selected {@link IndexFamily}, or null if it doesn't exist
-	 */
-	IndexFamily getIndexFamily(IndexFamilyType indexFamilyType);
 
 }
