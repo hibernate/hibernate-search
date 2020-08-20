@@ -176,7 +176,9 @@ public class SentenceInventor {
 	public static void main(String[] args) {
 		SentenceInventor wi = new SentenceInventor( 7L, 10000 );
 		for ( int i = 0; i < 3000; i++ ) {
+			//CHECKSTYLE:OFF
 			System.out.print( wi.nextPeriod() );
+			//CHECKSTYLE:ON
 		}
 	}
 

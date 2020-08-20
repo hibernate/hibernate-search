@@ -45,12 +45,16 @@ public class BytemanHelper extends Helper {
 
 	public void sleepASecond() {
 		try {
+			//CHECKSTYLE:OFF
 			log.info( "Byteman rule triggered: sleeping a second" );
+			//CHECKSTYLE:ON
 			Thread.sleep( 1000 );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
+			//CHECKSTYLE:OFF
 			log.error( "unexpected interruption", e );
+			//CHECKSTYLE:ON
 		}
 	}
 
