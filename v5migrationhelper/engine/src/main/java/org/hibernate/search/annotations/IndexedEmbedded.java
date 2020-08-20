@@ -22,18 +22,6 @@ import java.lang.annotation.Target;
 public @interface IndexedEmbedded {
 
 	/**
-	 * Default value for the {@link #indexNullAs} parameter. Indicates that {@code null} values should not be indexed.
-	 */
-	String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
-
-	/**
-	 * Value for the {@link #indexNullAs} parameter indicating that {@code null} values should be indexed using the null
-	 * token given through the {@link org.hibernate.search.cfg.Environment#DEFAULT_NULL_TOKEN} configuration property.
-	 * If no value is given for that property, the token {@code _null_} will be used.
-	 */
-	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
-
-	/**
 	 * Field name prefix.
 	 *
 	 * @return the field name prefix. Default to ".", indicating that {@code propertyname.} will be used.
@@ -75,19 +63,6 @@ public @interface IndexedEmbedded {
 	 * @return the target type of the association. Default to {@code void.class}
 	 */
 	Class<?> targetElement() default void.class;
-
-	/**
-	 * By default, null values are not indexed. Use {@link #indexNullAs()} if you want
-	 * null values to be indexed.
-	 * <p>If this property is set to something different from the default, null values
-	 * will be indexed in a field named after the {@link #prefix() prefix}, with the
-	 * trailing dot (if any) removed.
-	 *
-	 * @return Returns the value to be used for indexing {@code null}. Per default
-	 *         {@code IndexedEmbedded.DO_NOT_INDEX_NULL} is
-	 *         returned indicating that null values are not indexed.
-	 */
-	String indexNullAs() default DO_NOT_INDEX_NULL;
 
 	/**
 	 * Returns {@code true}, if the id of the embedded object should be included into the index,
