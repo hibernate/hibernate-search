@@ -162,6 +162,9 @@
         <module>mapper/pojo-base</module>
         <module>mapper/javabean</module>
         <module>mapper/orm</module>
+        <module>v5migrationhelper/bom</module>
+        <module>v5migrationhelper/engine</module>
+        <module>v5migrationhelper/orm</module>
         <module>util/internal/integrationtest</module>
         <module>parents/integrationtest</module>
         <module>integrationtest</module>
@@ -568,6 +571,16 @@
             <dependency>
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-mapper-stub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent-public</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
+        <relativePath>../../parents/public/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>hibernate-search-v5migrationhelper-bom</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Migration Helper - BOM</name>
+    <description>Temporary Bill Of Materials for all irregular dependencies used in the Search 5 Migration Helper</description>
+
+    <properties>
+        <!-- XXX: Temporary dependencies with legacy version; this should be upgraded to the same versions as Search 6 -->
+        <version.org.jboss.logging.jboss-logging>3.4.0.Final</version.org.jboss.logging.jboss-logging>
+        <version.org.jboss.logging.jboss-logging-tools>2.2.0.Final</version.org.jboss.logging.jboss-logging-tools>
+
+        <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
+
+        <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
+        <version.org.hibernate>5.3.6.Final</version.org.hibernate>
+
+        <version.javax.persistence>2.2</version.javax.persistence>
+        <version.javax.enterprise>2.0</version.javax.enterprise>
+        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
+
+        <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
+        <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
+
+        <version.org.apache.tika>1.4</version.org.apache.tika>
+        <version.xml-apis>1.3.03</version.xml-apis>
+        <version.org.apache.pdfbox>1.8.1</version.org.apache.pdfbox>
+
+        <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
+        <version.org.apache.commons.io>2.1</version.org.apache.commons.io>
+        <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
+
+        <version.org.unitils>3.4.6</version.org.unitils>
+        <version.simple-jndi>0.11.4.1</version.simple-jndi>
+        <version.org.jboss.byteman>4.0.4</version.org.jboss.byteman>
+    </properties>
+
+    <!-- XXX: Temporary dependencies with legacy version; this should be upgraded to the same versions as Search 6 -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-misc</artifactId>
+                <version>${version.org.apache.lucene}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-phonetic</artifactId>
+                <version>${version.org.apache.lucene}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.unitils</groupId>
+                <artifactId>unitils-easymock</artifactId>
+                <version>${version.org.unitils}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${version.org.apache.commons.lang}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${version.org.apache.commons.io}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${version.org.apache.commons.logging}</version>
+            </dependency>
+            <dependency>
+                <groupId>simple-jndi</groupId>
+                <artifactId>simple-jndi</artifactId>
+                <version>${version.simple-jndi}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman</artifactId>
+                <version>${version.org.jboss.byteman}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman-install</artifactId>
+                <version>${version.org.jboss.byteman}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun</groupId>
+                        <artifactId>tools</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman-bmunit</artifactId>
+                <version>${version.org.jboss.byteman}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${version.javax.xml.bind.jaxb-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${version.org.glassfish.jaxb}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-parsers</artifactId>
+                <version>${version.org.apache.tika}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.gagravarr</groupId>
+                        <artifactId>vorbis-java-tika</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>edu.ucar</groupId>
+                        <artifactId>netcdf</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.james</groupId>
+                        <artifactId>apache-mime4j-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.james</groupId>
+                        <artifactId>apache-mime4j-dom</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-compress</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.pdfbox</groupId>
+                        <artifactId>pdfbox</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi-scratchpad</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.poi</groupId>
+                        <artifactId>poi-ooxml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcmail-jdk15</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcprov-jdk15</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.ccil.cowan.tagsoup</groupId>
+                        <artifactId>tagsoup</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm-debug-all</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.googlecode.mp4parser</groupId>
+                        <artifactId>isoparser</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.drewnoakes</groupId>
+                        <artifactId>metadata-extractor</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>de.l3s.boilerpipe</groupId>
+                        <artifactId>boilerpipe</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>rome</groupId>
+                        <artifactId>rome</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.gagravarr</groupId>
+                        <artifactId>vorbis-java-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.googlecode.juniversalchardet</groupId>
+                        <artifactId>juniversalchardet</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${version.org.apache.tika}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${version.org.apache.pdfbox}</version>
+            </dependency>
+            <!-- Manage version of xml-apis to have dom4j and Tika requirements converge -->
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${version.xml-apis}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
