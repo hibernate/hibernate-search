@@ -33,7 +33,7 @@ public class ElasticsearchDialectFactoryTest {
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
+	private final ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 
 	@Test
 	public void es09012() {
