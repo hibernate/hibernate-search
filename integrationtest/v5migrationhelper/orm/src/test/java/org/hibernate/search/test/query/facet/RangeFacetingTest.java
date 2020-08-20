@@ -22,8 +22,6 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
-import org.hibernate.testing.TestForIssue;
-
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -205,29 +203,6 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-770")
-	public void testRangeBelowWithFacetSelection() {
-		final String facetingName = "truckHorsePowerFaceting";
-		FacetingRequest rangeRequest = queryBuilder( Truck.class ).facet()
-				.name( facetingName )
-				.onField( "horsePower" )
-				.range()
-				.below( 1000 )
-				.createFacetingRequest();
-		FullTextQuery query = createMatchAllQuery( Truck.class );
-		FacetManager facetManager = query.getFacetManager();
-		query.getFacetManager().enableFaceting( rangeRequest );
-
-		List<Facet> facets = facetManager.getFacets( facetingName ); // OK
-		facets = facetManager.getFacets( facetingName ); // Still OK
-		assertFacetCounts( facets, new int[] { 4 } );
-
-		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) ); // narrow search on facet
-		facets = facetManager.getFacets( facetingName ); // Exception...
-		assertFacetCounts( facets, new int[] { 4 } );
-	}
-
-	@Test
 	@Category(PortedToSearch6.class)
 	public void testRangeQueryForDoubleWithZeroCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
@@ -322,10 +297,6 @@ public class RangeFacetingTest extends AbstractFacetTest {
 
 		List<Facet> facets = facetManager.getFacets( facetingName );
 		assertFacetCounts( facets, new int[] { 1, 2, 2, 5 } );
-
-		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 3 ) );
-		facets = facetManager.getFacets( facetingName );
-		assertFacetCounts( facets, new int[] { 5 } );
 	}
 
 	@Test

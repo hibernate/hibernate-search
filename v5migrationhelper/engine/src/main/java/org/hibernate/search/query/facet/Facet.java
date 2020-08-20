@@ -7,8 +7,6 @@
 
 package org.hibernate.search.query.facet;
 
-import org.apache.lucene.search.Query;
-
 /**
  * A single facet (field value and count).
  *
@@ -41,12 +39,6 @@ public interface Facet {
 	 * @return the facet count.
 	 */
 	int getCount();
-
-	/**
-	 * @return a Lucene {@link Query} which which can be executed to retrieve all
-	 *         documents matching the value of this facet.
-	 */
-	Query getFacetQuery();
 }
 
 

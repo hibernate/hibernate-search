@@ -17,6 +17,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -160,7 +161,35 @@ public class WebShopTest extends AbstractFacetTest {
 					.get();
 
 			// build a Lucene query
-			final Query query = builder.keyword().onField( "make" ).matching( queryString ).createQuery();
+			final Query makeQuery = builder.keyword().onField( "make" ).matching( queryString ).createQuery();
+			BooleanJunction junction = builder.bool();
+			junction.must( makeQuery );
+			for ( Facet selectedFacet : selectedFacets ) {
+				switch ( selectedFacet.getFacetingName() ) {
+					case colorFacetName:
+						// Clearly not a great user experience, but Search 6 returns a Range<T>
+						// which is much easier to work with.
+						String value = selectedFacet.getValue();
+						junction.filteredBy( builder.keyword()
+								.onField( "color" )
+								.matching( value )
+								.createQuery() );
+						break;
+					case cubicCapacityFacetName:
+						// Clearly not a great user experience, but Search 6 returns a Range<T>
+						// which is much easier to work with.
+						Integer min = ((RangeFacet<Integer>) selectedFacet).getMin();
+						Integer max = ((RangeFacet<Integer>) selectedFacet).getMax();
+						junction.filteredBy( builder.range()
+								.onField( Car.CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING )
+								.from( min ).to( max )
+								.createQuery() );
+						break;
+					default:
+						throw new IllegalStateException( "Unexpected value: " + selectedFacet.getFacetingName() );
+				}
+			}
+			final Query query = junction.createQuery();
 
 			// create facets for navigation
 			// discrete faceting
@@ -170,7 +199,7 @@ public class WebShopTest extends AbstractFacetTest {
 					.discrete()
 					.createFacetingRequest();
 			// range faceting
-			final FacetingRequest priceFacet = builder.facet()
+			final FacetingRequest cubicCapacityFacet = builder.facet()
 					.name( cubicCapacityFacetName )
 					.onField( Car.CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING )
 					.range()
@@ -183,7 +212,7 @@ public class WebShopTest extends AbstractFacetTest {
 			// create the fulltext query, enable the facets via the facet manager and return the results
 			currentFullTextQuery = fullTextSession.createFullTextQuery( query, Car.class );
 			currentFullTextQuery.setFirstResult( 0 ).setMaxResults( 20 );
-			currentFullTextQuery.getFacetManager().enableFaceting( colorFacet ).enableFaceting( priceFacet );
+			currentFullTextQuery.getFacetManager().enableFaceting( colorFacet ).enableFaceting( cubicCapacityFacet );
 		}
 
 		public Map<String, List<FacetMenuItem>> getMenuItems() {
@@ -217,10 +246,6 @@ public class WebShopTest extends AbstractFacetTest {
 			buildFullTextQuery( queryString, fullTextSession );
 
 			Transaction tx = fullTextSession.beginTransaction();
-			// use the facet to narrow down the query
-			currentFullTextQuery.getFacetManager()
-					.getFacetGroup( item.getFacetingName() )
-					.selectFacets( selectedFacets.toArray( new Facet[selectedFacets.size()] ) );
 			List<Car> cars = currentFullTextQuery.list();
 			tx.commit();
 			fullTextSession.close();
@@ -238,10 +263,6 @@ public class WebShopTest extends AbstractFacetTest {
 			buildFullTextQuery( queryString, fullTextSession );
 
 			Transaction tx = fullTextSession.beginTransaction();
-			// use the facet to narrow down the query
-			currentFullTextQuery.getFacetManager()
-					.getFacetGroup( item.getFacetingName() )
-					.selectFacets( selectedFacets.toArray( new Facet[] { } ) );
 			List<Car> cars = currentFullTextQuery.list();
 			tx.commit();
 			fullTextSession.close();

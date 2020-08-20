@@ -7,8 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -62,9 +60,6 @@ public abstract class AbstractFacet implements Facet {
 	public String getFacetingName() {
 		return facetingName;
 	}
-
-	@Override
-	public abstract Query getFacetQuery();
 
 	@Override
 	public boolean equals(Object o) {

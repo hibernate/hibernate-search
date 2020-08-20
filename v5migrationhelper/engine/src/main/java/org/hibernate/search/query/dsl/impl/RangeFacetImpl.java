@@ -7,10 +7,6 @@
 package org.hibernate.search.query.dsl.impl;
 
 
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermRangeQuery;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.facet.RangeFacet;
 
 /**
@@ -31,32 +27,6 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 		super( facetingName, facetFieldName, sourceFieldName, range.getRangeString(), count );
 		this.range = range;
 		this.rangeIndex = index;
-	}
-
-	@Override
-	public Query getFacetQuery() {
-		Object minOrMax = getNonNullMinOrMax( range );
-		if ( NumericFieldUtils.requiresNumericRangeQuery( minOrMax ) ) {
-			return NumericFieldUtils.createNumericRangeQuery(
-					getSourceFieldName(),
-					range.getMin(),
-					range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else if ( minOrMax instanceof String ) {
-			return TermRangeQuery.newStringRange(
-					getSourceFieldName(),
-					(String) range.getMin(),
-					(String) range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else {
-			throw new AssertionFailure( "Unsupported range type" );
-		}
 	}
 
 	public int getRangeIndex() {

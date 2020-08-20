@@ -83,11 +83,6 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		this.maxNumberOfFacets = maxNumberOfFacets;
 	}
 
-	/**
-	 * @return the field value type on which the facets applies. This determines which type of facet query one needs to build.
-	 */
-	public abstract Class<?> getFacetValueType();
-
 	public abstract Facet createFacet(FacetMetadata facetMetadata, String value, int count);
 
 	@Override
