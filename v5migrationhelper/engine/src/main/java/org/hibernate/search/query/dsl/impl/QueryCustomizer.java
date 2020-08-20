@@ -12,7 +12,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.query.dsl.QueryCustomization;
 
 /**

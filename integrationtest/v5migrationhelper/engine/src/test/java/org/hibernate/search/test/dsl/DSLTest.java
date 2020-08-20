@@ -20,7 +20,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.hamcrest.CoreMatchers;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.AnalysisNames;

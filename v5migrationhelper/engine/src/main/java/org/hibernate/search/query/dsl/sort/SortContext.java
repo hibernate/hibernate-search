@@ -7,7 +7,7 @@
 package org.hibernate.search.query.dsl.sort;
 
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org

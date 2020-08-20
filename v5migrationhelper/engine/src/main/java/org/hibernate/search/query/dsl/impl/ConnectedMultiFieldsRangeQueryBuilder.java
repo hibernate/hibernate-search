@@ -8,7 +8,7 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.apache.lucene.search.Query;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
