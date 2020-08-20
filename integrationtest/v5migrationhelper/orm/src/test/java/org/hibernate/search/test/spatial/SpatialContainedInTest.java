@@ -24,7 +24,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.test.SearchInitializationTestBase;
@@ -147,7 +146,7 @@ public class SpatialContainedInTest extends SearchInitializationTestBase {
 	}
 
 	@Entity
-	@Spatial(name = "location", spatialMode = SpatialMode.HASH)
+	@Spatial(name = "location")
 	public static class ActorLocation {
 
 		@Id

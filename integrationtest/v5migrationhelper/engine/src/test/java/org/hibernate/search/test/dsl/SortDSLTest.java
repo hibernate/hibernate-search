@@ -15,7 +15,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -314,14 +313,14 @@ public class SortDSLTest {
 	public void distance() throws Exception {
 		Sort sort = builder().sort()
 				.byDistance()
-						.onField( "location_hash" )
+						.onField( "location" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 3, 2 );
 
 		sort = builder().sort()
 				.byDistance()
-						.onField( "location_hash" )
+						.onField( "location" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 						.asc()
 				.createSort();
@@ -329,7 +328,7 @@ public class SortDSLTest {
 
 		sort = builder().sort()
 				.byDistance()
-						.onField( "location_hash" )
+						.onField( "location" )
 						.fromLatitude( 24 ).andLongitude( 32 )
 						.desc()
 				.createSort();
@@ -448,7 +447,7 @@ public class SortDSLTest {
 	}
 
 	@Indexed
-	@Spatial(name = "location_hash", spatialMode = SpatialMode.HASH)
+	@Spatial(name = "location")
 	public static class IndexedEntry implements Coordinates {
 
 		@DocumentId

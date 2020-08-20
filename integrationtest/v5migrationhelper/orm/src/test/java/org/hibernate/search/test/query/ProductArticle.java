@@ -21,12 +21,11 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
 @Entity
-@Spatial(spatialMode = SpatialMode.HASH, name = "location")
+@Spatial(name = "location")
 @Indexed(index = "ProductArticle")
 public class ProductArticle implements Coordinates {
 

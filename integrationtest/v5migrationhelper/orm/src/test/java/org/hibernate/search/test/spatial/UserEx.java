@@ -13,10 +13,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 
 @Spatial
-@Spatial(name = "work", spatialMode = SpatialMode.HASH)
+@Spatial(name = "work")
 @Entity
 @Indexed
 public class UserEx {

@@ -10,7 +10,6 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -24,7 +23,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Indexed
-@Spatial(name = "hotel_location", spatialMode = SpatialMode.HASH)
+@Spatial(name = "hotel_location")
 public class Hotel implements Coordinates {
 	@Id
 	Integer id;

@@ -80,18 +80,4 @@ public @interface Spatial {
 	 */
 	Store store() default Store.NO;
 
-	/**
-	 * @return the mode used for Spatial indexing
-	 */
-	SpatialMode spatialMode() default SpatialMode.RANGE;
-
-	/**
-	 * @return top range spatial hash level for spatial indexing
-	 */
-	int topSpatialHashLevel() default SpatialFieldBridgeByHash.DEFAULT_TOP_SPATIAL_HASH_LEVEL;
-
-	/**
-	 * @return bottom spatial hash level for spatial indexing
-	 */
-	int bottomSpatialHashLevel() default SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
 }
