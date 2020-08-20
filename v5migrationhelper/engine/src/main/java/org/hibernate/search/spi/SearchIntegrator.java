@@ -7,7 +7,6 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
@@ -85,14 +84,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return true if the SearchIntegrator was stopped
 	 */
 	boolean isStopped();
-
-	/**
-	 * Used to catch exceptions in all synchronous operations; but default they are logged, the user
-	 * can configure alternative error management means.
-	 *
-	 * @return the configured ErrorHandler, global to the SearchIntegrator
-	 */
-	ErrorHandler getErrorHandler();
 
 	/**
 	 * Useful if you need to create custom exception types to represent query timeouts.
