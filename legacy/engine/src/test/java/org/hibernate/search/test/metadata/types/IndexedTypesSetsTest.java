@@ -10,7 +10,6 @@ import java.util.Collections;
 
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
-import org.hibernate.search.test.metadata.Foo;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,8 +29,8 @@ public class IndexedTypesSetsTest {
 		final String tostring = fromClasses.toString();
 		//being a set, the order is unspecified. The toString output is going to match A,B or B,A :
 		Assert.assertTrue(
-				"[org.hibernate.search.test.metadata.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
-				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.Foo]".equals( tostring ) );
+				"[org.hibernate.search.test.metadata.types.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
+				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.types.Foo]".equals( tostring ) );
 	}
 
 	@Test
@@ -41,8 +40,8 @@ public class IndexedTypesSetsTest {
 		final String tostring = fromClasses.toString();
 		//being a set, the order is unspecified. The toString output is going to match A,B or B,A :
 		Assert.assertTrue(
-				"[org.hibernate.search.test.metadata.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
-				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.Foo]".equals( tostring ) );
+				"[org.hibernate.search.test.metadata.types.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
+				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.types.Foo]".equals( tostring ) );
 	}
 
 	@Test
