@@ -69,16 +69,15 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		public static <T> Builder<T> forElasticsearch7AndAbove(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
-			// TODO HSEARCH-3517 disable track_total_hits when possible
 			return new Builder<>( payload, resultExtractor, true, false );
 		}
 
 		private final JsonObject payload;
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-		private final Boolean trackTotalHits;
 		private final boolean allowPartialSearchResultsSupported;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
+		private Boolean trackTotalHits;
 		private Integer from;
 		private Integer size;
 		private Integer scrollSize;
@@ -124,6 +123,16 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		@Override
 		public SearchWorkBuilder<R> timeout(ElasticsearchTimeoutManager timeoutManager) {
 			this.timeoutManager = timeoutManager;
+			return this;
+		}
+
+		@Override
+		public SearchWorkBuilder<R> disableTrackTotalHits() {
+			// setting trackTotalHits to false only if this parameter was already set,
+			// the parameter is not supported by the older Elasticsearch server
+			if ( trackTotalHits != null && trackTotalHits ) {
+				trackTotalHits = false;
+			}
 			return this;
 		}
 

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
@@ -70,9 +71,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				responseBody
 		);
 
-		long hitCount = extractHitCount( responseBody );
-
-		final List<Object> extractedHits = hitCount > 0 ?
+		Optional<Long> hitCount = extractHitCount( responseBody );
+		List<Object> extractedHits = ( !hitCount.isPresent() || hitCount.get() > 0 ) ?
 				extractHits( extractContext ) : Collections.emptyList();
 
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
@@ -86,7 +86,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
 				rootProjection,
-				hitCount,
+				hitCount.orElse( 0L ),
 				extractedHits,
 				extractedAggregations,
 				took, timedOut, scrollId,
@@ -94,8 +94,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		);
 	}
 
-	protected long extractHitCount(JsonObject responseBody) {
-		return HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
+	protected Optional<Long> extractHitCount(JsonObject responseBody) {
+		return HITS_TOTAL_ACCESSOR.get( responseBody );
 	}
 
 	private List<Object> extractHits(ElasticsearchSearchQueryExtractContext extractContext) {

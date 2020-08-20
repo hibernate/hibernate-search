@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
@@ -36,8 +37,8 @@ class Elasticsearch56SearchResultExtractor<H> extends Elasticsearch7SearchResult
 	}
 
 	@Override
-	protected long extractHitCount(JsonObject responseBody) {
-		return HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
+	protected Optional<Long> extractHitCount(JsonObject responseBody) {
+		return HITS_TOTAL_ACCESSOR.get( responseBody );
 	}
 
 }

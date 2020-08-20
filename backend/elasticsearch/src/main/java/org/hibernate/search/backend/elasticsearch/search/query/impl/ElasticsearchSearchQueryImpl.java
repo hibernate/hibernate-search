@@ -131,8 +131,24 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public List<H> fetchHits(Integer offset, Integer limit) {
-		// TODO HSEARCH-3517 Optimize this call
-		return fetch( offset, limit ).hits();
+		timeoutManager.start();
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = searchWorkBuilder()
+				.paging( defaultedLimit( limit, offset ), offset )
+				.disableTrackTotalHits()
+				.build();
+
+		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(
+				queryOrchestrator.submit( work ) )
+				/*
+				 * WARNING: the following call must run in the user thread.
+				 * If we introduce async query execution, we will have to add a loadAsync method here,
+				 * as well as in ProjectionHitMapper and EntityLoader.
+				 * This method may not be easy to implement for blocking mappers,
+				 * so we may choose to throw exceptions for those.
+				 */
+				.loadBlocking();
+		timeoutManager.stop();
+		return result.hits();
 	}
 
 	@Override
