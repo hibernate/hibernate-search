@@ -26,18 +26,6 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	TermMatchingContext onFields(String... fields);
 
 	/**
-	 * Threshold above which two terms are considered similar enough.
-	 * Value between 0 and 1 (1 excluded)
-	 * Defaults to .5
-	 *
-	 * @deprecated use {@link #withEditDistanceUpTo(int)}
-	 * @param threshold the value for the threshold
-	 * @return a {@link FuzzyContext}
-	 */
-	@Deprecated
-	FuzzyContext withThreshold(float threshold);
-
-	/**
 	 * Maximum value of the edit distance. Roughly speaking, the number of changes between two terms to be considered
 	 * close enough.
 	 * Can be either 1 or 2 (0 would mean no fuzziness).

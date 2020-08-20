@@ -161,7 +161,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				query = new WildcardQuery( new Term( fieldName, term ) );
 				break;
 			case FUZZY:
-				int maxEditDistance = getMaxEditDistance( term );
+				int maxEditDistance = termContext.getMaxEditDistance();
 				query = new FuzzyQuery(
 						new Term( fieldName, term ),
 						maxEditDistance,
@@ -172,18 +172,6 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				throw new AssertionFailure( "Unknown approximation: " + termContext.getApproximation() );
 		}
 		return query;
-	}
-
-	private int getMaxEditDistance(String term) {
-		int maxEditDistance;
-		if ( termContext.getThreshold() != null ) {
-			//support legacy withThreshold setting
-			maxEditDistance = FuzzyQuery.floatToEdits( termContext.getThreshold(), term.length() );
-		}
-		else {
-			maxEditDistance = termContext.getMaxEditDistance();
-		}
-		return maxEditDistance;
 	}
 
 	private Query createLuceneQuery(FieldContext fieldContext, String searchTerm) {
@@ -227,10 +215,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				);
 
 		if ( termContext.getApproximation() == TermQueryContext.Approximation.FUZZY ) {
-			// TODO: remove the threshold method as it's deprecated and not accurate
-			// the max edit distance based on the total searchTerm length which is wrong
-			// It might be a good time to consider removing the deprecated threshold method
-			queryBuilder.maxEditDistance( getMaxEditDistance( searchTerm ) );
+			queryBuilder.maxEditDistance( termContext.getMaxEditDistance() );
 		}
 
 		return queryBuilder.build();

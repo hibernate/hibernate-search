@@ -24,7 +24,6 @@ class TermQueryContext {
 
 	private int maxEditDistance = FuzzyQuery.defaultMaxEdits;
 	private int prefixLength = 0;
-	private Float threshold;
 
 	public TermQueryContext(Approximation approximation) {
 		this.approximation = approximation;
@@ -51,14 +50,6 @@ class TermQueryContext {
 
 	public int getPrefixLength() {
 		return prefixLength;
-	}
-
-	public Float getThreshold() {
-		return threshold;
-	}
-
-	public void setThreshold(float threshold) {
-		this.threshold = threshold;
 	}
 
 	public enum Approximation {

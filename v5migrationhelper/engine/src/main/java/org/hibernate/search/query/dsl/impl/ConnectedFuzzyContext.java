@@ -37,12 +37,6 @@ class ConnectedFuzzyContext implements FuzzyContext {
 	}
 
 	@Override
-	public ConnectedFuzzyContext withThreshold(float threshold) {
-		termContext.setThreshold( threshold );
-		return this;
-	}
-
-	@Override
 	public FuzzyContext withEditDistanceUpTo(int maxEditDistance) {
 		termContext.setMaxEditDistance( maxEditDistance );
 		return this;
