@@ -10,10 +10,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.dsl.DSLTest.MappingFactory;
+import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -29,8 +28,7 @@ import org.junit.rules.ExpectedException;
  */
 public class SimpleQueryStringDSLTest {
 	@Rule
-	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, CoffeeBrand.class, Book.class )
-			.withProperty( Environment.MODEL_MAPPING, MappingFactory.class.getName() );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, CoffeeBrand.class, Book.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
@@ -157,7 +155,7 @@ public class SimpleQueryStringDSLTest {
 		qb = sfHolder.getSearchFactory()
 				.buildQueryBuilder()
 				.forEntity( Book.class )
-				.overridesForField( "author", "titleAnalyzer" )
+				.overridesForField( "author", AnalysisNames.ANALYZER_WHITESPACE_LOWERCASE_ASCIIFOLDING )
 				.get();
 		query = qb.simpleQueryString()
 				.onFields( "title", "author" )

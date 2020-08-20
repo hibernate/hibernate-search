@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.cfg;
 
-import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -45,13 +44,6 @@ public final class Environment {
 	 * Default Lucene analyser
 	 */
 	public static final String ANALYZER_CLASS = "hibernate.search.analyzer";
-
-	/**
-	 * Provider of default analysis-related definitions for Lucene.
-	 * <p>
-	 * The value must be the fully-qualified name of a class implementing {@link LuceneAnalysisDefinitionProvider}.
-	 */
-	public static final String ANALYSIS_DEFINITION_PROVIDER = "hibernate.search.lucene.analysis_definition_provider";
 
 	/**
 	 * Default Lucene similarity
