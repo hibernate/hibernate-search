@@ -33,6 +33,7 @@
         <module>mapper/orm</module>
         <module>mapper/stub</module>
         <module>sharedresources</module>
+        <module>v5migrationhelper</module>
     </modules>
 
     <build>

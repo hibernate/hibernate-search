@@ -24,6 +24,8 @@
         <module>mapper/orm-realbackend</module>
         <module>performance</module>
         <module>showcase/library</module>
+        <module>v5migrationhelper/engine</module>
+        <module>v5migrationhelper/orm</module>
     </modules>
 
     <profiles>
