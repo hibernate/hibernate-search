@@ -32,10 +32,6 @@
         <module>integrationtest/elasticsearch</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/jsr352</module>
-        <module>integrationtest/performance/orm</module>
-        <module>integrationtest/performance/sandbox</module>
-        <module>integrationtest/performance/engine-lucene</module>
-        <module>integrationtest/performance/engine-elasticsearch</module>
         <module>documentation</module>
     </modules>
 
@@ -138,9 +134,6 @@
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
         <!-- Derby driver used by JBatch -->
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
-
-        <!-- >>> Performance ITs -->
-        <version.org.openjdk.jmh>1.20</version.org.openjdk.jmh>
     </properties>
 
     <dependencyManagement>
