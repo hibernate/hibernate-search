@@ -22,7 +22,6 @@ import javax.persistence.Parameter;
 import javax.persistence.TemporalType;
 
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -109,13 +108,6 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	@Override
 	public FullTextQueryImpl setSort(Sort sort) {
 		hSearchQuery.sort( sort );
-		return this;
-	}
-
-	@Override
-	@Deprecated
-	public FullTextQueryImpl setFilter(Filter filter) {
-		hSearchQuery.filter( filter );
 		return this;
 	}
 

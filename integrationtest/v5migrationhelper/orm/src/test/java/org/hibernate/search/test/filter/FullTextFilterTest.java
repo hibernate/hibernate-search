@@ -16,15 +16,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.QueryCachingPolicy;
-import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
@@ -223,64 +219,6 @@ public class FullTextFilterTest extends SearchTestBase {
 				new FieldConstraintFilterWithoutKeyMethod( "teacher", "andre" ),
 				new FieldConstraintFilterWithoutKeyMethod( "teacher", "max" )
 		);
-	}
-
-	@Test
-	public void testStraightFilters() {
-		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		TermQuery termQuery = new TermQuery( new Term( "name", "liz" ) );
-		Filter termFilter = new QueryWrapperFilter( termQuery );
-		ftQuery.setFilter( termFilter );
-		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
-
-		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.setFilter( termFilter );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		ftQuery.enableFullTextFilter( "security" ).setParameter( "login", "andre" );
-		ftQuery.disableFullTextFilter( "security" );
-		ftQuery.disableFullTextFilter( "bestDriver" );
-		ftQuery.setFilter( null );
-		assertEquals( "Should not filter anymore", 3, ftQuery.getResultSize() );
-	}
-
-	@Test
-	@Category(SkipOnElasticsearch.class)
-	// The Elasticsearch backend does not support custom Lucene filters.
-	public void testEmptyFilters() {
-		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		TermQuery termQuery = new TermQuery( new Term( "name", "liz" ) );
-		Filter termFilter = new QueryWrapperFilter( termQuery );
-		ftQuery.setFilter( termFilter );
-		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
-
-		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		ftQuery.enableFullTextFilter( "emptyWithDeprecatedFilterType" );
-		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
-	}
-
-	@TestForIssue(jiraKey = "HSEARCH-1513")
-	@Test
-	@Category(SkipOnElasticsearch.class)
-	// The Elasticsearch backend does not support custom Lucene filters.
-	public void testCachedEmptyFilters() {
-		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( "GMT" ), Locale.ROOT );
-		calendar.set( Calendar.YEAR, 2001 );
-		long from = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
-		calendar.set( Calendar.YEAR, 2005 );
-		long to = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
-		Filter dateFilter = NumericRangeFilter.newLongRange( "delivery", from, to, true, true );
-		ftQuery.setFilter( dateFilter );
-		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
-
-		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver" );
-		ftQuery.enableFullTextFilter( "cached_empty" );
-		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
 	}
 
 	@Test

@@ -613,10 +613,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 			}
 		}
 
-		if ( userFilter != null ) {
-			filterQueries.add( userFilter );
-		}
-
 		if ( filterQueries.isEmpty() ) {
 			return QueryFilters.EMPTY_FILTERSET;
 		}
