@@ -6,17 +6,10 @@
  */
 package org.hibernate.search.test.query.engine;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Facet;
-import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
@@ -121,22 +114,6 @@ public class HSQueryResultCacheClearingTest {
 		helper.assertThat( hsQuery ).facets( facetingRequestName ).isEmpty();
 	}
 
-	@Test
-	public void clear_fullTextFilter() throws Exception {
-		HSQuery hsQuery = queryAll();
-		helper.assertThat( hsQuery ).hasResultSize( 3 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1, 2 );
-
-		String filterName = "keepOnlyValueOne";
-		hsQuery.enableFullTextFilter( filterName );
-		helper.assertThat( hsQuery ).hasResultSize( 1 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 1 );
-
-		hsQuery.disableFullTextFilter( filterName );
-		helper.assertThat( hsQuery ).hasResultSize( 3 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1, 2 );
-	}
-
 	private HSQuery queryAll() {
 		QueryBuilder qb = helper.queryBuilder( IndexedEntity.class );
 		return helper.hsQuery( IndexedEntity.class )
@@ -144,7 +121,6 @@ public class HSQueryResultCacheClearingTest {
 	}
 
 	@Indexed
-	@FullTextFilterDef(name = "keepOnlyValueOne", impl = KeepOnlyValueOneFilter.class)
 	private static class IndexedEntity {
 		@DocumentId
 		@Field(name = "idSort")
@@ -161,15 +137,6 @@ public class HSQueryResultCacheClearingTest {
 			super();
 			this.id = id;
 			this.field = field;
-		}
-	}
-
-	public static class KeepOnlyValueOneFilter {
-		@Factory
-		public Query create() {
-			return new BooleanQuery.Builder()
-					.add( new TermQuery( new Term( "field", "one" ) ), Occur.MUST )
-					.build();
 		}
 	}
 

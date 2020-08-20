@@ -15,7 +15,6 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -102,21 +101,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setSpatialParameters(Coordinates center, String fieldName);
-
-	/**
-	 * Enable a given filter by its name.
-	 *
-	 * @param name the name of the filter
-	 * @return  a {@link FullTextFilter} object that allows filter parameter injection
-	 */
-	FullTextFilter enableFullTextFilter(String name);
-
-	/**
-	 * Disable a given filter by its name
-	 *
-	 * @param name the filter nane
-	 */
-	void disableFullTextFilter(String name);
 
 	/**
 	 * @return return the manager for all faceting related operations

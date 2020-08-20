@@ -38,7 +38,6 @@ import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -402,16 +401,6 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	protected Map getLockModes() {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
-	}
-
-	@Override
-	public FullTextFilter enableFullTextFilter(String name) {
-		return hSearchQuery.enableFullTextFilter( name );
-	}
-
-	@Override
-	public void disableFullTextFilter(String name) {
-		hSearchQuery.disableFullTextFilter( name );
 	}
 
 	@Override
