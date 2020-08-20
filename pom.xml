@@ -668,12 +668,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-engine</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-testing-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
