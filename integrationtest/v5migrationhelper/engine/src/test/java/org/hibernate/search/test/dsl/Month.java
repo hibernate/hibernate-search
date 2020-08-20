@@ -21,6 +21,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.testsupport.AnalysisNames;
 
 /**
  * @author Emmanuel Bernard
@@ -94,11 +95,15 @@ class Month {
 
 	@Fields({
 			@Field,
-			@Field(name = "mythology_stem", analyzer = @Analyzer(definition = "stemmer")),
-			@Field(name = "mythology_ngram", analyzer = @Analyzer(definition = "ngram")),
+			@Field(name = "mythology_stem",
+					analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP_STEMMER_ENGLISH)),
+			@Field(name = "mythology_ngram",
+					analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP_NGRAM_3)),
 			// This field must exist in order for tests to pass with the Elasticsearch integration... See HSEARCH-2534
-			@Field(name = "mythology_same_base_as_ngram", analyzer = @Analyzer(definition = "same_base_as_ngram")),
-			@Field(name = "mythology_normalized", normalizer = @Normalizer(definition = "lower"))
+			@Field(name = "mythology_same_base_as_ngram",
+					analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP)),
+			@Field(name = "mythology_normalized",
+					normalizer = @Normalizer(definition = AnalysisNames.NORMALIZER_LOWERCASE))
 	})
 	public String getMythology() {
 		return mythology;
@@ -147,7 +152,8 @@ class Month {
 
 	@Fields({
 			@Field,
-			@Field(name = "htmlDescription_htmlStrip", analyzer = @Analyzer(definition = "htmlStrip"))
+			@Field(name = "htmlDescription_htmlStrip",
+					analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD_HTML_STRIP_ESCAPED_LOWERCASE))
 	})
 	public String getHtmlDescription() {
 		return htmlDescription;

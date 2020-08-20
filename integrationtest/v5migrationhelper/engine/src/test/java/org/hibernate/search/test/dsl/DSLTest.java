@@ -16,25 +16,16 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.core.StopFilterFactory;
-import org.apache.lucene.analysis.ngram.NGramFilterFactory;
-import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
-import org.apache.lucene.analysis.standard.StandardFilterFactory;
-import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hamcrest.CoreMatchers;
-import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -61,8 +52,7 @@ public class DSLTest {
 
 	@Rule
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Month.class, Car.class,
-					SportsCar.class, Animal.class, Day.class, CoffeeBrand.class, Coffee.class )
-			.withProperty( Environment.MODEL_MAPPING, MappingFactory.class.getName() );
+					SportsCar.class, Animal.class, Day.class, CoffeeBrand.class, Coffee.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
@@ -875,7 +865,7 @@ public class DSLTest {
 	@TestForIssue(jiraKey = "HSEARCH-3233")
 	public void testOverridesForField() {
 		final QueryBuilder monthQb = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
-				.overridesForField( "mythology_ngram", "same_base_as_ngram" )
+				.overridesForField( "mythology_ngram", AnalysisNames.ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP )
 				.get();
 
 		// If the analyzer is correctly overridden, only ngram of size 3 should produce results
@@ -990,37 +980,5 @@ public class DSLTest {
 		coffee.setName( "Peruvian Gold" );
 		coffee.setBrand( brand );
 		helper.add( coffee );
-	}
-
-	public static class MappingFactory {
-		@Factory
-		public SearchMapping build() {
-			SearchMapping mapping = new SearchMapping();
-			mapping
-					.analyzerDef( "stemmer", StandardTokenizerFactory.class )
-							.filter( StandardFilterFactory.class )
-							.filter( LowerCaseFilterFactory.class )
-							.filter( StopFilterFactory.class )
-							.filter( SnowballPorterFilterFactory.class )
-									.param( "language", "English" )
-					.analyzerDef( "ngram", StandardTokenizerFactory.class )
-							.filter( StandardFilterFactory.class )
-							.filter( LowerCaseFilterFactory.class )
-							.filter( StopFilterFactory.class )
-							.filter( NGramFilterFactory.class )
-									.param( "minGramSize", "3" )
-									.param( "maxGramSize", "3" )
-					.analyzerDef( "same_base_as_ngram", StandardTokenizerFactory.class )
-							.filter( StandardFilterFactory.class )
-							.filter( LowerCaseFilterFactory.class )
-							.filter( StopFilterFactory.class )
-					.analyzerDef( "htmlStrip", StandardTokenizerFactory.class )
-							.charFilter( HTMLStripCharFilterFactory.class )
-									.param( "escapedTags", "escaped" )
-							.filter( LowerCaseFilterFactory.class )
-					.normalizerDef( "lower" )
-							.filter( LowerCaseFilterFactory.class );
-			return mapping;
-		}
 	}
 }

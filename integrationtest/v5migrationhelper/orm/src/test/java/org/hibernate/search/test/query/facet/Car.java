@@ -11,13 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
-import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.FacetEncodingType;
 import org.hibernate.search.annotations.Facets;
@@ -26,28 +21,16 @@ import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.bridge.builtin.IntegerBridge;
+import org.hibernate.search.testsupport.AnalysisNames;
 
 /**
  * @author Hardy Ferentschik
  */
 @Entity
 @Indexed
-@AnalyzerDefs({
-	@AnalyzerDef(
-			name = Car.COLLATING_ANALYZER_NAME,
-			tokenizer = @TokenizerDef(factory = KeywordTokenizerFactory.class),
-			filters = {
-					@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
-					@TokenFilterDef(factory = LowerCaseFilterFactory.class)
-			}
-	)
-})
 public class Car {
 
-	public static final String COLLATING_ANALYZER_NAME = "org_hibernate_search_test_query_facet_Car" + "_collatingAnalyzer";
+	public static final String COLLATING_ANALYZER_NAME = AnalysisNames.ANALYZER_KEYWORD_LOWERCASE_ASCIIFOLDING;
 
 	public static final String CUBIC_CAPACITY_STRING = "cubicCapacity_string";
 
