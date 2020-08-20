@@ -10,7 +10,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
-import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
@@ -133,18 +132,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return the IndexReaderAccessor for this SearchIntegrator
 	 */
 	IndexReaderAccessor getIndexReaderAccessor();
-
-	/**
-	 * Returns a descriptor for the specified entity type describing its indexed state.
-	 *
-	 * @param typeId the identification of the indexed entity for which to retrieve the descriptor
-	 *
-	 * @return a non {@code null} {@code IndexedEntityDescriptor}. This method can also be called for non indexed types.
-	 *         To determine whether the entity is actually indexed {@link IndexedTypeDescriptor#isIndexed()} can be used.
-	 *
-	 * @throws IllegalArgumentException in case {@code entityType} is {@code null}
-	 */
-	IndexedTypeDescriptor getIndexedTypeDescriptor(IndexedTypeIdentifier typeId);
 
 	/**
 	 * Returns the set of currently indexed types.
