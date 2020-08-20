@@ -23,9 +23,11 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.co
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -141,6 +143,58 @@ public class ElasticsearchSearchQueryIT {
 		);
 
 		query.fetchAll();
+	}
+
+	@Test
+	public void trackTotalHits_fetch() {
+		Assume.assumeTrue(
+				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
+				ElasticsearchTestDialect.get().supportsSkipOrLimitingTotalHitCount()
+		);
+
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<?> query = scope.query()
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		clientSpy.expectNext(
+				ElasticsearchRequest.post()
+						.param( "track_total_hits", true )
+						.pathComponent( readAlias )
+						.pathComponent( Paths._SEARCH )
+						.body( new JsonObject() ) // We don't care about the payload
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
+
+		query.fetch( 30 );
+	}
+
+	@Test
+	public void trackTotalHits_fetchHits() {
+		Assume.assumeTrue(
+				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
+				ElasticsearchTestDialect.get().supportsSkipOrLimitingTotalHitCount()
+		);
+
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<?> query = scope.query()
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		clientSpy.expectNext(
+				ElasticsearchRequest.post()
+						.param( "track_total_hits", false )
+						.pathComponent( readAlias )
+						.pathComponent( Paths._SEARCH )
+						.body( new JsonObject() ) // We don't care about the payload
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
+
+		query.fetchHits( 30 );
 	}
 
 	@SuppressWarnings("unused")

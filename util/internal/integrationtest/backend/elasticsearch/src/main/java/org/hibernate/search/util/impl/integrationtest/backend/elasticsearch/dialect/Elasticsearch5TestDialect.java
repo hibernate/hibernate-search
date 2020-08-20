@@ -82,4 +82,10 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
 		return false;
 	}
+
+
+	@Override
+	public boolean supportsSkipOrLimitingTotalHitCount() {
+		return false;
+	}
 }
