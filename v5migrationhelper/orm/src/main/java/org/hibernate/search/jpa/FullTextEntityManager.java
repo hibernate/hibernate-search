@@ -38,9 +38,6 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction: if a transaction is active, the operation
 	 * will not affect the index at least until commit.
-	 * <p>
-	 * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity will be ignored:
-	 * this method forces an index operation.
 	 *
 	 * @param <T> the type of the entity to index
 	 * @param entity The entity to index - must not be <code>null</code>.
@@ -58,9 +55,6 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
 	 * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
 	 * case this method behaves like {@link #purgeAll(Class)}.
-	 * <p>
-	 * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity will be ignored:
-	 * this method forces a purge operation.
 	 *
 	 * @param <T> the type of the entity to purge
 	 * @param entityType The type of the entity to delete.
@@ -72,8 +66,6 @@ public interface FullTextEntityManager extends EntityManager {
 
 	/**
 	 * Remove all entities from of particular class and all its subclasses from the index.
-	 * <p>
-	 * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity type will be ignored.
 	 *
 	 * @param <T> the type of the entity to purge
 	 * @param entityType The class of the entities to remove.
@@ -91,9 +83,6 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Creates a MassIndexer to rebuild the indexes of some
 	 * or all indexed entity types.
 	 * Instances cannot be reused.
-	 * <p>
-	 * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity types are applied: each instance will trigger
-	 * an {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor#onAdd(Object)} event from where you can customize the indexing operation.
 	 *
 	 * @param types optionally restrict the operation to selected types
 	 * @return a new MassIndexer
