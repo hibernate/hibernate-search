@@ -92,7 +92,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
 		final boolean applyTokenization;
 
-		FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
+		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
 		// Handle non-null numeric values
 		if ( value != null ) {
 			applyTokenization = fieldContext.applyAnalyzer();

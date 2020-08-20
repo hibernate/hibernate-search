@@ -32,13 +32,11 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hamcrest.CoreMatchers;
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.bridge.util.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -82,43 +80,6 @@ public class DSLTest {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
 		Query query = monthQb.keyword().onField( "monthValue" ).matching( 2 ).createQuery();
-		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
-	}
-
-	@Test
-	public void testUseOfCustomFieldBridgeInstance() throws Exception {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		ConnectedTermMatchingContext termMatchingContext = (ConnectedTermMatchingContext) monthQb
-				.keyword()
-				.onField( MonthClassBridge.FIELD_NAME_1 );
-
-		Query query = termMatchingContext
-				.withFieldBridge( new String2FieldBridgeAdaptor( new RomanNumberFieldBridge() ) )
-				.matching( 2 )
-				.createQuery();
-
-		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
-	}
-
-	@Test
-	public void testUseOfMultipleCustomFieldBridgeInstances() throws Exception {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		//Rather complex code here as we're not exposing the #withFieldBridge methods on the public interface
-		final ConnectedTermMatchingContext field1Context = (ConnectedTermMatchingContext) monthQb
-				.keyword()
-				.onField( MonthClassBridge.FIELD_NAME_1 );
-
-		final ConnectedTermMatchingContext field2Context = (ConnectedTermMatchingContext) field1Context
-					.withFieldBridge( new String2FieldBridgeAdaptor( new RomanNumberFieldBridge() ) )
-				.andField( MonthClassBridge.FIELD_NAME_2 );
-
-		Query query = field2Context
-					.withFieldBridge( new String2FieldBridgeAdaptor( new RomanNumberFieldBridge() ) )
-					.matching( 2 )
-				.createQuery();
-
 		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
 	}
 
