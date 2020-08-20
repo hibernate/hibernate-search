@@ -12,7 +12,6 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -194,21 +193,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * @return Lucene Explanation
 	 */
 	Explanation explain(int documentId);
-
-	/**
-	 * Enable a given filter by its name.
-	 *
-	 * @param name the name of the filter to enable
-	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
-	 */
-	FullTextFilter enableFullTextFilter(String name);
-
-	/**
-	 * Disable a given filter by its name.
-	 *
-	 * @param name the name of the filter to disable.
-	 */
-	void disableFullTextFilter(String name);
 
 	/**
 	 * <p>afterDeserialise.</p>
