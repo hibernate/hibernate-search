@@ -8,7 +8,6 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -30,10 +29,10 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	}
 
 	@Override
-	public Facet createFacet(FacetMetadata facetMetadata, String value, int count) {
+	public Facet createFacet(String absoluteFieldPath, String value, int count) {
 		int facetIndex = findFacetRangeIndex( value );
 		FacetRange<T> range = facetRangeList.get( facetIndex );
-		return new RangeFacetImpl<>( getFacetingName(), getFieldName(), facetMetadata.getSourceField().getAbsoluteName(), range, count, facetIndex );
+		return new RangeFacetImpl<>( getFacetingName(), getFieldName(), absoluteFieldPath, range, count, facetIndex );
 	}
 
 	@Override

@@ -31,24 +31,18 @@ import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
-import org.hibernate.query.ParameterMetadata;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
+import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
-import org.hibernate.search.query.engine.spi.DocumentExtractor;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.logging.impl.Log;
@@ -68,41 +62,20 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
-	private ObjectLookupMethod objectLookupMethod;
-	private DatabaseRetrievalMethod databaseRetrievalMethod;
+	private final SessionImplementor session;
 
-	private Criteria criteria;
-	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
 	private final HSQuery hSearchQuery;
-	private final SessionImplementor session;
 
 	private Integer firstResult;
 	private Integer maxResults;
 	//initialized at 0 since we don't expect to use hints at this stage
 	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
 
-	/**
-	 * Constructs a  <code>FullTextQueryImpl</code> instance.
-	 *
-	 * @param hSearchQuery The query
-	 * @param session Access to the Hibernate session.
-	 * @param parameterMetadata Additional query metadata.
-	 */
-	public FullTextQueryImpl(HSQuery hSearchQuery,
-			SessionImplementor session,
-			ParameterMetadata parameterMetadata) {
-		//TODO handle flushMode
-		super( session, parameterMetadata );
+	public FullTextQueryImpl(HSQuery hSearchQuery, SessionImplementor session) {
+		super( session, new ParameterMetadataImpl( null, null ) );
 		this.session = session;
-		ExtendedSearchIntegrator extendedIntegrator = getExtendedSearchIntegrator();
-		this.objectLookupMethod = extendedIntegrator.getDefaultObjectLookupMethod();
-		this.databaseRetrievalMethod = extendedIntegrator.getDefaultDatabaseRetrievalMethod();
-
 		this.hSearchQuery = hSearchQuery;
-		this.hSearchQuery
-				.timeoutExceptionFactory( new FullTextQueryTimeoutExceptionFactory() )
-				.tenantIdentifier( session.getTenantIdentifier() );
 	}
 
 	@Override
@@ -122,91 +95,16 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	 */
 	@Override
 	public Iterator iterate() {
-		//implement an iterator which keep the id/class for each hit and get the object on demand
-		//cause I can't keep the searcher and hence the hit opened. I don't have any hook to know when the
-		//user stops using it
-		//scrollable is better in this area
-
-		hSearchQuery.getTimeoutManager().start();
-		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
-		//stop timeout manager, the iterator pace is in the user's hands
-		hSearchQuery.getTimeoutManager().stop();
-		//TODO is this no-loader optimization really needed?
-		final Iterator<Object> iterator;
-		if ( entityInfos.size() == 0 ) {
-			iterator = new IteratorImpl( entityInfos, noLoader );
-			return iterator;
-		}
-		else {
-			Loader loader = getLoader();
-			iterator = new IteratorImpl( entityInfos, loader );
-		}
-		hSearchQuery.getTimeoutManager().stop();
-		return iterator;
-	}
-
-
-	/**
-	 * Decide which object loader to use depending on the targeted entities. If there is only a single entity targeted
-	 * a <code>QueryLoader</code> can be used which will only execute a single query to load the entities. If more than
-	 * one entity is targeted a <code>MultiClassesQueryLoader</code> must be used. We also have to consider whether
-	 * projections or <code>Criteria</code> are used.
-	 *
-	 * @return The loader instance to use to load the results of the query.
-	 */
-	private Loader getLoader() {
-		ObjectLoaderBuilder loaderBuilder = new ObjectLoaderBuilder()
-				.criteria( criteria )
-				.targetedEntities( hSearchQuery.getTargetedEntities() )
-				.indexedTargetedEntities( hSearchQuery.getIndexedTargetedEntities().toPojosSet() )
-				.session( session )
-				.searchFactory( hSearchQuery.getExtendedSearchIntegrator() )
-				.timeoutManager( hSearchQuery.getTimeoutManager() )
-				.lookupMethod( objectLookupMethod )
-				.retrievalMethod( databaseRetrievalMethod );
-		if ( hSearchQuery.getProjectedFields() != null ) {
-			return getProjectionLoader( loaderBuilder );
-		}
-		else {
-			return loaderBuilder.buildLoader();
-		}
-	}
-
-	private Loader getProjectionLoader(ObjectLoaderBuilder loaderBuilder) {
-		ProjectionLoader loader = new ProjectionLoader();
-		loader.init(
-				session,
-				hSearchQuery.getExtendedSearchIntegrator(),
-				resultTransformer,
-				loaderBuilder,
-				hSearchQuery.getProjectedFields(),
-				hSearchQuery.getTimeoutManager(),
-				hSearchQuery.hasThisProjection()
-		);
-		return loader;
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
-	public ScrollableResultsImpl scroll() {
-		//keep the searcher open until the resultset is closed
-
-		hSearchQuery.getTimeoutManager().start();
-		final DocumentExtractor documentExtractor = hSearchQuery.queryDocumentExtractor();
-		//stop timeout manager, the iterator pace is in the user's hands
-		hSearchQuery.getTimeoutManager().stop();
-		Loader loader = getLoader();
-		return new ScrollableResultsImpl(
-				fetchSize,
-				documentExtractor,
-				loader,
-				this.session,
-				hSearchQuery.hasThisProjection()
-		);
+	public ScrollableResultsImplementor scroll() {
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public ScrollableResultsImplementor scroll(ScrollMode scrollMode) {
-		//TODO think about this scrollmode
 		return scroll();
 	}
 
@@ -228,20 +126,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	protected List doHibernateSearchList() {
-		hSearchQuery.getTimeoutManager().start();
-		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
-		Loader loader = getLoader();
-		List list = loader.load( entityInfos );
-		//no need to timeoutManager.isTimedOut from this point, we don't do anything intensive
-		if ( resultTransformer == null || loader instanceof ProjectionLoader ) {
-			//stay consistent with transformTuple which can only be executed during a projection
-			//nothing to do
-		}
-		else {
-			list = resultTransformer.transformList( list );
-		}
-		hSearchQuery.getTimeoutManager().stop();
-		return list;
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
@@ -260,18 +145,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	public int doGetResultSize() {
-		if ( getLoader().isSizeSafe() ) {
-			return hSearchQuery.queryResultSize();
-		}
-		else {
-			throw log.cannotGetResultSizeWithCriteriaAndRestriction( criteria.toString() );
-		}
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public FullTextQueryImpl setCriteriaQuery(Criteria criteria) {
-		this.criteria = criteria;
-		return this;
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
@@ -473,9 +352,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	@Deprecated
 	@Override
 	public FullTextQueryImpl setResultTransformer(ResultTransformer transformer) {
-		super.setResultTransformer( transformer );
-		this.resultTransformer = transformer;
-		return this;
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	/*
@@ -569,13 +446,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public FullTextQueryImpl initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
-		this.objectLookupMethod = lookupMethod;
-		this.databaseRetrievalMethod = retrievalMethod;
-		return this;
-	}
-
-	private ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return ContextHelper.getSearchIntegratorBySessionImplementor( session );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
@@ -617,41 +488,4 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		return "FullTextQueryImpl(" + getQueryString() + ")";
 	}
 
-	private static final Loader noLoader = new Loader() {
-		@Override
-		public void init(SessionImplementor session,
-						ExtendedSearchIntegrator extendedIntegrator,
-						ObjectInitializer objectInitializer,
-						TimeoutManager timeoutManager) {
-		}
-
-		@Override
-		public Object load(EntityInfo entityInfo) {
-			throw new UnsupportedOperationException( "noLoader should not be used" );
-		}
-
-		@Override
-		public Object loadWithoutTiming(EntityInfo entityInfo) {
-			throw new UnsupportedOperationException( "noLoader should not be used" );
-		}
-
-		@Override
-		public List load(List<EntityInfo> entityInfos) {
-			throw new UnsupportedOperationException( "noLoader should not be used" );
-		}
-
-		@Override
-		public boolean isSizeSafe() {
-			return false;
-		}
-	};
-
-	private class FullTextQueryTimeoutExceptionFactory implements TimeoutExceptionFactory {
-
-		@Override
-		public RuntimeException createTimeoutException(String message, String queryDescription) {
-			return new javax.persistence.QueryTimeoutException( message, null, FullTextQueryImpl.this );
-		}
-
-	}
 }

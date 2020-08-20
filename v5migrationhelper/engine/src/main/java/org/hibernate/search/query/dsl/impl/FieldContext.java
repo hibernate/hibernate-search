@@ -7,23 +7,18 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-
 /**
  * @author Emmanuel Bernard
  */
 public class FieldContext {
 	private final String field;
-	private final boolean isIdField;
 	private boolean ignoreAnalyzer;
 	private final QueryCustomizer fieldCustomizer;
 	private boolean ignoreFieldBridge;
 
-	public FieldContext(String field, QueryBuildingContext queryContext) {
+	public FieldContext(String field) {
 		this.field = field;
 		this.fieldCustomizer = new QueryCustomizer();
-		isIdField = queryContext.getDocumentBuilder().getIdFieldName().equals( field );
 	}
 
 	public String getField() {
@@ -35,7 +30,7 @@ public class FieldContext {
 	 * @return {@code true} if the field must be analyzed
 	 */
 	public boolean applyAnalyzer() {
-		return !ignoreAnalyzer && !isIdField;
+		return !ignoreAnalyzer;
 	}
 
 	public void setIgnoreAnalyzer(boolean ignoreAnalyzer) {
@@ -52,15 +47,6 @@ public class FieldContext {
 
 	public void setIgnoreFieldBridge(boolean ignoreFieldBridge) {
 		this.ignoreFieldBridge = ignoreFieldBridge;
-	}
-
-	public String objectToString(DocumentBuilderIndexedEntity documentBuilder, Object value, ConversionContext conversionContext) {
-		if ( isIgnoreFieldBridge() ) {
-			return value == null ? null : value.toString();
-		}
-		else {
-			return documentBuilder.objectToString( field, value, conversionContext );
-		}
 	}
 
 	@Override

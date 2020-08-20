@@ -7,37 +7,19 @@
 package org.hibernate.search.impl;
 
 import java.io.Serializable;
-import java.util.Properties;
 
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.event.spi.EventSource;
-import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.event.impl.EventSourceTransactionContext;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.batchindexing.impl.DefaultMassIndexerFactory;
-import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
-import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.QueryDescriptor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.impl.IndexedTypeSets;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
@@ -53,17 +35,11 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
-	private transient ExtendedSearchIntegrator searchFactory;
+	private transient SearchIntegrator searchIntegrator;
 	private transient SearchFactory searchFactoryAPI;
-
-	private final TransactionContext transactionContext;
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
 		super( (SessionImplementor) session );
-		if ( session == null ) {
-			throw log.getNullSessionPassedToFullTextSessionCreationException();
-		}
-		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
 	}
 
 	@Override
@@ -73,11 +49,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	}
 
 	private FullTextQuery createFullTextQuery(HSQuery hsQuery) {
-		return new FullTextQueryImpl(
-				hsQuery,
-				delegate,
-				new ParameterMetadataImpl( null, null )
-		);
+		return new FullTextQueryImpl( hsQuery, delegate );
 	}
 
 	@Override
@@ -87,8 +59,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	@Override
 	public void flushToIndexes() {
-		ExtendedSearchIntegrator extendedIntegrator = getSearchIntegrator();
-		extendedIntegrator.getWorker().flushWorks( transactionContext );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
@@ -96,27 +67,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		if ( entityType == null ) {
 			return;
 		}
-		final ExtendedSearchIntegrator searchIntegrator = getSearchIntegrator();
-		final IndexedTypeIdentifier typeIdentifier = searchIntegrator.getIndexBindings().keyFromPojoType( entityType );
-		final IndexedTypeSet targetedClasses = getSearchIntegrator().getIndexedTypesPolymorphic( typeIdentifier.asTypeSet() );
-		if ( targetedClasses.isEmpty() ) {
-			String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
-			throw new IllegalArgumentException( msg );
-		}
-
-		for ( IndexedTypeIdentifier type : targetedClasses ) {
-			if ( id == null ) {
-				createAndPerformWork( type, null, WorkType.PURGE_ALL );
-			}
-			else {
-				createAndPerformWork( type, id, WorkType.PURGE );
-			}
-		}
-	}
-
-	private void createAndPerformWork(IndexedTypeIdentifier type, Serializable id, WorkType workType) {
-		Work work = new Work( delegate.getTenantIdentifier(), type, id, workType );
-		getSearchIntegrator().getWorker().performWork( work, transactionContext );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
@@ -125,38 +76,12 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 			throw new IllegalArgumentException( "Entity to index should not be null" );
 		}
 
-		Class<?> clazz = HibernateHelper.getClass( entity );
-		//TODO cache that at the FTSession level
-		ExtendedSearchIntegrator extendedIntegrator = getSearchIntegrator();
-		//not strictly necessary but a small optimization
-		if ( extendedIntegrator.getIndexBindings().get( clazz ) == null ) {
-			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
-			throw new IllegalArgumentException( msg );
-		}
-		Serializable id = delegate.getIdentifier( entity );
-		String tenantIdentifier = getTenantIdentifier();
-
-		Work work = new Work( tenantIdentifier, entity, id, WorkType.INDEX );
-		Worker worker = extendedIntegrator.getWorker();
-		worker.performWork( work, transactionContext );
-
-		//TODO
-		//need to add elements in a queue kept at the Session level
-		//the queue will be processed by a Lucene(Auto)FlushEventListener
-		//note that we could keep this queue somewhere in the event listener in the mean time but that requires
-		//a synchronized hashmap holding this queue on a per session basis plus some session house keeping (yuk)
-		//another solution would be to subclass SessionImpl instead of having this LuceneSession delegation model
-		//this is an open discussion
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		MassIndexerFactory massIndexerFactory = createMassIndexerFactory();
-		MassIndexer massIndexer = massIndexerFactory.createMassIndexer( getSearchIntegrator(), getFactory(), types );
-		if ( massIndexer instanceof MassIndexerWithTenant ) {
-			( (MassIndexerWithTenant) massIndexer ).tenantIdentifier( getTenantIdentifier() );
-		}
-		return massIndexer;
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
@@ -167,35 +92,16 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		return searchFactoryAPI;
 	}
 
-	private ExtendedSearchIntegrator getSearchIntegrator() {
-		if ( searchFactory == null ) {
-			searchFactory = ContextHelper.getSearchIntegrator( delegate );
+	private SearchIntegrator getSearchIntegrator() {
+		if ( searchIntegrator == null ) {
+			searchIntegrator = ContextHelper.getSearchIntegrator( delegate );
 		}
-		return searchFactory;
+		return searchIntegrator;
 	}
 
 	@Override
 	public FullTextSharedSessionBuilder sessionWithOptions() {
 		return new FullTextSharedSessionBuilderDelegator( super.sessionWithOptions() );
-	}
-
-	private MassIndexerFactory createMassIndexerFactory() {
-		MassIndexerFactory factory;
-		Properties properties = getSearchIntegrator().getConfigurationProperties();
-		String factoryClassName = properties.getProperty( MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME );
-
-		if ( factoryClassName != null ) {
-			ExtendedSearchIntegrator extendedIntegrator = getSearchIntegrator();
-			ServiceManager serviceManager = extendedIntegrator.getServiceManager();
-			factory = ClassLoaderHelper.instanceFromName(
-					MassIndexerFactory.class, factoryClassName, "Mass indexer factory", serviceManager
-			);
-		}
-		else {
-			factory = new DefaultMassIndexerFactory();
-		}
-		factory.initialize( properties );
-		return factory;
 	}
 
 	@Override

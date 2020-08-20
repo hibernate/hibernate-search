@@ -7,7 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -21,8 +20,8 @@ public class DiscreteFacetRequest extends FacetingRequestImpl {
 	}
 
 	@Override
-	public Facet createFacet(FacetMetadata facetMetadata, String value, int count) {
-		return new SimpleFacet( getFacetingName(), getFieldName(), facetMetadata.getSourceField().getAbsoluteName(), value, count );
+	public Facet createFacet(String absoluteFieldPath, String value, int count) {
+		return new SimpleFacet( getFacetingName(), getFieldName(), absoluteFieldPath, value, count );
 	}
 
 	static class SimpleFacet extends AbstractFacet {

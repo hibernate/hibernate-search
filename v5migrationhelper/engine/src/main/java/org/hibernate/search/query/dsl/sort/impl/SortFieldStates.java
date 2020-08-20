@@ -11,16 +11,13 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortField.Type;
-import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
-import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spatial.DistanceSortField;
+
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortField.Type;
 
 /**
  * Holds the list of @{link SortField}s as well as the state of the one being constructed.
@@ -123,16 +120,16 @@ public class SortFieldStates {
 			sortField = new SortField( null, Type.DOC, isDesc() );
 		}
 		else if ( coordinates != null ) {
-			sortField = new DistanceSortField( coordinates, currentName, isDesc() );
 			if ( hasMissingValue() ) {
 				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
+			throw new UnsupportedOperationException( "To be implemented through the Search 6 DSL" );
 		}
 		else if ( currentLatitude != null ) {
-			sortField = new DistanceSortField( currentLatitude, currentLongitude, currentName, isDesc() );
 			if ( hasMissingValue() ) {
 				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
+			throw new UnsupportedOperationException( "To be implemented through the Search 6 DSL" );
 		}
 		else {
 			sortField = new SortField( currentName, currentType, isDesc() );
@@ -143,81 +140,7 @@ public class SortFieldStates {
 	}
 
 	public void determineCurrentSortFieldTypeAutomaticaly() {
-		this.currentType = getCurrentSortFieldTypeFromMetamodel();
-	}
-
-	private Type getCurrentSortFieldTypeFromMetamodel() {
-		Type type = null;
-
-		TypeMetadata typeMetadata = queryContext.getExtendedSearchIntegrator()
-				.getIndexBinding( queryContext.getEntityType() )
-				.getDocumentBuilder()
-				.getTypeMetadata();
-
-		BridgeDefinedField bridgeDefinedFieldMetadata = typeMetadata.getBridgeDefinedFieldMetadataFor( currentName );
-		if ( bridgeDefinedFieldMetadata != null ) {
-			type = getSortFieldType( bridgeDefinedFieldMetadata );
-		}
-
-		if ( type == null ) {
-			DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( currentName );
-			if ( documentFieldMetadata != null ) {
-				type = getSortFieldType( documentFieldMetadata );
-			}
-		}
-
-		if ( type != null ) {
-			return type;
-		}
-		else {
-			throw new SearchException( "Cannot automatically determine the field type for field '" + currentName
-					+ "'. Use byField(String, Sort.Type) to provide the sort type explicitly." );
-		}
-	}
-
-	private Type getSortFieldType(BridgeDefinedField bridgeDefinedFieldMetadata) {
-		switch ( bridgeDefinedFieldMetadata.getType() ) {
-			case DOUBLE:
-				return Type.DOUBLE;
-			case FLOAT:
-				return Type.FLOAT;
-			case LONG:
-			case DATE:
-				return Type.LONG;
-			case INTEGER:
-				return Type.INT;
-			case BOOLEAN:
-			case STRING:
-				return Type.STRING;
-			case OBJECT:
-			default:
-				return null;
-		}
-	}
-
-	private Type getSortFieldType(DocumentFieldMetadata documentFieldMetadata) {
-		if ( documentFieldMetadata.isSpatial() ) {
-			throw new SearchException( "Field '" + currentName + "' is a spatial field."
-					+ " For spatial fields, use .byDistance() and not .byField()." );
-		}
-		else if ( documentFieldMetadata.isNumeric() ) {
-			switch ( documentFieldMetadata.getNumericEncodingType() ) {
-				case DOUBLE:
-					return Type.DOUBLE;
-				case FLOAT:
-					return Type.FLOAT;
-				case LONG:
-					return Type.LONG;
-				case INTEGER:
-					return Type.INT;
-				case UNKNOWN:
-				default:
-					return null;
-			}
-		}
-		else {
-			return Type.STRING;
-		}
+		throw new UnsupportedOperationException( "To be implemented through the Search 6 DSL" );
 	}
 
 	private void processMissingValue(SortField sortField) {
