@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
-import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
@@ -37,7 +36,6 @@ public class Tag {
 
 	@Column(nullable = false, length = 50)
 	@Field
-	@Boost(1.5f)
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "tag")

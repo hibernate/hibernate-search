@@ -48,30 +48,6 @@ public class FieldAccessTest extends SearchTestBase {
 
 	}
 
-	@Test
-	public void testFieldBoost() throws Exception {
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.persist( new Document( "Hibernate in Action", "Object and Relational", "blah blah blah" )		);
-		s.persist(
-				new Document( "Object and Relational", "Hibernate in Action", "blah blah blah" )
-		);
-		tx.commit();
-
-		s.clear();
-
-		FullTextSession session = Search.getFullTextSession( s );
-		tx = session.beginTransaction();
-		QueryParser p = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
-		List result = session.createFullTextQuery( p.parse( "title:Action OR Abstract:Action" ) ).list();
-		assertEquals( "Query by field", 2, result.size() );
-		assertEquals( "@Boost fails", "Hibernate in Action", ( (Document) result.get( 0 ) ).getTitle() );
-		s.delete( result.get( 0 ) );
-		tx.commit();
-		s.close();
-
-	}
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
