@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.annotations;
 
-import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
