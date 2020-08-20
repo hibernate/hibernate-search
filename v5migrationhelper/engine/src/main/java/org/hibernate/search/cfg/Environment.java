@@ -154,16 +154,6 @@ public final class Environment {
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 
 	/**
-	 * Option for specifying an error handler used during processing of the Lucene updates. Supported value types are:
-	 * <ul>
-	 * <li>{@code String}: the fully qualified name of an {@link org.hibernate.search.exception.ErrorHandler} implementation</li>
-	 * <li>{@code ErrorHandler}: an error handler instance</li>
-	 * </ul>
-	 * Default is to log errors.
-	 */
-	public static final String ERROR_HANDLER = "hibernate.search.error_handler";
-
-	/**
 	 * If set to {@code true} JMX beans get enabled. For all other values the beans do not.
 	 * get enabled.
 	 */
