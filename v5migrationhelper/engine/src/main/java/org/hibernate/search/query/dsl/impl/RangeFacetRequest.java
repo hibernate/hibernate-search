@@ -30,17 +30,6 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	}
 
 	@Override
-	public Class<?> getFacetValueType() {
-		// safe since we have at least one facet range set
-		Object o = facetRangeList.get( 0 ).getMin();
-		if ( o == null ) {
-			o = facetRangeList.get( 0 ).getMax();
-		}
-
-		return o.getClass();
-	}
-
-	@Override
 	public Facet createFacet(FacetMetadata facetMetadata, String value, int count) {
 		int facetIndex = findFacetRangeIndex( value );
 		FacetRange<T> range = facetRangeList.get( facetIndex );

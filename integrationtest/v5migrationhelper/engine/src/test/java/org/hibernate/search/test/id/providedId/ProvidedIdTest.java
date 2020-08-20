@@ -89,7 +89,6 @@ public class ProvidedIdTest {
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
 		LazyQueryState lowLevelSearcher = new LazyQueryState(
 				luceneQuery,
-				QueryFilters.EMPTY_FILTERSET,
 				indexReader,
 				defaultSimilarity,
 				extendedIntegrator,

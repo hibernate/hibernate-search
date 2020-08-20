@@ -488,15 +488,12 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 
 		final Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 
-		final QueryFilters facetingFilters = getFacetManager().getFacetFilters();
-
 		//handle the sort and projection
 		final String[] projection = this.projectedFields;
 		Collection<EntityIndexBinding> targetedEntityBindings = targetedEntityBindingsByName.values();
 		if ( Boolean.TRUE.equals( forceScoring ) ) {
 			return new LazyQueryState(
 					filteredQuery,
-					facetingFilters,
 					compoundReader,
 					searcherSimilarity,
 					extendedIntegrator,
@@ -508,7 +505,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		else if ( Boolean.FALSE.equals( forceScoring ) ) {
 			return new LazyQueryState(
 					filteredQuery,
-					facetingFilters,
 					compoundReader,
 					searcherSimilarity,
 					extendedIntegrator,
@@ -528,7 +524,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 				if ( activate ) {
 					return new LazyQueryState(
 							filteredQuery,
-							facetingFilters,
 							compoundReader,
 							searcherSimilarity,
 							extendedIntegrator,
@@ -542,7 +537,6 @@ public class LuceneHSQuery extends AbstractHSQuery implements HSQuery {
 		//default
 		return new LazyQueryState(
 				filteredQuery,
-				facetingFilters,
 				compoundReader,
 				searcherSimilarity,
 				extendedIntegrator,

@@ -9,7 +9,6 @@ package org.hibernate.search.query.engine.spi;
 import java.util.List;
 
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetSelection;
 import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
@@ -42,14 +41,4 @@ public interface FacetManager {
 	 * @see #enableFaceting(FacetingRequest)
 	 */
 	List<Facet> getFacets(String facetingName);
-
-	/**
-	 * Returns a instance of {@code FacetSelection} instance in order to apply a disjunction of facet criteria on
-	 * the current query.
-	 *
-	 * @param groupName the name the group. If the name is unknown an empty selection group is returned. {@code null}
-	 * is not allowed.
-	 * @return the {@code FacetSelection} for this group name if it exists., otherwise a new selection is created.
-	 */
-	FacetSelection getFacetGroup(String groupName);
 }
