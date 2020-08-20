@@ -30,7 +30,6 @@
         <module>testing</module>
         <module>infinispan</module>
         <module>integrationtest/elasticsearch</module>
-        <module>integrationtest/spring</module>
         <module>integrationtest/jsr352</module>
         <module>documentation</module>
     </modules>
@@ -126,9 +125,6 @@
 
         <!-- >>> ORM ITs-->
         <version.com.h2database>1.4.178</version.com.h2database>
-
-        <!-- >>> Spring ITs-->
-        <version.org.springframework.boot>1.5.3.RELEASE</version.org.springframework.boot>
 
         <!-- >>> JSR-352 ITs -->
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
