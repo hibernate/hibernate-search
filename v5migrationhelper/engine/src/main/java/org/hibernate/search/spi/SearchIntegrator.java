@@ -7,7 +7,6 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
@@ -123,13 +122,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return The statistics.
 	 */
 	Statistics getStatistics();
-
-	/**
-	 * Provides access to the IndexReader API
-	 *
-	 * @return the IndexReaderAccessor for this SearchIntegrator
-	 */
-	IndexReaderAccessor getIndexReaderAccessor();
 
 	/**
 	 * Returns the set of currently indexed types.

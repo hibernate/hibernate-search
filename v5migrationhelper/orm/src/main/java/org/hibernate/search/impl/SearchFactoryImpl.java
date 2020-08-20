@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -56,11 +55,6 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	@Override
 	public Statistics getStatistics() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
-	}
-
-	@Override
-	public IndexReaderAccessor getIndexReaderAccessor() {
 		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
