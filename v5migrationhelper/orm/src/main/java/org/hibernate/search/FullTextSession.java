@@ -8,7 +8,6 @@ package org.hibernate.search;
 
 import org.hibernate.Session;
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.query.engine.spi.QueryDescriptor;
 
 /**
  * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.
@@ -19,9 +18,6 @@ public interface FullTextSession extends Session, FullTextEntityManager {
 
 	@Override
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
-
-	@Override
-	FullTextQuery createFullTextQuery(QueryDescriptor descriptor, Class<?>... entities);
 
 	@Override
 	FullTextSharedSessionBuilder sessionWithOptions();

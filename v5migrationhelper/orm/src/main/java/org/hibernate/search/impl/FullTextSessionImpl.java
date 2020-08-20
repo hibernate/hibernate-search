@@ -72,12 +72,6 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		return createFullTextQuery( hsQuery );
 	}
 
-	@Override
-	public FullTextQuery createFullTextQuery(QueryDescriptor queryDescriptor, Class<?>... entities) {
-		HSQuery hsQuery = queryDescriptor.createHSQuery( getSearchIntegrator(), IndexedTypeSets.fromClasses( entities ) );
-		return createFullTextQuery( hsQuery );
-	}
-
 	private FullTextQuery createFullTextQuery(HSQuery hsQuery) {
 		return new FullTextQueryImpl(
 				hsQuery,
