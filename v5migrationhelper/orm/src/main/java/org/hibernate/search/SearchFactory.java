@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.stat.Statistics;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
@@ -61,13 +60,6 @@ public interface SearchFactory {
 	 * @return return a query builder providing a fluent API to create Lucene queries
 	 */
 	QueryContextBuilder buildQueryBuilder();
-
-	/**
-	 * Retrieve the statistics instance for this factory.
-	 *
-	 * @return The statistics.
-	 */
-	Statistics getStatistics();
 
 	/**
 	 * Returns the set of currently indexed types.
