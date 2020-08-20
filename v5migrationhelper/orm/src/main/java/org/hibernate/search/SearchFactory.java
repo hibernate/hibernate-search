@@ -13,7 +13,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.IndexFamily;
-import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -79,18 +78,6 @@ public interface SearchFactory {
 	 * @return the IndexReaderAccessor for this SearchFactory
 	 */
 	IndexReaderAccessor getIndexReaderAccessor();
-
-	/**
-	 * Returns a descriptor for the specified entity type describing its indexed state.
-	 *
-	 * @param entityType the entity for which to retrieve the descriptor
-	 *
-	 * @return a non {@code null} {@code IndexedEntityDescriptor}. This method can also be called for non indexed types.
-	 *         To determine whether the entity is actually indexed {@link org.hibernate.search.metadata.IndexedTypeDescriptor#isIndexed()} can be used.
-	 *
-	 * @throws IllegalArgumentException in case {@code entityType} is {@code null}
-	 */
-	IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType);
 
 	/**
 	 * Returns the set of currently indexed types.
