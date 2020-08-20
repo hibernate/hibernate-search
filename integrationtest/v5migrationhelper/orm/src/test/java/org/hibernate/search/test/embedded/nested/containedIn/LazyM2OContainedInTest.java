@@ -10,14 +10,13 @@ package org.hibernate.search.test.embedded.nested.containedIn;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.cache.CachingRegionFactory;
@@ -59,11 +58,11 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 		assertEquals(
 				1,
-				fts.createFullTextQuery( NumericFieldUtils.createExactMatchQuery( "uid_field", uid1 ), Entity1ForDoc0.class ).getResultSize()
+				fts.createFullTextQuery( LongPoint.newExactQuery( "uid_field", uid1 ), Entity1ForDoc0.class ).getResultSize()
 		);
 		assertEquals(
 				1,
-				fts.createFullTextQuery( NumericFieldUtils.createExactMatchQuery( "entities2.uid_field", uid2 ), Entity1ForDoc0.class ).getResultSize()
+				fts.createFullTextQuery( LongPoint.newExactQuery( "entities2.uid_field", uid2 ), Entity1ForDoc0.class ).getResultSize()
 		);
 
 		tx.commit();
@@ -118,9 +117,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 		assertEquals( 1, fts
 				.createFullTextQuery(
-						NumericRangeQuery.newLongRange(
-								"entity1.uid-numeric", ent1_0.getUid(), ent1_0.getUid(), true, true
-						),
+						LongPoint.newExactQuery( "entity1.uid-numeric", ent1_0.getUid() ),
 						Entity2ForUnindexed.class
 				)
 				.getResultSize() );

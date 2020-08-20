@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.jpa;
 
-import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.search.Query;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class EntityManagerTest extends JPATestCase {
 	public void testNonMatchingQueryDoesReturnEmptyResults() throws Exception {
 		em.getTransaction().begin();
 
-		Query query = NumericRangeQuery.newIntRange( "saltQty", 0, 0, true, true );
+		Query query = IntPoint.newExactQuery( "saltQty", 0 );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
 
 		em.getTransaction().commit();
@@ -70,7 +70,7 @@ public class EntityManagerTest extends JPATestCase {
 	public void testGetResultList() throws Exception {
 		em.getTransaction().begin();
 
-		Query query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
+		Query query = IntPoint.newExactQuery( "saltQty", 23 );
 		assertEquals( "getResultList should return a result", 1, em.createFullTextQuery( query ).getResultList().size() );
 
 		em.getTransaction().commit();
@@ -80,7 +80,7 @@ public class EntityManagerTest extends JPATestCase {
 	public void testGetSingleResult() throws Exception {
 		em.getTransaction().begin();
 
-		Query query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
+		Query query = IntPoint.newExactQuery( "saltQty", 23 );
 		assertEquals(
 				"getSingleResult should return a result", 23,
 				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty()
@@ -92,7 +92,7 @@ public class EntityManagerTest extends JPATestCase {
 	public void testGetResultSize() throws Exception {
 		em.getTransaction().begin();
 
-		Query query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
+		Query query = IntPoint.newExactQuery( "saltQty", 23 );
 		assertEquals( "Wrong result size", 1, em.createFullTextQuery( query ).getResultSize() );
 
 		em.getTransaction().commit();

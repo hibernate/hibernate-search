@@ -529,8 +529,14 @@ public class SortTest extends SearchTestBase {
 		}
 
 		@Override
-		public int compareBottom(int doc) {
-			int v = (int) ( currentReaderValuesField1.get( doc ) + currentReaderValuesField2.get( doc ) );
+		public int compareBottom(int doc) throws IOException {
+			int v;
+			if ( currentReaderValuesField1.advanceExact( doc ) && currentReaderValuesField2.advanceExact( doc ) ) {
+				v = (int) ( currentReaderValuesField1.longValue() + currentReaderValuesField2.longValue() );
+			}
+			else {
+				v = Integer.MAX_VALUE;
+			}
 			return compareValues( bottom, v );
 		}
 
@@ -540,11 +546,13 @@ public class SortTest extends SearchTestBase {
 		}
 
 		@Override
-		public void copy(int slot, int doc) {
-			int v1 = (int) currentReaderValuesField1.get( doc );
+		public void copy(int slot, int doc) throws IOException {
+			int v1 = (int) ( currentReaderValuesField1.advanceExact( doc ) ? currentReaderValuesField1.longValue()
+					: Integer.MAX_VALUE );
 			field1Values[slot] = v1;
 
-			int v2 = (int) currentReaderValuesField2.get( doc );
+			int v2 = (int) ( currentReaderValuesField2.advanceExact( doc ) ? currentReaderValuesField2.longValue()
+					: Integer.MAX_VALUE );
 			field2Values[slot] = v2;
 		}
 

@@ -9,6 +9,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.exception.AssertionFailure;
@@ -56,7 +57,9 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		if ( wrappedQuery == null ) {
 			throw new AssertionFailure( "wrapped query not set" );
 		}
-		finalQuery.setBoost( boost * finalQuery.getBoost() );
+		if ( boost != 1.0f ) {
+			finalQuery = new BoostQuery( finalQuery, boost );
+		}
 		if ( filter != null ) {
 			finalQuery = new BooleanQuery.Builder()
 					.add( finalQuery, Occur.MUST )

@@ -20,6 +20,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 
@@ -31,7 +32,7 @@ import org.apache.lucene.util.Version;
 public final class TestConstants {
 
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer();
-	public static final Analyzer stopAnalyzer = new StopAnalyzer();
+	public static final Analyzer stopAnalyzer = new StopAnalyzer( EnglishAnalyzer.ENGLISH_STOP_WORDS_SET );
 	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
