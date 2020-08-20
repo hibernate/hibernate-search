@@ -137,15 +137,6 @@ public final class Environment {
 	public static final String SIMILARITY_CLASS_PER_INDEX = "similarity";
 
 	/**
-	 * Provide a programmatic mapping model to Hibernate Search configuration
-	 * Accepts a fully populated SearchMapping object or a fully qualified
-	 * class name of a SearchMapping factory. Such a factory must have:
-	 * - a no-arg constructor
-	 * - a method returning SearchMapping and annotated with @Factory
-	 */
-	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
-
-	/**
 	 * If set to {@code true} JMX beans get enabled. For all other values the beans do not.
 	 * get enabled.
 	 */
