@@ -24,8 +24,6 @@
         <module>legacy</module>
         <module>engine</module>
         <module>serialization/avro</module>
-        <module>backends/jgroups</module>
-        <module>backends/jms</module>
         <module>elasticsearch</module>
         <module>elasticsearch-aws</module>
         <module>orm</module>
@@ -33,7 +31,6 @@
         <module>testing</module>
         <module>infinispan</module>
         <module>integrationtest/elasticsearch</module>
-        <module>integrationtest/jms</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/jsr352</module>
         <module>integrationtest/performance/orm</module>
@@ -109,13 +106,6 @@
         <!-- >>> Infinispan -->
         <version.org.infinispan>9.2.2.Final</version.org.infinispan>
 
-        <!-- >>> JMS -->
-        <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
-        <version.org.apache.activemq.broker>5.13.3</version.org.apache.activemq.broker>
-
-        <!-- >>> JGroups -->
-        <version.org.jgroups>4.0.11.Final</version.org.jgroups>
-
         <!-- >>> Avro -->
         <version.org.apache.avro>1.7.6</version.org.apache.avro>
         <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
@@ -128,7 +118,6 @@
         <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
         <osgi.version-range.org.hibernate>[5.3.0,5.4.0)</osgi.version-range.org.hibernate>
         <osgi.version-range.org.hibernate.commons.annotations>[5,6)</osgi.version-range.org.hibernate.commons.annotations>
-        <osgi.version-range.org.jgroups>[3.6.0,4)</osgi.version-range.org.jgroups>
         <osgi.version-range.org.jboss.logging.jboss-logging>[3.3,4.0.0)</osgi.version-range.org.jboss.logging.jboss-logging>
         <osgi.version-range.org.apache.tika>[1.4,2.0)</osgi.version-range.org.apache.tika>
         <osgi.version-range.org.apache.avro>[${version.org.apache.avro},1.8.0)</osgi.version-range.org.apache.avro>
@@ -428,21 +417,6 @@
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>${version.org.apache.commons.logging}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-broker</artifactId>
-                <version>${version.org.apache.activemq.broker}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.jms</groupId>
-                <artifactId>jboss-jms-api_2.0_spec</artifactId>
-                <version>${version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jgroups</groupId>
-                <artifactId>jgroups</artifactId>
-                <version>${version.org.jgroups}</version>
             </dependency>
             <dependency>
                 <groupId>javax.batch</groupId>
