@@ -10,10 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.hcore.impl.SearchFactoryReference;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Static helper class to retrieve the instance of the current {@code SearchIntegrator} / {@code ExtendedSearchIntegrator}.
@@ -31,27 +28,20 @@ public class ContextHelper {
 	private ContextHelper() {
 	}
 
-	public static ExtendedSearchIntegrator getSearchIntegrator(Session session) {
+	public static SearchIntegrator getSearchIntegrator(Session session) {
 		return getSearchIntegratorBySessionImplementor( (SessionImplementor) session );
 	}
 
-	public static ExtendedSearchIntegrator getSearchIntegratorBySessionImplementor(SessionImplementor session) {
+	public static SearchIntegrator getSearchIntegratorBySessionImplementor(SessionImplementor session) {
 		return getSearchIntegratorBySFI( session.getFactory() );
 	}
 
-	public static ExtendedSearchIntegrator getSearchIntegratorBySF(SessionFactory factory) {
+	public static SearchIntegrator getSearchIntegratorBySF(SessionFactory factory) {
 		return getSearchIntegratorBySFI( (SessionFactoryImplementor) factory );
 	}
 
-	public static ExtendedSearchIntegrator getSearchIntegratorBySFI(SessionFactoryImplementor sfi) {
-		final SearchFactoryReference factoryReference = sfi.getServiceRegistry()
-			.getService( SearchFactoryReference.class );
-		if ( factoryReference != null ) {
-			return factoryReference.getSearchIntegrator();
-		}
-		else {
-			throw LoggerFactory.make( MethodHandles.lookup() ).searchFactoryReferenceServiceNotFound();
-		}
+	public static SearchIntegrator getSearchIntegratorBySFI(SessionFactoryImplementor sfi) {
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 }

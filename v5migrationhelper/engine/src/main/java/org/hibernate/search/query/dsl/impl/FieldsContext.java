@@ -44,7 +44,7 @@ public class FieldsContext implements Iterable<FieldContext> {
 	}
 
 	private void doAdd(String fieldName) {
-		fieldContexts.add( new FieldContext( fieldName, queryContext ) );
+		fieldContexts.add( new FieldContext( fieldName ) );
 	}
 
 	public void addAll(String... fieldNames) {

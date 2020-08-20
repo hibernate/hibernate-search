@@ -10,14 +10,11 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.stat.Statistics;
 
 
@@ -29,74 +26,65 @@ import org.hibernate.search.stat.Statistics;
  */
 final class SearchFactoryImpl implements SearchFactory {
 
-	private final ExtendedSearchIntegrator searchIntegrator;
+	private final Object searchIntegrator;
 
-	public SearchFactoryImpl(ExtendedSearchIntegrator searchIntegrator) {
+	public SearchFactoryImpl(Object searchIntegrator) {
 		this.searchIntegrator = searchIntegrator;
 	}
 
 	@Override
 	public void optimize() {
-		searchIntegrator.optimize();
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public void optimize(Class<?> clazz) {
-		searchIntegrator.optimize( convertTypeIdentifier( clazz ) );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public Analyzer getAnalyzer(String name) {
-		return searchIntegrator.getAnalyzer( name );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		return searchIntegrator.getAnalyzer( convertTypeIdentifier( clazz ) );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public QueryContextBuilder buildQueryBuilder() {
-		return searchIntegrator.buildQueryBuilder();
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public Statistics getStatistics() {
-		return searchIntegrator.getStatistics();
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
-		return searchIntegrator.getIndexReaderAccessor();
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> clazz) {
-		return searchIntegrator.getIndexedTypeDescriptor( convertTypeIdentifier( clazz ) );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public Set<Class<?>> getIndexedTypes() {
-		return searchIntegrator.getIndexBindings().keySet().toPojosSet();
-	}
-
-	private IndexedTypeIdentifier convertTypeIdentifier(Class<?> clazz) {
-		return searchIntegrator.getIndexBindings().keyFromPojoType( clazz );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public IndexFamily getIndexFamily(IndexFamilyType indexFamilyType) {
-		return searchIntegrator.getIndexFamily( indexFamilyType );
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchIntegrator.class.isAssignableFrom( cls ) ) {
-			return (T) searchIntegrator;
-		}
-		else {
-			return searchIntegrator.unwrap( cls );
-		}
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 	}
 
 }

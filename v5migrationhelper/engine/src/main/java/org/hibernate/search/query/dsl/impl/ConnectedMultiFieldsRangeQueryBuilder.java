@@ -9,17 +9,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermRangeQuery;
-import org.hibernate.search.analyzer.impl.LuceneAnalyzerReference;
-import org.hibernate.search.analyzer.spi.AnalyzerReference;
-import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
@@ -62,76 +52,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 	@Override
 	public Query createQuery() {
-		final int size = fieldContexts.size();
-		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-		if ( size == 1 ) {
-			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ), conversionContext ) ).createQuery();
-		}
-		else {
-			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
-			for ( FieldContext fieldContext : fieldContexts ) {
-				aggregatedFieldsQueryBuilder.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
-			}
-			return queryCustomizer.setWrappedQuery( aggregatedFieldsQueryBuilder.build() ).createQuery();
-		}
+		throw new UnsupportedOperationException( "To be implemented through the Search 6 DSL" );
 	}
 
-	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
-		final Query perFieldQuery;
-		final String fieldName = fieldContext.getField();
-
-		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
-		if ( Helper.requiresNumericQuery( documentBuilder, fieldContext, rangeContext.getFrom(), rangeContext.getTo() ) ) {
-			perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
-		}
-		else {
-			perFieldQuery = createKeywordRangeQuery( fieldName, rangeContext, queryContext, conversionContext, fieldContext );
-		}
-
-		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
-	}
-
-	private static Query createKeywordRangeQuery(String fieldName, RangeQueryContext rangeContext, QueryBuildingContext queryContext, ConversionContext conversionContext, FieldContext fieldContext) {
-		final AnalyzerReference analyzerReference = queryContext.getQueryAnalyzerReference();
-
-		final DocumentBuilderIndexedEntity documentBuilder = queryContext.getDocumentBuilder();
-
-		final String fromString = rangeContext.hasFrom() ?
-				fieldContext.objectToString( documentBuilder, rangeContext.getFrom(), conversionContext ) :
-				null;
-		final String toString = rangeContext.hasTo() ?
-				fieldContext.objectToString( documentBuilder, rangeContext.getTo(), conversionContext ) :
-				null;
-
-		String lowerTerm;
-		String upperTerm;
-
-		if ( analyzerReference.is( LuceneAnalyzerReference.class ) ) {
-			final Analyzer queryAnalyzer = analyzerReference.unwrap( LuceneAnalyzerReference.class ).getAnalyzer();
-
-			lowerTerm = fromString == null ?
-					null :
-					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
-
-			upperTerm = toString == null ?
-					null :
-					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
-		}
-		else {
-			lowerTerm = fromString == null ? null : fromString;
-			upperTerm = toString == null ? null : toString;
-		}
-
-		return TermRangeQuery.newStringRange( fieldName, lowerTerm, upperTerm, !rangeContext.isExcludeFrom(), !rangeContext.isExcludeTo() );
-	}
-
-	private static Query createNumericRangeQuery(String fieldName, RangeQueryContext rangeContext) {
-		return NumericFieldUtils.createNumericRangeQuery(
-				fieldName,
-				rangeContext.getFrom(),
-				rangeContext.getTo(),
-				!rangeContext.isExcludeFrom(),
-				!rangeContext.isExcludeTo()
-		);
-	}
 }

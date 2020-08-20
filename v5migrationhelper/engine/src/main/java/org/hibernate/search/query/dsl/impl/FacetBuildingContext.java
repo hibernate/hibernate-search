@@ -11,11 +11,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -41,8 +38,7 @@ class FacetBuildingContext<T> {
 			Date.class.getName()
 		);
 
-	private final ExtendedSearchIntegrator factory;
-	private final IndexedTypeIdentifier entityType;
+	private final QueryBuildingContext context;
 
 	private String name;
 	private String fieldName;
@@ -56,9 +52,8 @@ class FacetBuildingContext<T> {
 	private boolean includeRangeEnd = true;
 	private int maxFacetCount = -1;
 
-	public FacetBuildingContext(ExtendedSearchIntegrator factory, IndexedTypeIdentifier indexedTypeIdentifier) {
-		this.factory = factory;
-		this.entityType = indexedTypeIdentifier;
+	public FacetBuildingContext(QueryBuildingContext context) {
+		this.context = context;
 	}
 
 	void setName(String name) {
@@ -67,7 +62,6 @@ class FacetBuildingContext<T> {
 
 	void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
-		assertFacetingFieldExists();
 	}
 
 	void setSort(FacetSortOrder sort) {
@@ -155,17 +149,6 @@ class FacetBuildingContext<T> {
 		request.setIncludeZeroCounts( includeZeroCount );
 		request.setMaxNumberOfFacets( maxFacetCount );
 		return request;
-	}
-
-	private void assertFacetingFieldExists() {
-		if ( fieldName == null ) {
-			throw new IllegalArgumentException( "null is an invalid field name" );
-		}
-
-		EntityIndexBinding indexBinding = factory.getIndexBinding( entityType );
-		if ( indexBinding == null ) {
-			throw log.attemptToCreateFacetingRequestForUnindexedEntity( entityType.getName() );
-		}
 	}
 
 	@Override

@@ -306,7 +306,7 @@ public class QueryHits {
 					continue;
 				}
 
-				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
+				Facet facet = facetRequest.createFacet( facetMetadata.getAbsoluteName(), labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 			}
 		}
@@ -318,7 +318,7 @@ public class QueryHits {
 					continue;
 				}
 
-				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
+				Facet facet = facetRequest.createFacet( facetMetadata.getAbsoluteName(), labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 			}
 		}
@@ -444,13 +444,13 @@ public class QueryHits {
 		}
 		if ( facetResult != null ) {
 			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
-				Facet facet = facetRequest.createFacet( facetMetadata, labelAndValue.label, (int) labelAndValue.value );
+				Facet facet = facetRequest.createFacet( facetMetadata.getAbsoluteName(), labelAndValue.label, (int) labelAndValue.value );
 				facets.add( facet );
 				termValues.remove( labelAndValue.label );
 			}
 		}
 		for ( String termValue : termValues ) {
-			Facet facet = facetRequest.createFacet( facetMetadata, termValue, 0 );
+			Facet facet = facetRequest.createFacet( facetMetadata.getAbsoluteName(), termValue, 0 );
 			facets.add( 0, facet );
 		}
 		return facets;

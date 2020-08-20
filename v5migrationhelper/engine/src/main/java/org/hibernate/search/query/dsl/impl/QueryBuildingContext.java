@@ -7,12 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.analyzer.spi.ScopedAnalyzerReference;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Keep the query builder contextual information
@@ -20,43 +15,15 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
  * @author Emmanuel Bernard
  */
 public class QueryBuildingContext {
-	private final ExtendedSearchIntegrator factory;
-	private final DocumentBuilderIndexedEntity documentBuilder;
-	private final ScopedAnalyzerReference originalAnalyzerReference;
-	private final ScopedAnalyzerReference queryAnalyzerReference;
-	private final IndexedTypeIdentifier entityType;
 
-	public QueryBuildingContext(ExtendedSearchIntegrator factory, ScopedAnalyzerReference originalAnalyzerReference,
-			ScopedAnalyzerReference queryAnalyzerReference, IndexedTypeIdentifier indexBoundType) {
-		this.factory = factory;
-		this.originalAnalyzerReference = originalAnalyzerReference;
-		this.queryAnalyzerReference = queryAnalyzerReference;
-		this.entityType = indexBoundType;
+	private final SearchIntegrator integrator;
 
-		EntityIndexBinding indexBinding = factory.getIndexBinding( indexBoundType );
-		if ( indexBinding == null ) {
-			throw new AssertionFailure( "Class is not indexed: " + indexBoundType );
-		}
-		documentBuilder = indexBinding.getDocumentBuilder();
+	public QueryBuildingContext(SearchIntegrator integrator) {
+		this.integrator = integrator;
 	}
 
-	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return factory;
+	public SearchIntegrator getIntegrator() {
+		return integrator;
 	}
 
-	public DocumentBuilderIndexedEntity getDocumentBuilder() {
-		return documentBuilder;
-	}
-
-	public ScopedAnalyzerReference getOriginalAnalyzerReference() {
-		return originalAnalyzerReference;
-	}
-
-	public ScopedAnalyzerReference getQueryAnalyzerReference() {
-		return queryAnalyzerReference;
-	}
-
-	public IndexedTypeIdentifier getEntityType() {
-		return entityType;
-	}
 }
