@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 
-import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -69,13 +68,6 @@ public interface SearchFactory {
 	 * @return The statistics.
 	 */
 	Statistics getStatistics();
-
-	/**
-	 * Provides access to the IndexReader API
-	 *
-	 * @return the IndexReaderAccessor for this SearchFactory
-	 */
-	IndexReaderAccessor getIndexReaderAccessor();
 
 	/**
 	 * Returns the set of currently indexed types.

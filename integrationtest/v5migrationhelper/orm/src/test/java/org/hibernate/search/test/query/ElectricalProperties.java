@@ -19,8 +19,10 @@ import org.hibernate.search.annotations.TermVector;
  * @author John Griffin
  */
 @Entity
-@Indexed
+@Indexed(index = ElectricalProperties.INDEX_NAME)
 public class ElectricalProperties {
+	public static final String INDEX_NAME = "elecprops";
+
 	private int id;
 	private String content;
 
