@@ -23,13 +23,10 @@
     <modules>
         <module>legacy</module>
         <module>engine</module>
-        <module>elasticsearch</module>
-        <module>elasticsearch-aws</module>
         <module>orm</module>
         <module>jsr352</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>integrationtest/elasticsearch</module>
         <module>integrationtest/jsr352</module>
         <module>documentation</module>
     </modules>
@@ -51,16 +48,6 @@
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
         <version.feature-pack.org.apache.lucene>5.5.5.hibernate05</version.feature-pack.org.apache.lucene>
 
-        <!-- >>> Elasticsearch -->
-        <!-- When updating the following versions you will likely need to update the
-             matching test profile as well, e.g. elasticsearch-5.2 for the 5.2+ series -->
-        <version.org.elasticsearch.client>5.6.8</version.org.elasticsearch.client>
-        <version.feature-pack.org.elasticsearch.client>5.6.8.hibernate01</version.feature-pack.org.elasticsearch.client>
-        <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
-        <version.feature-pack.com.google.code.gson>2.8.5.hibernate01</version.feature-pack.com.google.code.gson>
-        <version.uk.co.lucasweb.aws-v4-signer-java>1.3</version.uk.co.lucasweb.aws-v4-signer-java>
-        <version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>1.3.0.hibernate03</version.feature-pack.uk.co.lucasweb.aws-v4-signer-java>
-
         <!-- >>> ORM -->
         <version.org.hibernate>5.3.6.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
@@ -77,13 +64,11 @@
         <version.org.jberet>1.2.4.Final</version.org.jberet>
 
         <!-- >>> Apache dependencies -->
-        <!-- Some of these are necessary for Avro, some for the Elasticsearch backend, some for additional Lucene analyzers -->
+        <!-- Some of these are necessary for additional Lucene analyzers -->
         <version.org.apache.commons.compress>1.5</version.org.apache.commons.compress>
         <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
         <version.org.apache.commons.lang3>3.5</version.org.apache.commons.lang3>
         <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
-        <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
-        <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
         <version.org.apache.commons.codec>1.10</version.org.apache.commons.codec>
         <version.org.apache.commons.io>2.1</version.org.apache.commons.io>
 
@@ -348,16 +333,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${version.org.apache.commons.lang3}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${version.org.apache.httpcomponents.httpclient}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpcore</artifactId>
-                <version>${version.org.apache.httpcomponents.httpcore}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -664,158 +639,6 @@
     </build>
 
     <profiles>
-        <!-- The profiles `skippingAllTests` and `skippingIntegrationTests` are currently duplicates,
-            as one can't trigger the profile activation on either/or property -->
-        <profile>
-            <id>skippingAllTests</id>
-            <activation>
-                <property>
-                    <name>skipTests</name>
-                </property>
-            </activation>
-            <properties>
-                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>skippingIntegrationTests</id>
-            <activation>
-                <property>
-                    <name>skipITs</name>
-                </property>
-            </activation>
-            <properties>
-                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-            </properties>
-        </profile>
-
-        <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
-        <profile>
-            <id>elasticsearch-run</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.hosts has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.hosts</name>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.connection.hosts>localhost:9200</test.elasticsearch.connection.hosts>
-                <test.elasticsearch.connection.protocol>http</test.elasticsearch.connection.protocol>
-            </properties>
-        </profile>
-        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
-        <profile>
-            <id>elasticsearch-do-not-run</id>
-            <activation>
-                <!-- Activate if test.elasticsearch.connection.hosts has been defined explicitly -->
-                <property>
-                    <name>test.elasticsearch.connection.hosts</name>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
-            </properties>
-        </profile>
-
-        <!-- Elasticsearch 5.6+ test environment (default) -->
-        <profile>
-            <id>elasticsearch-5.6</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.connection.version</name>
-                </property>
-            </activation>
-            <properties>
-                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.connection.version>5.6.8</test.elasticsearch.connection.version>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
-                            <configuration>
-                                <skip>${test.elasticsearch.run.skip}</skip>
-                                <version>${test.elasticsearch.connection.version}</version>
-                                <clusterName>hsearchEsTestCluster</clusterName>
-                                <timeout>90</timeout><!-- Make it work on our slow CI -->
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
-                                <autoCreateIndex>false</autoCreateIndex>
-                            </configuration>
-                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
-                            <executions>
-                                <execution >
-                                    <id>start-elasticsearch</id>
-                                    <phase>pre-integration-test</phase>
-                                    <goals>
-                                        <goal>runforked</goal>
-                                    </goals>
-                                </execution>
-                                <execution>
-                                    <id>stop-elasticsearch</id>
-                                    <phase>post-integration-test</phase>
-                                    <goals>
-                                        <goal>stop</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
-        <!-- Elasticsearch 6.0+ test environment (non-default; tests are expected to fail) -->
-        <profile>
-            <id>elasticsearch-6.0</id>
-            <properties>
-                <test.elasticsearch.mavenPlugin.version>6.8</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.connection.version>6.5.0</test.elasticsearch.connection.version>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${test.elasticsearch.mavenPlugin.version}</version>
-                            <configuration>
-                                <skip>${test.elasticsearch.run.skip}</skip>
-                                <version>${test.elasticsearch.connection.version}</version>
-                                <timeout>90</timeout><!-- Make it work on our slow CI -->
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
-                                <autoCreateIndex>false</autoCreateIndex>
-                            </configuration>
-                            <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
-                            <executions>
-                                <execution >
-                                    <id>start-elasticsearch</id>
-                                    <phase>pre-integration-test</phase>
-                                    <goals>
-                                        <goal>runforked</goal>
-                                    </goals>
-                                </execution>
-                                <execution>
-                                    <id>stop-elasticsearch</id>
-                                    <phase>post-integration-test</phase>
-                                    <goals>
-                                        <goal>stop</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
         <!-- =============================== -->
         <!-- Database profiles               -->
         <!-- =============================== -->
