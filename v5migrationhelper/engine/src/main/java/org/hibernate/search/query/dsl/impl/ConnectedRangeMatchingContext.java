@@ -10,14 +10,13 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.query.dsl.RangeMatchingContext;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ConnectedRangeMatchingContext implements RangeMatchingContext, FieldBridgeCustomization<RangeMatchingContext> {
+public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final RangeQueryContext rangeContext;
@@ -109,14 +108,6 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 	public RangeMatchingContext ignoreFieldBridge() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreFieldBridge( true );
-		}
-		return this;
-	}
-
-	@Override
-	public RangeMatchingContext withFieldBridge(FieldBridge fieldBridge) {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setFieldBridge( fieldBridge );
 		}
 		return this;
 	}

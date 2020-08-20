@@ -93,8 +93,6 @@ final class Helper {
 	static boolean requiresNumericQuery(DocumentBuilderIndexedEntity documentBuilder, FieldContext fieldContext, Object ... searchedValues) {
 		String fieldName = fieldContext.getField();
 
-		FieldBridge overriddenFieldBridge = fieldContext.getFieldBridge();
-
 		/*
 		 * If using the original field bridge, rely on metadata (if any).
 		 *
@@ -105,7 +103,7 @@ final class Helper {
 		 * query those values. Thus ignoreFieldBridge() provides users with
 		 * a way to disable metadata inspection...
 		 */
-		if ( overriddenFieldBridge == null && !fieldContext.isIgnoreFieldBridge() ) {
+		if ( !fieldContext.isIgnoreFieldBridge() ) {
 			DocumentFieldMetadata metadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( fieldName );
 			if ( metadata != null ) {
 				return metadata.isNumeric();
@@ -116,11 +114,6 @@ final class Helper {
 			if ( bridge != null ) {
 				return NumericFieldUtils.isNumericFieldBridge( bridge );
 			}
-		}
-
-		// If using an overridden field bridge, guess numeric-ness from this bridge.
-		if ( overriddenFieldBridge != null ) {
-			return NumericFieldUtils.isNumericFieldBridge( overriddenFieldBridge );
 		}
 
 		// If the above wasn't conclusive, guess from the given value

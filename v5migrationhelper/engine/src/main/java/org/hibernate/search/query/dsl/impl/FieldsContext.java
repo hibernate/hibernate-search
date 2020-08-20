@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.search.bridge.FieldBridge;
-
 /**
  * Encapsulate the common field context state capture.
  *
@@ -73,12 +71,6 @@ public class FieldsContext implements Iterable<FieldContext> {
 	public void ignoreFieldBridge() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreFieldBridge( true );
-		}
-	}
-
-	public void withFieldBridge(FieldBridge fieldBridge) {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setFieldBridge( fieldBridge );
 		}
 	}
 
