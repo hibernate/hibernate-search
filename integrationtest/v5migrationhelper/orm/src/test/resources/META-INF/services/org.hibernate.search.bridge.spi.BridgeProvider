@@ -1,3 +1,0 @@
-org.hibernate.search.test.bridge.provider.MovieBridgeProvider
-org.hibernate.search.test.bridge.provider.TheaterBridgeProvider1
-org.hibernate.search.test.bridge.provider.TheaterBridgeProvider2

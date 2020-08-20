@@ -6,25 +6,16 @@
  */
 package org.hibernate.search.test.dsl;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
-import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
-import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
-import org.hibernate.search.bridge.spi.FieldType;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -225,90 +216,6 @@ public class SortDSLTest {
 						.onMissingValue().use( 2 )
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
-	}
-
-	@Test
-	public void singleField_stringFieldBridge() throws Exception {
-		Sort sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
-
-		sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.asc()
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
-
-		sort = builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.desc()
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
-	}
-
-	@Test(expected = SearchException.class)
-	public void singleField_stringFieldBridge_missingValue_use() throws Exception {
-		builder().sort()
-				.byField( "fieldBridgedStringField" )
-						.onMissingValue().use( "1.5" )
-				.createSort();
-	}
-
-	@Test
-	public void singleField_numericFieldBridge() throws Exception {
-		// Missing value is not provided; the missing values should be considered as 0
-
-		Sort sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
-
-		sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-						.asc()
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
-
-		sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-						.desc()
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
-	}
-
-	@Test
-	public void singleField_numericFieldBridge_missingValue_use() throws Exception {
-		Sort sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-						.onMissingValue().use( 1.5d )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
-
-		sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-						.asc()
-						.onMissingValue().use( 1.5d )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 1, 2, 0, 3 );
-
-		sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-						.desc()
-						.onMissingValue().use( 1.5d )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 2, 1 );
-	}
-
-	@Test(expected = ClassCastException.class)
-	public void singleField_numericFieldBridge_missingValue_use_nonRaw() throws Exception {
-		Sort sort = builder().sort()
-				.byField( "fieldBridgedNumericField" )
-						.onMissingValue().use( new WrappedDoubleValue( 1.5d ) )
-				.createSort();
-		sfHolder.getSearchFactory().createHSQuery( new MatchAllDocsQuery(), IndexedEntry.class )
-				.sort( sort )
-				.queryEntityInfos();
 	}
 
 	@Test
@@ -540,90 +447,6 @@ public class SortDSLTest {
 				.sort( sort );
 	}
 
-	public static class WrappedDoubleValue {
-		final Double value;
-
-		public WrappedDoubleValue(Double value) {
-			super();
-			this.value = value;
-		}
-	}
-
-	public static class WrappedDoubleValueFieldBridge implements MetadataProvidingFieldBridge, StringBridge {
-
-		@Override
-		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-			builder.field( name, FieldType.DOUBLE )
-					.sortable( true );
-		}
-
-		@Override
-		public String objectToString(Object object) {
-			if ( object == null ) {
-				return null;
-			}
-			return object.toString();
-		}
-
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			if ( value == null ) {
-				return;
-			}
-
-			Double doubleValue = ((WrappedDoubleValue) value).value;
-			if ( doubleValue == null ) {
-				return;
-			}
-
-			luceneOptions.addNumericFieldToDocument( name, doubleValue, document );
-			luceneOptions.addNumericDocValuesFieldToDocument( name, doubleValue, document );
-		}
-
-	}
-
-	public static class WrappedStringValue {
-		final String value;
-
-		public WrappedStringValue(String value) {
-			super();
-			this.value = value;
-		}
-	}
-
-	public static class WrappedStringValueFieldBridge implements MetadataProvidingFieldBridge, StringBridge {
-
-		@Override
-		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-			builder.field( name, FieldType.STRING )
-					.sortable( true );
-		}
-
-		@Override
-		public String objectToString(Object object) {
-			if ( object == null ) {
-				return null;
-			}
-			return object.toString();
-		}
-
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			if ( value == null ) {
-				return;
-			}
-
-			String stringValue = ((WrappedStringValue) value).value;
-			if ( stringValue == null ) {
-				return;
-			}
-
-			luceneOptions.addFieldToDocument( name, stringValue, document );
-			luceneOptions.addSortedDocValuesFieldToDocument( name, stringValue, document );
-		}
-
-	}
-
 	@Indexed
 	@Spatial(name = "location_hash", spatialMode = SpatialMode.HASH)
 	public static class IndexedEntry implements Coordinates {
@@ -647,12 +470,6 @@ public class SortDSLTest {
 		@Field
 		@SortableField
 		Integer uniqueIntegerField;
-
-		@Field(bridge = @FieldBridge(impl = WrappedStringValueFieldBridge.class))
-		WrappedStringValue fieldBridgedStringField;
-
-		@Field(bridge = @FieldBridge(impl = WrappedDoubleValueFieldBridge.class))
-		WrappedDoubleValue fieldBridgedNumericField;
 
 		@IndexedEmbedded(depth = 1)
 		IndexedEntry previous;
@@ -696,10 +513,6 @@ public class SortDSLTest {
 
 		public IndexedEntry setUniqueDoubleField(Double uniqueDoubleField) {
 			this.uniqueDoubleField = uniqueDoubleField;
-			this.fieldBridgedStringField = new WrappedStringValue(
-					uniqueDoubleField == null ? null : String.valueOf( uniqueDoubleField )
-			);
-			this.fieldBridgedNumericField = new WrappedDoubleValue( uniqueDoubleField );
 			return this;
 		}
 

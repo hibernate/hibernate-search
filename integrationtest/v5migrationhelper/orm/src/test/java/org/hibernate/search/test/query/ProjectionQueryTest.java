@@ -13,16 +13,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -505,38 +502,6 @@ public class ProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testProjectionUnmappedFieldValues() throws ParseException, IOException {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		s.persist( new CalendarDay().setDayFromItalianString( "01/04/2011" ) );
-		s.persist( new CalendarDay().setDayFromItalianString( "02/04/2011" ) );
-		tx.commit();
-		s.clear();
-
-		tx = s.beginTransaction();
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( new MatchAllDocsQuery(), CalendarDay.class );
-		hibQuery.setProjection( "day_year" );
-
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Wrong number of results", 2, result.size() );
-
-		for ( Object resultLine : result ) {
-			Object[] projection = (Object[]) resultLine;
-			assertNotNull( projection );
-			assertEquals( "Wrong projected result", "2011", projection[0] );
-		}
-
-		//cleanup
-		for ( Object element : s.createQuery( "from " + CalendarDay.class.getName() ).list() ) {
-			s.delete( element );
-		}
-
-		tx.commit();
-		s.close();
-	}
-
-	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2106")
 	public void testUnexpectedProjectionConstant() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -682,8 +647,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 				Employee.class,
 				Husband.class,
 				Spouse.class,
-				FootballTeam.class,
-				CalendarDay.class
+				FootballTeam.class
 		};
 	}
 

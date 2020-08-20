@@ -17,7 +17,6 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -25,7 +24,6 @@ import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -355,11 +353,13 @@ public class SortingTest {
 				@org.hibernate.search.annotations.SortableField(forField = "ageForNullChecks")
 		})
 		@Fields({
-			@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class) ),
 			@Field(name = "ageForIntSorting", store = Store.YES, analyze = Analyze.NO),
 			@Field(name = "ageForNullChecks", store = Store.YES, analyze = Analyze.NO, indexNullAs = "-1")
 		})
 		final Integer age;
+		@Field(name = "ageForStringSorting", store = Store.YES, analyze = Analyze.NO)
+		@SortableField(forField = "ageForStringSorting")
+		final String ageAsString;
 
 		@SortableFields({
 				@org.hibernate.search.annotations.SortableField(forField = "name"),
@@ -387,6 +387,7 @@ public class SortingTest {
 		Person(int id, Integer age, String name, CuddlyToy favoriteCuddlyToy) {
 			this.id = id;
 			this.age = age;
+			this.ageAsString = age == null ? null : age.toString();
 			this.name = name;
 			this.favoriteCuddlyToy = favoriteCuddlyToy;
 			this.friends = new ArrayList<Friend>();
@@ -395,6 +396,7 @@ public class SortingTest {
 		Person(int id, Integer age, String name, List<Friend> friends) {
 			this.id = id;
 			this.age = age;
+			this.ageAsString = age == null ? null : age.toString();
 			this.name = name;
 			this.favoriteCuddlyToy = null;
 			this.friends = friends;
@@ -403,6 +405,7 @@ public class SortingTest {
 		Person(int id, Integer age, String name, Integer... arrayItems) {
 			this.id = id;
 			this.age = age;
+			this.ageAsString = age == null ? null : age.toString();
 			this.name = name;
 			this.array = arrayItems;
 			this.favoriteCuddlyToy = null;

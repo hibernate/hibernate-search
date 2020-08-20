@@ -19,9 +19,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.embedded.fieldoncollection.CollectionOfStringsFieldBridge;
 
 @Entity
 @Indexed
@@ -86,7 +84,7 @@ public class ProductArticle {
 	}
 
 	@Transient
-	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class))
+	@Field
 	public Collection<String> getProductReferenceCodeWithColorCollection() {
 		Collection<String> productReferenceCodeWithColorCollection = new ArrayList<String>();
 

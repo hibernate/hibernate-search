@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.test.engine.numeric;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -52,15 +50,6 @@ class Location {
 	private Integer ranking;
 
 	@Field
-	@NumericField
-	@FieldBridge(impl = BigDecimalNumericFieldBridge.class)
-	private BigDecimal visibleStars;
-
-	@Field(store = Store.YES)
-	@FieldBridge(impl = CoordinatesPairFieldBridge.class)
-	private final String coordinatePair = "1;2";
-
-	@Field
 	private String description;
 
 	@IndexedEmbedded
@@ -96,7 +85,7 @@ class Location {
 	}
 
 	public Location(int id, Long counter, double latitude, Double longitude,
-					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars, short importance, byte popularity) {
+					Integer ranking, String description, Double multiple, Country country, short importance, byte popularity) {
 		this.id = id;
 		this.counter = counter;
 		this.longitude = longitude;
@@ -105,7 +94,6 @@ class Location {
 		this.description = description;
 		this.multiple = multiple;
 		this.country = country;
-		this.visibleStars = visibleStars;
 		this.importance = importance;
 		this.fallbackImportance = importance;
 		this.popularity = popularity;

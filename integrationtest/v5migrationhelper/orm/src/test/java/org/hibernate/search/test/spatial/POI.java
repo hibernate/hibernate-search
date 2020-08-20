@@ -10,15 +10,13 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 
 /**
  * Hibernate Search spatial : Point Of Interest test entity
@@ -44,8 +42,7 @@ public class POI {
 
 	Double longitude;
 
-	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
-	@FieldBridge(impl = SpatialFieldBridgeByHash.class)
+	@Spatial(store = Store.YES)
 	@Embedded
 	public Coordinates getLocation() {
 		return new Coordinates() {

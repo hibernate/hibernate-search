@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.test.embedded.fieldoncollection;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -18,14 +16,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -44,23 +38,10 @@ public class IndexedEntity {
 	@Field
 	private String name;
 
-	@ManyToMany(targetEntity = CollectionItem.class)
-	@JoinTable(name = "ent_collection_field")
-	@Field(bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
-	private List<CollectionItem> itemsWithFieldAnnotation = new ArrayList<CollectionItem>();
-
-	@ManyToMany(targetEntity = CollectionItem.class)
-	@JoinTable(name = "ent_collection_fields")
-	@Fields({
-			@Field(name = FIELD1_FIELD_NAME, bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO),
-			@Field(name = FIELD2_FIELD_NAME, bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
-	})
-	private List<CollectionItem> itemsWithFieldsAnnotation = new ArrayList<CollectionItem>();
-
 	@ElementCollection
 	@Column(name = "keyword")
 	@CollectionTable(name = "indexedentity_keyword", joinColumns = { @JoinColumn(name = "indexedentity") })
-	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class), analyze = Analyze.NO, store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	private Set<String> keywords = new HashSet<String>();
 
 	public IndexedEntity() {
@@ -84,42 +65,6 @@ public class IndexedEntity {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public List<CollectionItem> getItemsWithFieldAnnotation() {
-		return itemsWithFieldAnnotation;
-	}
-
-	public void setItemsWithFieldAnnotation(List<CollectionItem> items) {
-		this.itemsWithFieldAnnotation.clear();
-
-		for ( CollectionItem item : items ) {
-			this.addItemsWithFieldAnnotation( item );
-		}
-	}
-
-	public void addItemsWithFieldAnnotation(CollectionItem item) {
-		if ( !this.itemsWithFieldAnnotation.contains( item ) ) {
-			this.itemsWithFieldAnnotation.add( item );
-		}
-	}
-
-	public List<CollectionItem> getItemsWithFieldsAnnotation() {
-		return itemsWithFieldsAnnotation;
-	}
-
-	public void setItemsWithFieldsAnnotation(List<CollectionItem> items) {
-		this.itemsWithFieldsAnnotation.clear();
-
-		for ( CollectionItem item : items ) {
-			this.addItemsWithFieldsAnnotation( item );
-		}
-	}
-
-	public void addItemsWithFieldsAnnotation(CollectionItem item) {
-		if ( !this.itemsWithFieldsAnnotation.contains( item ) ) {
-			this.itemsWithFieldsAnnotation.add( item );
-		}
 	}
 
 	public Set<String> getKeywords() {

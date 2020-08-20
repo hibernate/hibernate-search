@@ -11,11 +11,9 @@ import java.util.Date;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Normalizer;
@@ -27,7 +25,6 @@ import org.hibernate.search.testsupport.AnalysisNames;
  * @author Emmanuel Bernard
  */
 @Indexed
-@ClassBridge(impl = MonthClassBridge.class)
 class Month {
 
 	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation) {
@@ -59,15 +56,7 @@ class Month {
 	private Integer id;
 
 	@Fields({
-			@Field(analyze = Analyze.NO, norms = Norms.NO),
-			@Field(analyze = Analyze.NO,
-					norms = Norms.NO,
-					name = "monthRomanNumber",
-					bridge = @FieldBridge(impl = RomanNumberFieldBridge.class)),
-			@Field(analyze = Analyze.NO,
-					norms = Norms.NO,
-					name = "monthBase0",
-					bridge = @FieldBridge(impl = MonthBase0FieldBridge.class))
+			@Field(analyze = Analyze.NO, norms = Norms.NO)
 	})
 	public int getMonthValue() {
 		return monthValue;

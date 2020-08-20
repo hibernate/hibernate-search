@@ -10,23 +10,16 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.bridge.BridgeException;
-import org.hibernate.search.bridge.builtin.StringEncodingCalendarBridge;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -45,8 +38,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
@@ -143,37 +134,6 @@ public class BridgeTest extends SearchTestBase {
 		result = session.createFullTextQuery( query ).setProjection( "char2" ).list();
 		assertEquals( "Wrong results number, CharacterBridge is not working", 1, result.size() );
 		assertEquals( "Wrong result, CharacterBridge is not working", 'P', ( (Object[]) result.get( 0 ) )[0] );
-
-		tx.commit();
-		s.close();
-
-	}
-
-	@Test
-	public void testCustomBridges() throws Exception {
-		Cloud cloud = new Cloud();
-		cloud.setCustomFieldBridge( "This is divided by 2" );
-		cloud.setCustomStringBridge( "This is div by 4" );
-		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-		org.hibernate.Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.persist( cloud );
-		s.flush();
-		tx.commit();
-
-		tx = s.beginTransaction();
-		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.simpleAnalyzer );
-		Query query;
-		List result;
-
-		query = parser.parse( "customFieldBridge:This AND customStringBridge:This" );
-		result = session.createFullTextQuery( query ).list();
-		assertEquals( "Properties not mapped", 1, result.size() );
-
-		query = parser.parse( "customFieldBridge:by AND customStringBridge:is" );
-		result = session.createFullTextQuery( query ).list();
-		assertEquals( "Custom types not taken into account", 0, result.size() );
 
 		tx.commit();
 		s.close();
@@ -346,17 +306,6 @@ public class BridgeTest extends SearchTestBase {
 
 		tx.commit();
 		s.close();
-
-		//now unit-test the bridge directly:
-
-		StringEncodingCalendarBridge bridge = new StringEncodingCalendarBridge();
-		HashMap<String, String> bridgeParams = new HashMap<String, String>();
-		bridgeParams.put( "resolution", Resolution.YEAR.toString() );
-		bridge.setParameterValues( bridgeParams );
-		assertEquals( "2000", bridge.objectToString( calendar ) );
-		bridgeParams.put( "resolution", Resolution.DAY.toString() );
-		bridge.setParameterValues( bridgeParams );
-		assertEquals( "20001215", bridge.objectToString( calendar ) );
 	}
 
 	@Test
@@ -420,131 +369,10 @@ public class BridgeTest extends SearchTestBase {
 		s.close();
 	}
 
-	@Test
-	public void testIncorrectSetBridge() throws Exception {
-		IncorrectSet incorrect = new IncorrectSet();
-		incorrect.setSubIncorrect( new IncorrectSet.SubIncorrect() );
-		incorrect.getSubIncorrect().setName( "This is a name not a class" );
-
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		try {
-			s.persist( incorrect );
-			s.flush();
-			s.flushToIndexes();
-			fail( "Incorrect bridge should fail" );
-		}
-		catch (BridgeException e) {
-			tx.rollback();
-		}
-		catch (HibernateException e) {
-			final Throwable throwable = e.getCause();
-			if ( throwable instanceof BridgeException ) {
-				//expected
-				assertTrue( throwable.getMessage().contains( "class: " + IncorrectSet.class.getName() ) );
-				assertTrue( throwable.getMessage().contains( "path: subIncorrect.name" ) );
-				tx.rollback();
-			}
-			else {
-				e.printStackTrace();
-				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			fail( "Incorrect bridge should raise a SearchException" );
-		}
-		s.close();
-	}
-
-	@Test
-	public void testIncorrectGetBridge() throws Exception {
-		IncorrectGet incorrect = new IncorrectGet();
-		incorrect.setSubIncorrect( new IncorrectGet.SubIncorrect() );
-		incorrect.getSubIncorrect().setName( "This is a name not a class" );
-
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		s.persist( incorrect );
-		tx.commit();
-		s.clear();
-		tx = s.beginTransaction();
-		final QueryBuilder builder = s.getSearchFactory().buildQueryBuilder().forEntity( IncorrectGet.class ).get();
-		final Query query = builder.keyword().onField( "subIncorrect.name" ).matching( "name" ).createQuery();
-
-		try {
-			final FullTextQuery textQuery = s.createFullTextQuery( query, IncorrectGet.class ).setProjection( "subIncorrect.name" );
-			textQuery.list();
-			fail( "Incorrect bridge should fail" );
-		}
-		catch (BridgeException e) {
-			tx.rollback();
-		}
-		catch (HibernateException e) {
-			final Throwable throwable = e.getCause();
-			if ( throwable instanceof BridgeException ) {
-				//expected
-				//System.out.println( throwable.getMessage() );
-				assertTrue( throwable.getMessage().contains( "class: " + IncorrectGet.class.getName() ) );
-				assertTrue( throwable.getMessage().contains( "path: subIncorrect.name" ) );
-				tx.rollback();
-			}
-			else {
-				e.printStackTrace();
-				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			fail( "Incorrect bridge should raise a SearchException" );
-		}
-		s.close();
-	}
-
-	@Test
-	public void testIncorrectObjectToStringBridge() throws Exception {
-		IncorrectObjectToString incorrect = new IncorrectObjectToString();
-		incorrect.setName( "test" );
-
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		try {
-			s.persist( incorrect );
-			s.flush();
-			s.flushToIndexes();
-			fail( "Incorrect bridge should fail" );
-		}
-		catch (BridgeException e) {
-			tx.rollback();
-		}
-		catch (HibernateException e) {
-			final Throwable throwable = e.getCause();
-			if ( throwable instanceof BridgeException ) {
-				//expected
-				assertTrue( throwable.getMessage().contains( "class: " + IncorrectObjectToString.class.getName() ) );
-				assertTrue( throwable.getMessage().contains( "path: id" ) );
-				tx.rollback();
-			}
-			else {
-				e.printStackTrace();
-				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			fail( "Incorrect bridge should raise a SearchException" );
-		}
-		s.close();
-	}
-
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Cloud.class,
-				IncorrectSet.class,
-				IncorrectGet.class,
-				IncorrectObjectToString.class
+				Cloud.class
 		};
 	}
 

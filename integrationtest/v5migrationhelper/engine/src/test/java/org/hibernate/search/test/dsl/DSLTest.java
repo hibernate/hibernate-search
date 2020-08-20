@@ -559,34 +559,6 @@ public class DSLTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2656")
-	public void testNumericRangeQueryWithFieldTypeOverriddenByFieldBridge() throws Exception {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb
-				.range()
-					.onField( "monthBase0" )
-						.ignoreFieldBridge().ignoreAnalyzer()
-					.below( 1 ).excludeLimit()
-					.createQuery();
-		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2656")
-	public void testNumericQueryWithFieldTypeOverriddenByFieldBridge() throws Exception {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb
-				.keyword()
-					.onField( "monthBase0" )
-						.ignoreFieldBridge().ignoreAnalyzer()
-					.matching( 0 )
-					.createQuery();
-		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1 );
-	}
-
-	@Test
 	@Category(PortedToSearch6.class)
 	public void testPhraseQuery() throws Exception {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
@@ -784,16 +756,6 @@ public class DSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
-	}
-
-	@Test
-	public void testFieldBridge() {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-		Query query = monthQb.keyword()
-				.onField( "monthRomanNumber" )
-				.matching( 2 )
-				.createQuery();
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 2 );
 	}
 
 	@Test

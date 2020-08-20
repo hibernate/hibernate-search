@@ -24,9 +24,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.embedded.fieldoncollection.CollectionOfStringsFieldBridge;
 
 @Entity
 @Indexed
@@ -100,7 +98,7 @@ public class ProductModel {
 		this.shootingBrief = shootingBrief;
 	}
 
-	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class))
+	@Field
 	public Collection<String> getProductReferenceCodeCollection() {
 		Collection<String> productReferenceCodeCollection = new ArrayList<String>();
 
