@@ -80,4 +80,9 @@ public class Elasticsearch64TestDialect implements ElasticsearchTestDialect {
 	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
 		return false;
 	}
+
+	@Override
+	public boolean supportsSkipOrLimitingTotalHitCount() {
+		return false;
+	}
 }

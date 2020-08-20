@@ -75,4 +75,8 @@ public interface ElasticsearchTestDialect {
 	default boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
 		return true;
 	}
+
+	default boolean supportsSkipOrLimitingTotalHitCount() {
+		return true;
+	}
 }
