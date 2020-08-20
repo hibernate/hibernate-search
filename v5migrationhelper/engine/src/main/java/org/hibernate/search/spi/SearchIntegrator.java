@@ -10,7 +10,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.stat.Statistics;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
@@ -115,13 +114,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return return a query builder providing a fluent API to create Lucene queries
 	 */
 	QueryContextBuilder buildQueryBuilder();
-
-	/**
-	 * Retrieve the statistics instance for this factory.
-	 *
-	 * @return The statistics.
-	 */
-	Statistics getStatistics();
 
 	/**
 	 * Returns the set of currently indexed types.
