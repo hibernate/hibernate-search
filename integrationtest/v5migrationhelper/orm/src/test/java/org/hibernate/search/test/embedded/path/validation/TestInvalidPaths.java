@@ -7,7 +7,7 @@
 
 package org.hibernate.search.test.embedded.path.validation;
 
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 

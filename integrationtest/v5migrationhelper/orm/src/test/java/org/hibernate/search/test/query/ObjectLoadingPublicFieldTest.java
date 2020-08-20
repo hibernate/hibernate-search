@@ -28,7 +28,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;

@@ -8,7 +8,7 @@ package org.hibernate.search.query.engine.spi;
 
 import java.io.Serializable;
 
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * Wrapper class describing the loading of an element.

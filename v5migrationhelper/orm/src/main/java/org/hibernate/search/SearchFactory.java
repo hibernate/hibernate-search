@@ -40,7 +40,7 @@ public interface SearchFactory {
 	 *
 	 * @return analyzer with the specified name
 	 *
-	 * @throws org.hibernate.search.exception.SearchException if the definition name is unknown
+	 * @throws org.hibernate.search.util.common.SearchException if the definition name is unknown
 	 */
 	Analyzer getAnalyzer(String name);
 

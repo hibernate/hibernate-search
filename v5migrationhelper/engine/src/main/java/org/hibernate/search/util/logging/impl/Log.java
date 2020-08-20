@@ -9,7 +9,7 @@ package org.hibernate.search.util.logging.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;

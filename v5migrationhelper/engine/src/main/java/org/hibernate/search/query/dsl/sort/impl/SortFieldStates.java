@@ -11,7 +11,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.impl.QueryBuildingContext;
 import org.hibernate.search.spatial.Coordinates;
 
