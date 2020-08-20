@@ -13,9 +13,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 
-@Spatial(name = "home", spatialMode = SpatialMode.HASH)
+@Spatial(name = "home")
 @Entity
 @Indexed
 public class GetterUser {

@@ -29,7 +29,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.test.SearchTestBase;
@@ -203,7 +202,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 
 	@Entity(name = "GeoEntity")
 	@Indexed
-	@Spatial(spatialMode = SpatialMode.RANGE)
+	@Spatial
 	public static class GeoEntity {
 
 		@Id

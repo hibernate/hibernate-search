@@ -26,7 +26,7 @@ import org.junit.Test;
 public class SpatialDSLTest {
 
 	@Rule
-	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( POI.class, POIHash.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( POI.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
@@ -61,42 +61,11 @@ public class SpatialDSLTest {
 				.matchesExactlyIds( 1 );
 	}
 
-	@Test
-	public void testSpatialHashQueries() {
-		final QueryBuilder builder = helper.queryBuilder( POIHash.class );
-
-		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
-		Query query = builder
-				.spatial()
-				.onField( "location" )
-				.within( 51, Unit.KM )
-				.ofCoordinates( coordinates )
-				.createQuery();
-
-		helper.assertThat( query ).from( POIHash.class )
-				.matchesExactlyIds( 2 );
-
-		query = builder
-				.spatial()
-				.onField( "location" )
-				.within( 500, Unit.KM )
-				.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
-				.createQuery();
-
-		helper.assertThat( query ).from( POIHash.class )
-				.matchesExactlyIds( 1 );
-	}
-
 	private void indexTestData() {
 		POI poi = new POI( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
 		helper.add( poi );
 		poi = new POI( 2, "Bozo", 24d, 32d, "Monument" );
 		helper.add( poi );
-
-		POIHash poiHash = new POIHash( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
-		helper.add( poiHash );
-		poiHash = new POIHash( 2, "Bozo", 24d, 32d, "Monument" );
-		helper.add( poiHash );
 	}
 
 }
