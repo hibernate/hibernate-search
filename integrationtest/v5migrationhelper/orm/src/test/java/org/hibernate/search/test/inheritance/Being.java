@@ -10,8 +10,6 @@ import javax.persistence.MappedSuperclass;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -19,7 +17,6 @@ import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 @MappedSuperclass
 public class Being {
 	@Field(analyze = Analyze.NO)
-	@FieldBridge(impl = PaddedIntegerBridge.class)
 	private int weight;
 
 	public int getWeight() {

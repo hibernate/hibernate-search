@@ -43,10 +43,7 @@ public class CollectionInitializeTest extends SearchTestBase {
 
 	private void clearData(FullTextSession fullTextSession) {
 		final Transaction transaction = fullTextSession.beginTransaction();
-		final LegacyCarPlantPK id = new LegacyCarPlantPK();
-		id.setCarId( "1" );
-		id.setPlantId( "2" );
-		fullTextSession.delete( fullTextSession.get( LegacyCarPlant.class, id ) );
+		fullTextSession.delete( fullTextSession.get( LegacyCarPlant.class, 12 ) );
 		for ( int i = 1; i < 4; i++ ) {
 			fullTextSession.delete( fullTextSession.get( LegacyCar.class, "" + i ) );
 		}
@@ -65,9 +62,7 @@ public class CollectionInitializeTest extends SearchTestBase {
 		LegacyCarPlant plant = new LegacyCarPlant();
 		plant.setCar( cars[0] );
 		plant.setName( "plant12" );
-		plant.setId( new LegacyCarPlantPK() );
-		plant.getId().setCarId( cars[0].getId() );
-		plant.getId().setPlantId( "2" );
+		plant.setId( 12 );
 		fullTextSession.persist( plant );
 		transaction.commit();
 	}

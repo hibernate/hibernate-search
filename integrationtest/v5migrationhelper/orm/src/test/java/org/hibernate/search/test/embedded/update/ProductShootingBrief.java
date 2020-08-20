@@ -21,9 +21,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.embedded.fieldoncollection.CollectionOfStringsFieldBridge;
 import org.hibernate.search.testsupport.AnalysisNames;
 
 @Entity
@@ -82,8 +80,7 @@ public class ProductShootingBrief {
 	}
 
 	@Transient
-	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class),
-			analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD))
+	@Field(analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD))
 	public Collection<String> getReferenceCodeCollection() {
 		Collection<String> referenceCodes = new ArrayList<String>();
 

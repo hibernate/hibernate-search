@@ -146,30 +146,6 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 		fullTextSession.close();
 	}
 
-
-	@Test
-	public void testIndexAndSearchWithCustomFieldBridge() throws Exception {
-		Value fooValue = new Value( "foo" );
-		fooValue.setDummy( "foo" );
-		Value nullValue = new Value( "bar" );
-		nullValue.setDummy( null );
-
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
-		getSession().save( fooValue );
-		getSession().save( nullValue );
-		tx.commit();
-
-		fullTextSession.clear();
-		tx = fullTextSession.beginTransaction();
-
-		searchKeywordWithExpectedNumberOfResults( fullTextSession, "dummy", "foo", 1 );
-		searchKeywordWithExpectedNumberOfResults( fullTextSession, "dummy", "_dummy_", 1 );
-
-		tx.commit();
-		fullTextSession.close();
-	}
-
 	private void searchKeywordWithExpectedNumberOfResults(FullTextSession fullTextSession, String fieldName, String termValue, int expectedNumberOfResults)
 			throws Exception {
 		TermQuery query = new TermQuery( new Term( fieldName, termValue ) );

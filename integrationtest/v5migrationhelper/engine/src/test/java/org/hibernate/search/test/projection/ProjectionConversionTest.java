@@ -6,23 +6,11 @@
  */
 package org.hibernate.search.test.projection;
 
-import java.util.Locale;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
-import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.LongBridge;
-import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
-import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -63,24 +51,17 @@ public class ProjectionConversionTest {
 		ExampleEntity entity = new ExampleEntity();
 		entity.id = 1L;
 		entity.someInteger = 5;
-		entity.longEncodedAsText = 20L;
+		entity.longEncodedAsText = String.valueOf( 20L );
 		entity.unstoredField = "unstoredField";
-		entity.customBridgedKeyword = "lowercase-keyword";
-		entity.customOneWayBridgedKeyword = "lowercase-keyword";
-		entity.customTwoWayBridgedKeywordWithMetadataOverride = "lowercase-keyword";
 
 		ExampleEntity embedded = new ExampleEntity();
 		embedded.id = 2L;
 		embedded.someInteger = 6;
-		embedded.longEncodedAsText = 21L;
+		embedded.longEncodedAsText = String.valueOf( 21L );
 		embedded.unstoredField = "unstoredFieldEmbedded";
-		embedded.customBridgedKeyword = "another-lowercase-keyword";
-		embedded.customOneWayBridgedKeyword = "another-lowercase-keyword";
-		embedded.customTwoWayBridgedKeywordWithMetadataOverride = "another-lowercase-keyword";
 
 		ConflictingMappedType second = new ConflictingMappedType();
 		second.id = "a string";
-		second.customBridgedKeyword = 17L;
 
 		entity.embedded = embedded;
 		entity.second = second;
@@ -119,26 +100,6 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	public void projectionWithCustomBridge() {
-		projectionTestHelper( "customBridgedKeyword", "lowercase-keyword" );
-	}
-
-	@Test
-	public void projectionWithCustomOneWayBridge() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000324" );
-		thrown.expectMessage( "customOneWayBridgedKeyword" );
-		thrown.expectMessage( CustomOneWayBridge.class.getName() );
-
-		projectionTestHelper( "customOneWayBridgedKeyword", "lowercase-keyword" );
-	}
-
-	@Test
-	public void projectionWithCustomBridgeOverridingMetadata() {
-		projectionTestHelper( "customTwoWayBridgedKeywordWithMetadataOverride", "lowercase-keyword" );
-	}
-
-	@Test
 	public void projectingEmbeddedIdByPropertyName() {
 		projectionTestHelper( "embedded.id", Long.valueOf( 2L ) );
 	}
@@ -149,33 +110,8 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	public void projectingEmbeddedWithCustomBridge() {
-		projectionTestHelper( "embedded.customBridgedKeyword", "another-lowercase-keyword" );
-	}
-
-	@Test
-	public void projectingEmbeddedWithCustomOneWayBridge() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000324" );
-		thrown.expectMessage( "embedded.customOneWayBridgedKeyword" );
-		thrown.expectMessage( CustomOneWayBridge.class.getName() );
-
-		projectionTestHelper( "embedded.customOneWayBridgedKeyword", "another-lowercase-keyword" );
-	}
-
-	@Test
-	public void projectingEmbeddedWithCustomBridgeOverridingMetadata() {
-		projectionTestHelper( "embedded.customTwoWayBridgedKeywordWithMetadataOverride", "another-lowercase-keyword" );
-	}
-
-	@Test
 	public void projectingNotIncludedEmbeddedField() {
 		projectionTestHelper( "embedded.someInteger", null );
-	}
-
-	@Test
-	public void projectingOnConflictingMappingEmbeddedField() {
-		projectionTestHelper( "second.customBridgedKeyword", Long.valueOf( 17L ) );
 	}
 
 	@Test
@@ -197,11 +133,8 @@ public class ProjectionConversionTest {
 							projectingIdOnOverloadedMapping();
 							projectingIntegerField();
 							projectingUnknownField();
-							projectionWithCustomBridge();
 							projectingEmbeddedIdByPropertyName();
 							projectingEmbeddedIdOnOverloadedMapping();
-							projectingEmbeddedWithCustomBridge();
-							projectingOnConflictingMappingEmbeddedField();
 							projectingOnConflictingMappedIdField();
 						}
 					};
@@ -226,28 +159,15 @@ public class ProjectionConversionTest {
 		@Field(store = Store.YES)
 		Integer someInteger;
 
-		@Field(store = Store.YES) @FieldBridge(impl = LongBridge.class)
-		Long longEncodedAsText;
+		@Field(store = Store.YES)
+		String longEncodedAsText;
 
 		@Field(store = Store.NO)
 		String unstoredField;
 
-		@Field(store = Store.YES)
-		@FieldBridge(impl = CustomTwoWayBridge.class)
-		String customBridgedKeyword;
-
-		@Field(store = Store.YES)
-		@FieldBridge(impl = CustomOneWayBridge.class)
-		String customOneWayBridgedKeyword;
-
-		@Field(store = Store.YES)
-		@FieldBridge(impl = CustomTwoWayBridgeOverridingDefaultFieldMetadata.class)
-		String customTwoWayBridgedKeywordWithMetadataOverride;
-
 		@IndexedEmbedded(
 				includePaths = {
-					"id", "stringTypedId", "customBridgedKeyword", "customOneWayBridgedKeyword",
-					"customTwoWayBridgedKeywordWithMetadataOverride"
+					"id", "stringTypedId"
 				},
 				includeEmbeddedObjectId = true
 		)
@@ -264,70 +184,6 @@ public class ProjectionConversionTest {
 		@DocumentId
 		String id;
 
-		@Field(store = Store.YES)
-		Long customBridgedKeyword; //Misleading field name on purpose
-
 	}
 
-	public static class CustomTwoWayBridge implements TwoWayFieldBridge {
-
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			luceneOptions.addFieldToDocument( name, String.valueOf( value ).toUpperCase( Locale.ENGLISH ), document );
-		}
-
-		@Override
-		public Object get(String name, Document document) {
-			IndexableField field = document.getField( name );
-			String stringValue = field.stringValue();
-			return stringValue.toLowerCase( Locale.ENGLISH );
-		}
-
-		@Override
-		public String objectToString(Object object) {
-			return String.valueOf( object );
-		}
-
-	}
-
-	public static class CustomOneWayBridge implements org.hibernate.search.bridge.FieldBridge, StringBridge {
-
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			luceneOptions.addFieldToDocument( name, String.valueOf( value ).toUpperCase( Locale.ENGLISH ), document );
-		}
-
-		@Override
-		public String objectToString(Object object) {
-			return String.valueOf( object );
-		}
-
-	}
-
-	public static class CustomTwoWayBridgeOverridingDefaultFieldMetadata implements TwoWayFieldBridge, MetadataProvidingFieldBridge {
-
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			luceneOptions.addFieldToDocument( name + ".value", String.valueOf( value ).toUpperCase( Locale.ENGLISH ), document );
-		}
-
-		@Override
-		public Object get(String name, Document document) {
-			IndexableField field = document.getField( name + ".value" );
-			String stringValue = field.stringValue();
-			return stringValue.toLowerCase( Locale.ENGLISH );
-		}
-
-		@Override
-		public String objectToString(Object object) {
-			return String.valueOf( object );
-		}
-
-		@Override
-		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-			builder.field( name, FieldType.OBJECT );
-			builder.field( name + ".value", FieldType.STRING );
-		}
-
-	}
 }

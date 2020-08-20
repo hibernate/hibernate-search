@@ -85,11 +85,6 @@ public @interface Field {
 	Normalizer normalizer() default @Normalizer;
 
 	/**
-	 * @return Returns the field bridge used for this field. Default is auto-wired.
-	 */
-	FieldBridge bridge() default @FieldBridge;
-
-	/**
 	 * @return Returns the value to be used for indexing {@code null}. Per default {@code Field.NO_NULL_INDEXING} is returned indicating that
 	 *         null values are not indexed.
 	 */

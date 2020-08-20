@@ -7,14 +7,13 @@
 package org.hibernate.search.test.batchindexing;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -27,18 +26,17 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Indexed
 public class LegacyCarPlant {
 
-	private LegacyCarPlantPK id;
+	private Integer id;
 	private String name;
 	private LegacyCar car;
 
-	@EmbeddedId
+	@Id
 	@DocumentId
-	@FieldBridge(impl = LegacyCarPlantPKBridge.class)
-	public LegacyCarPlantPK getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(LegacyCarPlantPK id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

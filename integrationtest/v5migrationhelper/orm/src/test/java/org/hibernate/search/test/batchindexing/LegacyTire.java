@@ -8,6 +8,7 @@ package org.hibernate.search.test.batchindexing;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,7 +16,6 @@ import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 
 /**
  * @author Bayo Erinle
@@ -24,7 +24,9 @@ import org.hibernate.search.annotations.FieldBridge;
 @Table(name = "Z_LEG_TIRE")
 public class LegacyTire {
 
-	private LegacyTirePK id;
+	@Id
+	@GeneratedValue
+	private Integer id;
 	private int tireSize;
 	private LegacyCar car;
 
@@ -50,12 +52,11 @@ public class LegacyTire {
 
 	@Id
 	@DocumentId
-	@FieldBridge(impl = LegacyTirePKBridge.class)
-	public LegacyTirePK getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(LegacyTirePK id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 }

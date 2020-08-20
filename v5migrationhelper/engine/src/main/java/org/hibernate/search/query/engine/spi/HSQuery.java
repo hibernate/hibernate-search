@@ -84,7 +84,7 @@ public interface HSQuery extends ProjectionConstants {
 	 * Each field is converted back to it's object representation, an Object[] being returned for each "row"
 	 * (similar to an HQL or a Criteria API projection).
 	 * <p>
-	 * A projectable field must be stored in the Lucene index and use a {@link org.hibernate.search.bridge.TwoWayFieldBridge}
+	 * A projectable field must be stored in the Lucene index and use a two-way field bridge
 	 * Unless notified in their JavaDoc, all built-in bridges are two-way. All @DocumentId fields are projectable by design.
 	 * <p>
 	 * If the projected field is not a projectable field, null is returned in the object[]

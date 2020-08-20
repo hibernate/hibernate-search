@@ -23,9 +23,7 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -53,8 +51,6 @@ public class Cloud {
 	private Date dateMinute;
 	private Date dateSecond;
 	private Date dateMillisecond;
-	private String customFieldBridge;
-	private String customStringBridge;
 	private Character char1;
 	private char char2;
 	private CloudType type;
@@ -106,28 +102,6 @@ public class Cloud {
 
 	public void setClazz(Class clazz) {
 		this.clazz = clazz;
-	}
-
-	@Field(store = Store.YES)
-	@FieldBridge(impl = TruncateFieldBridge.class)
-	public String getCustomFieldBridge() {
-		return customFieldBridge;
-	}
-
-	public void setCustomFieldBridge(String customFieldBridge) {
-		this.customFieldBridge = customFieldBridge;
-	}
-
-	@Field(store = Store.YES,
-			bridge = @FieldBridge(impl = TruncateStringBridge.class,
-					params = @Parameter(name = "dividedBy", value = "4"))
-	)
-	public String getCustomStringBridge() {
-		return customStringBridge;
-	}
-
-	public void setCustomStringBridge(String customStringBridge) {
-		this.customStringBridge = customStringBridge;
 	}
 
 	@Id

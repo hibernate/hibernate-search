@@ -6,31 +6,17 @@
  */
 package org.hibernate.search.test.engine.numeric;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.ShortBridge;
-import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.metadata.FieldDescriptor;
-import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
-import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.query.dsl.RangeMatchingContext;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -66,7 +52,6 @@ public class NumericFieldTest {
 		assertRangeQuery( "ranking", 1, 2 ).as( "Query by integer range" ).hasResultSize( 4 );
 		assertRangeQuery( "myCounter", 1L, 3L ).as( "Query by long range" ).hasResultSize( 3 );
 		assertRangeQuery( "strMultiple", 0.7d, 0.9d ).as( "Query by multi-fields" ).hasResultSize( 2 );
-		assertRangeQuery( "visibleStars", -100L, 500L ).as( "Query on custom bridge by range" ).hasResultSize( 4 );
 
 		// Range Queries different bounds
 		assertRangeQuery( "overriddenFieldName", 1, 3, true, false ).as( "Query by id excluding upper" ).hasResultSize( 2 );
@@ -86,7 +71,6 @@ public class NumericFieldTest {
 		assertExactQuery( "longitude", -20d ).as( "Query integer exact" ).matchesExactlyIds( 3 );
 		assertExactQuery( "myCounter", 4L ).as( "Query long exact" ).matchesExactlyIds( 4 );
 		assertExactQuery( "strMultiple", 0.1d ).as( "Query multifield exact" ).matchesExactlyIds( 5 );
-		assertExactQuery( "visibleStars", 1000L ).as( "Query on custom bridge exact" ).matchesExactlyIds( 3 );
 
 		// Delete operation on Numeric Id with overriden field name:
 		helper.delete( Location.class, 1, 2, 3, 4, 5 );
@@ -109,10 +93,8 @@ public class NumericFieldTest {
 				.matchesExactlySingleProjections( -20d );
 
 		helper.assertThat( latitudeQuery ).from( Location.class )
-				.projecting( "coordinatePair_x", "coordinatePair_y", "importance", "popularity" )
+				.projecting( "importance", "popularity" )
 				.matchesExactlyProjections( new Object[] {
-						1d,
-						2d,
 						(short) 10,
 						(byte) 20
 				} );
@@ -148,15 +130,15 @@ public class NumericFieldTest {
 	}
 
 	private void prepareData() {
-		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), BigDecimal.ONE, (short) 10, (byte) 20 );
+		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), (short) 10, (byte) 20 );
 		loc1.addPinPoints( new PinPoint( 1, 4, loc1 ), new PinPoint( 2, 5, loc1 ) );
 
-		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), BigDecimal.ONE, (short) 11, (byte) 21 );
+		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), (short) 11, (byte) 21 );
 		loc2.addPinPoints( new PinPoint( 3, 1, loc2 ), new PinPoint( 4, 2, loc2 ) );
 
-		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), BigDecimal.TEN, (short) 12, (byte) 22 );
-		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), BigDecimal.ONE, (short) 13, (byte) 23 );
-		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), BigDecimal.ONE, (short) 14, (byte) 24 );
+		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), (short) 12, (byte) 22 );
+		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), (short) 13, (byte) 23 );
+		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), (short) 14, (byte) 24 );
 
 		helper.add( loc1, loc2, loc3, loc4, loc5 );
 

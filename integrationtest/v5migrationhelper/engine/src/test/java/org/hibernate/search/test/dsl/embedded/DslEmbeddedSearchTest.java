@@ -45,7 +45,6 @@ public class DslEmbeddedSearchTest {
 	public void setUp() throws Exception {
 		EmbeddedEntity ee = new EmbeddedEntity();
 		ee.setEmbeddedField( "embedded" );
-		ee.setNumber( 7 );
 		ee.setDate( initCalendar( 2007, Calendar.JANUARY, 14 ).getTime() );
 
 		ContainerEntity pe = new ContainerEntity();
@@ -57,7 +56,6 @@ public class DslEmbeddedSearchTest {
 
 		EmbeddedEntity ee2 = new EmbeddedEntity();
 		ee2.setEmbeddedField( "otherembedded" );
-		ee2.setNumber( 3 );
 		ee2.setDate( initCalendar( 2007, Calendar.JANUARY, 12 ).getTime() );
 
 		ContainerEntity pe2 = new ContainerEntity();
@@ -72,14 +70,6 @@ public class DslEmbeddedSearchTest {
 	public void testSearchString() throws Exception {
 		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
 		Query q = qb.keyword().onField( "emb.embeddedField" ).matching( "embedded" ).createQuery();
-
-		assertQuery( q ).matchesExactlyIds( 1L );
-	}
-
-	@Test
-	public void testSearchNumberWithFieldBridge() throws Exception {
-		QueryBuilder qb = helper.queryBuilder( ContainerEntity.class );
-		Query q = qb.keyword().onField( "emb.num" ).matching( 7 ).createQuery();
 
 		assertQuery( q ).matchesExactlyIds( 1L );
 	}
