@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.persistence.FlushModeType;
 
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
 import org.hibernate.query.spi.QueryImplementor;
@@ -55,10 +54,6 @@ public interface FullTextQuery extends org.hibernate.search.jpa.FullTextQuery, Q
 
 	@Override
 	FullTextQuery setSort(Sort sort);
-
-	@Override
-	@Deprecated
-	FullTextQuery setFilter(Filter filter);
 
 	@Override
 	FullTextQuery setCriteriaQuery(Criteria criteria);

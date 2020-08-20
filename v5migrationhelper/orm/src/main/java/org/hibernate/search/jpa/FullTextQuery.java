@@ -12,7 +12,6 @@ import javax.persistence.FlushModeType;
 import javax.persistence.Query;
 
 import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
@@ -43,20 +42,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @return this for method chaining
 	 */
 	FullTextQuery setSort(Sort sort);
-
-	/**
-	 * Allows to set a single Lucene filter.
-	 * @deprecated use the {@link org.hibernate.search.annotations.FullTextFilterDef} approach,
-	 *     or use a {@link org.apache.lucene.search.BooleanQuery} and add a clause using
-	 *     {@link org.apache.lucene.search.BooleanClause.Occur#FILTER}.
-	 *
-	 * @param filter The Lucene filter.
-	 *
-	 * @return this for method chaining
-	 * @see org.apache.lucene.search.Filter
-	 */
-	@Deprecated
-	FullTextQuery setFilter(Filter filter);
 
 	/**
 	 * Returns the number of hits for this search

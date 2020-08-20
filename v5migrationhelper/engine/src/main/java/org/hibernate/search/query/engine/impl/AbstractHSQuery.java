@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.bridge.spi.FieldType;
@@ -86,11 +85,6 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	protected Integer maxResults;
 	protected Coordinates spatialSearchCenter = null;
 	protected String spatialFieldName = null;
-
-	/**
-	 * User specified filters. Will be combined into a single chained filter {@link #filter}.
-	 */
-	protected Filter userFilter;
 
 	/**
 	 * The  map of currently active/enabled filters.
@@ -165,14 +159,6 @@ public abstract class AbstractHSQuery implements HSQuery, Serializable {
 	public HSQuery sort(Sort sort) {
 		clearCachedResults();
 		this.sort = sort;
-		return this;
-	}
-
-	@Override
-	@Deprecated
-	public HSQuery filter(Filter filter) {
-		clearCachedResults();
-		this.userFilter = filter;
 		return this;
 	}
 
