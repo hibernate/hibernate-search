@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.bridge.builtin.impl;
 
-import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
 import org.hibernate.search.exception.AssertionFailure;
 
