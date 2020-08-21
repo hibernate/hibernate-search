@@ -26,15 +26,13 @@ import org.apache.lucene.search.TermQuery;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
-import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.StringHelper;
 import org.junit.Assert;
 
@@ -181,12 +179,13 @@ public class SearchITHelper {
 		}
 
 		public void execute() {
-			TransactionContextForTest tc = new TransactionContextForTest();
-			works.forEach(
-					w -> integratorProvider.get().getWorker().performWork( w, tc )
-			);
-			tc.end();
+			works.forEach( this::executeWork );
 			works.clear();
+		}
+
+		private void executeWork(Work w) {
+			// TODO implement. Don't forget to use tenantId.
+			throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
 		}
 	}
 
@@ -202,7 +201,7 @@ public class SearchITHelper {
 		}
 
 		public EntityInstanceWorkContext push(Object entry, Serializable id) {
-			executor.push( new Work( executor.tenantId, entry, id, workType, false ) );
+			executor.push( new Work( entry, id, workType ) );
 			return this;
 		}
 
@@ -215,7 +214,7 @@ public class SearchITHelper {
 		}
 
 		public EntityInstanceWorkContext push(Stream<?> entries) {
-			executor.push( entries.map( e -> new Work( executor.tenantId, e, null, workType, false ) ) );
+			executor.push( entries.map( e -> new Work( e, null, workType ) ) );
 			return this;
 		}
 
@@ -224,10 +223,58 @@ public class SearchITHelper {
 		}
 	}
 
+	private static class Work {
+		public final IndexedTypeIdentifier entityType;
+		public final Object entity;
+		public final Object providedId;
+		public final SearchITHelper.WorkType workType;
+
+		public Work(IndexedTypeIdentifier entityType, Object providedId, WorkType workType) {
+			this.entityType = entityType;
+			this.entity = null;
+			this.providedId = providedId;
+			this.workType = workType;
+		}
+
+		public Work(Object entity, Object providedId, WorkType workType) {
+			this.entityType = PojoIndexedTypeIdentifier.convertFromLegacy( entity.getClass() );
+			this.entity = entity;
+			this.providedId = providedId;
+			this.workType = workType;
+		}
+	}
+
+	private enum WorkType {
+		ADD,
+
+		UPDATE,
+
+		DELETE,
+
+		COLLECTION,
+
+		/**
+		 * Used to remove a specific instance of a class from an index.
+		 */
+		PURGE,
+
+		/**
+		 * Used to remove all instances of a class from an index.
+		 */
+		PURGE_ALL,
+
+		/**
+		 * This type is used for batch indexing.
+		 */
+		INDEX,
+
+		DELETE_BY_QUERY
+	}
+
 	public class EntityTypeWorkContext {
 		private final WorkType workType;
 
-		private WorkExecutor executor;
+		private final WorkExecutor executor;
 
 		private EntityTypeWorkContext(WorkType workType, WorkExecutor executor) {
 			super();
@@ -244,7 +291,7 @@ public class SearchITHelper {
 		}
 
 		public EntityTypeWorkContext push(Class<?> type, Stream<? extends Serializable> ids) {
-			executor.push( ids.map( id -> new Work( executor.tenantId, new PojoIndexedTypeIdentifier( type ), id, workType ) ) );
+			executor.push( ids.map( id -> new Work( new PojoIndexedTypeIdentifier( type ), id, workType ) ) );
 			return this;
 		}
 

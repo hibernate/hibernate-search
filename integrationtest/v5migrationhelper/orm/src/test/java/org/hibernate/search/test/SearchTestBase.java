@@ -15,8 +15,6 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
@@ -24,6 +22,8 @@ import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+
+import org.apache.lucene.store.Directory;
 
 /**
  * Base class for Hibernate Search tests using Hibernate ORM and Junit 4.
@@ -72,11 +72,6 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 	}
 
 	@Override
-	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return getTestResourceManager().getExtendedSearchIntegrator();
-	}
-
-	@Override
 	public final Session openSession() {
 		return getTestResourceManager().openSession();
 	}
@@ -107,18 +102,8 @@ public abstract class SearchTestBase implements TestResourceManager, TestConfigu
 		return Collections.emptySet();
 	}
 
-	/**
-	 * Use {@link #getNumberOfDocumentsInIndex(IndexedTypeIdentifier)}
-	 * @param entityType
-	 * @return
-	 */
-	@Deprecated
-	protected int getNumberOfDocumentsInIndex(Class<?> entityType) {
-		return getNumberOfDocumentsInIndex( new PojoIndexedTypeIdentifier( entityType ) );
-	}
-
-	protected int getNumberOfDocumentsInIndex(IndexedTypeIdentifier entityType) {
-		return getBackendTestHelper().getNumberOfDocumentsInIndex( entityType );
+	protected Directory openDirectoryForIndex(String indexName) {
+		return getBackendTestHelper().openDirectoryForIndex( indexName );
 	}
 
 	protected int getNumberOfDocumentsInIndex(String indexName) {
