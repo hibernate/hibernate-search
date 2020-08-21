@@ -26,7 +26,6 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
@@ -456,8 +455,6 @@ public class DSLTest {
 				.below( 0.24d )
 				.createQuery();
 
-		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
-
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1 );
 	}
 
@@ -735,8 +732,6 @@ public class DSLTest {
 					.to( 0.24d )
 					.createQuery();
 
-		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
-
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 1 );
 	}
 
@@ -751,8 +746,6 @@ public class DSLTest {
 					.onField( "raindropInMm" )
 					.above( 0.231d )
 					.createQuery();
-
-		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
 		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1, 2, 3 );
 
@@ -779,8 +772,6 @@ public class DSLTest {
 					.below( 0.435d )
 					.createQuery();
 
-		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
-
 		helper.assertThat( query ).from( Month.class ).matchesUnorderedIds( 1, 2, 3 );
 
 		//exclusive
@@ -802,8 +793,6 @@ public class DSLTest {
 				.onField( "raindropInMm" )
 				.matching( 0.231d )
 				.createQuery();
-
-		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
 		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
 	}
@@ -849,68 +838,6 @@ public class DSLTest {
 		catch (SearchException e) {
 			// success
 		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1791")
-	public void testUsingMatchQueryOnNumericDocumentIdGeneratesTermQuery() throws Exception {
-		// making sure a string based TermQuery is used
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb.keyword()
-				.onField( "id" )
-				.matching( 1 )
-				.createQuery();
-		assertTrue( "A string based TermQuery is expected, but got a " + query.getClass(), query instanceof TermQuery );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1791")
-	public void testUsingRangeQueryOnNumericDocumentIdGeneratesTermRangeQuery() throws Exception {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb.range()
-				.onField( "id" )
-				.from( 1 )
-				.to( 3 )
-				.createQuery();
-		assertTrue(
-				"A string based TermQuery is expected, but got a " + query.getClass(), query instanceof TermRangeQuery
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1791")
-	public void testUsingMatchingQueryOnNumericFieldCreatesNumericRangeQuery() throws Exception {
-		// making sure a NumericRangeQuery is used
-		QueryBuilder monthQb = helper.queryBuilder( Day.class );
-
-		Query query = monthQb.keyword()
-				.onField( "idNumeric" )
-				.matching( 2 )
-				.createQuery();
-
-		assertTrue(
-				"A NumericRangeQuery is expected, but got a " + query.getClass(), query instanceof NumericRangeQuery
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1791")
-	@Category(SkipOnElasticsearch.class)
-	// In the Elasticsearch case, we end up with a RemoteMatchQuery which is perfectly fine
-	// as soon as the analyzer is a conservative one (keyword).
-	public void testUseMatchQueryOnEmbeddedNumericIdCreatesTermQuery() throws Exception {
-		QueryBuilder coffeeQb = helper.queryBuilder( Coffee.class );
-
-		Query query = coffeeQb.keyword()
-				.onField( "brand.id" )
-				.matching( 1 )
-				.createQuery();
-
-		assertTrue(
-				"A TermQuery is expected, but got a " + query.getClass(), query instanceof TermQuery
-		);
 	}
 
 	@Test

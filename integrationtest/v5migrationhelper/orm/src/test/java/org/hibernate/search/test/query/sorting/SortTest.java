@@ -501,8 +501,7 @@ public class SortTest extends SearchTestBase {
 
 	public static class SumFieldComparatorSource extends FieldComparatorSource {
 		@Override
-		public FieldComparator<?> newComparator(String fieldName, int numHits, int sortPos, boolean reversed)
-				throws IOException {
+		public FieldComparator<?> newComparator(String fieldName, int numHits, int sortPos, boolean reversed) {
 			return new SumFieldComparator( numHits, "num1", "num2" );
 		}
 	}

@@ -8,27 +8,10 @@ package org.hibernate.search.test.engine.worker;
 
 import java.util.Map;
 
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 /**
  * @author Emmanuel Bernard
  */
-@RunWith(BMUnitRunner.class)
 public class AsyncWorkerTest extends WorkerTestCase {
-
-	@Override
-	@Test
-	@BMRule(targetClass = "org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor",
-			targetMethod = "applyWork",
-			helper = "org.hibernate.search.test.util.BytemanHelper",
-			action = "assertBooleanValue($0.sync, false)", // asserting that we are in async mode
-			name = "testConcurrency")
-	public void testConcurrency() throws Exception {
-		super.testConcurrency();
-	}
 
 	@Override
 	public void configure(Map<String,Object> cfg) {

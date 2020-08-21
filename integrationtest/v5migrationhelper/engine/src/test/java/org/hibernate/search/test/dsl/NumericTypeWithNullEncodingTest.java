@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.dsl;
 
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -51,8 +50,6 @@ public class NumericTypeWithNullEncodingTest {
 						.to( 3 ).excludeLimit()
 						.createQuery();
 
-		Assert.assertTrue( query instanceof NumericRangeQuery );
-
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
 	}
 
@@ -63,8 +60,6 @@ public class NumericTypeWithNullEncodingTest {
 					.onField( "age" )
 					.matching( 2 )
 					.createQuery();
-
-		Assert.assertTrue( query instanceof NumericRangeQuery );
 
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
 	}
@@ -77,7 +72,6 @@ public class NumericTypeWithNullEncodingTest {
 					.matching( null )
 					.createQuery();
 
-		Assert.assertTrue( query instanceof NumericRangeQuery );
 		Assert.assertEquals( "[-1 TO -1]", query.toString( "nullableAge" ) );
 
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
@@ -91,7 +85,6 @@ public class NumericTypeWithNullEncodingTest {
 					.matching( null )
 					.createQuery();
 
-		Assert.assertTrue( query instanceof NumericRangeQuery );
 		Assert.assertEquals( "[-7 TO -7]", query.toString( "age" ) );
 
 		assertProjection( query, "title" ).matchesNone();
