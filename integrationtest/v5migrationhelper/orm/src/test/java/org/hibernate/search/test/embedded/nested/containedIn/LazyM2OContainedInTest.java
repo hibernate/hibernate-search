@@ -63,7 +63,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		);
 		assertEquals(
 				1,
-				fts.createFullTextQuery( new TermQuery( new Term( "entities2.uid", Long.toString( uid2 ) ) ), Entity1ForDoc0.class ).getResultSize()
+				fts.createFullTextQuery( NumericFieldUtils.createExactMatchQuery( "entities2.uid_field", uid2 ), Entity1ForDoc0.class ).getResultSize()
 		);
 
 		tx.commit();

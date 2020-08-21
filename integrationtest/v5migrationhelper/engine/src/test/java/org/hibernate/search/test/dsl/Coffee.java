@@ -59,12 +59,12 @@ class Coffee {
 	public void setInternalDescription(String internalDescription) { this.internalDescription = internalDescription; }
 	private String internalDescription;
 
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@IndexedEmbedded
 	public CoffeeBrand getBrand() { return brand; }
 	public void setBrand(CoffeeBrand brand) { this.brand = brand; }
 	private CoffeeBrand brand;
 
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@IndexedEmbedded
 	public CoffeeMaker getMaker() { return maker; }
 	public void setMaker(CoffeeMaker maker) { this.maker = maker; }
 	private CoffeeMaker maker;

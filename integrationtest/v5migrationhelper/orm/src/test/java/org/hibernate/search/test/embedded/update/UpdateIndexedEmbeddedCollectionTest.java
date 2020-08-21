@@ -28,6 +28,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
@@ -158,7 +159,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		public void setLastName(String lastName) { this.lastName = lastName; }
 		private String lastName;
 
-		@IndexedEmbedded(includeEmbeddedObjectId = true)
+		@IndexedEmbedded
 		@OneToOne(cascade = CascadeType.ALL)
 		public Truck getTruck() { return truck; }
 		public void setTruck(Truck truck) { this.truck = truck; }
@@ -179,6 +180,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 
 		@Id
 		@GeneratedValue
+		@Field(store = Store.YES)
 		public Long getId() { return id; }
 		public void setId(Long id) { this.id = id; }
 		private Long id;

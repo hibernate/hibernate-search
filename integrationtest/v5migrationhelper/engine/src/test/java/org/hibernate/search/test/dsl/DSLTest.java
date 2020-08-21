@@ -20,7 +20,6 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.hamcrest.CoreMatchers;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;

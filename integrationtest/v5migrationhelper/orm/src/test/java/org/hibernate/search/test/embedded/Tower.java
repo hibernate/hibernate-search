@@ -32,7 +32,7 @@ public class Tower {
 	private String name;
 
 	@ManyToOne(cascade = CascadeType.ALL)
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@IndexedEmbedded
 	private Address address;
 
 
