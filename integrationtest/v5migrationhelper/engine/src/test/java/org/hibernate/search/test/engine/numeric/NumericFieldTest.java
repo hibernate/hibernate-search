@@ -177,7 +177,7 @@ public class NumericFieldTest {
 		@DocumentId
 		Long id;
 
-		@IndexedEmbedded(includeEmbeddedObjectId = true, prefix = "score_")
+		@IndexedEmbedded(prefix = "score_")
 		Set<Score> scores = new HashSet<Score>();
 
 	}

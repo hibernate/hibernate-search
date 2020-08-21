@@ -63,18 +63,4 @@ public @interface IndexedEmbedded {
 	 * @return the target type of the association. Default to {@code void.class}
 	 */
 	Class<?> targetElement() default void.class;
-
-	/**
-	 * Returns {@code true}, if the id of the embedded object should be included into the index,
-	 * {@code false} otherwise. The default is {@code false}.
-	 *
-	 * <p><b>Note</b><br>:
-	 * If the id property is explicitly listed via {@link #includePaths()}, then the id is included even if this value
-	 * is {@code false}.
-	 * </p>
-	 *
-	 * @return Returns {@code true}, if the id of the embedded object should be included into the index,
-	 * {@code false} otherwise.
-	 */
-	boolean includeEmbeddedObjectId() default false;
 }

@@ -65,10 +65,6 @@ public class EmbeddedTest extends SearchTestBase {
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property in embedded", 1, result.size() );
 
-		query = parser.parse( "address.id:" + a.getId().toString() );
-		result = session.createFullTextQuery( query, Tower.class ).list();
-		assertEquals( "unable to find property by id of embedded", 1, result.size() );
-
 		query = parser.parse( "address.country.name:" + a.getCountry().getName() );
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property with 2 levels of embedded", 1, result.size() );

@@ -29,7 +29,7 @@ public class Person {
 
 	String name;
 
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@IndexedEmbedded
 	@ManyToMany(cascade = { CascadeType.ALL })
 	private List<Place> placesVisited;
 

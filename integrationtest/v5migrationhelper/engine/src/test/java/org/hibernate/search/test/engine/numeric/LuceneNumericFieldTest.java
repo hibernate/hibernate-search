@@ -73,9 +73,6 @@ public class LuceneNumericFieldTest {
 		assertEquals( 1, list.size() );
 		Document document = (Document) list.iterator().next().getProjection()[0];
 
-		IndexableField scoreNumeric = document.getField( "score_id" );
-		assertThat( scoreNumeric.numericValue() ).isEqualTo( 1 );
-
 		IndexableField beta = document.getField( "score_beta" );
 		assertThat( beta.numericValue() ).isEqualTo( 100 );
 	}
@@ -101,7 +98,7 @@ public class LuceneNumericFieldTest {
 		@DocumentId
 		Long id;
 
-		@IndexedEmbedded(includeEmbeddedObjectId = true, prefix = "score_")
+		@IndexedEmbedded(prefix = "score_")
 		Set<Score> scores = new HashSet<Score>();
 
 	}
