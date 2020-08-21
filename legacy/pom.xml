@@ -28,8 +28,6 @@
         <module>jsr352</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>integrationtest/engine</module>
-        <module>integrationtest/orm</module>
         <module>integrationtest/jsr352</module>
         <module>documentation</module>
     </modules>
