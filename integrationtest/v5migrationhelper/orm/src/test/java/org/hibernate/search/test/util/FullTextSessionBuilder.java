@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.test.util;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,12 +27,9 @@ import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.impl.ImplementationFactory;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.FileHelper;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.rules.TestRule;
@@ -52,13 +46,9 @@ import org.junit.runners.model.Statement;
  */
 public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
-	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make( MethodHandles.lookup() );
-
-	private Path indexRootDirectory;
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactoryImplementor sessionFactory;
-	private boolean usingFileSystem = false;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 
 	public FullTextSessionBuilder() {
@@ -79,24 +69,6 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 				StopAnalyzer.class.getName()
 		);
 		cfg.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
-		usingFileSystem = false;
-	}
-
-	/**
-	 * Store indexes permanently in FSDirectory. Helper to automatically cleanup
-	 * the filesystem when the builder is closed; alternatively you could just use
-	 * properties directly and clean the filesystem explicitly.
-	 *
-	 * @param testClass needed to locate an appropriate temporary directory
-	 * @return the same builder (this).
-	 */
-	public FullTextSessionBuilder useFileSystemDirectoryProvider(Class<?> testClass) {
-		indexRootDirectory = TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir() );
-		log.debugf( "Using %s as index directory.", indexRootDirectory.toAbsolutePath() );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.toAbsolutePath().toString() );
-		usingFileSystem = true;
-		return this;
 	}
 
 	/**
@@ -148,16 +120,8 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 			sessionFactory.close();
 		}
 		finally {
-			if ( usingFileSystem ) {
-				try {
-					cleanupFilesystem();
-				}
-				catch (IOException e) {
-					throw new RuntimeException( e );
-				}
-			}
+			sessionFactory = null;
 		}
-		sessionFactory = null;
 	}
 
 	/**
@@ -205,24 +169,6 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 			build();
 		}
 		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchIntegratorBySFI( sessionFactory ) );
-	}
-
-	/**
-	 * Defines a programmatic configuration to be used by Search
-	 *
-	 * @return the enabled SearchMapping. change it to define the mapping programmatically.
-	 */
-	public SearchMapping fluentMapping() {
-		SearchMapping mapping = (SearchMapping) cfg.get( org.hibernate.search.cfg.Environment.MODEL_MAPPING );
-		if ( mapping == null ) {
-			mapping = new SearchMapping();
-			cfg.put( org.hibernate.search.cfg.Environment.MODEL_MAPPING, mapping );
-		}
-		return mapping;
-	}
-
-	public void cleanupFilesystem() throws IOException {
-		FileHelper.delete( indexRootDirectory );
 	}
 
 	public FullTextSessionBuilder addLoadEventListener(LoadEventListener additionalLoadEventListener) {

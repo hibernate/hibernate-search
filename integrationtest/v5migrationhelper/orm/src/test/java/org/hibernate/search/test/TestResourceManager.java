@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 
 /**
  * Interface defining ORM and Search infrastructure methods a test base class needs to offer.
@@ -33,8 +32,6 @@ public interface TestResourceManager {
 	Session getSession();
 
 	SearchFactory getSearchFactory();
-
-	ExtendedSearchIntegrator getExtendedSearchIntegrator();
 
 	void ensureIndexesAreEmpty() throws IOException;
 

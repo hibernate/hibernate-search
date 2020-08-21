@@ -7,7 +7,11 @@
 package org.hibernate.search.test;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -26,12 +30,9 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.test.util.MultitenancyTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
@@ -159,7 +160,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public void ensureIndexesAreEmpty() throws IOException {
-		FileHelper.delete( getBaseIndexDir() );
+		deleteRecursive( getBaseIndexDir() );
 	}
 
 	@Override
@@ -172,11 +173,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			}
 		}
 		return searchFactory;
-	}
-
-	@Override
-	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
-		return ContextHelper.getSearchIntegratorBySFI( sessionFactory );
 	}
 
 	@Override
@@ -232,6 +228,39 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		return TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir(), currentTestModuleClass ).resolve(
 				UUID.randomUUID().toString().substring( 0, 8 )
 			);
+	}
+
+	private static void deleteRecursive(Path path) throws IOException {
+		if ( path == null ) {
+			throw new IllegalArgumentException();
+		}
+
+		if ( Files.notExists( path ) ) {
+			return;
+		}
+
+		Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				safeDelete( file );
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+				safeDelete( dir );
+				return FileVisitResult.CONTINUE;
+			}
+		} );
+	}
+
+	private static void safeDelete(Path file) {
+		try {
+			Files.deleteIfExists( file );
+		}
+		catch (IOException e) {
+			log.fileDeleteFailureIgnored( e );
+		}
 	}
 
 	private static class RollbackWork implements Work {
