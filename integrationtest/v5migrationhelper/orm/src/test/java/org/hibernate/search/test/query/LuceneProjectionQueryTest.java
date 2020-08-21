@@ -6,34 +6,25 @@
  */
 package org.hibernate.search.test.query;
 
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +43,6 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.default.directory_provider", "local-heap" );
-		cfg.put( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 	}
 
 	@Before
@@ -73,9 +63,6 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		s.save( e4 );
 		Employee e5 = new Employee( 1004, "Whetbrook", "ITech" );
 		s.save( e5 );
-
-		s.persist( new CalendarDay().setDayFromItalianString( "01/04/2011" ) );
-		s.persist( new CalendarDay().setDayFromItalianString( "02/04/2011" ) );
 
 		tx.commit();
 		s.clear();
@@ -99,63 +86,6 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testProjectionOfThisFieldSelector() throws Exception {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( FullTextQuery.THIS );
-
-		resetFieldSelector();
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		assertFalse( result.isEmpty() );
-		assertFieldSelectorEnabled( "id" );
-
-		tx.commit();
-	}
-
-	@Test
-	public void testClassProjectionFieldSelector() throws Exception {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( FullTextQuery.OBJECT_CLASS );
-
-		resetFieldSelector();
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		assertFalse( result.isEmpty() );
-		assertFieldSelectorEnabled( ); // empty!
-
-		tx.commit();
-	}
-
-	@Test
-	public void testStoredFieldProjectionFieldSelector() throws Exception {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept" );
-
-		resetFieldSelector();
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		assertFalse( result.isEmpty() );
-		assertFieldSelectorEnabled( "lastname", "dept", "id" );
-
-		tx.commit();
-	}
-
-	@Test
 	public void testLuceneDocumentProjection() throws Exception {
 		FullTextSession s = Search.getFullTextSession( getSession() );
 		Transaction tx = s.beginTransaction();
@@ -175,25 +105,6 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testLuceneDocumentProjectionFieldSelector() throws Exception {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-		Query query = parser.parse( "dept:Accounting" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( FullTextQuery.DOCUMENT );
-
-		resetFieldSelector();
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		assertFalse( result.isEmpty() );
-		assertFieldSelectorDisabled(); //because of DOCUMENT being projected
-
-		tx.commit();
-	}
-
-	@Test
 	public void testLuceneDocumentIdProjection() throws Exception {
 		FullTextSession s = Search.getFullTextSession( getSession() );
 		Transaction tx = s.beginTransaction();
@@ -207,25 +118,6 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		assertNotNull( result );
 		Object[] projection = (Object[]) result.get( 0 );
 		assertTrue( "DOCUMENT_ID incorrect", projection[0] instanceof Integer );
-
-		tx.commit();
-	}
-
-	@Test
-	public void testLuceneDocumentIdProjectionFieldSelector() throws Exception {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( FullTextQuery.DOCUMENT_ID );
-
-		resetFieldSelector();
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		assertFalse( result.isEmpty() );
-		assertFieldSelectorDisabled(); //because of only DOCUMENT_ID being projected
 
 		tx.commit();
 	}
@@ -255,28 +147,10 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		tx.commit();
 	}
 
-	@Test
-	public void testProjectionUnmappedFieldValues() throws ParseException, IOException {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( new MatchAllDocsQuery(), CalendarDay.class );
-		hibQuery.setProjection( "day.year" );
-
-		resetFieldSelector();
-		List<?> result = hibQuery.list();
-		assertFieldSelectorEnabled( ); //empty: can't use one as the bridge we use mandates optimisations to be disabled
-		assertNotNull( result );
-		assertFalse( result.isEmpty() );
-
-		tx.commit();
-	}
-
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Employee.class,
-				CalendarDay.class
+				Employee.class
 		};
 	}
 
