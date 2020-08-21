@@ -21,6 +21,7 @@
     <description>Hibernate Search Legacy Modules Parent POM</description>
 
     <modules>
+        <module>testing-base</module>
         <module>legacy</module>
         <module>engine</module>
         <module>orm</module>

@@ -674,6 +674,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-testing-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-testing</artifactId>
                 <version>${project.version}</version>
             </dependency>

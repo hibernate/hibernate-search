@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.test.util;
 
-import org.hibernate.search.exception.AssertionFailure;
+import org.assertj.core.api.Assertions;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -35,7 +35,7 @@ public class JsonHelper {
 			JSONCompareResult result = JSONCompare.compareJSON( expectedJson, actualJson, mode );
 
 			if ( result.failed() ) {
-				throw new AssertionFailure( result.getMessage() + "; Actual: " + actualJson );
+				Assertions.fail( result.getMessage() + "; Actual: " + actualJson );
 			}
 		}
 		catch (JSONException e) {

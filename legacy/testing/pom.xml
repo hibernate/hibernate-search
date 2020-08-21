@@ -18,9 +18,13 @@
     <artifactId>hibernate-search-testing</artifactId>
 
     <name>Hibernate Search Testing</name>
-    <description>Hibernate Search Testing Utilities</description>
+    <description>Hibernate Search Testing Utilities - Engine</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-orm</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
@@ -32,19 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-testing</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
+            <artifactId>hibernate-search-testing-base</artifactId>
         </dependency>
     </dependencies>
     <build>
