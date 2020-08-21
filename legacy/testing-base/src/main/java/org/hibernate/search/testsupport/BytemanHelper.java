@@ -7,21 +7,24 @@
 
 package org.hibernate.search.testsupport;
 
+import static org.junit.Assert.fail;
+
+import java.lang.invoke.MethodHandles;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.byteman.rule.Rule;
-import org.jboss.byteman.rule.exception.ThrowException;
-import org.jboss.byteman.rule.helper.Helper;
+import org.hibernate.search.test.util.logging.Log;
+
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
-import static org.junit.Assert.fail;
+import org.jboss.byteman.rule.Rule;
+import org.jboss.byteman.rule.exception.ThrowException;
+import org.jboss.byteman.rule.helper.Helper;
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
@@ -29,7 +32,7 @@ import static org.junit.Assert.fail;
  */
 public class BytemanHelper extends Helper {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final BasicLogger log = Logger.getMessageLogger( Log.class, MethodHandles.lookup().lookupClass().getName() );
 
 	public static final String NAME = "org.hibernate.search.testsupport.BytemanHelper";
 

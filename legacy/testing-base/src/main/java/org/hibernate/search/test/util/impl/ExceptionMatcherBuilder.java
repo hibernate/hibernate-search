@@ -17,7 +17,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * @author Yoann Rodiere
@@ -234,7 +233,7 @@ public class ExceptionMatcherBuilder {
 		@Override
 		protected boolean matchesSafely(Throwable item, Description mismatchDescription) {
 			Throwable[] suppressedArray = item.getSuppressed();
-			List<Throwable> mainAndSuppressed = CollectionHelper.newArrayList( suppressedArray.length + 1 );
+			List<Throwable> mainAndSuppressed = new ArrayList<>( suppressedArray.length + 1 );
 			mainAndSuppressed.add( item );
 			for ( Throwable suppressed : suppressedArray ) {
 				mainAndSuppressed.add( suppressed );

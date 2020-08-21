@@ -7,8 +7,14 @@
 package org.hibernate.search.testsupport;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.hibernate.search.test.util.logging.Log;
+
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
@@ -16,9 +22,6 @@ import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
 
 /**
  * Collects static constants used across several tests.
@@ -32,7 +35,7 @@ public final class TestConstants {
 	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private static final BasicLogger log = Logger.getMessageLogger( Log.class, MethodHandles.lookup().lookupClass().getName() );
 	private static final CallerProvider callerProvider = new CallerProvider();
 
 	private TestConstants() {
