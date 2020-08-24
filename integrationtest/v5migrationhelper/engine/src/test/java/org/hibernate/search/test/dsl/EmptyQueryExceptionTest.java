@@ -9,12 +9,13 @@ package org.hibernate.search.test.dsl;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.exception.EmptyQueryException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -39,7 +40,7 @@ public class EmptyQueryExceptionTest {
 	@Test
 	@Category(SkipOnElasticsearch.class) // This isn't relevant when using Elasticsearch, since analysis is remote
 	public void verifyExceptionOnNonMeaningfullQueries() {
-		final ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
+		final SearchIntegrator searchFactory = sfHolder.getSearchFactory();
 
 		Book book = new Book();
 		book.title = "Empty Book";
@@ -49,7 +50,7 @@ public class EmptyQueryExceptionTest {
 
 		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity( Book.class ).get();
 
-		exceptions.expect( EmptyQueryException.class );
+		exceptions.expect( SearchException.class );
 
 		queryBuilder.keyword().onField( "text" ).matching( " " ).createQuery();
 		// Hence the answer is: a program won't be able to tell you.

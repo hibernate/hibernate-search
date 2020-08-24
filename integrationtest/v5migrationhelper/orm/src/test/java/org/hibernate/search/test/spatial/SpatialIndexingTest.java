@@ -23,7 +23,6 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -175,7 +174,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
-		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+		Sort distanceSort = builder.sort().byDistance().onField( "location" )
+				.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+				.createSort();
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
@@ -202,7 +203,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
-		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "name" ) );
+		Sort distanceSort = builder.sort().byDistance().onField( "name" )
+				.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+				.createSort();
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
@@ -227,7 +230,9 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
-		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+		Sort distanceSort = builder.sort().byDistance().onField( "location" )
+				.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+				.createSort();
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );

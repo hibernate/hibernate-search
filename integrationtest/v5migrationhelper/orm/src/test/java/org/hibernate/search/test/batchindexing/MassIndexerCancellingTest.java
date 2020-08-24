@@ -18,7 +18,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.logging.impl.Log;
@@ -74,13 +74,33 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 
 	}
 
-	class InnerIndexerProgressMonitor extends SimpleIndexingProgressMonitor {
+	class InnerIndexerProgressMonitor extends TracingProgressMonitor implements MassIndexerProgressMonitor {
 
 		public final List<Thread> threads = Collections.synchronizedList( new ArrayList<Thread>() );
 		private final AtomicInteger busyThreads = new AtomicInteger();
 
 		public InnerIndexerProgressMonitor() {
 			super();
+		}
+
+		@Override
+		public void entitiesLoaded(int increment) {
+			log.debugf( "entitiesLoaded(%d)", increment );
+		}
+
+		@Override
+		public void documentsAdded(long increment) {
+			log.debugf( "documentsAdded(%d)", increment );
+		}
+
+		@Override
+		public void addToTotalCount(long increment) {
+			log.debugf( "addToTotalCount(%d)", increment );
+		}
+
+		@Override
+		public void indexingCompleted() {
+			log.debug( "indexingCompleted()" );
 		}
 
 		@Override
@@ -121,7 +141,6 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 		public int getThreadNumber() {
 			return threads.size();
 		}
-
 	}
 
 	private int getIndexSize() {

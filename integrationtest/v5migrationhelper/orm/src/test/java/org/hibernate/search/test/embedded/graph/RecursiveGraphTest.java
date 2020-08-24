@@ -28,7 +28,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 		people[0] = parent;
 		people[1] = child;
 		savePeople( people );
-		assertEquals( 2, getNumberOfDocumentsInIndex( Person.class ) );
+		assertEquals( 2, getNumberOfDocumentsInIndex( "Person" ) );
 	}
 
 	private void connectChildToParent(Person child, Person parent) {

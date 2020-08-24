@@ -14,7 +14,6 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.spatial.DoubleIndexedPOI;
 import org.hibernate.search.test.spatial.POI;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -180,7 +179,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 						.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
-				Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+				Sort distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
@@ -198,7 +199,10 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				Assert.assertEquals( 22.239, (Double) fifthResult[1], 0.02 );
 				Assert.assertEquals( 24.446, (Double) sixthResult[1], 0.02 );
 
-				distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
+				distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.desc()
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				results = hibQuery.getResultList();
 				firstResult = (Object[]) results.get( 0 );
@@ -253,7 +257,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 						.createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
-				Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+				Sort distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				hibQuery.setMaxResults( 1000 );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
@@ -292,7 +298,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
-				Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+				Sort distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
@@ -302,7 +310,10 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
 				Assert.assertNull( secondResult[1] );
 
-				distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
+				distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.desc()
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				results = hibQuery.getResultList();
 				firstResult = (Object[]) results.get( 0 );
@@ -341,7 +352,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
-				Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+				Sort distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
@@ -351,7 +364,10 @@ public class SpatialQueryingJPATest extends JPATestCase {
 				Assert.assertEquals( 10.1582, (Double) firstResult[1], 0.01 );
 				Assert.assertNull( secondResult[1] );
 
-				distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location", true ) );
+				distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.desc()
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				results = hibQuery.getResultList();
 				firstResult = (Object[]) results.get( 0 );
@@ -396,7 +412,9 @@ public class SpatialQueryingJPATest extends JPATestCase {
 						.andLongitude( centerLongitude ).createQuery();
 
 				FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
-				Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+				Sort distanceSort = builder.sort().byDistance().onField( "location" )
+						.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+						.createSort();
 				hibQuery.setSort( distanceSort );
 				hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 				// Set max results to 3 when 6 documents are stored:

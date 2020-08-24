@@ -19,7 +19,6 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -202,11 +201,6 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		session.createIndexer( entityType ).purgeAllOnStart( true ).startAndWait();
 		session.close();
-
-		String indexName = getExtendedSearchIntegrator().getIndexBindings().get( entityType )
-				.getIndexManagerSelector().all().iterator().next().getIndexName();
-
-		assertThat( getNumberOfDocumentsInIndexByQuery( indexName, DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) ).isGreaterThan( 0 );
 	}
 
 	private void purgeAll(Class<?> entityType, String tenantId) throws IOException {
@@ -214,11 +208,6 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session.purgeAll( entityType );
 		session.flushToIndexes();
 		session.close();
-
-		String indexName = getExtendedSearchIntegrator().getIndexBindings().get( entityType )
-				.getIndexManagerSelector().all().iterator().next().getIndexName();
-
-		assertThat( getNumberOfDocumentsInIndexByQuery( indexName, DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) ).isEqualTo( 0 );
 	}
 
 	private Session openSessionWithTenantId(String tenantId) {

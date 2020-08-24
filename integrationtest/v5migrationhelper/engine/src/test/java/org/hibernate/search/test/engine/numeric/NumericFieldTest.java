@@ -26,12 +26,13 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor.Type;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
+import org.hibernate.search.query.dsl.RangeMatchingContext;
+import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
@@ -101,7 +102,8 @@ public class NumericFieldTest {
 	@TestForIssue(jiraKey = "HSEARCH-1193")
 	@Test
 	public void testNumericFieldProjections() {
-		Query latitudeQuery = NumericFieldUtils.createNumericRangeQuery( "latitude", -20d, -20d, true, true );
+		Query latitudeQuery = helper.queryBuilder( Location.class ).range().onField( "latitude" )
+				.from( -20d ).to( -20d ).createQuery();
 		helper.assertThat( latitudeQuery ).from( Location.class )
 				.projecting( "latitude" )
 				.matchesExactlySingleProjections( -20d );
@@ -141,17 +143,31 @@ public class NumericFieldTest {
 	}
 
 	private AssertBuildingHSQueryContext assertExactQuery(String fieldName, Object value) {
-		Query matchQuery = NumericFieldUtils.createExactMatchQuery( fieldName, value );
+		Query matchQuery = helper.queryBuilder( Location.class ).keyword().onField( fieldName )
+				.matching( value )
+				.createQuery();
 		return helper.assertThat( matchQuery ).from( Location.class );
 	}
 
 	private AssertBuildingHSQueryContext assertRangeQuery(String fieldName, Object from, Object to) {
-		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, true, true );
+		Query query = helper.queryBuilder( Location.class ).range().onField( fieldName )
+				.from( from ).to( to )
+				.createQuery();
 		return helper.assertThat( query ).from( Location.class );
 	}
 
 	private AssertBuildingHSQueryContext assertRangeQuery(String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
-		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, includeLower, includeUpper );
+		RangeMatchingContext.FromRangeContext<Object> fromContext = helper.queryBuilder(
+				Location.class ).range().onField( fieldName )
+				.from( from );
+		if ( !includeLower ) {
+			fromContext = fromContext.excludeLimit();
+		}
+		RangeTerminationExcludable toContext = fromContext.to( to );
+		if ( !includeUpper ) {
+			toContext = toContext.excludeLimit();
+		}
+		Query query = toContext.createQuery();
 		return helper.assertThat( query ).from( Location.class );
 	}
 

@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.Indexed;
 @Cacheable(true)
 @Cache( usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE )
 @Indexed
+// TODO HSEARCH-3282 add routing bridge to enable/disable indexing on-demand
 public class Kernel {
 
 	@Id
