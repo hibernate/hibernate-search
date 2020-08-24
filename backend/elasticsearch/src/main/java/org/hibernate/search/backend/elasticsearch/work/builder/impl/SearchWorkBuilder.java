@@ -30,4 +30,6 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkab
 	SearchWorkBuilder<R> timeout(ElasticsearchTimeoutManager timeoutManager);
 
 	SearchWorkBuilder<R> disableTrackTotalHits();
+
+	SearchWorkBuilder<R> totalHitCountMinimum(Integer totalHitCountMinimum);
 }
