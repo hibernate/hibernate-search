@@ -54,4 +54,12 @@ public class SimpleSearchResultTotal implements SearchResultTotal {
 	public long hitCountLowerBound() {
 		return totalHitCount;
 	}
+
+	@Override
+	public String toString() {
+		return "SimpleSearchResultTotal{" +
+				"totalHitCount=" + totalHitCount +
+				", isExact=" + isExact +
+				'}';
+	}
 }

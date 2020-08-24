@@ -22,6 +22,8 @@ import org.hibernate.search.backend.elasticsearch.search.timeout.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -38,6 +40,9 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	private static final JsonAccessor<Long> HITS_TOTAL_ACCESSOR =
 			HITS_ACCESSOR.property( "total" ).property( "value" ).asLong();
 
+	private static final JsonAccessor<String> HITS_TOTAL_RELATION_ACCESSOR =
+			HITS_ACCESSOR.property( "total" ).property( "relation" ).asString();
+
 	private static final JsonObjectAccessor AGGREGATIONS_ACCESSOR =
 			JsonAccessor.root().property( "aggregations" ).asObject();
 
@@ -49,6 +54,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 
 	private static final JsonAccessor<String> SCROLL_ID_ACCESSOR =
 			JsonAccessor.root().property( "_scroll_id" ).asString();
+
+	private static final String HITS_TOTAL_RELATION_EXACT_VALUE = "eq";
 
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 
@@ -71,8 +78,8 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				responseBody
 		);
 
-		Optional<Long> hitCount = extractHitCount( responseBody );
-		List<Object> extractedHits = ( !hitCount.isPresent() || hitCount.get() > 0 ) ?
+		SearchResultTotal total = extractTotal( responseBody );
+		List<Object> extractedHits = ( total.isHitCountLowerBound() || total.hitCount() > 0 ) ?
 				extractHits( extractContext ) : Collections.emptyList();
 
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
@@ -86,7 +93,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
 				rootProjection,
-				hitCount.orElse( 0L ),
+				total,
 				extractedHits,
 				extractedAggregations,
 				took, timedOut, scrollId,
@@ -94,8 +101,12 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		);
 	}
 
-	protected Optional<Long> extractHitCount(JsonObject responseBody) {
-		return HITS_TOTAL_ACCESSOR.get( responseBody );
+	protected SearchResultTotal extractTotal(JsonObject responseBody) {
+		Long hitsTotal = HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
+		Optional<String> hitsTotalRelation = HITS_TOTAL_RELATION_ACCESSOR.get( responseBody );
+
+		return ( hitsTotalRelation.isPresent() && HITS_TOTAL_RELATION_EXACT_VALUE.equals( hitsTotalRelation.get() ) ) ?
+				SimpleSearchResultTotal.exact( hitsTotal ) : SimpleSearchResultTotal.lowerBound( hitsTotal );
 	}
 
 	private List<Object> extractHits(ElasticsearchSearchQueryExtractContext extractContext) {

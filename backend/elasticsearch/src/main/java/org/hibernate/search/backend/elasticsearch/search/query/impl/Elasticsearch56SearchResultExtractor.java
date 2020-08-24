@@ -13,6 +13,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 
 import com.google.gson.JsonObject;
 
@@ -37,8 +39,11 @@ class Elasticsearch56SearchResultExtractor<H> extends Elasticsearch7SearchResult
 	}
 
 	@Override
-	protected Optional<Long> extractHitCount(JsonObject responseBody) {
-		return HITS_TOTAL_ACCESSOR.get( responseBody );
+	protected SearchResultTotal extractTotal(JsonObject responseBody) {
+		Optional<Long> hitsTotal = HITS_TOTAL_ACCESSOR.get( responseBody );
+
+		return ( hitsTotal.isPresent() ) ? SimpleSearchResultTotal.exact( hitsTotal.get() ) :
+				SimpleSearchResultTotal.lowerBound( 0L );
 	}
 
 }
