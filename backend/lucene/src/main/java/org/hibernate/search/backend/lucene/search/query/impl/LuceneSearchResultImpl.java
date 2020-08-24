@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
 import org.apache.lucene.search.TopDocs;
@@ -21,11 +22,9 @@ class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 
 	private final TopDocs topDocs;
 
-	LuceneSearchResultImpl(Long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
+	LuceneSearchResultImpl(SearchResultTotal resultTotal, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
 			Duration took, Boolean timedOut, TopDocs topDocs) {
-		// TODO HSEARCH-3517 Use #lowerBound if the total hits relation is GE
-		// hitCount is null in case of fetchHits
-		super( hitCount != null, ( hitCount != null ) ? hitCount : 0L, hits, aggregationResults, took, timedOut );
+		super( resultTotal, hits, aggregationResults, took, timedOut );
 		this.topDocs = topDocs;
 	}
 
