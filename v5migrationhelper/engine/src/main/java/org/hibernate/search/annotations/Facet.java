@@ -36,9 +36,4 @@ public @interface Facet {
 	 */
 	String forField() default "";
 
-	/**
-	 * @return the encoding type to use for this facet. Per default the encoding type is chosen based on the type of the
-	 * entity property.
-	 */
-	FacetEncodingType encoding() default FacetEncodingType.AUTO;
 }
