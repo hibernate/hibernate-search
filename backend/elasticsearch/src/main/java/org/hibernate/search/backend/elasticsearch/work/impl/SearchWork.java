@@ -78,6 +78,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
 		private Boolean trackTotalHits;
+		private Integer totalHitCountMinimum;
 		private Integer from;
 		private Integer size;
 		private Integer scrollSize;
@@ -137,6 +138,16 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		@Override
+		public SearchWorkBuilder<R> totalHitCountMinimum(Integer totalHitCountMinimum) {
+			// setting trackTotalHits to false only if this parameter was already set,
+			// the parameter is not supported by the older Elasticsearch server
+			if ( trackTotalHits != null && trackTotalHits ) {
+				this.totalHitCountMinimum = totalHitCountMinimum;
+			}
+			return this;
+		}
+
+		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
@@ -162,7 +173,13 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			}
 
 			if ( trackTotalHits != null ) {
-				builder.param( "track_total_hits", trackTotalHits );
+				if ( trackTotalHits && totalHitCountMinimum != null ) {
+					// total hits is tracked but a with a limited precision
+					builder.param( "track_total_hits", totalHitCountMinimum );
+				}
+				else {
+					builder.param( "track_total_hits", trackTotalHits );
+				}
 			}
 
 			if ( timeoutManager.defined() ) {

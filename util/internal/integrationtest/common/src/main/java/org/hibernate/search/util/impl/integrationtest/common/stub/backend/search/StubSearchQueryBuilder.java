@@ -59,6 +59,11 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	}
 
 	@Override
+	public void totalHitCountMinimum(int totalHitCountMinimum) {
+		// TODO HSEARCH-3517 implement it to test mappers
+	}
+
+	@Override
 	public SearchQuery<H> build() {
 		return new StubSearchQuery<>(
 				backend, scopeModel.getIndexNames(), workBuilder, projectionContext,

@@ -108,7 +108,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	@Override
 	public S totalHitCountMinimum(int totalHitCountMinimum) {
-		// TODO HSEARCH-3517 Support this
+		searchQueryBuilder.totalHitCountMinimum( totalHitCountMinimum );
 		return thisAsS();
 	}
 

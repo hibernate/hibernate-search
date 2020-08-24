@@ -114,6 +114,11 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
+	public void totalHitCountMinimum(int totalHitCountMinimum) {
+		// TODO HSEARCH-3517 support the feature with Lucene
+	}
+
+	@Override
 	public void collectPredicate(Query luceneQuery) {
 		this.luceneQuery = luceneQuery;
 	}
