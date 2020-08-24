@@ -31,11 +31,4 @@ public final class LoggerFactory {
 		return Logger.getMessageLogger( logClass, className );
 	}
 
-	public static Log make(LogCategory category) {
-		return make( Log.class, category );
-	}
-
-	public static <T> T make(Class<T> logClass, LogCategory category) {
-		return Logger.getMessageLogger( logClass, category.getName() );
-	}
 }

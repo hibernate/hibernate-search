@@ -6,13 +6,6 @@
  */
 package org.hibernate.search.engine.spi;
 
-import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.indexes.spi.IndexManagerSelector;
-import org.hibernate.search.indexes.spi.IndexManagerType;
-import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.store.ShardIdentifierProvider;
-
 /**
  * Specifies the relation and options from an indexed entity to its index(es).
  *
@@ -21,40 +14,4 @@ import org.hibernate.search.store.ShardIdentifierProvider;
  */
 public interface EntityIndexBinding {
 
-	/**
-	 * @return the {@code Similarity} used to search and index this entity
-	 */
-	Similarity getSimilarity();
-
-	/**
-	 * @return the index manager selector
-	 */
-	IndexManagerSelector getIndexManagerSelector();
-
-	/**
-	 * @return the shard identifier provider. Can be {@code null} depending on selected {@code IndexShardingStrategy}.
-	 */
-	ShardIdentifierProvider getShardIdentifierProvider();
-
-	/**
-	 * @return the document builder for this binding
-	 */
-	DocumentBuilderIndexedEntity getDocumentBuilder();
-
-	/**
-	 * Called once during bootstrapping
-	 *
-	 * @param indexedClasses set of indexed classes
-	 */
-	void postInitialize(IndexedTypeSet indexedClasses);
-
-	/**
-	 * @return the type of index managers
-	 */
-	IndexManagerType getIndexManagerType();
-
-	/**
-	 * @return the interceptor for indexing operations. Can be {@code null}
-	 */
-	EntityIndexingInterceptor getEntityIndexingInterceptor();
 }

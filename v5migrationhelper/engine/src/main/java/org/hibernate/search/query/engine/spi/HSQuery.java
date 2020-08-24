@@ -12,7 +12,6 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.IndexedTypeSet;
@@ -210,15 +209,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * @param name the name of the filter to disable.
 	 */
 	void disableFullTextFilter(String name);
-
-	/**
-	 * <p>getExtendedSearchIntegrator.</p>
-	 *
-	 * @return the {@code ExtendedSearchIntegrator} instance
-	 * @deprecated should be at most SearchIntegrator, preferably removed altogether
-	 */
-	@Deprecated
-	ExtendedSearchIntegrator getExtendedSearchIntegrator();
 
 	/**
 	 * <p>afterDeserialise.</p>
