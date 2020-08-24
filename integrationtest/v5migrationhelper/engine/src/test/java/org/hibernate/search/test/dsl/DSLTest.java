@@ -28,7 +28,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
 import org.hamcrest.CoreMatchers;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.Environment;

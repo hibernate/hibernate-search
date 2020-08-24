@@ -11,11 +11,9 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -26,8 +24,8 @@ public class AlternateBook {
 
 	@Id
 	@DocumentId
+	@Field
 	@SortableField
-	@FieldBridge(impl = PaddedIntegerBridge.class)
 	private Integer id;
 
 	@Field(store = Store.YES)

@@ -81,7 +81,7 @@ public class BridgeTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -163,7 +163,7 @@ public class BridgeTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", TestConstants.simpleAnalyzer );
+		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.simpleAnalyzer );
 		Query query;
 		List result;
 

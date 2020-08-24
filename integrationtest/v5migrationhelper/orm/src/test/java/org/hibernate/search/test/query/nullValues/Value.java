@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.Store;
 @Indexed
 public class Value {
 	@Id
+	@Field(store = Store.YES)
 	@GeneratedValue
 	private int id;
 

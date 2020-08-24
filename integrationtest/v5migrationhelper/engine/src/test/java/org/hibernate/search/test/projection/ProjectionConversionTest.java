@@ -94,11 +94,6 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	public void projectingIdByPropertyName() {
-		projectionTestHelper( "id", Long.valueOf( 1L ) );
-	}
-
-	@Test
 	public void projectingIdOnOverloadedMapping() {
 		projectionTestHelper( "stringTypedId", Long.valueOf( 1L ) );
 	}

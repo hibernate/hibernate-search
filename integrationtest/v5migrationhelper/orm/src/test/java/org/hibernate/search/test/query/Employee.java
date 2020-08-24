@@ -15,13 +15,11 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
  * @author John Griffin
@@ -56,7 +54,7 @@ public class Employee {
 
 	@Id
 	@DocumentId
-	@FieldBridge(impl = PaddedIntegerBridge.class) // test needs to sort on the id
+	@Field(store = Store.YES)
 	@SortableField
 	public Integer getId() {
 		return id;

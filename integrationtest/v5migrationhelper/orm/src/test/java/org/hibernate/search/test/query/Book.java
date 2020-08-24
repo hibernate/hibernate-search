@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
@@ -27,7 +28,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -83,22 +83,27 @@ public class Book {
 
 	@Id
 	@DocumentId
+	@Field(store = Store.YES)
 	@Field(
 		name = "id_forIntegerSort",
 		store = Store.NO,
 		index = Index.NO
 	)
 	@NumericField
-	@SortableFields({
-			@SortableField(forField = "id"),
-			@SortableField(forField = "id_forIntegerSort")
-	})
+	@SortableField(forField = "id_forIntegerSort")
 	public Integer getId() {
 		return id;
 	}
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	@Transient
+	@Field(name = "id_forStringSort", analyze = Analyze.NO)
+	@SortableField(forField = "id_forStringSort")
+	public String getIdAsString() {
+		return String.valueOf( id );
 	}
 
 	@Fields({
