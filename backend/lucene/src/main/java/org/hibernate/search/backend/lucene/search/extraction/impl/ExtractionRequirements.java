@@ -60,10 +60,7 @@ public final class ExtractionRequirements {
 		if ( maxDocs > 0 ) {
 			if ( sort == null ) {
 				topDocsCollector = TopScoreDocCollector.create(
-						maxDocs,
-						// TODO HSEARCH-3517 Change how we combine collectors,
-						// as MultiCollector explicitly ignores the total hit count optimization
-						( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
+						maxDocs, ( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
 				);
 			}
 			else {
@@ -76,11 +73,7 @@ public final class ExtractionRequirements {
 					scoreSortFieldIndexForRescoring = getScoreSortFieldIndexOrNull( sort );
 				}
 				topDocsCollector = TopFieldCollector.create(
-						sort,
-						maxDocs,
-						// TODO HSEARCH-3517 Change how we combine collectors,
-						// as MultiCollector explicitly ignores the total hit count optimization
-						( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
+						sort, maxDocs, ( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
 				);
 			}
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
