@@ -9,7 +9,6 @@ package org.hibernate.search.test.dsl;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
 /**
@@ -27,7 +26,7 @@ class CoffeeBrand {
 	public void setName(String name) { this.name = name; }
 	private String name;
 
-	@Field(termVector = TermVector.NO, store = Store.COMPRESS)
+	@Field(termVector = TermVector.NO)
 	public String getDescription() { return description; }
 	public void setDescription(String description) { this.description = description; }
 	private String description;
