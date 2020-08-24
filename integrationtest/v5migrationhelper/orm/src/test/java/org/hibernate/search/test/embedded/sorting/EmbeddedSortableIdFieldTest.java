@@ -65,34 +65,13 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testEntityCanSortOnId() {
-		try ( Session session = openSession() ) {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			Transaction transaction = fullTextSession.beginTransaction();
-
-			Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
-
-			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Villain.class ).get();
-			Query q = queryBuilder.keyword().onField( "name" ).matching( LEX ).createQuery();
-			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q, Villain.class );
-			fullTextQuery.setSort( sort );
-			List list = fullTextQuery.list();
-			assertThat( list ).hasSize( 1 );
-
-			Villain actual = (Villain) list.get( 0 );
-			assertThat( actual.getName() ).isEqualTo( LEX );
-			transaction.commit();
-		}
-	}
-
-	@Test
 	public void testSortingOnSortableFieldIncludedByIndexEmbedded() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			Transaction transaction = fullTextSession.beginTransaction();
 
 			// This should be of type Integer
-			Sort sort = new Sort( new SortField( "sortableVillain.id", SortField.Type.STRING ) );
+			Sort sort = new Sort( new SortField( "sortableVillain.id_sort", SortField.Type.STRING ) );
 
 			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
 			Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();
@@ -117,7 +96,7 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
 			Transaction transaction = fullTextSession.beginTransaction();
 
-			Sort sort = new Sort( new SortField( "villain.id", SortField.Type.STRING ) );
+			Sort sort = new Sort( new SortField( "villain.id_sort", SortField.Type.STRING ) );
 
 			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
 			Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();

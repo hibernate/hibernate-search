@@ -17,6 +17,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.cache.CachingRegionFactory;
@@ -58,7 +59,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 		assertEquals(
 				1,
-				fts.createFullTextQuery( new TermQuery( new Term( "uid", Long.toString( uid1 ) ) ), Entity1ForDoc0.class ).getResultSize()
+				fts.createFullTextQuery( NumericFieldUtils.createExactMatchQuery( "uid_field", uid1 ), Entity1ForDoc0.class ).getResultSize()
 		);
 		assertEquals(
 				1,

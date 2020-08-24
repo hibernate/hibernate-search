@@ -8,9 +8,6 @@ package org.hibernate.search.test.embedded.polymorphism.uninitializedproxy;
 
 import java.util.List;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -18,6 +15,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
@@ -109,8 +107,9 @@ public class SearchAfterUninitializedProxyEntityLoadingTest extends SearchTestBa
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
 		Transaction tx = fullTextSession.beginTransaction();
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( clazz ).get();
 		FullTextQuery query = fullTextSession.createFullTextQuery(
-				new TermQuery( new Term( "id", entityId.toString() ) ), clazz );
+				qb.keyword().onField( "id" ).matching( entityId ).createQuery(), clazz );
 
 		List<T> result = query.list();
 		tx.commit();

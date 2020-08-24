@@ -29,6 +29,7 @@ import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 @Indexed
 public class POI {
 	@Id
+	@Field(store = Store.YES)
 	@Field(name = "idSort")
 	@SortableField(forField = "idSort")
 	Integer id;

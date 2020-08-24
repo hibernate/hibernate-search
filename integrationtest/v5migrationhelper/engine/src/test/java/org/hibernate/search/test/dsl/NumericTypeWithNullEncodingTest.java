@@ -10,6 +10,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -112,6 +113,7 @@ public class NumericTypeWithNullEncodingTest {
 	@Indexed
 	public static class SomeEntity {
 		@DocumentId
+		@Field(store = Store.YES)
 		String title;
 
 		@Field(indexNullAs = Field.DEFAULT_NULL_TOKEN)

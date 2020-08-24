@@ -118,30 +118,6 @@ public class NumericFieldTest {
 				} );
 	}
 
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-997")
-	public void testShortDocumentIdExplicitlyMappedAsNumericField() {
-		Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (short) 1, (short) 1, true, true );
-		helper.assertThat( query ).from( Coordinate.class )
-				.matchesExactlyIds( (short) 1 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-997")
-	public void testByteDocumentIdExplicitlyMappedAsNumericField() {
-		Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (byte) 1, (byte) 1, true, true );
-		helper.assertThat( query ).from( PointOfInterest.class )
-				.matchesExactlyIds( (byte) 1 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-997")
-	public void testByteDocumentIdMappedAsStringFieldByDefault() {
-		Query query = TermRangeQuery.newStringRange( "id", "1", "1", true, true );
-		helper.assertThat( query ).from( Position.class )
-				.matchesExactlyIds( (byte) 1 );
-	}
-
 	private AssertBuildingHSQueryContext assertExactQuery(String fieldName, Object value) {
 		Query matchQuery = helper.queryBuilder( Location.class ).keyword().onField( fieldName )
 				.matching( value )

@@ -363,6 +363,7 @@ public class SortingTest {
 		public static final String TOKENIZING_ANALYZER_NAME = "org_hibernate_search_test_sorting_SortingTest_Person_tokenizingAnalyzer";
 
 		@DocumentId
+		@Field
 		final int id;
 
 		@SortableFields({

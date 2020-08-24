@@ -53,7 +53,7 @@ public class EmbeddedTest extends SearchTestBase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -120,7 +120,7 @@ public class EmbeddedTest extends SearchTestBase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -157,7 +157,7 @@ public class EmbeddedTest extends SearchTestBase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -195,7 +195,7 @@ public class EmbeddedTest extends SearchTestBase {
 		s.clear();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 

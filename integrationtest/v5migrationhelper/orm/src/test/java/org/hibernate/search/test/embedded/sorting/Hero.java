@@ -30,7 +30,7 @@ class Hero {
 	private Villain villain;
 
 	@OneToOne(mappedBy = "hero")
-	@IndexedEmbedded(includePaths = { "id", "name" })
+	@IndexedEmbedded(includePaths = { "id_sort", "name" })
 	private Villain sortableVillain;
 
 	public Hero() {

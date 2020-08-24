@@ -11,12 +11,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Field;
+
 @Entity
 @Cacheable
 public abstract class AbstractEntity {
 
 	@Id
 	@GeneratedValue
+	@Field
 	private Integer id;
 
 	public AbstractEntity() {
