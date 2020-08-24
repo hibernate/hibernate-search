@@ -45,7 +45,7 @@ public final class ExtractionRequirements {
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
 			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager,
-			boolean skipTotalHitCount)
+			boolean skipTotalHitCount, Integer totalHitCountMinimum)
 			throws IOException {
 		TopDocsCollector<?> topDocsCollector;
 		Integer scoreSortFieldIndexForRescoring = null;
@@ -57,10 +57,13 @@ public final class ExtractionRequirements {
 		CollectorSet.Builder collectorsForAllMatchingDocsBuilder =
 				new CollectorSet.Builder( executionContext, timeoutManager );
 
+		int totalHitsThreshold = ( skipTotalHitCount ) ? 0 :
+				( totalHitCountMinimum == null ) ? Integer.MAX_VALUE : totalHitCountMinimum;
+
 		if ( maxDocs > 0 ) {
 			if ( sort == null ) {
 				topDocsCollector = TopScoreDocCollector.create(
-						maxDocs, ( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
+						maxDocs, totalHitsThreshold
 				);
 			}
 			else {
@@ -73,13 +76,13 @@ public final class ExtractionRequirements {
 					scoreSortFieldIndexForRescoring = getScoreSortFieldIndexOrNull( sort );
 				}
 				topDocsCollector = TopFieldCollector.create(
-						sort, maxDocs, ( skipTotalHitCount ) ? 0 : Integer.MAX_VALUE
+						sort, maxDocs, totalHitsThreshold
 				);
 			}
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
 		}
 
-		if ( !skipTotalHitCount ) {
+		if ( !skipTotalHitCount && totalHitCountMinimum == null ) {
 			TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollector );
 		}

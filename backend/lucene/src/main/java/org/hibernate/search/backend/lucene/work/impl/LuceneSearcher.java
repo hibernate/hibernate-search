@@ -18,7 +18,7 @@ import org.apache.lucene.search.Query;
 public interface LuceneSearcher<R, ER> {
 
 	R search(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit, boolean skipTotalHitCount) throws IOException;
+			int offset, Integer limit, boolean skipTotalHitCount, Integer totalHitCountMinimum) throws IOException;
 
 	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver, int limit) throws IOException;
 
