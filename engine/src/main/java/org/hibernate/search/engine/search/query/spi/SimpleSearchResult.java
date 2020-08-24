@@ -22,17 +22,22 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final boolean hitExact;
-	private final long hitCount;
+	private final SearchResultTotal resultTotal;
 	private final List<H> hits;
 	private final Map<AggregationKey<?>, ?> aggregationResults;
 	private final Duration took;
 	private final boolean timedOut;
 
-	public SimpleSearchResult(boolean hitExact, long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
+	public SimpleSearchResult(boolean hitExact, long hitCount, List<H> hits,
+			Map<AggregationKey<?>, ?> aggregationResults, Duration took, Boolean timedOut) {
+		this( ( hitExact ) ? SimpleSearchResultTotal.exact( hitCount ) : SimpleSearchResultTotal.lowerBound( hitCount ),
+				hits, aggregationResults, took, timedOut
+		);
+	}
+
+	public SimpleSearchResult(SearchResultTotal resultTotal, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
 			Duration took, Boolean timedOut) {
-		this.hitExact = hitExact;
-		this.hitCount = hitCount;
+		this.resultTotal = resultTotal;
 		this.hits = hits;
 		this.aggregationResults = aggregationResults;
 		this.took = took;
@@ -41,8 +46,7 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 
 	@Override
 	public SearchResultTotal total() {
-		return ( hitExact ) ? SimpleSearchResultTotal.exact( hitCount ) :
-				SimpleSearchResultTotal.lowerBound( hitCount );
+		return resultTotal;
 	}
 
 	@Override
@@ -73,7 +77,7 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	@Override
 	public String toString() {
 		return new StringJoiner( ", ", SimpleSearchResult.class.getSimpleName() + "[", "]" )
-				.add( "hitCount=" + hitCount )
+				.add( "resultTotal=" + resultTotal )
 				.add( "hits=" + hits )
 				.add( "aggregationResults=" + aggregationResults )
 				.add( "took=" + took )

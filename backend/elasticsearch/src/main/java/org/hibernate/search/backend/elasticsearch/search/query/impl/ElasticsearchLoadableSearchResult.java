@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
@@ -33,7 +34,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final ElasticsearchSearchQueryExtractContext extractContext;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
-	private final long hitCount;
+	private final SearchResultTotal resultTotal;
 	private List<Object> extractedHits;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
 	private final Integer took;
@@ -44,14 +45,14 @@ public class ElasticsearchLoadableSearchResult<H> {
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
-			long hitCount,
+			SearchResultTotal resultTotal,
 			List<Object> extractedHits,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			Integer took, Boolean timedOut, String scrollId,
 			ElasticsearchTimeoutManager timeoutManager) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
-		this.hitCount = hitCount;
+		this.resultTotal = resultTotal;
 		this.extractedHits = extractedHits;
 		this.extractedAggregations = extractedAggregations;
 		this.took = took;
@@ -98,7 +99,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 
 		return new ElasticsearchSearchResultImpl<>(
 				extractContext.getResponseBody(),
-				hitCount, loadedHits, extractedAggregations,
+				resultTotal, loadedHits, extractedAggregations,
 				took, timedOut, scrollId );
 	}
 
