@@ -68,7 +68,10 @@ public class CollectorSet {
 			}
 
 			Collector composed = wrapTimeLimitingCollectorIfNecessary(
-					MultiCollector.wrap( components.values() ),
+					// avoid to use a multi collector if we have just one collector,
+					// as MultiCollector explicitly ignores the total hit count optimization
+					( components.size() == 1 ) ? components.values().iterator().next() :
+							MultiCollector.wrap( components.values() ),
 					timeoutManager
 			);
 
