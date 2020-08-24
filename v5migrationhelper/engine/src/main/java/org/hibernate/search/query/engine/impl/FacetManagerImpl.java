@@ -37,9 +37,9 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The query from which this manager was retrieved
 	 */
-	private final AbstractHSQuery query;
+	private final Object query;
 
-	public FacetManagerImpl(AbstractHSQuery query) {
+	public FacetManagerImpl(Object query) {
 		this.query = query;
 	}
 
@@ -78,7 +78,8 @@ public class FacetManagerImpl implements FacetManager {
 		if ( facets != null ) {
 			return facets;
 		}
-		query.extractFacetResults();
+		// TODO HSEARCH-3282 request aggregation results (potentially cached) from query
+		//query.extractFacetResults();
 		//handle edge case of an empty index
 		if ( facetResults == null ) {
 			return Collections.emptyList();
@@ -102,7 +103,8 @@ public class FacetManagerImpl implements FacetManager {
 
 	void facetsHaveChanged() {
 		this.facetResults = null;
-		query.clearCachedResults();
+		// TODO HSEARCH-3282 clear cached aggregation results from query
+		//query.clearCachedResults();
 	}
 
 }

@@ -19,16 +19,9 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
 public interface IndexedTypeDescriptor extends FieldContributor {
 
 	/**
-	 * @deprecated Use {@link #getIndexedType()} instead. This method will be removed.
 	 * @return the type for which this descriptor provides meta information
 	 */
-	@Deprecated
 	Class<?> getType();
-
-	/**
-	 * @return the type for which this descriptor provides meta information
-	 */
-	IndexedTypeIdentifier getIndexedType();
 
 	/**
 	 * @return {@code true} if the type for this descriptor is indexed, {@code false} otherwise

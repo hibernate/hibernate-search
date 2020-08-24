@@ -6,20 +6,11 @@
  */
 package org.hibernate.search.spi;
 
-import java.util.function.Predicate;
-
-import org.hibernate.search.backend.spi.BatchBackend;
-import org.hibernate.search.backend.spi.OperationDispatcher;
-import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexFamily;
 import org.hibernate.search.indexes.IndexFamilyType;
 import org.hibernate.search.indexes.IndexReaderAccessor;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -134,18 +125,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	Analyzer getAnalyzer(String name);
 
 	/**
-	 * Retrieves the scoped analyzer for a given indexed type.
-	 *
-	 * @param typeId The indexed type identifier for which to retrieve the analyzer.
-	 *
-	 * @return The scoped analyzer for the specified class.
-	 *
-	 * @throws IllegalArgumentException in case {@code clazz == null} or the specified
-	 * class is not an indexed entity.
-	 */
-	Analyzer getAnalyzer(IndexedTypeIdentifier typeId);
-
-	/**
 	 * @return return a query builder providing a fluent API to create Lucene queries
 	 */
 	QueryContextBuilder buildQueryBuilder();
@@ -184,28 +163,6 @@ public interface SearchIntegrator extends AutoCloseable {
 	IndexedTypeSet getIndexedTypeIdentifiers();
 
 	/**
-	 * Unwraps some internal Hibernate Search types.
-	 * Currently, no public type is accessible. This method should not be used by users.
-	 * @param <T> the type of the unwrapped object
-	 * @param cls the class of the internal object to unwrap
-	 * @return the unwrapped object
-	 */
-	<T> T unwrap(Class<T> cls);
-
-	/**
-	 * Returns the service manager.
-	 *
-	 * @return Returns the service manager.
-	 */
-	ServiceManager getServiceManager();
-
-	/**
-	 * The Worker is the entry point to apply writes and updates to the indexes.
-	 * @return the {@link Worker}
-	 */
-	Worker getWorker();
-
-	/**
 	 * Shuts down all workers and releases all resources.
 	 */
 	@Override
@@ -217,35 +174,5 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return the selected {@link IndexFamily}, or null if it doesn't exist
 	 */
 	IndexFamily getIndexFamily(IndexFamilyType indexFamilyType);
-
-	/**
-	 * Get an {@link IndexManager} using the name
-	 * @param indexName the name of the {@link IndexManager}
-	 * @return the selected {@link IndexManager}
-	 */
-	IndexManager getIndexManager(String indexName);
-
-	/**
-	 * @return the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
-	 */
-	IndexingMode getIndexingMode();
-
-	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
-
-	LuceneWorkSerializer getWorkSerializer();
-
-	/**
-	 * @param indexManagerFilter A predicate allowing to exclude index managers from
-	 * dispatching. Works will not be applied to these index managers.
-	 * @return An operation dispatcher allowing to insert works retrieved from
-	 * remote sources (e.g. JMS or JGroups slaves), but only for index managers
-	 * verifying the given predicate.
-	 * This allows JMS or JGroups integrations to perform checks on index managers that
-	 * wouldn't exist before the dispatch, in the case of dynamic sharding in particular.
-	 *
-	 * @hsearch.experimental Operation dispatchers are under active development.
-	 * You should be prepared for incompatible changes in future releases.
-	 */
-	OperationDispatcher createRemoteOperationDispatcher(Predicate<IndexManager> indexManagerFilter);
 
 }

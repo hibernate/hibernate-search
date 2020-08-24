@@ -8,7 +8,6 @@
 package org.hibernate.search.query.engine;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 
 /**
  * Represent a timeout during a Fulltext search in the HSQuery.
@@ -21,19 +20,8 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  */
 public class QueryTimeoutException extends SearchException {
 
-	public static final TimeoutExceptionFactory DEFAULT_TIMEOUT_EXCEPTION_FACTORY = new DefaultSearchTimeoutException();
-
 	private QueryTimeoutException(String message, String queryDescription) {
 		super( message + " \"" + queryDescription + '\"' );
-	}
-
-	private static class DefaultSearchTimeoutException implements TimeoutExceptionFactory {
-
-		@Override
-		public RuntimeException createTimeoutException(String message, String queryDescription) {
-			return new QueryTimeoutException( message, queryDescription );
-		}
-
 	}
 
 }
