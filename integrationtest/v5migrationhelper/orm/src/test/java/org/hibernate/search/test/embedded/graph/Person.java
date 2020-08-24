@@ -25,7 +25,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 
 @Entity
-@Indexed
+@Indexed(index = "Person")
 public class Person implements Serializable {
 
 	private Long id;

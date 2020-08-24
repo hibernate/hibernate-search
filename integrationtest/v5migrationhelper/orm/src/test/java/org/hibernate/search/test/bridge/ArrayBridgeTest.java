@@ -18,7 +18,6 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
@@ -243,7 +242,9 @@ public class ArrayBridgeTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	private List<ArrayBridgeTestEntity> findNumericResults(String fieldName, Object number) {
-		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, number, number, true, true );
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( ArrayBridgeTestEntity.class ).get();
+		Query query = queryBuilder.range().onField( fieldName ).from( number ).to( number ).createQuery();
 		return fullTextSession.createFullTextQuery( query, ArrayBridgeTestEntity.class ).list();
 	}
 

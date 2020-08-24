@@ -24,7 +24,6 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.backend.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Test;
@@ -181,14 +180,14 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		statistics.setStatisticsEnabled( true );
 		setData( session, statistics );
 
-		GatedLuceneBackend.open.set( false ); // disable processing of index updates
+		// TODO HSEARCH-3282 disable index updates
 		Transaction tx = session.beginTransaction();
 		List list = session.createCriteria( Kernel.class ).list();
 		assertThat( list ).hasSize( 2 );
 		session.delete( list.get( 0 ) );
 		tx.commit();
 		session.clear();
-		GatedLuceneBackend.open.set( true );
+		// TODO HSEARCH-3282 re-enable index updates
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery allKernelsQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() )
@@ -283,7 +282,6 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.put( "hibernate.search.default.worker.backend", GatedLuceneBackend.class.getName() );
 		cfg.put( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
 	}
 

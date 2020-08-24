@@ -33,7 +33,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 		assertEquals(
 				"Due to manual indexing being enabled no automatic indexing should have occurred",
 				0,
-				getNumberOfDocumentsInIndex( TestEntity.class )
+				getNumberOfDocumentsInIndex( "TestEntity" )
 		);
 	}
 
@@ -57,7 +57,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 		session.close();
 	}
 
-	@Indexed
+	@Indexed(index = "TestEntity")
 	@Entity
 	@Table(name = "TestEntity")
 	public static class TestEntity {

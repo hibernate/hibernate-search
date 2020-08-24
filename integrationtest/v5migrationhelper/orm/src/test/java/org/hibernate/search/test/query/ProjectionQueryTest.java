@@ -35,7 +35,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
@@ -474,7 +473,11 @@ public class ProjectionQueryTest extends SearchTestBase {
 		s.clear();
 		tx = s.beginTransaction();
 
-		Query query = NumericFieldUtils.createNumericRangeQuery( "debtInMillions", 600d, 800d, true, true );
+		Query query = s.getSearchFactory().buildQueryBuilder().forEntity( FootballTeam.class )
+				.get()
+				.range().onField( "debtInMillions" )
+				.from( 600d ).to( 800d )
+				.createQuery();
 
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
 		hibQuery.setProjection( "nrTitles", "name", "debtInMillions" );
@@ -539,7 +542,11 @@ public class ProjectionQueryTest extends SearchTestBase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
 		try {
-			Query query = NumericFieldUtils.createNumericRangeQuery( "debtInMillions", 600d, 800d, true, true );
+			Query query = s.getSearchFactory().buildQueryBuilder().forEntity( FootballTeam.class )
+					.get()
+					.range().onField( "debtInMillions" )
+					.from( 600d ).to( 800d )
+					.createQuery();
 
 			FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
 			hibQuery.setProjection( "__HSearch_xyz" );

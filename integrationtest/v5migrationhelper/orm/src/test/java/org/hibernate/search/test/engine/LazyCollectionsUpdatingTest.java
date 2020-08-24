@@ -18,11 +18,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -42,7 +40,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
-			resetFieldSelector();
 			List list = fullTextSession.createCriteria( BusStop.class ).list();
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
@@ -138,7 +135,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.allow_update_outside_transaction", "true" );
-		cfg.put( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 

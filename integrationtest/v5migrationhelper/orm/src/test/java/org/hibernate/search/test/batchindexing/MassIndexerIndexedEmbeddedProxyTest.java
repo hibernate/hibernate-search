@@ -22,7 +22,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.embedded.fieldbridgeonlazyfield.Root;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
@@ -121,7 +120,7 @@ public class MassIndexerIndexedEmbeddedProxyTest extends SearchTestBase {
 			assertEquals( 1, resultSize );
 
 			@SuppressWarnings("unchecked")
-			List<Root> list = fullTextQuery.list();
+			List<IndexedEmbeddedProxyRootEntity> list = fullTextQuery.list();
 			assertEquals( 1, list.size() );
 			transaction.commit();
 		}

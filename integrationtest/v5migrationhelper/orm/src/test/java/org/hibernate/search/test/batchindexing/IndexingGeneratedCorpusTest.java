@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
@@ -24,12 +22,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.testsupport.backend.LuceneBackendTestHelpers;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -62,7 +55,6 @@ public class IndexingGeneratedCorpusTest {
 			.addAnnotatedClass( AncientBook.class )
 			.addAnnotatedClass( Nation.class )
 			.addAnnotatedClass( SecretBook.class )
-			.setProperty( "hibernate.search.DVDS.exclusive_index_use", "false" ) // to test lock release
 			.setProperty( "hibernate.search.default.worker.thread_pool.size", "4" );
 
 	@BeforeClass
@@ -132,15 +124,13 @@ public class IndexingGeneratedCorpusTest {
 		verifyResultNumbers(); // verify the count match again
 		reindexAll(); //tests that purgeAll is automatic:
 		verifyResultNumbers(); //..same numbers again
-		verifyIndexIsLocked( false, Dvd.class ); //non exclusive index configured
-		verifyIndexIsLocked( true, Book.class ); //exclusive index enabled
 	}
 
 	@Test
 	public void testCreationOfTheDefaultMassIndexer() throws Exception {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		MassIndexer indexer = fullTextSession.createIndexer( Object.class );
-		assertThat( indexer, instanceOf( MassIndexerImpl.class ) );
+		assertNotNull( indexer );
 	}
 
 	private void reindexAll() throws InterruptedException {
@@ -170,18 +160,6 @@ public class IndexingGeneratedCorpusTest {
 		}
 		finally {
 			fullTextSession.close();
-		}
-	}
-
-	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
-		SearchIntegrator searchIntegrator = builder.getSearchFactory().unwrap( SearchIntegrator.class );
-		IndexManager indexManager = searchIntegrator.getIndexBindings().get( type )
-				.getIndexManagerSelector().all().iterator().next();
-
-		// No need to check for alternative implementations such as ES
-		if ( indexManager instanceof DirectoryBasedIndexManager ) {
-			Directory directory = ( (DirectoryBasedIndexManager) indexManager ).getDirectoryProvider().getDirectory();
-			Assert.assertEquals( isLocked, LuceneBackendTestHelpers.isLocked( directory ) );
 		}
 	}
 

@@ -10,7 +10,6 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -28,7 +27,7 @@ public class DslEmbeddedSearchTest {
 
 	private static Calendar initCalendar(int year, int month, int day) {
 		Calendar instance = createCalendar();
-		instance = DateUtils.truncate( instance, Calendar.DATE );
+		instance.clear();
 		instance.set( year, month, day );
 		return instance;
 	}

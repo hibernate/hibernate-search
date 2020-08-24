@@ -33,10 +33,10 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
@@ -231,7 +231,7 @@ public class SortingTest {
 		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
 		Class<?> entityType = UnsortableToy.class;
 
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		SearchIntegrator integrator = factoryHolder.getSearchFactory();
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
 		Query query = queryBuilder
 				.keyword()
@@ -253,7 +253,7 @@ public class SortingTest {
 		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
 		Class<?> entityType = UnsortableToy.class;
 
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		SearchIntegrator integrator = factoryHolder.getSearchFactory();
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
 		Query query = queryBuilder
 				.keyword()
@@ -275,7 +275,7 @@ public class SortingTest {
 		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
 		Class<?> entityType = UnsortableToy.class;
 
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		SearchIntegrator integrator = factoryHolder.getSearchFactory();
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
 		Query query = queryBuilder
 				.keyword()
@@ -306,7 +306,7 @@ public class SortingTest {
 	}
 
 	private Query queryForRangeOnFieldSorted(int min, int max, String fieldName) {
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		SearchIntegrator integrator = factoryHolder.getSearchFactory();
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Person.class ).get();
 		return queryBuilder
 				.range()
@@ -331,7 +331,7 @@ public class SortingTest {
 	}
 
 	private HSQuery queryForValueNullAndSorting(String fieldName, SortField.Type sortType) {
-		ExtendedSearchIntegrator integrator = factoryHolder.getSearchFactory();
+		SearchIntegrator integrator = factoryHolder.getSearchFactory();
 		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Person.class ).get();
 		Query query = queryBuilder
 				.keyword()

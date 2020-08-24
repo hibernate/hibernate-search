@@ -21,7 +21,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -39,13 +38,9 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
-import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
-import org.hibernate.search.bridge.spi.FieldType;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
@@ -441,16 +436,17 @@ public class SortTest extends SearchTestBase {
 
 	@Entity
 	@Indexed
-	@ClassBridge(impl = SortFieldCreatingClassBridge.class)
 	public static class NumberHolder {
 		@Id
 		@GeneratedValue
 		int id;
 
 		@Field(analyze = Analyze.NO)
+		@SortableField
 		int num1;
 
 		@Field(analyze = Analyze.NO)
+		@SortableField
 		int num2;
 
 		public NumberHolder(int num1, int num2) {
@@ -474,28 +470,6 @@ public class SortTest extends SearchTestBase {
 			sb.append( ", num2=" ).append( num2 );
 			sb.append( '}' );
 			return sb.toString();
-		}
-	}
-
-	/**
-	 * Class bridge creating doc value fields for custom sorting.
-	 *
-	 * @author Gunnar Morling
-	 */
-	public static class SortFieldCreatingClassBridge implements MetadataProvidingFieldBridge {
-
-		@Override
-		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			NumberHolder numberHolder = (NumberHolder) value;
-
-			luceneOptions.addNumericDocValuesFieldToDocument( "num1", numberHolder.num1, document );
-			luceneOptions.addNumericDocValuesFieldToDocument( "num2", numberHolder.num2, document );
-		}
-
-		@Override
-		public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
-			builder.field( "sum", FieldType.INTEGER )
-				.sortable( true );
 		}
 	}
 

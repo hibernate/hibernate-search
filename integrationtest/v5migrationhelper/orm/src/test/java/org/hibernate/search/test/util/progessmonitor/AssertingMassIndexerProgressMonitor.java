@@ -10,7 +10,7 @@ package org.hibernate.search.test.util.progessmonitor;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
+import org.hibernate.search.test.batchindexing.TracingProgressMonitor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +29,7 @@ public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressM
 	public AssertingMassIndexerProgressMonitor(int expectedAddedDocuments, int expectedTotalCount) {
 		this.expectedAddedDocuments = expectedAddedDocuments;
 		this.expectedTotalCount = expectedTotalCount;
-		this.monitor = new SimpleIndexingProgressMonitor( 1 );
+		this.monitor = new TracingProgressMonitor();
 	}
 
 	@Override
@@ -57,6 +57,7 @@ public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressM
 	@Override
 	public void indexingCompleted() {
 		finishedCount.add( 1 );
+		monitor.indexingCompleted();
 	}
 
 	public void assertExpectedProgressMade() {

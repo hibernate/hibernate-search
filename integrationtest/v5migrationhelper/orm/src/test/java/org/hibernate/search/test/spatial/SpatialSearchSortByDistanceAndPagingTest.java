@@ -32,7 +32,6 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -173,13 +172,9 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		hibQuery.setSpatialParameters( startLat, startLon, Spatial.COORDINATES_DEFAULT_FIELD );
 
 		if ( sortByDistance ) {
-			Sort distanceSort = new Sort(
-					new DistanceSortField(
-							startLat,
-							startLon,
-							Spatial.COORDINATES_DEFAULT_FIELD
-					)
-			);
+			Sort distanceSort = builder.sort().byDistance().onField( Spatial.COORDINATES_DEFAULT_FIELD )
+					.fromLatitude( startLat ).andLongitude( startLon )
+					.createSort();
 			hibQuery.setSort( distanceSort );
 		}
 

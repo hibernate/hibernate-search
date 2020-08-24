@@ -75,7 +75,7 @@ public class TransactionTest extends SearchTestBase {
 	}
 
 	private int getDocumentNumber() throws IOException {
-		return getNumberOfDocumentsInIndex( Document.class );
+		return getNumberOfDocumentsInIndex( "Documents" );
 	}
 
 	@Override
