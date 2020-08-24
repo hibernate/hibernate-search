@@ -15,6 +15,8 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
@@ -26,6 +28,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
+import org.apache.lucene.search.TotalHits;
 
 public class LuceneCollectors {
 
@@ -46,7 +49,7 @@ public class LuceneCollectors {
 
 	private final LuceneTimeoutManager timeoutManager;
 
-	private Long totalHitCount;
+	private SearchResultTotal resultTotal;
 	private TopDocs topDocs = null;
 
 	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher, Query luceneQuery,
@@ -74,6 +77,7 @@ public class LuceneCollectors {
 	 */
 	public void collectMatchingDocs(int offset, Integer limit) throws IOException {
 		if ( timeoutManager.checkTimedOut() ) {
+			resultTotal = SimpleSearchResultTotal.lowerBound( 0L );
 			// in case of timeout before the query execution, skip the query
 			return;
 		}
@@ -91,7 +95,7 @@ public class LuceneCollectors {
 
 		TotalHitCountCollector totalHitCountCollector = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY );
 		if ( totalHitCountCollector != null ) {
-			totalHitCount = Long.valueOf( totalHitCountCollector.getTotalHits() );
+			resultTotal = SimpleSearchResultTotal.exact( totalHitCountCollector.getTotalHits() );
 		}
 
 		TopDocsCollector<?> topDocsCollector = collectorsForAllMatchingDocs.get( TOP_DOCS_KEY );
@@ -100,6 +104,12 @@ public class LuceneCollectors {
 		}
 
 		extractTopDocs( topDocsCollector, offset, limit );
+		if ( resultTotal == null ) {
+			resultTotal = ( TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation ) ) ?
+					SimpleSearchResultTotal.exact( topDocs.totalHits.value ) :
+					SimpleSearchResultTotal.lowerBound( topDocs.totalHits.value );
+		}
+
 		if ( requireFieldDocRescoring ) {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
@@ -137,8 +147,8 @@ public class LuceneCollectors {
 		return collectorsForTopDocs;
 	}
 
-	public Long getTotalHitCount() {
-		return totalHitCount;
+	public SearchResultTotal getResultTotal() {
+		return resultTotal;
 	}
 
 	public TopDocs getTopDocs() {

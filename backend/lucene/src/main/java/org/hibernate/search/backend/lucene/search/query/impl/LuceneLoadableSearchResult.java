@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 
 import org.apache.lucene.search.TopDocs;
 
@@ -39,7 +40,7 @@ public class LuceneLoadableSearchResult<H> {
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
-	private final Long hitCount;
+	private final SearchResultTotal resultTotal;
 	private final TopDocs topDocs;
 
 	private List<Object> extractedData;
@@ -51,13 +52,13 @@ public class LuceneLoadableSearchResult<H> {
 
 	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext convertContext,
 			LuceneSearchProjection<?, H> rootProjection,
-			Long hitCount, TopDocs topDocs, List<Object> extractedData,
+			SearchResultTotal resultTotal, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			Duration took, boolean timedOut, LuceneTimeoutManager timeoutManager) {
 		this.convertContext = convertContext;
 		this.rootProjection = rootProjection;
-		this.hitCount = hitCount;
+		this.resultTotal = resultTotal;
 		this.topDocs = topDocs;
 		this.extractedData = extractedData;
 		this.extractedAggregations = extractedAggregations;
@@ -100,6 +101,6 @@ public class LuceneLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;
 
-		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut, topDocs );
+		return new LuceneSearchResultImpl<>( resultTotal, loadedHits, extractedAggregations, took, timedOut, topDocs );
 	}
 }
