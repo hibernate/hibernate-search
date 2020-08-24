@@ -68,6 +68,7 @@ public class LuceneSearchQueryBuilder<H>
 	private Long timeout;
 	private TimeUnit timeUnit;
 	private boolean exceptionOnTimeout;
+	private Integer totalHitCountMinimum;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -115,7 +116,7 @@ public class LuceneSearchQueryBuilder<H>
 
 	@Override
 	public void totalHitCountMinimum(int totalHitCountMinimum) {
-		// TODO HSEARCH-3517 support the feature with Lucene
+		this.totalHitCountMinimum = totalHitCountMinimum;
 	}
 
 	@Override
@@ -233,7 +234,7 @@ public class LuceneSearchQueryBuilder<H>
 				timeoutManager,
 				definitiveLuceneQuery,
 				luceneSort,
-				searcher
+				searcher, totalHitCountMinimum
 		);
 	}
 }

@@ -24,14 +24,16 @@ public class SearchWork<R> implements ReadWork<R> {
 	private final int offset;
 	private final Integer limit;
 	private final boolean skipTotalHitCount;
+	private final Integer totalHitCountMinimum;
 
 	SearchWork(LuceneSearcher<R, ?> searcher,
 			Integer offset, Integer limit,
-			boolean skipTotalHitCount) {
+			boolean skipTotalHitCount, Integer totalHitCountMinimum) {
 		this.offset = offset == null ? 0 : offset;
 		this.limit = limit;
 		this.searcher = searcher;
 		this.skipTotalHitCount = skipTotalHitCount;
+		this.totalHitCountMinimum = totalHitCountMinimum;
 	}
 
 	@Override
@@ -40,7 +42,8 @@ public class SearchWork<R> implements ReadWork<R> {
 			IndexSearcher indexSearcher = context.createSearcher();
 
 			return searcher.search(
-					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit, skipTotalHitCount
+					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit, skipTotalHitCount,
+					totalHitCountMinimum
 			);
 		}
 		catch (IOException e) {
@@ -55,6 +58,8 @@ public class SearchWork<R> implements ReadWork<R> {
 				.append( "searcher=" ).append( searcher )
 				.append( ", offset=" ).append( offset )
 				.append( ", limit=" ).append( limit )
+				.append( ", skipTotalHitCount=" ).append( skipTotalHitCount )
+				.append( ", totalHitCountMinimum=" ).append( totalHitCountMinimum )
 				.append( "]" );
 		return sb.toString();
 	}

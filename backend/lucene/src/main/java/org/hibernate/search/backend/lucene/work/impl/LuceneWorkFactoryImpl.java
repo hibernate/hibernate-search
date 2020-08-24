@@ -95,8 +95,8 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
 	@Override
 	public <R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit,
-			boolean skipTotalHitCount) {
-		return new SearchWork<>( searcher, offset, limit, skipTotalHitCount );
+			boolean skipTotalHitCount, Integer totalHitCountMinimum) {
+		return new SearchWork<>( searcher, offset, limit, skipTotalHitCount, totalHitCountMinimum );
 	}
 
 	@Override
