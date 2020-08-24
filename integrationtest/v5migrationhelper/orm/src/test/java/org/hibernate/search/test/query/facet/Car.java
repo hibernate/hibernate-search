@@ -14,11 +14,9 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Facet;
-import org.hibernate.search.annotations.FacetEncodingType;
 import org.hibernate.search.annotations.Facets;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.testsupport.AnalysisNames;
@@ -57,9 +55,8 @@ public class Car {
 
 	private String make;
 
-	@Field(name = CUBIC_CAPACITY_STRING, analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class))
-	@Facet(name = CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING, forField = CUBIC_CAPACITY_STRING, encoding = FacetEncodingType.STRING)
-	@Facet(name = CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING, forField = CUBIC_CAPACITY_STRING, encoding = FacetEncodingType.LONG)
+	@Field
+	@Facet(name = CUBIC_CAPACITY_STRING_FACET_NUMERIC_ENCODING)
 	private Integer cubicCapacity;
 
 	public Car() {
@@ -77,6 +74,12 @@ public class Car {
 
 	public Integer getCubicCapacity() {
 		return cubicCapacity;
+	}
+
+	@Field(name = CUBIC_CAPACITY_STRING, analyze = Analyze.NO)
+	@Facet(name = CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING, forField = CUBIC_CAPACITY_STRING)
+	public String getCubicCapacityString() {
+		return cubicCapacity == null ? null : cubicCapacity.toString();
 	}
 
 	public int getId() {
