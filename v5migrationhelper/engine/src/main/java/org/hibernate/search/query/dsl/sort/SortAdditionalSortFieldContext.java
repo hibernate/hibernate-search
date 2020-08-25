@@ -67,14 +67,4 @@ public interface SortAdditionalSortFieldContext {
 	 */
 	SortNativeContext andByNative(SortField sortField);
 
-	/**
-	 * Order element using the native backend API for Elasticsearch.
-	 *
-	 * @param fieldName The name of the index field to sort by
-	 * @param sortFieldNativeDescription The sort field description, as valid JSON. This may be a
-	 * simple quoted string (e.g. "'asc'") or a JSON map (e.g. "{'key': 'value'}"). See
-	 * Elasticsearch's documentation for information about the exact syntax.
-	 * @see SortContext#byNative(String, String)
-	 */
-	SortNativeContext andByNative(String fieldName, String sortFieldNativeDescription);
 }

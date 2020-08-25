@@ -64,7 +64,6 @@ public class SortFieldStates {
 	private Coordinates coordinates;
 	private Double currentLatitude;
 	private Double currentLongitude;
-	private String currentStringNativeSortFieldDescription;
 
 	public SortFieldStates(QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
@@ -134,9 +133,6 @@ public class SortFieldStates {
 			if ( hasMissingValue() ) {
 				throw new SearchException( "Missing values substitutes are not supported for distance sorting yet" );
 			}
-		}
-		else if ( currentStringNativeSortFieldDescription != null ) {
-			sortField = new NativeSortField( currentName, currentStringNativeSortFieldDescription );
 		}
 		else {
 			sortField = new SortField( currentName, currentType, isDesc() );
@@ -304,9 +300,5 @@ public class SortFieldStates {
 
 	public void setCurrentLongitude(double longitude) {
 		this.currentLongitude = longitude;
-	}
-
-	public void setCurrentStringNativeSortFieldDescription(String nativeSortFieldDescription) {
-		this.currentStringNativeSortFieldDescription = nativeSortFieldDescription;
 	}
 }
