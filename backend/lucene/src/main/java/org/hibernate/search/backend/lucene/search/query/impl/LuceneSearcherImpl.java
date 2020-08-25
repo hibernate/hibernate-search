@@ -64,14 +64,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit, boolean skipTotalHitCount, Integer totalHitsThreshold) throws IOException {
+			int offset, Integer limit, int totalHitsThreshold) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs,
-				skipTotalHitCount, totalHitsThreshold
+				totalHitsThreshold
 		);
 
 		luceneCollectors.collectMatchingDocs( offset, limit );
@@ -93,7 +93,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		int offset = 0;
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs, false, null );
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs,
+				Integer.MAX_VALUE );
 
 		luceneCollectors.collectMatchingDocs( offset, limit );
 
@@ -135,10 +136,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int maxDocs, boolean skipTotalHitCount, Integer totalHitsThreshold) throws IOException {
+			int maxDocs, int totalHitsThreshold) throws IOException {
 		return extractionRequirements.createCollectors(
 				indexSearcher, requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
-				metadataResolver, maxDocs, timeoutManager, skipTotalHitCount, totalHitsThreshold
+				metadataResolver, maxDocs, timeoutManager, totalHitsThreshold
 		);
 	}
 
