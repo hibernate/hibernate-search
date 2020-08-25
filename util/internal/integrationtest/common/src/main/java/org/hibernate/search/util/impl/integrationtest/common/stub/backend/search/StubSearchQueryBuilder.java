@@ -59,7 +59,7 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	}
 
 	@Override
-	public void totalHitCountMinimum(int totalHitCountMinimum) {
+	public void totalHitsThreshold(int totalHitsThreshold) {
 		// TODO HSEARCH-3517 implement it to test mappers
 	}
 
