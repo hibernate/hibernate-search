@@ -7,7 +7,6 @@
 
 package org.hibernate.search.query.dsl;
 
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 
 /**
@@ -43,18 +42,4 @@ public interface QueryCustomization<T> {
 	 */
 	T filteredBy(Query filter);
 
-	/**
-	 * Filter the query results with the given Query instance
-	 * @deprecated Lucene {@link Filter}s have been deprecated and will be removed in a future version.
-	 * Please use {@link Query Queries} instead of {@link Filter}s
-	 * and use {@link #filteredBy(Query)} instead of this method.
-	 * @param filter the Query to use as a filter
-	 * @return an instance of T for method chaining
-	 */
-	@Deprecated
-	default T filteredBy(Filter filter) {
-		return filteredBy( (Query) filter );
-	}
-
-	//TODO filter(String) + parameters
 }
