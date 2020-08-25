@@ -142,13 +142,13 @@ public interface SearchQueryOptionsStep<
 	/**
 	 * Sometime we don't need the exact total hit count number but a reasonable lower bound of it could be enough.
 	 * <p>
-	 * So that we can skip to collect the hits for the count when a given {@code totalHitCountMinimum} is reached,
+	 * So that we can skip to collect the hits for the count when a given {@code totalHitsThreshold} is reached,
 	 * potentially improving the performance.
 	 *
-	 * @param totalHitCountMinimum the value below which the hit count is always exact
+	 * @param totalHitsThreshold the value below which the hit count is always exact
 	 * @return {@code this}, for method chaining.
 	 * @see SearchResultTotal
 	 */
-	S totalHitCountMinimum(int totalHitCountMinimum);
+	S totalHitsThreshold(int totalHitsThreshold);
 
 }

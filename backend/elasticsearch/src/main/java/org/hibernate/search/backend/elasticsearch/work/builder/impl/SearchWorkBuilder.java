@@ -31,5 +31,5 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkab
 
 	SearchWorkBuilder<R> disableTrackTotalHits();
 
-	SearchWorkBuilder<R> totalHitCountMinimum(Integer totalHitCountMinimum);
+	SearchWorkBuilder<R> totalHitsThreshold(Integer totalHitsThreshold);
 }

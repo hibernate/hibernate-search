@@ -26,7 +26,7 @@ public interface SearchQueryBuilder<H, C> {
 
 	void failAfter(long timeout, TimeUnit timeUnit);
 
-	void totalHitCountMinimum(int totalHitCountMinimum);
+	void totalHitsThreshold(int totalHitsThreshold);
 
 	SearchQuery<H> build();
 

@@ -72,7 +72,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
 	private boolean exceptionOnTimeout;
-	private Integer totalHitCountMinimum;
+	private Integer totalHitsThreshold;
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -125,8 +125,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void totalHitCountMinimum(int totalHitCountMinimum) {
-		this.totalHitCountMinimum = totalHitCountMinimum;
+	public void totalHitsThreshold(int totalHitsThreshold) {
+		this.totalHitsThreshold = totalHitsThreshold;
 	}
 
 	@Override
@@ -235,7 +235,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 				payload, requestTransformer,
 				searchResultExtractor,
 				timeoutManager,
-				scrollTimeout, totalHitCountMinimum
+				scrollTimeout, totalHitsThreshold
 		);
 	}
 }

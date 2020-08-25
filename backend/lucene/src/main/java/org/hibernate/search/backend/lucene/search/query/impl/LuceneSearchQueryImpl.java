@@ -53,7 +53,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
-	private final Integer totalHitCountMinimum;
+	private final Integer totalHitsThreshold;
 
 	private LuceneTimeoutManager timeoutManager;
 
@@ -65,7 +65,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			LuceneTimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
-			Integer totalHitCountMinimum) {
+			Integer totalHitsThreshold) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;
@@ -76,7 +76,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.searcher = searcher;
-		this.totalHitCountMinimum = totalHitCountMinimum;
+		this.totalHitsThreshold = totalHitsThreshold;
 	}
 
 	@Override
@@ -174,7 +174,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private LuceneSearchResult<H> doFetch(Integer offset, Integer limit, boolean skipTotalHitCount) {
 		timeoutManager.start();
 		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit, skipTotalHitCount,
-				totalHitCountMinimum );
+				totalHitsThreshold
+		);
 		LuceneSearchResult<H> result = doSubmit( work )
 				/*
 				 * WARNING: the following call must run in the user thread.

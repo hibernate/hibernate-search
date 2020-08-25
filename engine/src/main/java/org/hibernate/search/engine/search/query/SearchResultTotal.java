@@ -22,7 +22,7 @@ public interface SearchResultTotal {
 	boolean isHitCountExact();
 
 	/**
-	 * It could be a lower bound only when a {@link SearchQueryOptionsStep#totalHitCountMinimum(int)} or
+	 * It could be a lower bound only when a {@link SearchQueryOptionsStep#totalHitsThreshold(int)} or
 	 * a {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)} has been defined
 	 * for the current query.
 	 *
