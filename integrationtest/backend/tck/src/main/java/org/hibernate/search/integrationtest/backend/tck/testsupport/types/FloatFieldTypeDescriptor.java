@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -76,28 +73,6 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 				42.42f,
 				1584514514.000000184f,
 				-1.001f, 3.0f, 5.1f
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Float>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				42.1f, 67.0f
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Float>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				3.0f, 13.2f, 25.79f,
-				10.0f, 19.101f
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Float> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				0.0f, 67.0f
 		);
 	}
 

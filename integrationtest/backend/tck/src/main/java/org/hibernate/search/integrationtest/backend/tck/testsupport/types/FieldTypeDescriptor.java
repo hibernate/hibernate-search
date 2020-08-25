@@ -13,10 +13,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
@@ -144,12 +141,6 @@ public abstract class FieldTypeDescriptor<F> {
 	}
 
 	protected abstract List<F> createUniquelyMatchableValues();
-
-	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
-
-	public abstract Optional<RangePredicateExpectations<F>> getRangePredicateExpectations();
-
-	public abstract ExistsPredicateExpectations<F> getExistsPredicateExpectations();
 
 	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
 		// Assume supported by default: this way, we'll get test failures if we forget to override this method.

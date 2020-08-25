@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -76,28 +73,6 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 		return Arrays.asList(
 				Byte.MIN_VALUE, Byte.MAX_VALUE,
 				(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Byte>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				(byte) 42, (byte) 67
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Byte>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				(byte) 3, (byte) 13, (byte) 25,
-				(byte) 10, (byte) 19
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Byte> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				(byte) 0, (byte) 42
 		);
 	}
 

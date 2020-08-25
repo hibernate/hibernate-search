@@ -18,10 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -115,35 +112,6 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 				ZoneOffset.ofHoursMinutes( 2, 30 ),
 				ZoneOffset.ofHoursMinutes( 10, 0 ),
 				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<OffsetDateTime>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				LocalDateTime.of( 1980, 10, 11, 0, 15 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 1984, 10, 7, 15, 37, 37 ).atOffset( ZoneOffset.ofHours( -6 ) )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<OffsetDateTime>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 0, 30 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 18, 22, 57, 59 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 4, 1, 14, 0, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				// Values around what is indexed
-				LocalDateTime.of( 2018, 2, 15, 21, 10, 10 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 3, 18, 22, 57, 59 ).atOffset( ZoneOffset.ofHours( -6 ) )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<OffsetDateTime> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atOffset( ZoneOffset.UTC ),
-				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		);
 	}
 

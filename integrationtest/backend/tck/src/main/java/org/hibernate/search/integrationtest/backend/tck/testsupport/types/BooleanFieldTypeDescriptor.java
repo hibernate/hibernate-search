@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
@@ -70,26 +67,6 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 		return Arrays.asList(
 				true,
 				false
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Boolean>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				true, false
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Boolean>> getRangePredicateExpectations() {
-		// Tested separately in BooleanSortAndRangePredicateIT, because we can only use two values
-		return Optional.empty();
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Boolean> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				true, false
 		);
 	}
 

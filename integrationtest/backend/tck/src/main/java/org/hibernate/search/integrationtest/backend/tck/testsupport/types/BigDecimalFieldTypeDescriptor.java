@@ -14,10 +14,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -100,28 +97,6 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 				BigDecimal.valueOf( 1584514514.000000184 ),
 				scaled( Long.MAX_VALUE ),
 				scaled( Long.MIN_VALUE )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<BigDecimal>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				BigDecimal.valueOf( 42.1 ), BigDecimal.valueOf( 67.0 )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<BigDecimal>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				BigDecimal.valueOf( 3.0 ), BigDecimal.valueOf( 13.2 ), BigDecimal.valueOf( 25.79 ),
-				BigDecimal.valueOf( 10.0 ), BigDecimal.valueOf( 19.13 )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<BigDecimal> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				BigDecimal.ZERO, new BigDecimal( 42.1 )
 		);
 	}
 

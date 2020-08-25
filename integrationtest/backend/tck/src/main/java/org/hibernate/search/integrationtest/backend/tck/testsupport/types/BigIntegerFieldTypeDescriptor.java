@@ -13,10 +13,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -102,28 +99,6 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 				BigInteger.valueOf( -251_484_254 ),
 				BigInteger.valueOf( 42 ),
 				BigInteger.valueOf( 151_484_254L )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<BigInteger>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				BigInteger.valueOf( 4200 ), BigInteger.valueOf( 6700 )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<BigInteger>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				BigInteger.valueOf( 300 ), BigInteger.valueOf( 1300 ), BigInteger.valueOf( 2500 ),
-				BigInteger.valueOf( 1000 ), BigInteger.valueOf( 1900 )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<BigInteger> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				BigInteger.ZERO, BigInteger.valueOf( 6700L )
 		);
 	}
 

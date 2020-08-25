@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -82,29 +79,6 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 				"several tokens",
 				"onetoken",
 				"    trailingspaces   "
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<String>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				"Irving", "Auster"
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<String>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				"aaron", "george", "zach",
-				"bastian", "marc"
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<String> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				"", // No token, but still non-null: should be considered as existing
-				"Aaron"
 		);
 	}
 

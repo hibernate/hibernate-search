@@ -15,10 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -78,31 +75,6 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 			}
 		}
 		return values;
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<YearMonth>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-			YearMonth.of( -348, Month.NOVEMBER ), YearMonth.of( 2200, Month.NOVEMBER )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<YearMonth>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-			// Indexed
-			YearMonth.of( 1797, Month.JANUARY ), YearMonth.of( 1980, Month.NOVEMBER ), YearMonth.of( 3001, Month.JANUARY ),
-			// Values around what is indexed
-			YearMonth.of( 1980, Month.OCTOBER ), YearMonth.of( 1981, Month.JANUARY )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<YearMonth> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				YearMonth.of( 0, Month.JANUARY ),
-				YearMonth.of( 2017, Month.NOVEMBER )
-		);
 	}
 
 	@Override

@@ -12,10 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -77,35 +74,6 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 				LocalTime.of( 10, 10, 10, 123_000_000 ),
 				LocalTime.of( 11, 10, 12, 123_450_000 ),
 				LocalTime.of( 12, 10, 11, 123_456_789 )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<LocalTime>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				LocalTime.of( 10, 10, 10, 123_000_000 ),
-				LocalTime.of( 10, 10, 10, 122_000_000 )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<LocalTime>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				// Indexed
-				LocalTime.of( 10, 10, 10, 0 ),
-				LocalTime.of( 11, 10, 10, 0 ),
-				LocalTime.of( 12, 10, 10, 0 ),
-				// Values around what is indexed
-				LocalTime.of( 10, 40, 10, 0 ),
-				LocalTime.of( 11, 40, 10, 0 )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<LocalTime> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				LocalTime.of( 0, 0, 0 ),
-				LocalTime.of( 12, 14, 52 )
 		);
 	}
 

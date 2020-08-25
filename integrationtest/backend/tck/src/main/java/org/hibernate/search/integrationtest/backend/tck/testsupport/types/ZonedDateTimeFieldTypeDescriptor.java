@@ -20,10 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -147,35 +144,6 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 				ZoneOffset.ofHoursMinutes( -2, 0 ),
 				ZoneOffset.ofHoursMinutes( 2, 30 ),
 				ZoneOffset.ofHoursMinutesSeconds( 10, 0, 24 )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<ZonedDateTime>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				LocalDateTime.of( 1980, 10, 11, 0, 15 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 1984, 10, 7, 15, 37, 37 ).atZone( ZoneId.of( "America/Chicago" ) )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<ZonedDateTime>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 10, 0, 36 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 23, 0, 1 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 4, 1, 0, 30 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				// Values around what is indexed
-				LocalDateTime.of( 2018, 2, 15, 0, 0 ).atZone( ZoneId.of( "Europe/Paris" ) ),
-				LocalDateTime.of( 2018, 3, 1, 23, 0, 1 ).atZone( ZoneId.of( "America/Chicago" ) )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<ZonedDateTime> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) ),
-				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atZone( ZoneId.of( "Europe/Paris" ) )
 		);
 	}
 
