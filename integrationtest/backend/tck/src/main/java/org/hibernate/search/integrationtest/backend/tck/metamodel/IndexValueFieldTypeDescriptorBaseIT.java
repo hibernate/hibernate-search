@@ -176,7 +176,7 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 	}
 
 	private boolean isSortSupported() {
-		return fieldType.getFieldSortExpectations().isSupported();
+		return fieldType.isFieldSortSupported();
 	}
 
 	private boolean isAggregationSupported() {

@@ -536,7 +536,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
 		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
 			c.searchable( Searchable.NO );
-			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				c.sortable( Sortable.YES );
 				c.aggregable( Aggregable.YES );
 			}

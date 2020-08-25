@@ -45,7 +45,7 @@ public class FieldSearchSortFilteringSpecificsIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
+				.filter( typeDescriptor -> typeDescriptor.isFieldSortSupported() );
 	}
 
 	@Parameterized.Parameters(name = "{0}")

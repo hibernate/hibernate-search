@@ -32,7 +32,6 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -66,8 +65,7 @@ public class FieldSearchSortBaseIT<F> {
 		dataSets = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
-			ExpectationsAlternative<?, ?> expectations = fieldType.getFieldSortExpectations();
-			if ( expectations.isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
 					// We need two separate datasets when the sort mode is not defined,

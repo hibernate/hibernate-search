@@ -617,7 +617,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
 			c.searchable( Searchable.NO );
 			c.projectable( Projectable.YES );
-			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				c.sortable( Sortable.YES );
 			}
 		}

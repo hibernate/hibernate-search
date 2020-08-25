@@ -30,7 +30,6 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -69,8 +68,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		dataSets = new ArrayList<>();
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
-			ExpectationsAlternative<?, ?> expectations = fieldType.getFieldSortExpectations();
-			if ( expectations.isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				for ( TestedFieldStructure fieldStructure : TestedFieldStructure.all() ) {
 					// We need two separate datasets when the sort mode is not defined,

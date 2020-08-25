@@ -44,7 +44,7 @@ public class ExistsPredicateSpecificsIT<F> {
 	private static final List<Object[]> parameters = new ArrayList<>();
 	static {
 		for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
-			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypesWithDocValues.add( fieldType );
 			}
 			DataSet<?> dataSet = new DataSet<>( fieldType );
