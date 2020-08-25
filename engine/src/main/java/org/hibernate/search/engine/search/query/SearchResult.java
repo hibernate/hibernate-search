@@ -18,7 +18,9 @@ public interface SearchResult<H> {
 
 	/**
 	 * @return The total number of matching entities, ignoring pagination settings.
+	 * @deprecated Use {@link #total()} and then {@link SearchResultTotal#hitCount()} instead.
 	 */
+	@Deprecated
 	default long totalHitCount() {
 		return total().hitCount();
 	}
@@ -30,11 +32,11 @@ public interface SearchResult<H> {
 
 	/**
 	 * @return The total number of matching entities, ignoring pagination settings.
-	 * @deprecated Use {@link #totalHitCount()} instead.
+	 * @deprecated Use {@link #total()} and then {@link SearchResultTotal#hitCount()} instead.
 	 */
 	@Deprecated
 	default long getTotalHitCount() {
-		return totalHitCount();
+		return total().hitCount();
 	}
 
 	/**

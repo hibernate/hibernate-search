@@ -390,7 +390,7 @@ public class AnnotationMappingSmokeIT {
 							EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
 							EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 )
 					);
-			assertThat( result.totalHitCount() ).isEqualTo( 6L );
+			assertThat( result.total().hitCount() ).isEqualTo( 6L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -425,7 +425,7 @@ public class AnnotationMappingSmokeIT {
 							"text1",
 							null
 					);
-			assertThat( result.totalHitCount() ).isEqualTo( 2L );
+			assertThat( result.total().hitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -489,7 +489,7 @@ public class AnnotationMappingSmokeIT {
 									null
 							)
 					);
-			assertThat( result.totalHitCount() ).isEqualTo( 2L );
+			assertThat( result.total().hitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}

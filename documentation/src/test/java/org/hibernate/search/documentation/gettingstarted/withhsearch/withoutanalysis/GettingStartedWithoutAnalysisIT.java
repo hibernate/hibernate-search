@@ -109,7 +109,7 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.fetch( 20 ); // <5>
 
-			long totalHitCount = result.totalHitCount(); // <6>
+			long totalHitCount = result.total().hitCount(); // <6>
 			List<Book> hits = result.hits(); // <7>
 
 			List<Book> hits2 =
@@ -145,7 +145,7 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.fetch( 20 ); // <4>
 
-			long totalHitCount = result.totalHitCount(); // <5>
+			long totalHitCount = result.total().hitCount(); // <5>
 			List<Book> hits = result.hits(); // <6>
 
 			List<Book> hits2 =

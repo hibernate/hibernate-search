@@ -124,7 +124,7 @@ public class SearchQueryTimeoutIT {
 
 		// we cannot have an exact hit count in case of limitFetching-timeout event
 		assertThat( result.total().hitCountLowerBound() ).isLessThan( TOTAL_DOCUMENT_COUNT );
-		Assertions.assertThatThrownBy( () -> result.totalHitCount() )
+		Assertions.assertThatThrownBy( () -> result.total().hitCount() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound" );
 	}
