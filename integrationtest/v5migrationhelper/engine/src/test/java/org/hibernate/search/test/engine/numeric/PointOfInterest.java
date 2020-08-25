@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.test.engine.numeric;
 
-import static org.hibernate.search.annotations.FieldCacheType.CLASS;
-import static org.hibernate.search.annotations.FieldCacheType.ID;
-
-import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -20,7 +16,6 @@ import org.hibernate.search.annotations.Store;
  * @author Gunnar Morling
  */
 @Indexed
-@CacheFromIndex({ CLASS, ID })
 class PointOfInterest {
 
 	@DocumentId
