@@ -6,14 +6,10 @@
  */
 package org.hibernate.search.test.engine.numeric;
 
-import static org.hibernate.search.annotations.FieldCacheType.CLASS;
-import static org.hibernate.search.annotations.FieldCacheType.ID;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -29,7 +25,6 @@ import org.hibernate.search.annotations.Store;
  * @author Gustavo Fernandes
  */
 @Indexed(index = "numeric_field_test")
-@CacheFromIndex({ CLASS, ID })
 class Location {
 
 	@DocumentId
