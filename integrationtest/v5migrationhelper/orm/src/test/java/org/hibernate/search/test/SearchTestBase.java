@@ -17,7 +17,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -32,8 +31,6 @@ import org.apache.lucene.store.Directory;
  */
 @RunWith(CustomRunner.class)
 public abstract class SearchTestBase implements TestResourceManager, TestConfiguration {
-
-	protected static final Boolean PERFORMANCE_TESTS_ENABLED = TestConstants.arePerformanceTestsEnabled();
 
 	// access only via getter, since instance gets lazily initialized
 	private DefaultTestResourceManager testResourceManager;

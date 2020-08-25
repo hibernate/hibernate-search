@@ -86,10 +86,6 @@ public final class TestConstants {
 		return indexDirPath;
 	}
 
-	public static boolean arePerformanceTestsEnabled() {
-		return Boolean.getBoolean( "org.hibernate.search.enable_performance_tests" );
-	}
-
 	private static class CallerProvider extends SecurityManager {
 
 		public Class<?> getCallerClass() {
