@@ -47,7 +47,6 @@
 
         <version.org.unitils>3.4.6</version.org.unitils>
         <version.simple-jndi>0.11.4.1</version.simple-jndi>
-        <version.org.jboss.byteman>4.0.4</version.org.jboss.byteman>
     </properties>
 
     <!-- XXX: Temporary dependencies with legacy version; this should be upgraded to the same versions as Search 6 -->
@@ -87,27 +86,6 @@
                 <groupId>simple-jndi</groupId>
                 <artifactId>simple-jndi</artifactId>
                 <version>${version.simple-jndi}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.byteman</groupId>
-                <artifactId>byteman</artifactId>
-                <version>${version.org.jboss.byteman}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.byteman</groupId>
-                <artifactId>byteman-install</artifactId>
-                <version>${version.org.jboss.byteman}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sun</groupId>
-                        <artifactId>tools</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.byteman</groupId>
-                <artifactId>byteman-bmunit</artifactId>
-                <version>${version.org.jboss.byteman}</version>
             </dependency>
 
             <dependency>

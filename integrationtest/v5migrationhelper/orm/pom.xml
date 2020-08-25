@@ -51,7 +51,6 @@
 
         <version.org.unitils>3.4.6</version.org.unitils>
         <version.simple-jndi>0.11.4.1</version.simple-jndi>
-        <version.org.jboss.byteman>4.0.4</version.org.jboss.byteman>
 
         <version.com.h2database>1.4.178</version.com.h2database>
     </properties>
