@@ -24,6 +24,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
@@ -79,6 +80,62 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
+	public void resultTotal() {
+		initData( 5000 );
+		StubMappingScope scope = index.createScope();
+
+		SearchResult<DocumentReference> fetch = scope.query()
+				.where( f -> f.matchAll() )
+				.toQuery()
+				.fetch( 10 );
+
+		SearchResultTotal resultTotal = fetch.total();
+		assertThat( resultTotal.isHitCountExact() ).isTrue();
+		assertThat( resultTotal.isHitCountLowerBound() ).isFalse();
+		assertThat( resultTotal.hitCount() ).isEqualTo( 5000 );
+		assertThat( resultTotal.hitCountLowerBound() ).isEqualTo( 5000 );
+	}
+
+	@Test
+	public void resultTotal_totalHitsThreshold() {
+		initData( 5000 );
+		StubMappingScope scope = index.createScope();
+
+		SearchResult<DocumentReference> fetch = scope.query()
+				.where( f -> f.matchAll() )
+				.totalHitsThreshold( 100 )
+				.toQuery()
+				.fetch( 10 );
+
+		SearchResultTotal resultTotal = fetch.total();
+		assertThat( resultTotal.isHitCountExact() ).isFalse();
+		assertThat( resultTotal.isHitCountLowerBound() ).isTrue();
+		assertThat( resultTotal.hitCountLowerBound() ).isLessThanOrEqualTo( 5000 );
+
+		Assertions.assertThatThrownBy( () -> resultTotal.hitCount() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound." );
+	}
+
+	@Test
+	public void resultTotal_totalHitsThreshold_veryHigh() {
+		initData( 5000 );
+		StubMappingScope scope = index.createScope();
+
+		SearchResult<DocumentReference> fetch = scope.query()
+				.where( f -> f.matchAll() )
+				.totalHitsThreshold( 5000 )
+				.toQuery()
+				.fetch( 10 );
+
+		SearchResultTotal resultTotal = fetch.total();
+		assertThat( resultTotal.isHitCountExact() ).isTrue();
+		assertThat( resultTotal.isHitCountLowerBound() ).isFalse();
+		assertThat( resultTotal.hitCount() ).isEqualTo( 5000 );
+		assertThat( resultTotal.hitCountLowerBound() ).isEqualTo( 5000 );
+	}
+
+	@Test
 	public void extension() {
 		initData( 2 );
 
@@ -112,12 +169,12 @@ public class SearchQueryBaseIT {
 				.extension( new SupportedQueryDslExtension<>() )
 				.extendedFeature( "string", "value1", "value2" );
 		SearchResultAssert.assertThat( query )
-				.hasDocRefHitsExactOrder( index.typeName(), "1","2" );
+				.hasDocRefHitsExactOrder( index.typeName(), "1", "2" );
 
 		// Mandatory extension, unsupported
 		Assertions.assertThatThrownBy(
 				() -> scope.query()
-				.extension( new UnSupportedQueryDslExtension<>() )
+						.extension( new UnSupportedQueryDslExtension<>() )
 		)
 				.isInstanceOf( SearchException.class );
 	}
