@@ -19,10 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -97,35 +94,6 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 			}
 		}
 		return uniqueTimestampValues;
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<OffsetTime>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				LocalTime.of( 11, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalTime.of( 7, 0, 3, 1029 ).atOffset( ZoneOffset.ofHours( -6 ) )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<OffsetTime>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				// Indexed
-				LocalTime.of( 11, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalTime.of( 18, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalTime.of( 18, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				// Values around what is indexed
-				LocalTime.of( 12, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalTime.of( 18, 0, 0, 1 ).atOffset( ZoneOffset.ofHours( -3 ) )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<OffsetTime> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				LocalTime.of( 0, 0, 0 ).atOffset( ZoneOffset.UTC ),
-				LocalTime.of( 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
-		);
 	}
 
 	@Override

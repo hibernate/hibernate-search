@@ -13,10 +13,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
@@ -98,28 +95,6 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 				"Aaron",
 				"george",
 				"Zach"
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<String>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				"irving and company", "Auster",
-				"Irving"
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<String>> getRangePredicateExpectations() {
-		// TODO also test range predicates, be it only to check that we correctly throw exceptions?
-		return Optional.empty();
-	}
-
-	@Override
-	public ExistsPredicateExpectations<String> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				"", // No token, but still non-null: should be considered as existing
-				"irving and company"
 		);
 	}
 

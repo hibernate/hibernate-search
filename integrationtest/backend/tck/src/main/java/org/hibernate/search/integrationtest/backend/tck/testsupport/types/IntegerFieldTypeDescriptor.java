@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -69,28 +66,6 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 		return Arrays.asList(
 				Integer.MIN_VALUE, Integer.MAX_VALUE,
 				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Integer>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				42, 67
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Integer>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				3, 13, 25,
-				10, 19
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Integer> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				0, 12
 		);
 	}
 

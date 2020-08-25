@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -76,28 +73,6 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 				42.42,
 				1584514514.000000184,
 				-1.001, 3.0, 5.1
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Double>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				42.1, 67.0
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Double>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				3.0, 13.2, 25.79,
-				10.0, 19.101
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Double> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				0.0, 42.1
 		);
 	}
 

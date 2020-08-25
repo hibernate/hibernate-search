@@ -12,10 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -84,30 +81,6 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 				 */
 				Year.of( -292_275_054 ),
 				Year.of( 292_278_993 )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Year>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				Year.of( 1980 ), Year.of( 4302 )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Year>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				// Indexed
-				Year.of( 1980 ), Year.of( 1982 ), Year.of( 1984 ),
-				// Values around what is indexed
-				Year.of( 1981 ), Year.of( 1983 )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Year> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				Year.of( 1980 ), Year.of( 4302 )
 		);
 	}
 

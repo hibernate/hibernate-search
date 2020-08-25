@@ -10,10 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -70,28 +67,6 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 				Long.MIN_VALUE, Long.MAX_VALUE,
 				(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
 				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<Long>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				42L, 67L
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<Long>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				3L, 13L, 25L,
-				10L, 19L
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<Long> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				0L, 67L
 		);
 	}
 

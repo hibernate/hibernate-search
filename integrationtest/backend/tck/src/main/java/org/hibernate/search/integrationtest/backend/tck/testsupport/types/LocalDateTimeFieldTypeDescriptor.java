@@ -12,10 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -93,35 +90,6 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 				 */
 				LocalDateTime.of( -292_275_054, 1, 1, 0, 0, 0, 0 ),
 				LocalDateTime.of( 292_278_993, 12, 31, 23, 59, 59, 999_000_000 )
-		);
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<LocalDateTime>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-				LocalDateTime.of( 1980, 10, 11, 0, 15 ),
-				LocalDateTime.of( 1984, 10, 7, 15, 37, 37 )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<LocalDateTime>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 10, 0 ),
-				LocalDateTime.of( 2018, 3, 1, 15, 15, 15 ),
-				LocalDateTime.of( 2018, 4, 1, 0, 59 ),
-				// Values around what is indexed
-				LocalDateTime.of( 2018, 2, 1, 10, 0, 1 ),
-				LocalDateTime.of( 2018, 3, 15, 10, 10 )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<LocalDateTime> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),
-				LocalDateTime.of( 1984, 10, 7, 12, 14, 52 )
 		);
 	}
 

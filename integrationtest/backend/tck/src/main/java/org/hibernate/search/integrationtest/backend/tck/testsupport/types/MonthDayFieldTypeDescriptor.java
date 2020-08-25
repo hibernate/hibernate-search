@@ -16,10 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
 
@@ -87,31 +84,6 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 				MonthDay.of( Month.DECEMBER, 31 )
 		);
 		return values;
-	}
-
-	@Override
-	public Optional<MatchPredicateExpectations<MonthDay>> getMatchPredicateExpectations() {
-		return Optional.of( new MatchPredicateExpectations<>(
-			MonthDay.of( Month.NOVEMBER, 7 ), MonthDay.of( Month.NOVEMBER, 21 )
-		) );
-	}
-
-	@Override
-	public Optional<RangePredicateExpectations<MonthDay>> getRangePredicateExpectations() {
-		return Optional.of( new RangePredicateExpectations<>(
-			// Indexed
-			MonthDay.of( Month.FEBRUARY, 7 ), MonthDay.of( Month.JUNE, 21 ), MonthDay.of( Month.NOVEMBER, 7 ),
-			// Values around what is indexed
-			MonthDay.of( Month.FEBRUARY, 21 ), MonthDay.of( Month.OCTOBER, 1 )
-		) );
-	}
-
-	@Override
-	public ExistsPredicateExpectations<MonthDay> getExistsPredicateExpectations() {
-		return new ExistsPredicateExpectations<>(
-				MonthDay.of( Month.JANUARY, 1 ),
-				MonthDay.of( Month.FEBRUARY, 28 )
-		);
 	}
 
 	@Override
