@@ -196,7 +196,7 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 		// See HSEARCH-3307: this checks that irrelevant options are ignored when checking cross-index field compatibility
 		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
 			c.projectable( Projectable.YES );
-			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				c.sortable( Sortable.YES );
 				c.aggregable( Aggregable.YES );
 			}

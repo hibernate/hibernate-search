@@ -14,7 +14,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 
@@ -67,8 +66,8 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
-	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
-		return ExpectationsAlternative.unsupported( this );
+	public boolean isFieldSortSupported() {
+		return false;
 	}
 
 	@Override

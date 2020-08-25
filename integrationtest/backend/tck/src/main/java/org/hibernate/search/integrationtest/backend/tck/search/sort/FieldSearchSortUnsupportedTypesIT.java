@@ -39,7 +39,7 @@ public class FieldSearchSortUnsupportedTypesIT<F> {
 
 	private static Stream<FieldTypeDescriptor<?>> unsupportedTypeDescriptors() {
 		return FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> ! typeDescriptor.getFieldSortExpectations().isSupported() );
+				.filter( typeDescriptor -> ! typeDescriptor.isFieldSortSupported() );
 	}
 
 	@Parameterized.Parameters(name = "{0}")

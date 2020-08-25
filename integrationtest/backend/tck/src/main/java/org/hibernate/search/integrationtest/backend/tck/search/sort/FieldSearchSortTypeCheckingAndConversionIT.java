@@ -30,7 +30,6 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
@@ -62,8 +61,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
-			ExpectationsAlternative<?, ?> expectations = fieldType.getFieldSortExpectations();
-			if ( expectations.isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				supportedFieldTypes.add( fieldType );
 				parameters.add( new Object[] { fieldType } );
 			}
@@ -458,7 +456,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		protected void addIrrelevantOptions(FieldTypeDescriptor<?> fieldType, StandardIndexFieldTypeOptionsStep<?, ?> c) {
 			c.searchable( Searchable.NO );
 			c.projectable( Projectable.YES );
-			if ( fieldType.getFieldSortExpectations().isSupported() ) {
+			if ( fieldType.isFieldSortSupported() ) {
 				c.aggregable( Aggregable.YES );
 			}
 		}

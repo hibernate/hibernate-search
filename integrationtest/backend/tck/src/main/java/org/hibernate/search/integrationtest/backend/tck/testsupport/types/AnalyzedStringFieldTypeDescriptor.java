@@ -16,7 +16,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
@@ -99,8 +98,8 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
-	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
-		return ExpectationsAlternative.unsupported( this );
+	public boolean isFieldSortSupported() {
+		return false;
 	}
 
 	@Override

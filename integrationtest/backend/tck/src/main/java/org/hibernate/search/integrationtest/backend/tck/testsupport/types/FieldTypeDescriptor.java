@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableValues;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public abstract class FieldTypeDescriptor<F> {
 
@@ -142,9 +141,9 @@ public abstract class FieldTypeDescriptor<F> {
 
 	protected abstract List<F> createUniquelyMatchableValues();
 
-	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
+	public boolean isFieldSortSupported() {
 		// Assume supported by default: this way, we'll get test failures if we forget to override this method.
-		return ExpectationsAlternative.supported( this );
+		return true;
 	}
 
 	public abstract Optional<IndexNullAsMatchPredicateExpectactions<F>> getIndexNullAsMatchPredicateExpectations();
