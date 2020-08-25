@@ -56,7 +56,7 @@ public class SearchResultAssert<H> {
 	}
 
 	public AbstractLongAssert<?> totalHitCount() {
-		return Assertions.assertThat( actual.totalHitCount() )
+		return Assertions.assertThat( actual.total().hitCount() )
 				.as( "Total hit count of " + queryDescription );
 	}
 

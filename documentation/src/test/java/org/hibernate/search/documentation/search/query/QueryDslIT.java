@@ -78,7 +78,7 @@ public class QueryDslIT {
 							.matching( "robot" ) )
 					.fetch( 20 ); // <4>
 
-			long totalHitCount = result.totalHitCount(); // <5>
+			long totalHitCount = result.total().hitCount(); // <5>
 			List<Book> hits = result.hits(); // <6>
 			// Not shown: commit the transaction and close the entity manager
 			// end::entryPoint[]
@@ -145,7 +145,7 @@ public class QueryDslIT {
 					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <2>
 
-			long totalHitCount = result.totalHitCount(); // <3>
+			long totalHitCount = result.total().hitCount(); // <3>
 			List<Book> hits = result.hits(); // <4>
 			// ... // <5>
 			// end::fetching-searchResult[]
@@ -200,7 +200,7 @@ public class QueryDslIT {
 					.where( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
 					.fetchAll();
 
-			long totalHitCount = result.totalHitCount();
+			long totalHitCount = result.total().hitCount();
 			List<Book> hits = result.hits();
 			// end::fetching-all-searchResult[]
 
@@ -231,7 +231,7 @@ public class QueryDslIT {
 					.where( f -> f.matchAll() )
 					.fetch( 40, 20 ); // <1>
 			// end::fetching-pagination-searchResult[]
-			long totalHitCount = result.totalHitCount();
+			long totalHitCount = result.total().hitCount();
 			List<Book> hits = result.hits();
 
 			assertThat( totalHitCount ).isEqualTo( 4 );
