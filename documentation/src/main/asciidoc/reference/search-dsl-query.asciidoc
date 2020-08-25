@@ -23,6 +23,7 @@ The predicate is created using a factory `f` passed as an argument to the lambda
 See <<search-dsl-predicate>> for more information about predicates.
 <4> Build the query and fetch the results, limiting to the top 20 hits.
 <5> Retrieve the total number of matching entities.
+See <<search-dsl-query-fetching-results-total>> for ways to optimize computation of the total hit count.
 <6> Retrieve matching entities.
 ====
 
@@ -130,6 +131,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 <3> Retrieve the total hit count, i.e. the total number of matching entities/documents,
 which could be 10,000 even if you only retrieved the top 20 hits.
 This is useful to give end users and idea of how many more hits they query produced.
+See <<search-dsl-query-fetching-results-total>> for ways to optimize computation of the total hit count.
 <4> Retrieve the top hits, in this case the top 20 matching entities/documents.
 <5> Other kinds of results and information can be retrieved from `SearchResult`.
 They are explained in dedicated sections, such as <<search-dsl-aggregation>>.
@@ -208,6 +210,57 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-all-hits]
 ----
+====
+
+[[search-dsl-query-fetching-results-total]]
+=== Fetching the total (hit count, ...)
+
+A `SearchResultTotal` contains the count of the **total** hits have been matched the query, either belonging
+to the current page or not. For pagination see <<search-dsl-query-fetching-results-pagination>>.
+
+The total hit count is exact by default, but can be replaced with a lower-bound estimate in the following cases:
+
+* The `totalHitCountThreshold` option is enabled. See <<search-dsl-query-total-hits-threshold>>.
+* The `truncateAfter` option is enabled and a timeout occurs.
+
+.Working with the result total
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-resultTotal]
+----
+<1> Extract the `SearchResultTotal` from the `SearchResult`.
+<2> Retrieve the exact total hit count. This call will raise an exception if the only available hit count is a lower-bound estimate.
+<3> Retrieve a lower-bound estimate of the total hit count. This will return the exact hit count if available.
+<4> Test if the count is exact.
+<5> Test if the count is a lower bound.
+====
+
+[[search-dsl-query-total-hits-threshold]]
+=== `totalHitCountThreshold(...)`: optimizing total hit count computation
+
+When working with large result sets, counting the number of hits exactly can be very resource-consuming.
+
+When sorting by score (the default) and retrieving the result through `fetch(...)`, it is possible to yield significant performance improvements by allowing Hibernate Search to return a lower-bound estimate of the total hit count, instead of the exact total hit count. In that case, the underlying engine (Lucene or Elasticsearch) will be able to skip large chunks of non-competitive hits, leading to fewer index scans and thus better performance.
+
+To enable this performance optimization, call `totalHitCountThreshold(...)` when building the query, as shown in the example below.
+
+[NOTE]
+====
+This optimization has no effect on calls to `fetchHits(...)` (which is already optimized by default) or to `fetchTotalHitCount()` (which always returns an exact hit count).
+====
+
+.Defining a total hit count threshold
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-totalHitsThreshold]
+----
+<1> Define a `totalHitsThreshold` for the current query
+<2> Extract the `SearchResultTotal` from the `SearchResult`.
+<3> Retrieve a lower-bound estimate of the total hit count. This will return the exact hit count if available.
+<4> Test if the count is exact.
+<5> Test if the count is a lower-bound estimate.
 ====
 
 [[search-dsl-query-fetching-results-pagination]]
@@ -524,6 +577,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 this method is used for debugging purposes and in particular to find out why a query is slow.
 ====
 
+[[limit_the_number_of_results_when_the_time_limit_is_reached]]
 === `truncateAfter()`: Truncating the results after a given amount of time
 // Search 5 anchors backward compatibility
 [[_limit_the_number_of_results_when_the_time_limit_is_reached]]

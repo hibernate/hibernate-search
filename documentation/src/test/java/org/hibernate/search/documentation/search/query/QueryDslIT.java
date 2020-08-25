@@ -27,6 +27,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.mapper.orm.Search;
@@ -414,6 +415,49 @@ public class QueryDslIT {
 
 			assertThat( result.hits() ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void resultTotal() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-resultTotal[]
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.fetch( 20 );
+
+			SearchResultTotal resultTotal = result.total(); // <1>
+			long totalHitCount = resultTotal.hitCount(); // <2>
+			long totalHitCountLowerBound = resultTotal.hitCountLowerBound(); // <3>
+			boolean hitCountExact = resultTotal.isHitCountExact(); // <4>
+			boolean hitCountLowerBound = resultTotal.isHitCountLowerBound(); // <5>
+			// end::fetching-resultTotal[]
+
+			assertThat( totalHitCount ).isEqualTo( 4 );
+			assertThat( totalHitCountLowerBound ).isEqualTo( 4 );
+			assertThat( hitCountExact ).isEqualTo( true );
+			assertThat( hitCountLowerBound ).isEqualTo( false );
+		} );
+	}
+
+	@Test
+	public void resultTotal_totalHitsThreshold() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::fetching-totalHitsThreshold[]
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.totalHitsThreshold( 1000 ) // <1>
+					.fetch( 20 );
+
+			SearchResultTotal resultTotal = result.total(); // <2>
+			long totalHitCountLowerBound = resultTotal.hitCountLowerBound(); // <3>
+			boolean hitCountExact = resultTotal.isHitCountExact(); // <4>
+			boolean hitCountLowerBound = resultTotal.isHitCountLowerBound(); // <5>
+			// end::fetching-totalHitsThreshold[]
+
+			assertThat( totalHitCountLowerBound ).isLessThanOrEqualTo( 4 );
 		} );
 	}
 
