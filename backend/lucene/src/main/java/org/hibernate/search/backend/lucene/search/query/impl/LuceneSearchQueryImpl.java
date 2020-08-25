@@ -121,7 +121,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
 				indexNames, searchContext.indexes().elements(), routingKeys );
 		return new LuceneSearchScrollImpl<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
-				searcher, indexReader, chunkSize );
+				searcher, indexReader, chunkSize
+		);
 	}
 
 	@Override
@@ -134,7 +135,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
 
-		Map.Entry<String, ? extends LuceneSearchIndexContext> entry = mappedTypeNameToIndex.entrySet().iterator().next();
+		Map.Entry<String, ? extends LuceneSearchIndexContext> entry = mappedTypeNameToIndex.entrySet().iterator()
+				.next();
 		String typeName = entry.getKey();
 		LuceneSearchIndexContext index = entry.getValue();
 		String documentId = toDocumentId( index, id );
@@ -159,22 +161,22 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return doExplain( typeName, documentId );
 	}
 
-	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
-		ToDocumentIdentifierValueConverter<?> converter = index.idDslConverter();
-		ToDocumentIdentifierValueConvertContext convertContext =
-				searchContext.toDocumentIdentifierValueConvertContext();
-		return converter.convertUnknown( id, convertContext );
-	}
-
 	@Override
 	public Sort luceneSort() {
 		return luceneSort;
 	}
 
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+		// replace the timeout manager on already created query instance
+		timeoutManager = searchContext.createTimeoutManager( luceneQuery, timeout, timeUnit, true );
+		searcher.setTimeoutManager( timeoutManager );
+	}
+
 	private LuceneSearchResult<H> doFetch(Integer offset, Integer limit, boolean skipTotalHitCount) {
 		timeoutManager.start();
-		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit, skipTotalHitCount,
-				totalHitsThreshold
+		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit,
+				totalHitsThreshold( skipTotalHitCount )
 		);
 		LuceneSearchResult<H> result = doSubmit( work )
 				/*
@@ -189,15 +191,6 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return result;
 	}
 
-	private <T> T doSubmit(ReadWork<T> work) {
-		return queryOrchestrator.submit(
-				searchContext.indexes().indexNames(),
-				searchContext.indexes().elements(),
-				routingKeys,
-				work
-		);
-	}
-
 	private Explanation doExplain(String typeName, String id) {
 		timeoutManager.start();
 		Query filter = searchContext.filterOrNull( sessionContext.tenantIdentifier() );
@@ -209,10 +202,29 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return explanation;
 	}
 
-	@Override
-	public void failAfter(long timeout, TimeUnit timeUnit) {
-		// replace the timeout manager on already created query instance
-		timeoutManager = searchContext.createTimeoutManager( luceneQuery, timeout, timeUnit, true );
-		searcher.setTimeoutManager( timeoutManager );
+	private <T> T doSubmit(ReadWork<T> work) {
+		return queryOrchestrator.submit(
+				searchContext.indexes().indexNames(),
+				searchContext.indexes().elements(),
+				routingKeys,
+				work
+		);
+	}
+
+	private int totalHitsThreshold(boolean skipTotalHitCount) {
+		if ( skipTotalHitCount ) {
+			return 0;
+		}
+		if ( totalHitsThreshold == null ) {
+			return Integer.MAX_VALUE;
+		}
+		return totalHitsThreshold;
+	}
+
+	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
+		ToDocumentIdentifierValueConverter<?> converter = index.idDslConverter();
+		ToDocumentIdentifierValueConvertContext convertContext =
+				searchContext.toDocumentIdentifierValueConvertContext();
+		return converter.convertUnknown( id, convertContext );
 	}
 }
