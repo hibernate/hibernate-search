@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
@@ -196,58 +195,6 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		assertThat( allKernelsQuery.getResultSize() ).isEqualTo( 2 );
 		assertThat( allKernelsQuery.list() ).hasSize( 1 );
 		assertThat( statistics.getSecondLevelCacheHitCount() ).isEqualTo( 1 );
-	}
-
-	@Test
-	public void testQueryUsingFindByIdInitialization() throws Exception {
-		Session session = openSession();
-		final Statistics statistics = session.getSessionFactory().getStatistics();
-		statistics.clear();
-		statistics.setStatisticsEnabled( true );
-		setData( session, statistics );
-
-		Transaction tx = session.beginTransaction();
-		Kernel k = new Kernel();
-		k.setCodeName( "notpresent" );
-		k.setProduct( "Polgeiser" );
-		session.persist( k );
-		session.flush();
-		Search.getFullTextSession( session ).flushToIndexes();
-		tx.rollback(); //ie do not store notpresent
-
-		session.clear();
-		//make sure the 2LC is empty
-		session.getSessionFactory().getCache().evictEntityRegion( Kernel.class );
-
-		statistics.clear();
-
-		Transaction transaction = session.beginTransaction();
-		final FullTextSession fullTextSession = Search.getFullTextSession( session );
-		final QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder()
-				.forEntity( Kernel.class )
-				.get();
-		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
-		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
-		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID );
-		List list = fullTextQuery.list();
-		assertThat( list.size() ).isEqualTo( 2 );
-		assertThat( list ).allSatisfy( o -> assertThat( Hibernate.isInitialized( o ) ).isTrue() );
-
-		for ( Object o : list ) {
-			o.toString(); //check true initialization
-		}
-
-		assertThat( statistics.getSecondLevelCacheHitCount() )
-			.isEqualTo( 0 );
-		assertThat( statistics.getQueryExecutionCount() )
-			.isEqualTo( 0 );
-		assertThat( statistics.getEntityLoadCount() )
-			.isEqualTo( 2 );
-
-		transaction.commit();
-		clearData( session );
-		session.close();
 	}
 
 	private void clearData(Session session) {
