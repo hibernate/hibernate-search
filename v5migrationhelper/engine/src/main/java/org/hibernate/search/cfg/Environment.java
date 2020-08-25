@@ -45,12 +45,6 @@ public final class Environment {
 	 */
 	public static final String ANALYZER_CLASS = "hibernate.search.analyzer";
 
-	/**
-	 * Default Lucene similarity
-	 */
-	public static final String SIMILARITY_CLASS = "hibernate.search.similarity";
-
-
 	public static final String WORKER_SCOPE = "hibernate.search.worker.scope";
 
 	/**
