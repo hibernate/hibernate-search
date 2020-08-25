@@ -10,7 +10,9 @@ package org.hibernate.search.query;
  * Defines the method used to initialize an object
  *
  * @author Emmanuel Bernard
+ * @deprecated This setting is ignored in Hibernate Search 6.
  */
+@Deprecated
 public enum DatabaseRetrievalMethod {
 	/**
 	 * Use a criteria query to load the objects.
