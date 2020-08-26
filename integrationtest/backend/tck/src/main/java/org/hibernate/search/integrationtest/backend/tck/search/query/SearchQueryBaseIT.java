@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -98,6 +100,11 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void resultTotal_totalHitCountThreshold() {
+		assumeTrue(
+				"This backend doesn't take totalHitsThreshold() into account.",
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThreshold()
+		);
+
 		initData( 5000 );
 		StubMappingScope scope = index.createScope();
 
