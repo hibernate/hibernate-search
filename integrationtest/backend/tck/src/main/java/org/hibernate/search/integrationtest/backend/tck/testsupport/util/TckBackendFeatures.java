@@ -70,4 +70,8 @@ public class TckBackendFeatures {
 	public boolean projectionPreservesNulls() {
 		return true;
 	}
+
+	public boolean supportsTotalHitsThreshold() {
+		return true;
+	}
 }

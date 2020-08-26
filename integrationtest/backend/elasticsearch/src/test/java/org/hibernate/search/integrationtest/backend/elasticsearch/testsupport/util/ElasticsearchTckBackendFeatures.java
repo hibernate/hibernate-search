@@ -117,4 +117,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 			return true;
 		}
 	}
+
+	@Override
+	public boolean supportsTotalHitsThreshold() {
+		return dialect.supportsSkipOrLimitingTotalHitCount();
+	}
 }
