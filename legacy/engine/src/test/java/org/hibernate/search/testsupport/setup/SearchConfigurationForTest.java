@@ -42,10 +42,6 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	private ClassLoaderService classLoaderService;
 	private boolean enableJPAAnnotationsProcessing;
 
-	public static SearchConfigurationForTest noTestDefaults() {
-		return new SearchConfigurationForTest( new Properties() );
-	}
-
 	public SearchConfigurationForTest() {
 		this( DefaultInstanceInitializer.DEFAULT_INITIALIZER, false );
 	}
@@ -55,7 +51,7 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	}
 
 	public SearchConfigurationForTest(InstanceInitializer init, boolean expectsJPAAnnotations) {
-		this( init, expectsJPAAnnotations, TestDefaults.getProperties() );
+		this( init, expectsJPAAnnotations, new Properties() );
 	}
 
 	private SearchConfigurationForTest(InstanceInitializer init, boolean expectsJPAAnnotations, Properties properties) {
