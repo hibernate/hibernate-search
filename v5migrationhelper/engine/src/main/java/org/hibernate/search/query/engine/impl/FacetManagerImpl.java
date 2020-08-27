@@ -7,6 +7,7 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +15,6 @@ import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
-
-import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * Default implementation of the {@link FacetManager} implementation.
@@ -46,7 +45,7 @@ public class FacetManagerImpl implements FacetManager {
 	@Override
 	public FacetManager enableFaceting(FacetingRequest facetingRequest) {
 		if ( facetRequests == null ) {
-			facetRequests = newHashMap();
+			facetRequests = new HashMap<>();
 		}
 		facetRequests.put( facetingRequest.getFacetingName(), (FacetingRequestImpl) facetingRequest );
 		facetsHaveChanged();
