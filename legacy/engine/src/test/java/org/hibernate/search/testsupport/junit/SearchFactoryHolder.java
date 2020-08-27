@@ -26,7 +26,6 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.setup.TestDefaults;
 
 import org.junit.Assert;
 import org.junit.rules.ExternalResource;
@@ -60,7 +59,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	public SearchFactoryHolder(SearchMapping buildMappingDefinition, Class<?>... entities) {
 		this.buildMappingDefinition = buildMappingDefinition;
 		this.entities = entities;
-		this.configuration = TestDefaults.getProperties();
+		this.configuration = new Properties();
 	}
 
 	public ExtendedSearchIntegrator getSearchFactory() {
