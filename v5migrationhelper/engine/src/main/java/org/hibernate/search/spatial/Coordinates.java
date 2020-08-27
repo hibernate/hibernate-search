@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spatial;
 
+import org.hibernate.search.engine.spatial.GeoPoint;
+
 /**
  * Minimum interface for a field/method to be spatial hash indexable
  *
@@ -21,4 +23,16 @@ public interface Coordinates {
 	 * @return the longitude in degrees
 	 */
 	Double getLongitude();
+
+	static GeoPoint toGeoPoint(Coordinates coordinates) {
+		if ( coordinates == null ) {
+			return null;
+		}
+		Double latitude = coordinates.getLatitude();
+		Double longitude = coordinates.getLongitude();
+		if ( latitude == null || longitude == null ) {
+			return null;
+		}
+		return GeoPoint.of( latitude, longitude );
+	}
 }
