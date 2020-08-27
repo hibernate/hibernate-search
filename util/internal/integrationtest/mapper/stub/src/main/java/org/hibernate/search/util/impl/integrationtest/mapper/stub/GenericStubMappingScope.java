@@ -33,10 +33,15 @@ public class GenericStubMappingScope<R, E> {
 
 	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubBackendSessionContext sessionContext,
 			LoadingContext<R, E> loadingContext) {
-		LoadingContextBuilder<R, E, StubLoadingOptionsStep> loadingContextBuilder = new LoadingContextBuilder<R, E, StubLoadingOptionsStep>() {
+		return query( sessionContext, loadingContext, new StubLoadingOptionsStep() );
+	}
+
+	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubBackendSessionContext sessionContext,
+			LoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
+		LoadingContextBuilder<R, E, LOS> loadingContextBuilder = new LoadingContextBuilder<R, E, LOS>() {
 			@Override
-			public StubLoadingOptionsStep toAPI() {
-				return new StubLoadingOptionsStep();
+			public LOS toAPI() {
+				return loadingOptionsStep;
 			}
 
 			@Override
