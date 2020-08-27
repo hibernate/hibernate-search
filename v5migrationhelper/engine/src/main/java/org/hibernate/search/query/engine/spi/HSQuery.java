@@ -14,7 +14,6 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.IndexedTypeSet;
-import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -49,15 +48,6 @@ import org.hibernate.search.spi.SearchIntegrator;
  * @author Emmanuel Bernard
  */
 public interface HSQuery extends ProjectionConstants {
-	/**
-	 * Defines the underlying Lucene query
-	 *
-	 * @param query the Lucene query
-	 * @return {@code this} to allow method chaining
-	 */
-	HSQuery luceneQuery(Query query);
-
-	HSQuery tenantIdentifier(String tenantId);
 
 	/**
 	 * Lets Lucene sort the results. This is useful when you have
@@ -69,15 +59,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery sort(Sort sort);
-
-	/**
-	 * Define the timeout exception factory to customize the exception returned by the user.
-	 * Defaults to returning {@link org.hibernate.search.query.engine.QueryTimeoutException}
-	 *
-	 * @param exceptionFactory the timeout exception factory to use
-	 * @return {@code this}  to allow for method chaining
-	 */
-	HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory);
 
 	/**
 	 * Defines the Lucene field names projected and returned in a query result
@@ -119,20 +100,9 @@ public interface HSQuery extends ProjectionConstants {
 	IndexedTypeSet getTargetedEntities();
 
 	/**
-	 * @return a set of indexed entities corresponding to the class hierarchy of the targeted entities
-	 */
-	IndexedTypeSet getIndexedTargetedEntities();
-
-	/**
 	 * @return the projected field names
 	 */
 	String[] getProjectedFields();
-
-	/**
-	 * @return {@code true} if the projected field names contain the
-	 * {@link ProjectionConstants#THIS} constant.
-	 */
-	boolean hasThisProjection();
 
 	/**
 	 * @return the timeout manager. Make sure to wrap your HSQuery usage around a {@code timeoutManager.start()} and  {@code timeoutManager.stop()}.
@@ -164,17 +134,6 @@ public interface HSQuery extends ProjectionConstants {
 	List<EntityInfo> queryEntityInfos();
 
 	/**
-	 * Execute the Lucene query and return a traversable object over the results.
-	 * Results are lazily fetched.
-	 * {@link ProjectionConstants#THIS} if projected is <b>not</b> populated. It is the responsibility
-	 * of the object source integration.
-	 * The returned {@code DocumentExtractor} <b>must</b> be closed by the caller to release Lucene resources.
-	 *
-	 * @return the {@code DocumentExtractor} instance
-	 */
-	DocumentExtractor queryDocumentExtractor();
-
-	/**
 	 * @return the number of hits for this search
 	 *         <p>
 	 *         Caution:
@@ -193,13 +152,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * @return Lucene Explanation
 	 */
 	Explanation explain(int documentId);
-
-	/**
-	 * <p>afterDeserialise.</p>
-	 *
-	 * @param integrator a {@link SearchIntegrator} object.
-	 */
-	void afterDeserialise(SearchIntegrator integrator);
 
 	/**
 	 * <p>setSpatialParameters.</p>
