@@ -26,7 +26,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS, C>
 						SearchAggregationFactory,
 						C
 				>
-		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS,C>, H, SearchPredicateFactory>,
+		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS, C>, H, LOS, SearchPredicateFactory>,
 				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS, C>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder,

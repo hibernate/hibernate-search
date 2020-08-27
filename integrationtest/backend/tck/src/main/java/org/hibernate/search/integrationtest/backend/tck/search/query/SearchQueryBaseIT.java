@@ -201,9 +201,9 @@ public class SearchQueryBaseIT {
 	}
 
 	private static class MyExtendedDslContext<T> {
-		private final SearchQueryWhereStep<?, T, ?> delegate;
+		private final SearchQueryWhereStep<?, T, ?, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryWhereStep<?, T, ?> delegate) {
+		MyExtendedDslContext(SearchQueryWhereStep<?, T, ?, ?> delegate) {
 			this.delegate = delegate;
 		}
 

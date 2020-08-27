@@ -44,32 +44,32 @@ public interface LuceneSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	@Deprecated
-	default LuceneSearchQueryWhereStep<E, ?> asEntity() {
+	default LuceneSearchQueryWhereStep<E, LOS> asEntity() {
 		return selectEntity();
 	}
 
 	@Override
 	@Deprecated
-	default LuceneSearchQueryWhereStep<R, ?> asEntityReference() {
+	default LuceneSearchQueryWhereStep<R, LOS> asEntityReference() {
 		return selectEntityReference();
 	}
 
 	@Override
 	@Deprecated
-	default <P> LuceneSearchQueryWhereStep<P, ?> asProjection(
+	default <P> LuceneSearchQueryWhereStep<P, LOS> asProjection(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return select( projectionContributor );
 	}
 
 	@Override
 	@Deprecated
-	default <P> LuceneSearchQueryWhereStep<P, ?> asProjection(SearchProjection<P> projection) {
+	default <P> LuceneSearchQueryWhereStep<P, LOS> asProjection(SearchProjection<P> projection) {
 		return select( projection );
 	}
 
 	@Override
 	@Deprecated
-	default LuceneSearchQueryWhereStep<List<?>, ?> asProjections(SearchProjection<?>... projections) {
+	default LuceneSearchQueryWhereStep<List<?>, LOS> asProjections(SearchProjection<?>... projections) {
 		return select( projections );
 	}
 

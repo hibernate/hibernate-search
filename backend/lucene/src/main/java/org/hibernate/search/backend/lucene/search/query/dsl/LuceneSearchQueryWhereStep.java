@@ -10,6 +10,6 @@ import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPred
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 
 public interface LuceneSearchQueryWhereStep<H, LOS>
-		extends SearchQueryWhereStep<LuceneSearchQueryOptionsStep<H, LOS>, H, LuceneSearchPredicateFactory> {
+		extends SearchQueryWhereStep<LuceneSearchQueryOptionsStep<H, LOS>, H, LOS, LuceneSearchPredicateFactory> {
 
 }

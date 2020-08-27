@@ -50,7 +50,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 				AF extends SearchAggregationFactory,
 				C
 		>
-		implements SearchQueryWhereStep<S, H, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
+		implements SearchQueryWhereStep<S, H, LOS, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;

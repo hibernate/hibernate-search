@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
 public abstract class AbstractDelegatingSearchQuerySelectStep<R, E, LOS>
 		implements SearchQuerySelectStep<
-						SearchQueryOptionsStep<?, E, LOS,?, ?>,
+						SearchQueryOptionsStep<?, E, LOS, ?, ?>,
 						R,
 						E,
 						LOS,
@@ -37,28 +37,28 @@ public abstract class AbstractDelegatingSearchQuerySelectStep<R, E, LOS>
 	}
 
 	@Override
-	public SearchQueryWhereStep<?, E, ?> selectEntity() {
+	public SearchQueryWhereStep<?, E, LOS, ?> selectEntity() {
 		return delegate.selectEntity();
 	}
 
 	@Override
-	public SearchQueryWhereStep<?, R, ?> selectEntityReference() {
+	public SearchQueryWhereStep<?, R, LOS, ?> selectEntityReference() {
 		return delegate.selectEntityReference();
 	}
 
 	@Override
-	public <P> SearchQueryWhereStep<?, P, ?> select(
+	public <P> SearchQueryWhereStep<?, P, LOS, ?> select(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return delegate.select( projectionContributor );
 	}
 
 	@Override
-	public <P> SearchQueryWhereStep<?, P, ?> select(SearchProjection<P> projection) {
+	public <P> SearchQueryWhereStep<?, P, LOS, ?> select(SearchProjection<P> projection) {
 		return delegate.select( projection );
 	}
 
 	@Override
-	public SearchQueryWhereStep<?, List<?>, ?> select(
+	public SearchQueryWhereStep<?, List<?>, LOS, ?> select(
 			SearchProjection<?>... projections) {
 		return delegate.select( projections );
 	}
