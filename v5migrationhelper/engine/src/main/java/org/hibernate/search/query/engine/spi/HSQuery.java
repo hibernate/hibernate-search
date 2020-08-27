@@ -7,13 +7,13 @@
 package org.hibernate.search.query.engine.spi;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spi.IndexedTypeSet;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -97,7 +97,7 @@ public interface HSQuery extends ProjectionConstants {
 	/**
 	 * @return the targeted entity types
 	 */
-	IndexedTypeSet getTargetedEntities();
+	Set<Class<?>> getTargetedEntities();
 
 	/**
 	 * @return the projected field names
