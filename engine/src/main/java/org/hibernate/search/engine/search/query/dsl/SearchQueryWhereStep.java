@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.query.dsl;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -18,10 +19,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <N> The type of the next step, returned after a predicate is defined.
  * @param <H> The type of hits for the created query.
  * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
+ * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  */
 public interface SearchQueryWhereStep<
-				N extends SearchQueryOptionsStep<?, H, ?, ?, ?>,
+				N extends SearchQueryOptionsStep<?, H, LOS, ?, ?>,
 				H,
+				LOS,
 				PDF extends SearchPredicateFactory
 		> {
 

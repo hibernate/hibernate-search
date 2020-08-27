@@ -47,7 +47,7 @@ public interface SearchQuerySelectStep<
 				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory
 		>
-		extends SearchQueryWhereStep<N, E, PDF> {
+		extends SearchQueryWhereStep<N, E, LOS, PDF> {
 
 	/**
 	 * Select the entity was originally indexed
@@ -58,7 +58,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, E, ?> selectEntity();
+	SearchQueryWhereStep<?, E, LOS, ?> selectEntity();
 
 	/**
 	 * Select a reference to the entity that was originally indexed
@@ -67,7 +67,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, R, ?> selectEntityReference();
+	SearchQueryWhereStep<?, R, LOS, ?> selectEntityReference();
 
 	/**
 	 * Select a given projection as a representation of the search hit for each matching document.
@@ -79,7 +79,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, ?> select(
+	<P> SearchQueryWhereStep<?, P, LOS, ?> select(
 			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
@@ -90,7 +90,7 @@ public interface SearchQuerySelectStep<
 	 * @return The next step.
 	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryWhereStep<?, P, ?> select(SearchProjection<P> projection);
+	<P> SearchQueryWhereStep<?, P, LOS, ?> select(SearchProjection<P> projection);
 
 	/**
 	 * Select a list of projections as a representation of the search hit for each matching document.
@@ -105,7 +105,7 @@ public interface SearchQuerySelectStep<
 	 * @see SearchProjectionFactory#composite(SearchProjection[])
 	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryWhereStep<?, List<?>, ?> select(SearchProjection<?>... projections);
+	SearchQueryWhereStep<?, List<?>, LOS, ?> select(SearchProjection<?>... projections);
 
 	/**
 	 * Extend the current DSL step with the given extension,
@@ -129,7 +129,7 @@ public interface SearchQuerySelectStep<
 	 * @deprecated Use {@link #selectEntity()} instead.
 	 */
 	@Deprecated
-	default SearchQueryWhereStep<?, E, ?> asEntity() {
+	default SearchQueryWhereStep<?, E, LOS, ?> asEntity() {
 		return selectEntity();
 	}
 
@@ -142,7 +142,7 @@ public interface SearchQuerySelectStep<
 	 * @deprecated Use {@link #selectEntityReference()} instead.
 	 */
 	@Deprecated
-	default SearchQueryWhereStep<?, R, ?> asEntityReference() {
+	default SearchQueryWhereStep<?, R, LOS, ?> asEntityReference() {
 		return selectEntityReference();
 	}
 
@@ -158,7 +158,7 @@ public interface SearchQuerySelectStep<
 	 * @deprecated Use {@link #select(Function)} instead.
 	 */
 	@Deprecated
-	default <P> SearchQueryWhereStep<?, P, ?> asProjection(
+	default <P> SearchQueryWhereStep<?, P, LOS, ?> asProjection(
 			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return select( projectionContributor );
 	}
@@ -173,7 +173,7 @@ public interface SearchQuerySelectStep<
 	 * @deprecated Use {@link #select(SearchProjection)} instead.
 	 */
 	@Deprecated
-	default <P> SearchQueryWhereStep<?, P, ?> asProjection(SearchProjection<P> projection) {
+	default <P> SearchQueryWhereStep<?, P, LOS, ?> asProjection(SearchProjection<P> projection) {
 		return select( projection );
 	}
 
@@ -192,7 +192,7 @@ public interface SearchQuerySelectStep<
 	 * @deprecated Use {@link #select(SearchProjection)} instead.
 	 */
 	@Deprecated
-	default SearchQueryWhereStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections) {
+	default SearchQueryWhereStep<?, List<?>, LOS, ?> asProjections(SearchProjection<?>... projections) {
 		return select( projections );
 	}
 

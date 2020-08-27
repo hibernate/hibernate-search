@@ -44,32 +44,32 @@ public interface ElasticsearchSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	@Deprecated
-	default ElasticsearchSearchQueryWhereStep<E, ?> asEntity() {
+	default ElasticsearchSearchQueryWhereStep<E, LOS> asEntity() {
 		return selectEntity();
 	}
 
 	@Override
 	@Deprecated
-	default ElasticsearchSearchQueryWhereStep<R, ?> asEntityReference() {
+	default ElasticsearchSearchQueryWhereStep<R, LOS> asEntityReference() {
 		return selectEntityReference();
 	}
 
 	@Override
 	@Deprecated
-	default <P> ElasticsearchSearchQueryWhereStep<P, ?> asProjection(
+	default <P> ElasticsearchSearchQueryWhereStep<P, LOS> asProjection(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return select( projectionContributor );
 	}
 
 	@Override
 	@Deprecated
-	default <P> ElasticsearchSearchQueryWhereStep<P, ?> asProjection(SearchProjection<P> projection) {
+	default <P> ElasticsearchSearchQueryWhereStep<P, LOS> asProjection(SearchProjection<P> projection) {
 		return select( projection );
 	}
 
 	@Override
 	@Deprecated
-	default ElasticsearchSearchQueryWhereStep<List<?>, ?> asProjections(SearchProjection<?>... projections) {
+	default ElasticsearchSearchQueryWhereStep<List<?>, LOS> asProjections(SearchProjection<?>... projections) {
 		return select( projections );
 	}
 
