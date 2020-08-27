@@ -49,8 +49,8 @@ public interface ProjectionConstants {
 	 * the matching object/document
 	 * This feature is relatively expensive, do not use unless you return a limited
 	 * amount of objects (using pagination)
-	 * To retrieve explanation of a single result, consider retrieving {@link #DOCUMENT_ID}
-	 * and using fullTextQuery.explain(int)
+	 * To retrieve explanation of a single result, consider retrieving {@link #ID the entity id}
+	 * and using fullTextQuery.explain(Object)
 	 */
 	String EXPLANATION = "__HSearch_Explanation";
 

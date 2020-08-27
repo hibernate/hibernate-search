@@ -129,8 +129,8 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public Explanation explain(int documentId) {
-		return hSearchQuery.explain( documentId );
+	public Explanation explain(Object entityId) {
+		return hSearchQuery.explain( entityId );
 	}
 
 	@Override

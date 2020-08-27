@@ -120,11 +120,11 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * object describing the score computation for the matching object/document
 	 * in the current query
 	 *
-	 * @param documentId Lucene Document id to be explain. This is NOT the object id
+	 * @param entityId The identifier of the entity whose match should be explained.
 	 *
 	 * @return Lucene {@link Explanation}
 	 */
-	Explanation explain(int documentId);
+	Explanation explain(Object entityId);
 
 	/**
 	 * Limit the time used by Hibernate Search to execute the query. When the limit is reached, results already

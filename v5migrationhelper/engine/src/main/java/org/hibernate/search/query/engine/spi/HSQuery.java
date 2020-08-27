@@ -148,10 +148,10 @@ public interface HSQuery extends ProjectionConstants {
 	 * object describing the score computation for the matching object/document
 	 * in the current query
 	 *
-	 * @param documentId Lucene Document id to be explain. This is NOT the object id
+	 * @param entityId The identifier of the entity whose match should be explained.
 	 * @return Lucene Explanation
 	 */
-	Explanation explain(int documentId);
+	Explanation explain(Object entityId);
 
 	/**
 	 * <p>setSpatialParameters.</p>
