@@ -21,7 +21,7 @@ import org.apache.lucene.search.Query;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public interface SearchIntegrator extends AutoCloseable {
+public interface SearchIntegrator {
 
 	/**
 	 * Return an Hibernate Search query object.
@@ -38,11 +38,5 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * @return return a query builder providing a fluent API to create Lucene queries
 	 */
 	QueryContextBuilder buildQueryBuilder();
-
-	/**
-	 * Shuts down all workers and releases all resources.
-	 */
-	@Override
-	void close();
 
 }

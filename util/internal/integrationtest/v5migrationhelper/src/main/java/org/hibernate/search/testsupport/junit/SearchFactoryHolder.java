@@ -50,7 +50,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	protected void after() {
 		if ( searchIntegrator != null ) {
 			try {
-				searchIntegrator.close();
+				throw new UnsupportedOperationException( "Closing to be implemented by delegating to Search 6 APIs." );
 			}
 			finally {
 				searchIntegrator = null;
