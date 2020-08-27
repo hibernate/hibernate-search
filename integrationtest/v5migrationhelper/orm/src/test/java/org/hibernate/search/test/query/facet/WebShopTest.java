@@ -7,6 +7,8 @@
 
 package org.hibernate.search.test.query.facet;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +29,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import org.junit.Test;
 
-import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
-import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -97,7 +97,7 @@ public class WebShopTest extends AbstractFacetTest {
 	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
-		List<Car> allCars = newArrayList();
+		List<Car> allCars = new ArrayList<>();
 		for ( String make : makes ) {
 			for ( String color : colors ) {
 				for ( int cc : ccs ) {
@@ -126,7 +126,7 @@ public class WebShopTest extends AbstractFacetTest {
 		private FullTextQuery currentFullTextQuery;
 		private Map<String, List<FacetMenuItem>> menuItems;
 		private String queryString;
-		private final List<Facet> selectedFacets = newArrayList();
+		private final List<Facet> selectedFacets = new ArrayList<>();
 
 		public SearchService(SessionFactory factory) {
 			this.factory = factory;
@@ -216,8 +216,8 @@ public class WebShopTest extends AbstractFacetTest {
 		}
 
 		public Map<String, List<FacetMenuItem>> getMenuItems() {
-			menuItems = newHashMap();
-			List<FacetMenuItem> items = newArrayList();
+			menuItems = new HashMap<>();
+			List<FacetMenuItem> items = new ArrayList<>();
 
 			int i = 0;
 			for ( Facet facet : currentFullTextQuery.getFacetManager().getFacets( colorFacetName ) ) {
@@ -226,7 +226,7 @@ public class WebShopTest extends AbstractFacetTest {
 			}
 			menuItems.put( colorFacetName, items );
 
-			items = newArrayList();
+			items = new ArrayList<>();
 			i = 0;
 			for ( Facet facet : currentFullTextQuery.getFacetManager().getFacets( cubicCapacityFacetName ) ) {
 				items.add( new FacetMenuItem( facet, selectedFacets.contains( facet ), i++ ) );

@@ -7,6 +7,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -17,8 +18,6 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
-
-import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
 
 /**
  * @author Hardy Ferentschik
@@ -45,7 +44,7 @@ class FacetBuildingContext<T> {
 	private FacetSortOrder sort = FacetSortOrder.COUNT_DESC;
 	private boolean includeZeroCount = false;
 	private boolean isRangeQuery = false;
-	private List<FacetRange<T>> rangeList = newArrayList();
+	private List<FacetRange<T>> rangeList = new ArrayList<>();
 	private T rangeStart;
 	private boolean includeRangeStart = true;
 	private T rangeEnd;
