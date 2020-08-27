@@ -18,6 +18,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
+import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.util.StringHelper;
+
+import org.junit.Assert;
+
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -26,13 +36,6 @@ import org.apache.lucene.search.TermQuery;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.util.StringHelper;
-import org.junit.Assert;
 
 /**
  * A helper for Hibernate Search integration tests.
@@ -110,12 +113,16 @@ public class SearchITHelper {
 		return integratorProvider.get().buildQueryBuilder().forEntity( clazz ).get();
 	}
 
+	public V5MigrationSearchSession<Void> session() {
+		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs" );
+	}
+
 	public HSQuery hsQuery(Class<?> ... classes) {
 		return hsQuery( new MatchAllDocsQuery(), classes );
 	}
 
 	public HSQuery hsQuery(Query query, Class<?> ... classes) {
-		return integratorProvider.get().createHSQuery( query, classes );
+		return integratorProvider.get().createHSQuery( query, session(), null, classes );
 	}
 
 	public AssertBuildingHSQueryContext assertThat(String fieldName, String value) {
@@ -311,9 +318,10 @@ public class SearchITHelper {
 
 		public ListAssert asResultIds() {
 			HSQuery hsQuery = getHSQuery();
-			List<EntityInfo> results = hsQuery.queryEntityInfos();
-			List<Serializable> ids = results.stream()
-					.map( EntityInfo::getId )
+			hsQuery.projection( ProjectionConstants.ID );
+			List<Object[]> results = (List<Object[]>) hsQuery.fetch();
+			List<Object> ids = results.stream()
+					.map( array -> array[0] )
 					.collect( Collectors.toList() );
 			return Assertions.assertThat( ids )
 					.as( "IDs of results of query " + toString( hsQuery ) );
@@ -321,25 +329,17 @@ public class SearchITHelper {
 
 		public ListAssert asResultProjectionsAsLists() {
 			HSQuery hsQuery = getHSQuery();
-			List<EntityInfo> results = hsQuery.queryEntityInfos();
+			List<Object[]> results = (List<Object[]>) hsQuery.fetch();
 			List<List<Object>> projections = results.stream()
-					.map( EntityInfo::getProjection )
 					.map( Arrays::asList ) // Take advantage of List.equals when calling ListAssert.containsExactly, for instance
 					.collect( Collectors.toList() );
 			return Assertions.assertThat( projections )
 					.as( "Projections of results of query " + toString( hsQuery ) );
 		}
 
-		public ListAssert asResults() {
-			HSQuery hsQuery = getHSQuery();
-			List<EntityInfo> results = hsQuery.queryEntityInfos();
-			return Assertions.assertThat( results )
-					.as( "Results of query " + toString( hsQuery ) );
-		}
-
 		public AbstractIntegerAssert<?> asResultSize() {
 			HSQuery hsQuery = getHSQuery();
-			int actualSize = hsQuery.queryResultSize();
+			int actualSize = hsQuery.getResultSize();
 			return Assertions.assertThat( actualSize )
 					.as( "Number of results of query " + toString( hsQuery ) );
 		}
@@ -522,7 +522,7 @@ public class SearchITHelper {
 
 		@Override
 		protected HSQuery getHSQuery() {
-			HSQuery hsQuery = integratorProvider.get().createHSQuery( luceneQuery, classes );
+			HSQuery hsQuery = integratorProvider.get().createHSQuery( luceneQuery, session(), null, classes );
 			before.accept( hsQuery );
 			return hsQuery;
 		}

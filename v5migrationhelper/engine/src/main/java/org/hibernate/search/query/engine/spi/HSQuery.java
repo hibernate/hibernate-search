@@ -8,6 +8,7 @@ package org.hibernate.search.query.engine.spi;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
@@ -105,9 +106,18 @@ public interface HSQuery extends ProjectionConstants {
 	String[] getProjectedFields();
 
 	/**
-	 * @return the timeout manager. Make sure to wrap your HSQuery usage around a {@code timeoutManager.start()} and  {@code timeoutManager.stop()}.
+	 * @param timeout Timeout value.
+	 * @param timeUnit Timeout unit.
+	 * @see org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit)
 	 */
-	TimeoutManager getTimeoutManager();
+	void failAfter(long timeout, TimeUnit timeUnit);
+
+	/**
+	 * @param timeout Timeout value.
+	 * @param timeUnit Timeout unit.
+	 * @see org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#truncateAfter(long, TimeUnit)
+	 */
+	void truncateAfter(long timeout, TimeUnit timeUnit);
 
 	/**
 	 * @return return the manager for all faceting related operations
@@ -125,13 +135,17 @@ public interface HSQuery extends ProjectionConstants {
 	String getQueryString();
 
 	/**
-	 * Execute the Lucene query and return the list of {@code EntityInfo}s populated with
-	 * metadata and projection. {@link ProjectionConstants#THIS} if projected is <b>not</b> populated.
-	 * It is the responsibility of the object source integration.
-	 *
-	 * @return list of {@code EntityInfo}s populated with metadata and projection
+	 * Execute the Lucene query and return the hits.
+	 * @return list of hits.
 	 */
-	List<EntityInfo> queryEntityInfos();
+	List<?> fetch();
+
+	/**
+	 * @return {@code true} if the last call to {@link #fetch()}
+	 * returned a {@link #truncateAfter(long, TimeUnit) truncated} list of hits,
+	 * {@code false} otherwise.
+	 */
+	boolean hasPartialResults();
 
 	/**
 	 * @return the number of hits for this search
@@ -141,7 +155,7 @@ public interface HSQuery extends ProjectionConstants {
 	 *         what the object source returns if the index is
 	 *         not in sync with the store at the time of query.
 	 */
-	int queryResultSize();
+	int getResultSize();
 
 	/**
 	 * Return the Lucene {@link Explanation}

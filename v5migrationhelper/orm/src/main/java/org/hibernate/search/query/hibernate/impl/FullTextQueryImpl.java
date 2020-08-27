@@ -130,7 +130,7 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public Explanation explain(Object entityId) {
-		return hSearchQuery.explain( entityId );
+		return hSearchQuery.explain( null, entityId );
 	}
 
 	@Override
@@ -415,22 +415,19 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public FullTextQueryImpl setTimeout(long timeout, TimeUnit timeUnit) {
-		super.setTimeout( (int) timeUnit.toSeconds( timeout ) );
-		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
-		hSearchQuery.getTimeoutManager().raiseExceptionOnTimeout();
+		hSearchQuery.failAfter( timeout, timeUnit );
 		return this;
 	}
 
 	@Override
 	public FullTextQueryImpl limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
-		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
-		hSearchQuery.getTimeoutManager().limitFetchingOnTimeout();
+		hSearchQuery.truncateAfter( timeout, timeUnit );
 		return this;
 	}
 
 	@Override
 	public boolean hasPartialResults() {
-		return hSearchQuery.getTimeoutManager().hasPartialResults();
+		return hSearchQuery.hasPartialResults();
 	}
 
 	@Override

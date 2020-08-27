@@ -44,7 +44,8 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
-		HSQuery hsQuery = getSearchIntegrator().createHSQuery( luceneQuery, entities );
+		// TODO pass the session and loading options contributor here
+		HSQuery hsQuery = getSearchIntegrator().createHSQuery( luceneQuery, null, null, entities );
 		return createFullTextQuery( hsQuery );
 	}
 

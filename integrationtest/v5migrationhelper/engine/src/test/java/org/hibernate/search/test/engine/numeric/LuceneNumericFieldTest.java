@@ -21,7 +21,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
@@ -47,12 +46,12 @@ public class LuceneNumericFieldTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
 	public void testDocumentFieldIsNumeric() {
-		List<EntityInfo> list = helper.hsQuery( TouristAttraction.class )
+		List<Object[]> list = (List<Object[]>) helper.hsQuery( TouristAttraction.class )
 				.projection( ProjectionConstants.DOCUMENT )
-				.queryEntityInfos();
+				.fetch();
 
 		assertEquals( 1, list.size() );
-		Document document = (Document) list.iterator().next().getProjection()[0];
+		Document document = (Document) list.iterator().next()[0];
 
 		IndexableField scoreNumeric = document.getField( "scoreNumeric" );
 		assertThat( scoreNumeric.numericValue() ).isEqualTo( 23 );
@@ -61,12 +60,12 @@ public class LuceneNumericFieldTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
 	public void testNumericMappingOfEmbeddedFields() {
-		List<EntityInfo> list = helper.hsQuery( ScoreBoard.class )
+		List<Object[]> list = (List<Object[]>) helper.hsQuery( ScoreBoard.class )
 				.projection( ProjectionConstants.DOCUMENT )
-				.queryEntityInfos();
+				.fetch();
 
 		assertEquals( 1, list.size() );
-		Document document = (Document) list.iterator().next().getProjection()[0];
+		Document document = (Document) list.iterator().next()[0];
 
 		IndexableField beta = document.getField( "score_beta" );
 		assertThat( beta.numericValue() ).isEqualTo( 100 );
