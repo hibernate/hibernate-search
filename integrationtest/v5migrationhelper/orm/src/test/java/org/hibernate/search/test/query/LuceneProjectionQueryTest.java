@@ -105,24 +105,6 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testLuceneDocumentIdProjection() throws Exception {
-		FullTextSession s = Search.getFullTextSession( getSession() );
-		Transaction tx = s.beginTransaction();
-
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( FullTextQuery.DOCUMENT_ID );
-
-		List<?> result = hibQuery.list();
-		assertNotNull( result );
-		Object[] projection = (Object[]) result.get( 0 );
-		assertTrue( "DOCUMENT_ID incorrect", projection[0] instanceof Integer );
-
-		tx.commit();
-	}
-
-	@Test
 	public void testLuceneDocumentProjectionNonLoadedFieldOptimization() throws Exception {
 		FullTextSession s = Search.getFullTextSession( getSession() );
 		Transaction tx = s.beginTransaction();
