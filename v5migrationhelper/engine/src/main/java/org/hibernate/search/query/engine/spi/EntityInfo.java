@@ -9,7 +9,6 @@ package org.hibernate.search.query.engine.spi;
 import java.io.Serializable;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
 
 /**
  * Wrapper class describing the loading of an element.
@@ -31,7 +30,7 @@ public interface EntityInfo {
 	 * @return The entity type.
 	 * @throws SearchException If the entity class could not be retrieved from the indexed document.
 	 */
-	IndexedTypeIdentifier getType();
+	Class<?> getType();
 
 	/**
 	 * @return The entity identifier.

@@ -30,9 +30,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.util.StringHelper;
 import org.junit.Assert;
 
@@ -224,12 +222,12 @@ public class SearchITHelper {
 	}
 
 	private static class Work {
-		public final IndexedTypeIdentifier entityType;
+		public final Class<?> entityType;
 		public final Object entity;
 		public final Object providedId;
 		public final SearchITHelper.WorkType workType;
 
-		public Work(IndexedTypeIdentifier entityType, Object providedId, WorkType workType) {
+		public Work(Class<?> entityType, Object providedId, WorkType workType) {
 			this.entityType = entityType;
 			this.entity = null;
 			this.providedId = providedId;
@@ -237,7 +235,7 @@ public class SearchITHelper {
 		}
 
 		public Work(Object entity, Object providedId, WorkType workType) {
-			this.entityType = PojoIndexedTypeIdentifier.convertFromLegacy( entity.getClass() );
+			this.entityType = entity.getClass();
 			this.entity = entity;
 			this.providedId = providedId;
 			this.workType = workType;
@@ -291,7 +289,7 @@ public class SearchITHelper {
 		}
 
 		public EntityTypeWorkContext push(Class<?> type, Stream<? extends Serializable> ids) {
-			executor.push( ids.map( id -> new Work( new PojoIndexedTypeIdentifier( type ), id, workType ) ) );
+			executor.push( ids.map( id -> new Work( type, id, workType ) ) );
 			return this;
 		}
 
