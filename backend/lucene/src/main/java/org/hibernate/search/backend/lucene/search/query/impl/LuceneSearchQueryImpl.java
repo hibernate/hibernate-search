@@ -53,7 +53,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
-	private final Integer totalHitsThreshold;
+	private final Integer totalHitCountThreshold;
 
 	private LuceneTimeoutManager timeoutManager;
 
@@ -65,7 +65,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			LuceneTimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
-			Integer totalHitsThreshold) {
+			Integer totalHitCountThreshold) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;
@@ -76,7 +76,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.searcher = searcher;
-		this.totalHitsThreshold = totalHitsThreshold;
+		this.totalHitCountThreshold = totalHitCountThreshold;
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private LuceneSearchResult<H> doFetch(Integer offset, Integer limit, boolean skipTotalHitCount) {
 		timeoutManager.start();
 		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit,
-				totalHitsThreshold( skipTotalHitCount )
+				totalHitCountThreshold( skipTotalHitCount )
 		);
 		LuceneSearchResult<H> result = doSubmit( work )
 				/*
@@ -211,14 +211,14 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		);
 	}
 
-	private int totalHitsThreshold(boolean skipTotalHitCount) {
+	private int totalHitCountThreshold(boolean skipTotalHitCount) {
 		if ( skipTotalHitCount ) {
 			return 0;
 		}
-		if ( totalHitsThreshold == null ) {
+		if ( totalHitCountThreshold == null ) {
 			return Integer.MAX_VALUE;
 		}
-		return totalHitsThreshold;
+		return totalHitCountThreshold;
 	}
 
 	private String toDocumentId(LuceneSearchIndexContext index, Object id) {

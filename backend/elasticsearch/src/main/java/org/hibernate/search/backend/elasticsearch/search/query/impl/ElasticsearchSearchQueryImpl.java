@@ -65,7 +65,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final Integer scrollTimeout;
-	private final Integer totalHitsThreshold;
+	private final Integer totalHitCountThreshold;
 
 	private ElasticsearchTimeoutManager timeoutManager;
 
@@ -78,7 +78,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			ElasticsearchTimeoutManager timeoutManager, Integer scrollTimeout, Integer totalHitsThreshold) {
+			ElasticsearchTimeoutManager timeoutManager, Integer scrollTimeout, Integer totalHitCountThreshold) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
@@ -90,7 +90,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.searchResultExtractor = searchResultExtractor;
 		this.timeoutManager = timeoutManager;
 		this.scrollTimeout = scrollTimeout;
-		this.totalHitsThreshold = totalHitsThreshold;
+		this.totalHitCountThreshold = totalHitCountThreshold;
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		timeoutManager.start();
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = searchWorkBuilder()
 				.paging( defaultedLimit( limit, offset ), offset )
-				.totalHitsThreshold( totalHitsThreshold )
+				.totalHitCountThreshold( totalHitCountThreshold )
 				.build();
 
 		ElasticsearchSearchResultImpl<H> result = Futures.unwrappedExceptionJoin(

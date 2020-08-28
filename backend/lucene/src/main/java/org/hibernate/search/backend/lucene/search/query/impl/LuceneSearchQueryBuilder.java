@@ -68,7 +68,7 @@ public class LuceneSearchQueryBuilder<H>
 	private Long timeout;
 	private TimeUnit timeUnit;
 	private boolean exceptionOnTimeout;
-	private Integer totalHitsThreshold;
+	private Integer totalHitCountThreshold;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -115,8 +115,8 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void totalHitsThreshold(int totalHitsThreshold) {
-		this.totalHitsThreshold = totalHitsThreshold;
+	public void totalHitCountThreshold(int totalHitCountThreshold) {
+		this.totalHitCountThreshold = totalHitCountThreshold;
 	}
 
 	@Override
@@ -234,7 +234,7 @@ public class LuceneSearchQueryBuilder<H>
 				timeoutManager,
 				definitiveLuceneQuery,
 				luceneSort,
-				searcher, totalHitsThreshold
+				searcher, totalHitCountThreshold
 		);
 	}
 }

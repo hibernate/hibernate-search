@@ -64,14 +64,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher,
 			IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit, int totalHitsThreshold) throws IOException {
+			int offset, Integer limit, int totalHitCountThreshold) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
 		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs,
-				totalHitsThreshold
+				totalHitCountThreshold
 		);
 
 		luceneCollectors.collectMatchingDocs( offset, limit );
@@ -136,10 +136,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int maxDocs, int totalHitsThreshold) throws IOException {
+			int maxDocs, int totalHitCountThreshold) throws IOException {
 		return extractionRequirements.createCollectors(
 				indexSearcher, requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
-				metadataResolver, maxDocs, timeoutManager, totalHitsThreshold
+				metadataResolver, maxDocs, timeoutManager, totalHitCountThreshold
 		);
 	}
 
