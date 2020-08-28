@@ -78,7 +78,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
 		private Boolean trackTotalHits;
-		private Integer totalHitsThreshold;
+		private Integer totalHitCountThreshold;
 		private Integer from;
 		private Integer size;
 		private Integer scrollSize;
@@ -138,11 +138,11 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		@Override
-		public SearchWorkBuilder<R> totalHitsThreshold(Integer totalHitsThreshold) {
+		public SearchWorkBuilder<R> totalHitCountThreshold(Integer totalHitCountThreshold) {
 			// setting trackTotalHits to false only if this parameter was already set,
 			// the parameter is not supported by the older Elasticsearch server
 			if ( trackTotalHits != null && trackTotalHits ) {
-				this.totalHitsThreshold = totalHitsThreshold;
+				this.totalHitCountThreshold = totalHitCountThreshold;
 			}
 			return this;
 		}
@@ -173,9 +173,9 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			}
 
 			if ( trackTotalHits != null ) {
-				if ( trackTotalHits && totalHitsThreshold != null ) {
+				if ( trackTotalHits && totalHitCountThreshold != null ) {
 					// total hits is tracked but a with a limited precision
-					builder.param( "track_total_hits", totalHitsThreshold );
+					builder.param( "track_total_hits", totalHitCountThreshold );
 				}
 				else {
 					builder.param( "track_total_hits", trackTotalHits );

@@ -97,13 +97,13 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitsThreshold() {
+	public void resultTotal_totalHitCountThreshold() {
 		initData( 5000 );
 		StubMappingScope scope = index.createScope();
 
 		SearchResult<DocumentReference> fetch = scope.query()
 				.where( f -> f.matchAll() )
-				.totalHitsThreshold( 100 )
+				.totalHitCountThreshold( 100 )
 				.toQuery()
 				.fetch( 10 );
 
@@ -118,13 +118,13 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitsThreshold_veryHigh() {
+	public void resultTotal_totalHitCountThreshold_veryHigh() {
 		initData( 5000 );
 		StubMappingScope scope = index.createScope();
 
 		SearchResult<DocumentReference> fetch = scope.query()
 				.where( f -> f.matchAll() )
-				.totalHitsThreshold( 5000 )
+				.totalHitCountThreshold( 5000 )
 				.toQuery()
 				.fetch( 10 );
 

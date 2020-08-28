@@ -38,7 +38,7 @@ public interface LuceneWorkFactory {
 
 	IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 
-	<R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit, int totalHitsThreshold);
+	<R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit, int totalHitCountThreshold);
 
 	<ER> ReadWork<ER> scroll(LuceneSearcher<?, ER> searcher, int limit);
 

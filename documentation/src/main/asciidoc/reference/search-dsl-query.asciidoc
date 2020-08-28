@@ -254,9 +254,9 @@ This optimization has no effect on calls to `fetchHits(...)` (which is already o
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-totalHitsThreshold]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-totalHitCountThreshold]
 ----
-<1> Define a `totalHitsThreshold` for the current query
+<1> Define a `totalHitCountThreshold` for the current query
 <2> Extract the `SearchResultTotal` from the `SearchResult`.
 <3> Retrieve a lower-bound estimate of the total hit count. This will return the exact hit count if available.
 <4> Test if the count is exact.

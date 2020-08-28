@@ -442,20 +442,20 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void resultTotal_totalHitsThreshold() {
+	public void resultTotal_totalHitCountThreshold() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
-			// tag::fetching-totalHitsThreshold[]
+			// tag::fetching-totalHitCountThreshold[]
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
-					.totalHitsThreshold( 1000 ) // <1>
+					.totalHitCountThreshold( 1000 ) // <1>
 					.fetch( 20 );
 
 			SearchResultTotal resultTotal = result.total(); // <2>
 			long totalHitCountLowerBound = resultTotal.hitCountLowerBound(); // <3>
 			boolean hitCountExact = resultTotal.isHitCountExact(); // <4>
 			boolean hitCountLowerBound = resultTotal.isHitCountLowerBound(); // <5>
-			// end::fetching-totalHitsThreshold[]
+			// end::fetching-totalHitCountThreshold[]
 
 			assertThat( totalHitCountLowerBound ).isLessThanOrEqualTo( 4 );
 		} );
