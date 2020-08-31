@@ -85,7 +85,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		}
 
 		// no more results check
-		if ( search.resultTotal().isHitCountExact() && scrollIndex >= search.resultTotal().hitCount() ) {
+		if ( scrollIndex >= search.hitSize() ) {
 			return new LuceneSearchScrollResultImpl<>( false, Collections.emptyList(), Duration.ZERO, false );
 		}
 
