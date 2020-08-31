@@ -72,7 +72,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
 	private boolean exceptionOnTimeout;
-	private Integer totalHitCountThreshold;
+	private Long totalHitCountThreshold;
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -125,7 +125,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void totalHitCountThreshold(int totalHitCountThreshold) {
+	public void totalHitCountThreshold(long totalHitCountThreshold) {
 		this.totalHitCountThreshold = totalHitCountThreshold;
 	}
 

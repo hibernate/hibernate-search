@@ -68,7 +68,7 @@ public class LuceneSearchQueryBuilder<H>
 	private Long timeout;
 	private TimeUnit timeUnit;
 	private boolean exceptionOnTimeout;
-	private Integer totalHitCountThreshold;
+	private Long totalHitCountThreshold;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -115,7 +115,7 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void totalHitCountThreshold(int totalHitCountThreshold) {
+	public void totalHitCountThreshold(long totalHitCountThreshold) {
 		this.totalHitCountThreshold = totalHitCountThreshold;
 	}
 

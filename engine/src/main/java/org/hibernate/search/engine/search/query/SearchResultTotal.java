@@ -23,14 +23,14 @@ public interface SearchResultTotal {
 	/**
 	 * @return Whether the total hit count is exact.
 	 * The total hit count is exact by default, but that can change when a
-	 * {@link SearchQueryOptionsStep#totalHitCountThreshold(int)} or a
+	 * {@link SearchQueryOptionsStep#totalHitCountThreshold(long)} or a
 	 * {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)} has been defined for the current query.
 	 */
 	boolean isHitCountExact();
 
 	/**
 	 * @return Whether the total hit count is a lower-bound estimate.
-	 * The total hit count can be a lower bound only when a {@link SearchQueryOptionsStep#totalHitCountThreshold(int)}
+	 * The total hit count can be a lower bound only when a {@link SearchQueryOptionsStep#totalHitCountThreshold(long)}
 	 * or a {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)} has been defined for the current query.
 	 */
 	boolean isHitCountLowerBound();
