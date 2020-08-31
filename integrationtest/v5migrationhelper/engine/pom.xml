@@ -31,6 +31,10 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-javabean</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.hibernate.search</groupId>
