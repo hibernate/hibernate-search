@@ -10,7 +10,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.impl.V5MigrationOrmSearchIntegratorAdapter;
 
 /**
  * Static helper class to retrieve the instance of the current {@code SearchIntegrator} / {@code ExtendedSearchIntegrator}.
@@ -28,20 +29,20 @@ public class ContextHelper {
 	private ContextHelper() {
 	}
 
-	public static SearchIntegrator getSearchIntegrator(Session session) {
+	public static V5MigrationOrmSearchIntegratorAdapter getSearchIntegrator(Session session) {
 		return getSearchIntegratorBySessionImplementor( (SessionImplementor) session );
 	}
 
-	public static SearchIntegrator getSearchIntegratorBySessionImplementor(SessionImplementor session) {
+	public static V5MigrationOrmSearchIntegratorAdapter getSearchIntegratorBySessionImplementor(SessionImplementor session) {
 		return getSearchIntegratorBySFI( session.getFactory() );
 	}
 
-	public static SearchIntegrator getSearchIntegratorBySF(SessionFactory factory) {
+	public static V5MigrationOrmSearchIntegratorAdapter getSearchIntegratorBySF(SessionFactory factory) {
 		return getSearchIntegratorBySFI( (SessionFactoryImplementor) factory );
 	}
 
-	public static SearchIntegrator getSearchIntegratorBySFI(SessionFactoryImplementor sfi) {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+	public static V5MigrationOrmSearchIntegratorAdapter getSearchIntegratorBySFI(SessionFactoryImplementor sfi) {
+		return new V5MigrationOrmSearchIntegratorAdapter( Search.mapping( sfi ) );
 	}
 
 }

@@ -10,9 +10,11 @@ package org.hibernate.search.util.logging.impl;
 import java.io.IOException;
 
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -78,4 +80,7 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 353, value = "Unknown analyzer: '%1$s'. Make sure you defined this analyzer.")
 	SearchException unknownAnalyzer(String analyzerName);
+
+	@Message(id = 400, value = "Cannot unwrap a SearchFactory into a '%1$s'.")
+	SearchException cannotUnwrapSearchFactory(@FormatWith(ClassFormatter.class) Class<?> cls);
 }

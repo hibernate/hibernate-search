@@ -35,7 +35,7 @@ public final class ImplementationFactory {
 		}
 	}
 
-	public static SearchFactory createSearchFactory(Object searchIntegrator) {
+	public static SearchFactory createSearchFactory(V5MigrationOrmSearchIntegratorAdapter searchIntegrator) {
 		return new SearchFactoryImpl( searchIntegrator );
 	}
 

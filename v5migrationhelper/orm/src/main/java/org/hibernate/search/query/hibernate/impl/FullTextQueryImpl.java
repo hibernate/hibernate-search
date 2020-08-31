@@ -15,14 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
+import java.util.function.Consumer;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
+import javax.persistence.QueryTimeoutException;
 import javax.persistence.TemporalType;
 
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -38,17 +37,23 @@ import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.impl.V5MigrationOrmSearchIntegratorAdapter;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
+
+import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}.
@@ -59,11 +64,8 @@ import org.hibernate.type.Type;
 @SuppressWarnings("rawtypes") // We extend the raw version of AbstractProducedQuery on purpose, see HSEARCH-2564
 public class FullTextQueryImpl extends AbstractProducedQuery implements FullTextQuery {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
+	private final V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession;
 
-	private final SessionImplementor session;
-
-	private int fetchSize = 1;
 	private final HSQuery hSearchQuery;
 
 	private Integer firstResult;
@@ -71,10 +73,25 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	//initialized at 0 since we don't expect to use hints at this stage
 	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
 
-	public FullTextQueryImpl(HSQuery hSearchQuery, SessionImplementor session) {
+	private Integer fetchSize = null;
+	private EntityLoadingCacheLookupStrategy cacheLookupStrategy = null;
+	private final Consumer<SearchLoadingOptionsStep> loadingOptionsContributor = o -> {
+		if ( cacheLookupStrategy != null ) {
+			o.cacheLookupStrategy( cacheLookupStrategy );
+		}
+		if ( fetchSize != null ) {
+			o.fetchSize( fetchSize );
+		}
+	};
+
+	public FullTextQueryImpl(Query luceneQuery, SessionImplementor session,
+			V5MigrationOrmSearchIntegratorAdapter searchIntegrator,
+			V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession,
+			Class<?> ... entities) {
 		super( session, new ParameterMetadataImpl( null, null ) );
-		this.session = session;
-		this.hSearchQuery = hSearchQuery;
+		this.searchSession = searchSession;
+		this.hSearchQuery = searchIntegrator.createHSQuery( luceneQuery, searchSession,
+				loadingOptionsContributor, entities );
 	}
 
 	@Override
@@ -113,6 +130,9 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		try {
 			return doHibernateSearchList();
 		}
+		catch (SearchTimeoutException e) {
+			throw new QueryTimeoutException( e );
+		}
 		catch (QueryExecutionRequestException he) {
 			throw new IllegalStateException( he );
 		}
@@ -125,12 +145,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	protected List doHibernateSearchList() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		return hSearchQuery.fetch();
 	}
 
 	@Override
 	public Explanation explain(Object entityId) {
-		return hSearchQuery.explain( null, entityId );
+		return hSearchQuery.explain( entityId );
 	}
 
 	@Override
@@ -138,13 +158,16 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		try {
 			return doGetResultSize();
 		}
+		catch (SearchTimeoutException e) {
+			throw new QueryTimeoutException( e );
+		}
 		catch (HibernateException he) {
 			throw getExceptionConverter().convert( he );
 		}
 	}
 
 	public int doGetResultSize() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		return hSearchQuery.getResultSize();
 	}
 
 	@Override
@@ -432,7 +455,18 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public FullTextQueryImpl initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		switch ( lookupMethod ) {
+			case SKIP:
+				this.cacheLookupStrategy = EntityLoadingCacheLookupStrategy.SKIP;
+				break;
+			case PERSISTENCE_CONTEXT:
+				this.cacheLookupStrategy = EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT;
+				break;
+			case SECOND_LEVEL_CACHE:
+				this.cacheLookupStrategy = EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE;
+				break;
+		}
+		return this;
 	}
 
 	@Override

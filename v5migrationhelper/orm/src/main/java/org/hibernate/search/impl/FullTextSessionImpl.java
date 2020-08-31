@@ -15,14 +15,16 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.scope.spi.V5MigrationSearchScope;
+import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
-import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+import org.hibernate.search.scope.impl.V5MigrationOrmSearchScopeAdapter;
 
 /**
  * Lucene full text search aware session.
@@ -31,11 +33,10 @@ import java.lang.invoke.MethodHandles;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession, SessionImplementor {
+final class FullTextSessionImpl extends SessionDelegatorBaseImpl
+		implements FullTextSession, SessionImplementor, V5MigrationSearchSession<SearchLoadingOptionsStep> {
 
-	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
-
-	private transient SearchIntegrator searchIntegrator;
+	private transient V5MigrationOrmSearchIntegratorAdapter searchIntegrator;
 	private transient SearchFactory searchFactoryAPI;
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
@@ -44,13 +45,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 
 	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
-		// TODO pass the session and loading options contributor here
-		HSQuery hsQuery = getSearchIntegrator().createHSQuery( luceneQuery, null, null, entities );
-		return createFullTextQuery( hsQuery );
-	}
-
-	private FullTextQuery createFullTextQuery(HSQuery hsQuery) {
-		return new FullTextQueryImpl( hsQuery, delegate );
+		return new FullTextQueryImpl( luceneQuery, delegate, getSearchIntegrator(), this, entities );
 	}
 
 	@Override
@@ -93,7 +88,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		return searchFactoryAPI;
 	}
 
-	private SearchIntegrator getSearchIntegrator() {
+	private V5MigrationOrmSearchIntegratorAdapter getSearchIntegrator() {
 		if ( searchIntegrator == null ) {
 			searchIntegrator = ContextHelper.getSearchIntegrator( delegate );
 		}
@@ -119,4 +114,13 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		}
 	}
 
+	@Override
+	public SearchQuerySelectStep<?, ?, ?, SearchLoadingOptionsStep, ?, ?> search(V5MigrationSearchScope scope) {
+		SearchSession searchSession = searchSession();
+		return searchSession.search( ( (V5MigrationOrmSearchScopeAdapter) scope ).toSearchScope() );
+	}
+
+	private SearchSession searchSession() {
+		return Search.session( delegate );
+	}
 }
