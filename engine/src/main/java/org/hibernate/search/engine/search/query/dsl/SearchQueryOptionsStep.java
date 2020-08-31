@@ -140,10 +140,14 @@ public interface SearchQueryOptionsStep<
 	<T> S aggregation(AggregationKey<T> key, Function<? super AF, ? extends AggregationFinalStep<T>> aggregationContributor);
 
 	/**
-	 * Sometime we don't need the exact total hit count number but a reasonable lower bound of it could be enough.
+	 * Allow Hibernate Search to return a lower-bound estimate of the total hit count
+	 * if it exceeds {@code totalHitCountThreshold}.
 	 * <p>
-	 * So that we can skip to collect the hits for the count when a given {@code totalHitCountThreshold} is reached,
-	 * potentially improving the performance.
+	 * Allowing Hibernate Search to return a lower-bound estimate of the total hit count can lead to significantly fewer
+	 * index scans and yield significant performance improvements,
+	 * in particular when sorting by score (the default) on a large result set.
+	 * <p>
+	 * Note this optimization has no effect when also requesting aggregations.
 	 *
 	 * @param totalHitCountThreshold the value below which the hit count is always exact
 	 * @return {@code this}, for method chaining.

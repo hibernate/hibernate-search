@@ -26,7 +26,8 @@ public interface SearchResult<H> {
 	}
 
 	/**
-	 * @return A result related to all matched documents. E.g.: exact or a lower bound of total hit count.
+	 * @return The total for a search result, pertaining to all matched documents,
+	 * independently from the offset/limit used when fetching hits. Includes in particular the total hit count.
 	 */
 	SearchResultTotal total();
 

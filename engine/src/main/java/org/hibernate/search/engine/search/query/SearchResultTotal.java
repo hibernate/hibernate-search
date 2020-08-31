@@ -11,37 +11,41 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 
 /**
- * Result related to all matching documents: ether belonging to the current page or not.
- * It contains the exact or a lower bound of the total number of matching entities.
+ * The total for a search result, pertaining to all matched documents,
+ * independently from the offset/limit used when fetching hits.
+ * <p>
+ * The total includes in particular the total hit count,
+ * which may be exact (default)
+ * or just a lower bound estimate (when particular search options are used).
  */
 public interface SearchResultTotal {
 
 	/**
-	 * @return whether the total hit count is exact.
+	 * @return Whether the total hit count is exact.
+	 * The total hit count is exact by default, but that can change when a
+	 * {@link SearchQueryOptionsStep#totalHitCountThreshold(int)} or a
+	 * {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)} has been defined for the current query.
 	 */
 	boolean isHitCountExact();
 
 	/**
-	 * It could be a lower bound only when a {@link SearchQueryOptionsStep#totalHitCountThreshold(int)} or
-	 * a {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)} has been defined
-	 * for the current query.
-	 *
-	 * @return whether the total hit count is lower bound.
+	 * @return Whether the total hit count is a lower-bound estimate.
+	 * The total hit count can be a lower bound only when a {@link SearchQueryOptionsStep#totalHitCountThreshold(int)}
+	 * or a {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)} has been defined for the current query.
 	 */
 	boolean isHitCountLowerBound();
 
 	/**
-	 * @return the exact value of the total hit count.
+	 * @return The exact value of the total hit count, if available.
+	 * Unless you used particular search options,
+	 * you can safely assume the exact value of the total hit count is available.
 	 * @throws org.hibernate.search.util.common.SearchException if {@link #isHitCountLowerBound()}
 	 */
 	long hitCount();
 
 	/**
-	 * Get the total hit count value.
-	 * The exact value is a (not-strict) lower bound value too,
-	 * the opposite is false.
-	 *
-	 * @return the total hit count (lower bound or exact)
+	 * @return A lower-bound estimate of the total hit count.
+	 * If the total hit count is known exactly, the exact total hit count is returned.
 	 */
 	long hitCountLowerBound();
 
