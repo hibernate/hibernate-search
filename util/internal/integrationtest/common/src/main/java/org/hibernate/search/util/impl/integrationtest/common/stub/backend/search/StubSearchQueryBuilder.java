@@ -59,8 +59,8 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	}
 
 	@Override
-	public void totalHitsThreshold(int totalHitsThreshold) {
-		// TODO HSEARCH-3517 implement it to test mappers
+	public void totalHitCountThreshold(long totalHitCountThreshold) {
+		// totalHitCountThreshold is not tested from the mapper
 	}
 
 	@Override

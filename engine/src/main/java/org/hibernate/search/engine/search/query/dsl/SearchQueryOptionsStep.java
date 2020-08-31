@@ -153,6 +153,6 @@ public interface SearchQueryOptionsStep<
 	 * @return {@code this}, for method chaining.
 	 * @see SearchResultTotal
 	 */
-	S totalHitCountThreshold(int totalHitCountThreshold);
+	S totalHitCountThreshold(long totalHitCountThreshold);
 
 }

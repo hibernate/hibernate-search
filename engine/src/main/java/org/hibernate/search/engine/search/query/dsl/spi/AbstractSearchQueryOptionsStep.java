@@ -107,7 +107,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public S totalHitCountThreshold(int totalHitCountThreshold) {
+	public S totalHitCountThreshold(long totalHitCountThreshold) {
 		searchQueryBuilder.totalHitCountThreshold( totalHitCountThreshold );
 		return thisAsS();
 	}

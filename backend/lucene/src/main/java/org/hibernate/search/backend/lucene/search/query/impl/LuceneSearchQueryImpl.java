@@ -53,7 +53,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
-	private final Integer totalHitCountThreshold;
+	private final Long totalHitCountThreshold;
 
 	private LuceneTimeoutManager timeoutManager;
 
@@ -65,7 +65,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			LuceneTimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
-			Integer totalHitCountThreshold) {
+			Long totalHitCountThreshold) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.searchContext = searchContext;
@@ -215,10 +215,11 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		if ( skipTotalHitCount ) {
 			return 0;
 		}
-		if ( totalHitCountThreshold == null ) {
+		if ( totalHitCountThreshold == null || totalHitCountThreshold >= (long) Integer.MAX_VALUE ) {
 			return Integer.MAX_VALUE;
 		}
-		return totalHitCountThreshold;
+
+		return Math.toIntExact( totalHitCountThreshold );
 	}
 
 	private String toDocumentId(LuceneSearchIndexContext index, Object id) {

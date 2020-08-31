@@ -65,7 +65,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final Integer scrollTimeout;
-	private final Integer totalHitCountThreshold;
+	private final Long totalHitCountThreshold;
 
 	private ElasticsearchTimeoutManager timeoutManager;
 
@@ -78,7 +78,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			ElasticsearchTimeoutManager timeoutManager, Integer scrollTimeout, Integer totalHitCountThreshold) {
+			ElasticsearchTimeoutManager timeoutManager, Integer scrollTimeout, Long totalHitCountThreshold) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
