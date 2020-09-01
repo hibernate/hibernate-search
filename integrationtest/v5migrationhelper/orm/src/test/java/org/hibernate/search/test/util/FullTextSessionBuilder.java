@@ -7,31 +7,26 @@
 package org.hibernate.search.test.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.hibernate.Session;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.LoadEventListener;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.impl.ImplementationFactory;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
-import org.hibernate.testing.cache.CachingRegionFactory;
+
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -46,29 +41,15 @@ import org.junit.runners.model.Statement;
  */
 public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
-	private final Properties cfg = new Properties();
-	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
+	private final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
+
+	private final Map<String, Object> cfg = new HashMap<>();
+	private final Set<Class<?>> annotatedClasses = new HashSet<>();
 	private SessionFactoryImplementor sessionFactory;
-	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
+	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<>();
 
 	public FullTextSessionBuilder() {
-		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
-		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
-
-		//cache:
-		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.setProperty(
-				Environment.CACHE_REGION_FACTORY,
-				CachingRegionFactory.class.getCanonicalName()
-		);
-		cfg.setProperty( Environment.USE_QUERY_CACHE, "true" );
-
-		//search specific:
-		cfg.setProperty(
-				org.hibernate.search.cfg.Environment.ANALYZER_CLASS,
-				StopAnalyzer.class.getName()
-		);
-		cfg.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
+		cfg.put( AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true" ); //As in ORM testsuite
 	}
 
 	/**
@@ -80,7 +61,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder setProperty(String key, String value) {
-		cfg.setProperty( key, value );
+		cfg.put( key, value );
 		return this;
 	}
 
@@ -128,37 +109,22 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	 * Builds the sessionFactory as configured so far.
 	 */
 	public FullTextSessionBuilder build() {
-		final Configuration hibConfiguration = buildBaseConfiguration();
+		V5MigrationHelperOrmSetupHelper.SetupContext setupContext = setupHelper.start();
 
-		for ( Class<?> annotatedClass : annotatedClasses ) {
-			hibConfiguration.addAnnotatedClass( annotatedClass );
-		}
-		hibConfiguration.getProperties().putAll( cfg );
+		setupContext = setupContext.withProperties( cfg );
 
-		StandardServiceRegistry serviceRegistry = buildServiceRegistry( cfg );
+		setupContext = setupContext.withConfiguration( builder -> builder.addAnnotatedClasses( annotatedClasses ) );
 
-		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory(
-				serviceRegistry
-		);
-		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactoryImpl.getServiceRegistry();
+		sessionFactory = setupContext.setup().unwrap( SessionFactoryImplementor.class );
+
+		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactory.getServiceRegistry();
 		EventListenerRegistry registry = serviceRegistryImplementor.getService( EventListenerRegistry.class );
 
 		for ( LoadEventListener listener : additionalLoadEventListeners ) {
 			registry.getEventListenerGroup( EventType.LOAD ).appendListener( listener );
 		}
 
-		sessionFactory = sessionFactoryImpl;
 		return this;
-	}
-
-	private StandardServiceRegistry buildServiceRegistry(Properties settings) {
-		return new StandardServiceRegistryBuilder().applySettings( settings ).build();
-	}
-
-	private Configuration buildBaseConfiguration() {
-		Configuration configuration = new Configuration();
-		configuration.setProperty( AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true" ); //As in ORM testsuite
-		return configuration;
 	}
 
 	/**
@@ -178,7 +144,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
 	@Override
 	public Statement apply(final Statement base, Description description) {
-		return new Statement() {
+		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
 				build();
@@ -190,6 +156,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 				}
 			}
 		};
+		return setupHelper.apply( wrapped, description );
 	}
 
 }

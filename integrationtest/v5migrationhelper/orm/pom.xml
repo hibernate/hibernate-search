@@ -37,6 +37,10 @@
             <artifactId>hibernate-search-util-internal-integrationtest-v5migrationhelper</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
             <scope>test</scope>

@@ -9,10 +9,12 @@ package org.hibernate.search.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.search.test.util.BackendTestHelper;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.junit.After;
+import org.junit.Rule;
 
 /**
  * A base class for tests of the initialization process.
@@ -27,6 +29,9 @@ import org.junit.After;
  */
 public abstract class SearchInitializationTestBase {
 
+	@Rule
+	public final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
+
 	private DefaultTestResourceManager testResourceManager;
 
 	private BackendTestHelper backendTestHelper;
@@ -37,7 +42,7 @@ public abstract class SearchInitializationTestBase {
 	 */
 	protected void init(TestConfiguration configuration) {
 		if ( testResourceManager == null ) {
-			testResourceManager = new DefaultTestResourceManager( configuration, this.getClass() );
+			testResourceManager = new DefaultTestResourceManager( configuration, setupHelper );
 		}
 		testResourceManager.openSessionFactory();
 	}
