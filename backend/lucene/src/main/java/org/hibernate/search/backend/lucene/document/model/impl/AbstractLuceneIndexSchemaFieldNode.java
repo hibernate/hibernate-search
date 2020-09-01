@@ -63,6 +63,7 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 		return multiValued;
 	}
 
+	@Override
 	public boolean multiValuedInRoot() {
 		return multiValuedInRoot;
 	}

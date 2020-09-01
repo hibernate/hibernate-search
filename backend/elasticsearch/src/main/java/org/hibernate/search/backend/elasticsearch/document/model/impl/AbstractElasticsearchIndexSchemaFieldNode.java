@@ -81,8 +81,8 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 		return multiValued;
 	}
 
+	@Override
 	public boolean multiValuedInRoot() {
 		return multiValuedInRoot;
 	}
-
 }
