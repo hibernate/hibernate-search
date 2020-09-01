@@ -30,23 +30,22 @@ import org.junit.Test;
 public class NumericTypeWithNullEncodingTest {
 
 	@Rule
-	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( SomeEntity.class )
-			.withProperty( org.hibernate.search.cfg.Environment.DEFAULT_NULL_TOKEN, "-7" );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( SomeEntity.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
 	@Before
 	public void prepareTestData() {
-		storeData( "title-one", 1, 1 );
-		storeData( "title-two", 2, null );
-		storeData( "title-three", 3, 3 );
+		storeData( "title-one", 1 );
+		storeData( "title-two", null );
+		storeData( "title-three", 3 );
 	}
 
 	@Test
 	public void verifyExplicitRangeQuery() {
 		Query query = getQueryBuilder()
 					.range()
-						.onField( "age" )
+						.onField( "nullableAge" )
 						.from( 1 ).excludeLimit()
 						.to( 3 ).excludeLimit()
 						.createQuery();
@@ -58,7 +57,7 @@ public class NumericTypeWithNullEncodingTest {
 	public void verifyExplicitKeywordQuery() {
 		Query query = getQueryBuilder()
 					.keyword()
-					.onField( "age" )
+					.onField( "nullableAge" )
 					.matching( 2 )
 					.createQuery();
 
@@ -73,22 +72,9 @@ public class NumericTypeWithNullEncodingTest {
 					.matching( null )
 					.createQuery();
 
-		Assert.assertEquals( "[-1 TO -1]", query.toString( "nullableAge" ) );
+		Assert.assertEquals( "[2 TO 2]", query.toString( "nullableAge" ) );
 
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
-	}
-
-	@Test
-	public void verifyNullEncoding() {
-		Query query = getQueryBuilder()
-					.keyword()
-					.onField( "age" )
-					.matching( null )
-					.createQuery();
-
-		Assert.assertEquals( "[-7 TO -7]", query.toString( "age" ) );
-
-		assertProjection( query, "title" ).matchesNone();
 	}
 
 	private AssertBuildingHSQueryContext assertProjection(Query query, String fieldName) {
@@ -101,10 +87,9 @@ public class NumericTypeWithNullEncodingTest {
 		return helper.queryBuilder( SomeEntity.class );
 	}
 
-	private void storeData(String title, int value, Integer nullableAge) {
+	private void storeData(String title, Integer nullableAge) {
 		SomeEntity entry = new SomeEntity();
 		entry.title = title;
-		entry.age = value;
 		entry.nullableAge = nullableAge;
 
 		helper.add( entry );
@@ -116,10 +101,7 @@ public class NumericTypeWithNullEncodingTest {
 		@Field(store = Store.YES)
 		String title;
 
-		@Field(indexNullAs = Field.DEFAULT_NULL_TOKEN)
-		int age;
-
-		@Field(indexNullAs = "-1")
+		@Field(indexNullAs = "2")
 		Integer nullableAge;
 	}
 

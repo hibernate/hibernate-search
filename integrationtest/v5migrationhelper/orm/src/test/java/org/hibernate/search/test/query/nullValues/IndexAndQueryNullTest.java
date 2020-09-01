@@ -156,11 +156,6 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 	}
 
 	@Override
-	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default_null_token", "fubar" );
-	}
-
-	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Value.class,
