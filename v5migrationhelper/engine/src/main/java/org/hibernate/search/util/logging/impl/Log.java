@@ -83,4 +83,7 @@ public interface Log extends BaseHibernateSearchLogger {
 
 	@Message(id = 400, value = "Cannot unwrap a SearchFactory into a '%1$s'.")
 	SearchException cannotUnwrapSearchFactory(@FormatWith(ClassFormatter.class) Class<?> cls);
+
+	@Message(id = 401, value = "Cannot use firstResult > 0 with scrolls.")
+	SearchException cannotUseSetFirstResultWithScroll();
 }

@@ -40,6 +40,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.impl.V5MigrationOrmSearchIntegratorAdapter;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -116,7 +117,10 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public ScrollableResultsImplementor scroll() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		return new HibernateOrmSearchScrollableResultsAdapter<>(
+				hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 ),
+				maxResults != null ? maxResults : Integer.MAX_VALUE
+		);
 	}
 
 	@Override

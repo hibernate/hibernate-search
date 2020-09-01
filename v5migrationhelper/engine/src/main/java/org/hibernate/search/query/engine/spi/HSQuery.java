@@ -14,6 +14,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -156,6 +157,13 @@ public interface HSQuery extends ProjectionConstants {
 	 *         not in sync with the store at the time of query.
 	 */
 	int getResultSize();
+
+	/**
+	 * Execute the Lucene query continuously, as a {@link SearchScroll}.
+	 * @param chunkSize The size of chunks.
+	 * @return the scroll (must eventually be closed).
+	 */
+	SearchScroll<?> scroll(int chunkSize);
 
 	/**
 	 * Return the Lucene {@link Explanation}

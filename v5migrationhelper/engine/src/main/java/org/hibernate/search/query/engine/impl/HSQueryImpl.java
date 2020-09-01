@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -163,6 +164,16 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		}
 		resultSize = Math.toIntExact( createSearchQuery().fetchTotalHitCount() );
 		return resultSize;
+	}
+
+	@Override
+	public SearchScroll<?> scroll(int chunkSize) {
+		if ( offset > 0 ) {
+			// Search 6 doesn't support an offset with scrolls.
+			// Maybe we could introduce that, but Elasticsearch doesn't support it, so it would be Lucene-only...
+			throw log.cannotUseSetFirstResultWithScroll();
+		}
+		return createSearchQuery().scroll( chunkSize );
 	}
 
 	@Override
