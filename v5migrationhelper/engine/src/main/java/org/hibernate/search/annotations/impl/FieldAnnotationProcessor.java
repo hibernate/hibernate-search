@@ -1,0 +1,233 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.annotations.impl;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
+
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.engine.backend.types.Norms;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedProperty;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingGenericFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
+
+public class FieldAnnotationProcessor implements PropertyMappingAnnotationProcessor<Field> {
+	private static final String LEGACY_DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
+	private static final String DEFAULT_ANALYZER_NAME = "default";
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	@Override
+	public void process(PropertyMappingStep mapping, Field annotation,
+			PropertyMappingAnnotationProcessorContext context) {
+		// the following is an approximation. we're trying here to emulate the HS5's annotation behavior.
+		// but some concepts of HS5, such as `DEFAULT_NULL_TOKEN`, have no equivalent in Search 6.
+
+		MappingAnnotatedProperty annotatedProperty = context.annotatedElement();
+		Class<?> propertyType = annotatedProperty.javaClass( ContainerExtractorPath.defaultExtractors() )
+				.get(); // The default extractors can always be applied: worst case, they default to no extractors.
+
+		PropertyMappingStandardFieldOptionsStep<?> optionsStep;
+		if ( String.class.equals( propertyType ) || Enum.class.isAssignableFrom( propertyType )
+				|| Character.class.equals( propertyType ) ) {
+			if ( Analyze.YES.equals( annotation.analyze() ) ) {
+				optionsStep = mapAnalyzed( mapping, annotation, context );
+			}
+			else {
+				optionsStep = mapKeyword( mapping, annotation, context, null );
+			}
+		}
+		else {
+			optionsStep = mapGeneric( mapping, annotation, context );
+		}
+
+		optionsStep
+				.searchable( Index.YES.equals( annotation.index() ) ? Searchable.YES : Searchable.NO )
+				.projectable( Store.YES.equals( annotation.store() ) ? Projectable.YES : Projectable.NO );
+	}
+
+	private PropertyMappingGenericFieldOptionsStep mapGeneric(PropertyMappingStep mapping, Field annotation,
+			PropertyMappingAnnotationProcessorContext context) {
+		String name = name( annotation, context );
+
+		PropertyMappingGenericFieldOptionsStep genericOptionsStep = mapping.genericField( name )
+				.sortable( sortable( name, context ) ? Sortable.YES : Sortable.NO );
+
+		String indexNullAs = indexNullAs( annotation, context );
+		if ( indexNullAs != null ) {
+			genericOptionsStep = genericOptionsStep.indexNullAs( indexNullAs );
+		}
+
+		return genericOptionsStep;
+	}
+
+	private PropertyMappingStandardFieldOptionsStep<?> mapAnalyzed(PropertyMappingStep mapping, Field annotation,
+			PropertyMappingAnnotationProcessorContext context) {
+		String name = name( annotation, context );
+
+		String analyzer = annotation.analyzer().definition();
+		if ( analyzer.isEmpty() ) {
+			analyzer = null;
+		}
+		String normalizer = annotation.normalizer().definition();
+		if ( normalizer.isEmpty() ) {
+			normalizer = null;
+		}
+
+		if ( analyzer != null && normalizer != null ) {
+			/*
+			 * @Field(normalizer = @Normalizer(definition = "..."), analyzer = @Analyzer(definition = "..."))
+			 * private String myProperty;
+			 */
+			throw log.cannotReferenceAnalyzerAndNormalizer( name );
+		}
+
+		if ( normalizer != null ) {
+			return mapKeyword( mapping, annotation, context, normalizer );
+		}
+		else {
+			String analyzerOrDefault = analyzerOrDefault( context, analyzer );
+			return mapFullText( mapping, annotation, context, analyzerOrDefault );
+		}
+	}
+
+	private PropertyMappingStandardFieldOptionsStep<?> mapFullText(PropertyMappingStep mapping, Field annotation,
+			PropertyMappingAnnotationProcessorContext context, String analyzerOrDefault) {
+		String name = name( annotation, context );
+
+		PropertyMappingFullTextFieldOptionsStep fullTextOptionsStep = mapping.fullTextField( name )
+				.analyzer( analyzerOrDefault )
+				.norms( norms( annotation ) )
+				.termVector( termVector( annotation ) );
+
+		if ( sortable( name, context ) ) {
+			throw log.cannotUseAnalyzerOnSortableField( analyzerOrDefault );
+		}
+
+		String indexNullAs = indexNullAs( annotation, context );
+		if ( indexNullAs != null ) {
+			throw log.cannotUseIndexNullAsAndAnalyzer( analyzerOrDefault, indexNullAs );
+		}
+
+		return fullTextOptionsStep;
+	}
+
+	private PropertyMappingKeywordFieldOptionsStep mapKeyword(PropertyMappingStep mapping, Field annotation,
+			PropertyMappingAnnotationProcessorContext context, String normalizer) {
+		String name = name( annotation, context );
+
+		PropertyMappingKeywordFieldOptionsStep keywordOptionsStep = mapping.keywordField( name )
+				.norms( norms( annotation ) )
+				.sortable( sortable( name, context ) ? Sortable.YES : Sortable.NO );
+
+		if ( normalizer != null ) {
+			keywordOptionsStep = keywordOptionsStep.normalizer( normalizer );
+		}
+
+		String indexNullAs = indexNullAs( annotation, context );
+		if ( indexNullAs != null ) {
+			keywordOptionsStep = keywordOptionsStep.indexNullAs( indexNullAs );
+		}
+
+		return keywordOptionsStep;
+	}
+
+	private String name(Field annotation, PropertyMappingAnnotationProcessorContext context) {
+		MappingAnnotatedProperty annotatedProperty = context.annotatedElement();
+		return annotation.name().isEmpty() ? annotatedProperty.name() : annotation.name();
+	}
+
+	private String analyzerOrDefault(PropertyMappingAnnotationProcessorContext context,
+			String fieldAnnotationAnalyzer) {
+		if ( fieldAnnotationAnalyzer != null ) {
+			return fieldAnnotationAnalyzer;
+		}
+
+		MappingAnnotatedProperty annotatedProperty = context.annotatedElement();
+		Optional<String> propertyLevelAnalyzer = annotatedProperty.allAnnotations()
+				.filter( a -> Analyzer.class.equals( a.annotationType() ) )
+				.map( a -> ( (Analyzer) a ).definition() )
+				.filter( a -> !a.isEmpty() )
+				.findAny();
+		if ( propertyLevelAnalyzer.isPresent() ) {
+			return propertyLevelAnalyzer.get();
+		}
+
+		log.noAnalyzerDefinedOnPropertyUsingDefault( DEFAULT_ANALYZER_NAME, context.eventContext() );
+		return DEFAULT_ANALYZER_NAME;
+	}
+
+	private String indexNullAs(Field annotation, PropertyMappingAnnotationProcessorContext context) {
+		String indexNullAs = annotation.indexNullAs();
+		if ( LEGACY_DEFAULT_NULL_TOKEN.equals( indexNullAs ) ) {
+			throw log.defaultNullTokenNotSupported( context.annotatedElement().javaClass() );
+		}
+		if ( Field.DO_NOT_INDEX_NULL.equals( indexNullAs ) ) {
+			return null;
+		}
+		return indexNullAs;
+	}
+
+	private boolean sortable(String fieldName, PropertyMappingAnnotationProcessorContext context) {
+		MappingAnnotatedProperty annotatedProperty = context.annotatedElement();
+		return annotatedProperty.allAnnotations()
+				.filter( a -> SortableField.class.equals( a.annotationType() ) )
+				.map( a -> ( (SortableField) a ).forField() )
+				.anyMatch( forField -> forField.equals( fieldName )
+						|| forField.isEmpty() && fieldName.equals( annotatedProperty.name() ) );
+	}
+
+	// Converts the Search 5 Norms type to the Search 6 Norms type
+	private Norms norms(Field annotation) {
+		org.hibernate.search.annotations.Norms value = annotation.norms();
+		switch ( value ) {
+			case YES:
+				return Norms.YES;
+			case NO:
+				return Norms.NO;
+			default:
+				throw new AssertionFailure( "Unknown value: " + value );
+		}
+	}
+
+	// Converts the Search 5 TermVector type to the Search 6 TermVector type
+	private TermVector termVector(Field annotation) {
+		org.hibernate.search.annotations.TermVector value = annotation.termVector();
+		switch ( value ) {
+			case YES:
+				return TermVector.YES; // This is the Search 6 TermVector, a different type.
+			case NO:
+				return TermVector.NO;
+			case WITH_OFFSETS:
+				return TermVector.WITH_OFFSETS;
+			case WITH_POSITIONS:
+				return TermVector.WITH_POSITIONS;
+			case WITH_POSITION_OFFSETS:
+				return TermVector.WITH_POSITIONS_OFFSETS;
+			default:
+				throw new AssertionFailure( "Unknown value: " + annotation.termVector() );
+		}
+	}
+}

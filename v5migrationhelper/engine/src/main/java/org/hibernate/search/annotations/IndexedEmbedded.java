@@ -12,6 +12,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.annotations.impl.IndexedEmbeddedAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+
 /**
  * Specifies that an association ({@code @*To*}, {@code @Embedded}, {@code @CollectionOfEmbedded}) is to be indexed in
  * the root entity index. This allows queries involving associated objects properties.
@@ -19,6 +23,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexedEmbeddedAnnotationProcessor.class))
 public @interface IndexedEmbedded {
 
 	/**

@@ -12,12 +12,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.annotations.impl.IndexedAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
 @Documented
-/**
- * Specifies that an entity is to be indexed by Lucene
- */
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedAnnotationProcessor.class))
 public @interface Indexed {
 	/**
 	 * @return The filename of the index. Default to empty string
