@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.bridge;
 
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
@@ -14,6 +13,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.MetadataProvidingFieldBridge;
+import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.experimental.categories.Category;
 
@@ -51,7 +51,7 @@ public class CheckCustomFieldDefaultsTest extends CheckCustomFieldDefaultAnalyze
 
 		@Field(analyze = Analyze.YES)
 		@FieldBridge(impl = AdditionalFieldBridge.class)
-		@Analyzer(impl = WhitespaceAnalyzer.class)
+		@Analyzer(definition = AnalysisNames.ANALYZER_WHITESPACE)
 		public String result;
 	}
 }

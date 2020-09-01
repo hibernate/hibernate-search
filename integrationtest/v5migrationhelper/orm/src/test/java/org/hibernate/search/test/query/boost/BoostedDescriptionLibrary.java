@@ -10,14 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.testsupport.AnalysisNames;
 
 /**
  * @author John Griffin
@@ -42,7 +41,7 @@ public class BoostedDescriptionLibrary {
 	}
 
 	@Field(store = Store.YES)
-	@Analyzer(impl = StandardAnalyzer.class)
+	@Analyzer(definition = AnalysisNames.ANALYZER_STANDARD)
 	public String getTitle() {
 		return title;
 	}
@@ -52,7 +51,7 @@ public class BoostedDescriptionLibrary {
 	}
 
 	@Field(store = Store.YES)
-	@Analyzer(impl = StandardAnalyzer.class)
+	@Analyzer(definition = AnalysisNames.ANALYZER_STANDARD)
 	public String getAuthor() {
 		return author;
 	}
@@ -63,7 +62,7 @@ public class BoostedDescriptionLibrary {
 
 	@Boost(2.0F)
 	@Field(store = Store.YES, boost = @Boost(2.0F))
-	@Analyzer(impl = StandardAnalyzer.class)
+	@Analyzer(definition = AnalysisNames.ANALYZER_STANDARD)
 	public String getDescription() {
 		return description;
 	}

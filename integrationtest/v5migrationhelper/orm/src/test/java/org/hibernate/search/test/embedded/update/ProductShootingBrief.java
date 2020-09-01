@@ -19,12 +19,12 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.embedded.fieldoncollection.CollectionOfStringsFieldBridge;
+import org.hibernate.search.testsupport.AnalysisNames;
 
 @Entity
 @Indexed
@@ -82,7 +82,8 @@ public class ProductShootingBrief {
 	}
 
 	@Transient
-	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class), analyzer = @Analyzer(impl = StandardAnalyzer.class))
+	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class),
+			analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD))
 	public Collection<String> getReferenceCodeCollection() {
 		Collection<String> referenceCodes = new ArrayList<String>();
 
