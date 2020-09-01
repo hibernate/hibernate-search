@@ -36,13 +36,6 @@ public @interface Field {
 	String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
 
 	/**
-	 * Value for the {@link #indexNullAs} parameter indicating that {@code null} values should be indexed using the null
-	 * token given through the {@link org.hibernate.search.cfg.Environment#DEFAULT_NULL_TOKEN} configuration property.
-	 * If no value is given for that property, the token {@code _null_} will be used.
-	 */
-	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
-
-	/**
 	 * @return Returns the field name. Defaults to the JavaBean property name.
 	 */
 	String name() default "";

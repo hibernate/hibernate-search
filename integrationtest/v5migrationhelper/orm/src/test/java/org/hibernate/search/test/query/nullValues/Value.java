@@ -29,7 +29,7 @@ public class Value {
 	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = "_custom_token_")
 	private String value;
 
-	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = "fubar")
 	private String fallback;
 
 	public Value() {

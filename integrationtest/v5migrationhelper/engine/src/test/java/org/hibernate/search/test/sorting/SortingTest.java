@@ -367,7 +367,7 @@ public class SortingTest {
 				@org.hibernate.search.annotations.SortableField(forField = "tokenizedName")
 		})
 		@Fields({
-				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN),
+				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = "_null_"),
 				@Field(name = "collatedName", store = Store.YES, normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME)),
 				@Field(name = "tokenizedName", store = Store.YES, analyzer = @Analyzer(definition = TOKENIZING_ANALYZER_NAME))
 		})
@@ -426,7 +426,7 @@ public class SortingTest {
 	private class CuddlyToy {
 
 		@org.hibernate.search.annotations.SortableField
-		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+		@Field(store = Store.YES, analyze = Analyze.NO, indexNullAs = "_null_")
 		String type;
 
 		public CuddlyToy(String type) {
