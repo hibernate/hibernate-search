@@ -47,7 +47,7 @@ public class LuceneNumericFieldTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1987")
-	public void testOneOfSeveralFieldsIsNumeric() {
+	public void testDocumentFieldIsNumeric() {
 		List<EntityInfo> list = helper.hsQuery( TouristAttraction.class )
 				.projection( ProjectionConstants.DOCUMENT )
 				.queryEntityInfos();
@@ -57,10 +57,6 @@ public class LuceneNumericFieldTest {
 
 		IndexableField scoreNumeric = document.getField( "scoreNumeric" );
 		assertThat( scoreNumeric.numericValue() ).isEqualTo( 23 );
-
-		IndexableField scoreString = document.getField( "scoreString" );
-		assertThat( scoreString.numericValue() ).isNull();
-		assertThat( scoreString.stringValue() ).isEqualTo( "23" );
 	}
 
 	@Test

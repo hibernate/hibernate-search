@@ -14,10 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Extension annotation for {@code @Field} supporting Lucene's numeric field feature.
+ * @deprecated This annotation does not do anything anymore and is not necessary. It can be removed safely.
  *
  * @author Gustavo Fernandes
  */
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Documented
