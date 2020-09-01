@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -25,6 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.assertj.core.api.Assertions;
@@ -299,5 +302,50 @@ public class CustomTypeMappingAnnotationBaseIT {
 
 	}
 
+	@Test
+	public void eventContext() {
+		@Indexed(index = INDEX_NAME)
+		@EventContextAwareAnnotation
+		class IndexedEntityType {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getText() {
+				return text;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "myText", String.class )
+		);
+
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntityType.class );
+		backendMock.verifyExpectationsMet();
+
+		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext ).isNotNull();
+		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext.render() )
+				.isEqualTo( "type '" + IndexedEntityType.class.getName() + "', annotation '@"
+						+ EventContextAwareAnnotation.class.getName() + "()'" );
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.TYPE})
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = EventContextAwareAnnotation.Processor.class))
+	private @interface EventContextAwareAnnotation {
+
+		class Processor implements TypeMappingAnnotationProcessor<EventContextAwareAnnotation> {
+			static EventContext lastProcessedContext = null;
+
+			@Override
+			public void process(TypeMappingStep mapping, EventContextAwareAnnotation annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				lastProcessedContext = context.eventContext();
+				mapping.property( "text" ).genericField( "myText" );
+			}
+		}
+	}
 
 }

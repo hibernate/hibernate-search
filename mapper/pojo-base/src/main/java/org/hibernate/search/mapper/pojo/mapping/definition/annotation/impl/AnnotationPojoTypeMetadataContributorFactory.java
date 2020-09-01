@@ -26,10 +26,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class AnnotationPojoTypeMetadataContributorFactory {
@@ -105,16 +103,14 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		}
 
 		TypeMappingAnnotationProcessorContext context = new TypeMappingAnnotationProcessorContextImpl(
-				typeModel, annotationHelper );
+				typeModel, annotation, annotationHelper );
 
 		try ( BeanHolder<? extends TypeMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {
 			processorHolder.get().process( mapping, annotation, context );
 		}
 		catch (RuntimeException e) {
-			rootFailureCollector
-					.withContext( PojoEventContexts.fromType( typeModel ) )
-					.withContext( PojoEventContexts.fromAnnotation( annotation ) )
+			rootFailureCollector.withContext( context.eventContext() )
 					.add( e );
 		}
 
@@ -131,20 +127,15 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		}
 
 		PropertyMappingAnnotationProcessorContext context =
-				new PropertyMappingAnnotationProcessorContextImpl( propertyModel, annotationHelper, configurationContext );
+				new PropertyMappingAnnotationProcessorContextImpl( typeModel, propertyModel, annotation,
+						annotationHelper, configurationContext );
 
 		try ( BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {
 			processorHolder.get().process( mapping, annotation, context );
 		}
 		catch (RuntimeException e) {
-			rootFailureCollector
-					.withContext( PojoEventContexts.fromType( typeModel ) )
-					.withContext( PojoEventContexts.fromPath(
-							PojoModelPath.ofProperty( propertyModel.name() )
-					) )
-					.withContext( PojoEventContexts.fromAnnotation( annotation ) )
-					.add( e );
+			rootFailureCollector.withContext( context.eventContext() ).add( e );
 		}
 
 		return true;

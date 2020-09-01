@@ -12,21 +12,32 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedType;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 public class TypeMappingAnnotationProcessorContextImpl
 		extends AbstractMappingAnnotationProcessorContext
 		implements TypeMappingAnnotationProcessorContext, MappingAnnotatedType {
 	private final PojoRawTypeModel<?> typeModel;
+	private final Annotation annotation;
 
-	public TypeMappingAnnotationProcessorContextImpl(PojoRawTypeModel<?> typeModel, AnnotationHelper annotationHelper) {
+	public TypeMappingAnnotationProcessorContextImpl(PojoRawTypeModel<?> typeModel, Annotation annotation,
+			AnnotationHelper annotationHelper) {
 		super( annotationHelper );
 		this.typeModel = typeModel;
+		this.annotation = annotation;
 	}
 
 	@Override
 	public MappingAnnotatedType annotatedElement() {
 		return this; // Not a lot to implement, so we just implement everything in the same class
+	}
+
+	@Override
+	public EventContext eventContext() {
+		return PojoEventContexts.fromType( typeModel )
+				.append( PojoEventContexts.fromAnnotation( annotation ) );
 	}
 
 	@Override
