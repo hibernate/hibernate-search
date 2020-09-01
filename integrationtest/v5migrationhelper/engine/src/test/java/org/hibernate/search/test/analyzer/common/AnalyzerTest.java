@@ -78,7 +78,6 @@ public class AnalyzerTest {
 	public void testScopedAnalyzers() throws Exception {
 		MyEntity en = new MyEntity();
 		en.setId( 1 );
-		en.setEntity( "Entity" );
 		en.setField( "Field" );
 		en.setProperty( "Property" );
 		en.setComponent( new MyComponent() );
@@ -87,10 +86,7 @@ public class AnalyzerTest {
 		helper.index( en );
 
 		QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
-		org.apache.lucene.search.Query luceneQuery = parser.parse( "entity:alarm" );
-		helper.assertThat( luceneQuery ).matchesExactlyIds( 1 );
-
-		luceneQuery = parser.parse( "property:cat" );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "property:cat" );
 		helper.assertThat( luceneQuery ).matchesExactlyIds( 1 );
 
 		luceneQuery = parser.parse( "field:energy" );
