@@ -17,13 +17,9 @@ import org.hibernate.search.annotations.IndexedEmbedded;
  * @author Emmanuel Bernard
  */
 @Indexed(index = "idx1")
-@Analyzer(impl = AnalyzerForTests1.class)
 public class MyEntity {
 	@DocumentId
 	private Integer id;
-
-	@Field
-	private String entity;
 
 	@Field
 	@Analyzer(impl = AnalyzerForTests2.class)
@@ -53,14 +49,6 @@ public class MyEntity {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public String getEntity() {
-		return entity;
-	}
-
-	public void setEntity(String entity) {
-		this.entity = entity;
 	}
 
 	public String getProperty() {

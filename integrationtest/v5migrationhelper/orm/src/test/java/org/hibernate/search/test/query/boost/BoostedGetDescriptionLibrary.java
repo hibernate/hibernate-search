@@ -24,7 +24,6 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed
-@Analyzer(impl = StandardAnalyzer.class)
 public class BoostedGetDescriptionLibrary {
 	private int id;
 	private String title;
@@ -43,6 +42,7 @@ public class BoostedGetDescriptionLibrary {
 	}
 
 	@Field(store = Store.YES)
+	@Analyzer(impl = StandardAnalyzer.class)
 	public String getTitle() {
 		return title;
 	}
@@ -52,6 +52,7 @@ public class BoostedGetDescriptionLibrary {
 	}
 
 	@Field(store = Store.YES)
+	@Analyzer(impl = StandardAnalyzer.class)
 	public String getAuthor() {
 		return author;
 	}
@@ -62,6 +63,7 @@ public class BoostedGetDescriptionLibrary {
 
 	@Boost(2.0F)
 	@Field(store = Store.YES)
+	@Analyzer(impl = StandardAnalyzer.class)
 	public String getDescription() {
 		return description;
 	}

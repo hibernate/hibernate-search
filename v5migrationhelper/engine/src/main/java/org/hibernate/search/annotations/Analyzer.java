@@ -17,16 +17,12 @@ import java.lang.annotation.Documented;
  * The order of precedence is as such:
  *  - @Field
  *  - field / method
- *  - entity
  *  - default
- *
- * Either describe an explicit implementation through the <code>impl</code> parameter
- * or use an external @AnalyzerDef definition through the <code>def</code> parameter
  *
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface Analyzer {
 	Class<?> impl() default void.class;
