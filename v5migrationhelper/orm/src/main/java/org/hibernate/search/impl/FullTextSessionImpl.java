@@ -66,12 +66,6 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
 	}
 
-	/**
-	 * Execute a Lucene query and retrieve managed objects of type entities (or their indexed subclasses)
-	 * If entities is empty, include all indexed entities
-	 *
-	 * @param entities must be immutable for the lifetime of the query object
-	 */
 	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		HSQuery hsQuery = getSearchIntegrator().createHSQuery( luceneQuery, entities );
@@ -131,14 +125,6 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 		getSearchIntegrator().getWorker().performWork( work, transactionContext );
 	}
 
-	/**
-	 * (Re-)index an entity.
-	 * The entity must be associated with the session and non indexable entities are ignored.
-	 *
-	 * @param entity The entity to index - must not be <code>null</code>.
-	 *
-	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
-	 */
 	@Override
 	public <T> void index(T entity) {
 		if ( entity == null ) {
