@@ -21,6 +21,7 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.massindexing.impl.V5MigrationMassIndexerAdapter;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
@@ -50,12 +51,12 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl
 
 	@Override
 	public <T> void purgeAll(Class<T> entityType) {
-		purge( entityType, null );
+		searchSession().workspace( entityType ).purge();
 	}
 
 	@Override
 	public void flushToIndexes() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		searchSession().indexingPlan().execute();
 	}
 
 	@Override
@@ -63,7 +64,13 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl
 		if ( entityType == null ) {
 			return;
 		}
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		if ( id == null ) {
+			// Search 5 behavior: if id is null, the method call is interpreted as purgeAll.
+			purgeAll( entityType );
+		}
+		else {
+			searchSession().indexingPlan().purge( entityType, id, null );
+		}
 	}
 
 	@Override
@@ -71,13 +78,14 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl
 		if ( entity == null ) {
 			throw new IllegalArgumentException( "Entity to index should not be null" );
 		}
-
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		searchSession().indexingPlan().addOrUpdate( entity );
 	}
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		return new V5MigrationMassIndexerAdapter( types == null || types.length == 0
+				? searchSession().massIndexer( Object.class )
+				: searchSession().massIndexer( types ) );
 	}
 
 	@Override
