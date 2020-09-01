@@ -42,6 +42,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityGraphHint;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
