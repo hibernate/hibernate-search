@@ -18,6 +18,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.annotations.impl.FieldAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+
 /**
  * Annotation used for marking a property as indexable.
  *
@@ -28,6 +32,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 @Repeatable(Fields.class)
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FieldAnnotationProcessor.class))
 public @interface Field {
 
 	/**
