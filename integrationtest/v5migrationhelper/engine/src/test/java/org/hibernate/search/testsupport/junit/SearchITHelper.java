@@ -12,19 +12,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.migration.V5MigrationJavaBeanSearchSessionAdapter;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import org.junit.Assert;
 
@@ -46,15 +49,10 @@ import org.assertj.core.api.ListAssert;
  */
 public class SearchITHelper {
 
-	private final Supplier<? extends SearchIntegrator> integratorProvider;
+	private final SearchFactoryHolder sfHolder;
 
 	public SearchITHelper(SearchFactoryHolder sfHolder) {
-		this( sfHolder::getSearchFactory );
-	}
-
-	public SearchITHelper(Supplier<? extends SearchIntegrator> integratorProvider) {
-		super();
-		this.integratorProvider = integratorProvider;
+		this.sfHolder = sfHolder;
 	}
 
 	public WorkExecutor executor() {
@@ -110,11 +108,11 @@ public class SearchITHelper {
 	}
 
 	public QueryBuilder queryBuilder(Class<?> clazz) {
-		return integratorProvider.get().buildQueryBuilder().forEntity( clazz ).get();
+		return sfHolder.getSearchFactory().buildQueryBuilder().forEntity( clazz ).get();
 	}
 
-	public V5MigrationSearchSession<Void> session() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs" );
+	public V5MigrationSearchSession<?> session() {
+		return new V5MigrationJavaBeanSearchSessionAdapter( sfHolder.getMapping().createSession() );
 	}
 
 	public HSQuery hsQuery(Class<?> ... classes) {
@@ -122,7 +120,7 @@ public class SearchITHelper {
 	}
 
 	public HSQuery hsQuery(Query query, Class<?> ... classes) {
-		return integratorProvider.get().createHSQuery( query, session(), null, classes );
+		return sfHolder.getSearchFactory().createHSQuery( query, session(), null, classes );
 	}
 
 	public AssertBuildingHSQueryContext assertThat(String fieldName, String value) {
@@ -184,13 +182,31 @@ public class SearchITHelper {
 		}
 
 		public void execute() {
-			works.forEach( this::executeWork );
-			works.clear();
+			try ( SearchSession session = sfHolder.getMapping().createSession() ) {
+				SearchIndexer indexer = session.indexer();
+				CompletableFuture<?>[] futures = new CompletableFuture[works.size()];
+				for ( int i = 0; i < works.size(); i++ ) {
+					futures[i] = executeWork( indexer, works.get( i ) );
+				}
+				CompletableFuture.allOf( futures ).join();
+			}
+			finally {
+				works.clear();
+			}
 		}
 
-		private void executeWork(Work w) {
-			// TODO implement. Don't forget to use tenantId.
-			throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		private CompletableFuture<?> executeWork(SearchIndexer indexer, Work w) {
+			switch ( w.workType ) {
+				case ADD:
+					return indexer.add( w.providedId, w.entity );
+				case UPDATE:
+				case INDEX:
+					return indexer.addOrUpdate( w.providedId, w.entity );
+				case DELETE:
+					return indexer.purge( w.entityType, w.providedId, null );
+				default:
+					throw new AssertionFailure( "Unexpected work type: " + w.workType );
+			}
 		}
 	}
 
@@ -256,24 +272,10 @@ public class SearchITHelper {
 
 		DELETE,
 
-		COLLECTION,
-
-		/**
-		 * Used to remove a specific instance of a class from an index.
-		 */
-		PURGE,
-
-		/**
-		 * Used to remove all instances of a class from an index.
-		 */
-		PURGE_ALL,
-
 		/**
 		 * This type is used for batch indexing.
 		 */
-		INDEX,
-
-		DELETE_BY_QUERY
+		INDEX
 	}
 
 	public class EntityTypeWorkContext {
@@ -522,7 +524,7 @@ public class SearchITHelper {
 
 		@Override
 		protected HSQuery getHSQuery() {
-			HSQuery hsQuery = integratorProvider.get().createHSQuery( luceneQuery, session(), null, classes );
+			HSQuery hsQuery = sfHolder.getSearchFactory().createHSQuery( luceneQuery, session(), null, classes );
 			before.accept( hsQuery );
 			return hsQuery;
 		}

@@ -14,29 +14,23 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
 import org.hibernate.search.test.util.MultitenancyTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
-import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 /**
  * Manages bootstrap and teardown of an Hibernate SessionFactory for purposes of
@@ -54,24 +48,27 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final TestConfiguration test;
-	private final Path baseIndexDir;
+	private final V5MigrationHelperOrmSetupHelper setupHelper;
 
 	/* Each of the following fields needs to be cleaned up on close */
 	private SessionFactoryImplementor sessionFactory;
-	private MultitenancyTestHelper multitenancy;
+	private Path baseIndexDir;
+	private MultitenancyTestHelper multitenancyHelper;
 	private Session session;
 	private SearchFactory searchFactory;
 	private Map<String,Object> configurationSettings;
 
-	public DefaultTestResourceManager(TestConfiguration test, Class<?> currentTestModuleClass) {
+	public DefaultTestResourceManager(TestConfiguration test, V5MigrationHelperOrmSetupHelper setupHelper) {
 		this.test = test;
-		this.baseIndexDir = createBaseIndexDir( currentTestModuleClass );
+		this.setupHelper = setupHelper;
 	}
 
 	@Override
 	public void openSessionFactory() {
 		if ( sessionFactory == null ) {
 			sessionFactory = buildSessionFactory();
+			Map settings = sessionFactory.getServiceRegistry().getService( ConfigurationService.class ).getSettings();
+			baseIndexDir = Path.of( (String) settings.get( "hibernate.search.backend.directory.root" ) );
 		}
 		else {
 			throw new IllegalStateException( "there should be no SessionFactory initialized at this point" );
@@ -79,42 +76,30 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	private SessionFactoryImplementor buildSessionFactory() {
-		multitenancy = new MultitenancyTestHelper( test.multiTenantIds() );
+		V5MigrationHelperOrmSetupHelper.SetupContext setupContext = setupHelper.start();
+
+		multitenancyHelper = new MultitenancyTestHelper( test.multiTenantIds() );
 		Map<String, Object> settings = getConfigurationSettings();
-		multitenancy.forceConfigurationSettings( settings );
+		multitenancyHelper.forceConfigurationSettings( settings );
 
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-			.applySettings( settings );
+		setupContext = setupContext.withProperties( settings );
 
-		multitenancy.enableIfNeeded( registryBuilder );
+		setupContext = setupContext.withConfiguration( b -> b.onServiceRegistryBuilder( multitenancyHelper::enableIfNeeded ) );
 
-		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry );
 		Class<?>[] annotatedClasses = test.getAnnotatedClasses();
 		if ( annotatedClasses != null ) {
-			for ( Class<?> entity : annotatedClasses ) {
-				ms.addAnnotatedClass( entity );
-			}
+			setupContext = setupContext.withConfiguration( builder ->
+					builder.addAnnotatedClasses( Arrays.asList( annotatedClasses ) ) );
 		}
 
-		Metadata metadata = ms.buildMetadata();
-		multitenancy.exportSchema( serviceRegistry, metadata, settings );
+		setupContext = setupContext.withConfiguration( b -> b.onMetadata( multitenancyHelper::exportSchema ) );
 
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-		return (SessionFactoryImplementor) sfb.build();
+		return setupContext.setup().unwrap( SessionFactoryImplementor.class );
 	}
 
 	private Map<String,Object> getConfigurationSettings() {
 		if ( configurationSettings == null ) {
 			configurationSettings = new HashMap<>();
-			configurationSettings.put( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
-			configurationSettings.put( "hibernate.search.default.directory_provider", "local-heap" );
-			configurationSettings.put( "hibernate.search.default.indexBase", getBaseIndexDir().toAbsolutePath().toString() );
-			configurationSettings.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-			configurationSettings.put( "hibernate.search.default.indexwriter.merge_factor", "100" );
-			configurationSettings.put( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
-			configurationSettings.put( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 			test.configure( configurationSettings );
 		}
 		return configurationSettings;
@@ -126,9 +111,9 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			sessionFactory.close();
 			sessionFactory = null;
 		}
-		if ( multitenancy != null ) {
-			multitenancy.close();
-			multitenancy = null;
+		if ( multitenancyHelper != null ) {
+			multitenancyHelper.close();
+			multitenancyHelper = null;
 		}
 		//Make sure we don't reuse the settings across SessionFactories
 		configurationSettings = null;
@@ -219,15 +204,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			session = null;
 		}
 		searchFactory = null;
-	}
-
-	private Path createBaseIndexDir(Class<?> currentTestModuleClass) {
-		// Appending UUID to be extra-sure no directory is ever reused across the test suite as Windows might not be
-		// able to delete the files after usage. See also
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
-		return TestConstants.getIndexDirectory( TestConstants.getTempTestDataDir(), currentTestModuleClass ).resolve(
-				UUID.randomUUID().toString().substring( 0, 8 )
-			);
 	}
 
 	private static void deleteRecursive(Path path) throws IOException {

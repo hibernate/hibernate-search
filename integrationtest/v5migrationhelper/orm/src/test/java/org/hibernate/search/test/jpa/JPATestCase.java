@@ -19,24 +19,24 @@ import javax.persistence.Persistence;
 import org.apache.lucene.util.Version;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
+import org.hibernate.search.test.testsupport.V5MigrationHelperJPASetupHelper;
 import org.hibernate.search.testsupport.TestConstants;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 
 /**
  * @author Emmanuel Bernard
  */
 public abstract class JPATestCase {
+
+	@Rule
+	public final V5MigrationHelperJPASetupHelper setupHelper = V5MigrationHelperJPASetupHelper.create();
+
 	protected EntityManagerFactory factory;
 
 	@Before
 	public void setUp() {
-		factory = Persistence.createEntityManagerFactory( getPersistenceUnitName(), getConfig() );
-	}
-
-	@After
-	public void tearDown() {
-		factory.close();
+		factory = setupHelper.start().withProperties( getConfig() ).setup( getPersistenceUnitName() );
 	}
 
 	public abstract Class[] getAnnotatedClasses();

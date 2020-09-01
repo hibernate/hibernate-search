@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.testsupport.junit;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.testsupport.migration.V5MigrationJavaBeanSearchIntegratorAdapter;
 
 import org.junit.Assert;
-import org.junit.rules.ExternalResource;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * Testing SearchFactoryHolder.
@@ -21,47 +26,53 @@ import org.junit.rules.ExternalResource;
  * @author Sanne Grinovero
  * @since 4.1
  */
-public class SearchFactoryHolder extends ExternalResource {
+public class SearchFactoryHolder implements TestRule {
+
+	private final V5MigrationHelperEngineSetupHelper setupHelper = V5MigrationHelperEngineSetupHelper.create();
 
 	private final Class<?>[] entities;
-	private final Properties configuration;
+	private final Map<String, Object> configuration;
 
+	private SearchMapping mapping;
 	private SearchIntegrator searchIntegrator;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this.entities = entities;
-		this.configuration = new Properties();
+		this.configuration = new HashMap<>();
 	}
 
 	public SearchIntegrator getSearchFactory() {
 		return searchIntegrator;
 	}
 
-	@Override
-	protected void before() throws Throwable {
-		searchIntegrator = createSearchFactory();
-	}
-
-	private SearchIntegrator createSearchFactory() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+	public SearchMapping getMapping() {
+		return mapping;
 	}
 
 	@Override
-	protected void after() {
-		if ( searchIntegrator != null ) {
-			try {
-				throw new UnsupportedOperationException( "Closing to be implemented by delegating to Search 6 APIs." );
+	public Statement apply(Statement base, Description description) {
+		Statement wrapped = new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				try {
+					mapping = setupHelper.start()
+							.withProperties( configuration )
+							.setup( entities );
+					searchIntegrator = new V5MigrationJavaBeanSearchIntegratorAdapter( mapping );
+					base.evaluate();
+				}
+				finally {
+					mapping = null;
+					searchIntegrator = null;
+				}
 			}
-			finally {
-				searchIntegrator = null;
-			}
-		}
+		};
+		return setupHelper.apply( wrapped, description );
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		Assert.assertNull( "SearchIntegrator already initialized", searchIntegrator );
+		Assert.assertNull( "Mapping already initialized", mapping );
 		configuration.put( key, value );
 		return this;
 	}
-
 }

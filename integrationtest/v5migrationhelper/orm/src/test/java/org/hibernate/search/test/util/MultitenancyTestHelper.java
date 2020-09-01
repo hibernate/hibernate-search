@@ -14,20 +14,24 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
 import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
-import org.hibernate.testing.boot.JdbcConnectionAccessImpl;
-import org.hibernate.testing.env.ConnectionProviderBuilder;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
 import org.hibernate.tool.schema.internal.SchemaCreatorImpl;
 import org.hibernate.tool.schema.internal.SchemaDropperImpl;
 import org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase;
+
+import org.hibernate.testing.boot.JdbcConnectionAccessImpl;
+import org.hibernate.testing.env.ConnectionProviderBuilder;
 
 /**
  * Utility to help setting up a test SessionFactory which uses multi-tenancy based
@@ -55,6 +59,9 @@ public class MultitenancyTestHelper implements Closeable {
 	}
 
 	public void enableIfNeeded(StandardServiceRegistryBuilder registryBuilder) {
+		if ( !multitenancyEnabled ) {
+			return;
+		}
 		registryBuilder.addService( MultiTenantConnectionProvider.class, multiTenantConnectionProvider );
 	}
 
@@ -88,24 +95,25 @@ public class MultitenancyTestHelper implements Closeable {
 		}
 	}
 
-	public void exportSchema(ServiceRegistryImplementor serviceRegistry, Metadata metadata, Map<String, Object> settings) {
+	public void exportSchema(MetadataImplementor metadata) {
+		if ( !multitenancyEnabled ) {
+			return;
+		}
+		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) metadata.getMetadataBuildingOptions()
+				.getServiceRegistry();
 		HibernateSchemaManagementTool tool = new HibernateSchemaManagementTool();
 		tool.injectServices( serviceRegistry );
 		final GenerationTargetToDatabase[] databaseTargets = createSchemaTargets( serviceRegistry );
 		new SchemaDropperImpl( serviceRegistry ).doDrop(
 				metadata,
-				serviceRegistry,
-				settings,
 				true,
 				databaseTargets
-			);
+		);
 		new SchemaCreatorImpl( serviceRegistry ).doCreation(
 				metadata,
-				serviceRegistry,
-				settings,
 				true,
 				databaseTargets
-			);
+		);
 	}
 
 	private GenerationTargetToDatabase[] createSchemaTargets(ServiceRegistryImplementor serviceRegistry) {
@@ -122,10 +130,13 @@ public class MultitenancyTestHelper implements Closeable {
 	}
 
 	public void forceConfigurationSettings(Map<String, Object> settings) {
-		if ( multitenancyEnabled ) {
-			settings.remove( org.hibernate.cfg.Environment.HBM2DDL_AUTO );
-			settings.put( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
+		if ( !multitenancyEnabled ) {
+			return;
 		}
+		settings.remove( org.hibernate.cfg.Environment.HBM2DDL_AUTO );
+		settings.put( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
+		settings.put( BackendSettings.backendKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY ),
+				MultiTenancyStrategyName.DISCRIMINATOR );
 	}
 
 }

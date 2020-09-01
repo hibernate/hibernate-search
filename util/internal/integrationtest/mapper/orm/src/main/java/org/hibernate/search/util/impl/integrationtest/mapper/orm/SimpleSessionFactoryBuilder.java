@@ -18,6 +18,7 @@ import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.classloading.internal.TcclLookupPrecedence;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.service.ServiceRegistry;
@@ -30,6 +31,7 @@ public final class SimpleSessionFactoryBuilder {
 	private final List<Consumer<BootstrapServiceRegistryBuilder>> bootstrapServiceRegistryBuilderContributors = new ArrayList<>();
 	private final List<Consumer<StandardServiceRegistryBuilder>> serviceRegistryBuilderContributors = new ArrayList<>();
 	private final List<Consumer<MetadataSources>> metadataSourcesContributors = new ArrayList<>();
+	private final List<Consumer<MetadataImplementor>> metadataContributors = new ArrayList<>();
 	private final List<Consumer<SessionFactoryBuilder>> sessionFactoryBuilderContributors = new ArrayList<>();
 
 	public SimpleSessionFactoryBuilder setTcclLookupPrecedenceBefore() {
@@ -82,6 +84,11 @@ public final class SimpleSessionFactoryBuilder {
 		return this;
 	}
 
+	public SimpleSessionFactoryBuilder onMetadata(Consumer<MetadataImplementor> contributor) {
+		metadataContributors.add( contributor );
+		return this;
+	}
+
 	public SimpleSessionFactoryBuilder onSessionFactoryBuilder(Consumer<SessionFactoryBuilder> contributor) {
 		sessionFactoryBuilderContributors.add( contributor );
 		return this;
@@ -105,6 +112,8 @@ public final class SimpleSessionFactoryBuilder {
 			metadataSources = new MetadataSources( serviceRegistry );
 			metadataSourcesContributors.forEach( c -> c.accept( metadataSources ) );
 			Metadata metadata = metadataSources.buildMetadata();
+
+			metadataContributors.forEach( c -> c.accept( (MetadataImplementor) metadata ) );
 
 			sessionFactoryBuilder = metadata.getSessionFactoryBuilder();
 			sessionFactoryBuilderContributors.forEach( c -> c.accept( sessionFactoryBuilder ) );
