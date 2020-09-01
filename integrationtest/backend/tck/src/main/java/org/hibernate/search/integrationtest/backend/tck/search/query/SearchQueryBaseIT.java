@@ -99,6 +99,20 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
+	@SuppressWarnings("deprecation") // we can remove the test when the deprecated API is removed
+	public void totalHitCount_deprecated() {
+		initData( 5000 );
+		StubMappingScope scope = index.createScope();
+
+		SearchResult<DocumentReference> fetch = scope.query()
+				.where( f -> f.matchAll() )
+				.toQuery()
+				.fetch( 10 );
+
+		assertThat( fetch.totalHitCount() ).isEqualTo( 5000 );
+	}
+
+	@Test
 	public void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
 				"This backend doesn't take totalHitsThreshold() into account.",
