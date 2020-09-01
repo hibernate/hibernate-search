@@ -86,6 +86,8 @@ public final class EventContext {
 
 	/**
 	 * @return A human-readable representation of this context.
+	 * This representation may change without prior notice in new versions of Hibernate Search:
+	 * callers should not try to parse it.
 	 */
 	public String render() {
 		StringJoiner contextJoiner = new StringJoiner( MESSAGES.contextSeparator() );
@@ -97,6 +99,8 @@ public final class EventContext {
 
 	/**
 	 * @return A human-readable representation of this context, with a "Context: " prefix.
+	 * This representation may change without prior notice in new versions of Hibernate Search:
+	 * callers should not try to parse it.
 	 */
 	public String renderWithPrefix() {
 		return MESSAGES.contextPrefix() + render();

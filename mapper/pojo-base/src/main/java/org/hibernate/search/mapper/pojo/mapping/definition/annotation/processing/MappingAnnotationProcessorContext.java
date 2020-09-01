@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * A superinterface for contexts passed to mapping annotation processors.
@@ -62,5 +63,11 @@ public interface MappingAnnotationProcessorContext {
 	 */
 	<T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
 			Class<? extends T> type, String name);
+
+	/**
+	 * @return An event context describing the annotation being processed and its location,
+	 * for use in log messages and exception messages.
+	 */
+	EventContext eventContext();
 
 }

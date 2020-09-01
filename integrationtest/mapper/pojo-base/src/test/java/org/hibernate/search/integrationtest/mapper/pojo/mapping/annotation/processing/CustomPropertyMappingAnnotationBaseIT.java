@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -305,4 +306,49 @@ public class CustomPropertyMappingAnnotationBaseIT {
 
 	}
 
+	@Test
+	public void eventContext() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntityType {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@EventContextAwareAnnotation
+			public String getText() {
+				return text;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "myText", String.class )
+		);
+
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntityType.class );
+		backendMock.verifyExpectationsMet();
+
+		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext ).isNotNull();
+		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext.render() )
+				.isEqualTo( "type '" + IndexedEntityType.class.getName() + "', path '.text', annotation '@"
+						+ EventContextAwareAnnotation.class.getName() + "()'" );
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = EventContextAwareAnnotation.Processor.class))
+	private @interface EventContextAwareAnnotation {
+
+		class Processor implements PropertyMappingAnnotationProcessor<EventContextAwareAnnotation> {
+			static EventContext lastProcessedContext = null;
+
+			@Override
+			public void process(PropertyMappingStep mapping, EventContextAwareAnnotation annotation,
+					PropertyMappingAnnotationProcessorContext context) {
+				lastProcessedContext = context.eventContext();
+				mapping.genericField( "myText" );
+			}
+		}
+	}
 }
