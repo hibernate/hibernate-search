@@ -34,11 +34,4 @@ class HibernateOrmClassPropertyModel<T>
 				member, ormPropertyMetadata );
 	}
 
-	Member getMember() {
-		return member;
-	}
-
-	HibernateOrmBasicClassPropertyMetadata getOrmPropertyMetadata() {
-		return ormPropertyMetadata;
-	}
 }
