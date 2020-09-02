@@ -90,45 +90,21 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		MonthDay myProperty;
-		MonthDay indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public MonthDay getMyProperty() {
-			return myProperty;
-		}
-
+		MonthDay myProperty;
 		@GenericField(indexNullAs = "--01-01")
-		public MonthDay getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		MonthDay indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		MonthDay myProperty;
-		MonthDay indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public MonthDay getMyProperty() {
-			return myProperty;
-		}
-
+		MonthDay myProperty;
 		@GenericField(indexNullAs = "--11-21")
-		public MonthDay getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		MonthDay indexNullAsProperty;
 	}
 }

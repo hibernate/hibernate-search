@@ -90,47 +90,23 @@ public class GeoPointPropertyTypeDescriptor extends PropertyTypeDescriptor<GeoPo
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		GeoPoint myProperty;
-		GeoPoint indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public GeoPoint getMyProperty() {
-			return myProperty;
-		}
-
+		GeoPoint myProperty;
 		// see ParseUtils#GEO_POINT_SEPARATOR
 		@GenericField(indexNullAs = "0, 0")
-		public GeoPoint getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		GeoPoint indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		GeoPoint myProperty;
-		GeoPoint indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public GeoPoint getMyProperty() {
-			return myProperty;
-		}
-
+		GeoPoint myProperty;
 		// see ParseUtils#GEO_POINT_SEPARATOR
 		@GenericField(indexNullAs = "100.123, 200.234")
-		public GeoPoint getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		GeoPoint indexNullAsProperty;
 	}
 }

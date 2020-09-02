@@ -82,24 +82,12 @@ public class BoxedDoublePropertyTypeDescriptor extends PropertyTypeDescriptor<Do
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Double myProperty;
-		Double indexNullAsProperty;
-
 		@DocumentId
-		public int getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Double getMyProperty() {
-			return myProperty;
-		}
-
+		Double myProperty;
 		@GenericField(indexNullAs = "0")
-		public Double getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Double indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)

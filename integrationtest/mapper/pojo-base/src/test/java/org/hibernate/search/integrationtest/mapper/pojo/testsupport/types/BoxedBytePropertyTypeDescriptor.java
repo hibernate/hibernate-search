@@ -82,24 +82,12 @@ public class BoxedBytePropertyTypeDescriptor extends PropertyTypeDescriptor<Byte
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Byte myProperty;
-		Byte indexNullAsProperty;
-
 		@DocumentId
-		public int getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Byte getMyProperty() {
-			return myProperty;
-		}
-
+		Byte myProperty;
 		@GenericField(indexNullAs = "0")
-		public Byte getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Byte indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)

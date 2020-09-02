@@ -97,45 +97,21 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		ZoneOffset myProperty;
-		ZoneOffset indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public ZoneOffset getMyProperty() {
-			return myProperty;
-		}
-
+		ZoneOffset myProperty;
 		@GenericField(indexNullAs = "+00:00")
-		public ZoneOffset getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		ZoneOffset indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		ZoneOffset myProperty;
-		ZoneOffset indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public ZoneOffset getMyProperty() {
-			return myProperty;
-		}
-
+		ZoneOffset myProperty;
 		@GenericField(indexNullAs = "-08:30:52")
-		public ZoneOffset getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		ZoneOffset indexNullAsProperty;
 	}
 }

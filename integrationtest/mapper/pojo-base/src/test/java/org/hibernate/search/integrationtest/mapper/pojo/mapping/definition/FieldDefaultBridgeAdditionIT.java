@@ -143,64 +143,40 @@ public class FieldDefaultBridgeAdditionIT {
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithCustomClassProperty {
+		@DocumentId
 		private Integer id;
+		@GenericField
 		private CustomClass property;
 
 		public IndexedEntityWithCustomClassProperty(Integer id, String property) {
 			this.id = id;
 			this.property = new CustomClass( property );
 		}
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		@GenericField
-		public CustomClass getProperty() {
-			return property;
-		}
 	}
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithCustomClassSubclass1Property {
+		@DocumentId
 		private Integer id;
+		@GenericField
 		private CustomClassSubclass1 property;
 
 		public IndexedEntityWithCustomClassSubclass1Property(Integer id, String property) {
 			this.id = id;
 			this.property = new CustomClassSubclass1( property );
 		}
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		@GenericField
-		public CustomClassSubclass1 getProperty() {
-			return property;
-		}
 	}
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithCustomClassSubclass2Property {
+		@DocumentId
 		private Integer id;
+		@GenericField
 		private CustomClassSubclass2 property;
 
 		public IndexedEntityWithCustomClassSubclass2Property(Integer id, String property) {
 			this.id = id;
 			this.property = new CustomClassSubclass2( property );
-		}
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		@GenericField
-		public CustomClassSubclass2 getProperty() {
-			return property;
 		}
 	}
 

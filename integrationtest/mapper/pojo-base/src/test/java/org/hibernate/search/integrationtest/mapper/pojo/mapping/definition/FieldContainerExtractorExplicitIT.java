@@ -48,22 +48,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 	public void mapKeys() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			private Integer id;
+			@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY))
 			private Map<String, String> myProperty;
 
 			IndexedEntity(int id, Map<String, String> myProperty) {
 				this.id = id;
 				this.myProperty = myProperty;
-			}
-
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
-			@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY))
-			public Map<String, String> getMyProperty() {
-				return myProperty;
 			}
 		}
 		Map<String, String> map = new LinkedHashMap<>();
@@ -82,25 +74,17 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 	public void chain_mapListKeys() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			private Integer id;
+			@GenericField(extraction = @ContainerExtraction({
+					BuiltinContainerExtractors.MAP_KEY,
+					BuiltinContainerExtractors.ITERABLE
+			}))
 			private Map<List<String>, String> myProperty;
 
 			private IndexedEntity(int id, Map<List<String>, String> myProperty) {
 				this.id = id;
 				this.myProperty = myProperty;
-			}
-
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
-			@GenericField(extraction = @ContainerExtraction({
-					BuiltinContainerExtractors.MAP_KEY,
-					BuiltinContainerExtractors.ITERABLE
-			}))
-			public Map<List<String>, String> getMyProperty() {
-				return myProperty;
 			}
 		}
 		Map<List<String>, String> map = new LinkedHashMap<>();
@@ -118,25 +102,17 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 	public void containerBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			private Integer id;
+			@GenericField(
+					extraction = @ContainerExtraction(extract = ContainerExtract.NO),
+					valueBridge = @ValueBridgeRef(type = FirstCollectionElementBridge.class)
+			)
 			private List<String> myProperty;
 
 			private IndexedEntity(int id, List<String> myProperty) {
 				this.id = id;
 				this.myProperty = myProperty;
-			}
-
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
-			@GenericField(
-					extraction = @ContainerExtraction(extract = ContainerExtract.NO),
-					valueBridge = @ValueBridgeRef(type = FirstCollectionElementBridge.class)
-			)
-			public List<String> getMyProperty() {
-				return myProperty;
 			}
 		}
 		doTest(
@@ -153,22 +129,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, String[]> objectArray() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY))
 				private String[] myProperty;
 
 				private IndexedEntity(int id, String[] myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY))
-				public String[] getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -178,22 +146,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Iterable<String>> iterable() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
 				private Iterable<String> myProperty;
 
 				private IndexedEntity(int id, Iterable<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
-				public Iterable<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -203,22 +163,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Collection<String>> collection() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
 				private Collection<String> myProperty;
 
 				private IndexedEntity(int id, Collection<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
-				public Collection<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -228,22 +180,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, List<String>> list() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
 				private List<String> myProperty;
 
 				private IndexedEntity(int id, List<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
-				public List<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -253,22 +197,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Set<String>> set() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
 				private Set<String> myProperty;
 
 				private IndexedEntity(int id, Set<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
-				public Set<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -278,22 +214,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, SortedSet<String>> sortedSet() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
 				private SortedSet<String> myProperty;
 
 				private IndexedEntity(int id, SortedSet<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
-				public SortedSet<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -303,22 +231,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Map<String, String>> mapValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
 				private Map<String, String> myProperty;
 
 				private IndexedEntity(int id, Map<String, String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
-				public Map<String, String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -328,22 +248,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, SortedMap<String, String>> sortedMapValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
 				private SortedMap<String, String> myProperty;
 
 				private IndexedEntity(int id, SortedMap<String, String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
-				public SortedMap<String, String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -353,25 +265,17 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Map<String, List<String>>> mapListValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction({
+						BuiltinContainerExtractors.MAP_VALUE,
+						BuiltinContainerExtractors.ITERABLE
+				}))
 				private Map<String, List<String>> myProperty;
 
 				private IndexedEntity(int id, Map<String, List<String>> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction({
-						BuiltinContainerExtractors.MAP_VALUE,
-						BuiltinContainerExtractors.ITERABLE
-				}))
-				public Map<String, List<String>> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -381,22 +285,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Optional<String>> optional() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL))
 				private Optional<String> myProperty;
 
 				private IndexedEntity(int id, Optional<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL))
-				public Optional<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -406,22 +302,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, OptionalDouble> optionalDouble() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL_DOUBLE))
 				private OptionalDouble myProperty;
 
 				private IndexedEntity(int id, OptionalDouble myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL_DOUBLE))
-				public OptionalDouble getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -431,22 +319,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, OptionalInt> optionalInt() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL_INT))
 				private OptionalInt myProperty;
 
 				private IndexedEntity(int id, OptionalInt myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL_INT))
-				public OptionalInt getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -456,22 +336,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, OptionalLong> optionalLong() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL_LONG))
 				private OptionalLong myProperty;
 
 				private IndexedEntity(int id, OptionalLong myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.OPTIONAL_LONG))
-				public OptionalLong getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -481,25 +353,17 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, List<String>> list_explicitPrefixedStringBridge() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(
+						valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class),
+						extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE)
+				)
 				private List<String> myProperty;
 
 				private IndexedEntity(int id, List<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(
-						valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class),
-						extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE)
-				)
-				public List<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -509,22 +373,14 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, List<MyEnum>> list_implicitEnumBridge() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
 				private List<MyEnum> myProperty;
 
 				private IndexedEntity(int id, List<MyEnum> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ITERABLE))
-				public List<MyEnum> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );

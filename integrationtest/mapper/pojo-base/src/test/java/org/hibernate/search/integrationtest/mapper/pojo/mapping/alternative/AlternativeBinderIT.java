@@ -44,29 +44,14 @@ public class AlternativeBinderIT {
 	public void smoke() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			Language language;
-			String title;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@AlternativeDiscriminator
-			public Language getLanguage() {
-				return language;
-			}
-
+			Language language;
 			@MultiLanguageField(projectable = Projectable.YES)
-			public String getTitle() {
-				return title;
-			}
-
+			String title;
 			@MultiLanguageField(name = "content")
-			public String getText() {
-				return text;
-			}
+			String text;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -118,28 +103,13 @@ public class AlternativeBinderIT {
 	public void discriminator_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Language language;
-			String title;
-			String text;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
-			public Language getLanguage() {
-				return language;
-			}
-
 			@MultiLanguageField(projectable = Projectable.YES)
-			public String getTitle() {
-				return title;
-			}
-
+			String title;
 			@MultiLanguageField(name = "content")
-			public String getText() {
-				return text;
-			}
+			String text;
 		}
 
 		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
@@ -158,35 +128,16 @@ public class AlternativeBinderIT {
 	public void discriminator_conflict() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			Language language;
-			Language otherLanguage;
-			String title;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@AlternativeDiscriminator
-			public Language getLanguage() {
-				return language;
-			}
-
+			Language language;
 			@AlternativeDiscriminator
-			public Language getOtherLanguage() {
-				return otherLanguage;
-			}
-
+			Language otherLanguage;
 			@MultiLanguageField(projectable = Projectable.YES)
-			public String getTitle() {
-				return title;
-			}
-
+			String title;
 			@MultiLanguageField(name = "content")
-			public String getText() {
-				return text;
-			}
+			String text;
 		}
 
 		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )

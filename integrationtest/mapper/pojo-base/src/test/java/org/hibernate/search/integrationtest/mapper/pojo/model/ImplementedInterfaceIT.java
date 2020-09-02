@@ -65,21 +65,13 @@ public class ImplementedInterfaceIT {
 	@Indexed
 	public static class IndexedPojo implements ImplementedInterface {
 
+		@DocumentId
 		private Integer id;
 		private String text;
 
 		public IndexedPojo(Integer id, String text) {
 			this.id = id;
 			this.text = text;
-		}
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
 		}
 
 		@Override

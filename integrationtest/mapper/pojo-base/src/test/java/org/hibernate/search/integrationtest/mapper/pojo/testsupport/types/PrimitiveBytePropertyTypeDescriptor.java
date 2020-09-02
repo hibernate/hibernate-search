@@ -83,29 +83,17 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		int id;
-		byte myProperty;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 		@GenericField
-		public byte getMyProperty() {
-			return myProperty;
-		}
+		byte myProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		int id;
-		byte myProperty;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 		@GenericField
-		public byte getMyProperty() {
-			return myProperty;
-		}
+		byte myProperty;
 	}
 }

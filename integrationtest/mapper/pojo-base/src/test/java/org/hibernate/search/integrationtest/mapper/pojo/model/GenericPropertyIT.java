@@ -62,22 +62,22 @@ public class GenericPropertyIT {
 	public void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
+			entity1.id = 1;
 			GenericEntity<String> genericEntity = new GenericEntity<>();
-			genericEntity.setContent( "genericEntityContent" );
-			genericEntity.setArrayContent( new String[] { "entry1", "entry2" } );
+			genericEntity.content = "genericEntityContent";
+			genericEntity.arrayContent = new String[] { "entry1", "entry2" };
 
-			entity1.setGenericProperty( genericEntity );
-			genericEntity.setParent( entity1 );
+			entity1.genericProperty = genericEntity;
+			genericEntity.parent = entity1;
 
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "genericProperty", b2 -> b2
-									.field( "content", genericEntity.getContent() )
-									.field( "arrayContent", genericEntity.getArrayContent()[0] )
-									.field( "arrayContent", genericEntity.getArrayContent()[1] )
+									.field( "content", genericEntity.content )
+									.field( "arrayContent", genericEntity.arrayContent[0] )
+									.field( "arrayContent", genericEntity.arrayContent[1] )
 							)
 					)
 					.processedThenExecuted();
@@ -89,63 +89,23 @@ public class GenericPropertyIT {
 
 		static final String INDEX = "IndexedEntity";
 
-		private Integer id;
-
-		private GenericEntity<String> genericProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
+		private Integer id;
 
 		@IndexedEmbedded
 		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "parent")))
-		public GenericEntity<String> getGenericProperty() {
-			return genericProperty;
-		}
-
-		public void setGenericProperty(GenericEntity<String> genericProperty) {
-			this.genericProperty = genericProperty;
-		}
+		private GenericEntity<String> genericProperty;
 	}
 
 	public static class GenericEntity<T> {
 
 		private IndexedEntity parent;
 
+		@GenericField
 		private T content;
 
+		@GenericField
 		private T[] arrayContent;
-
-		public IndexedEntity getParent() {
-			return parent;
-		}
-
-		public void setParent(IndexedEntity parent) {
-			this.parent = parent;
-		}
-
-		@GenericField
-		public T getContent() {
-			return content;
-		}
-
-		public void setContent(T content) {
-			this.content = content;
-		}
-
-		@GenericField
-		public T[] getArrayContent() {
-			return arrayContent;
-		}
-
-		public void setArrayContent(T[] arrayContent) {
-			this.arrayContent = arrayContent;
-		}
 	}
 
 }

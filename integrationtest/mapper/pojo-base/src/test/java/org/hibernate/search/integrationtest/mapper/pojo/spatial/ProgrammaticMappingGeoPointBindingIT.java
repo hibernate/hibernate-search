@@ -116,26 +116,27 @@ public class ProgrammaticMappingGeoPointBindingIT {
 	public void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
-			entity1.setId( 1 );
-			entity1.setHomeLatitude( 1.1d );
-			entity1.setHomeLongitude( 1.2d );
-			entity1.setWorkLatitude( 1.3d );
-			entity1.setWorkLongitude( 1.4d );
+			entity1.id = 1;
+			entity1.homeLatitude = 1.1d;
+			entity1.homeLongitude = 1.2d;
+			entity1.workLatitude = 1.3d;
+			entity1.workLongitude = 1.4d;
 			GeoPointOnCoordinatesPropertyEntity entity2 = new GeoPointOnCoordinatesPropertyEntity();
-			entity2.setId( 2 );
-			entity2.setCoord( new GeoPoint() {
+			entity2.id = 2;
+			entity2.coord = new GeoPoint() {
 				@Override
 				public double latitude() {
 					return 2.1d;
 				}
+
 				@Override
 				public double longitude() {
 					return 2.2d;
 				}
-			} );
+			};
 			GeoPointOnCustomCoordinatesPropertyEntity entity3 = new GeoPointOnCustomCoordinatesPropertyEntity();
-			entity3.setId( 3 );
-			entity3.setCoord( new CustomCoordinates( 3.1d, 3.2d ) );
+			entity3.id = 3;
+			entity3.coord = new CustomCoordinates( 3.1d, 3.2d );
 
 			session.indexingPlan().add( entity1 );
 			session.indexingPlan().add( entity2 );
@@ -144,26 +145,26 @@ public class ProgrammaticMappingGeoPointBindingIT {
 			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
 					.add( "1", b -> b
 							.field( "homeLocation", GeoPoint.of(
-									entity1.getHomeLatitude(), entity1.getHomeLongitude()
+									entity1.homeLatitude, entity1.homeLongitude
 							) )
 							.field( "workLocation", GeoPoint.of(
-									entity1.getWorkLatitude(), entity1.getWorkLongitude()
+									entity1.workLatitude, entity1.workLongitude
 							) )
 					)
 					.processedThenExecuted();
 			backendMock.expectWorks( GeoPointOnCoordinatesPropertyEntity.INDEX )
 					.add( "2", b -> b
-							.field( "coord", entity2.getCoord() )
-							.field( "location", entity2.getCoord() )
+							.field( "coord", entity2.coord )
+							.field( "location", entity2.coord )
 					)
 					.processedThenExecuted();
 			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
 					.add( "3", b -> b
 							.field( "coord", GeoPoint.of(
-									entity3.getCoord().getLat(), entity3.getCoord().getLon()
+									entity3.coord.lat, entity3.coord.lon
 							) )
 							.field( "location", GeoPoint.of(
-									entity3.getCoord().getLat(), entity3.getCoord().getLon()
+									entity3.coord.lat, entity3.coord.lon
 							) )
 					)
 					.processedThenExecuted();
@@ -183,46 +184,6 @@ public class ProgrammaticMappingGeoPointBindingIT {
 		private Double workLatitude;
 
 		private Double workLongitude;
-
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public Double getHomeLatitude() {
-			return homeLatitude;
-		}
-
-		public void setHomeLatitude(Double homeLatitude) {
-			this.homeLatitude = homeLatitude;
-		}
-
-		public Double getHomeLongitude() {
-			return homeLongitude;
-		}
-
-		public void setHomeLongitude(Double homeLongitude) {
-			this.homeLongitude = homeLongitude;
-		}
-
-		public Double getWorkLatitude() {
-			return workLatitude;
-		}
-
-		public void setWorkLatitude(Double workLatitude) {
-			this.workLatitude = workLatitude;
-		}
-
-		public Double getWorkLongitude() {
-			return workLongitude;
-		}
-
-		public void setWorkLongitude(Double workLongitude) {
-			this.workLongitude = workLongitude;
-		}
 
 	}
 
@@ -260,43 +221,19 @@ public class ProgrammaticMappingGeoPointBindingIT {
 
 		private CustomCoordinates coord;
 
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public CustomCoordinates getCoord() {
-			return coord;
-		}
-
-		public void setCoord(CustomCoordinates coord) {
-			this.coord = coord;
-		}
-
 	}
 
 	// Does not implement GeoPoint on purpose
 	public static class CustomCoordinates {
 
+		// Test primitive type
 		private final double lat;
+		// Test boxed type
 		private final Double lon;
 
 		public CustomCoordinates(double lat, Double lon) {
 			this.lat = lat;
 			this.lon = lon;
-		}
-
-		// Test primitive type
-		public double getLat() {
-			return lat;
-		}
-
-		// Test boxed type
-		public Double getLon() {
-			return lon;
 		}
 	}
 

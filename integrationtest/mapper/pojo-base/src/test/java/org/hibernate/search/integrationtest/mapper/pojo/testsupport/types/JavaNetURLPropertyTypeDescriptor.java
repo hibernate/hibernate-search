@@ -104,46 +104,22 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		URL myProperty;
-		URL indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public URL getMyProperty() {
-			return myProperty;
-		}
-
+		URL myProperty;
 		@GenericField(indexNullAs = "https://www.redhat.com")
-		public URL getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		URL indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		URL myProperty;
-		URL indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public URL getMyProperty() {
-			return myProperty;
-		}
-
+		URL myProperty;
 		@GenericField(indexNullAs = "https://hibernate.org")
-		public URL getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		URL indexNullAsProperty;
 	}
 
 	private static URL url(String spec) {

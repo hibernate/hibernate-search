@@ -33,47 +33,28 @@ public class IndexedEmbeddedDepthIT {
 	@TestForIssue(jiraKey = "HSEARCH-1467")
 	public void includeDepth_differentDepths() {
 		class IndexedEmbeddedLevel2 {
-			String level2Property;
 			@GenericField
-			public String getLevel2Property() {
-				return level2Property;
-			}
+			String level2Property;
 		}
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
-			IndexedEmbeddedLevel2 level2;
 			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
+			String level1Property;
 			@IndexedEmbedded
-			public IndexedEmbeddedLevel2 getLevel2() {
-				return level2;
-			}
+			IndexedEmbeddedLevel2 level2;
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(includeDepth = 1)
 			IndexedEmbeddedLevel1 level1Depth1;
+			@IndexedEmbedded(includeDepth = 2)
 			IndexedEmbeddedLevel1 level1Depth2;
 
 			public IndexedEntity(int id, String level1Value, String level2Value) {
 				this.id = id;
 				level1Depth1 = create( level1Value, level2Value );
 				level1Depth2 = create( level1Value, level2Value );
-			}
-
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(includeDepth = 1)
-			public IndexedEmbeddedLevel1 getLevel1Depth1() {
-				return level1Depth1;
-			}
-			@IndexedEmbedded(includeDepth = 2)
-			public IndexedEmbeddedLevel1 getLevel1Depth2() {
-				return level1Depth2;
 			}
 
 			private IndexedEmbeddedLevel1 create(String level1Value, String level2Value) {

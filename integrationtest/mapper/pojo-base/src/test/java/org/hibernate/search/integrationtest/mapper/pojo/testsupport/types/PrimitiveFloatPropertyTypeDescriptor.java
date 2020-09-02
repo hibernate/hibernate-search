@@ -83,29 +83,17 @@ public class PrimitiveFloatPropertyTypeDescriptor extends PropertyTypeDescriptor
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		int id;
-		float myProperty;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 		@GenericField
-		public float getMyProperty() {
-			return myProperty;
-		}
+		float myProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		int id;
-		float myProperty;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 		@GenericField
-		public float getMyProperty() {
-			return myProperty;
-		}
+		float myProperty;
 	}
 }

@@ -55,15 +55,9 @@ public class CustomTypeMappingAnnotationBaseIT {
 		@Indexed(index = INDEX_NAME)
 		@WorkingAnnotation
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String text;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getText() {
-				return text;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b ->
@@ -94,11 +88,8 @@ public class CustomTypeMappingAnnotationBaseIT {
 		@Indexed
 		@AnnotationWithEmptyProcessorRef
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -125,11 +116,8 @@ public class CustomTypeMappingAnnotationBaseIT {
 		@Indexed
 		@AnnotationWithProcessorWithDifferentAnnotationType
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -181,41 +169,23 @@ public class CustomTypeMappingAnnotationBaseIT {
 		@AnnotatedElementAwareAnnotation
 		@AnalyzerAnnotation(name = "foo")
 		class IndexedEntityType1 {
+			@DocumentId
 			Integer id;
 			String text;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getText() {
-				return text;
-			}
 		}
 		@Indexed(index = index2Name)
 		@AnnotatedElementAwareAnnotation
 		class IndexedEntityType2 {
+			@DocumentId
 			Integer id;
 			String keyword;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getKeyword() {
-				return keyword;
-			}
 		}
 		@Indexed(index = index3Name)
 		@AnnotatedElementAwareAnnotation
 		class IndexedEntityType3 {
+			@DocumentId
 			Integer id;
 			Integer integer;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Integer getInteger() {
-				return integer;
-			}
 		}
 
 		backendMock.expectSchema( index1Name, b -> b

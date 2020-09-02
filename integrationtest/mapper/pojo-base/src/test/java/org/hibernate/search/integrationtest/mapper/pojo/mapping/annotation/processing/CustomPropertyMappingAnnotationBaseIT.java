@@ -57,16 +57,10 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	public void simple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@WorkingAnnotation
-			public String getText() {
-				return text;
-			}
+			String text;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b ->
@@ -95,12 +89,9 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	public void missingProcessorReference() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
 			@AnnotationWithEmptyProcessorRef
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -126,12 +117,9 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	public void invalidAnnotationType() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
 			@AnnotationWithProcessorWithDifferentAnnotationType
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -178,27 +166,15 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	public void annotatedElement() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			String text;
-			String keyword;
-			Integer integer;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@AnnotatedElementAwareAnnotation
 			@AnalyzerAnnotation(name = "foo")
-			public String getText() {
-				return text;
-			}
+			String text;
 			@AnnotatedElementAwareAnnotation
-			public String getKeyword() {
-				return keyword;
-			}
+			String keyword;
 			@AnnotatedElementAwareAnnotation
-			public Integer getInteger() {
-				return integer;
-			}
+			Integer integer;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b

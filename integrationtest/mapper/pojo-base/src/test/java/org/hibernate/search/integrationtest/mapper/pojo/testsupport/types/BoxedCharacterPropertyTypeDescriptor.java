@@ -82,45 +82,21 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Character myProperty;
-		Character indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Character getMyProperty() {
-			return myProperty;
-		}
-
+		Character myProperty;
 		@GenericField(indexNullAs = "7")
-		public Character getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Character indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Character myProperty;
-		Character indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Character getMyProperty() {
-			return myProperty;
-		}
-
+		Character myProperty;
 		@GenericField(indexNullAs = "F")
-		public Character getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Character indexNullAsProperty;
 	}
 }

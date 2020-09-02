@@ -42,11 +42,8 @@ public class DocumentIdBaseIT {
 	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType() {
 		@Indexed
 		class IndexedEntity {
-			Object id;
 			@DocumentId
-			public Object getId() {
-				return id;
-			}
+			Object id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -68,11 +65,8 @@ public class DocumentIdBaseIT {
 	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {
-			Enum id;
 			@DocumentId
-			public Enum getId() {
-				return id;
-			}
+			Enum id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -92,11 +86,8 @@ public class DocumentIdBaseIT {
 	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithWildcard() {
 		@Indexed
 		class IndexedEntity {
-			Enum<?> id;
 			@DocumentId
-			public Enum<?> getId() {
-				return id;
-			}
+			Enum<?> id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -116,11 +107,8 @@ public class DocumentIdBaseIT {
 	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
-			Enum<EnumForEnumSuperClassTest> id;
 			@DocumentId
-			public Enum<EnumForEnumSuperClassTest> getId() {
-				return id;
-			}
+			Enum<EnumForEnumSuperClassTest> id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -146,11 +134,8 @@ public class DocumentIdBaseIT {
 	public void error_invalidInputTypeForIdentifierBridge() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyStringBridge.class))
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -188,14 +173,11 @@ public class DocumentIdBaseIT {
 	public void error_definingBothBridgeReferenceAndBinderReference() {
 		@Indexed
 		class IndexedEntity {
-			Object id;
 			@DocumentId(
 					identifierBridge = @IdentifierBridgeRef(name = "foo"),
 					identifierBinder = @IdentifierBinderRef(name = "bar")
 			)
-			public Object getId() {
-				return id;
-			}
+			Object id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -218,9 +200,6 @@ public class DocumentIdBaseIT {
 		@Indexed
 		class IndexedEntity {
 			Object id;
-			public Object getId() {
-				return id;
-			}
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )

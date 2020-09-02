@@ -90,45 +90,21 @@ public class LocalDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		LocalDateTime myProperty;
-		LocalDateTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public LocalDateTime getMyProperty() {
-			return myProperty;
-		}
-
+		LocalDateTime myProperty;
 		@GenericField(indexNullAs = "1970-01-01T00:00:00")
-		public LocalDateTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		LocalDateTime indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		LocalDateTime myProperty;
-		LocalDateTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public LocalDateTime getMyProperty() {
-			return myProperty;
-		}
-
+		LocalDateTime myProperty;
 		@GenericField(indexNullAs = "2030-11-21T15:15:15")
-		public LocalDateTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		LocalDateTime indexNullAsProperty;
 	}
 }

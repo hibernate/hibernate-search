@@ -82,45 +82,21 @@ public class BoxedBooleanPropertyTypeDescriptor extends PropertyTypeDescriptor<B
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Boolean myProperty;
-		Boolean indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Boolean getMyProperty() {
-			return myProperty;
-		}
-
+		Boolean myProperty;
 		@GenericField(indexNullAs = "false")
-		public Boolean getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Boolean indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Boolean myProperty;
-		Boolean indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Boolean getMyProperty() {
-			return myProperty;
-		}
-
+		Boolean myProperty;
 		@GenericField(indexNullAs = "true")
-		public Boolean getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Boolean indexNullAsProperty;
 	}
 }

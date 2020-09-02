@@ -41,22 +41,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, String[]> objectArray() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private String[] myProperty;
 
 				private IndexedEntity(int id, String[] myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public String[] getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -66,22 +58,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Iterable<String>> iterable() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private Iterable<String> myProperty;
 
 				private IndexedEntity(int id, Iterable<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public Iterable<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -91,22 +75,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Collection<String>> collection() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private Collection<String> myProperty;
 
 				private IndexedEntity(int id, Collection<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public Collection<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -116,22 +92,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, List<String>> list() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private List<String> myProperty;
 
 				private IndexedEntity(int id, List<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public List<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -141,22 +109,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Set<String>> set() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private Set<String> myProperty;
 
 				private IndexedEntity(int id, Set<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public Set<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -166,22 +126,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, SortedSet<String>> sortedSet() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private SortedSet<String> myProperty;
 
 				private IndexedEntity(int id, SortedSet<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public SortedSet<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -191,22 +143,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Map<String, String>> mapValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private Map<String, String> myProperty;
 
 				private IndexedEntity(int id, Map<String, String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public Map<String, String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -216,22 +160,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, SortedMap<String, String>> sortedMapValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private SortedMap<String, String> myProperty;
 
 				private IndexedEntity(int id, SortedMap<String, String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public SortedMap<String, String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -241,22 +177,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Map<String, List<String>>> mapListValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private Map<String, List<String>> myProperty;
 
 				private IndexedEntity(int id, Map<String, List<String>> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public Map<String, List<String>> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -266,22 +194,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, Optional<String>> optional() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private Optional<String> myProperty;
 
 				private IndexedEntity(int id, Optional<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public Optional<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -291,22 +211,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, OptionalDouble> optionalDouble() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private OptionalDouble myProperty;
 
 				private IndexedEntity(int id, OptionalDouble myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public OptionalDouble getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -316,22 +228,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, OptionalInt> optionalInt() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private OptionalInt myProperty;
 
 				private IndexedEntity(int id, OptionalInt myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public OptionalInt getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -341,22 +245,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, OptionalLong> optionalLong() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private OptionalLong myProperty;
 
 				private IndexedEntity(int id, OptionalLong myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public OptionalLong getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -366,22 +262,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, List<String>> list_explicitPrefixedStringBridge() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField(valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class))
 				private List<String> myProperty;
 
 				private IndexedEntity(int id, List<String> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField(valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class))
-				public List<String> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
@@ -391,22 +279,14 @@ public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExt
 		public TestModel<?, List<MyEnum>> list_implicitEnumBridge() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
+				@DocumentId
 				private Integer id;
+				@GenericField
 				private List<MyEnum> myProperty;
 
 				private IndexedEntity(int id, List<MyEnum> myProperty) {
 					this.id = id;
 					this.myProperty = myProperty;
-				}
-
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-
-				@GenericField
-				public List<MyEnum> getMyProperty() {
-					return myProperty;
 				}
 			}
 			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );

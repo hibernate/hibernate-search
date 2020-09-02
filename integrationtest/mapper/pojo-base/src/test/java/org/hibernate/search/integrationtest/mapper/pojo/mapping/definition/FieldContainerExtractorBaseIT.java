@@ -52,16 +52,10 @@ public class FieldContainerExtractorBaseIT {
 	public void custom() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			MyContainer<String> text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(extraction = @ContainerExtraction(MyContainerExtractor.NAME))
-			public MyContainer<String> getText() {
-				return text;
-			}
+			MyContainer<String> text;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -113,12 +107,9 @@ public class FieldContainerExtractorBaseIT {
 	public void custom_error_undefined() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
 			@GenericField(extraction = @ContainerExtraction("some-undefined-name"))
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -141,12 +132,9 @@ public class FieldContainerExtractorBaseIT {
 	public void custom_error_cannotInferClassTypePattern() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
 			@GenericField(extraction = @ContainerExtraction(RawContainerExtractor.NAME))
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
@@ -181,16 +169,10 @@ public class FieldContainerExtractorBaseIT {
 	public void error_invalidContainerExtractorForType() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			List<Integer> numbers;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
-			public List<Integer> getNumbers() {
-				return numbers;
-			}
+			List<Integer> numbers;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -212,19 +194,13 @@ public class FieldContainerExtractorBaseIT {
 	public void invalidContainerExtractorWithExtractNo() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			List<Integer> numbers;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(extraction = @ContainerExtraction(
 					extract = ContainerExtract.NO,
 					value = BuiltinContainerExtractors.MAP_VALUE
 			))
-			public List<Integer> getNumbers() {
-				return numbers;
-			}
+			List<Integer> numbers;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )

@@ -98,45 +98,21 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		ZoneId myProperty;
-		ZoneId indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public ZoneId getMyProperty() {
-			return myProperty;
-		}
-
+		ZoneId myProperty;
 		@GenericField(indexNullAs = "Z")
-		public ZoneId getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		ZoneId indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		ZoneId myProperty;
-		ZoneId indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public ZoneId getMyProperty() {
-			return myProperty;
-		}
-
+		ZoneId myProperty;
 		@GenericField(indexNullAs = "Europe/Paris")
-		public ZoneId getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		ZoneId indexNullAsProperty;
 	}
 }

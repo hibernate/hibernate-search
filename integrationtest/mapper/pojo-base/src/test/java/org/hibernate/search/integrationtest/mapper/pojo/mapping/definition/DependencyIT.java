@@ -38,11 +38,8 @@ public class DependencyIT {
 	public void associationInverseSide_error_missingInversePath() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@AssociationInverseSide(inversePath = @ObjectPath({}))
 			public IndexedEntity getOther() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -67,11 +64,8 @@ public class DependencyIT {
 	public void derivedFrom_error_missingPath() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath({}))
 			public String getDerived() {
@@ -97,11 +91,8 @@ public class DependencyIT {
 	public void derivedFrom_error_invalidPath() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "invalidPath")))
 			public String getDerived() {
@@ -128,15 +119,9 @@ public class DependencyIT {
 		class DerivedFromCycle {
 			@Indexed
 			class A {
+				@DocumentId
 				Integer id;
 				B b;
-				@DocumentId
-				public Integer getId() {
-					return id;
-				}
-				public B getB() {
-					return b;
-				}
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "b"),
@@ -148,9 +133,6 @@ public class DependencyIT {
 			}
 			class B {
 				C c;
-				public C getC() {
-					return c;
-				}
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "c"),
@@ -162,9 +144,6 @@ public class DependencyIT {
 			}
 			class C {
 				A a;
-				public A getA() {
-					return a;
-				}
 				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "a"),
@@ -200,34 +179,19 @@ public class DependencyIT {
 		class CannotInvertAssociation {
 			@Indexed
 			class A {
-				Integer id;
-				Embedded embedded;
 				@DocumentId
-				public Integer getId() {
-					return id;
-				}
+				Integer id;
 				@IndexedEmbedded
-				public Embedded getEmbedded() {
-					return embedded;
-				}
+				Embedded embedded;
 			}
 			class Embedded {
-				B b;
 				@IndexedEmbedded
-				public B getB() {
-					return b;
-				}
+				B b;
 			}
 			class B {
 				A a;
-				String text;
-				public A getA() {
-					return a;
-				}
 				@GenericField
-				public String getText() {
-					throw new UnsupportedOperationException( "Should not be called" );
-				}
+				String text;
 			}
 		}
 		Assertions.assertThatThrownBy(
@@ -262,28 +226,16 @@ public class DependencyIT {
 		class CannotApplyInvertAssociationPath {
 			@Indexed
 			class A {
-				Integer id;
-				B b;
 				@DocumentId
-				public Integer getId() {
-					return id;
-				}
+				Integer id;
 				@IndexedEmbedded
 				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "invalidPath")))
-				public B getB() {
-					return b;
-				}
+				B b;
 			}
 			class B {
 				A a;
-				String text;
-				public A getA() {
-					return a;
-				}
 				@GenericField
-				public String getText() {
-					throw new UnsupportedOperationException( "Should not be called" );
-				}
+				String text;
 			}
 		}
 		Assertions.assertThatThrownBy(
@@ -316,28 +268,16 @@ public class DependencyIT {
 		class CannotApplyInvertAssociationPath {
 			@Indexed
 			class A {
-				Integer id;
-				B b;
 				@DocumentId
-				public Integer getId() {
-					return id;
-				}
+				Integer id;
 				@IndexedEmbedded
 				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "a")))
-				public B getB() {
-					return b;
-				}
+				B b;
 			}
 			class B {
 				String a;
-				String text;
-				public String getA() {
-					return a;
-				}
 				@GenericField
-				public String getText() {
-					throw new UnsupportedOperationException( "Should not be called" );
-				}
+				String text;
 			}
 		}
 		Assertions.assertThatThrownBy(

@@ -92,45 +92,21 @@ public class ZonedDateTimePropertyTypeDescriptor extends PropertyTypeDescriptor<
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		ZonedDateTime myProperty;
-		ZonedDateTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public ZonedDateTime getMyProperty() {
-			return myProperty;
-		}
-
+		ZonedDateTime myProperty;
 		@GenericField(indexNullAs = "1970-01-01T00:00:00Z[GMT]")
-		public ZonedDateTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		ZonedDateTime indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		ZonedDateTime myProperty;
-		ZonedDateTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public ZonedDateTime getMyProperty() {
-			return myProperty;
-		}
-
+		ZonedDateTime myProperty;
 		@GenericField(indexNullAs = "1999-05-31T09:30:10-05:00[America/Chicago]")
-		public ZonedDateTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		ZonedDateTime indexNullAsProperty;
 	}
 }

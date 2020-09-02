@@ -54,11 +54,8 @@ public class RoutingKeyBindingBaseIT {
 	@org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding(
 			binder = @org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef(type = WorkingRoutingKeyBinder.class))
 	private static class IndexedEntityWithWorkingRoutingKeyBinding {
-		Integer id;
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
+		Integer id;
 	}
 
 	public static class WorkingRoutingKeyBinder implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
@@ -78,11 +75,8 @@ public class RoutingKeyBindingBaseIT {
 		@org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding(
 				binder = @org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef)
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )

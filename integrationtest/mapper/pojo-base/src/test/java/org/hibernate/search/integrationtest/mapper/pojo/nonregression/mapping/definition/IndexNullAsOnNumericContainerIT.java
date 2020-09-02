@@ -51,10 +51,10 @@ public class IndexNullAsOnNumericContainerIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getIntegerList().add( 1 );
-			entity1.getIntegerList().add( null );
-			entity1.getIntegerList().add( 2 );
+			entity1.id = 1;
+			entity1.integerList.add( 1 );
+			entity1.integerList.add( null );
+			entity1.integerList.add( 2 );
 
 			session.indexingPlan().add( entity1 );
 
@@ -72,22 +72,10 @@ public class IndexNullAsOnNumericContainerIT {
 
 		static final String INDEX = "IndexedEntity";
 
+		@DocumentId
 		private Integer id;
 
-		private List<Integer> integerList = new ArrayList<>();
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
 		@GenericField(indexNullAs = "42")
-		public List<Integer> getIntegerList() {
-			return integerList;
-		}
+		private List<Integer> integerList = new ArrayList<>();
 	}
 }

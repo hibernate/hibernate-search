@@ -53,17 +53,11 @@ public class FailureReportIT {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
-			Integer id;
-			Integer myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "failingField1")
 			@GenericField(name = "failingField2")
-			public Integer getMyProperty() {
-				return myProperty;
-			}
+			Integer myProperty;
 		}
 		String field1FailureMessage = "This is the failure message for field 1";
 		String field2FailureMessage = "This is the failure message for field 2";
@@ -115,21 +109,12 @@ public class FailureReportIT {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
-			Integer id;
-			Integer myProperty1;
-			Integer myProperty2;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "failingField1")
-			public Integer getMyProperty1() {
-				return myProperty1;
-			}
+			Integer myProperty1;
 			@GenericField(name = "failingField2")
-			public Integer getMyProperty2() {
-				return myProperty2;
-			}
+			Integer myProperty2;
 		}
 		String field1FailureMessage = "This is the failure message for field 1";
 		String field2FailureMessage = "This is the failure message for field 2";
@@ -183,30 +168,18 @@ public class FailureReportIT {
 		final String indexName1 = "indexName1";
 		@Indexed(index = indexName1)
 		class IndexedEntity1 {
-			Integer id;
-			Integer myProperty1;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "failingField1")
-			public Integer getMyProperty1() {
-				return myProperty1;
-			}
+			Integer myProperty1;
 		}
 		final String indexName2 = "indexName2";
 		@Indexed(index = indexName2)
 		class IndexedEntity2 {
-			Integer id;
-			Integer myProperty2;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "failingField2")
-			public Integer getMyProperty2() {
-				return myProperty2;
-			}
+			Integer myProperty2;
 		}
 		String field1FailureMessage = "This is the failure message for field 1";
 		String field2FailureMessage = "This is the failure message for field 2";
@@ -257,17 +230,11 @@ public class FailureReportIT {
 		final String indexName = "indexName";
 		@Indexed(index = indexName)
 		class IndexedEntity {
-			Integer id;
-			Integer myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "failingField1")
 			@GenericField(name = "failingField2")
-			public Integer getMyProperty() {
-				return myProperty;
-			}
+			Integer myProperty;
 		}
 		String field1FailureMessage = "This is the failure message for field 1";
 		String field2FailureMessage = "This is the failure message for field 2";

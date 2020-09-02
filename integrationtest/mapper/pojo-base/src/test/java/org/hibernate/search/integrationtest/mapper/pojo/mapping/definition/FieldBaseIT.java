@@ -49,16 +49,10 @@ public class FieldBaseIT {
 	public void error_unableToResolveDefaultValueBridgeFromSourceType() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			Object myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public Object getMyProperty() {
-				return myProperty;
-			}
+			Object myProperty;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -80,16 +74,10 @@ public class FieldBaseIT {
 	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			Enum myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public Enum getMyProperty() {
-				return myProperty;
-			}
+			Enum myProperty;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -109,16 +97,10 @@ public class FieldBaseIT {
 	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassWithWildcard() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			Enum<?> myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public Enum<?> getMyProperty() {
-				return myProperty;
-			}
+			Enum<?> myProperty;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -138,16 +120,10 @@ public class FieldBaseIT {
 	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			Enum<EnumForEnumSuperClassTest> myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public Enum<EnumForEnumSuperClassTest> getMyProperty() {
-				return myProperty;
-			}
+			Enum<EnumForEnumSuperClassTest> myProperty;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -173,12 +149,9 @@ public class FieldBaseIT {
 	public void error_invalidInputTypeForValueBridge() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
 			@GenericField(valueBridge = @ValueBridgeRef(type = MyStringBridge.class))
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -199,16 +172,10 @@ public class FieldBaseIT {
 	public void error_invalidInputTypeForValueBridge_implicitContainerExtractor() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			List<Integer> numbers;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(valueBridge = @ValueBridgeRef(type = MyStringBridge.class))
-			public List<Integer> getNumbers() {
-				return numbers;
-			}
+			List<Integer> numbers;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -242,15 +209,12 @@ public class FieldBaseIT {
 	public void error_definingBothBridgeReferenceAndBinderReference() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
 			@GenericField(
 					valueBridge = @ValueBridgeRef(name = "foo"),
 					valueBinder = @ValueBinderRef(name = "bar")
 			)
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -272,14 +236,10 @@ public class FieldBaseIT {
 	public void indexNullAs() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			Integer integer;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(valueBridge = @ValueBridgeRef(type = ParsingValueBridge.class), indexNullAs = "7")
-			public Integer getInteger() { return integer; }
+			Integer integer;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -317,14 +277,10 @@ public class FieldBaseIT {
 	public void error_indexNullAs_noParsing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			Integer integer;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(valueBridge = @ValueBridgeRef(type = NoParsingValueBridge.class), indexNullAs = "7")
-			public Integer getInteger() { return integer; }
+			Integer integer;
 		}
 
 		Assertions.assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )

@@ -89,45 +89,21 @@ public class InstantPropertyTypeDescriptor extends PropertyTypeDescriptor<Instan
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Instant myProperty;
-		Instant indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Instant getMyProperty() {
-			return myProperty;
-		}
-
+		Instant myProperty;
 		@GenericField(indexNullAs = "1970-01-01T00:00:00.00Z")
-		public Instant getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Instant indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Instant myProperty;
-		Instant indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Instant getMyProperty() {
-			return myProperty;
-		}
-
+		Instant myProperty;
 		@GenericField(indexNullAs = "2017-11-06T19:19:03.54Z")
-		public Instant getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Instant indexNullAsProperty;
 	}
 }

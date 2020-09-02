@@ -93,18 +93,9 @@ public class SearchTimeoutIT {
 
 	@Indexed(index = INDEX_NAME)
 	public static final class IndexedEntity {
-
-		private Integer id;
-		private String keyword;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		private Integer id;
 		@KeywordField
-		public String getKeyword() {
-			return keyword;
-		}
+		private String keyword;
 	}
 }

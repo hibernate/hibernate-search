@@ -111,63 +111,33 @@ public class BoxedIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<I
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
-		Integer id;
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
+		Integer id;
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
-		Integer id;
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
+		Integer id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Integer myProperty;
-		Integer indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Integer getMyProperty() {
-			return myProperty;
-		}
-
+		Integer myProperty;
 		@GenericField(indexNullAs = "0")
-		public Integer getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Integer indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Integer myProperty;
-		Integer indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Integer getMyProperty() {
-			return myProperty;
-		}
-
+		Integer myProperty;
 		@GenericField(indexNullAs = "739")
-		public Integer getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Integer indexNullAsProperty;
 	}
 }

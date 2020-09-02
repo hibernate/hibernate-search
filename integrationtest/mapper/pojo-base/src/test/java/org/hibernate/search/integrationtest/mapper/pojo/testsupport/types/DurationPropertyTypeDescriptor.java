@@ -95,45 +95,21 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Duration myProperty;
-		Duration indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Duration getMyProperty() {
-			return myProperty;
-		}
-
+		Duration myProperty;
 		@GenericField(indexNullAs = "PT0S")
-		public Duration getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Duration indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Duration myProperty;
-		Duration indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Duration getMyProperty() {
-			return myProperty;
-		}
-
+		Duration myProperty;
 		@GenericField(indexNullAs = "PT1.000000123S")
-		public Duration getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Duration indexNullAsProperty;
 	}
 }

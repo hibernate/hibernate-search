@@ -110,66 +110,34 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
-		UUID id;
-
 		@DocumentId
-		public UUID getId() {
-			return id;
-		}
+		UUID id;
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
-		UUID id;
-
 		@DocumentId
-		public UUID getId() {
-			return id;
-		}
+		UUID id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		UUID myProperty;
-		UUID indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public UUID getMyProperty() {
-			return myProperty;
-		}
-
+		UUID myProperty;
 		@GenericField(indexNullAs = "80000000-0000-0000-8000-000000000000")
-		public UUID getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		UUID indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		UUID myProperty;
-		UUID indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public UUID getMyProperty() {
-			return myProperty;
-		}
-
+		UUID myProperty;
 		@GenericField(indexNullAs = "8cea97f9-9696-4299-9f05-636a208b6c1f")
-		public UUID getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		UUID indexNullAsProperty;
 	}
 
 	public static List<UUID> getSequence() {

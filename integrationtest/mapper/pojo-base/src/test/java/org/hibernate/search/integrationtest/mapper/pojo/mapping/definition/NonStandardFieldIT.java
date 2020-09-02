@@ -52,16 +52,10 @@ public class NonStandardFieldIT {
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			WrappedValue value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@NonStandardField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getValue() {
-				return value;
-			}
+			WrappedValue value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -75,17 +69,11 @@ public class NonStandardFieldIT {
 	public void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			WrappedValue value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@NonStandardField(name = "explicitName",
 					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getValue() {
-				return value;
-			}
+			WrappedValue value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -99,16 +87,10 @@ public class NonStandardFieldIT {
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			WrappedValue value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@NonStandardField(name = "invalid.withdot", valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getValue() {
-				return value;
-			}
+			WrappedValue value;
 		}
 
 		assertThatThrownBy(
@@ -130,18 +112,10 @@ public class NonStandardFieldIT {
 	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@NonStandardField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -155,16 +129,10 @@ public class NonStandardFieldIT {
 	public void defaultBridge_invalidFieldType() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			Integer myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@NonStandardField
-			public Integer getMyProperty() {
-				return myProperty;
-			}
+			Integer myProperty;
 		}
 		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -187,18 +155,10 @@ public class NonStandardFieldIT {
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@NonStandardField(valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		assertThatThrownBy(

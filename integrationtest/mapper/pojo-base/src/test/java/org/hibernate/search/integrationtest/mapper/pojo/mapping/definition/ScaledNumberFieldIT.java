@@ -46,16 +46,10 @@ public class ScaledNumberFieldIT {
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			BigDecimal value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@ScaledNumberField
-			public BigDecimal getValue() {
-				return value;
-			}
+			BigDecimal value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -69,16 +63,10 @@ public class ScaledNumberFieldIT {
 	public void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			BigDecimal value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@ScaledNumberField(name = "explicitName")
-			public BigDecimal getValue() {
-				return value;
-			}
+			BigDecimal value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -92,16 +80,10 @@ public class ScaledNumberFieldIT {
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			BigDecimal value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@ScaledNumberField(name = "invalid.withdot")
-			public BigDecimal getValue() {
-				return value;
-			}
+			BigDecimal value;
 		}
 
 		assertThatThrownBy(
@@ -124,30 +106,14 @@ public class ScaledNumberFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			BigDecimal scaled;
-			BigDecimal unscaled;
-			BigDecimal defaultScaled;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(decimalScale = 7)
-			public BigDecimal getScaled() {
-				return scaled;
-			}
-
+			BigDecimal scaled;
 			@ScaledNumberField(decimalScale = 0)
-			public BigDecimal getUnscaled() {
-				return unscaled;
-			}
-
+			BigDecimal unscaled;
 			@ScaledNumberField
-			public BigDecimal getDefaultScaled() {
-				return defaultScaled;
-			}
+			BigDecimal defaultScaled;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -164,30 +130,14 @@ public class ScaledNumberFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			BigInteger scaled;
-			BigInteger unscaled;
-			BigInteger defaultScaled;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(decimalScale = 7)
-			public BigInteger getScaled() {
-				return scaled;
-			}
-
+			BigInteger scaled;
 			@ScaledNumberField(decimalScale = 0)
-			public BigInteger getUnscaled() {
-				return unscaled;
-			}
-
+			BigInteger unscaled;
 			@ScaledNumberField
-			public BigInteger getDefaultScaled() {
-				return defaultScaled;
-			}
+			BigInteger defaultScaled;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -203,18 +153,10 @@ public class ScaledNumberFieldIT {
 	public void defaultBridge_invalidFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			Integer notScalable;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField
-			public Integer getNotScalable() {
-				return notScalable;
-			}
+			Integer notScalable;
 		}
 
 		assertThatThrownBy(
@@ -239,36 +181,16 @@ public class ScaledNumberFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			BigDecimal searchable;
-			BigInteger unsearchable;
-			BigDecimal useDefault;
-			BigInteger implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(searchable = Searchable.YES)
-			public BigDecimal getSearchable() {
-				return searchable;
-			}
-
+			BigDecimal searchable;
 			@ScaledNumberField(searchable = Searchable.NO)
-			public BigInteger getUnsearchable() {
-				return unsearchable;
-			}
-
+			BigInteger unsearchable;
 			@ScaledNumberField(searchable = Searchable.DEFAULT)
-			public BigDecimal getUseDefault() {
-				return useDefault;
-			}
-
+			BigDecimal useDefault;
 			@ScaledNumberField
-			public BigInteger getImplicit() {
-				return implicit;
-			}
+			BigInteger implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -285,36 +207,16 @@ public class ScaledNumberFieldIT {
 	public void aggregable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			BigDecimal enabled;
-			BigDecimal disabled;
-			BigDecimal explicitDefault;
-			BigDecimal implicitDefault;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(aggregable = Aggregable.YES)
-			public BigDecimal getEnabled() {
-				return enabled;
-			}
-
+			BigDecimal enabled;
 			@ScaledNumberField(aggregable = Aggregable.NO)
-			public BigDecimal getDisabled() {
-				return disabled;
-			}
-
+			BigDecimal disabled;
 			@ScaledNumberField(aggregable = Aggregable.DEFAULT)
-			public BigDecimal getExplicitDefault() {
-				return explicitDefault;
-			}
-
+			BigDecimal explicitDefault;
 			@ScaledNumberField
-			public BigDecimal getImplicitDefault() {
-				return implicitDefault;
-			}
+			BigDecimal implicitDefault;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -331,18 +233,10 @@ public class ScaledNumberFieldIT {
 	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -356,18 +250,10 @@ public class ScaledNumberFieldIT {
 	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -381,18 +267,10 @@ public class ScaledNumberFieldIT {
 	public void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(decimalScale = 3, valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		assertThatThrownBy(
@@ -416,18 +294,10 @@ public class ScaledNumberFieldIT {
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		assertThatThrownBy(

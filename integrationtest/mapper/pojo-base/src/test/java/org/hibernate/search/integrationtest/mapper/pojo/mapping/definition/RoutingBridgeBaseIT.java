@@ -52,11 +52,8 @@ public class RoutingBridgeBaseIT {
 	public void invalidTypeForRoutingBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		assertThatThrownBy( () -> setupHelper.start()
 				.withConfiguration( b -> {
@@ -80,15 +77,9 @@ public class RoutingBridgeBaseIT {
 	public void conflictingRoutingBridgeAndRoutingKeyBinder() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		assertThatThrownBy( () -> setupHelper.start()
 				.withConfiguration( b -> {
@@ -114,11 +105,8 @@ public class RoutingBridgeBaseIT {
 	public void currentRoute_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 
 		class NoCurrentRouteRoutingBridge implements RoutingBridge<IndexedEntity> {
@@ -173,11 +161,8 @@ public class RoutingBridgeBaseIT {
 	public void previousRoutes_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 
 		class NoPreviousRouteRoutingBridge implements RoutingBridge<IndexedEntity> {
@@ -243,11 +228,8 @@ public class RoutingBridgeBaseIT {
 	public void currentRoute_multiple() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 
 		class TwoCurrentRoutesRoutingBridge implements RoutingBridge<IndexedEntity> {
@@ -302,15 +284,9 @@ public class RoutingBridgeBaseIT {
 	public void accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
@@ -390,15 +366,9 @@ public class RoutingBridgeBaseIT {
 	public void accessors_incompatibleRequestedType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		assertThatThrownBy( () -> setupHelper.start()
 				.withConfiguration( b -> {
@@ -431,15 +401,9 @@ public class RoutingBridgeBaseIT {
 	public void explicitDependencies() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
@@ -455,7 +419,7 @@ public class RoutingBridgeBaseIT {
 									@Override
 									public void route(DocumentRoutes routes, Object entityIdentifier,
 											IndexedEntity indexedEntity, RoutingBridgeRouteContext context) {
-										routes.addRoute().routingKey( indexedEntity.getStringProperty() );
+										routes.addRoute().routingKey( indexedEntity.stringProperty );
 									}
 
 									@Override
@@ -518,15 +482,9 @@ public class RoutingBridgeBaseIT {
 	public void explicitDependencies_error_invalidProperty() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
@@ -550,15 +508,9 @@ public class RoutingBridgeBaseIT {
 	public void missingDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
@@ -583,15 +535,9 @@ public class RoutingBridgeBaseIT {
 	public void inconsistentDependencyDeclaration() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		assertThatThrownBy( () -> setupHelper.start()
@@ -618,15 +564,9 @@ public class RoutingBridgeBaseIT {
 	public void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
