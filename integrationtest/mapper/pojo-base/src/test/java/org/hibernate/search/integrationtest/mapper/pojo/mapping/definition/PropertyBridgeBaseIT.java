@@ -250,7 +250,7 @@ public class PropertyBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
 						.failure(
-								"Unable to find property 'doesNotExist' on type '" + Contained.class.getName() + "'"
+								"Unable to find a readable property 'doesNotExist' on type '" + Contained.class.getName() + "'"
 						)
 						.build()
 				);
@@ -460,7 +460,7 @@ public class PropertyBridgeBaseIT {
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".child" )
 						.failure(
-								"Unable to find property 'doesNotExist' on type '"
+								"Unable to find a readable property 'doesNotExist' on type '"
 								+ PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'"
 						)
 						.build()
@@ -494,7 +494,7 @@ public class PropertyBridgeBaseIT {
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".child" )
 						.failure(
-								"Unable to find property 'doesNotExist' on type '" + PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'"
+								"Unable to find a readable property 'doesNotExist' on type '" + PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'"
 						)
 						.build()
 				);
