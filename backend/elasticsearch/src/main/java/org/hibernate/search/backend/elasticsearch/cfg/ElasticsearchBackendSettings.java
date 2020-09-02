@@ -106,7 +106,7 @@ public final class ElasticsearchBackendSettings {
 	 * Expects a positive Integer value in milliseconds, such as 60000,
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#REQUEST_TIMEOUT}.
+	 * Defaults to no request timeout.
 	 */
 	public static final String REQUEST_TIMEOUT = "request_timeout";
 
@@ -267,7 +267,6 @@ public final class ElasticsearchBackendSettings {
 
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
 		public static final String PROTOCOL = "http";
-		public static final int REQUEST_TIMEOUT = 60000;
 		public static final int READ_TIMEOUT = 30000;
 		public static final int CONNECTION_TIMEOUT = 1000;
 		public static final int MAX_CONNECTIONS = 20;

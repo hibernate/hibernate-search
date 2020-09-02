@@ -86,10 +86,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.asString()
 					.build();
 
-	private static final ConfigurationProperty<Integer> REQUEST_TIMEOUT =
+	private static final OptionalConfigurationProperty<Integer> REQUEST_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.REQUEST_TIMEOUT )
 					.asInteger()
-					.withDefault( ElasticsearchBackendSettings.Defaults.REQUEST_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
@@ -139,7 +138,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ScheduledExecutorService timeoutExecutorService,
 			GsonProvider gsonProvider) {
-		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
+		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );

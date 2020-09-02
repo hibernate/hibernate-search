@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -58,7 +59,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private final ScheduledExecutorService timeoutExecutorService;
 
-	private final int requestTimeout;
+	private final Optional<Integer> requestTimeout;
 	private final int connectionTimeout;
 	private final TimeUnit timeoutUnit;
 
@@ -67,7 +68,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
 			ScheduledExecutorService timeoutExecutorService,
-			int requestTimeout, int connectionTimeout, TimeUnit timeoutUnit,
+			Optional<Integer> requestTimeout, int connectionTimeout, TimeUnit timeoutUnit,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
@@ -137,8 +138,13 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				);
 
 		RequestDeadline requestDeadline = elasticsearchRequest.deadline();
-		long currentTimeoutValue = ( requestDeadline == null ) ?
-				requestTimeout : requestDeadline.remainingTimeToHardTimeout();
+		if ( requestDeadline == null && !requestTimeout.isPresent() ) {
+			// no need to schedule a client side timeout
+			return completableFuture;
+		}
+
+		Long currentTimeoutValue = ( requestDeadline == null ) ?
+				Long.valueOf( requestTimeout.get() ) : requestDeadline.remainingTimeToHardTimeout();
 		TimeUnit currentTimeoutUnit = ( requestDeadline == null ) ?
 				timeoutUnit : TimeUnit.MILLISECONDS;
 
