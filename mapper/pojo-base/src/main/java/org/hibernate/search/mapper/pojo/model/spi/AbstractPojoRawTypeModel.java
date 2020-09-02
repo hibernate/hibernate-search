@@ -4,40 +4,34 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.model.impl;
+package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
+public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrospector> implements PojoRawTypeModel<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final HibernateOrmBootstrapIntrospector introspector;
+	protected final I introspector;
 	protected final PojoRawTypeIdentifier<T> typeIdentifier;
-	protected final XClass xClass;
 	private final PojoCaster<T> caster;
+
+	private final Map<String, PojoPropertyModel<?>> propertyModelCache = new HashMap<>();
 
 	private List<PojoPropertyModel<?>> declaredProperties;
 
-	AbstractHibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
-			PojoRawTypeIdentifier<T> typeIdentifier) {
+	public AbstractPojoRawTypeModel(I introspector, PojoRawTypeIdentifier<T> typeIdentifier) {
 		this.introspector = introspector;
 		this.typeIdentifier = typeIdentifier;
-		this.xClass = introspector.toXClass( typeIdentifier.javaClass() );
 		this.caster = new JavaClassPojoCaster<>( typeIdentifier.javaClass() );
 	}
 
@@ -49,7 +43,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		AbstractHibernateOrmRawTypeModel<?> that = (AbstractHibernateOrmRawTypeModel<?>) o;
+		AbstractPojoRawTypeModel<?, ?> that = (AbstractPojoRawTypeModel<?, ?>) o;
 		/*
 		 * We need to take the introspector into account, so that the engine does not confuse
 		 * type models from different mappers during bootstrap.
@@ -64,12 +58,12 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return getClass().getSimpleName() + "[" + typeIdentifier + "]";
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<T> typeIdentifier() {
+	public final PojoRawTypeIdentifier<T> typeIdentifier() {
 		return typeIdentifier;
 	}
 
@@ -79,20 +73,8 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public boolean isSubTypeOf(MappableTypeModel other) {
-		return other instanceof AbstractHibernateOrmRawTypeModel
-				&& ( (AbstractHibernateOrmRawTypeModel<?>) other ).xClass.isAssignableFrom( xClass );
-	}
-
-	@Override
-	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> ascendingSuperTypes();
-
-	@Override
-	public abstract Stream<? extends AbstractHibernateOrmRawTypeModel<? super T>> descendingSuperTypes();
-
-	@Override
 	public final PojoPropertyModel<?> property(String propertyName) {
-		PojoPropertyModel<?> propertyModel = getPropertyOrNull( propertyName );
+		PojoPropertyModel<?> propertyModel = propertyOrNull( propertyName );
 		if ( propertyModel == null ) {
 			throw log.cannotFindReadableProperty( this, propertyName );
 		}
@@ -102,9 +84,8 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	@Override
 	public final Stream<PojoPropertyModel<?>> declaredProperties() {
 		if ( declaredProperties == null ) {
-			// TODO HSEARCH-3056 remove lambdas if possible
-			declaredProperties = getDeclaredPropertyNames()
-					.map( this::getPropertyOrNull )
+			declaredProperties = declaredPropertyNames()
+					.map( this::propertyOrNull )
 					.filter( Objects::nonNull )
 					.collect( Collectors.toList() );
 		}
@@ -116,8 +97,12 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 		return caster;
 	}
 
-	abstract Stream<String> getDeclaredPropertyNames();
+	protected abstract Stream<String> declaredPropertyNames();
 
-	abstract PojoPropertyModel<?> getPropertyOrNull(String propertyName);
+	protected abstract PojoPropertyModel<?> createPropertyModel(String propertyName);
+
+	private PojoPropertyModel<?> propertyOrNull(String propertyName) {
+		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
+	}
 
 }

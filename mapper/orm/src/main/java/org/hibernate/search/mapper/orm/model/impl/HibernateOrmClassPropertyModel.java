@@ -6,116 +6,32 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.stream.Stream;
 
-import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnPropertyModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class HibernateOrmClassPropertyModel<T> implements PojoPropertyModel<T> {
+class HibernateOrmClassPropertyModel<T>
+		extends AbstractPojoHCAnnPropertyModel<T, HibernateOrmBootstrapIntrospector> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final HibernateOrmBootstrapIntrospector introspector;
-	private final HibernateOrmClassRawTypeModel<?> holderTypeModel;
-
-	private final String name;
-	/**
-	 * The declared XProperties for this property in the holder type.
-	 * May be empty if this property is declared in a supertype of the holder type
-	 * and not overridden in the holder type.
- 	 */
-	private final List<XProperty> declaredXProperties;
 	private final HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata;
-
-	private final Member member;
-
-	private ValueReadHandle<T> handle;
-	private PojoGenericTypeModel<T> typeModel;
 
 	HibernateOrmClassPropertyModel(HibernateOrmBootstrapIntrospector introspector,
 			HibernateOrmClassRawTypeModel<?> holderTypeModel,
 			String name, List<XProperty> declaredXProperties,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata,
 			Member member) {
-		this.introspector = introspector;
-		this.holderTypeModel = holderTypeModel;
-		this.name = name;
-		this.declaredXProperties = declaredXProperties;
+		super( introspector, holderTypeModel, name, declaredXProperties, member );
 		this.ormPropertyMetadata = ormPropertyMetadata;
-		this.member = member;
-	}
-
-	@Override
-	public String name() {
-		return name;
-	}
-
-	@Override
-	public Stream<Annotation> annotations() {
-		return declaredXProperties.stream().flatMap( introspector::annotations );
-	}
-
-	@Override
-	/*
-	 * The cast is safe as long as both type parameter T and getGetterGenericReturnType
-	 * match the actual type for this property.
-	 */
-	@SuppressWarnings( "unchecked" )
-	public PojoGenericTypeModel<T> typeModel() {
-		if ( typeModel == null ) {
-			try {
-				typeModel = (PojoGenericTypeModel<T>) holderTypeModel.getRawTypeDeclaringContext()
-						.createGenericTypeModel( getGetterGenericReturnType() );
-			}
-			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
-			}
-		}
-		return typeModel;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	public ValueReadHandle<T> handle() {
-		if ( handle == null ) {
-			try {
-				handle = (ValueReadHandle<T>) introspector.createValueReadHandle(
-						holderTypeModel.typeIdentifier().javaClass(), member, ormPropertyMetadata
-				);
-			}
-			catch (IllegalAccessException | RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
-			}
-		}
-		return handle;
-	}
-
-	Type getGetterGenericReturnType() {
-		// Try to preserve generics information if possible
-		if ( member instanceof Method ) {
-			return ( (Method) member ).getGenericReturnType();
-		}
-		else if ( member instanceof Field ) {
-			return ( (Field) member ).getGenericType();
-		}
-		else {
-			throw new AssertionFailure(
-					"Unexpected type for a " + Member.class.getName() + ": " + member
-					+ " has type " + ( member == null ? null : member.getClass() )
-			);
-		}
+	protected ValueReadHandle<T> createHandle() throws IllegalAccessException {
+		return (ValueReadHandle<T>) introspector.createValueReadHandle( holderTypeModel.typeIdentifier().javaClass(),
+				member, ormPropertyMetadata );
 	}
 
 	Member getMember() {

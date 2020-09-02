@@ -7,18 +7,18 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawTypeModel<Map> {
+public class HibernateOrmDynamicMapRawTypeModel
+		extends AbstractPojoRawTypeModel<Map, HibernateOrmBootstrapIntrospector> {
 
 	private final HibernateOrmBasicDynamicMapTypeMetadata ormTypeMetadata;
-
-	private final Map<String, HibernateOrmDynamicMapPropertyModel<?>> propertyModelCache = new HashMap<>();
 
 	HibernateOrmDynamicMapRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
 			PojoRawTypeIdentifier<Map> typeIdentifier,
@@ -37,7 +37,7 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 		if ( equals( superTypeCandidate ) ) {
 			return true;
 		}
-		AbstractHibernateOrmRawTypeModel<?> superType = getSuperType();
+		PojoRawTypeModel<?> superType = getSuperType();
 		if ( superType != null ) {
 			return superType.isSubTypeOf( superTypeCandidate );
 		}
@@ -45,12 +45,12 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 	}
 
 	@Override
-	public Stream<AbstractHibernateOrmRawTypeModel<? super Map>> ascendingSuperTypes() {
+	public Stream<PojoRawTypeModel<? super Map>> ascendingSuperTypes() {
 		return Stream.concat( Stream.of( this ), getSuperType().ascendingSuperTypes() );
 	}
 
 	@Override
-	public Stream<AbstractHibernateOrmRawTypeModel<? super Map>> descendingSuperTypes() {
+	public Stream<PojoRawTypeModel<? super Map>> descendingSuperTypes() {
 		return Stream.concat( getSuperType().descendingSuperTypes(), Stream.of( this ) );
 	}
 
@@ -60,12 +60,7 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 	}
 
 	@Override
-	HibernateOrmDynamicMapPropertyModel<?> getPropertyOrNull(String propertyName) {
-		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
-	}
-
-	@Override
-	Stream<String> getDeclaredPropertyNames() {
+	protected Stream<String> declaredPropertyNames() {
 		return ormTypeMetadata.getPropertyNames().stream();
 	}
 
@@ -73,7 +68,7 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 	 * @return The supertype of this type.
 	 * Dynamic-map types cannot implement interfaces, so they only have one direct supertype.
 	 */
-	private AbstractHibernateOrmRawTypeModel<? super Map> getSuperType() {
+	private PojoRawTypeModel<? super Map> getSuperType() {
 		HibernateOrmDynamicMapRawTypeModel entitySupertypeOrNull = getSuperEntityOrNull();
 		if ( entitySupertypeOrNull != null ) {
 			return entitySupertypeOrNull;
@@ -93,7 +88,8 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 		return null;
 	}
 
-	private HibernateOrmDynamicMapPropertyModel<?> createPropertyModel(String propertyName) {
+	@Override
+	protected HibernateOrmDynamicMapPropertyModel<?> createPropertyModel(String propertyName) {
 		HibernateOrmBasicDynamicMapPropertyMetadata ormPropertyMetadata = getPropertyMetadata( propertyName );
 
 		if ( ormPropertyMetadata == null ) {

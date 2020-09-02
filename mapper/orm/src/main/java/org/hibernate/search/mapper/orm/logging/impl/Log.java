@@ -165,11 +165,6 @@ public interface Log extends BasicLogger {
 					+ " Hibernate ORM metadata node of type '%1$s'.")
 	SearchException invalidContainerExtractorForDirtyChecking(Class<?> ormMappingClass, String extractorName);
 
-	@Message(id = ID_OFFSET_2 + 10,
-			value = "Unable to find a readable property '%2$s' on type '%1$s'.")
-	SearchException cannotFindReadableProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			String propertyName);
-
 	@Message(id = ID_OFFSET_2 + 11, value = "Mapping service cannot create a SearchSession using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
 	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory, SessionFactory usedSessionFactory);
 

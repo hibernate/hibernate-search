@@ -453,4 +453,14 @@ public interface Log extends BasicLogger {
 			value = "Routing bridge '%1$s' did not define any previous route. At least one previous route must be defined," +
 					" or you can call notIndexed() to explicitly indicate no route was necessary.")
 	SearchException noPreviousRoute(Object routingBridge);
+
+	@Message(id = ID_OFFSET_2 + 78,
+			value = "Unable to find a readable property '%2$s' on type '%1$s'.")
+	SearchException cannotFindReadableProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
+			String propertyName);
+
+	@Message(id = ID_OFFSET_2 + 79, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
+	SearchException errorRetrievingPropertyTypeModel(String propertyModelName,
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
+
 }
