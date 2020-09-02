@@ -87,7 +87,8 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping);
 
-	WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus, String timeout);
+	WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus,
+			int requiredStatusTimeoutInMs);
 
 	PutIndexAliasesWorkBuilder putIndexAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases);
 

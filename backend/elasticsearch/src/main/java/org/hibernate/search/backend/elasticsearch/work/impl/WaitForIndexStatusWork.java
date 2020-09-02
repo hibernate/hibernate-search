@@ -30,13 +30,13 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 			implements WaitForIndexStatusWorkBuilder {
 		private final URLEncodedString indexName;
 		private final IndexStatus requiredStatus;
-		private final String timeout;
+		private final int requiredStatusTimeoutInMs;
 
-		public Builder(URLEncodedString indexName, IndexStatus requiredStatus, String timeout) {
+		public Builder(URLEncodedString indexName, IndexStatus requiredStatus, int requiredStatusTimeoutInMs) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.requiredStatus = requiredStatus;
-			this.timeout = timeout;
+			this.requiredStatusTimeoutInMs = requiredStatusTimeoutInMs;
 		}
 
 		@Override
@@ -47,7 +47,7 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 					.pathComponent( Paths.HEALTH )
 					.pathComponent( indexName )
 					.param( "wait_for_status", requiredStatus.externalRepresentation() )
-					.param( "timeout", timeout );
+					.param( "timeout", requiredStatusTimeoutInMs + "ms" );
 
 			return builder.build();
 		}
