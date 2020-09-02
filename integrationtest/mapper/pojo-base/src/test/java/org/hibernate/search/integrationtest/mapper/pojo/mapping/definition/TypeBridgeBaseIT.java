@@ -228,7 +228,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"Unable to find property 'doesNotExist' on type '" + IndexedEntity.class.getName() + "'"
+								"Unable to find a readable property 'doesNotExist' on type '" + IndexedEntity.class.getName() + "'"
 						)
 						.build()
 				);
@@ -364,7 +364,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"Unable to find property 'doesNotExist' on type '" + ContainedEntity.class.getName() + "'"
+								"Unable to find a readable property 'doesNotExist' on type '" + ContainedEntity.class.getName() + "'"
 						)
 						.build()
 				);
@@ -410,7 +410,7 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"Unable to find property 'doesNotExist' on type '" + ContainedEntity.class.getName() + "'"
+								"Unable to find a readable property 'doesNotExist' on type '" + ContainedEntity.class.getName() + "'"
 						)
 						.build()
 				);

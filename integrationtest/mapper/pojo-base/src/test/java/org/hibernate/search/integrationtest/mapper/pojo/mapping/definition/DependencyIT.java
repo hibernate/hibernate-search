@@ -116,7 +116,7 @@ public class DependencyIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".derived<no value extractors>" )
 						.failure(
-								"Unable to find property 'invalidPath' on type '"
+								"Unable to find a readable property 'invalidPath' on type '"
 										+ IndexedEntity.class.getName() + "'"
 						)
 						.build()
@@ -306,7 +306,7 @@ public class DependencyIT {
 								+ CannotApplyInvertAssociationPath.B.class.getName() + "' is modified."
 				)
 				.hasMessageContaining(
-						"Unable to find property 'invalidPath' on type '"
+						"Unable to find a readable property 'invalidPath' on type '"
 						+ CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				);
 	}

@@ -541,7 +541,7 @@ public class RoutingBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Unable to find property 'doesNotExist' on type '" + IndexedEntity.class.getName()
+						.failure( "Unable to find a readable property 'doesNotExist' on type '" + IndexedEntity.class.getName()
 								+ "'" )
 						.build() );
 	}
