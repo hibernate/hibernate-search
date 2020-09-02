@@ -587,8 +587,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	protected final IndexedEntity createEntity(int id) {
 		IndexedEntity entity = new IndexedEntity();
-		entity.setId( id );
-		entity.setValue( String.valueOf( id ) );
+		entity.id = id;
+		entity.value = String.valueOf( id );
 		return entity;
 	}
 
@@ -652,27 +652,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 		public static final String INDEX = "IndexedEntity";
 
+		@DocumentId
 		private Integer id;
 
-		private String value;
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
 		@GenericField
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
+		private String value;
 
 	}
 

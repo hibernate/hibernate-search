@@ -460,53 +460,6 @@ public class CleanupIT {
 
 		private IndexedEntity otherEmbedding;
 
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
-
-		public IndexedEntity getEmbedded() {
-			return embedded;
-		}
-
-		public void setEmbedded(IndexedEntity embedded) {
-			this.embedded = embedded;
-		}
-
-		public IndexedEntity getOtherEmbedded() {
-			return otherEmbedded;
-		}
-
-		public void setOtherEmbedded(IndexedEntity otherEmbedded) {
-			this.otherEmbedded = otherEmbedded;
-		}
-
-		public IndexedEntity getEmbedding() {
-			return embedding;
-		}
-
-		public void setEmbedding(IndexedEntity embedding) {
-			this.embedding = embedding;
-		}
-
-		public IndexedEntity getOtherEmbedding() {
-			return otherEmbedding;
-		}
-
-		public void setOtherEmbedding(IndexedEntity otherEmbedding) {
-			this.otherEmbedding = otherEmbedding;
-		}
 	}
 
 	public static final class OtherIndexedEntity {
@@ -516,21 +469,6 @@ public class CleanupIT {
 
 		private String text;
 
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
 	}
 
 	private static class SimulatedFailure extends RuntimeException {

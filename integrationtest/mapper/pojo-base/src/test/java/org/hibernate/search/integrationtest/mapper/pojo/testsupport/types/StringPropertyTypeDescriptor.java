@@ -115,63 +115,33 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String>
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
-		String id;
 		@DocumentId
-		public String getId() {
-			return id;
-		}
+		String id;
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
-		String id;
 		@DocumentId
-		public String getId() {
-			return id;
-		}
+		String id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		String myProperty;
-		String indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public String getMyProperty() {
-			return myProperty;
-		}
-
+		String myProperty;
 		@GenericField(indexNullAs = "")
-		public String getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		String indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		String myProperty;
-		String indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public String getMyProperty() {
-			return myProperty;
-		}
-
+		String myProperty;
 		@GenericField(indexNullAs = "some value")
-		public String getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		String indexNullAsProperty;
 	}
 }

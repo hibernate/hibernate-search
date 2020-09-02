@@ -58,14 +58,14 @@ public class PojoIndexingPlanBaseIT {
 	public void success() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setValue( "val1" );
+			entity1.id = 1;
+			entity1.value = "val1";
 			IndexedEntity entity2 = new IndexedEntity();
-			entity2.setId( 2 );
-			entity2.setValue( "val2" );
+			entity2.id = 2;
+			entity2.value = "val2";
 			IndexedEntity entity3 = new IndexedEntity();
-			entity3.setId( 3 );
-			entity3.setValue( "val3" );
+			entity3.id = 3;
+			entity3.value = "val3";
 
 			session.indexingPlan().add( entity1 );
 			session.indexingPlan().addOrUpdate( entity2 );
@@ -76,14 +76,14 @@ public class PojoIndexingPlanBaseIT {
 					.add( b -> b
 							.identifier( "1" )
 							.document( StubDocumentNode.document()
-									.field( "value", entity1.getValue() )
+									.field( "value", entity1.value )
 									.build()
 							)
 					)
 					.update( b -> b
 							.identifier( "2" )
 							.document( StubDocumentNode.document()
-									.field( "value", entity2.getValue() )
+									.field( "value", entity2.value )
 									.build()
 							)
 					)
@@ -102,8 +102,8 @@ public class PojoIndexingPlanBaseIT {
 				failingFuture.completeExceptionally( simulatedFailure );
 
 				IndexedEntity entity1 = new IndexedEntity();
-				entity1.setId( 1 );
-				entity1.setValue( "val1" );
+				entity1.id = 1;
+				entity1.value = "val1";
 
 				session.indexingPlan().add( entity1 );
 
@@ -111,7 +111,7 @@ public class PojoIndexingPlanBaseIT {
 						.add( b -> b
 								.identifier( "1" )
 								.document( StubDocumentNode.document()
-										.field( "value", entity1.getValue() )
+										.field( "value", entity1.value )
 										.build()
 								)
 						)
@@ -126,27 +126,11 @@ public class PojoIndexingPlanBaseIT {
 
 		public static final String INDEX = "IndexedEntity";
 
+		@DocumentId
 		private Integer id;
 
-		private String value;
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
 		@GenericField
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
+		private String value;
 
 	}
 }

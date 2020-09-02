@@ -95,45 +95,21 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Period myProperty;
-		Period indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Period getMyProperty() {
-			return myProperty;
-		}
-
+		Period myProperty;
 		@GenericField(indexNullAs = "P0D")
-		public Period getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Period indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Period myProperty;
-		Period indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Period getMyProperty() {
-			return myProperty;
-		}
-
+		Period myProperty;
 		@GenericField(indexNullAs = "P1900Y12M21D")
-		public Period getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Period indexNullAsProperty;
 	}
 }

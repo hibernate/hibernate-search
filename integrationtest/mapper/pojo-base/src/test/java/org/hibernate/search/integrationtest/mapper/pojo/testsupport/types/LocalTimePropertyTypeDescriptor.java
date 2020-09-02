@@ -89,45 +89,21 @@ public class LocalTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Loca
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		LocalTime myProperty;
-		LocalTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public LocalTime getMyProperty() {
-			return myProperty;
-		}
-
+		LocalTime myProperty;
 		@GenericField(indexNullAs = "00:00:00")
-		public LocalTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		LocalTime indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		LocalTime myProperty;
-		LocalTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public LocalTime getMyProperty() {
-			return myProperty;
-		}
-
+		LocalTime myProperty;
 		@GenericField(indexNullAs = "12:30:15")
-		public LocalTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		LocalTime indexNullAsProperty;
 	}
 }

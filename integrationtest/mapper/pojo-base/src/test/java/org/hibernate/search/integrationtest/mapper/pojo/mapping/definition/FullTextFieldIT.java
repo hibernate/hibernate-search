@@ -61,16 +61,10 @@ public class FullTextFieldIT {
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME)
-			public String getValue() {
-				return value;
-			}
+			String value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -84,16 +78,10 @@ public class FullTextFieldIT {
 	public void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@FullTextField(name = "explicitName", analyzer = ANALYZER_NAME)
-			public String getValue() {
-				return value;
-			}
+			String value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -107,16 +95,10 @@ public class FullTextFieldIT {
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@FullTextField(name = "invalid.withdot", analyzer = ANALYZER_NAME)
-			public String getValue() {
-				return value;
-			}
+			String value;
 		}
 
 		assertThatThrownBy(
@@ -138,19 +120,13 @@ public class FullTextFieldIT {
 	public void defaultBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@FullTextField(analyzer = ANALYZER_NAME)
 			String myProperty;
 			IndexedEntity(int id, String myProperty) {
 				this.id = id;
 				this.myProperty = myProperty;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@FullTextField(analyzer = ANALYZER_NAME)
-			public String getMyProperty() {
-				return myProperty;
 			}
 		}
 
@@ -167,36 +143,16 @@ public class FullTextFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String norms;
-			String noNorms;
-			String defaultNorms;
-			String implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.YES)
-			public String getNorms() {
-				return norms;
-			}
-
+			String norms;
 			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.NO)
-			public String getNoNorms() {
-				return noNorms;
-			}
-
+			String noNorms;
 			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.DEFAULT)
-			public String getDefaultNorms() {
-				return defaultNorms;
-			}
-
+			String defaultNorms;
 			@FullTextField(analyzer = ANALYZER_NAME)
-			public String getImplicit() {
-				return implicit;
-			}
+			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -214,36 +170,16 @@ public class FullTextFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String searchable;
-			String unsearchable;
-			String useDefault;
-			String implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.YES)
-			public String getSearchable() {
-				return searchable;
-			}
-
+			String searchable;
 			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.NO)
-			public String getUnsearchable() {
-				return unsearchable;
-			}
-
+			String unsearchable;
 			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.DEFAULT)
-			public String getUseDefault() {
-				return useDefault;
-			}
-
+			String useDefault;
 			@FullTextField(analyzer = ANALYZER_NAME)
-			public String getImplicit() {
-				return implicit;
-			}
+			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -261,42 +197,18 @@ public class FullTextFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String termVector;
-			String noTermVector;
-			String moreOptions;
-			String useDefault;
-			String implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.YES)
-			public String getTermVector() {
-				return termVector;
-			}
-
+			String termVector;
 			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.NO)
-			public String getNoTermVector() {
-				return noTermVector;
-			}
-
+			String noTermVector;
 			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.WITH_POSITIONS_OFFSETS)
-			public String getMoreOptions() {
-				return moreOptions;
-			}
-
+			String moreOptions;
 			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.DEFAULT)
-			public String getUseDefault() {
-				return useDefault;
-			}
-
+			String useDefault;
 			@FullTextField(analyzer = ANALYZER_NAME)
-			public String getImplicit() {
-				return implicit;
-			}
+			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -314,18 +226,10 @@ public class FullTextFieldIT {
 	public void searchAnalyzer() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String text;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME, searchAnalyzer = SEARCH_ANALYZER_NAME)
-			public String getText() {
-				return text;
-			}
+			String text;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -339,19 +243,11 @@ public class FullTextFieldIT {
 	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME,
 					valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -365,19 +261,11 @@ public class FullTextFieldIT {
 	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME,
 					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -391,16 +279,10 @@ public class FullTextFieldIT {
 	public void defaultBridge_invalidFieldType() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			Integer myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME)
-			public Integer getMyProperty() {
-				return myProperty;
-			}
+			Integer myProperty;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
@@ -423,19 +305,11 @@ public class FullTextFieldIT {
 	public void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME,
 					valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		Assertions.assertThatThrownBy(
@@ -459,19 +333,11 @@ public class FullTextFieldIT {
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@FullTextField(analyzer = ANALYZER_NAME,
 					valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		Assertions.assertThatThrownBy(

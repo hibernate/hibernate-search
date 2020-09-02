@@ -137,43 +137,31 @@ public class DocumentIdDefaultBridgeAdditionIT {
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithCustomClassId {
+		@DocumentId
 		private CustomClass id;
 
 		public IndexedEntityWithCustomClassId(String id) {
 			this.id = new CustomClass( id );
 		}
-
-		@DocumentId
-		public CustomClass getId() {
-			return id;
-		}
 	}
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithCustomClassSubclass1Id {
+		@DocumentId
 		private CustomClassSubclass1 id;
 
 		public IndexedEntityWithCustomClassSubclass1Id(String id) {
 			this.id = new CustomClassSubclass1( id );
 		}
-
-		@DocumentId
-		public CustomClassSubclass1 getId() {
-			return id;
-		}
 	}
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithCustomClassSubclass2Id {
+		@DocumentId
 		private CustomClassSubclass2 id;
 
 		public IndexedEntityWithCustomClassSubclass2Id(String id) {
 			this.id = new CustomClassSubclass2( id );
-		}
-
-		@DocumentId
-		public CustomClassSubclass2 getId() {
-			return id;
 		}
 	}
 

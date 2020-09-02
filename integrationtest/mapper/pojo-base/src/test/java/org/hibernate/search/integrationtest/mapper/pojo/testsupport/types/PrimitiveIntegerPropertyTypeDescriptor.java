@@ -113,47 +113,29 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
-		int id;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
-		int id;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		int id;
-		int myProperty;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 		@GenericField
-		public int getMyProperty() {
-			return myProperty;
-		}
+		int myProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		int id;
-		int myProperty;
 		@DocumentId
-		public int getId() {
-			return id;
-		}
+		int id;
 		@GenericField
-		public int getMyProperty() {
-			return myProperty;
-		}
+		int myProperty;
 	}
 }

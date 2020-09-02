@@ -60,15 +60,9 @@ public class TypeBindingBaseIT {
 	@Indexed(index = INDEX_NAME)
 	@TypeBinding(binder = @TypeBinderRef(type = WorkingTypeBinder.class))
 	private static class IndexedEntityWithWorkingTypeBinding {
+		@DocumentId
 		Integer id;
 		String text;
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-		public String getText() {
-			return text;
-		}
 	}
 
 	public static class WorkingTypeBinder implements TypeBinder {
@@ -92,11 +86,8 @@ public class TypeBindingBaseIT {
 		@Indexed
 		@TypeBinding(binder = @TypeBinderRef)
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )

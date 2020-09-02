@@ -122,45 +122,21 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Time myProperty;
-		Time indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Time getMyProperty() {
-			return myProperty;
-		}
-
+		Time myProperty;
 		@GenericField(indexNullAs = "1970-01-01T00:00:00.00Z")
-		public Time getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Time indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Time myProperty;
-		Time indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Time getMyProperty() {
-			return myProperty;
-		}
-
+		Time myProperty;
 		@GenericField(indexNullAs = "2001-03-31T02:59:01.99Z")
-		public Time getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Time indexNullAsProperty;
 	}
 }

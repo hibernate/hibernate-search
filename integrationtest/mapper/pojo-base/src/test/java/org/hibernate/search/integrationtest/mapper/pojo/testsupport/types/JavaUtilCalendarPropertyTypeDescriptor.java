@@ -161,45 +161,21 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Calendar myProperty;
-		Calendar indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Calendar getMyProperty() {
-			return myProperty;
-		}
-
+		Calendar myProperty;
 		@GenericField(indexNullAs = "1970-01-01T00:00:00Z[GMT]")
-		public Calendar getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Calendar indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Calendar myProperty;
-		Calendar indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Calendar getMyProperty() {
-			return myProperty;
-		}
-
+		Calendar myProperty;
 		@GenericField(indexNullAs = "2017-11-05T19:00:54+01:00[Europe/Paris]")
-		public Calendar getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Calendar indexNullAsProperty;
 	}
 }

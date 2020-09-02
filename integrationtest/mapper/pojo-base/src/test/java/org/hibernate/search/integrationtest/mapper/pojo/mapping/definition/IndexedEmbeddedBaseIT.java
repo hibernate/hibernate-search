@@ -70,27 +70,20 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void defaultAttributes() {
 		class IndexedEmbeddedLevel2 {
-			String level2Property;
 			@GenericField
-			public String getLevel2Property() {
-				return level2Property;
-			}
+			String level2Property;
 		}
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
-			IndexedEmbeddedLevel2 level2;
 			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
+			String level1Property;
 			@IndexedEmbedded
-			public IndexedEmbeddedLevel2 getLevel2() {
-				return level2;
-			}
+			IndexedEmbeddedLevel2 level2;
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value, String level2Value) {
 				this.id = id;
@@ -98,14 +91,6 @@ public class IndexedEmbeddedBaseIT {
 				this.level1.level1Property = level1Value;
 				this.level1.level2 = new IndexedEmbeddedLevel2();
 				this.level1.level2.level2Property = level2Value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -138,28 +123,19 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void name() {
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
 			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
+			String level1Property;
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(name = "explicitName")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(name = "explicitName")
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -187,28 +163,19 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void name_invalid_dot() {
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
 			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
+			String level1Property;
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(name = "invalid.withdot")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(name = "invalid.withdot")
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -230,28 +197,19 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void name_andPrefix() {
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
 			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
+			String level1Property;
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(name = "somename", prefix = "someprefix.")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(name = "somename", prefix = "someprefix.")
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -298,7 +256,13 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(name = "default", includePaths = {"default", "common"})
+			@IndexedEmbedded(name = "flat", includePaths = {"flat", "common"},
+					structure = ObjectStructure.FLATTENED)
+			@IndexedEmbedded(name = "nest", includePaths = {"nest", "common"},
+					structure = ObjectStructure.NESTED)
 			Embedded embedded;
 			public IndexedEntity(int id, String value) {
 				this.id = id;
@@ -307,18 +271,6 @@ public class IndexedEmbeddedBaseIT {
 				this.embedded.flat = value;
 				this.embedded.nest = value;
 				this.embedded.common = value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(name = "default", includePaths = {"default", "common"})
-			@IndexedEmbedded(name = "flat", includePaths = {"flat", "common"},
-					structure = ObjectStructure.FLATTENED)
-			@IndexedEmbedded(name = "nest", includePaths = {"nest", "common"},
-					structure = ObjectStructure.NESTED)
-			public Embedded getEmbedded() {
-				return embedded;
 			}
 		}
 
@@ -353,29 +305,17 @@ public class IndexedEmbeddedBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3324")
 	public void multiValued() {
 		class IndexedEmbeddedLevel1 {
+			@GenericField
 			String level1SingleValuedProperty;
+			@GenericField
 			List<String> level1MultiValuedProperty;
-			@GenericField
-			public String getLevel1SingleValuedProperty() {
-				return level1SingleValuedProperty;
-			}
-			@GenericField
-			public List<String> getLevel1MultiValuedProperty() {
-				return level1MultiValuedProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@IndexedEmbedded
-			public List<IndexedEmbeddedLevel1> getLevel1() {
-				return level1;
-			}
+			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -456,16 +396,10 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@IndexedEmbedded(prefix = "level1_")
-			public List<IndexedEmbeddedLevel1> getLevel1() {
-				return level1;
-			}
+			List<IndexedEmbeddedLevel1> level1 = new ArrayList<>();
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -540,28 +474,19 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void prefix() {
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
 			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
+			String level1Property;
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(prefix = "customPrefix_")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Property) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = level1Property;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(prefix = "customPrefix_")
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -603,21 +528,15 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(includePaths = "includedProperty")
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.ignoredProperty = ignoredProperty;
 				this.level1.includedProperty = includedProperty;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(includePaths = "includedProperty")
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -648,34 +567,22 @@ public class IndexedEmbeddedBaseIT {
 	@TestForIssue(jiraKey = "HSEARCH-3136")
 	public void error_includePaths_nonMatched() {
 		class IndexedEmbeddedLevel1 {
+			@GenericField
 			String ignoredProperty;
+			@GenericField
 			String includedProperty;
-			@GenericField
-			public String getIgnoredProperty() {
-				return ignoredProperty;
-			}
-			@GenericField
-			public String getIncludedProperty() {
-				return includedProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(includePaths = {"includedProperty", "nonMatchingPath"})
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.ignoredProperty = ignoredProperty;
 				this.level1.includedProperty = includedProperty;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(includePaths = {"includedProperty", "nonMatchingPath"})
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -728,7 +635,9 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(includeDepth = 1)
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value, String level2Value) {
 				this.id = id;
@@ -736,14 +645,6 @@ public class IndexedEmbeddedBaseIT {
 				this.level1.level1Property = level1Value;
 				this.level1.level2 = new IndexedEmbeddedLevel2();
 				this.level1.level2.level2Property = level2Value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(includeDepth = 1)
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -794,7 +695,9 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(maxDepth = 1)
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value, String level2Value) {
 				this.id = id;
@@ -802,14 +705,6 @@ public class IndexedEmbeddedBaseIT {
 				this.level1.level1Property = level1Value;
 				this.level1.level2 = new IndexedEmbeddedLevel2();
 				this.level1.level2.level2Property = level2Value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(maxDepth = 1)
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -841,28 +736,22 @@ public class IndexedEmbeddedBaseIT {
 	@Test
 	public void structure() {
 		class IndexedEmbeddedLevel1 {
-			String level1Property;
 			@GenericField
+			String level1Property;
 			public String getLevel1Property() {
 				return level1Property;
 			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(structure = ObjectStructure.NESTED)
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = level1Value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(structure = ObjectStructure.NESTED)
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -901,20 +790,14 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(storage = org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.NESTED)
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = level1Value;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(storage = org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.NESTED)
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -949,9 +832,6 @@ public class IndexedEmbeddedBaseIT {
 
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
-			public String getLevel1Property() {
-				return level1Property;
-			}
 			public Double getLongitude() {
 				StaticCounters.get().increment( getLongitudeKey );
 				return null;
@@ -968,12 +848,6 @@ public class IndexedEmbeddedBaseIT {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1();
 				this.level1.level1Property = level1Property;
-			}
-			public Integer getId() {
-				return id;
-			}
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -1054,20 +928,14 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				this.level1 = new IndexedEmbeddedLevel1Impl();
 				this.level1.setLevel1Property( level1Value );
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -1124,21 +992,15 @@ public class IndexedEmbeddedBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
 			IndexedEmbeddedLevel1 level1;
 			public IndexedEntity(int id, String level1Value) {
 				this.id = id;
 				// The actual instance has a type that cannot be cast to IndexedEmbeddedLevel1Impl
 				this.level1 = new InvalidTypeImpl();
 				this.level1.setLevel1Property( level1Value );
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
-			public IndexedEmbeddedLevel1 getLevel1() {
-				return level1;
 			}
 		}
 
@@ -1168,24 +1030,12 @@ public class IndexedEmbeddedBaseIT {
 	public void invalid_wrongType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			String text;
-			String invalid;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@GenericField
-			public String getText() {
-				return text;
-			}
-
+			String text;
 			@IndexedEmbedded
-			public String getInvalid() {
-				return invalid;
-			}
+			String invalid;
 		}
 
 		Assertions.assertThatThrownBy( () -> setupHelper.start()
@@ -1218,24 +1068,12 @@ public class IndexedEmbeddedBaseIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			ValidNested valid;
-			EmptyNested invalid;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@IndexedEmbedded
-			public ValidNested getValid() {
-				return valid;
-			}
-
+			ValidNested valid;
 			@IndexedEmbedded
-			public EmptyNested getInvalid() {
-				return invalid;
-			}
+			EmptyNested invalid;
 		}
 
 		Assertions.assertThatThrownBy( () -> setupHelper.start()

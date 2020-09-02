@@ -71,16 +71,10 @@ public class IndexedBaseIT {
 	public void implicitIndexName_defaultEntityName() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text;
 		}
 
 		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> b
@@ -96,16 +90,10 @@ public class IndexedBaseIT {
 	public void implicitIndexName_explicitEntityName() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text;
 		}
 
 		defaultBackendMock.expectSchema( "myEntityName", b -> b
@@ -124,16 +112,10 @@ public class IndexedBaseIT {
 	public void explicitIndexName() {
 		@Indexed(index = "explicitIndexName")
 		class IndexedEntity {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text;
 		}
 
 		defaultBackendMock.expectSchema( "explicitIndexName", b -> b
@@ -148,16 +130,10 @@ public class IndexedBaseIT {
 	public void nonDefaultBackend() {
 		@Indexed(index = "index", backend = "backend2")
 		class IndexedEntity {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text;
 		}
 
 		backend2Mock.expectSchema( "index", b -> b
@@ -172,29 +148,17 @@ public class IndexedBaseIT {
 	public void multiBackend() {
 		@Indexed(index = "index1", backend = "backend2")
 		class IndexedEntity1 {
-			Integer id;
-			String text1;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText1() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text1;
 		}
 		@Indexed(index = "index2", backend = "backend3")
 		class IndexedEntity2 {
-			Integer id;
-			String text2;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText2() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text2;
 		}
 
 		backend2Mock.expectSchema( "index1", b -> b
@@ -472,16 +436,10 @@ public class IndexedBaseIT {
 	public void error_indexedWithoutEntityMetadata() {
 		@Indexed
 		class IndexedWithoutEntityMetadata {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public String getText() {
-				throw new UnsupportedOperationException( "Should not be called" );
-			}
+			String text;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
@@ -506,11 +464,8 @@ public class IndexedBaseIT {
 	public void routingBinder() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = StaticCounterRoutingBinder.class))
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 
 		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> { } );
@@ -526,11 +481,8 @@ public class IndexedBaseIT {
 	public void routingBinder_failure() {
 		@Indexed(routingBinder = @RoutingBinderRef(type = FailingRoutingBinder.class))
 		class IndexedEntity {
-			Integer id;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 		}
 		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )

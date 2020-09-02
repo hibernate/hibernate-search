@@ -142,37 +142,20 @@ public class AnnotationMappingDiscoveryIT {
 	public static final class IndexedEntity {
 		public static final String INDEX = "IndexedEntity";
 
+		@DocumentId
 		private Integer id;
 
+		@IndexedEmbedded
 		private NonExplicitlyRegisteredType annotationMappedEmbedded;
 
 		private NonExplicitlyRegisteredNonAnnotationMappedType nonAnnotationMappedEmbedded;
 
-		@DocumentId
 		public Integer getId() {
 			return id;
 		}
 
 		public void setId(Integer id) {
 			this.id = id;
-		}
-
-		@IndexedEmbedded
-		public NonExplicitlyRegisteredType getAnnotationMappedEmbedded() {
-			return annotationMappedEmbedded;
-		}
-
-		public void setAnnotationMappedEmbedded(NonExplicitlyRegisteredType annotationMappedEmbedded) {
-			this.annotationMappedEmbedded = annotationMappedEmbedded;
-		}
-
-		public NonExplicitlyRegisteredNonAnnotationMappedType getNonAnnotationMappedEmbedded() {
-			return nonAnnotationMappedEmbedded;
-		}
-
-		public void setNonAnnotationMappedEmbedded(
-				NonExplicitlyRegisteredNonAnnotationMappedType nonAnnotationMappedEmbedded) {
-			this.nonAnnotationMappedEmbedded = nonAnnotationMappedEmbedded;
 		}
 	}
 
@@ -181,16 +164,8 @@ public class AnnotationMappingDiscoveryIT {
 	 * It should be automatically discovered when applying the indexed-embedded.
 	 */
 	public static class NonExplicitlyRegisteredType extends AlwaysPresentPropertyType {
-		private NonExplicitlyRegisteredNonMappedType content;
-
 		@PropertyBinding(binder = @PropertyBinderRef(type = CustomMarkerConsumingPropertyBridge.Binder.class))
-		public NonExplicitlyRegisteredNonMappedType getContent() {
-			return content;
-		}
-
-		public void setContent(NonExplicitlyRegisteredNonMappedType content) {
-			this.content = content;
-		}
+		private NonExplicitlyRegisteredNonMappedType content;
 	}
 
 	/**
@@ -199,16 +174,8 @@ public class AnnotationMappingDiscoveryIT {
 	 * if it isn't, the bridge will not contribute any field.
 	 */
 	public static class NonExplicitlyRegisteredNonMappedType {
-		private Integer annotatedProperty;
-
 		@MarkerBinding(binder = @MarkerBinderRef(type = CustomMarker.Binder.class))
-		public Integer getAnnotatedProperty() {
-			return annotatedProperty;
-		}
-
-		public void setAnnotatedProperty(Integer annotatedProperty) {
-			this.annotatedProperty = annotatedProperty;
-		}
+		private Integer annotatedProperty;
 	}
 
 	/**
@@ -218,28 +185,12 @@ public class AnnotationMappingDiscoveryIT {
 	 * if it isn't, the field "nonAnnotationMappedEmbedded.text" will be missing.
 	 */
 	public static class NonExplicitlyRegisteredNonAnnotationMappedType extends AlwaysPresentPropertyType {
-		private String text;
-
 		@GenericField
-		public String getText() {
-			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
+		private String text;
 	}
 
 	public static class AlwaysPresentPropertyType {
 		private String alwaysPresent;
-
-		public String getAlwaysPresent() {
-			return alwaysPresent;
-		}
-
-		public void setAlwaysPresent(String alwaysPresent) {
-			this.alwaysPresent = alwaysPresent;
-		}
 	}
 
 	private static final class CustomMarker {

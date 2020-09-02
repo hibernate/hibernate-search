@@ -60,16 +60,10 @@ public class KeywordFieldIT {
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			String myProperty;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@KeywordField
-			public String getMyProperty() {
-				return myProperty;
-			}
+			String myProperty;
 		}
 
 		// Schema
@@ -84,16 +78,10 @@ public class KeywordFieldIT {
 	public void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@KeywordField(name = "explicitName")
-			public String getValue() {
-				return value;
-			}
+			String value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -107,16 +95,10 @@ public class KeywordFieldIT {
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@KeywordField(name = "invalid.withdot")
-			public String getValue() {
-				return value;
-			}
+			String value;
 		}
 
 		assertThatThrownBy(
@@ -138,19 +120,13 @@ public class KeywordFieldIT {
 	public void defaultBridge() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@KeywordField(normalizer = NORMALIZER_NAME)
 			String myProperty;
 			IndexedEntity(int id, String myProperty) {
 				this.id = id;
 				this.myProperty = myProperty;
-			}
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@KeywordField(normalizer = NORMALIZER_NAME)
-			public String getMyProperty() {
-				return myProperty;
 			}
 		}
 
@@ -167,36 +143,16 @@ public class KeywordFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String norms;
-			String noNorms;
-			String defaultNorms;
-			String implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(norms = Norms.YES)
-			public String getNorms() {
-				return norms;
-			}
-
+			String norms;
 			@KeywordField(norms = Norms.NO)
-			public String getNoNorms() {
-				return noNorms;
-			}
-
+			String noNorms;
 			@KeywordField(norms = Norms.DEFAULT)
-			public String getDefaultNorms() {
-				return defaultNorms;
-			}
-
+			String defaultNorms;
 			@KeywordField
-			public String getImplicit() {
-				return implicit;
-			}
+			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -214,36 +170,16 @@ public class KeywordFieldIT {
 
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String searchable;
-			String unsearchable;
-			String useDefault;
-			String implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(searchable = Searchable.YES)
-			public String getSearchable() {
-				return searchable;
-			}
-
+			String searchable;
 			@KeywordField(searchable = Searchable.NO)
-			public String getUnsearchable() {
-				return unsearchable;
-			}
-
+			String unsearchable;
 			@KeywordField(searchable = Searchable.DEFAULT)
-			public String getUseDefault() {
-				return useDefault;
-			}
-
+			String useDefault;
 			@KeywordField
-			public String getImplicit() {
-				return implicit;
-			}
+			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -260,36 +196,16 @@ public class KeywordFieldIT {
 	public void aggregable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String enabled;
-			String disabled;
-			String explicitDefault;
-			String implicitDefault;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(aggregable = Aggregable.YES)
-			public String getEnabled() {
-				return enabled;
-			}
-
+			String enabled;
 			@KeywordField(aggregable = Aggregable.NO)
-			public String getDisabled() {
-				return disabled;
-			}
-
+			String disabled;
 			@KeywordField(aggregable = Aggregable.DEFAULT)
-			public String getExplicitDefault() {
-				return explicitDefault;
-			}
-
+			String explicitDefault;
 			@KeywordField
-			public String getImplicitDefault() {
-				return implicitDefault;
-			}
+			String implicitDefault;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -306,19 +222,11 @@ public class KeywordFieldIT {
 	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(normalizer = NORMALIZER_NAME,
 					valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -332,19 +240,11 @@ public class KeywordFieldIT {
 	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(normalizer = NORMALIZER_NAME,
 					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -358,18 +258,10 @@ public class KeywordFieldIT {
 	public void defaultBridge_invalidFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			Integer notString;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(normalizer = NORMALIZER_NAME)
-			public Integer getNotString() {
-				return notString;
-			}
+			Integer notString;
 		}
 
 		Assertions.assertThatThrownBy(
@@ -393,19 +285,11 @@ public class KeywordFieldIT {
 	public void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(normalizer = NORMALIZER_NAME,
 					valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		Assertions.assertThatThrownBy(
@@ -429,19 +313,11 @@ public class KeywordFieldIT {
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@KeywordField(normalizer = NORMALIZER_NAME,
 					valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		Assertions.assertThatThrownBy(

@@ -47,16 +47,10 @@ public class GenericFieldIT {
 	public void defaultAttributes() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			Long value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField
-			public Long getValue() {
-				return value;
-			}
+			Long value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -70,16 +64,10 @@ public class GenericFieldIT {
 	public void name() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			LocalDate value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "explicitName")
-			public LocalDate getValue() {
-				return value;
-			}
+			LocalDate value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -93,16 +81,10 @@ public class GenericFieldIT {
 	public void name_invalid_dot() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			Long value;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@GenericField(name = "invalid.withdot")
-			public Long getValue() {
-				return value;
-			}
+			Long value;
 		}
 
 		assertThatThrownBy(
@@ -122,39 +104,18 @@ public class GenericFieldIT {
 
 	@Test
 	public void searchable() {
-
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			Long searchable;
-			LocalDate unsearchable;
-			BigDecimal useDefault;
-			String implicit;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@GenericField(searchable = Searchable.YES)
-			public Long getSearchable() {
-				return searchable;
-			}
-
+			Long searchable;
 			@GenericField(searchable = Searchable.NO)
-			public LocalDate getUnsearchable() {
-				return unsearchable;
-			}
-
+			LocalDate unsearchable;
 			@GenericField(searchable = Searchable.DEFAULT)
-			public BigDecimal getUseDefault() {
-				return useDefault;
-			}
-
+			BigDecimal useDefault;
 			@GenericField
-			public String getImplicit() {
-				return implicit;
-			}
+			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -171,36 +132,16 @@ public class GenericFieldIT {
 	public void aggregable() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
-			Integer id;
-			String enabled;
-			String disabled;
-			String explicitDefault;
-			String implicitDefault;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@GenericField(aggregable = Aggregable.YES)
-			public String getEnabled() {
-				return enabled;
-			}
-
+			String enabled;
 			@GenericField(aggregable = Aggregable.NO)
-			public String getDisabled() {
-				return disabled;
-			}
-
+			String disabled;
 			@GenericField(aggregable = Aggregable.DEFAULT)
-			public String getExplicitDefault() {
-				return explicitDefault;
-			}
-
+			String explicitDefault;
 			@GenericField
-			public String getImplicitDefault() {
-				return implicitDefault;
-			}
+			String implicitDefault;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -218,18 +159,10 @@ public class GenericFieldIT {
 	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@GenericField(valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -243,18 +176,10 @@ public class GenericFieldIT {
 	public void customBridge_explicitFieldType() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@GenericField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -269,18 +194,10 @@ public class GenericFieldIT {
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
-			Integer id;
-			WrappedValue wrap;
-
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-
+			Integer id;
 			@GenericField(valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
-			public WrappedValue getWrap() {
-				return wrap;
-			}
+			WrappedValue wrap;
 		}
 
 		assertThatThrownBy(

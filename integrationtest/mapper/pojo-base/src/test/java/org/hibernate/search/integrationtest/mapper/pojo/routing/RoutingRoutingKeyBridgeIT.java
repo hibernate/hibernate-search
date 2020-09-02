@@ -55,9 +55,9 @@ public class RoutingRoutingKeyBridgeIT {
 	public void index() {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setCategory( EntityCategory.CATEGORY_2 );
-			entity1.setValue( "val1" );
+			entity1.id = 1;
+			entity1.category = EntityCategory.CATEGORY_2;
+			entity1.value = "val1";
 
 			session.indexingPlan().add( entity1 );
 
@@ -66,7 +66,7 @@ public class RoutingRoutingKeyBridgeIT {
 							.identifier( "1" )
 							.routingKey( "category_2" )
 							.document( StubDocumentNode.document()
-									.field( "value", entity1.getValue() )
+									.field( "value", entity1.value )
 									.build()
 							)
 					)
@@ -80,9 +80,9 @@ public class RoutingRoutingKeyBridgeIT {
 				.tenantId( "myTenantId" )
 				.build() ) {
 			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setCategory( EntityCategory.CATEGORY_2 );
-			entity1.setValue( "val1" );
+			entity1.id = 1;
+			entity1.category = EntityCategory.CATEGORY_2;
+			entity1.value = "val1";
 
 			session.indexingPlan().add( entity1 );
 
@@ -92,7 +92,7 @@ public class RoutingRoutingKeyBridgeIT {
 							.tenantIdentifier( "myTenantId" )
 							.routingKey( "myTenantId/category_2" )
 							.document( StubDocumentNode.document()
-									.field( "value", entity1.getValue() )
+									.field( "value", entity1.value )
 									.build()
 							)
 					)
@@ -148,38 +148,13 @@ public class RoutingRoutingKeyBridgeIT {
 
 		public static final String INDEX = "IndexedEntity";
 
+		@DocumentId
 		private Integer id;
 
 		private EntityCategory category;
 
-		private String value;
-
-		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public EntityCategory getCategory() {
-			return category;
-		}
-
-		public void setCategory(EntityCategory category) {
-			this.category = category;
-		}
-
 		@GenericField
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
+		private String value;
 	}
 
 	public static final class MyRoutingKeyBridge implements org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge {

@@ -122,45 +122,21 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		Timestamp myProperty;
-		Timestamp indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Timestamp getMyProperty() {
-			return myProperty;
-		}
-
+		Timestamp myProperty;
 		@GenericField(indexNullAs = "1970-01-01T00:00:00.00Z")
-		public Timestamp getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Timestamp indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		Timestamp myProperty;
-		Timestamp indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public Timestamp getMyProperty() {
-			return myProperty;
-		}
-
+		Timestamp myProperty;
 		@GenericField(indexNullAs = "2017-11-06T19:19:00.54Z")
-		public Timestamp getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		Timestamp indexNullAsProperty;
 	}
 }

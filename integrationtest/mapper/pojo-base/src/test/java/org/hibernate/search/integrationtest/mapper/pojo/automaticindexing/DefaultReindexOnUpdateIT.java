@@ -86,15 +86,15 @@ public class DefaultReindexOnUpdateIT {
 		backendMock.verifyExpectationsMet();
 
 		ParentEntity parent = new ParentEntity();
-		parent.setId( 1 );
-		parent.setValue( "val1" );
+		parent.id = 1;
+		parent.value = "val1";
 
 		ChildEntity child = new ChildEntity();
-		child.setId( 2 );
-		child.setValue( "val2" );
+		child.id = 2;
+		child.value = "val2";
 
-		parent.setChild( child );
-		child.setParent( parent );
+		parent.child = child;
+		child.parent = parent;
 
 		// Test indexed-embedding
 		try ( SearchSession session = mapping.createSession() ) {
@@ -220,15 +220,15 @@ public class DefaultReindexOnUpdateIT {
 		backendMock.verifyExpectationsMet();
 
 		ParentEntity parent = new ParentEntity();
-		parent.setId( 1 );
-		parent.setValue( "val1" );
+		parent.id = 1;
+		parent.value = "val1";
 
 		ChildEntity child = new ChildEntity();
-		child.setId( 2 );
-		child.setValue( "val2" );
+		child.id = 2;
+		child.value = "val2";
 
-		parent.setChild( child );
-		child.setParent( parent );
+		parent.child = child;
+		child.parent = parent;
 
 		// Test indexed-embedding
 		try ( SearchSession session = mapping.createSession() ) {
@@ -264,29 +264,6 @@ public class DefaultReindexOnUpdateIT {
 		private String value;
 		private ChildEntity child;
 
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		public ChildEntity getChild() {
-			return child;
-		}
-
-		public void setChild(ChildEntity child) {
-			this.child = child;
-		}
 	}
 
 	public static final class ChildEntity {
@@ -297,29 +274,6 @@ public class DefaultReindexOnUpdateIT {
 		private String value;
 		private ParentEntity parent;
 
-		public Integer getId() {
-			return id;
-		}
-
-		public void setId(Integer id) {
-			this.id = id;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		public ParentEntity getParent() {
-			return parent;
-		}
-
-		public void setParent(ParentEntity parent) {
-			this.parent = parent;
-		}
 	}
 
 }

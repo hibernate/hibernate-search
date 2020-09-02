@@ -114,63 +114,33 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
-		MyEnum id;
 		@DocumentId
-		public MyEnum getId() {
-			return id;
-		}
+		MyEnum id;
 	}
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
-		MyEnum id;
 		@DocumentId
-		public MyEnum getId() {
-			return id;
-		}
+		MyEnum id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		MyEnum myProperty;
-		MyEnum indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public MyEnum getMyProperty() {
-			return myProperty;
-		}
-
+		MyEnum myProperty;
 		@GenericField(indexNullAs = "VALUE1")
-		public MyEnum getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		MyEnum indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		MyEnum myProperty;
-		MyEnum indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public MyEnum getMyProperty() {
-			return myProperty;
-		}
-
+		MyEnum myProperty;
 		@GenericField(indexNullAs = "VALUE2")
-		public MyEnum getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		MyEnum indexNullAsProperty;
 	}
 }

@@ -59,16 +59,10 @@ public class PropertyBindingBaseIT {
 
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntityWithWorkingPropertyBinding {
-		Integer id;
-		String text;
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
+		Integer id;
 		@PropertyBinding(binder = @PropertyBinderRef(type = WorkingPropertyBinder.class))
-		public String getText() {
-			return text;
-		}
+		String text;
 	}
 
 	public static class WorkingPropertyBinder implements PropertyBinder {
@@ -91,16 +85,10 @@ public class PropertyBindingBaseIT {
 	public void missingBinderReference() {
 		@Indexed
 		class IndexedEntity {
-			Integer id;
-			String text;
 			@DocumentId
-			public Integer getId() {
-				return id;
-			}
+			Integer id;
 			@PropertyBinding(binder = @PropertyBinderRef)
-			public String getText() {
-				return text;
-			}
+			String text;
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )

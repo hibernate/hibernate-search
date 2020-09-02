@@ -112,65 +112,33 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
-		BigInteger id;
-
 		@DocumentId
-		public BigInteger getId() {
-			return id;
-		}
+		BigInteger id;
 
 	}
 	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
-		BigInteger id;
-
 		@DocumentId
-		public BigInteger getId() {
-			return id;
-		}
+		BigInteger id;
 
 	}
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		BigInteger myProperty;
-		BigInteger indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public BigInteger getMyProperty() {
-			return myProperty;
-		}
-
+		BigInteger myProperty;
 		@GenericField(indexNullAs = "0")
-		public BigInteger getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		BigInteger indexNullAsProperty;
 	}
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		BigInteger myProperty;
-		BigInteger indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public BigInteger getMyProperty() {
-			return myProperty;
-		}
-
+		BigInteger myProperty;
 		@GenericField(indexNullAs = "-10301")
-		public BigInteger getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		BigInteger indexNullAsProperty;
 	}
 
 	private List<BigInteger> takeBigIntegerSequence() {

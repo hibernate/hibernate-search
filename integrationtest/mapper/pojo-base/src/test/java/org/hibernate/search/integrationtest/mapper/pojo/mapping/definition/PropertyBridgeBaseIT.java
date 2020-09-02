@@ -68,15 +68,9 @@ public class PropertyBridgeBaseIT {
 	public void accessors() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b ->
@@ -141,21 +135,12 @@ public class PropertyBridgeBaseIT {
 	public void explicitDependencies() {
 		class Contained {
 			String stringProperty;
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b ->
@@ -177,7 +162,7 @@ public class PropertyBridgeBaseIT {
 							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
 								Contained castedBridgedElement = (Contained) bridgedElement;
 								target.addValue(
-									indexFieldReference, castedBridgedElement.getStringProperty()
+									indexFieldReference, castedBridgedElement.stringProperty
 								);
 							} );
 						} )
@@ -216,21 +201,12 @@ public class PropertyBridgeBaseIT {
 	public void explicitDependencies_error_invalidProperty() {
 		class Contained {
 			String stringProperty;
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		Assertions.assertThatThrownBy(
@@ -261,21 +237,12 @@ public class PropertyBridgeBaseIT {
 	public void explicitDependencies_error_invalidContainerExtractorPath() {
 		class Contained {
 			String stringProperty;
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		Assertions.assertThatThrownBy(
@@ -390,41 +357,19 @@ public class PropertyBridgeBaseIT {
 	private static class PropertyBridgeExplicitIndexingClasses {
 		@Indexed(index = INDEX_NAME)
 		static class IndexedEntity {
+			@DocumentId
 			Integer id;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "parent")))
 			ContainedLevel1Entity child;
 			NotEntity notEntity;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "parent")))
-			public ContainedLevel1Entity getChild() {
-				return child;
-			}
-			public NotEntity getNotEntity() {
-				return notEntity;
-			}
 		}
 		static class ContainedLevel1Entity {
 			IndexedEntity parent;
-			public IndexedEntity getParent() {
-				return parent;
-			}
 		}
 		static class ContainedLevel2Entity {
 			ContainedLevel1Entity parent;
 			DifferentEntity associationToDifferentEntity;
 			String stringProperty;
-			public ContainedLevel1Entity getParent() {
-				return parent;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
-
-			public DifferentEntity getAssociationToDifferentEntity() {
-				return associationToDifferentEntity;
-			}
 		}
 		static class DifferentEntity {
 		}
@@ -649,21 +594,12 @@ public class PropertyBridgeBaseIT {
 	public void missingDependencyDeclaration() {
 		class Contained {
 			String stringProperty;
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		Assertions.assertThatThrownBy(
@@ -695,21 +631,12 @@ public class PropertyBridgeBaseIT {
 	public void inconsistentDependencyDeclaration() {
 		class Contained {
 			String stringProperty;
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		Assertions.assertThatThrownBy(
@@ -744,15 +671,9 @@ public class PropertyBridgeBaseIT {
 	public void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			List<String> stringProperty = new ArrayList<>();
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public List<String> getStringProperty() {
-				return stringProperty;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b ->
@@ -816,15 +737,9 @@ public class PropertyBridgeBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -862,15 +777,9 @@ public class PropertyBridgeBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -917,15 +826,9 @@ public class PropertyBridgeBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -968,15 +871,9 @@ public class PropertyBridgeBaseIT {
 		}
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			Contained contained;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public Contained getContained() {
-				return contained;
-			}
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -1025,15 +922,9 @@ public class PropertyBridgeBaseIT {
 	public void accessors_incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {
+			@DocumentId
 			Integer id;
 			String stringProperty;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-			public String getStringProperty() {
-				return stringProperty;
-			}
 		}
 		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()

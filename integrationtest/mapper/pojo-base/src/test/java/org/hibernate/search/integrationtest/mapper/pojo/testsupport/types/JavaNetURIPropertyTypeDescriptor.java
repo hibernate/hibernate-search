@@ -102,45 +102,21 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		URI myProperty;
-		URI indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public URI getMyProperty() {
-			return myProperty;
-		}
-
+		URI myProperty;
 		@GenericField(indexNullAs = "https://www.redhat.com")
-		public URI getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		URI indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		URI myProperty;
-		URI indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public URI getMyProperty() {
-			return myProperty;
-		}
-
+		URI myProperty;
 		@GenericField(indexNullAs = "file:///~calendar")
-		public URI getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		URI indexNullAsProperty;
 	}
 }

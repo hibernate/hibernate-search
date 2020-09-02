@@ -92,45 +92,21 @@ public class OffsetTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Off
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
-		Integer id;
-		OffsetTime myProperty;
-		OffsetTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public OffsetTime getMyProperty() {
-			return myProperty;
-		}
-
+		OffsetTime myProperty;
 		@GenericField(indexNullAs = "00:00:00Z")
-		public OffsetTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		OffsetTime indexNullAsProperty;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
-		Integer id;
-		OffsetTime myProperty;
-		OffsetTime indexNullAsProperty;
-
 		@DocumentId
-		public Integer getId() {
-			return id;
-		}
-
+		Integer id;
 		@GenericField
-		public OffsetTime getMyProperty() {
-			return myProperty;
-		}
-
+		OffsetTime myProperty;
 		@GenericField(indexNullAs = "12:30:55-03:00")
-		public OffsetTime getIndexNullAsProperty() {
-			return indexNullAsProperty;
-		}
+		OffsetTime indexNullAsProperty;
 	}
 }
