@@ -6,63 +6,42 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTypeModel<T> {
+public class HibernateOrmClassRawTypeModel<T>
+		extends AbstractPojoHCAnnRawTypeModel<T, HibernateOrmBootstrapIntrospector> {
 
 	private final HibernateOrmBasicClassTypeMetadata ormTypeMetadata;
-	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 
 	private List<HibernateOrmClassRawTypeModel<? super T>> ascendingSuperTypesCache;
 	private List<HibernateOrmClassRawTypeModel<? super T>> descendingSuperTypesCache;
 
-	private final Map<String, HibernateOrmClassPropertyModel<?>> propertyModelCache = new HashMap<>();
-
-	private Map<String, XProperty> declaredFieldAccessXPropertiesByName;
-	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
-
 	HibernateOrmClassRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
 			PojoRawTypeIdentifier<T> typeIdentifier,
 			HibernateOrmBasicClassTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
-		super( introspector, typeIdentifier );
+		super( introspector, typeIdentifier, rawTypeDeclaringContext );
 		this.ormTypeMetadata = ormTypeMetadata;
-		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
-	}
-
-	@Override
-	public boolean isAbstract() {
-		return xClass.isAbstract();
-	}
-
-	@Override
-	public boolean isSubTypeOf(MappableTypeModel superTypeCandidate) {
-		return superTypeCandidate instanceof HibernateOrmClassRawTypeModel
-				&& ( (HibernateOrmClassRawTypeModel<?>) superTypeCandidate ).xClass.isAssignableFrom( xClass );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> ascendingSuperTypes() {
 		if ( ascendingSuperTypesCache == null ) {
-			ascendingSuperTypesCache =
-					( (Stream<HibernateOrmClassRawTypeModel<? super T>>) introspector.getAscendingSuperTypes( xClass ) )
+			ascendingSuperTypesCache = introspector.ascendingSuperClasses( xClass )
+					.map( xc -> (HibernateOrmClassRawTypeModel<? super T>) introspector.typeModel( xc ) )
 					.collect( Collectors.toList() );
 		}
 		return ascendingSuperTypesCache.stream();
@@ -72,59 +51,21 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> descendingSuperTypes() {
 		if ( descendingSuperTypesCache == null ) {
-			descendingSuperTypesCache =
-					( (Stream<HibernateOrmClassRawTypeModel<? super T>>) introspector.getDescendingSuperTypes( xClass ) )
+			descendingSuperTypesCache = introspector.descendingSuperClasses( xClass )
+					.map( xc -> (HibernateOrmClassRawTypeModel<? super T>) introspector.typeModel( xc ) )
 					.collect( Collectors.toList() );
 		}
 		return descendingSuperTypesCache.stream();
 	}
 
 	@Override
-	public Stream<Annotation> annotations() {
-		return introspector.annotations( xClass );
-	}
-
-	@Override
-	Stream<String> getDeclaredPropertyNames() {
-		return Stream.concat(
-				getDeclaredFieldAccessXPropertiesByName().keySet().stream(),
-				getDeclaredMethodAccessXPropertiesByName().keySet().stream()
-		)
-				.distinct();
-	}
-
-	@Override
-	HibernateOrmClassPropertyModel<?> getPropertyOrNull(String propertyName) {
-		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
-	}
-
-	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
-		return rawTypeDeclaringContext;
-	}
-
-	private Map<String, XProperty> getDeclaredFieldAccessXPropertiesByName() {
-		if ( declaredFieldAccessXPropertiesByName == null ) {
-			declaredFieldAccessXPropertiesByName =
-					introspector.declaredFieldAccessXPropertiesByName( xClass );
-		}
-		return declaredFieldAccessXPropertiesByName;
-	}
-
-	private Map<String, XProperty> getDeclaredMethodAccessXPropertiesByName() {
-		if ( declaredMethodAccessXPropertiesByName == null ) {
-			declaredMethodAccessXPropertiesByName =
-					introspector.declaredMethodAccessXPropertiesByName( xClass );
-		}
-		return declaredMethodAccessXPropertiesByName;
-	}
-
-	private HibernateOrmClassPropertyModel<?> createPropertyModel(String propertyName) {
+	protected HibernateOrmClassPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
-		XProperty methodAccessXProperty = getDeclaredMethodAccessXPropertiesByName().get( propertyName );
+		XProperty methodAccessXProperty = declaredMethodAccessXPropertiesByName().get( propertyName );
 		if ( methodAccessXProperty != null ) {
 			declaredXProperties.add( methodAccessXProperty );
 		}
-		XProperty fieldAccessXProperty = getDeclaredFieldAccessXPropertiesByName().get( propertyName );
+		XProperty fieldAccessXProperty = declaredFieldAccessXPropertiesByName().get( propertyName );
 		if ( fieldAccessXProperty != null ) {
 			declaredXProperties.add( fieldAccessXProperty );
 		}
@@ -194,28 +135,10 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	private <T2> T2 findInSelfOrParents(Function<HibernateOrmClassRawTypeModel<?>, T2> getter) {
 		return ascendingSuperTypes()
-				.skip( 1 ) // Ignore self
 				.map( getter )
 				.filter( Objects::nonNull )
 				.findFirst()
 				.orElse( null );
 	}
 
-	private Member declaredPropertyGetter(String propertyName) {
-		XProperty methodAccessXProperty = getDeclaredMethodAccessXPropertiesByName().get( propertyName );
-		if ( methodAccessXProperty != null ) {
-			// Method access is available. Get values from the getter.
-			return PojoCommonsAnnotationsHelper.extractUnderlyingMember( methodAccessXProperty );
-		}
-		return null;
-	}
-
-	private Member declaredPropertyField(String propertyName) {
-		XProperty fieldAccessXProperty = getDeclaredFieldAccessXPropertiesByName().get( propertyName );
-		if ( fieldAccessXProperty != null ) {
-			// Method access is available. Get values from the getter.
-			return PojoCommonsAnnotationsHelper.extractUnderlyingMember( fieldAccessXProperty );
-		}
-		return null;
-	}
 }

@@ -16,11 +16,9 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -29,6 +27,8 @@ import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmReflectionStrategyName;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
+import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -38,7 +38,8 @@ import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
-public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
+public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector
+		implements PojoBootstrapIntrospector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -74,7 +75,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final ValueReadHandleFactory valueReadHandleFactory;
-	private final HibernateOrmGenericContextHelper genericContextHelper;
+	private final PojoHCannOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
 	/*
@@ -96,14 +97,14 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		super( reflectionManager );
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.valueReadHandleFactory = valueReadHandleFactory;
-		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
+		this.genericContextHelper = new PojoHCannOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
 		);
 	}
 
 	@Override
-	public AbstractHibernateOrmRawTypeModel<?> typeModel(String name) {
+	public AbstractPojoRawTypeModel<?, ?> typeModel(String name) {
 		HibernateOrmBasicDynamicMapTypeMetadata dynamicMapTypeOrmMetadata =
 				basicTypeMetadataProvider.getBasicDynamicMapTypeMetadata( name );
 		if ( dynamicMapTypeOrmMetadata != null ) {
@@ -144,14 +145,6 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	@Override
 	public ValueReadHandleFactory annotationValueReadHandleFactory() {
 		return valueReadHandleFactory;
-	}
-
-	Stream<? extends HibernateOrmClassRawTypeModel<?>> getAscendingSuperTypes(XClass xClass) {
-		return ascendingSuperClasses( xClass ).map( this::typeModel );
-	}
-
-	Stream<? extends HibernateOrmClassRawTypeModel<?>> getDescendingSuperTypes(XClass xClass) {
-		return descendingSuperClasses( xClass ).map( this::typeModel );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Class<?> holderClass, Member member,

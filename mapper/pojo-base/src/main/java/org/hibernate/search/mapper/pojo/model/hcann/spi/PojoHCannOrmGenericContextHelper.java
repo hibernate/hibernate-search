@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.model.impl;
+package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.reflect.Type;
 
@@ -12,10 +12,10 @@ import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGeneric
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-public class HibernateOrmGenericContextHelper implements GenericContextAwarePojoGenericTypeModel.Helper {
-	private final HibernateOrmBootstrapIntrospector introspector;
+public class PojoHCannOrmGenericContextHelper implements GenericContextAwarePojoGenericTypeModel.Helper {
+	private final AbstractPojoHCAnnBootstrapIntrospector introspector;
 
-	public HibernateOrmGenericContextHelper(HibernateOrmBootstrapIntrospector introspector) {
+	public PojoHCannOrmGenericContextHelper(AbstractPojoHCAnnBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 
@@ -31,7 +31,7 @@ public class HibernateOrmGenericContextHelper implements GenericContextAwarePojo
 
 	@Override
 	public Type propertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
-		HibernateOrmClassPropertyModel<?> ormPropertyModel = (HibernateOrmClassPropertyModel<?>) rawPropertyModel;
-		return ormPropertyModel.getGetterGenericReturnType();
+		AbstractPojoHCAnnPropertyModel<?, ?> hcannPropertyModel = (AbstractPojoHCAnnPropertyModel<?, ?>) rawPropertyModel;
+		return hcannPropertyModel.getterGenericReturnType();
 	}
 }
