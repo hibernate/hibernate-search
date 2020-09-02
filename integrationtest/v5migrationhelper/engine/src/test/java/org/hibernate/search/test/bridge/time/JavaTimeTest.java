@@ -205,7 +205,7 @@ public class JavaTimeTest {
 	private void assertThatFieldIsIndexed(String field, Object expectedValue, Sample sample) {
 		helper.add( sample, sample.id );
 
-		Query query = queryBuilder().keyword().onField( field ).ignoreAnalyzer().matching( expectedValue ).createQuery();
+		Query query = queryBuilder().keyword().onField( field ).matching( expectedValue ).createQuery();
 
 		helper.assertThat( query )
 				.from( Sample.class )
