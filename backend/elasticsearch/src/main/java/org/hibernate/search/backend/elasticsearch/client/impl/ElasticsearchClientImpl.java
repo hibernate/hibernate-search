@@ -37,7 +37,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.backend.elasticsearch.search.timeout.spi.RequestDeadline;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -136,9 +136,10 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				}
 				);
 
-		long currentTimeoutValue = ( elasticsearchRequest.timeoutManager() == null ) ?
-				requestTimeout : elasticsearchRequest.timeoutManager().remainingTimeToHardTimeout();
-		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.timeoutManager() == null ) ?
+		RequestDeadline requestDeadline = elasticsearchRequest.deadline();
+		long currentTimeoutValue = ( requestDeadline == null ) ?
+				requestTimeout : requestDeadline.remainingTimeToHardTimeout();
+		TimeUnit currentTimeoutUnit = ( requestDeadline == null ) ?
 				timeoutUnit : TimeUnit.MILLISECONDS;
 
 		/*
@@ -176,12 +177,12 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private void setPerRequestSocketTimeout(ElasticsearchRequest elasticsearchRequest, Request request) {
-		TimeoutManager timeoutManager = elasticsearchRequest.timeoutManager();
-		if ( timeoutManager == null ) {
+		RequestDeadline requestDeadline = elasticsearchRequest.deadline();
+		if ( requestDeadline == null ) {
 			return;
 		}
 
-		Long timeToHardTimeout = timeoutManager.remainingTimeToHardTimeout();
+		Long timeToHardTimeout = requestDeadline.remainingTimeToHardTimeout();
 		if ( timeToHardTimeout == null ) {
 			return;
 		}

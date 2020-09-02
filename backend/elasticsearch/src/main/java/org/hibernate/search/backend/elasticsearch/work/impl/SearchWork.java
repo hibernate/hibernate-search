@@ -202,7 +202,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 				// Client-side timeout: the search will fail on timeout.
 				// This is necessary to address network problems: the server-side timeout would not detect that.
 				if ( timeoutManager.hasHardTimeout() ) {
-					builder.timeout( timeoutManager );
+					builder.requestDeadline( timeoutManager );
 				}
 			}
 
