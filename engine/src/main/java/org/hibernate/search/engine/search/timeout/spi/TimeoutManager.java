@@ -56,6 +56,8 @@ public class TimeoutManager {
 	 * If no hard timeout is defined, returns {@code null}.
 	 *
 	 * @return the remaining time to hard timeout in milliseconds
+	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
+	 * a hard timeout was requested.
 	 */
 	public Long remainingTimeToHardTimeout() {
 		if ( !Type.EXCEPTION.equals( type ) ) {
