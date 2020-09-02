@@ -7,8 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.List;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.search.query.dsl.SimpleQueryStringTermination;
 import org.hibernate.search.util.logging.impl.Log;
@@ -24,20 +22,20 @@ public class ConnectedMultiFieldsSimpleQueryStringQueryBuilder implements Simple
 
 	private final String simpleQueryString;
 	private final QueryCustomizer queryCustomizer;
-	private final List<FieldsContext> fieldsContexts;
+	private final FieldsContext fieldsContext;
 	private final QueryBuildingContext queryContext;
 
 	private final boolean withAndAsDefaultOperator;
 
 	public ConnectedMultiFieldsSimpleQueryStringQueryBuilder(String simpleQueryString,
-			List<FieldsContext> fieldsContexts,
+			FieldsContext fieldsContext,
 			boolean withAndAsDefaultOperator,
 			QueryCustomizer queryCustomizer,
 			QueryBuildingContext queryContext) {
 		this.simpleQueryString = simpleQueryString;
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
-		this.fieldsContexts = fieldsContexts;
+		this.fieldsContext = fieldsContext;
 
 		this.withAndAsDefaultOperator = withAndAsDefaultOperator;
 	}

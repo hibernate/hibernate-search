@@ -7,8 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.List;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
@@ -20,16 +18,16 @@ import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationExcludable {
 	private final RangeQueryContext rangeContext;
 	private final QueryCustomizer queryCustomizer;
-	private final List<FieldContext> fieldContexts;
+	private final FieldsContext fieldsContexts;
 	private final QueryBuildingContext queryContext;
 
 	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext rangeContext,
 			QueryCustomizer queryCustomizer,
-			List<FieldContext> fieldContexts,
+			FieldsContext fieldsContexts,
 			QueryBuildingContext queryContext) {
 		this.rangeContext = rangeContext;
 		this.queryCustomizer = queryCustomizer;
-		this.fieldContexts = fieldContexts;
+		this.fieldsContexts = fieldsContexts;
 		this.queryContext = queryContext;
 	}
 

@@ -7,9 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.search.query.dsl.PhraseMatchingContext;
 import org.hibernate.search.query.dsl.PhraseTermination;
 
@@ -20,10 +17,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final PhraseQueryContext phraseContext;
-	private final List<FieldContext> fieldContexts;
-	//when a varargs of fields are passed, apply the same customization for all.
-	//keep the index of the first context in this queue
-	private int firstOfContext = 0;
+	private final FieldsContext fieldsContext;
 
 	public ConnectedPhraseMatchingContext(String fieldName,
 											PhraseQueryContext phraseContext,
@@ -32,46 +26,36 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.phraseContext = phraseContext;
-		this.fieldContexts = new ArrayList<FieldContext>( 4 );
-		this.fieldContexts.add( new FieldContext( fieldName ) );
+		this.fieldsContext = new FieldsContext( new String[] { fieldName }, queryContext );
 	}
 
 	@Override
 	public PhraseMatchingContext andField(String field) {
-		this.fieldContexts.add( new FieldContext( field ) );
-		this.firstOfContext = fieldContexts.size() - 1;
+		this.fieldsContext.add( field );
 		return this;
 	}
 
 	@Override
 	public PhraseTermination sentence(String sentence) {
 		phraseContext.setSentence( sentence );
-		return new ConnectedMultiFieldsPhraseQueryBuilder( phraseContext, queryCustomizer, fieldContexts, queryContext );
+		return new ConnectedMultiFieldsPhraseQueryBuilder( phraseContext, queryCustomizer, fieldsContext, queryContext );
 	}
 
 	@Override
 	public PhraseMatchingContext boostedTo(float boost) {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.getFieldCustomizer().boostedTo( boost );
-		}
+		fieldsContext.boostedTo( boost );
 		return this;
-	}
-
-	private List<FieldContext> getCurrentFieldContexts() {
-		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 
 	@Override
 	public PhraseMatchingContext ignoreAnalyzer() {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setIgnoreAnalyzer( true );
-		}
+		fieldsContext.ignoreAnalyzer();
 		return this;
 	}
 
 	@Override
 	public PhraseMatchingContext ignoreFieldBridge() {
-		//this is a no-op
+		fieldsContext.ignoreFieldBridge();
 		return this;
 	}
 }

@@ -7,9 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.search.query.dsl.RangeMatchingContext;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
@@ -20,10 +17,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final RangeQueryContext rangeContext;
-	private final List<FieldContext> fieldContexts;
-	//when a varargs of fields are passed, apply the same customization for all.
-	//keep the index of the first context in this queue
-	private int firstOfContext = 0;
+	private final FieldsContext fieldsContext;
 
 	public ConnectedRangeMatchingContext(String fieldName,
 										QueryCustomizer queryCustomizer,
@@ -31,14 +25,12 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.rangeContext = new RangeQueryContext();
-		this.fieldContexts = new ArrayList<FieldContext>( 4 );
-		this.fieldContexts.add( new FieldContext( fieldName ) );
+		this.fieldsContext = new FieldsContext( new String[] { fieldName }, queryContext );
 	}
 
 	@Override
 	public RangeMatchingContext andField(String field) {
-		this.fieldContexts.add( new FieldContext( field ) );
-		this.firstOfContext = fieldContexts.size() - 1;
+		this.fieldsContext.add( field );
 		return this;
 	}
 
@@ -61,7 +53,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 			return new ConnectedMultiFieldsRangeQueryBuilder(
 					mother.rangeContext,
 					mother.queryCustomizer,
-					mother.fieldContexts,
+					mother.fieldsContext,
 					mother.queryContext );
 		}
 
@@ -75,40 +67,30 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	@Override
 	public RangeTerminationExcludable below(Object below) {
 		rangeContext.setTo( below );
-		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext );
+		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldsContext, queryContext );
 	}
 
 	@Override
 	public RangeTerminationExcludable above(Object above) {
 		rangeContext.setFrom( above );
-		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext );
+		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldsContext, queryContext );
 	}
 
 	@Override
 	public RangeMatchingContext boostedTo(float boost) {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.getFieldCustomizer().boostedTo( boost );
-		}
+		fieldsContext.boostedTo( boost );
 		return this;
-	}
-
-	private List<FieldContext> getCurrentFieldContexts() {
-		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 
 	@Override
 	public RangeMatchingContext ignoreAnalyzer() {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setIgnoreAnalyzer( true );
-		}
+		fieldsContext.ignoreAnalyzer();
 		return this;
 	}
 
 	@Override
 	public RangeMatchingContext ignoreFieldBridge() {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setIgnoreFieldBridge( true );
-		}
+		fieldsContext.ignoreFieldBridge();
 		return this;
 	}
 }
