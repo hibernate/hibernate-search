@@ -268,8 +268,8 @@ public final class ElasticsearchBackendSettings {
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
 		public static final String PROTOCOL = "http";
 		public static final int REQUEST_TIMEOUT = 60000;
-		public static final int READ_TIMEOUT = 60000;
-		public static final int CONNECTION_TIMEOUT = 3000;
+		public static final int READ_TIMEOUT = 30000;
+		public static final int CONNECTION_TIMEOUT = 1000;
 		public static final int MAX_CONNECTIONS = 20;
 		public static final int MAX_CONNECTIONS_PER_ROUTE = 10;
 		public static final boolean DISCOVERY_ENABLED = false;
