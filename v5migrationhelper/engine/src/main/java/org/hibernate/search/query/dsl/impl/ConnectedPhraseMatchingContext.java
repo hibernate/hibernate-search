@@ -38,7 +38,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 	@Override
 	public PhraseTermination sentence(String sentence) {
 		phraseContext.setSentence( sentence );
-		return new ConnectedMultiFieldsPhraseQueryBuilder( phraseContext, queryCustomizer, fieldsContext, queryContext );
+		return new ConnectedMultiFieldsPhraseQueryBuilder( queryContext, queryCustomizer, fieldsContext, phraseContext );
 	}
 
 	@Override

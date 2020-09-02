@@ -8,49 +8,54 @@
 package org.hibernate.search.query.dsl.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-
+import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.search.spi.LuceneMigrationUtils;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.AllContext;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ConnectedAllContext implements AllContext {
-	private final List<BooleanClause> clauses;
+	private final QueryBuildingContext queryContext;
+	private final List<Query> except;
 	private final QueryCustomizer queryCustomizer;
 
-	public ConnectedAllContext() {
+	public ConnectedAllContext(QueryBuildingContext queryContext) {
+		this.queryContext = queryContext;
 		this.queryCustomizer = new QueryCustomizer();
-		this.clauses = new ArrayList<BooleanClause>( 5 );
-		this.clauses.add( new BooleanClause( new MatchAllDocsQuery(), BooleanClause.Occur.SHOULD ) );
+		this.except = new ArrayList<>();
 	}
 
 	@Override
 	public Query createQuery() {
-		Query query;
-		if ( clauses.size() == 1 ) {
-			query = clauses.get( 0 ).getQuery();
+		return LuceneMigrationUtils.toLuceneQuery( createPredicate() );
+	}
+
+	private SearchPredicate createPredicate() {
+		SearchPredicateFactory factory = queryContext.getScope().predicate();
+
+		MatchAllPredicateOptionsStep<?> optionsStep = factory.matchAll();
+
+		for ( Query query : except ) {
+			optionsStep = optionsStep.except( factory.extension( LuceneExtension.get() ).fromLuceneQuery( query ) );
 		}
-		else {
-			BooleanQuery.Builder booleanQueryBuilder = new BooleanQuery.Builder();
-			for ( BooleanClause clause : clauses ) {
-				booleanQueryBuilder.add( clause );
-			}
-			query = booleanQueryBuilder.build();
-		}
-		return queryCustomizer.setWrappedQuery( query ).createQuery();
+
+		queryCustomizer.applyScoreOptions( optionsStep );
+		SearchPredicate predicate = optionsStep.toPredicate();
+		return queryCustomizer.applyFilter( factory, predicate );
 	}
 
 	@Override
 	public AllContext except(Query... queriesMatchingExcludedDocuments) {
-		for ( Query query : queriesMatchingExcludedDocuments ) {
-			clauses.add( new BooleanClause( query, BooleanClause.Occur.MUST_NOT ) );
-		}
+		Collections.addAll( except, queriesMatchingExcludedDocuments );
 		return this;
 	}
 

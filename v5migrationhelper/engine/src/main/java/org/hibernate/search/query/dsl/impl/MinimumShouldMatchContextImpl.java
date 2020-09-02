@@ -8,10 +8,9 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import org.apache.lucene.search.BooleanQuery;
 
 final class MinimumShouldMatchContextImpl {
 
@@ -31,10 +30,9 @@ final class MinimumShouldMatchContextImpl {
 		);
 	}
 
-	void applyMinimum(BooleanQuery.Builder builder, int shouldClauseCount) {
+	void applyMinimum(BooleanPredicateClausesStep<?> step) {
 		if ( minimumShouldMatchConstraint != null ) {
-			int minimumShouldMatch = minimumShouldMatchConstraint.toMinimum( shouldClauseCount );
-			builder.setMinimumNumberShouldMatch( minimumShouldMatch );
+			minimumShouldMatchConstraint.apply( step );
 		}
 	}
 
@@ -54,30 +52,13 @@ final class MinimumShouldMatchContextImpl {
 			this.matchingClausesPercent = matchingClausesPercent;
 		}
 
-		int toMinimum(int totalShouldClauseNumber) {
-			int minimum;
+		void apply(BooleanPredicateClausesStep<?> step) {
 			if ( matchingClausesNumber != null ) {
-				if ( matchingClausesNumber >= 0 ) {
-					minimum = matchingClausesNumber;
-				}
-				else {
-					minimum = totalShouldClauseNumber + matchingClausesNumber;
-				}
+				step.minimumShouldMatchNumber( matchingClausesNumber );
 			}
 			else {
-				if ( matchingClausesPercent >= 0 ) {
-					minimum = matchingClausesPercent * totalShouldClauseNumber / 100;
-				}
-				else {
-					minimum = totalShouldClauseNumber + matchingClausesPercent * totalShouldClauseNumber / 100;
-				}
+				step.minimumShouldMatchPercent( matchingClausesPercent );
 			}
-
-			if ( minimum < 1 || minimum > totalShouldClauseNumber ) {
-				throw log.minimumShouldMatchMinimumOutOfBounds( minimum, totalShouldClauseNumber );
-			}
-
-			return minimum;
 		}
 	}
 }

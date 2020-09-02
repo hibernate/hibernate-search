@@ -58,7 +58,7 @@ public class FieldsContext implements Iterable<FieldContext> {
 
 	public void boostedTo(float boost) {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.getFieldCustomizer().boostedTo( boost );
+			fieldContext.boostedTo( boost );
 		}
 	}
 

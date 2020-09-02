@@ -55,7 +55,8 @@ public class ConnectedSimpleQueryStringMatchingContext implements SimpleQueryStr
 
 	@Override
 	public SimpleQueryStringTermination matching(String simpleQueryString) {
-		return new ConnectedMultiFieldsSimpleQueryStringQueryBuilder( simpleQueryString, fieldsContext, withAndAsDefaultOperator, queryCustomizer, queryContext );
+		return new ConnectedMultiFieldsSimpleQueryStringQueryBuilder( queryContext, queryCustomizer, fieldsContext,
+				simpleQueryString, withAndAsDefaultOperator );
 	}
 
 	@Override

@@ -7,28 +7,26 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
-import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.Range;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationExcludable {
+public class ConnectedMultiFieldsRangeQueryBuilder
+		extends AbstractConnectedMultiFieldsQueryBuilder<RangeTerminationExcludable, RangePredicateOptionsStep<?>>
+		implements RangeTerminationExcludable {
 	private final RangeQueryContext rangeContext;
-	private final QueryCustomizer queryCustomizer;
-	private final FieldsContext fieldsContexts;
-	private final QueryBuildingContext queryContext;
 
-	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext rangeContext,
-			QueryCustomizer queryCustomizer,
-			FieldsContext fieldsContexts,
-			QueryBuildingContext queryContext) {
+	public ConnectedMultiFieldsRangeQueryBuilder(QueryBuildingContext queryContext, QueryCustomizer queryCustomizer,
+			FieldsContext fieldsContext, RangeQueryContext rangeContext) {
+		super( queryContext, queryCustomizer, fieldsContext );
 		this.rangeContext = rangeContext;
-		this.queryCustomizer = queryCustomizer;
-		this.fieldsContexts = fieldsContexts;
-		this.queryContext = queryContext;
 	}
 
 	@Override
@@ -49,8 +47,17 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	}
 
 	@Override
-	public Query createQuery() {
-		throw new UnsupportedOperationException( "To be implemented through the Search 6 DSL" );
+	protected RangePredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory, FieldContext fieldContext) {
+		return fieldContext.applyBoost( factory.range().field( fieldContext.getField() ) )
+				.range(
+						Range.between(
+								rangeContext.getFrom(),
+								rangeContext.isExcludeFrom() ? RangeBoundInclusion.EXCLUDED : RangeBoundInclusion.INCLUDED,
+								rangeContext.getTo(),
+								rangeContext.isExcludeTo() ? RangeBoundInclusion.EXCLUDED : RangeBoundInclusion.INCLUDED
+						),
+						fieldContext.getValueConvert()
+				);
 	}
 
 }

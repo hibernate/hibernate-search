@@ -54,12 +54,12 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	//fixme Have to use raw types but would be nice to not have to
 	@Override
 	public BooleanJunction bool() {
-		return new BooleanQueryBuilder();
+		return new BooleanQueryBuilder( context );
 	}
 
 	@Override
 	public AllContext all() {
-		return new ConnectedAllContext();
+		return new ConnectedAllContext( context );
 	}
 
 	@Override

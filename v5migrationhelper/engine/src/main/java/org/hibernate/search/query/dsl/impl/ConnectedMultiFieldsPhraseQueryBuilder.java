@@ -7,45 +7,43 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
+import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.PhraseTermination;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination {
+public class ConnectedMultiFieldsPhraseQueryBuilder
+		extends AbstractConnectedMultiFieldsQueryBuilder<PhraseTermination, PhrasePredicateOptionsStep<?>>
+		implements PhraseTermination {
 	private final PhraseQueryContext phraseContext;
-	private final QueryBuildingContext queryContext;
-	private final QueryCustomizer queryCustomizer;
-	private final FieldsContext fieldsContext;
 
-	public ConnectedMultiFieldsPhraseQueryBuilder(PhraseQueryContext phraseContext, QueryCustomizer queryCustomizer,
-			FieldsContext fieldsContext, QueryBuildingContext queryContext) {
+	public ConnectedMultiFieldsPhraseQueryBuilder(QueryBuildingContext queryContext, QueryCustomizer queryCustomizer,
+			FieldsContext fieldsContext, PhraseQueryContext phraseContext) {
+		super( queryContext, queryCustomizer, fieldsContext );
 		this.phraseContext = phraseContext;
-		this.queryContext = queryContext;
-		this.queryCustomizer = queryCustomizer;
-		this.fieldsContext = fieldsContext;
 	}
 
 	@Override
-	public Query createQuery() {
-		final int size = fieldsContext.size();
-		if ( size == 1 ) {
-			return queryCustomizer.setWrappedQuery( createQuery( fieldsContext.getFirst() ) ).createQuery();
+	protected PhrasePredicateOptionsStep<?> createPredicate(SearchPredicateFactory factory, FieldContext fieldContext) {
+		PhrasePredicateOptionsStep<?> optionsStep =
+				fieldContext.applyBoost( factory.phrase().field( fieldContext.getField() ) )
+						.matching( phraseContext.getSentence() );
+
+		optionsStep = optionsStep.slop( phraseContext.getSlop() );
+
+		if ( fieldContext.skipAnalysis() ) {
+			optionsStep = optionsStep.skipAnalysis();
 		}
 		else {
-			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
-			for ( FieldContext fieldContext : fieldsContext ) {
-				aggregatedFieldsQueryBuilder.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
+			String overriddenAnalyzer = queryContext.getOverriddenAnalyzer( fieldContext.getField() );
+			if ( overriddenAnalyzer != null ) {
+				optionsStep = optionsStep.analyzer( overriddenAnalyzer );
 			}
-			BooleanQuery aggregatedFieldsQuery = aggregatedFieldsQueryBuilder.build();
-			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
+
+		return optionsStep;
 	}
 
-	public Query createQuery(FieldContext fieldContext) {
-		throw new UnsupportedOperationException( "To be implemented through the Search 6 DSL" );
-	}
 }

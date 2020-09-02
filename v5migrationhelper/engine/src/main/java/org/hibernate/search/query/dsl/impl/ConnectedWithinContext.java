@@ -36,9 +36,9 @@ final class ConnectedWithinContext implements WithinContext, WithinContext.Longi
 	public SpatialTermination ofCoordinates(Coordinates coordinates) {
 		spatialContext.setCoordinates( coordinates );
 		return new ConnectedSpatialQueryBuilder(
-				spatialContext,
+				queryContext,
 				queryCustomizer,
-				queryContext
+				spatialContext
 		);
 	}
 
@@ -52,9 +52,9 @@ final class ConnectedWithinContext implements WithinContext, WithinContext.Longi
 	public SpatialTermination andLongitude(double longitude) {
 		spatialContext.setCoordinates( Point.fromDegrees( latitude, longitude ) );
 		return new ConnectedSpatialQueryBuilder(
-				spatialContext,
+				queryContext,
 				queryCustomizer,
-				queryContext
+				spatialContext
 		);
 	}
 }
