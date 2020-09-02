@@ -7,8 +7,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.List;
-
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -21,25 +19,25 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 	private final PhraseQueryContext phraseContext;
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
-	private final List<FieldContext> fieldContexts;
+	private final FieldsContext fieldsContext;
 
 	public ConnectedMultiFieldsPhraseQueryBuilder(PhraseQueryContext phraseContext, QueryCustomizer queryCustomizer,
-												List<FieldContext> fieldContexts, QueryBuildingContext queryContext) {
+			FieldsContext fieldsContext, QueryBuildingContext queryContext) {
 		this.phraseContext = phraseContext;
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
-		this.fieldContexts = fieldContexts;
+		this.fieldsContext = fieldsContext;
 	}
 
 	@Override
 	public Query createQuery() {
-		final int size = fieldContexts.size();
+		final int size = fieldsContext.size();
 		if ( size == 1 ) {
-			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ) ) ).createQuery();
+			return queryCustomizer.setWrappedQuery( createQuery( fieldsContext.getFirst() ) ).createQuery();
 		}
 		else {
 			BooleanQuery.Builder aggregatedFieldsQueryBuilder = new BooleanQuery.Builder();
-			for ( FieldContext fieldContext : fieldContexts ) {
+			for ( FieldContext fieldContext : fieldsContext ) {
 				aggregatedFieldsQueryBuilder.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
 			}
 			BooleanQuery aggregatedFieldsQuery = aggregatedFieldsQueryBuilder.build();
