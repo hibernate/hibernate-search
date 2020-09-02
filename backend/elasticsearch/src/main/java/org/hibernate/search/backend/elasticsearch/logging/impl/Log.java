@@ -103,8 +103,8 @@ public interface Log extends BasicLogger {
 			+ " Valid statuses are: %2$s.")
 	SearchException invalidIndexStatus(String invalidRepresentation, List<String> validRepresentations);
 
-	@Message(id = ID_OFFSET_2 + 24, value = "Index '%1$s' failed to reach status '%2$s' after %3$s.")
-	SearchException unexpectedIndexStatus(URLEncodedString indexName, String expected, String timeoutAndUnit,
+	@Message(id = ID_OFFSET_2 + 24, value = "Index '%1$s' failed to reach status '%2$s' after %3$sms.")
+	SearchException unexpectedIndexStatus(URLEncodedString indexName, String expected, int requiredStatusTimeoutInMs,
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 34,

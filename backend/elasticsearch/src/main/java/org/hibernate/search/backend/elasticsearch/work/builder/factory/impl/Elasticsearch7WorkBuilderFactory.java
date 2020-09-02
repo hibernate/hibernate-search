@@ -176,8 +176,9 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus, String timeout) {
-		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, timeout );
+	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, IndexStatus requiredStatus,
+			int requiredStatusTimeoutInMs) {
+		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, requiredStatusTimeoutInMs );
 	}
 
 	@Override

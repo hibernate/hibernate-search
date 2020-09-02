@@ -144,17 +144,17 @@ public class ElasticsearchSchemaAccessor {
 
 	public CompletableFuture<?> waitForIndexStatus(IndexNames indexNames, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
-		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
+		int requiredStatusTimeoutInMs = executionOptions.getRequiredStatusTimeoutInMs();
 
 		URLEncodedString alias = indexNames.getWrite();
 
 		NonBulkableWork<?> work =
-				getWorkFactory().waitForIndexStatusWork( alias, requiredIndexStatus, timeoutAndUnit )
+				getWorkFactory().waitForIndexStatusWork( alias, requiredIndexStatus, requiredStatusTimeoutInMs )
 						.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.unexpectedIndexStatus(
-							alias, requiredIndexStatus.externalRepresentation(), timeoutAndUnit,
+							alias, requiredIndexStatus.externalRepresentation(), requiredStatusTimeoutInMs,
 							Throwables.expectException( e )
 					);
 				} ) );
