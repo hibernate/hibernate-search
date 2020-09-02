@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import org.hibernate.search.backend.elasticsearch.search.timeout.spi.RequestDeadline;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import com.google.gson.JsonObject;
 
@@ -46,14 +46,14 @@ public final class ElasticsearchRequest {
 	private final String path;
 	private final Map<String, String> parameters;
 	private final List<JsonObject> bodyParts;
-	private final TimeoutManager timeoutManager;
+	private final RequestDeadline deadline;
 
 	private ElasticsearchRequest(Builder builder) {
 		this.method = builder.method;
 		this.path = builder.pathBuilder.toString();
 		this.parameters = builder.parameters == null ? Collections.emptyMap() : Collections.unmodifiableMap( builder.parameters );
 		this.bodyParts = builder.bodyParts == null ? Collections.emptyList() : Collections.unmodifiableList( builder.bodyParts );
-		this.timeoutManager = builder.timeoutManager;
+		this.deadline = builder.requestDeadline;
 	}
 
 	public String method() {
@@ -72,8 +72,8 @@ public final class ElasticsearchRequest {
 		return bodyParts;
 	}
 
-	public TimeoutManager timeoutManager() {
-		return timeoutManager;
+	public RequestDeadline deadline() {
+		return deadline;
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public final class ElasticsearchRequest {
 				.add( "path='" + path + "'" )
 				.add( "parameters=" + parameters )
 				.add( "bodyParts=" + bodyParts )
-				.add( "timeoutManager=" + timeoutManager )
+				.add( "deadline=" + deadline )
 				.toString();
 	}
 
@@ -95,7 +95,7 @@ public final class ElasticsearchRequest {
 
 		private Map<String, String> parameters;
 		private List<JsonObject> bodyParts;
-		private TimeoutManager timeoutManager;
+		private RequestDeadline requestDeadline;
 
 		private Builder(String method) {
 			super();
@@ -160,8 +160,8 @@ public final class ElasticsearchRequest {
 			return this;
 		}
 
-		public Builder timeout(TimeoutManager timeoutManager) {
-			this.timeoutManager = timeoutManager;
+		public Builder requestDeadline(RequestDeadline requestDeadline) {
+			this.requestDeadline = requestDeadline;
 			return this;
 		}
 

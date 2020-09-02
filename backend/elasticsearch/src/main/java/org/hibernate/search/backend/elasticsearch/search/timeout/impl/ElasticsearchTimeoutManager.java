@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.timeout.spi.RequestDeadline;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -20,7 +21,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Emmanuel Bernard
  */
-public final class ElasticsearchTimeoutManager extends TimeoutManager {
+public final class ElasticsearchTimeoutManager extends TimeoutManager implements RequestDeadline {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
