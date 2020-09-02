@@ -7,42 +7,44 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.dsl.MultiFieldPredicateFieldBoostStep;
+
 /**
  * @author Emmanuel Bernard
  */
 public class FieldContext {
 	private final String field;
 	private boolean ignoreAnalyzer;
-	private final QueryCustomizer fieldCustomizer;
+	private float fieldBoost = 1.0f;
 	private boolean ignoreFieldBridge;
 
 	public FieldContext(String field) {
 		this.field = field;
-		this.fieldCustomizer = new QueryCustomizer();
 	}
 
 	public String getField() {
 		return field;
 	}
 
-	/**
-	 * Whether to analyze the given field value or not.
-	 * @return {@code true} if the field must be analyzed
-	 */
-	public boolean applyAnalyzer() {
-		return !ignoreAnalyzer;
+	public boolean skipAnalysis() {
+		return ignoreAnalyzer;
 	}
 
 	public void setIgnoreAnalyzer(boolean ignoreAnalyzer) {
 		this.ignoreAnalyzer = ignoreAnalyzer;
 	}
 
-	public QueryCustomizer getFieldCustomizer() {
-		return fieldCustomizer;
+	public <S> S applyBoost(MultiFieldPredicateFieldBoostStep<S> step) {
+		return step.boost( fieldBoost );
 	}
 
-	public boolean isIgnoreFieldBridge() {
-		return ignoreFieldBridge;
+	public void boostedTo(float boost) {
+		fieldBoost *= boost;
+	}
+
+	public ValueConvert getValueConvert() {
+		return ignoreFieldBridge ? ValueConvert.NO : ValueConvert.YES;
 	}
 
 	public void setIgnoreFieldBridge(boolean ignoreFieldBridge) {
@@ -51,7 +53,7 @@ public class FieldContext {
 
 	@Override
 	public String toString() {
-		return "FieldContext [field=" + field + ", fieldCustomizer=" + fieldCustomizer + ", ignoreAnalyzer=" + ignoreAnalyzer
+		return "FieldContext [field=" + field + ", fieldBoost=" + fieldBoost + ", ignoreAnalyzer=" + ignoreAnalyzer
 				+ ", ignoreFieldBridge=" + ignoreFieldBridge + "]";
 	}
 }

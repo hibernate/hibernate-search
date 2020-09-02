@@ -37,7 +37,16 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 
 	@Override
 	public TermTermination matching(Object value) {
-		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldsContext, queryCustomizer, queryContext );
+		switch ( termContext.getApproximation() ) {
+			case WILDCARD:
+				return new ConnectedMultiFieldsWildcardQueryBuilder( queryContext, queryCustomizer, fieldsContext,
+						value );
+			case EXACT:
+			case FUZZY:
+			default:
+				return new ConnectedMultiFieldsMatchQueryBuilder( queryContext, queryCustomizer, fieldsContext, value,
+						termContext );
+		}
 	}
 
 	@Override

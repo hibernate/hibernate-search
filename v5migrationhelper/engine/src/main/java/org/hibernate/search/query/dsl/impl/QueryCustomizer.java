@@ -7,13 +7,14 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.BoostQuery;
-import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.Query;
-import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateScoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.query.dsl.QueryCustomization;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
@@ -21,7 +22,6 @@ import org.hibernate.search.query.dsl.QueryCustomization;
 class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 	private float boost = 1f;
 	private boolean constantScore;
-	private Query wrappedQuery;
 	private Query filter;
 
 	@Override
@@ -42,33 +42,33 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		return this;
 	}
 
-	public QueryCustomizer setWrappedQuery(Query wrappedQuery) {
-		this.wrappedQuery = wrappedQuery;
-		return this;
-	}
-
 	// TODO: this is ugly: we probably need to rethink how this is built to not depend on Lucene behavior
 	public float getBoost() {
 		return boost;
 	}
 
-	public Query createQuery() {
-		Query finalQuery = wrappedQuery;
-		if ( wrappedQuery == null ) {
-			throw new AssertionFailure( "wrapped query not set" );
-		}
+	public void applyScoreOptions(PredicateScoreStep<?> step) {
 		if ( boost != 1.0f ) {
-			finalQuery = new BoostQuery( finalQuery, boost );
-		}
-		if ( filter != null ) {
-			finalQuery = new BooleanQuery.Builder()
-					.add( finalQuery, Occur.MUST )
-					.add( filter, Occur.FILTER )
-					.build();
+			step.boost( boost );
 		}
 		if ( constantScore ) {
-			finalQuery = new ConstantScoreQuery( finalQuery );
+			step.constantScore();
 		}
-		return finalQuery;
+	}
+
+	public SearchPredicate applyFilter(SearchPredicateFactory factory, SearchPredicate predicate) {
+		if ( filter == null ) {
+			return predicate;
+		}
+		BooleanPredicateClausesStep<?> step = factory.bool().must( predicate );
+		applyFilter( factory, step );
+		return step.toPredicate();
+	}
+
+	public void applyFilter(SearchPredicateFactory factory, BooleanPredicateClausesStep<?> step) {
+		if ( filter == null ) {
+			return;
+		}
+		step.filter( factory.extension( LuceneExtension.get() ).fromLuceneQuery( filter ) );
 	}
 }

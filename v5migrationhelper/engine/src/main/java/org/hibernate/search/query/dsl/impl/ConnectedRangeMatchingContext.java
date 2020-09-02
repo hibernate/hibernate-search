@@ -51,10 +51,11 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		public RangeTerminationExcludable to(T to) {
 			mother.rangeContext.setTo( to );
 			return new ConnectedMultiFieldsRangeQueryBuilder(
-					mother.rangeContext,
+					mother.queryContext,
 					mother.queryCustomizer,
 					mother.fieldsContext,
-					mother.queryContext );
+					mother.rangeContext
+			);
 		}
 
 		@Override
@@ -67,13 +68,13 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	@Override
 	public RangeTerminationExcludable below(Object below) {
 		rangeContext.setTo( below );
-		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldsContext, queryContext );
+		return new ConnectedMultiFieldsRangeQueryBuilder( queryContext, queryCustomizer, fieldsContext, rangeContext );
 	}
 
 	@Override
 	public RangeTerminationExcludable above(Object above) {
 		rangeContext.setFrom( above );
-		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldsContext, queryContext );
+		return new ConnectedMultiFieldsRangeQueryBuilder( queryContext, queryCustomizer, fieldsContext, rangeContext );
 	}
 
 	@Override

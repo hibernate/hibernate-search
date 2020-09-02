@@ -8,6 +8,7 @@
 package org.hibernate.search.util.logging.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
@@ -73,10 +74,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 342, value = "Field '%1$s' refers to both an analyzer and a normalizer." )
 	SearchException cannotReferenceAnalyzerAndNormalizer(String relativeFieldPath);
 
-	@Message(id = 351, value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
-			+ " expected a number between 1 and '%1$s', got '%2$s'.")
-	SearchException minimumShouldMatchMinimumOutOfBounds(int minimum, int totalShouldClauseNumber);
-
 	@Message(id = 352, value = "Multiple conflicting minimumShouldMatch constraints")
 	SearchException minimumShouldMatchConflictingConstraints();
 
@@ -111,4 +108,11 @@ public interface Log extends BaseHibernateSearchLogger {
 			+ " this is what the new @FullTextField annotation of Hibernate Search 6 will expect,"
 			+ " since it doesn't have any default for the analyzer. %2$s")
 	void noAnalyzerDefinedOnPropertyUsingDefault(String name, @FormatWith(EventContextFormatter.class) EventContext eventContext);
+
+	@Message(id = 406, value = "For simple query string queries, if one field has its analyzer overridden," +
+			" all fields must have the same analyzers." +
+			" You probably forgot to override the analyzer for some fields," +
+			" because multiple analyzers were found: %1$s.")
+	SearchException unableToOverrideQueryAnalyzerWithMoreThanOneAnalyzerForSimpleQueryStringQueries(
+			Collection<String> analyzers);
 }
