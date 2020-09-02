@@ -21,8 +21,10 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.entity.ContentType;
 import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
@@ -35,6 +37,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -56,7 +59,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final ScheduledExecutorService timeoutExecutorService;
 
 	private final int requestTimeout;
-	// TODO HSEARCH-2505 Use this value to create custom per-request RequestConfig
 	private final int connectionTimeout;
 	private final TimeUnit timeoutUnit;
 
@@ -160,8 +162,9 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		return completableFuture;
 	}
 
-	private static Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity) {
+	private Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity) {
 		Request request = new Request( elasticsearchRequest.method(), elasticsearchRequest.path() );
+		setPerRequestSocketTimeout( elasticsearchRequest, request );
 
 		for ( Entry<String, String> parameter : elasticsearchRequest.parameters().entrySet() ) {
 			request.addParameter( parameter.getKey(), parameter.getValue() );
@@ -170,6 +173,31 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		request.setEntity( entity );
 
 		return request;
+	}
+
+	private void setPerRequestSocketTimeout(ElasticsearchRequest elasticsearchRequest, Request request) {
+		TimeoutManager timeoutManager = elasticsearchRequest.timeoutManager();
+		if ( timeoutManager == null ) {
+			return;
+		}
+
+		Long timeToHardTimeout = timeoutManager.remainingTimeToHardTimeout();
+		if ( timeToHardTimeout == null ) {
+			return;
+		}
+
+		// set a per-request socket timeout
+		int socketTimeout = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setConnectionRequestTimeout( 0 ) //Disable lease handling for the connection pool! See also HSEARCH-2681
+				.setSocketTimeout( socketTimeout )
+				.setConnectTimeout( connectionTimeout )
+				.build();
+
+		RequestOptions.Builder requestOptions = RequestOptions.DEFAULT.toBuilder()
+				.setRequestConfig( requestConfig );
+
+		request.setOptions( requestOptions );
 	}
 
 	private ElasticsearchResponse convertResponse(Response response) {
