@@ -140,6 +140,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			ScheduledExecutorService timeoutExecutorService,
 			GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
+		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
 		RestClient restClient = createClient( propertySource, threadProvider, threadNamePrefix, hosts );
@@ -147,7 +148,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 		return new ElasticsearchClientImpl(
 				restClient, sniffer, timeoutExecutorService,
-				requestTimeoutMs, TimeUnit.MILLISECONDS,
+				requestTimeoutMs, connectionTimeoutMs, TimeUnit.MILLISECONDS,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
 		);
 	}

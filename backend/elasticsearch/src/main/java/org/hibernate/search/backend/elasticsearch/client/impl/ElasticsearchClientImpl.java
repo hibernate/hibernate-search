@@ -55,21 +55,24 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private final ScheduledExecutorService timeoutExecutorService;
 
-	private final int globalTimeoutValue;
-	private final TimeUnit globalTimeoutUnit;
+	private final int requestTimeout;
+	// TODO HSEARCH-2505 Use this value to create custom per-request RequestConfig
+	private final int connectionTimeout;
+	private final TimeUnit timeoutUnit;
 
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
 	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
 			ScheduledExecutorService timeoutExecutorService,
-			int globalTimeoutValue, TimeUnit globalTimeoutUnit,
+			int requestTimeout, int connectionTimeout, TimeUnit timeoutUnit,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = timeoutExecutorService;
-		this.globalTimeoutValue = globalTimeoutValue;
-		this.globalTimeoutUnit = globalTimeoutUnit;
+		this.requestTimeout = requestTimeout;
+		this.connectionTimeout = connectionTimeout;
+		this.timeoutUnit = timeoutUnit;
 		this.gson = gson;
 		this.jsonLogHelper = jsonLogHelper;
 	}
@@ -132,9 +135,9 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				);
 
 		long currentTimeoutValue = ( elasticsearchRequest.timeoutManager() == null ) ?
-				globalTimeoutValue : elasticsearchRequest.timeoutManager().remainingTimeToHardTimeout();
+				requestTimeout : elasticsearchRequest.timeoutManager().remainingTimeToHardTimeout();
 		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.timeoutManager() == null ) ?
-				globalTimeoutUnit : TimeUnit.MILLISECONDS;
+				timeoutUnit : TimeUnit.MILLISECONDS;
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
