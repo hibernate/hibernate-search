@@ -386,8 +386,6 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.from( from )
 					.to( to ).excludeLimit()
 					.createQuery();
@@ -411,8 +409,6 @@ public class DSLTest {
 				.range()
 					.onField( "estimatedCreation" )
 						.ignoreFieldBridge()
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.from( DateTools.round( from, DateTools.Resolution.MINUTE ) )
 					.to( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 						.excludeLimit()
@@ -431,8 +427,6 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.below( to )
 					.createQuery();
 
@@ -459,8 +453,6 @@ public class DSLTest {
 				.range()
 					.onField( "estimatedCreation" )
 						.ignoreFieldBridge()
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.below( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 
@@ -500,8 +492,6 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.above( to )
 					.createQuery();
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 2 );
@@ -520,8 +510,6 @@ public class DSLTest {
 				.range()
 					.onField( "estimatedCreation" )
 						.ignoreFieldBridge()
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.above( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 2 );
@@ -535,8 +523,6 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
 					.above( february )
 					.createQuery();
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 2 );
@@ -550,9 +536,7 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
-						.above( february ).excludeLimit()
+					.above( february ).excludeLimit()
 					.createQuery();
 		helper.assertThat( query ).from( Month.class ).matchesNone();
 	}

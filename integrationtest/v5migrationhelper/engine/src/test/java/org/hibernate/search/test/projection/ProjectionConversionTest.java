@@ -81,11 +81,6 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	public void projectingUnknownField() {
-		projectionTestHelper( "someNonExistingField", null );
-	}
-
-	@Test
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2423 Projecting an unstored field should raise an exception
 	public void projectingUnstoredField() {
 		thrown.expect( SearchException.class );
@@ -101,11 +96,6 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
-	public void projectingNotIncludedEmbeddedField() {
-		projectionTestHelper( "embedded.someInteger", null );
-	}
-
-	@Test
 	public void concurrentMixedProjections() throws Exception {
 		//The point of this test is to "simultaneously" project multiple different types
 		new ConcurrentRunner( 1000, 20,
@@ -118,7 +108,6 @@ public class ProjectionConversionTest {
 							projectingExplicitId();
 							projectingIdOnOverloadedMapping();
 							projectingIntegerField();
-							projectingUnknownField();
 							projectingEmbeddedIdOnOverloadedMapping();
 						}
 					};
