@@ -43,10 +43,15 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBooleanIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultByteIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDoubleIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultFloatIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURIValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLValueBridge;
@@ -201,11 +206,14 @@ public final class BridgeResolver {
 					.valueBinder( new PassThroughValueBridge.Binder<>( String.class, ParseUtils::parseString ) )
 					.identifierBridge( new DefaultStringIdentifierBridge() );
 			exactType( Character.class )
-					.valueBridge( new DefaultCharacterValueBridge() );
+					.valueBridge( new DefaultCharacterValueBridge() )
+					.identifierBridge( new DefaultCharacterIdentifierBridge() );
 			exactType( Boolean.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Boolean.class, ConvertUtils::convertBoolean ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( Boolean.class, ConvertUtils::convertBoolean ) )
+					.identifierBridge( new DefaultBooleanIdentifierBridge() );
 			exactType( Byte.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Byte.class, ConvertUtils::convertByte ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( Byte.class, ConvertUtils::convertByte ) )
+					.identifierBridge( new DefaultByteIdentifierBridge() );
 			exactType( Short.class )
 					.valueBinder( new PassThroughValueBridge.Binder<>( Short.class, ConvertUtils::convertShort ) )
 					.identifierBridge( new DefaultShortIdentifierBridge() );
@@ -216,9 +224,11 @@ public final class BridgeResolver {
 					.valueBinder( new PassThroughValueBridge.Binder<>( Long.class, ConvertUtils::convertLong ) )
 					.identifierBridge( new DefaultLongIdentifierBridge() );
 			exactType( Float.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Float.class, ConvertUtils::convertFloat ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( Float.class, ConvertUtils::convertFloat ) )
+					.identifierBridge( new DefaultFloatIdentifierBridge() );
 			exactType( Double.class )
-					.valueBinder( new PassThroughValueBridge.Binder<>( Double.class, ConvertUtils::convertDouble ) );
+					.valueBinder( new PassThroughValueBridge.Binder<>( Double.class, ConvertUtils::convertDouble ) )
+					.identifierBridge( new DefaultDoubleIdentifierBridge() );
 			strictSubTypesOf( Enum.class )
 					.valueBinder( new DefaultEnumValueBridge.Binder() )
 					.identifierBinder( new DefaultEnumIdentifierBridge.Binder() );
