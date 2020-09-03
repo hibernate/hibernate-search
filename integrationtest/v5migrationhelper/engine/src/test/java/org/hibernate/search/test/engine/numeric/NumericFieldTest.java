@@ -66,8 +66,8 @@ public class NumericFieldTest {
 		// Exact Matching Queries
 		assertExactQuery( "overriddenFieldName", 1 ).as( "Query id exact" ).matchesExactlyIds( 1 );
 		assertExactQuery( "latitude", -10d ).as( "Query double exact" ).matchesExactlyIds( 2 );
-		assertExactQuery( "importance", 12 ).as( "Query short exact" ).matchesExactlyIds( 3 );
-		assertExactQuery( "popularity", 22 ).as( "Query byte exact" ).matchesExactlyIds( 3 );
+		assertExactQuery( "importance", (short)12 ).as( "Query short exact" ).matchesExactlyIds( 3 );
+		assertExactQuery( "popularity", (byte)22 ).as( "Query byte exact" ).matchesExactlyIds( 3 );
 		assertExactQuery( "longitude", -20d ).as( "Query integer exact" ).matchesExactlyIds( 3 );
 		assertExactQuery( "myCounter", 4L ).as( "Query long exact" ).matchesExactlyIds( 4 );
 		assertExactQuery( "strMultiple", 0.1d ).as( "Query multifield exact" ).matchesExactlyIds( 5 );
