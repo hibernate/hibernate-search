@@ -134,19 +134,22 @@ public class SortDSLTest {
 		Sort sort = builder().sort()
 				.byIndexOrder()
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 2, 3 );
+		// Index order is not deterministic
+		assertQueryAll( sort ).matchesUnorderedIds( 0, 1, 2, 3 );
 
 		sort = builder().sort()
 				.byIndexOrder()
 						.asc()
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 0, 1, 2, 3 );
+		// Index order is not deterministic
+		assertQueryAll( sort ).matchesUnorderedIds( 0, 1, 2, 3 );
 
 		sort = builder().sort()
 				.byIndexOrder()
 						.desc()
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 2, 1, 0 );
+		// Index order is not deterministic
+		assertQueryAll( sort ).matchesUnorderedIds( 0, 1, 2, 3 );
 	}
 
 	@Test
