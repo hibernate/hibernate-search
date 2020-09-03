@@ -20,10 +20,13 @@ import org.apache.lucene.analysis.ngram.NGramFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 
 class V5MigrationHelperTestDefaultLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
+		context.similarity( new ClassicSimilarity() );
+
 		context.normalizer( AnalysisNames.NORMALIZER_LOWERCASE ).custom()
 				.tokenFilter( LowerCaseFilterFactory.class );
 		context.normalizer( AnalysisNames.NORMALIZER_LOWERCASE_ASCIIFOLDING ).custom()
