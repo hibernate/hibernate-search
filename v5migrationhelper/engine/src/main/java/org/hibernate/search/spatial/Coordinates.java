@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.spatial;
 
+import org.hibernate.search.annotations.Longitude;
+import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -17,11 +19,13 @@ public interface Coordinates {
 	/**
 	 * @return the latitude in degrees
 	 */
+	@Latitude
 	Double getLatitude();
 
 	/**
 	 * @return the longitude in degrees
 	 */
+	@Longitude
 	Double getLongitude();
 
 	static GeoPoint toGeoPoint(Coordinates coordinates) {
