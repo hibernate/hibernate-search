@@ -21,6 +21,8 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 @Entity
 @Indexed()
@@ -47,6 +49,7 @@ public class Music {
 			fetch = FetchType.EAGER,
 			targetEntity = Author.class)
 	@IndexedEmbedded(depth = 1)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	public Set<Author> getAuthors() {
 		return authors;
 	}

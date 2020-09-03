@@ -28,6 +28,8 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 /**
  * @author Emmanuel Bernard
@@ -45,6 +47,7 @@ public class Book {
 
 	@IndexedEmbedded
 	@ManyToOne
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	public Author getMainAuthor() {
 		return mainAuthor;
 	}

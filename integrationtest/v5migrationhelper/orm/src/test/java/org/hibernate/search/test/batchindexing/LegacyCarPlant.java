@@ -16,6 +16,8 @@ import javax.persistence.Table;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 
 /**
@@ -50,6 +52,7 @@ public class LegacyCarPlant {
 	}
 
 	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	@ManyToOne
 	@JoinColumn(name = "CAR_ID", insertable = false, updatable = false)
 	public LegacyCar getCar() {

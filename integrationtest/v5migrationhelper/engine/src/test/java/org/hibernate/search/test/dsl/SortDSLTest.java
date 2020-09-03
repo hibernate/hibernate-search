@@ -14,6 +14,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -67,9 +70,11 @@ public class SortDSLTest {
 				 */
 				.setLocation( 23.9d, 32.0d )
 				.setPrevious( entry0 );
+		entry0.setNext( entry1 );
 		IndexedEntry entry2 = new IndexedEntry( 2 )
 				.setNonUniqueIntgerField( 1 )
 				.setPrevious( entry1 );
+		entry1.setNext( entry2 );
 		IndexedEntry entry3 = new IndexedEntry( 3 )
 				.setTextField(
 						"infrequent1"
@@ -86,6 +91,9 @@ public class SortDSLTest {
 				 */
 				.setLocation( 23.9d, 32.1d )
 				.setPrevious( entry2 );
+		entry2.setNext( entry3 );
+
+		entry3.setNext( entry0 );
 		entry0.setPrevious( entry3 );
 
 		helper.add(
@@ -455,6 +463,9 @@ public class SortDSLTest {
 		@IndexedEmbedded(depth = 1)
 		IndexedEntry previous;
 
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "previous")))
+		IndexedEntry next;
+
 		Double latitude;
 
 		Double longitude;
@@ -505,6 +516,11 @@ public class SortDSLTest {
 
 		public IndexedEntry setPrevious(IndexedEntry previous) {
 			this.previous = previous;
+			return this;
+		}
+
+		public IndexedEntry setNext(IndexedEntry next) {
+			this.next = next;
 			return this;
 		}
 	}

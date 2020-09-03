@@ -27,7 +27,7 @@ import org.junit.rules.ExpectedException;
  */
 public class SimpleQueryStringDSLTest {
 	@Rule
-	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, CoffeeBrand.class, Book.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, Book.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 

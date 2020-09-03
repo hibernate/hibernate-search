@@ -21,6 +21,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 /**
  * @author Emmanuel Bernard
@@ -37,11 +39,13 @@ public class Product {
 
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
 	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	private Set<Author> authors = new HashSet<Author>();
 
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
 	@MapKeyColumn(name = "CUST_NAME", nullable = false)
 	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	private Map<String, Order> orders = new HashMap<String, Order>();
 
 	public Integer getId() {

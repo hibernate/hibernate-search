@@ -19,7 +19,6 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -36,7 +35,7 @@ import org.junit.experimental.categories.Category;
 public class LuceneNumericFieldTest {
 
 	@Rule
-	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( TouristAttraction.class, ScoreBoard.class, Score.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( TouristAttraction.class, ScoreBoard.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 
@@ -80,7 +79,6 @@ public class LuceneNumericFieldTest {
 		Score score1 = new Score();
 		score1.id = 1;
 		score1.subscore = 100;
-		helper.add( score1 );
 
 		ScoreBoard scoreboard = new ScoreBoard();
 		scoreboard.id = 1L;
@@ -99,11 +97,7 @@ public class LuceneNumericFieldTest {
 
 	}
 
-	@Indexed
 	private static class Score {
-
-		@DocumentId
-		@NumericField
 		Integer id;
 
 		@Field(name = "beta", store = Store.YES)

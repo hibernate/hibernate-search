@@ -15,6 +15,8 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 @Entity
 @Indexed
@@ -26,10 +28,12 @@ public class IndexedEmbeddedProxyRootEntity {
 
 	@OneToOne(optional = false, fetch = FetchType.LAZY)
 	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	private IndexedEmbeddedProxyLazyEntity lazyEntity;
 
 	@OneToOne(optional = false, fetch = FetchType.LAZY)
 	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	private IndexedEmbeddedProxyLazyEntity lazyEntity2;
 
 	public Integer getId() {
