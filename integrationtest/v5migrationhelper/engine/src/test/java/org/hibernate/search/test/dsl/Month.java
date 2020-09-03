@@ -36,11 +36,10 @@ class Month {
 		this.monthValue = monthValue;
 	}
 
-	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation, double raindropInMm, String keyForOrdering,
+	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation, double raindropInMm,
 			String htmlDescription) {
 		this( name, monthValue, mythology, history, estimatedCreation );
 		this.raindropInMm = raindropInMm;
-		this.keyForOrdering = keyForOrdering;
 		this.htmlDescription = htmlDescription;
 	}
 
@@ -126,18 +125,6 @@ class Month {
 	}
 
 	private Date estimatedCreation;
-
-	@Field(analyze = Analyze.NO, indexNullAs = "_null_")
-	public String getKeyForOrdering() {
-		return keyForOrdering;
-	}
-
-	public void setKeyForOrdering(String keyForOrdering) {
-		this.keyForOrdering = keyForOrdering;
-	}
-
-	private String keyForOrdering;
-
 
 	@Fields({
 			@Field,

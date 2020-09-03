@@ -16,7 +16,6 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.AssertBuildingHSQueryContext;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,19 +59,6 @@ public class NumericTypeWithNullEncodingTest {
 					.onField( "nullableAge" )
 					.matching( 2 )
 					.createQuery();
-
-		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
-	}
-
-	@Test
-	public void verifyCustomNullEncoding() {
-		Query query = getQueryBuilder()
-					.keyword()
-					.onField( "nullableAge" )
-					.matching( null )
-					.createQuery();
-
-		Assert.assertEquals( "[2 TO 2]", query.toString( "nullableAge" ) );
 
 		assertProjection( query, "title" ).matchesExactlySingleProjections( "title-two" );
 	}
