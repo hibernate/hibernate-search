@@ -13,6 +13,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.annotations.impl.SpatialAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+
 /**
  * Defines a spatial property.
  *
@@ -58,6 +64,8 @@ import java.lang.annotation.Target;
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
 @Repeatable(Spatials.class)
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class))
 public @interface Spatial {
 	/**
 	 * Prefix used to generate field names for a default {@link Spatial} annotation

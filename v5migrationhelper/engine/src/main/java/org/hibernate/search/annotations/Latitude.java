@@ -12,6 +12,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.annotations.impl.LatitudeAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+
 /**
  * Mark the property hosting the latitude of a specific spatial coordinate.
  * The property must be of type {@code Double} (or its native version).
@@ -22,6 +26,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD, ElementType.METHOD } )
 @Documented
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeAnnotationProcessor.class))
 public @interface Latitude {
 	/**
 	 * @return the name of the spatial field (defined in @Spatial.name)
