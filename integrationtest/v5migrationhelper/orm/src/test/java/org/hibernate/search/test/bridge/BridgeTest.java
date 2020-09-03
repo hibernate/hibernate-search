@@ -22,10 +22,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
@@ -302,67 +300,6 @@ public class BridgeTest extends SearchTestBase {
 
 		BooleanQuery booleanQuery = booleanQueryBuilder.build();
 		List result = session.createFullTextQuery( booleanQuery ).list();
-		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
-
-		tx.commit();
-		s.close();
-	}
-
-	@Test
-	@Category(SkipOnElasticsearch.class) // Elasticsearch uses a specific encoding for dates
-	public void testDateBridgeStringEncoding() throws Exception {
-		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
-		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
-		c.set( Calendar.MILLISECOND, 5 );
-		Date date = new Date( c.getTimeInMillis() );
-
-		Cloud cloud = new Cloud();
-		cloud.setDateDay( date );
-		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-
-		org.hibernate.Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.persist( cloud );
-		s.flush();
-		tx.commit();
-
-		tx = s.beginTransaction();
-		FullTextSession session = Search.getFullTextSession( s );
-
-		TermQuery termQuery = new TermQuery( new Term( "dateDayStringEncoding",
-				DateTools.dateToString( date, DateTools.Resolution.DAY ) ) );
-
-		List result = session.createFullTextQuery( termQuery ).list();
-		assertEquals( "Date not found or not properly truncated", 1, result.size() );
-
-		tx.commit();
-		s.close();
-	}
-
-	@Test
-	@Category(SkipOnElasticsearch.class) // Elasticsearch uses a specific encoding for calendars
-	public void testCalendarBridgeStringEncoding() throws Exception {
-		Calendar c = Calendar.getInstance( TimeZone.getTimeZone( "Europe/Rome" ), Locale.ROOT ); //for the sake of tests
-		c.set( 2000, Calendar.DECEMBER, 15, 3, 43, 2 );
-		c.set( Calendar.MILLISECOND, 5 );
-
-		Cloud cloud = new Cloud();
-		cloud.setCalendarDay( c );
-		cloud.setChar2( 's' ); // Avoid errors with PostgreSQL ("invalid byte sequence for encoding "UTF8": 0x00")
-
-		org.hibernate.Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.persist( cloud );
-		s.flush();
-		tx.commit();
-
-		tx = s.beginTransaction();
-		FullTextSession session = Search.getFullTextSession( s );
-
-		TermQuery termQuery = new TermQuery( new Term( "calendarDayStringEncoding",
-				DateTools.dateToString( c.getTime(), DateTools.Resolution.DAY ) ) );
-
-		List result = session.createFullTextQuery( termQuery ).list();
 		assertEquals( "Calendar not found or not properly truncated", 1, result.size() );
 
 		tx.commit();

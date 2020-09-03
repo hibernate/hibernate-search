@@ -29,8 +29,4 @@ public @interface DateBridge {
 	 */
 	Resolution resolution();
 
-	/**
-	 * @return the encoding type for the annotated date.
-	 */
-	EncodingType encoding() default EncodingType.NUMERIC;
 }

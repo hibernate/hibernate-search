@@ -30,8 +30,4 @@ public @interface CalendarBridge {
 	 */
 	Resolution resolution();
 
-	/**
-	 * @return the encoding type for the annotated {@code Calendar} instance.
-	 */
-	EncodingType encoding() default EncodingType.NUMERIC;
 }
