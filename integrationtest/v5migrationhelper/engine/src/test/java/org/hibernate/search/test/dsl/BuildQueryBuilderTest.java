@@ -10,6 +10,10 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -39,24 +43,32 @@ public class BuildQueryBuilderTest {
 
 	@Test
 	public void forEntity_configured_notIndexed() {
-		thrown.expectMessage( "HSEARCH000278" );
-		thrown.expectMessage( "indexed" );
-		thrown.expectMessage( ConfiguredNotIndexed.class.getSimpleName() );
+		thrown.expectMessage( "Some of the given types cannot be targeted" );
+		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes: ["
+				+ ConfiguredNotIndexed.class.getName() + "]" );
+		thrown.expectMessage( "some of them are indexed-embedded in an indexed entity, "
+				+ "but this is not enough to be targeted (only indexed types can be targeted): ["
+				+ ConfiguredNotIndexed.class.getName() + "]" );
 		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( ConfiguredNotIndexed.class ).get();
 	}
 
 	@Test
 	public void forEntity_notConfigured_indexed() {
-		thrown.expectMessage( "HSEARCH000331" );
-		thrown.expectMessage( "configured" );
-		thrown.expectMessage( NotConfiguredIndexed.class.getSimpleName() );
+		thrown.expectMessage( "Some of the given types cannot be targeted" );
+		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes: ["
+				+ NotConfiguredIndexed.class.getName() + "]" );
+		thrown.expectMessage( "some of them are indexed-embedded in an indexed entity, "
+				+ "but this is not enough to be targeted (only indexed types can be targeted): []" );
 		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NotConfiguredIndexed.class ).get();
 	}
 
 	@Test
 	public void forEntity_notConfigured_notIndexed() {
-		thrown.expectMessage( "HSEARCH000331" );
-		thrown.expectMessage( "configured" );
+		thrown.expectMessage( "Some of the given types cannot be targeted" );
+		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes: ["
+				+ NotConfiguredNotIndexed.class.getName() + "]" );
+		thrown.expectMessage( "some of them are indexed-embedded in an indexed entity, "
+				+ "but this is not enough to be targeted (only indexed types can be targeted): []" );
 		thrown.expectMessage( NotConfiguredNotIndexed.class.getSimpleName() );
 		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NotConfiguredNotIndexed.class ).get();
 	}
@@ -67,6 +79,9 @@ public class BuildQueryBuilderTest {
 
 		@Field
 		private String field;
+
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "embedded")))
+		private ConfiguredIndexed containing;
 	}
 
 	@Indexed
@@ -76,6 +91,9 @@ public class BuildQueryBuilderTest {
 
 		@Field
 		private String field;
+
+		@IndexedEmbedded
+		private ConfiguredNotIndexed embedded;
 	}
 
 	private static class NotConfiguredNotIndexed {

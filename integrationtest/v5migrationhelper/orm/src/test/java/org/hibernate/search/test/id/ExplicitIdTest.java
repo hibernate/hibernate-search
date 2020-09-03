@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.Search;
@@ -19,6 +20,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -115,10 +117,11 @@ public class ExplicitIdTest extends SearchTestBase {
 			fail( "Test should fail, because document id is not unique." );
 		}
 		catch (SearchException e) {
-			assertEquals(
-					"Loading entity of type org.hibernate.search.test.id.Article using 'documentId' as document id and '1' as value was not unique",
-					e.getMessage()
-			);
+			assertThat( e )
+					.hasMessageContainingAll(
+							"Found multiple entities of type 'Article' with 'documentId' set to '1'.",
+							"'documentId' is the document ID and must be assigned unique values"
+					);
 		}
 		tx.commit();
 		s.close();

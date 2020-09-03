@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.test.query.facet;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -32,14 +31,9 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 				.onField( "foobar" ) // foobar is not a valid field name
 				.discrete()
 				.createFacetingRequest();
-		try {
-			FullTextQuery query = queryHondaWithFacet( request );
-			query.getFacetManager().getFacets( "foo" );
-			fail( "The specified field name did not exist. Faceting request should fail" );
-		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000268" ) );
-		}
+		assertThatThrownBy( () -> queryHondaWithFacet( request ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Unknown field 'foobar'" );
 	}
 
 	@Test
@@ -50,17 +44,15 @@ public class FacetUnknownFieldFailureTest extends AbstractFacetTest {
 				.discrete()
 				.createFacetingRequest();
 
-		try {
+		assertThatThrownBy( () -> {
 			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Fruit.class );
 			query.getFacetManager().enableFaceting( request );
 			assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
 
 			query.getFacetManager().getFacets( "foo" );
-			fail( "The specified field name did not exist. Faceting request should fail" );
-		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000268" ) );
-		}
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Cannot use 'aggregation:terms' on field 'name'" );
 	}
 
 	private FullTextQuery queryHondaWithFacet(FacetingRequest request) {

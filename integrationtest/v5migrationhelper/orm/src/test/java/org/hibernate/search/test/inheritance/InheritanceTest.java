@@ -19,6 +19,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
@@ -51,7 +52,7 @@ public class InheritanceTest extends SearchTestBase {
 			tx.commit();
 			fail();
 		}
-		catch (IllegalArgumentException iae) {
+		catch (SearchException e) {
 			log.debug( "success" );
 			tx.rollback();
 		}
@@ -165,7 +166,7 @@ public class InheritanceTest extends SearchTestBase {
 			hibQuery.list();
 			fail();
 		}
-		catch (IllegalArgumentException iae) {
+		catch (SearchException e) {
 			log.debug( "success" );
 		}
 
@@ -234,7 +235,7 @@ public class InheritanceTest extends SearchTestBase {
 			tx.commit();
 			fail();
 		}
-		catch (IllegalArgumentException iae) {
+		catch (SearchException e) {
 			log.debug( "Success" );
 		}
 		s.close();

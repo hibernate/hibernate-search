@@ -6,21 +6,20 @@
  */
 package org.hibernate.search.test.query;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import org.hibernate.Transaction;
-
-import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 
 /**
  * HSEARCH-162 - trying to index an entity which is not marked with @Indexed
@@ -43,13 +42,15 @@ public class QueryUnindexedEntityTest extends SearchTestBase {
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "name", TestConstants.standardAnalyzer );
 		Query query = parser.parse( "name:foo" );
-		FullTextQuery hibQuery = s.createFullTextQuery( query );
 		try {
-			hibQuery.list();
+			s.createFullTextQuery( query );
 			fail();
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong message", e.getMessage().contains( "Cannot query: there aren't any mapped entity" ) );
+			assertThat( e ).hasMessageContainingAll(
+					"Some of the given types cannot be targeted.",
+					"These types are not indexed, nor is any of their subtypes: [java.lang.Object]"
+			);
 		}
 
 		tx.rollback();

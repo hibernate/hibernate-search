@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.spatial;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.lucene.search.Sort;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -200,21 +202,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( NonGeoPOI.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
-
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
-		Sort distanceSort = builder.sort().byDistance().onField( "name" )
-				.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
-				.createSort();
-		hibQuery.setSort( distanceSort );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		try {
-			hibQuery.list();
+			builder.sort().byDistance().onField( "name" )
+					.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+					.createSort();
 			fail( "Sorting on a field that it is not a coordinate should fail" );
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000282: " ) );
+			assertThat( e ).hasMessageContaining( "Cannot use 'sort:distance' on field 'name'" );
 		}
 	}
 
@@ -227,21 +222,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( NonGeoPOI.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
-
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
-		Sort distanceSort = builder.sort().byDistance().onField( "location" )
-				.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
-				.createSort();
-		hibQuery.setSort( distanceSort );
-		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		try {
-			hibQuery.list();
+			builder.sort().byDistance().onField( "location" )
+					.fromLatitude( centerLatitude ).andLongitude( centerLongitude )
+					.createSort();
 			fail( "Sorting on a field not indexed should fail" );
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000283: " ) );
+			assertThat( e ).hasMessageContaining( "Unknown field 'location'" );
 		}
 	}
 
@@ -260,7 +248,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 			fail( "Building an invalid spatial query should fail" );
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000131" ) );
+			assertThat( e ).hasMessageContaining( "Unknown field '" + Spatial.COORDINATES_DEFAULT_FIELD + "'" );
 		}
 	}
 
@@ -280,7 +268,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 			fail( "Building an invalid spatial query should fail" );
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong error message " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000131" ) );
+			assertThat( e ).hasMessageContaining( "Unknown field 'foo'" );
 		}
 	}
 

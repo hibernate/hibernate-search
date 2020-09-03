@@ -521,7 +521,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 
 			FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
 			hibQuery.setProjection( "__HSearch_xyz" );
-
+			hibQuery.list();
 			fail();
 		}
 		catch (SearchException se) {
