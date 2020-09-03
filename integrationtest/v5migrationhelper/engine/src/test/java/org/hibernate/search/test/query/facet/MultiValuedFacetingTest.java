@@ -21,7 +21,6 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.facet.Facet;
@@ -229,7 +228,6 @@ public class MultiValuedFacetingTest {
 
 		@Field(analyze = Analyze.NO)
 		@org.hibernate.search.annotations.Facet
-		@IndexedEmbedded // This enables ArrayBridge: not needed for faceting, but needed for indexing
 		private String[] facet;
 
 		private StringArrayFacetEntity(Long id, String ... facet) {
@@ -246,7 +244,6 @@ public class MultiValuedFacetingTest {
 
 		@Field(analyze = Analyze.NO)
 		@org.hibernate.search.annotations.Facet
-		@IndexedEmbedded // This enables IterableBridge: not needed for faceting, but needed for indexing
 		private Collection<String> facet;
 
 		private StringCollectionFacetEntity(Long id, String ... facet) {
@@ -263,7 +260,6 @@ public class MultiValuedFacetingTest {
 
 		@Field(analyze = Analyze.NO)
 		@org.hibernate.search.annotations.Facet
-		@IndexedEmbedded // This enables MapBridge: not needed for faceting, but needed for indexing
 		private Map<Integer, String> facet;
 
 		private StringMapFacetEntity(Long id, String ... facet) {
@@ -285,7 +281,6 @@ public class MultiValuedFacetingTest {
 
 		@Field(analyze = Analyze.NO)
 		@org.hibernate.search.annotations.Facet
-		@IndexedEmbedded // This enables ArrayBridge: not needed for faceting, but needed for indexing
 		private int[] facet;
 
 		private NumberArrayFacetEntity(Long id, int ... facet) {
@@ -302,7 +297,6 @@ public class MultiValuedFacetingTest {
 
 		@Field(analyze = Analyze.NO)
 		@org.hibernate.search.annotations.Facet
-		@IndexedEmbedded // This enables IterableBridge: not needed for faceting, but needed for indexing
 		private Collection<Float> facet;
 
 		private NumberCollectionFacetEntity(Long id, Float ... facet) {
@@ -319,7 +313,6 @@ public class MultiValuedFacetingTest {
 
 		@Field(analyze = Analyze.NO, index = Index.NO)
 		@org.hibernate.search.annotations.Facet
-		@IndexedEmbedded // This enables MapBridge: not needed for faceting, but needed for indexing
 		private Map<Integer, Float> facet;
 
 		private NumberMapFacetEntity(Long id, Float ... facet) {

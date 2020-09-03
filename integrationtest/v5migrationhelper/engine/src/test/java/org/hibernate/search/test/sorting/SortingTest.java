@@ -381,7 +381,6 @@ public class SortingTest {
 
 		@Field
 		@SortableField
-		@IndexedEmbedded//TODO improve error message when this is missing
 		Integer[] array;
 
 		Person(int id, Integer age, String name, CuddlyToy favoriteCuddlyToy) {
