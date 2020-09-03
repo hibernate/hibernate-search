@@ -24,7 +24,36 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Character>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Character>() {
+			@Override
+			public List<Character> getEntityIdentifierValues() {
+				return Arrays.asList( Character.MIN_VALUE, '7', 'A', 'a', 'f', Character.MAX_VALUE );
+			}
+
+			@Override
+			public List<String> getDocumentIdentifierValues() {
+				return Arrays.asList(
+						String.valueOf( Character.MIN_VALUE ), "7", "A", "a", "f", String.valueOf( Character.MAX_VALUE )
+				);
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Character identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -78,6 +107,18 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 				return "F";
 			}
 		} );
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Character id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Character id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
