@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.bridge.builtin.impl;
 
-import org.apache.lucene.document.DateTools.Resolution;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.util.common.AssertionFailure;
 
 public class DateResolutionUtil {
@@ -14,33 +17,24 @@ public class DateResolutionUtil {
 	private DateResolutionUtil() {
 	}
 
-	public static Resolution getLuceneResolution(org.hibernate.search.annotations.Resolution hibResolution) {
-		final Resolution resolution;
-		switch ( hibResolution ) {
+	public static TemporalUnit getLowestTemporalUnit(Resolution resolution) {
+		switch ( resolution ) {
 			case YEAR:
-				resolution = Resolution.YEAR;
-				break;
+				return ChronoUnit.YEARS;
 			case MONTH:
-				resolution = Resolution.MONTH;
-				break;
+				return ChronoUnit.MONTHS;
 			case DAY:
-				resolution = Resolution.DAY;
-				break;
+				return ChronoUnit.DAYS;
 			case HOUR:
-				resolution = Resolution.HOUR;
-				break;
+				return ChronoUnit.HOURS;
 			case MINUTE:
-				resolution = Resolution.MINUTE;
-				break;
+				return ChronoUnit.MINUTES;
 			case SECOND:
-				resolution = Resolution.SECOND;
-				break;
+				return ChronoUnit.SECONDS;
 			case MILLISECOND:
-				resolution = Resolution.MILLISECOND;
-				break;
+				return ChronoUnit.MILLIS;
 			default:
-				throw new AssertionFailure( "Unknown Resolution: " + hibResolution );
+				throw new AssertionFailure( "Unknown Resolution: " + resolution );
 		}
-		return resolution;
 	}
 }

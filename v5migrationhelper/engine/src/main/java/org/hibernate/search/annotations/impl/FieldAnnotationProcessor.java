@@ -6,20 +6,31 @@
  */
 package org.hibernate.search.annotations.impl;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.CalendarBridge;
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.bridge.builtin.impl.TruncatingCalendarBridge;
+import org.hibernate.search.bridge.builtin.impl.TruncatingDateBridge;
+import org.hibernate.search.bridge.builtin.impl.Truncation;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedProperty;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
@@ -78,6 +89,11 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 		String indexNullAs = indexNullAs( annotation, context );
 		if ( indexNullAs != null ) {
 			genericOptionsStep = genericOptionsStep.indexNullAs( indexNullAs );
+		}
+
+		BeanReference<? extends ValueBridge<?, ?>> valueBridge = valueBridge( context );
+		if ( valueBridge != null ) {
+			genericOptionsStep = genericOptionsStep.valueBridge( valueBridge );
 		}
 
 		return genericOptionsStep;
@@ -228,6 +244,34 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 				return TermVector.WITH_POSITIONS_OFFSETS;
 			default:
 				throw new AssertionFailure( "Unknown value: " + annotation.termVector() );
+		}
+	}
+
+	private BeanReference<? extends ValueBridge<?, ?>> valueBridge(PropertyMappingAnnotationProcessorContext context) {
+		MappingAnnotatedProperty annotatedProperty = context.annotatedElement();
+		return annotatedProperty.allAnnotations()
+				.map( a -> valueBridge( annotatedProperty, a ) )
+				.filter( Objects::nonNull )
+				.findAny()
+				.orElse( null );
+	}
+
+	private BeanReference<? extends ValueBridge<?, ?>> valueBridge(MappingAnnotatedProperty annotatedProperty,
+			Annotation annotation) {
+		if ( Date.class.isAssignableFrom( annotatedProperty.javaClass() )
+				&& annotation.annotationType().equals( DateBridge.class ) ) {
+			DateBridge castedAnnotation = (DateBridge) annotation;
+			Truncation truncation = Truncation.at( castedAnnotation.resolution() );
+			return BeanReference.ofInstance( new TruncatingDateBridge( truncation ) );
+		}
+		else if ( Calendar.class.isAssignableFrom( annotatedProperty.javaClass() )
+				&& annotation.annotationType().equals( CalendarBridge.class ) ) {
+			CalendarBridge castedAnnotation = (CalendarBridge) annotation;
+			Truncation truncation = Truncation.at( castedAnnotation.resolution() );
+			return BeanReference.ofInstance( new TruncatingCalendarBridge( truncation ) );
+		}
+		else {
+			return null;
 		}
 	}
 }
