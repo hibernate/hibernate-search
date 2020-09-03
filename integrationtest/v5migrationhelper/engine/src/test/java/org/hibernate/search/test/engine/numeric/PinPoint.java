@@ -9,14 +9,12 @@ package org.hibernate.search.test.engine.numeric;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 
 /**
  * @author Gustavo Fernandes
  */
-@Indexed (index = "numeric_field_test")
 class PinPoint {
 
 	@DocumentId

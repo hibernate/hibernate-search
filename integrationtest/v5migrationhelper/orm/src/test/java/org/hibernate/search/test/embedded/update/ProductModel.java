@@ -25,6 +25,9 @@ import javax.persistence.OneToOne;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 @Entity
 @Indexed
@@ -35,6 +38,7 @@ public class ProductModel {
 	private Long id;
 
 	@OneToOne(cascade = CascadeType.ALL)
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "model")))
 	private ProductReferenceCode mainReferenceCode;
 
 	@OneToMany(mappedBy = "model", cascade = CascadeType.ALL)

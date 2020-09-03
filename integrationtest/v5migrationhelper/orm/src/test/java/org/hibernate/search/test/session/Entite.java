@@ -17,6 +17,8 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 /**
  * @author Emmanuel Bernard
@@ -34,6 +36,7 @@ public class Entite {
 
 	@IndexedEmbedded
 	@ManyToOne(fetch = FetchType.LAZY)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	private Categorie categorie;
 
 	public Entite() {

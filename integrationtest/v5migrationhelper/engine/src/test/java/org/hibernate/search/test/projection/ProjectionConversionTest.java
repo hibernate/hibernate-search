@@ -12,6 +12,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
@@ -61,6 +64,7 @@ public class ProjectionConversionTest {
 		embedded.unstoredField = "unstoredFieldEmbedded";
 
 		entity.embedded = embedded;
+		embedded.containing = entity;
 
 		helper.add( entity );
 	}
@@ -144,6 +148,9 @@ public class ProjectionConversionTest {
 				}
 		)
 		ExampleEntity embedded;
+
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "embedded")))
+		ExampleEntity containing;
 
 	}
 

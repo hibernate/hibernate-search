@@ -11,9 +11,13 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,9 +43,11 @@ public class DefaultPathsWithNestedIndexedEmbeddedTest {
 		a.foo = "someValue";
 		B b = new B();
 		b.a = a;
+		a.b = b;
 		b.id = 1L;
 		C c = new C();
 		c.b = b;
+		b.c = c;
 		c.id = 2L;
 		helper.add( c );
 
@@ -57,6 +63,9 @@ public class DefaultPathsWithNestedIndexedEmbeddedTest {
 
 		@Field(analyze = Analyze.NO)
 		private String foo;
+
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "a")))
+		private B b;
 	}
 
 	private static class B {
@@ -65,6 +74,9 @@ public class DefaultPathsWithNestedIndexedEmbeddedTest {
 
 		@IndexedEmbedded(includePaths = "foo") // Include only "a.foo"
 		private A a;
+
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "b")))
+		private C c;
 	}
 
 	@Indexed

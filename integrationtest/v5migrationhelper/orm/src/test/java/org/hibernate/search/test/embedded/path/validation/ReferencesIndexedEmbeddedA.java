@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 /**
  * @author zkurey
@@ -28,6 +30,7 @@ public class ReferencesIndexedEmbeddedA {
 
 	@ManyToOne
 	@IndexedEmbedded
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	public A a;
 
 }

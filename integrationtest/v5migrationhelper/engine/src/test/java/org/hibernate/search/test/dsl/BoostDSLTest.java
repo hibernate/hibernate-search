@@ -24,7 +24,7 @@ import org.junit.Test;
 public class BoostDSLTest {
 
 	@Rule
-	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class, CoffeeBrand.class );
+	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Coffee.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 

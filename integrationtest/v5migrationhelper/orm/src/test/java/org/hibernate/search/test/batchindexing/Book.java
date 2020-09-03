@@ -17,6 +17,8 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 @Indexed
 @Entity
@@ -52,6 +54,7 @@ public class Book implements TitleAble {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Fetch(FetchMode.SELECT)
 	@IndexedEmbedded(depth = 3)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}

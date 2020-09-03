@@ -50,7 +50,7 @@ public class DSLTest {
 
 	@Rule
 	public final SearchFactoryHolder sfHolder = new SearchFactoryHolder( Month.class, Car.class,
-					SportsCar.class, Animal.class, Day.class, CoffeeBrand.class, Coffee.class );
+					SportsCar.class, Animal.class, Day.class, Coffee.class );
 
 	private final SearchITHelper helper = new SearchITHelper( sfHolder );
 

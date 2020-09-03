@@ -18,6 +18,8 @@ import javax.persistence.Transient;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 
 @Entity
@@ -53,6 +55,7 @@ public class Dad {
 	}
 
 	@ManyToOne
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 	public Grandpa getGrandpa() {
 		return grandpa;
 	}
