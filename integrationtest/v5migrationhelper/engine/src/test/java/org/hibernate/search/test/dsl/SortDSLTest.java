@@ -156,13 +156,13 @@ public class SortDSLTest {
 		Sort sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
+		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
 						.asc()
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
+		assertQueryAll( sort ).matchesExactlyIds( 1, 0, 3, 2 );
 
 		sort = builder().sort()
 				.byField( "uniqueDoubleField" )
@@ -292,14 +292,14 @@ public class SortDSLTest {
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 0, 3, 1 );
+		assertQueryAll( sort ).matchesExactlyIds( 0, 3, 2, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
 				.andByField( "uniqueDoubleField" )
 						.asc()
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 0, 3, 1 );
+		assertQueryAll( sort ).matchesExactlyIds( 0, 3, 2, 1 );
 
 		sort = builder().sort()
 				.byField( "nonUniqueIntegerField" )
@@ -419,13 +419,13 @@ public class SortDSLTest {
 		Sort sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 2, 1, 0 );
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
 						.asc()
 				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 2, 1, 0 );
+		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
 
 		sort = builder().sort()
 				.byField( "previous.uniqueDoubleField" )
