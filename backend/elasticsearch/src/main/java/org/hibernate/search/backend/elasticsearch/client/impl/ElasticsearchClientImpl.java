@@ -59,23 +59,21 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private final ScheduledExecutorService timeoutExecutorService;
 
-	private final Optional<Integer> requestTimeout;
-	private final int connectionTimeout;
-	private final TimeUnit timeoutUnit;
+	private final Optional<Integer> requestTimeoutMs;
+	private final int connectionTimeoutMs;
 
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
 	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
 			ScheduledExecutorService timeoutExecutorService,
-			Optional<Integer> requestTimeout, int connectionTimeout, TimeUnit timeoutUnit,
+			Optional<Integer> requestTimeoutMs, int connectionTimeoutMs,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = timeoutExecutorService;
-		this.requestTimeout = requestTimeout;
-		this.connectionTimeout = connectionTimeout;
-		this.timeoutUnit = timeoutUnit;
+		this.requestTimeoutMs = requestTimeoutMs;
+		this.connectionTimeoutMs = connectionTimeoutMs;
 		this.gson = gson;
 		this.jsonLogHelper = jsonLogHelper;
 	}
@@ -138,15 +136,13 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				);
 
 		RequestDeadline requestDeadline = elasticsearchRequest.deadline();
-		if ( requestDeadline == null && !requestTimeout.isPresent() ) {
+		if ( requestDeadline == null && !requestTimeoutMs.isPresent() ) {
 			// no need to schedule a client side timeout
 			return completableFuture;
 		}
 
 		Long currentTimeoutValue = ( requestDeadline == null ) ?
-				Long.valueOf( requestTimeout.get() ) : requestDeadline.remainingTimeToHardTimeout();
-		TimeUnit currentTimeoutUnit = ( requestDeadline == null ) ?
-				timeoutUnit : TimeUnit.MILLISECONDS;
+				Long.valueOf( requestTimeoutMs.get() ) : requestDeadline.remainingTimeToHardTimeout();
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
@@ -157,12 +153,12 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				() -> {
 					if ( !completableFuture.isDone() ) {
 						completableFuture.completeExceptionally( log.timedOut(
-								Duration.ofNanos( currentTimeoutUnit.toNanos( currentTimeoutValue ) ),
+								Duration.ofNanos( TimeUnit.MILLISECONDS.toNanos( currentTimeoutValue ) ),
 								elasticsearchRequest
 						) );
 					}
 				},
-				currentTimeoutValue, currentTimeoutUnit
+				currentTimeoutValue, TimeUnit.MILLISECONDS
 		);
 		completableFuture.thenRun( () -> timeout.cancel( false ) );
 
@@ -194,11 +190,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		}
 
 		// set a per-request socket timeout
-		int socketTimeout = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;
+		int socketTimeoutMs = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;
 		RequestConfig requestConfig = RequestConfig.custom()
 				.setConnectionRequestTimeout( 0 ) //Disable lease handling for the connection pool! See also HSEARCH-2681
-				.setSocketTimeout( socketTimeout )
-				.setConnectTimeout( connectionTimeout )
+				.setSocketTimeout( socketTimeoutMs )
+				.setConnectTimeout( connectionTimeoutMs )
 				.build();
 
 		RequestOptions.Builder requestOptions = RequestOptions.DEFAULT.toBuilder()

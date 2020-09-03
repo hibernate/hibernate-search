@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
@@ -147,7 +146,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 		return new ElasticsearchClientImpl(
 				restClient, sniffer, timeoutExecutorService,
-				requestTimeoutMs, connectionTimeoutMs, TimeUnit.MILLISECONDS,
+				requestTimeoutMs, connectionTimeoutMs,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
 		);
 	}
