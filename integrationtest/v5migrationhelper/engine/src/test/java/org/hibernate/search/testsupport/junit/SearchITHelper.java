@@ -436,7 +436,7 @@ public class SearchITHelper {
 					.append( " from <" ).append( query.getTargetedEntities() ).append( ">" );
 			String[] projected = query.getProjectedFields();
 			if ( projected != null && projected.length > 0 ) {
-				builder.append( " with projections <" ).append( query.getProjectedFields() ).append( ">" );
+				builder.append( " with projections <" ).append( Arrays.toString( query.getProjectedFields() ) ).append( ">" );
 			}
 			return builder.toString();
 		}
