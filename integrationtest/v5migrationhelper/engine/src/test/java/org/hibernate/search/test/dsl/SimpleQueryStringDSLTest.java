@@ -9,7 +9,6 @@ package org.hibernate.search.test.dsl;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -172,9 +171,8 @@ public class SimpleQueryStringDSLTest {
 	public void testNullQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000334" );
-		thrown.expectMessage( "does not support null queries" );
+		thrown.expect( IllegalArgumentException.class );
+		thrown.expectMessage( "'simpleQueryString' must not be null" );
 
 		qb.simpleQueryString()
 				.onFields( "name", "summary", "description" )

@@ -25,6 +25,7 @@ import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -347,13 +348,12 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		FacetManager facetManager = query.getFacetManager();
 		facetManager.enableFaceting( rangeRequest );
 
-		try {
+		assertThatThrownBy( () -> {
 			query.getFacetManager().getFacets( priceRange );
-			fail( "Trying to so a range query using string as parameter should fail." );
-		}
-		catch (SearchException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000266" ) );
-		}
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Invalid type for DSL arguments: 'java.lang.String'.",
+						"Expected 'java.lang.Double' or a subtype" );
 	}
 
 	@Override

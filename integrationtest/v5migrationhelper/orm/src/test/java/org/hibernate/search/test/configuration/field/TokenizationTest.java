@@ -16,10 +16,10 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 
 /**
@@ -31,7 +31,7 @@ public class TokenizationTest {
 	private static final String DEFAULT_FIELD_NAME = "default";
 
 	@Rule
-	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void testWarningLoggedForInconsistentFieldConfiguration() throws Exception {
@@ -41,7 +41,8 @@ public class TokenizationTest {
 		config.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 
-		logged.expectMessage( "HSEARCH000120", Product.class.getName(), DEFAULT_FIELD_NAME );
+		thrown.expectMessage( "The index schema node '" + DEFAULT_FIELD_NAME + "' was added twice" );
+		thrown.expectMessage( Product.class.getName() );
 
 		config.buildSessionFactory();
 	}

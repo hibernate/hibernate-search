@@ -88,8 +88,8 @@ public class ProjectionConversionTest {
 	@Category(ElasticsearchSupportInProgress.class) // HSEARCH-2423 Projecting an unstored field should raise an exception
 	public void projectingUnstoredField() {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH000323" );
-		thrown.expectMessage( "unstoredField" );
+		thrown.expectMessage( "Cannot use 'projection:field' on field 'unstoredField'." );
+		thrown.expectMessage( "Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)." );
 
 		projectionTestHelper( "unstoredField", null );
 	}

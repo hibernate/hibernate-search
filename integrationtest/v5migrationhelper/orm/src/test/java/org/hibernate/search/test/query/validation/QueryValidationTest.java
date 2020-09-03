@@ -12,6 +12,7 @@ import javax.persistence.Id;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +23,9 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.common.SearchException;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Hardy Ferentschik
@@ -54,23 +56,21 @@ public class QueryValidationTest extends SearchTestBase {
 	@Test
 	public void testTargetingNonIndexedEntityThrowsException() {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
-		try {
-			fullTextSession.createFullTextQuery( query, C.class );
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000234" ) );
-		}
+		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, C.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Some of the given types cannot be targeted.",
+					"These types are not indexed, nor is any of their subtypes: ["
+							+ C.class.getName() + "]" );
 	}
 
 	@Test
 	public void testTargetingNonConfiguredEntityThrowsException() {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
-		try {
-			fullTextSession.createFullTextQuery( query, D.class );
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000332" ) );
-		}
+		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, D.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Some of the given types cannot be targeted.",
+					"These types are not indexed, nor is any of their subtypes: ["
+							+ D.class.getName() + "]" );
 	}
 
 	@Override

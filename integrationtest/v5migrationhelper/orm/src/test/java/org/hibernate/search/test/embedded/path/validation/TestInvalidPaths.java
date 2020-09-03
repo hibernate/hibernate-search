@@ -11,7 +11,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -49,10 +49,12 @@ public class TestInvalidPaths {
 			fail( "Exception should have been thrown for DeepPathWithLeadingPrefixCase having invalid path: b.c.dne" );
 		}
 		catch (SearchException se) {
-			assertTrue( "Should contain information about invalid path b.c.dne (message: <" + se.getMessage() + ">)" ,
-					se.getMessage().matches( ".*\\[b.c.dne\\].*" ) );
-			assertFalse( "Should NOT contain information about invalid path prefix: notJustA (message: <" + se.getMessage() + ">)",
-					se.getMessage().contains( "notJustA" ) );
+			assertThat( se )
+					.hasMessageContainingAll(
+							"type '" + DeepPathWithLeadingPrefixCase.class.getName() + "'",
+							"Non-matching includePaths filters: [b.c.dne]",
+							"Encountered field paths: [notJustAb, b.c, b.c.indexed, b.c.notIndexed]"
+					);
 		}
 	}
 
@@ -91,23 +93,6 @@ public class TestInvalidPaths {
 	}
 
 	@Test
-	public void testNonLeafPathInvalid() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
-		cfg.addAnnotatedClass( A.class );
-		cfg.addAnnotatedClass( B.class );
-		cfg.addAnnotatedClass( C.class );
-		cfg.addAnnotatedClass( InvalidNonLeafUseCase.class );
-		try {
-			cfg.build();
-			fail( "Exception should have been thrown for D having invalid path: b.c" );
-		}
-		catch (SearchException se) {
-			assertTrue( "Expected search exception to contain information about invalid path b.c",
-					se.getMessage().contains( "b.c" ) );
-		}
-	}
-
-	@Test
 	public void testEmbeddedPathValidation() {
 		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
 		cfg.addAnnotatedClass( A.class );
@@ -120,12 +105,12 @@ public class TestInvalidPaths {
 			fail( "Exception should have been thrown for InvalidEmbeddedPathsCase having invalid path: emb.e4" );
 		}
 		catch (SearchException se) {
-			assertTrue(
-					"Expected search exception to contain information about invalid path emb.e4, instead got error: "
-							+ se.getMessage(), se.getMessage().contains( "emb.e4" ) );
-			assertFalse(
-					"Expected search exception to NOT contain information about invalid path emb.e1, instead got error: "
-							+ se.getMessage(), se.getMessage().contains( "emb.e1" ) );
+			assertThat( se )
+					.hasMessageContainingAll(
+							"type '" + InvalidEmbeddedPathCase.class.getName() + "'",
+							"Non-matching includePaths filters: [emb.e4]",
+							"Encountered field paths: [emb, emb.e1, emb.e3, emb.e3.c, emb.e3.c.indexed, emb.e3.c.notIndexed]"
+					);
 		}
 	}
 
@@ -142,12 +127,12 @@ public class TestInvalidPaths {
 			fail( "Exception should have been thrown for InvalidEmbeddedNonLeafCase having invalid path: emb.e3" );
 		}
 		catch (SearchException se) {
-			assertTrue(
-					"Expected search exception to contain information about invalid leaf path emb.e3, instead got error: "
-							+ se.getMessage(), se.getMessage().contains( "emb.e3" ) );
-			assertFalse(
-					"Expected search exception to NOT contain information about invalid path emb.e1, instead got error: "
-							+ se.getMessage(), se.getMessage().contains( "emb.e1" ) );
+			assertThat( se )
+					.hasMessageContainingAll(
+							"type '" + InvalidEmbeddedNonLeafCase.class.getName() + "'",
+							"Non-matching includePaths filters: [emb.e4]",
+							"Encountered field paths: [emb, emb.e1, emb.e3, emb.e3.c, emb.e3.c.indexed, emb.e3.c.notIndexed]"
+					);
 		}
 	}
 

@@ -828,8 +828,11 @@ public class DSLTest {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown analyzer: 'invalid_analyzer_name'" );
 
-		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
-				.overridesForField( "mythology_ngram", "invalid_analyzer_name" );
+		QueryBuilder monthQb = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
+				.overridesForField( "mythology_ngram", "invalid_analyzer_name" )
+				.get();
+
+		monthQb.keyword().onField( "mythology_ngram" ).matching( "sno" ).createQuery();
 	}
 
 	private void indexTestData() {
