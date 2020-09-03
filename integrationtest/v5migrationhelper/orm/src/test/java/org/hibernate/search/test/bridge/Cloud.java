@@ -15,13 +15,11 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
@@ -231,13 +229,6 @@ public class Cloud {
 		return dateDay;
 	}
 
-	@Transient
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	@DateBridge(resolution = Resolution.DAY, encoding = EncodingType.STRING)
-	public Date getDateDayStringEncoding() {
-		return dateDay;
-	}
-
 	public void setDateDay(Date dateDay) {
 		this.dateDay = dateDay;
 	}
@@ -350,13 +341,6 @@ public class Cloud {
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	@CalendarBridge(resolution = Resolution.DAY)
 	public Calendar getCalendarDay() {
-		return calendarDay;
-	}
-
-	@Transient
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	@CalendarBridge(resolution = Resolution.DAY, encoding = EncodingType.STRING)
-	public Calendar getCalendarDayStringEncoding() {
 		return calendarDay;
 	}
 

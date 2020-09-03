@@ -19,7 +19,6 @@ import javax.persistence.Transient;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Index;
@@ -121,7 +120,7 @@ public class Book {
 
 	@SortableField
 	@Field(analyze = Analyze.NO, store = Store.YES)
-	@DateBridge(resolution = Resolution.SECOND, encoding = EncodingType.STRING)
+	@DateBridge(resolution = Resolution.SECOND)
 	public Date getPublicationDate() {
 		return publicationDate;
 	}

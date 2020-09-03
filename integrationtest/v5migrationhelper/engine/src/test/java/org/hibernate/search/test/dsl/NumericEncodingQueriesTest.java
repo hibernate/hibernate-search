@@ -16,7 +16,6 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
@@ -107,11 +106,11 @@ public class NumericEncodingQueriesTest {
 		private String name;
 
 		@Field
-		@DateBridge(encoding = EncodingType.NUMERIC, resolution = Resolution.DAY)
+		@DateBridge(resolution = Resolution.DAY)
 		private Date startDate;
 
 		@Field
-		@CalendarBridge(encoding = EncodingType.NUMERIC, resolution = Resolution.YEAR)
+		@CalendarBridge(resolution = Resolution.YEAR)
 		private Calendar since;
 
 		@Field

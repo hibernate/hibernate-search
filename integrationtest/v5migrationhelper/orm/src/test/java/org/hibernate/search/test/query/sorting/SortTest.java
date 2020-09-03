@@ -189,7 +189,7 @@ public class SortTest extends SearchTestBase {
 		// order by date backwards
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "publicationDate", SortField.Type.STRING, true ) ); //DESC
+		Sort sort = new Sort( new SortField( "publicationDate", SortField.Type.LONG, true ) ); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
