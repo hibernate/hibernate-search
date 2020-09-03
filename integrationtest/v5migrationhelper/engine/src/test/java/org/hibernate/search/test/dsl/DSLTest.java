@@ -16,7 +16,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -408,9 +407,8 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-						.ignoreFieldBridge()
-					.from( DateTools.round( from, DateTools.Resolution.MINUTE ) )
-					.to( DateTools.round( to, DateTools.Resolution.MINUTE ) )
+					.from( from )
+					.to( to )
 						.excludeLimit()
 					.createQuery();
 		helper.assertThat( query ).from( Month.class ).hasResultSize( 1 );
@@ -452,8 +450,7 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-						.ignoreFieldBridge()
-					.below( DateTools.round( to, DateTools.Resolution.MINUTE ) )
+					.below( to )
 					.createQuery();
 
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 3 );
@@ -509,8 +506,7 @@ public class DSLTest {
 		Query query = monthQb
 				.range()
 					.onField( "estimatedCreation" )
-						.ignoreFieldBridge()
-					.above( DateTools.round( to, DateTools.Resolution.MINUTE ) )
+					.above( to )
 					.createQuery();
 		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 2 );
 	}
