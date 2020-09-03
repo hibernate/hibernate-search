@@ -24,7 +24,34 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 
 	@Override
 	public Optional<DefaultIdentifierBridgeExpectations<Float>> getDefaultIdentifierBridgeExpectations() {
-		return Optional.empty();
+		return Optional.of( new DefaultIdentifierBridgeExpectations<Float>() {
+			@Override
+			public List<Float> getEntityIdentifierValues() {
+				return Arrays.asList( Float.MIN_VALUE, -1.0f, 0.0f, 1.0f, 42.0f, Float.MAX_VALUE );
+			}
+
+			@Override
+			public List<String> getDocumentIdentifierValues() {
+				return Arrays.asList( "1.4E-45", "-1.0", "0.0", "1.0", "42.0", "3.4028235E38" );
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge1() {
+				return TypeWithIdentifierBridge1.class;
+			}
+
+			@Override
+			public Object instantiateTypeWithIdentifierBridge1(Float identifier) {
+				TypeWithIdentifierBridge1 instance = new TypeWithIdentifierBridge1();
+				instance.id = identifier;
+				return instance;
+			}
+
+			@Override
+			public Class<?> getTypeWithIdentifierBridge2() {
+				return TypeWithIdentifierBridge2.class;
+			}
+		} );
 	}
 
 	@Override
@@ -78,6 +105,18 @@ public class BoxedFloatPropertyTypeDescriptor extends PropertyTypeDescriptor<Flo
 				return 37.33379f;
 			}
 		} );
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
+	public static class TypeWithIdentifierBridge1 {
+		@DocumentId
+		Float id;
+	}
+
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
+	public static class TypeWithIdentifierBridge2 {
+		@DocumentId
+		Float id;
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
