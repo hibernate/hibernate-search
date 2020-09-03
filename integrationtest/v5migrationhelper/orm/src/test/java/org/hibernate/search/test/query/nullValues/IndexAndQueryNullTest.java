@@ -22,7 +22,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
@@ -73,7 +72,7 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 		tx = fullTextSession.beginTransaction();
 
 		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
-		Query query = queryBuilder.keyword().onField( "value" ).matching( null ).createQuery();
+		Query query = queryBuilder.keyword().onField( "value" ).matching( "_custom_token_" ).createQuery();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
 
 		@SuppressWarnings("unchecked")
@@ -82,12 +81,6 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 
 		tx.commit();
 		fullTextSession.close();
-	}
-
-	@Test(expected = SearchException.class)
-	public void testNullIndexingWithDSLQueryIgnoringFieldBridge() throws Exception {
-		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
-		queryBuilder.keyword().onField( "value" ).ignoreFieldBridge().matching( null ).createQuery();
 	}
 
 	@Test

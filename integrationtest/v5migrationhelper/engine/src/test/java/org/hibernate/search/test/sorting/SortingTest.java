@@ -201,21 +201,6 @@ public class SortingTest {
 	}
 
 	@Test
-	public void testSortOnNullableNumericField() throws Exception {
-		helper.index(
-				new Person( 1, 25, "name1" ),
-				new Person( 2, 22, null ),
-				new Person( 3, null, "name3" )
-		);
-
-		HSQuery nameQuery = queryForValueNullAndSorting( "name", SortField.Type.STRING );
-		helper.assertThat( nameQuery ).hasResultSize( 1 );
-
-		HSQuery ageQuery = queryForValueNullAndSorting( "ageForNullChecks", SortField.Type.INT );
-		helper.assertThat( ageQuery ).hasResultSize( 1 );
-	}
-
-	@Test
 	public void testExceptionSortingStringFieldAsNumeric() throws Exception {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
@@ -320,21 +305,6 @@ public class SortingTest {
 				.from( Person.class )
 				.projecting( fieldName )
 				.matchesExactlySingleProjections( expectedValue );
-	}
-
-	private HSQuery queryForValueNullAndSorting(String fieldName, SortField.Type sortType) {
-		SearchIntegrator integrator = factoryHolder.getSearchFactory();
-		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( Person.class ).get();
-		Query query = queryBuilder
-				.keyword()
-				.onField( fieldName )
-				.matching( null )
-				.createQuery();
-
-		HSQuery hsQuery = integrator.createHSQuery( query, Person.class );
-		Sort sort = new Sort( new SortField( fieldName, sortType ) );
-		hsQuery.sort( sort );
-		return hsQuery;
 	}
 
 	@Indexed

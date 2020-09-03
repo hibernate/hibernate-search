@@ -457,28 +457,6 @@ public class DSLTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2030")
-	public void testRangeQueryWithNullToken() throws Exception {
-		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
-
-		Query query = monthQb
-				.range()
-					.onField( "keyForOrdering" )
-					.below( "-mar" )
-					.createQuery();
-
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 3 );
-
-		query = monthQb
-				.range()
-					.onField( "keyForOrdering" )
-					.below( null )
-					.createQuery();
-
-		helper.assertThat( query ).from( Month.class ).matchesExactlyIds( 3 );
-	}
-
-	@Test
 	public void testRangeQueryAbove() throws Exception {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
@@ -867,7 +845,6 @@ public class DSLTest {
 						"Historically colder than any other month in the northern hemisphere",
 						january,
 						0.231d,
-						"jan",
 						"<escaped>Month</escaped> of <em>colder</em> and <strong>whitening</strong>"
 				)
 		);
@@ -881,7 +858,6 @@ public class DSLTest {
 						"Historically, the month where we make babies while watching the whitening landscape",
 						february,
 						0.435d,
-						"feb",
 						"Month of <em>snowboarding</em>"
 				)
 		);
@@ -895,7 +871,6 @@ public class DSLTest {
 						"Historically, the month in which we actually find time to go snowboarding.",
 						march,
 						0.435d,
-						"-mar",
 						"Month of <strong>fake</strong> spring"
 				)
 		);
