@@ -25,8 +25,10 @@ import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
  * Represents a set of types and the corresponding indexes,
  * allowing to build search-related objects (query, predicate, ...)
  * taking into account the relevant indexes and their metadata (underlying technology, field types, ...).
+ *
+ * @param <E> A supertype of all types in this scope.
  */
-public interface SearchScope {
+public interface SearchScope<E> {
 
 	/**
 	 * Initiate the building of a search predicate.
@@ -95,6 +97,6 @@ public interface SearchScope {
 	/**
 	 * @return A set containing one {@link SearchIndexedEntity} for each indexed entity in this scope.
 	 */
-	Set<? extends SearchIndexedEntity<?>> includedTypes();
+	Set<? extends SearchIndexedEntity<? extends E>> includedTypes();
 
 }

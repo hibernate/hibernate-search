@@ -21,11 +21,11 @@ import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
-public class SearchScopeImpl implements SearchScope {
+public class SearchScopeImpl<E> implements SearchScope<E> {
 
-	private final PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<?>> delegate;
+	private final PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<? extends E>> delegate;
 
-	public SearchScopeImpl(PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<?>> delegate) {
+	public SearchScopeImpl(PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<? extends E>> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -50,7 +50,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	@Override
-	public Set<? extends SearchIndexedEntity<?>> includedTypes() {
+	public Set<? extends SearchIndexedEntity<? extends E>> includedTypes() {
 		return delegate.includedIndexedTypes();
 	}
 

@@ -72,17 +72,17 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	}
 
 	@Override
-	public SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types) {
+	public <T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<? extends T>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope) {
-		return search( (SearchScopeImpl) scope );
+	public <T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope<T> scope) {
+		return search( (SearchScopeImpl<T>) scope );
 	}
 
 	@Override
-	public SearchScopeImpl scope(Collection<? extends Class<?>> types) {
+	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
 		return mappingContext.createScope( types );
 	}
 
@@ -140,8 +140,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), identifier );
 	}
 
-	private SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl scope) {
-		return ( (SearchScopeImpl) scope ).search( this, this );
+	private <T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl<T> scope) {
+		return scope.search( this, this );
 	}
 
 	public static class Builder

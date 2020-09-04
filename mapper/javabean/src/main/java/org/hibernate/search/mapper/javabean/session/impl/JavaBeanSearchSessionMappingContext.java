@@ -13,6 +13,6 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingCont
 
 public interface JavaBeanSearchSessionMappingContext extends PojoSearchSessionMappingContext {
 
-	SearchScopeImpl createScope(Collection<? extends Class<?>> types);
+	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 
 }
