@@ -137,7 +137,7 @@ public class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3994")
 	public void scope_indexedEntities() {
-		SearchScope objectScope = mapping.scope( Object.class );
+		SearchScope<Object> objectScope = mapping.scope( Object.class );
 		Set<? extends SearchIndexedEntity<?>> objectEntities = objectScope.includedTypes();
 		assertThat( objectEntities )
 				.extracting( SearchIndexedEntity::name )
@@ -146,16 +146,16 @@ public class SearchMappingIT {
 						Pet.ENTITY_NAME
 				);
 
-		SearchScope personScope = mapping.scope( Person.class );
-		Set<? extends SearchIndexedEntity<?>> personEntities = personScope.includedTypes();
+		SearchScope<Person> personScope = mapping.scope( Person.class );
+		Set<? extends SearchIndexedEntity<? extends Person>> personEntities = personScope.includedTypes();
 		assertThat( personEntities )
 				.extracting( SearchIndexedEntity::name )
 				.containsExactlyInAnyOrder(
 						Person.ENTITY_NAME
 				);
 
-		SearchScope petScope = mapping.scope( Pet.class );
-		Set<? extends SearchIndexedEntity<?>> petEntities = petScope.includedTypes();
+		SearchScope<Pet> petScope = mapping.scope( Pet.class );
+		Set<? extends SearchIndexedEntity<? extends Pet>> petEntities = petScope.includedTypes();
 		assertThat( petEntities )
 				.extracting( SearchIndexedEntity::name )
 				.containsExactlyInAnyOrder(

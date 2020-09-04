@@ -50,7 +50,7 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	@Override
-	public SearchScope scope(Collection<? extends Class<?>> targetedTypes) {
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> targetedTypes) {
 		return createScope( targetedTypes );
 	}
 
@@ -70,13 +70,13 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	@Override
-	public SearchScopeImpl createScope(Collection<? extends Class<?>> classes) {
-		List<PojoRawTypeIdentifier<?>> typeIdentifiers = new ArrayList<>( classes.size() );
-		for ( Class<?> clazz : classes ) {
+	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
+		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
+		for ( Class<? extends T> clazz : classes ) {
 			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
 		}
 
-		return new SearchScopeImpl( delegate().createPojoScope( this, typeIdentifiers,
+		return new SearchScopeImpl<>( delegate().createPojoScope( this, typeIdentifiers,
 				typeContextContainer::indexedForExactType ) );
 	}
 

@@ -30,10 +30,11 @@ public interface SearchSession extends AutoCloseable {
 	 * The query will target the indexes mapped to the given type, or to any of its sub-types.
 	 *
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
+	 * @param <T> An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	default SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Class<?> type) {
+	default <T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Class<T> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -43,10 +44,11 @@ public interface SearchSession extends AutoCloseable {
 	 * The query will target the indexes mapped to the given types, or to any of their sub-types.
 	 *
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types);
+	<T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Initiate the building of a search query.
@@ -54,19 +56,21 @@ public interface SearchSession extends AutoCloseable {
 	 * The query will target the indexes in the given scope.
 	 *
 	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all types in the given scope.
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope);
+	<T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope<T> scope);
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.
 	 *
 	 * @param type A type to include in the scope.
+	 * @param <T> A type to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default SearchScope scope(Class<?> type) {
+	default <T> SearchScope<T> scope(Class<T> type) {
 		return scope( Collections.singleton( type ) );
 	}
 
@@ -74,10 +78,11 @@ public interface SearchSession extends AutoCloseable {
 	 * Create a {@link SearchScope} limited to the given types.
 	 *
 	 * @param types A collection of types to include in the scope.
+	 * @param <T> A supertype of all types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	SearchScope scope(Collection<? extends Class<?>> types);
+	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * @return The indexing plan for this session. It will be executed upon closing this session.

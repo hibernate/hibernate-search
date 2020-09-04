@@ -21,10 +21,11 @@ public interface SearchMapping {
 	 * Create a {@link SearchScope} limited to the given type.
 	 *
 	 * @param type A type to include in the scope.
+	 * @param <T> A type to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default SearchScope scope(Class<?> type) {
+	default <T> SearchScope<T> scope(Class<T> type) {
 		return scope( Collections.singleton( type ) );
 	}
 
@@ -32,10 +33,11 @@ public interface SearchMapping {
 	 * Create a {@link SearchScope} limited to the given types.
 	 *
 	 * @param types A collection of types to include in the scope.
+	 * @param <T> A supertype of all types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	SearchScope scope(Collection<? extends Class<?>> types);
+	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * @return A new session allowing to {@link SearchSession#indexingPlan() index} or
