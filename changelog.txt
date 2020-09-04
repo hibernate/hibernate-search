@@ -1,6 +1,36 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta10 (04-09-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3988 Using search(...).select(...) drops the type of loading options and prevents their definition
+
+** Improvement
+    * HSEARCH-3787 Support hard timeout on Hibernate ORM entity loading
+    * HSEARCH-3774 Improve the timeout implementation for Elasticsearch
+    * HSEARCH-3517 Optimize the computation of total hit count
+    * HSEARCH-3309 Allow per-index analyzer definitions in Elasticsearch
+
+** New Feature
+    * HSEARCH-3993 Add default identifier bridges for types character, boolean, byte, float, double
+    * HSEARCH-3974 Backend-specific extensions for scroll
+    * HSEARCH-3613 Allow field access to property with the JavaBean mapper
+
+** Task
+    * HSEARCH-3989 Upgrade to Hibernate ORM 5.4.21.Final
+    * HSEARCH-3987 Remove dead code related to "*Expectations" classes in the backend TCK
+    * HSEARCH-3984 Upgrade to Elasticsearch 7.9.0
+    * HSEARCH-3983 Upgrade to Lucene 8.6.1
+    * HSEARCH-3981 Upgrade to Hibernate ORM 5.4.20.Final
+    * HSEARCH-3980 Expose multiValuedInRoot in the metamodel
+    * HSEARCH-3979 Rename @IndexedEmbedded.maxDepth to includeDepth
+    * HSEARCH-3975 Expose scrolling operations through JPA/ORM queries
+    * HSEARCH-3973 Re-enable SearchQueryEntityLoadingGraphIT.lazy_fetch
+    * HSEARCH-3108 Search 6 groundwork - Restore support for indexing event interceptors
+    * HSEARCH-2505 Lower the default read timeout with Elasticsearch
+
 6.0.0.Beta9 (31-07-2020)
 -------------------------
 
