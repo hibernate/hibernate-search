@@ -12,10 +12,8 @@ import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 
 import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
@@ -31,10 +29,8 @@ import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
-import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -129,27 +125,6 @@ public class SortingTest {
 				.matching( person.id )
 				.createQuery();
 		assertStoredValueEquals( query, "collatedName", person.name );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2376")
-	@Category(SkipOnElasticsearch.class) // Elasticsearch handles sorts on multi-value fields differently (the default is unclear, but it provides "sort modes" like min, max, avg, etc.)
-	public void testSortingOnTokenizedString() {
-		// Index all testData:
-		helper.index(
-				new Person( 0, 3, "elizabeth" ),
-				new Person( 1, 10, "zach other" ),
-				new Person( 2, 9, " edric" ),
-				new Person( 3, 5, "bob" ),
-				new Person( 4, 10, "zach Aaron" )
-		);
-
-		// Sorting by tokenized name: ensure only the first token is taken into account
-		Sort sortAsString = builder().sort()
-				.byField( "tokenizedName" )
-				.andByNative( SortField.FIELD_DOC )
-				.createSort();
-		assertSortedResults( sortAsString, 3, 2, 0, 1, 4 );
 	}
 
 	@Test
@@ -248,7 +223,6 @@ public class SortingTest {
 	private class Person {
 
 		public static final String COLLATING_NORMALIZER_NAME = AnalysisNames.NORMALIZER_LOWERCASE_ASCIIFOLDING;
-		public static final String TOKENIZING_ANALYZER_NAME = AnalysisNames.ANALYZER_WHITESPACE;
 
 		@DocumentId
 		@Field
@@ -270,13 +244,11 @@ public class SortingTest {
 
 		@SortableFields({
 				@org.hibernate.search.annotations.SortableField(forField = "name"),
-				@org.hibernate.search.annotations.SortableField(forField = "collatedName"),
-				@org.hibernate.search.annotations.SortableField(forField = "tokenizedName")
+				@org.hibernate.search.annotations.SortableField(forField = "collatedName")
 		})
 		@Fields({
 				@Field(name = "name", store = Store.YES, analyze = Analyze.NO, indexNullAs = "_null_"),
-				@Field(name = "collatedName", store = Store.YES, normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME)),
-				@Field(name = "tokenizedName", store = Store.YES, analyzer = @Analyzer(definition = TOKENIZING_ANALYZER_NAME))
+				@Field(name = "collatedName", store = Store.YES, normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME))
 		})
 		final String name;
 
