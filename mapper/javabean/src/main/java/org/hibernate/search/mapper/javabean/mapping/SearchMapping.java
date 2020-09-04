@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
@@ -48,6 +49,27 @@ public interface SearchMapping {
 	 * @see #createSession()
 	 */
 	SearchSessionBuilder createSessionWithOptions();
+
+	/**
+	 * @param entityType The type of an indexed entity.
+	 * This must be the exact type; passing the type of a mapped-superclass for example will not work.
+	 * @return A {@link SearchIndexedEntity} for the indexed entity with the exact given type.
+	 * @param <E> The type of an indexed entity.
+	 * @throws org.hibernate.search.util.common.SearchException If the type does not match any indexed entity.
+	 */
+	<E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType);
+
+	/**
+	 * @param entityName The name of an indexed entity. See {@link SearchMappingBuilder#addEntityType(Class, String)}.
+	 * @return A {@link SearchIndexedEntity} for the indexed entity with the given name.
+	 * @throws org.hibernate.search.util.common.SearchException If the name does not match any indexed entity.
+	 */
+	SearchIndexedEntity<?> indexedEntity(String entityName);
+
+	/**
+	 * @return A collection containing one {@link SearchIndexedEntity} for each indexed entity
+	 */
+	Collection<? extends SearchIndexedEntity<?>> allIndexedEntities();
 
 	static SearchMappingBuilder builder() {
 		return builder( MethodHandles.publicLookup() );

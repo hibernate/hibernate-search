@@ -48,4 +48,10 @@ public interface Log extends BasicLogger {
 					+ " but there was an attempt to configure entity loading."
 	)
 	SearchException entityLoadingConfigurationNotSupported();
+
+	@Message(id = ID_OFFSET_1 + 9, value = "Type '%1$s' is not an entity type, or the entity is not indexed.")
+	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
+
+	@Message(id = ID_OFFSET_1 + 10, value = "Entity '%1$s' does not exist or is not indexed.")
+	SearchException notIndexedEntityName(String name);
 }
