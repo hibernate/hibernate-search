@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -25,6 +26,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -39,7 +41,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 
 public class SearchMappingIT {
@@ -146,10 +147,39 @@ public class SearchMappingIT {
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void allIndexedEntities() {
 		Collection<? extends SearchIndexedEntity<?>> entities = mapping.allIndexedEntities();
-		Assertions.<SearchIndexedEntity<?>>assertThat( entities )
+		assertThat( entities )
 				.extracting( SearchIndexedEntity::jpaName )
 				.containsExactlyInAnyOrder(
 						Person.JPA_ENTITY_NAME,
+						Pet.JPA_ENTITY_NAME
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3994")
+	public void scope_indexedEntities() {
+		SearchScope<Object> objectScope = mapping.scope( Object.class );
+		Set<? extends SearchIndexedEntity<?>> objectEntities = objectScope.includedTypes();
+		assertThat( objectEntities )
+				.extracting( SearchIndexedEntity::jpaName )
+				.containsExactlyInAnyOrder(
+						Person.JPA_ENTITY_NAME,
+						Pet.JPA_ENTITY_NAME
+				);
+
+		SearchScope<Person> personScope = mapping.scope( Person.class );
+		Set<? extends SearchIndexedEntity<? extends Person>> personEntities = personScope.includedTypes();
+		assertThat( personEntities )
+				.extracting( SearchIndexedEntity::jpaName )
+				.containsExactlyInAnyOrder(
+						Person.JPA_ENTITY_NAME
+				);
+
+		SearchScope<Pet> petScope = mapping.scope( Pet.class );
+		Set<? extends SearchIndexedEntity<? extends Pet>> petEntities = petScope.includedTypes();
+		assertThat( petEntities )
+				.extracting( SearchIndexedEntity::jpaName )
+				.containsExactlyInAnyOrder(
 						Pet.JPA_ENTITY_NAME
 				);
 	}
