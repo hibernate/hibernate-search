@@ -14,6 +14,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -84,21 +85,22 @@ public interface SearchMapping {
 	 * @param entityType The type of an indexed entity.
 	 * This must be the exact type; passing the type of a mapped-superclass for example will not work.
 	 * @return A {@link SearchIndexedEntity} for the indexed entity with the exact given type.
+	 * @param <E> The type of an indexed entity.
 	 * @throws org.hibernate.search.util.common.SearchException If the type does not match any indexed entity.
 	 */
-	SearchIndexedEntity indexedEntity(Class<?> entityType);
+	<E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType);
 
 	/**
 	 * @param entityName The name of an indexed entity. See {@link Entity#name()}.
 	 * @return A {@link SearchIndexedEntity} for the indexed entity with the given name.
 	 * @throws org.hibernate.search.util.common.SearchException If the name does not match any indexed entity.
 	 */
-	SearchIndexedEntity indexedEntity(String entityName);
+	SearchIndexedEntity<?> indexedEntity(String entityName);
 
 	/**
 	 * @return A collection containing one {@link SearchIndexedEntity} for each indexed entity
 	 */
-	Collection<? extends SearchIndexedEntity> allIndexedEntities();
+	Collection<? extends SearchIndexedEntity<?>> allIndexedEntities();
 
 	/**
 	 * @param indexName The name of an index. See {@link Indexed#index()}.

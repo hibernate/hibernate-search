@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmEntityIdEntityLoader;
@@ -22,7 +22,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
-		implements SearchIndexedEntity, HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
+		implements SearchIndexedEntity<E>, HibernateOrmSessionIndexedTypeContext<E>,
+				HibernateOrmScopeIndexedTypeContext<E> {
 
 	private final boolean documentIdIsEntityId;
 	private final EntityLoaderFactory loaderFactory;
@@ -58,7 +59,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public Class<?> javaClass() {
+	public Class<E> javaClass() {
 		return typeIdentifier().javaClass();
 	}
 

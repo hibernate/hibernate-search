@@ -22,8 +22,8 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescrip
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +45,7 @@ public class SearchMappingIndexedEntitiesIT {
 	public void indexedEntities() {
 		//tag::indexedEntities[]
 		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
-		SearchIndexedEntity bookEntity = mapping.indexedEntity( Book.class ); // <2>
+		SearchIndexedEntity<Book> bookEntity = mapping.indexedEntity( Book.class ); // <2>
 		String jpaName = bookEntity.jpaName(); // <3>
 		IndexManager indexManager = bookEntity.indexManager(); // <4>
 		Backend backend = indexManager.backend(); // <5>
@@ -53,13 +53,13 @@ public class SearchMappingIndexedEntitiesIT {
 		assertThat( jpaName ).isEqualTo( "Book" );
 		//tag::indexedEntities[]
 
-		SearchIndexedEntity bookEntity2 = mapping.indexedEntity( "Book" ); // <6>
+		SearchIndexedEntity<?> bookEntity2 = mapping.indexedEntity( "Book" ); // <6>
 		Class<?> javaClass = bookEntity2.javaClass();
 		//end::indexedEntities[]
 		assertThat( javaClass ).isEqualTo( Book.class );
 		//tag::indexedEntities[]
 
-		for ( SearchIndexedEntity entity : mapping.allIndexedEntities() ) { // <7>
+		for ( SearchIndexedEntity<?> entity : mapping.allIndexedEntities() ) { // <7>
 			//end::indexedEntities[]
 			assertThat( entity.jpaName() ).isEqualTo( "Book" );
 			//tag::indexedEntities[]
@@ -72,7 +72,7 @@ public class SearchMappingIndexedEntitiesIT {
 	public void indexMetamodel() {
 		SearchMapping mapping = Search.mapping( entityManagerFactory );
 		//tag::indexMetamodel[]
-		SearchIndexedEntity bookEntity = mapping.indexedEntity( Book.class ); // <1>
+		SearchIndexedEntity<Book> bookEntity = mapping.indexedEntity( Book.class ); // <1>
 		IndexManager indexManager = bookEntity.indexManager(); // <2>
 		IndexDescriptor indexDescriptor = indexManager.descriptor(); // <3>
 
