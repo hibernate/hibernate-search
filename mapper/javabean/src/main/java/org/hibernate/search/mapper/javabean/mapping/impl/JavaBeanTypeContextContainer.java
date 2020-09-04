@@ -23,12 +23,12 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 	private JavaBeanTypeContextContainer(Builder builder) {
 		for ( JavaBeanIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			JavaBeanIndexedTypeContext<?> indexedTypeContext = contextBuilder.build();
-			indexedTypeContextsByEntityName.put( indexedTypeContext.getEntityName(), indexedTypeContext );
+			indexedTypeContextsByEntityName.put( indexedTypeContext.name(), indexedTypeContext );
 		}
 	}
 
 	@Override
-	public JavaBeanSessionIndexedTypeContext<?> getIndexedByEntityName(String indexName) {
+	public JavaBeanSessionIndexedTypeContext<?> indexedForEntityName(String indexName) {
 		return indexedTypeContextsByEntityName.get( indexName );
 	}
 

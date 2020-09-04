@@ -25,17 +25,17 @@ class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
 	}
 
 	@Override
-	public String getEntityName() {
+	public String name() {
 		return entityName;
 	}
 
 	@Override
-	public IdentifierMapping getIdentifierMapping() {
+	public IdentifierMapping identifierMapping() {
 		return identifierMapping;
 	}
 
