@@ -15,7 +15,6 @@ import static org.easymock.EasyMock.verify;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 
 import org.easymock.Capture;
@@ -26,6 +25,7 @@ public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends Abstrac
 
 	private final MassIndexingFailureHandler failureHandler = EasyMock.createMock( MassIndexingFailureHandler.class );
 	private final Capture<MassIndexingFailureContext> genericFailureContextCapture = EasyMock.newCapture();
+	private final Capture<MassIndexingFailureContext> genericFailureContextCaptureII = EasyMock.newCapture();
 	private final Capture<MassIndexingEntityFailureContext> entityFailureContextCapture = EasyMock.newCapture();
 
 	@Override
@@ -68,34 +68,30 @@ public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends Abstrac
 	}
 
 	@Override
-	protected void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString) {
+	protected void expectEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString) {
 		reset( failureHandler );
-		failureHandler.handle( capture( entityFailureContextCapture ) );
+		failureHandler.handle( capture( genericFailureContextCapture ) );
+		failureHandler.handle( capture( genericFailureContextCaptureII ) );
 		replay( failureHandler );
 	}
 
 	@Override
-	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString) {
+	protected void assertEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString) {
 		verify( failureHandler );
 
-		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
+		MassIndexingFailureContext context = genericFailureContextCapture.getValue();
+		MassIndexingFailureContext contextII = genericFailureContextCaptureII.getValue();
+
+		assertThat( context ).isEqualTo( contextII );
+
 		MatcherAssert.assertThat(
 				context.throwable(),
-				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "Exception while invoking" )
-						.causedBy( SimulatedError.class )
+				ExceptionMatcherBuilder.isException( SimulatedError.class )
 						.withMessage( exceptionMessage )
 						.build()
 		);
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
-		assertThat( context.entityReferences() )
-				.hasSize( 1 )
-				.element( 0 )
-				.asString()
-				.isEqualTo( entityReferenceAsString );
 	}
 
 	@Override

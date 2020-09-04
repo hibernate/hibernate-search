@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.massindexing;
 
+import java.util.Objects;
+
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -78,6 +80,24 @@ public class MassIndexingFailureContext {
 	@Deprecated
 	public Object getFailingOperation() {
 		return failingOperation();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		MassIndexingFailureContext that = (MassIndexingFailureContext) o;
+		return Objects.equals( throwable, that.throwable ) &&
+				Objects.equals( failingOperation, that.failingOperation );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( throwable, failingOperation );
 	}
 
 	public static class Builder {

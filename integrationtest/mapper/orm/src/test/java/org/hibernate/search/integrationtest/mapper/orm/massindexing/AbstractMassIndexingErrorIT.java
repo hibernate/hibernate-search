@@ -88,7 +88,7 @@ public abstract class AbstractMassIndexingErrorIT {
 						.hasCauseInstanceOf( SimulatedError.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.FAIL ),
+				expectIndexingWorks( ExecutionExpectation.ERROR ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
@@ -103,82 +103,47 @@ public abstract class AbstractMassIndexingErrorIT {
 	public void getId() {
 		SessionFactory sessionFactory = setup();
 
-		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
 		String exceptionMessage = "getId failure";
-		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
+		String failingOperationAsString = "MassIndexer operation";
 
-		expectEntityGetterFailureHandling(
-				entityName, entityReferenceAsString,
-				exceptionMessage, failingOperationAsString
-		);
+		expectEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
 
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageContainingAll(
-								"1 entities could not be indexed",
-								"See the logs for details.",
-								"First failure on entity 'Book#2': ",
-								"Exception while invoking"
-						)
-						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" ),
-				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
+						.hasMessageContaining( exceptionMessage ),
+				ExecutionExpectation.ERROR, ExecutionExpectation.STOP,
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
+				expectIndexingWorks( ExecutionExpectation.STOP )
+				// no final refresh && flush
 		);
 
-		assertEntityGetterFailureHandling(
-				entityName, entityReferenceAsString,
-				exceptionMessage, failingOperationAsString
-		);
+		assertEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
 	}
 
 	@Test
 	public void getTitle() {
 		SessionFactory sessionFactory = setup();
 
-		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
 		String exceptionMessage = "getTitle failure";
-		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
+		String failingOperationAsString = "MassIndexer operation";
 
-		expectEntityGetterFailureHandling(
-				entityName, entityReferenceAsString,
-				exceptionMessage, failingOperationAsString
-		);
+		expectEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
 
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageContainingAll(
-								"1 entities could not be indexed",
-								"See the logs for details.",
-								"First failure on entity 'Book#2': ",
-								"Exception while invoking"
-						)
-						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" ),
-				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
+						.hasMessageContaining( exceptionMessage ),
+				ExecutionExpectation.SUCCEED, ExecutionExpectation.ERROR,
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
+				expectIndexingWorks( ExecutionExpectation.STOP )
 		);
 
-		assertEntityGetterFailureHandling(
-				entityName, entityReferenceAsString,
-				exceptionMessage, failingOperationAsString
-		);
+		assertEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
 	}
 
 	@Test
@@ -218,7 +183,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessageContaining( exceptionMessage ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.ERROR )
 		);
 
 		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
@@ -239,7 +204,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessageContaining( exceptionMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.ERROR )
 		);
 
 		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
@@ -263,7 +228,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.ERROR )
 		);
 
 		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
@@ -286,7 +251,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.ERROR )
 		);
 
 		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
@@ -310,7 +275,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.ERROR )
 		);
 
 		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
@@ -352,8 +317,8 @@ public abstract class AbstractMassIndexingErrorIT {
 						),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.FAIL ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.FAIL )
+				expectIndexingWorks( ExecutionExpectation.ERROR ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.ERROR )
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
@@ -399,9 +364,9 @@ public abstract class AbstractMassIndexingErrorIT {
 						),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.FAIL ),
+				expectIndexingWorks( ExecutionExpectation.ERROR ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.ERROR )
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
@@ -427,11 +392,9 @@ public abstract class AbstractMassIndexingErrorIT {
 	protected abstract void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString);
+	protected abstract void expectEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString);
+	protected abstract void assertEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString);
 
 	protected abstract void expectMassIndexerOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
@@ -469,8 +432,8 @@ public abstract class AbstractMassIndexingErrorIT {
 			Consumer<Throwable> thrownExpectation,
 			ExecutionExpectation book2GetIdExpectation, ExecutionExpectation book2GetTitleExpectation,
 			Runnable ... expectationSetters) {
-		Book.failOnBook2GetId.set( ExecutionExpectation.FAIL.equals( book2GetIdExpectation ) );
-		Book.failOnBook2GetTitle.set( ExecutionExpectation.FAIL.equals( book2GetTitleExpectation ) );
+		Book.failOnBook2GetId.set( ExecutionExpectation.ERROR.equals( book2GetIdExpectation ) );
+		Book.failOnBook2GetTitle.set( ExecutionExpectation.ERROR.equals( book2GetTitleExpectation ) );
 		AssertionError assertionError = null;
 		try {
 			MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
@@ -548,13 +511,13 @@ public abstract class AbstractMassIndexingErrorIT {
 					backendMock.expectIndexScaleWorks( Book.NAME )
 							.indexScaleWork( type );
 					break;
-				case FAIL:
+				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
 					failingFuture.completeExceptionally( new SimulatedError( type.name() + " failure" ) );
 					backendMock.expectIndexScaleWorks( Book.NAME )
 							.indexScaleWork( type, failingFuture );
 					break;
-				case SKIP:
+				case STOP:
 					break;
 			}
 		};
@@ -581,7 +544,7 @@ public abstract class AbstractMassIndexingErrorIT {
 							)
 							.processedThenExecuted();
 					break;
-				case FAIL:
+				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
 					failingFuture.completeExceptionally( new SimulatedError( "Indexing failure" ) );
 					backendMock.expectWorksAnyOrder(
@@ -605,17 +568,13 @@ public abstract class AbstractMassIndexingErrorIT {
 							)
 							.processedThenExecuted( failingFuture );
 					break;
-				case SKIP:
+				case STOP:
 					backendMock.expectWorksAnyOrder(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
 									.field( "title", TITLE_1 )
 									.field( "author", AUTHOR_1 )
-							)
-							.add( "3", b -> b
-									.field( "title", TITLE_3 )
-									.field( "author", AUTHOR_3 )
 							)
 							.processedThenExecuted();
 					break;
@@ -649,8 +608,8 @@ public abstract class AbstractMassIndexingErrorIT {
 
 	private enum ExecutionExpectation {
 		SUCCEED,
-		FAIL,
-		SKIP;
+		ERROR,
+		STOP;
 	}
 
 	private enum ThreadExpectation {
@@ -716,7 +675,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		}
 	}
 
-	protected static class SimulatedError extends RuntimeException {
+	protected static class SimulatedError extends Error {
 		SimulatedError(String message) {
 			super( message );
 		}

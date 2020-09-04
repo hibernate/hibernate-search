@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
@@ -52,25 +51,19 @@ public class MassIndexingErrorDefaultBackgroundFailureHandlerIT extends Abstract
 	}
 
 	@Override
-	protected void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString) {
+	protected void expectEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString) {
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "Exception while invoking" )
-						.causedBy( SimulatedError.class )
+				ExceptionMatcherBuilder.isException( SimulatedError.class )
 						.withMessage( exceptionMessage )
 						.build(),
-				failingOperationAsString,
-				"Entities that could not be indexed correctly:",
-				entityReferenceAsString
+				failingOperationAsString
 		)
-				.once();
+				.times( 2 );
 	}
 
 	@Override
-	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString) {
+	protected void assertEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString) {
 		// If we get there, everything works fine.
 	}
 
