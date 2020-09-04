@@ -23,8 +23,8 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -76,7 +76,7 @@ public class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void indexedEntity_byName() {
-		SearchIndexedEntity entity = mapping.indexedEntity( Person.JPA_ENTITY_NAME );
+		SearchIndexedEntity<?> entity = mapping.indexedEntity( Person.JPA_ENTITY_NAME );
 		assertThat( entity )
 				.isNotNull()
 				.returns( Person.JPA_ENTITY_NAME, SearchIndexedEntity::jpaName )
@@ -114,7 +114,7 @@ public class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void indexedEntity_byJavaClass() {
-		SearchIndexedEntity entity = mapping.indexedEntity( Person.class );
+		SearchIndexedEntity<Person> entity = mapping.indexedEntity( Person.class );
 		assertThat( entity )
 				.isNotNull()
 				.returns( Person.JPA_ENTITY_NAME, SearchIndexedEntity::jpaName )
@@ -145,8 +145,8 @@ public class SearchMappingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void allIndexedEntities() {
-		Collection<? extends SearchIndexedEntity> entities = mapping.allIndexedEntities();
-		Assertions.<SearchIndexedEntity>assertThat( entities )
+		Collection<? extends SearchIndexedEntity<?>> entities = mapping.allIndexedEntities();
+		Assertions.<SearchIndexedEntity<?>>assertThat( entities )
 				.extracting( SearchIndexedEntity::jpaName )
 				.containsExactlyInAnyOrder(
 						Person.JPA_ENTITY_NAME,

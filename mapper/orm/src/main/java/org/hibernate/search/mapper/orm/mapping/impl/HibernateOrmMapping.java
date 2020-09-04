@@ -38,9 +38,9 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -198,10 +198,10 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public SearchIndexedEntity indexedEntity(Class<?> entityType) {
-		PojoRawTypeIdentifier<?> typeIdentifier =
+	public <E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType) {
+		PojoRawTypeIdentifier<E> typeIdentifier =
 				typeContextContainer.typeIdentifierForJavaClass( entityType );
-		SearchIndexedEntity type = typeContextContainer.indexedForExactType( typeIdentifier );
+		SearchIndexedEntity<E> type = typeContextContainer.indexedForExactType( typeIdentifier );
 		if ( type == null ) {
 			throw log.notIndexedEntityType( entityType );
 		}
@@ -209,10 +209,10 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public SearchIndexedEntity indexedEntity(String entityName) {
+	public SearchIndexedEntity<?> indexedEntity(String entityName) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
 				typeContextContainer.typeIdentifierForEntityName( entityName );
-		SearchIndexedEntity type = typeContextContainer.indexedForExactType( typeIdentifier );
+		SearchIndexedEntity<?> type = typeContextContainer.indexedForExactType( typeIdentifier );
 		if ( type == null ) {
 			throw log.notIndexedEntityName( entityName );
 		}
@@ -220,7 +220,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public Collection<SearchIndexedEntity> allIndexedEntities() {
+	public Collection<SearchIndexedEntity<?>> allIndexedEntities() {
 		return Collections.unmodifiableCollection( typeContextContainer.allIndexed() );
 	}
 
