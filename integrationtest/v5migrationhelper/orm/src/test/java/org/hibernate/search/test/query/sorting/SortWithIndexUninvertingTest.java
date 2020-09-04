@@ -12,13 +12,13 @@ import java.util.Map;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Book;
 import org.hibernate.search.testsupport.TestConstants;
@@ -72,9 +72,10 @@ public class SortWithIndexUninvertingTest extends SearchTestBase {
 	public void testCombinedQueryOnIndexWithSortFieldAndIndexToBeUninverted() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Plumber.class ).get();
 		Query query = queryParser.parse( "name:Bill" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Plumber.class, BrickLayer.class );
-		Sort sort = new Sort( new SortField( "sortName", SortField.Type.STRING ) ); //ASC
+		Sort sort = qb.sort().byField( "sortName" ).createSort(); //ASC
 		hibQuery.setSort( sort );
 
 		@SuppressWarnings("unchecked")
@@ -97,9 +98,10 @@ public class SortWithIndexUninvertingTest extends SearchTestBase {
 	public void testQueryOnIndexSharedByEntityWithRequiredSortFieldAndEntityWithoutRaisesException() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Thatcher.class ).get();
 		Query query = queryParser.parse( "name:Bill" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Thatcher.class, BrickLayer.class );
-		Sort sort = new Sort( new SortField( "sortName", SortField.Type.STRING ) ); //ASC
+		Sort sort = qb.sort().byField( "sortName" ).createSort(); //ASC
 		hibQuery.setSort( sort );
 
 		try {

@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -68,10 +67,11 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 	public void testSortingOnSortableFieldIncludedByIndexEmbedded() {
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
 			Transaction transaction = fullTextSession.beginTransaction();
 
 			// This should be of type Integer
-			Sort sort = new Sort( new SortField( "sortableVillain.id_sort", SortField.Type.STRING ) );
+			Sort sort = qb.sort().byField( "sortableVillain.id_sort" ).createSort();
 
 			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
 			Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();
@@ -94,9 +94,10 @@ public class EmbeddedSortableIdFieldTest extends SearchTestBase {
 
 		try ( Session session = openSession() ) {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
 			Transaction transaction = fullTextSession.beginTransaction();
 
-			Sort sort = new Sort( new SortField( "villain.id_sort", SortField.Type.STRING ) );
+			Sort sort = qb.sort().byField( "villain.id_sort" ).createSort();
 
 			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Hero.class ).get();
 			Query q = queryBuilder.keyword().onField( "villain.name" ).matching( LEX ).createQuery();

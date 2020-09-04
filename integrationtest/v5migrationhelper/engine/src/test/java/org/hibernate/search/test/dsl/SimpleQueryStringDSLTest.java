@@ -9,7 +9,6 @@ package org.hibernate.search.test.dsl;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.SortField.Type;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.AnalysisNames;
@@ -52,7 +51,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "balanced arabica" )
 				.createQuery();
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Dulsão do Brasil", "Kazaar", "Livanto" );
 
 		query = qb.simpleQueryString()
@@ -61,7 +60,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "-balanced arabica" )
 				.createQuery();
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Bukeela ka Ethiopia", "Linizio Lungo", "Volluto" );
 
 		query = qb.simpleQueryString()
@@ -70,7 +69,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "powerful \"fruity note\"" )
 				.createQuery();
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Ristretto" );
 
 		query = qb.simpleQueryString()
@@ -78,7 +77,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "sweet robust" )
 				.createQuery();
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Caramelito", "Dulsão do Brasil", "Roma", "Volluto" );
 	}
 
@@ -122,7 +121,7 @@ public class SimpleQueryStringDSLTest {
 			.createQuery();
 
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Decaffeinato", "Ristretto", "Rosabaya de Colombia", "Volluto" );
 	}
 
@@ -139,7 +138,7 @@ public class SimpleQueryStringDSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Book.class )
-				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
+				.sort( qb.sort().byField( "title_sort" ).createSort() )
 				.matchesExactlyIds( "Le Grand Molière illustré", "Tartuffe" );
 
 		query = qb.simpleQueryString()
@@ -149,7 +148,7 @@ public class SimpleQueryStringDSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Book.class )
-				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
+				.sort( qb.sort().byField( "title_sort" ).createSort() )
 				.matchesExactlyIds( "Le chat qui déplaçait des montagnes" );
 
 		qb = sfHolder.getSearchFactory()
@@ -164,7 +163,7 @@ public class SimpleQueryStringDSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Book.class )
-				.sort( new Sort( new SortField( "title_sort", SortField.Type.STRING ) ) )
+				.sort( qb.sort().byField( "title_sort" ).createSort() )
 				.matchesExactlyIds( "Dom Garcie de Navarre", "Le Grand Molière illustré" );
 	}
 	@Test
@@ -197,7 +196,7 @@ public class SimpleQueryStringDSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesNone();
 	}
 
@@ -214,7 +213,7 @@ public class SimpleQueryStringDSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesNone();
 
 		query = qb.simpleQueryString()
@@ -224,7 +223,7 @@ public class SimpleQueryStringDSLTest {
 				.createQuery();
 
 		helper.assertThat( query ).from( Coffee.class )
-				.sort( new Sort( new SortField( Coffee.NAME_SORT, Type.STRING ) ) )
+				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesNone();
 	}
 

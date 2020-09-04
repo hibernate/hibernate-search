@@ -17,8 +17,6 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
@@ -26,6 +24,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.stat.Statistics;
@@ -285,10 +284,11 @@ public class LuceneQueryTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 6 );
 
@@ -307,10 +307,11 @@ public class LuceneQueryTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
 
@@ -340,6 +341,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
@@ -347,7 +349,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery.setFetchSize( 3 );
 		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 3 );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
@@ -431,10 +433,11 @@ public class LuceneQueryTest extends SearchTestBase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 
 

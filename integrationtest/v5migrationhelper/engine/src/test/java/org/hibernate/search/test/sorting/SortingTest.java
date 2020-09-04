@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
@@ -24,10 +25,7 @@ import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.AnalysisNames;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -67,17 +65,17 @@ public class SortingTest {
 		);
 
 		// Sorting Age as string:
-		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
+		Sort sortAsString = builder().sort().byField( "ageForStringSorting" ).createSort();
 		assertSortedResults( sortAsString, 1, 0, 3, 2 );
 		// Also check reverse, to ensure this wasn't just luck
-		sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING, true ) );
+		sortAsString = builder().sort().byField( "ageForStringSorting" ).desc().createSort();
 		assertSortedResults( sortAsString, 2, 3, 0, 1 );
 
 		// Sorting Age as Int (numeric):
-		Sort sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT ) );
+		Sort sortAsInt = builder().sort().byField( "ageForIntSorting" ).createSort();
 		assertSortedResults( sortAsInt, 0, 3, 2, 1 );
 		// Also check reverse, to ensure this wasn't just luck
-		sortAsInt = new Sort( new SortField( "ageForIntSorting", SortField.Type.INT, true ) );
+		sortAsInt = builder().sort().byField( "ageForIntSorting" ).desc().createSort();
 		assertSortedResults( sortAsInt, 1, 2, 3, 0 );
 	}
 
@@ -92,7 +90,7 @@ public class SortingTest {
 		);
 
 		// Sorting Name
-		Sort sortAsString = new Sort( new SortField( "name", SortField.Type.STRING ) );
+		Sort sortAsString = builder().sort().byField( "name" ).createSort();
 		assertSortedResults( sortAsString, 3, 2, 1, 0 );
 	}
 
@@ -109,7 +107,7 @@ public class SortingTest {
 		);
 
 		// Sorting by collated name
-		Sort sortAsString = new Sort( new SortField( "collatedName", SortField.Type.STRING ) );
+		Sort sortAsString = builder().sort().byField( "collatedName" ).createSort();
 		assertSortedResults( sortAsString, 4, 3, 1, 2, 0 );
 	}
 
@@ -147,10 +145,10 @@ public class SortingTest {
 		);
 
 		// Sorting by tokenized name: ensure only the first token is taken into account
-		Sort sortAsString = new Sort(
-				new SortField( "tokenizedName", SortField.Type.STRING ),
-				SortField.FIELD_DOC // Stabilize the sort for the two zachs
-				);
+		Sort sortAsString = builder().sort()
+				.byField( "tokenizedName" )
+				.andByNative( SortField.FIELD_DOC )
+				.createSort();
 		assertSortedResults( sortAsString, 3, 2, 0, 1, 4 );
 	}
 
@@ -164,7 +162,7 @@ public class SortingTest {
 				new Person( 3, 5, "Five" , new CuddlyToy( "Alligator" ) )
 		);
 
-		Sort sortAsString = new Sort( new SortField( "favoriteCuddlyToy.type", SortField.Type.STRING ) );
+		Sort sortAsString = builder().sort().byField( "favoriteCuddlyToy.type" ).createSort();
 		assertSortedResults( sortAsString, 3, 1, 2, 0 );
 	}
 
@@ -197,77 +195,8 @@ public class SortingTest {
 				)
 		);
 
-		Sort sortAsString = new Sort( new SortField( "ageForStringSorting", SortField.Type.STRING ) );
+		Sort sortAsString = builder().sort().byField( "ageForStringSorting" ).createSort();
 		assertSortedResults( sortAsString, 1, 0 );
-	}
-
-	@Test
-	public void testExceptionSortingStringFieldAsNumeric() throws Exception {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
-
-		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
-		Class<?> entityType = UnsortableToy.class;
-
-		SearchIntegrator integrator = factoryHolder.getSearchFactory();
-		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
-		Query query = queryBuilder
-				.keyword()
-				.onField( "description" )
-				.matching( "Teddy Bear" )
-				.createQuery();
-
-		Sort sort = new Sort( new SortField( "description", SortField.Type.DOUBLE ) );
-		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
-		hsQuery.projection( ProjectionConstants.ID );
-		hsQuery.sort( sort );
-		hsQuery.queryEntityInfos().size();
-	}
-
-	@Test
-	public void testExceptionSortingNumericFieldWithStringType() throws Exception {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
-
-		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
-		Class<?> entityType = UnsortableToy.class;
-
-		SearchIntegrator integrator = factoryHolder.getSearchFactory();
-		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
-		Query query = queryBuilder
-				.keyword()
-				.onField( "description" )
-				.matching( "Teddy Bear" )
-				.createQuery();
-
-		Sort sort = new Sort( new SortField( "longValue", SortField.Type.STRING ) );
-		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
-		hsQuery.projection( ProjectionConstants.ID );
-		hsQuery.sort( sort );
-		hsQuery.queryEntityInfos().size();
-	}
-
-	@Test
-	public void testExceptionSortingNumericFieldWithWrongType() throws Exception {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( SORT_TYPE_ERROR_CODE );
-
-		helper.index( new UnsortableToy( "111", "Teddy Bear", 300L, 555 ) );
-		Class<?> entityType = UnsortableToy.class;
-
-		SearchIntegrator integrator = factoryHolder.getSearchFactory();
-		QueryBuilder queryBuilder = integrator.buildQueryBuilder().forEntity( entityType ).get();
-		Query query = queryBuilder
-				.keyword()
-				.onField( "description" )
-				.matching( "Teddy Bear" )
-				.createQuery();
-
-		Sort sort = new Sort( new SortField( "longValue", SortField.Type.INT ) );
-		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
-		hsQuery.projection( ProjectionConstants.ID );
-		hsQuery.sort( sort );
-		hsQuery.queryEntityInfos().size();
 	}
 
 	@Test
@@ -279,7 +208,7 @@ public class SortingTest {
 		);
 
 		Query rangeQuery = queryForRangeOnFieldSorted( 0, 2, "array" );
-		Sort sortAsInt = new Sort( new SortField( "array", SortField.Type.INT ) );
+		Sort sortAsInt = builder().sort().byField( "array" ).createSort();
 		helper.assertThat( rangeQuery )
 				.from( Person.class )
 				.sort( sortAsInt )
@@ -295,6 +224,10 @@ public class SortingTest {
 				.from( min )
 				.to( max )
 				.createQuery();
+	}
+
+	private QueryBuilder builder() {
+		return helper.queryBuilder( Person.class );
 	}
 
 	private void assertSortedResults(Sort sort, int... expectedIds) {
