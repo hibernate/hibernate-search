@@ -8,6 +8,6 @@ package org.hibernate.search.mapper.javabean.session.impl;
 
 public interface JavaBeanSearchSessionTypeContextProvider {
 
-	JavaBeanSessionIndexedTypeContext<?> getIndexedByEntityName(String indexName);
+	JavaBeanSessionIndexedTypeContext<?> indexedForEntityName(String indexName);
 
 }

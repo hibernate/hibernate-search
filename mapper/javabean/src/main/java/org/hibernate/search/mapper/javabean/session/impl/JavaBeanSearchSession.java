@@ -112,15 +112,15 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	@Override
 	public EntityReference fromDocumentReference(DocumentReference reference) {
 		JavaBeanSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.getIndexedByEntityName( reference.typeName() );
+				typeContextProvider.indexedForEntityName( reference.typeName() );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Document reference " + reference + " refers to an unknown type"
 			);
 		}
-		Object id = typeContext.getIdentifierMapping()
+		Object id = typeContext.identifierMapping()
 				.fromDocumentIdentifier( reference.id(), this );
-		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), id );
+		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), id );
 	}
 
 	@Override
@@ -131,13 +131,13 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	@Override
 	public EntityReference createEntityReference(String typeName, Object identifier) {
 		JavaBeanSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.getIndexedByEntityName( typeName );
+				typeContextProvider.indexedForEntityName( typeName );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Type name " + typeName + " refers to an unknown type"
 			);
 		}
-		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), identifier );
+		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), identifier );
 	}
 
 	private SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl scope) {
