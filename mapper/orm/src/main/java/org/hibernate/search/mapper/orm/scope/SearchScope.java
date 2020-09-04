@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.scope;
 
+import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -17,6 +18,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -148,5 +150,10 @@ public interface SearchScope<E> {
 	 * @return A {@link MassIndexer}.
 	 */
 	MassIndexer massIndexer(String tenantId);
+
+	/**
+	 * @return A set containing one {@link SearchIndexedEntity} for each indexed entity in this scope.
+	 */
+	Set<? extends SearchIndexedEntity<? extends E>> includedTypes();
 
 }

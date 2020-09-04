@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.scope.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -93,7 +94,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 			Set<C> targetedTypeExtendedContexts) {
 		this.mappingContext = mappingContext;
 		this.targetedTypeContexts = targetedTypeContexts;
-		this.targetedTypeExtendedContexts = targetedTypeExtendedContexts;
+		this.targetedTypeExtendedContexts = Collections.unmodifiableSet( targetedTypeExtendedContexts );
 	}
 
 	@Override
