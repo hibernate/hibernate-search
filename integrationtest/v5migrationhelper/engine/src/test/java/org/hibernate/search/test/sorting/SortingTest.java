@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.SortableFields;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -218,6 +219,7 @@ public class SortingTest {
 
 		Sort sort = new Sort( new SortField( "description", SortField.Type.DOUBLE ) );
 		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
+		hsQuery.projection( ProjectionConstants.ID );
 		hsQuery.sort( sort );
 		hsQuery.queryEntityInfos().size();
 	}
@@ -240,6 +242,7 @@ public class SortingTest {
 
 		Sort sort = new Sort( new SortField( "longValue", SortField.Type.STRING ) );
 		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
+		hsQuery.projection( ProjectionConstants.ID );
 		hsQuery.sort( sort );
 		hsQuery.queryEntityInfos().size();
 	}
@@ -262,6 +265,7 @@ public class SortingTest {
 
 		Sort sort = new Sort( new SortField( "longValue", SortField.Type.INT ) );
 		HSQuery hsQuery = integrator.createHSQuery( query, entityType );
+		hsQuery.projection( ProjectionConstants.ID );
 		hsQuery.sort( sort );
 		hsQuery.queryEntityInfos().size();
 	}
