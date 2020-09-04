@@ -8,7 +8,6 @@ package org.hibernate.search.test.dsl;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -336,26 +335,6 @@ public class SortDSLTest {
 						.desc()
 				.createSort();
 		assertQueryAll( sort ).matchesExactlyIds( 2, 3, 1, 0 );
-	}
-
-	@Test
-	public void nativeLucene() throws Exception {
-		// Missing value is not provided; the missing values should be considered as 0
-
-		Sort sort = builder().sort()
-				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE ) )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
-
-		sort = builder().sort()
-				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE, false ) )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 2, 1, 0, 3 );
-
-		sort = builder().sort()
-				.byNative( new SortField( "uniqueDoubleField", SortField.Type.DOUBLE, true ) )
-				.createSort();
-		assertQueryAll( sort ).matchesExactlyIds( 3, 0, 1, 2 );
 	}
 
 	@Test

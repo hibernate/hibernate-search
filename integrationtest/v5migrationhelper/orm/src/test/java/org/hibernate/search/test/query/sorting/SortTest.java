@@ -41,6 +41,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
@@ -94,9 +95,10 @@ public class SortTest extends SearchTestBase {
 	public void testResultOrderedByIdAsString() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "id_forStringSort", SortField.Type.STRING, false ) );
+		Sort sort = qb.sort().byField( "id_forStringSort" ).asc().createSort();
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -110,9 +112,10 @@ public class SortTest extends SearchTestBase {
 	public void testResultOrderedByIdAsLong() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) );
+		Sort sort = qb.sort().byField( "id_forIntegerSort" ).asc().createSort();
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -127,18 +130,19 @@ public class SortTest extends SearchTestBase {
 	public void testResultOrderedByIdAlteringSortStyle() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 
-		hibQuery.setSort( new Sort( new SortField( "id_forStringSort", SortField.Type.STRING, false ) ) );
+		hibQuery.setSort( qb.sort().byField( "id_forStringSort" ).asc().createSort() );
 		List<Book> result = hibQuery.list();
 		assertThat( result ).extracting( "id" ).containsExactly( 1, 10, 2, 3 );
 
-		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) ) );
+		hibQuery.setSort( qb.sort().byField( "id_forIntegerSort" ).asc().createSort() );
 		result = hibQuery.list();
 		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3, 10 );
 
-		hibQuery.setSort( new Sort( new SortField( "id_forStringSort", SortField.Type.STRING, false ) ) );
+		hibQuery.setSort( qb.sort().byField( "id_forStringSort" ).asc().createSort() );
 		result = hibQuery.list();
 		assertThat( result ).extracting( "id" ).containsExactly( 1, 10, 2, 3 );
 
@@ -151,9 +155,10 @@ public class SortTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by summary
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "summary_forSort", SortField.Type.STRING ) ); //ASC
+		Sort sort = qb.sort().byField( "summary_forSort" ).createSort(); //ASC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -169,9 +174,10 @@ public class SortTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by summary backwards
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "summary_forSort", SortField.Type.STRING, true ) ); //DESC
+		Sort sort = qb.sort().byField( "summary_forSort" ).desc().createSort(); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -187,9 +193,10 @@ public class SortTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by date backwards
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "publicationDate", SortField.Type.LONG, true ) ); //DESC
+		Sort sort = qb.sort().byField( "publicationDate" ).desc().createSort(); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -268,9 +275,10 @@ public class SortTest extends SearchTestBase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// order by summary
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "mainAuthor.name_sort", SortField.Type.STRING ) ); //ASC
+		Sort sort = qb.sort().byField( "mainAuthor.name_sort" ).createSort(); //ASC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -283,9 +291,10 @@ public class SortTest extends SearchTestBase {
 	public void testSortingByMultipleFields() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( BrickLayer.class ).get();
 		Query query = queryParser.parse( "name:Bill OR name:Barny OR name:Bart" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, BrickLayer.class );
-		Sort sort = new Sort( new SortField( "sortLastName", SortField.Type.STRING ), new SortField( "sortName", SortField.Type.STRING ) );
+		Sort sort = qb.sort().byField( "sortLastName" ).andByField( "sortName" ).createSort();
 		hibQuery.setSort( sort );
 
 
@@ -307,14 +316,15 @@ public class SortTest extends SearchTestBase {
 	public void testChangingSortOrder() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Book.class ).get();
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 
-		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, false ) ) );
+		hibQuery.setSort( qb.sort().byField( "id_forIntegerSort" ).asc().createSort() );
 		List<Book> result = hibQuery.list();
 		assertThat( result ).extracting( "id" ).containsExactly( 1, 2, 3, 10 );
 
-		hibQuery.setSort( new Sort( new SortField( "id_forIntegerSort", SortField.Type.INT, true ) ) );
+		hibQuery.setSort( qb.sort().byField( "id_forIntegerSort" ).desc().createSort() );
 		result = hibQuery.list();
 		assertThat( result ).extracting( "id" ).containsExactly( 10, 3, 2, 1 );
 

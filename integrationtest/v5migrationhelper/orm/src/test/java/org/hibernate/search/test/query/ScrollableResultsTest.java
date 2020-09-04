@@ -12,12 +12,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -65,8 +65,9 @@ public class ScrollableResultsTest {
 	@Test
 	public void testScrollingForward() {
 		Transaction tx = sess.beginTransaction();
+		QueryBuilder qb = sess.getSearchFactory().buildQueryBuilder().forEntity( AlternateBook.class ).get();
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
-		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
+		Sort sort = qb.sort().byField( "id" ).createSort();
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -101,8 +102,9 @@ public class ScrollableResultsTest {
 	@Test
 	public void testScrollingBackwards() {
 		Transaction tx = sess.beginTransaction();
+		QueryBuilder qb = sess.getSearchFactory().buildQueryBuilder().forEntity( AlternateBook.class ).get();
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
-		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
+		Sort sort = qb.sort().byField( "id" ).createSort();
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -132,8 +134,9 @@ public class ScrollableResultsTest {
 	@Test
 	public void testResultsAreManaged() {
 		Transaction tx = sess.beginTransaction();
+		QueryBuilder qb = sess.getSearchFactory().buildQueryBuilder().forEntity( AlternateBook.class ).get();
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
-		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
+		Sort sort = qb.sort().byField( "id" ).createSort();
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -178,9 +181,10 @@ public class ScrollableResultsTest {
 	@Test
 	public void testScrollProjectionAndManaged() {
 		Transaction tx = sess.beginTransaction();
+		QueryBuilder qb = sess.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 		TermQuery tq = new TermQuery( new Term( "dept", "num" ) );
 		//the tests relies on the results being returned sorted by id:
-		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
+		Sort sort = qb.sort().byField( "id" ).createSort();
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, Employee.class )
 			.setProjection(

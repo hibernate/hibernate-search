@@ -21,10 +21,10 @@ import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
+import org.apache.lucene.search.SortField;
+
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -136,8 +136,9 @@ public class ProjectionQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ), SortField.FIELD_SCORE ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).andByNative( SortField.FIELD_DOC ).createSort() );
 		hibQuery.setProjection(
 				"id",
 				"lastname",
@@ -202,10 +203,11 @@ public class ProjectionQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ), SortField.FIELD_SCORE ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).andByNative( SortField.FIELD_DOC ).createSort() );
 
 		@SuppressWarnings("unchecked")
 		List<String> result = hibQuery.list();
@@ -229,6 +231,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		s.clear();
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
@@ -240,7 +243,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 				FullTextQuery.SCORE,
 				FullTextQuery.ID
 		);
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ), SortField.FIELD_SCORE ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).andByNative( SortField.FIELD_SCORE ).createSort() );
 
 		hibQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
 
@@ -270,6 +273,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection(
 				"id",
@@ -279,7 +283,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 				FullTextQuery.SCORE,
 				FullTextQuery.ID
 		);
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ), SortField.FIELD_SCORE ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).andByNative( SortField.FIELD_DOC ).createSort() );
 
 		final CounterCallsProjectionToMapResultTransformer counters = new CounterCallsProjectionToMapResultTransformer();
 		hibQuery.setResultTransformer( counters );
@@ -368,10 +372,11 @@ public class ProjectionQueryTest extends SearchTestBase {
 		s.clear();
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ), SortField.FIELD_SCORE ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).andByNative( SortField.FIELD_SCORE ).createSort() );
 		hibQuery.setProjection(
 				"id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
 				FullTextQuery.ID
@@ -429,10 +434,11 @@ public class ProjectionQueryTest extends SearchTestBase {
 		s.clear();
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 		hibQuery.setProjection(
 				FullTextQuery.SCORE, FullTextQuery.ID
 		);

@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.dialect.PostgreSQL81Dialect;
@@ -20,6 +18,7 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.PortedToSearch6;
@@ -299,9 +298,10 @@ public class SearchAndEnversIntegrationTest extends SearchTestBase {
 
 	@SuppressWarnings("unchecked")
 	private List<Person> findPeopleFromIndex(FullTextSession session, String term, String value) {
+		QueryBuilder qb = session.getSearchFactory().buildQueryBuilder().forEntity( Person.class ).get();
 		Query luceneQuery = createLuceneQuery( term, value );
 		return session.createFullTextQuery( luceneQuery, Person.class )
-				.setSort( new Sort( new SortField( "surname", SortField.Type.STRING ) ) ).list();
+				.setSort( qb.sort().byField( "surname" ).createSort() ).list();
 	}
 
 	private Person findPersonFromIndexBySurname(FullTextSession session, String surname) {
