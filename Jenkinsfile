@@ -410,6 +410,7 @@ stage('Default build') {
 		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			sh """ \
 					mvn clean \
+					--fail-at-end \
 					${deploySnapshot ? "\
 							deploy \
 					" : "\
@@ -491,7 +492,7 @@ stage('Non-default environments') {
 					// Re-run integration tests against the JARs produced by the default build,
 					// but using a different JDK to build and run the tests.
 					mavenNonDefaultBuild buildEnv, """ \
-							clean install --fail-at-end \
+							clean install \
 					""", 'integrationtest'
 				}
 			}
@@ -504,7 +505,7 @@ stage('Non-default environments') {
 			runBuildOnNode {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
-							clean install --fail-at-end \
+							clean install \
 							-DskipTests \
 							-P${buildEnv.mavenProfile},!javaModuleITs \
 					"""
@@ -845,6 +846,7 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 				mvn -Dsurefire.environment=$testSuffix \
 						${toTestJdkArg(buildEnv)} \
 						${toElasticsearchJdkArg(buildEnv)} \
+						--fail-at-end \
 						$args \
 		"""
 	}
