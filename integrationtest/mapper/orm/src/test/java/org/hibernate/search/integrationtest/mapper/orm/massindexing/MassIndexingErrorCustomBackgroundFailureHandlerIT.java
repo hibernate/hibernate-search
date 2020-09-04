@@ -58,17 +58,17 @@ public class MassIndexingErrorCustomBackgroundFailureHandlerIT extends AbstractM
 	}
 
 	@Override
-	protected void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString) {
+	protected void expectEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
-	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString) {
+	protected void assertEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
+		// HANDLE_GENERIC_CONTEXT 2 instead of 0
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 2 );
+		// HANDLE_ENTITY_INDEXING_CONTEXT 0 instead of 1
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 	}
 
 	@Override
