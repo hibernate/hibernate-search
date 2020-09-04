@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
@@ -22,9 +26,12 @@ import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionMa
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMapping>
 		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanTypeContextContainer typeContextContainer;
 
@@ -69,14 +76,31 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
 		}
 
-		return new SearchScopeImpl(
-				delegate().createPojoScope(
-						this,
-						typeIdentifiers,
-						// We don't load anything, so we don't need any additional type context
-						ignored -> null
-				)
-		);
+		return new SearchScopeImpl( delegate().createPojoScope( this, typeIdentifiers,
+				typeContextContainer::indexedForExactType ) );
+	}
+
+	@Override
+	public <E> SearchIndexedEntity<E> indexedEntity(Class<E> entityType) {
+		SearchIndexedEntity<E> type = typeContextContainer.indexedForExactClass( entityType );
+		if ( type == null ) {
+			throw log.notIndexedEntityType( entityType );
+		}
+		return type;
+	}
+
+	@Override
+	public SearchIndexedEntity<?> indexedEntity(String entityName) {
+		SearchIndexedEntity<?> type = typeContextContainer.indexedForEntityName( entityName );
+		if ( type == null ) {
+			throw log.notIndexedEntityName( entityName );
+		}
+		return type;
+	}
+
+	@Override
+	public Collection<SearchIndexedEntity<?>> allIndexedEntities() {
+		return Collections.unmodifiableCollection( typeContextContainer.allIndexed() );
 	}
 
 	public void setIntegration(SearchIntegration integration) {

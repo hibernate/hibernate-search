@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.javabean.scope.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -14,15 +16,16 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
+import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl implements SearchScope {
 
-	private final PojoScopeDelegate<EntityReference, Void, Void> delegate;
+	private final PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<?>> delegate;
 
-	public SearchScopeImpl(PojoScopeDelegate<EntityReference, Void, Void> delegate) {
+	public SearchScopeImpl(PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<?>> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -44,6 +47,11 @@ public class SearchScopeImpl implements SearchScope {
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return delegate.aggregation();
+	}
+
+	@Override
+	public Set<? extends SearchIndexedEntity<?>> includedTypes() {
+		return delegate.includedIndexedTypes();
 	}
 
 	public SearchQuerySelectStep<?, EntityReference, Void, ?, ?, ?> search(BackendSessionContext sessionContext,
