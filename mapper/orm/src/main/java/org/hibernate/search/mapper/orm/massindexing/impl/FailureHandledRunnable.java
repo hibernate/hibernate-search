@@ -63,6 +63,31 @@ abstract class FailureHandledRunnable implements Runnable {
 			// Also propagate the exception
 			throw e;
 		}
+		catch (Error e) {
+			try {
+				cleanUpOnFailure();
+			}
+			catch (RuntimeException e2) {
+				e.addSuppressed( e2 );
+			}
+			catch (InterruptedException e2) {
+				interrupted = true;
+				e.addSuppressed( e2 );
+			}
+			catch (Error e2) {
+				e.addSuppressed( e2 );
+			}
+
+			try {
+				notifyFailure( e );
+			}
+			catch (Error e2) {
+				e.addSuppressed( e2 );
+			}
+
+			// Also propagate the exception
+			throw e;
+		}
 		finally {
 			if ( interrupted ) {
 				// Restore interruption signal
@@ -98,6 +123,13 @@ abstract class FailureHandledRunnable implements Runnable {
 	}
 
 	protected void notifyFailure(RuntimeException exception) {
+		notifier.notifyRunnableFailure(
+				exception,
+				log.massIndexerOperation()
+		);
+	}
+
+	protected void notifyFailure(Error exception) {
 		notifier.notifyRunnableFailure(
 				exception,
 				log.massIndexerOperation()

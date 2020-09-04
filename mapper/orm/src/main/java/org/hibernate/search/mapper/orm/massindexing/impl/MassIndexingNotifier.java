@@ -48,6 +48,13 @@ class MassIndexingNotifier {
 		failureHandler.handle( contextBuilder.build() );
 	}
 
+	void notifyRunnableFailure(Error exception, String operation) {
+		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
+		contextBuilder.throwable( exception );
+		contextBuilder.failingOperation( operation );
+		failureHandler.handle( contextBuilder.build() );
+	}
+
 	void notifyEntitiesLoaded(int size) {
 		monitor.entitiesLoaded( size );
 	}
