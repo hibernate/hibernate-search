@@ -76,7 +76,8 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
 		}
 
-		return new SearchScopeImpl<>( delegate().createPojoScope( this, typeIdentifiers,
+		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
+		return new SearchScopeImpl<T>( delegate().createPojoScope( this, typeIdentifiers,
 				typeContextContainer::indexedForExactType ) );
 	}
 

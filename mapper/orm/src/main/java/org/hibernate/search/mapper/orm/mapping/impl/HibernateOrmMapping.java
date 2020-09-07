@@ -371,6 +371,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 						typeContextContainer::indexedForExactType
 				);
 
+		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
 		return new SearchScopeImpl<T>( this, scopeDelegate );
 	}
 }
