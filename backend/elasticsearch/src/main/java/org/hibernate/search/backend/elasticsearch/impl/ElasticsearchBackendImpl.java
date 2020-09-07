@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
+import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
@@ -60,6 +61,12 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
+					.build();
+
+	private static final ConfigurationProperty<DynamicMapping> DYNAMIC_MAPPING =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.DYNAMIC_MAPPING )
+					.as( DynamicMapping.class, DynamicMapping::of )
+					.withDefault( ElasticsearchIndexSettings.Defaults.DYNAMIC_MAPPING )
 					.build();
 
 	private final EventContext eventContext;
@@ -179,7 +186,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
 				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName,
-						analysisDefinitionRegistry ),
+						analysisDefinitionRegistry, DYNAMIC_MAPPING.get( propertySource ) ),
 				createDocumentMetadataContributors( mappedTypeName )
 		);
 	}
@@ -210,14 +217,15 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			DynamicMapping dynamicMapping) {
 
 		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
 				typeFactoryProvider,
 				indexEventContext,
 				indexNames,
 				mappedTypeName,
-				analysisDefinitionRegistry
+				analysisDefinitionRegistry, dynamicMapping
 		);
 
 		typeNameMapping.getIndexSchemaRootContributor()

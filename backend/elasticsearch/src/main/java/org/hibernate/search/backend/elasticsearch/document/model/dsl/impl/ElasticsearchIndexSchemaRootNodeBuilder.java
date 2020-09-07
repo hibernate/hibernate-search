@@ -21,6 +21,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaRootNode;
+import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
@@ -44,6 +46,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final IndexNames indexNames;
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
@@ -51,12 +54,13 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, DynamicMapping dynamicMapping) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
 		this.indexNames = indexNames;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.defaultDynamicType = DynamicType.create( dynamicMapping );
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			schemaRootContributor.contribute( mapping );
 		}
 
-		mapping.setDynamic( resolveSelfDynamicType() );
+		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
 
 		final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes = new HashMap<>();
 		final Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes = new HashMap<>();

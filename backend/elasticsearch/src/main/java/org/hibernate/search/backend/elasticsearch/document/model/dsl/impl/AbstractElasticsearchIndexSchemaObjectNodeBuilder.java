@@ -111,14 +111,8 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	abstract String getAbsolutePath();
 
-	final DynamicType resolveSelfDynamicType() {
-		if ( templates.isEmpty() ) {
-			// TODO HSEARCH-3122 allow configuring this at index level (configuration properties)
-			return DynamicType.STRICT;
-		}
-		else {
-			return DynamicType.TRUE;
-		}
+	final DynamicType resolveSelfDynamicType(DynamicType defaultDynamicType) {
+		return ( templates.isEmpty() ) ? defaultDynamicType : DynamicType.TRUE;
 	}
 
 	private void putField(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
