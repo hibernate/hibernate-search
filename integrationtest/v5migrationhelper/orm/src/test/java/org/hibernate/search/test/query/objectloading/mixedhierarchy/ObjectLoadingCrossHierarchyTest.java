@@ -7,14 +7,12 @@
 package org.hibernate.search.test.query.objectloading.mixedhierarchy;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -141,11 +139,5 @@ public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 				PrimarySchool.class,
 				HighSchool.class
 		};
-	}
-
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		// make sure the criteria initializer is used, just in case
-		cfg.put( Environment.DATABASE_RETRIEVAL_METHOD, "query" );
 	}
 }

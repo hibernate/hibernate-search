@@ -8,13 +8,16 @@ package org.hibernate.search.test.backend;
 
 import java.util.Map;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
+import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,18 +63,32 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 	}
 
 	@Override
+	public void tearDown() throws Exception {
+		org.hibernate.search.mapper.orm.Search.mapping( getSessionFactory() )
+				.scope( Object.class )
+				.schemaManager()
+				.dropIfExisting();
+
+		super.tearDown();
+	}
+
+	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Clock.class };
 	}
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		//needs FSDirectory to have the index contents survive the SessionFactory close
-		cfg.put( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.put( "hibernate.search.default.max_queue_length", "5" );
-		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.put( "hibernate.search.default.elasticsearch.index_schema_management_strategy", "update" );
+		// The index content must survive the SessionFactory close/recreate
+		cfg.put( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, SchemaManagementStrategyName.CREATE );
 
+		// The queues must be small enough to be a bottleneck
+		// (apparently that was the intent of the original test in Search 5)
+		cfg.put( BackendSettings.backendKey( LuceneIndexSettings.INDEXING_QUEUE_SIZE ), 5 );
+		cfg.put( BackendSettings.backendKey( LuceneIndexSettings.INDEXING_QUEUE_COUNT ), 2 );
+
+		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
+				AutomaticIndexingSynchronizationStrategyNames.SYNC );
 	}
 
 }

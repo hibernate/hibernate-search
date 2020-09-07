@@ -21,7 +21,9 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
@@ -55,7 +57,7 @@ public class IndexingGeneratedCorpusTest {
 			.addAnnotatedClass( AncientBook.class )
 			.addAnnotatedClass( Nation.class )
 			.addAnnotatedClass( SecretBook.class )
-			.setProperty( "hibernate.search.default.worker.thread_pool.size", "4" );
+			.setProperty( BackendSettings.backendKey( LuceneBackendSettings.THREAD_POOL_SIZE ), "4" );
 
 	@BeforeClass
 	public static void setUp() throws Exception {
