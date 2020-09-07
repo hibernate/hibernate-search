@@ -58,7 +58,6 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setChar1( null );
 		cloud.setChar2( 'P' );
 		cloud.setStorm( false );
-		cloud.setClazz( Cloud.class );
 		cloud.setUri( new URI( "http://www.hibernate.org" ) );
 		cloud.setUrl( new URL( "http://www.hibernate.org" ) );
 		cloud.setUuid( UUID.fromString( "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) );
@@ -100,29 +99,17 @@ public class BridgeTest extends SearchTestBase {
 		result = session.createFullTextQuery( query ).setProjection( "type" ).list();
 		assertEquals( "Enum projection works", 1, result.size() ); //the query is dumb because restrictive
 
-		query = new TermQuery( new Term( "clazz", Cloud.class.getName() ) );
-		result = session.createFullTextQuery( query ).setProjection( "clazz" ).list();
-		assertEquals( "Clazz projection works", 1, result.size() );
-		assertEquals(
-				"Clazz projection works",
-				Cloud.class.getName(),
-				( (Class) ( (Object[]) result.get( 0 ) )[0] ).getName()
-		);
+		query = new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ); //the query is dumb because restrictive
+		result = session.createFullTextQuery( query ).setProjection( "uri" ).list();
+		assertEquals( "URI works", 1, result.size() );
 
-		BooleanQuery bQuery = new BooleanQuery.Builder()
-				.add( new TermQuery( new Term( "uri", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( "url", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST )
-				.build();
+		query = new TermQuery( new Term( "url", "http://www.hibernate.org" ) ); //the query is dumb because restrictive
+		result = session.createFullTextQuery( query ).setProjection( "url" ).list();
+		assertEquals( "URL works", 1, result.size() );
 
-		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
-		assertEquals( "Clazz projection works", 1, result.size() );
-
-		bQuery = new BooleanQuery.Builder()
-				.add( new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) ), BooleanClause.Occur.MUST )
-				.build();
-
-		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
-		assertEquals( "Clazz projection works", 1, result.size() );
+		query = new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) );
+		result = session.createFullTextQuery( query ).setProjection( "uuid" ).list();
+		assertEquals( "UUID works", 1, result.size() );
 
 		query = parser.parse( "char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE ) + "]" );
 		result = session.createFullTextQuery( query ).setProjection( "char1" ).list();
