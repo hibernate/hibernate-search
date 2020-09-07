@@ -8,6 +8,8 @@ package org.hibernate.search.test.batchindexing;
 
 import javax.persistence.Entity;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+
 /**
  * To cover the unusual case in which a non-indexed entity
  * extends an indexed entity.
@@ -17,6 +19,7 @@ import javax.persistence.Entity;
  * @author Sanne Grinovero
  */
 @Entity
+@Indexed(enabled = false)
 public class SecretBook extends Book {
 
 	boolean allCopiesBurnt = true;
