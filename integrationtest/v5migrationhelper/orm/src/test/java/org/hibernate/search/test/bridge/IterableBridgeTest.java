@@ -92,7 +92,7 @@ public class IterableBridgeTest extends SearchTestBase {
 	@Test
 	public void testSearchNullEntry() throws Exception {
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", IterableBridgeTestEntity.NULL_TOKEN, true );
+			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", IterableBridgeTestEntity.NULL_LANGUAGE_TOKEN, true );
 
 			assertNotNull( "No result found for an indexed collection", results );
 			assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -102,7 +102,7 @@ public class IterableBridgeTest extends SearchTestBase {
 
 	@Test
 	public void testSearchNullNumericEntry() throws Exception {
-		List<IterableBridgeTestEntity> results = findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN, true );
+		List<IterableBridgeTestEntity> results = findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN_INT, false );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );

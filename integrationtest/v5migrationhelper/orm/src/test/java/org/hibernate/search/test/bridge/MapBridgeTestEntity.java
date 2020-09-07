@@ -34,8 +34,9 @@ import org.hibernate.search.annotations.Store;
 @Table(name = "IBT_Entity")
 public class MapBridgeTestEntity {
 
-	static final String NULL_TOKEN = "NULL_MARKER";
+	static final String NULL_LANGUAGE_TOKEN = "PIRATE";
 	static final String NULL_NUMERIC_TOKEN = "-7777";
+	static final int NULL_NUMERIC_TOKEN_INT = -7777;
 
 	private Long id;
 	private String name;
@@ -71,7 +72,7 @@ public class MapBridgeTestEntity {
 		this.name = name;
 	}
 
-	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
+	@Field(indexNullAs = NULL_LANGUAGE_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
