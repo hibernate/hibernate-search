@@ -53,7 +53,6 @@ public class Cloud {
 	private char char2;
 	private CloudType type;
 	private boolean storm;
-	private Class clazz;
 	private URL url;
 	private URI uri;
 	private UUID uuid;
@@ -91,15 +90,6 @@ public class Cloud {
 
 	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
-	}
-
-	@Field(analyze = Analyze.NO, store = Store.YES)
-	public Class getClazz() {
-		return clazz;
-	}
-
-	public void setClazz(Class clazz) {
-		this.clazz = clazz;
 	}
 
 	@Id
