@@ -10,9 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -20,7 +18,6 @@ import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
@@ -78,11 +75,6 @@ public class MassIndexUsingManualFlushTest extends SearchTestBase {
 		}
 		tx.commit();
 		s.close();
-	}
-
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
 	@Override

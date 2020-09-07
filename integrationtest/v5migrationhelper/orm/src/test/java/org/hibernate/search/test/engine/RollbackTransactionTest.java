@@ -8,13 +8,11 @@ package org.hibernate.search.test.engine;
 
 import java.util.Map;
 
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
@@ -93,7 +91,6 @@ public class RollbackTransactionTest extends SearchTestBase {
 	@Override
 	public void configure(Map<String,Object> cfg) {
 		cfg.put( "hibernate.search.default.directory_provider", "local-heap" );
-		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
 }

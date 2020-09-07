@@ -16,7 +16,6 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.util.Version;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
@@ -104,10 +103,9 @@ public abstract class JPATestCase {
 			config.put( AvailableSettings.XML_FILE_NAMES, dds );
 		}
 
-		//Search config
-		config.put( "hibernate.search.default.directory_provider", "local-heap" );
-		config.put( org.hibernate.search.cfg.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		config.put( AvailableSettings.ENTITY_MANAGER_FACTORY_NAME, "Test" + getClass() );
+
+		//Search config
 		configure( config );
 
 		return config;

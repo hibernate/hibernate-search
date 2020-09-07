@@ -12,20 +12,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
 import org.junit.Test;
 
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.FloatPoint;
@@ -303,9 +300,4 @@ public class BridgeTest extends SearchTestBase {
 		};
 	}
 
-
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		cfg.put( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
-	}
 }
