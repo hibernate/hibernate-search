@@ -36,8 +36,9 @@ import org.hibernate.search.annotations.Store;
 @Table(name = "IBT_Entity")
 public class IterableBridgeTestEntity {
 
-	static final String NULL_TOKEN = "NULL_MARKER";
+	static final String NULL_LANGUAGE_TOKEN = "PIRATE";
 	static final String NULL_NUMERIC_TOKEN = "-555";
+	static final int NULL_NUMERIC_TOKEN_INT = -555;
 
 	private Long id;
 	private String name;
@@ -73,7 +74,7 @@ public class IterableBridgeTestEntity {
 		this.name = name;
 	}
 
-	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
+	@Field(indexNullAs = NULL_LANGUAGE_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
