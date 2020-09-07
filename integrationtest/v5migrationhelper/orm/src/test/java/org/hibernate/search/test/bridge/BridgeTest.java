@@ -79,7 +79,7 @@ public class BridgeTest extends SearchTestBase {
 				.add( IntPoint.newRangeQuery( "integerv2", 2, 3 ), BooleanClause.Occur.MUST )
 				.add( LongPoint.newRangeQuery( "long2", 2L, 3L ), BooleanClause.Occur.MUST )
 				.add( new TermQuery( new Term( "type", "dog" ) ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( "storm", "false" ) ), BooleanClause.Occur.MUST )
+				.add( IntPoint.newExactQuery( "storm", 0 ), BooleanClause.Occur.MUST )
 				.build();
 
 		result = session.createFullTextQuery( booleanQuery ).list();

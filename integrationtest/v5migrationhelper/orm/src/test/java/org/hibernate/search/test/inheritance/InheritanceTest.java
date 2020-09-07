@@ -80,7 +80,7 @@ public class InheritanceTest extends SearchTestBase {
 		hibQuery = s.createFullTextQuery( query );
 		assertItsTheElephant( hibQuery.list() );
 
-		query = parser.parse( "hasSweatGlands:false" );
+		query = IntPoint.newExactQuery( "hasSweatGlands", 0 );
 		hibQuery = s.createFullTextQuery( query, Animal.class, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
 
