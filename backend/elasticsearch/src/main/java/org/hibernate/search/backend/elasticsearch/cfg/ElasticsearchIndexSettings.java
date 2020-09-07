@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.cfg;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 
 /**
@@ -96,6 +97,18 @@ public final class ElasticsearchIndexSettings {
 	public static final String INDEXING_MAX_BULK_SIZE = INDEXING_PREFIX + IndexingRadicals.MAX_BULK_SIZE;
 
 	/**
+	 * Specify the default behavior to handle dynamically-mapped fields in the Elasticsearch mapping.
+	 * <p>
+	 * Defaults to {@link Defaults#DYNAMIC_MAPPING}.
+	 * <p>
+	 * In case of dynamic fields with field templates, the value will be ignored,
+	 * since this feature requires a {@link DynamicMapping#TRUE} to operate.
+	 *
+	 * @see DynamicMapping
+	 */
+	public static final String DYNAMIC_MAPPING = INDEXING_PREFIX + IndexingRadicals.DYNAMIC_MAPPING;
+
+	/**
 	 * Configuration property keys for indexing, without the {@link #INDEXING_PREFIX prefix}.
 	 */
 	public static final class IndexingRadicals {
@@ -106,6 +119,7 @@ public final class ElasticsearchIndexSettings {
 		public static final String QUEUE_COUNT = "queue_count";
 		public static final String QUEUE_SIZE = "queue_size";
 		public static final String MAX_BULK_SIZE = "max_bulk_size";
+		public static final String DYNAMIC_MAPPING = "dynamic_mapping";
 	}
 
 	/**
@@ -121,6 +135,7 @@ public final class ElasticsearchIndexSettings {
 		public static final int INDEXING_QUEUE_COUNT = 10;
 		public static final int INDEXING_QUEUE_SIZE = 1000;
 		public static final int INDEXING_MAX_BULK_SIZE = 100;
+		public static final DynamicMapping DYNAMIC_MAPPING = DynamicMapping.STRICT;
 	}
 
 }

@@ -94,10 +94,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		reference.setSchemaNode( fieldNode );
 
-		DynamicType dynamicType = parentMapping.getDynamic();
-		if ( DynamicType.STRICT.equals( dynamicType ) ) {
-			dynamicType = resolveSelfDynamicType();
-		}
+		DynamicType dynamicType = resolveSelfDynamicType( parentMapping.getDynamic() );
 
 		PropertyMapping mapping = createPropertyMapping( structure, dynamicType );
 

@@ -652,4 +652,8 @@ public interface Log extends BasicLogger {
 	SearchTimeoutException clientSideTimedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
 			String query);
 
+	@Message(id = ID_OFFSET_3 + 121, value = "Invalid dynamic type: '%1$s'."
+			+ " Valid values are: %2$s.")
+	SearchException invalidDynamicType(String invalidRepresentation, List<String> validRepresentations);
+
 }
