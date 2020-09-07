@@ -115,8 +115,8 @@ SearchResult<Book> result = Search.session( entityManager )
                 .matching( "Isaac" ) )
         .fetch( 20 );
 
-long totalHitCount = result.totalHitCount();
 List<Book> hits = result.hits();
+long totalHitCount = result.total().hitCount();
 ```
 
 ## License
