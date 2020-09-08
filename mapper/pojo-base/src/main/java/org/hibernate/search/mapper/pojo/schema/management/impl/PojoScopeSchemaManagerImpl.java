@@ -17,6 +17,7 @@ import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 
 public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 
@@ -80,7 +81,7 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 					failureCollector.withContext( PojoEventContexts.fromType( typeContext.getTypeIdentifier() ) );
 			futures[typeCounter++] = operation.apply( delegate, typeFailureCollector )
 					.exceptionally( Futures.handler( e -> {
-						typeFailureCollector.add( e );
+						typeFailureCollector.add( Throwables.expectException( e ) );
 						return null;
 					} ) );
 		}
