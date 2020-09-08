@@ -39,16 +39,16 @@ public class RecursiveGraphTest extends SearchTestBase {
 	}
 
 	public void savePeople(Person... people) {
+		Session s = getSessionFactory().openSession();
+		s.getTransaction().begin();
 		for ( Person person : people ) {
 			if ( person == null ) {
 				continue;
 			}
-			Session s = getSessionFactory().openSession();
-			s.getTransaction().begin();
 			s.save( person );
-			s.getTransaction().commit();
-			s.close();
 		}
+		s.getTransaction().commit();
+		s.close();
 	}
 
 	@Override
