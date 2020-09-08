@@ -23,7 +23,7 @@ import org.hibernate.search.annotations.SortableField;
 @Indexed
 class Villain {
 
-	private static final String ID_SORT = "idSort";
+	private static final String ID_SORT = "id_sort";
 
 	@Id
 	@SortableField
