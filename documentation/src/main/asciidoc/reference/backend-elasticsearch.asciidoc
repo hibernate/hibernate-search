@@ -612,6 +612,28 @@ contains the actual index name (e.g. `myindex-000001`), not the alias (e.g. `myi
 If indexes do not follow the default naming scheme `<hibernateSearchIndexName>-<6 digits>`,
 a custom <<backend-elasticsearch-indexlayout,index layout>> must be configured.
 
+=== Dynamic types mapping
+
+By default, Hibernate Search sets the link:{elasticsearchDocUrl}/dynamic.html[`dynamic`] property in Elasticsearch index mappings to `strict`.
+This means that attempting to index documents with fields that are not present in the mapping will lead to an indexing failure.
+
+If Hibernate Search is the only client, that won't be a problem,
+since Hibernate Search usually works on declared schema fields only.
+For the other cases in which we need to change this setting,
+we can use the following index-level property to change the value.
+
+[source]
+----
+# To configure the defaults for all indexes:
+hibernate.search.backend.dynamic_mapping = strict (default)
+# To configure a specific index:
+hibernate.search.backend.indexes.<index name>.dynamic_mapping = strict (default)
+----
+
+We said that Hibernate Search **usually** works on declared schema fields. More precisely, it always does
+if no <<mapper-orm-bridge-index-field-dsl-dynamic>> are defined.
+When field templates are defined, `dynamic` will be forced to `true`, in order to allow for dynamic fields. In that case, the value of the `dynamic_mapping` property is ignored.
+
 [[backend-elasticsearch-multi-tenancy]]
 === Multi-tenancy
 
