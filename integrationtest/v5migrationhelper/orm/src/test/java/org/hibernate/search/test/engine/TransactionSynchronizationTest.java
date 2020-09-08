@@ -21,6 +21,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.test.SearchTestBase;
 
 /**
@@ -77,6 +79,7 @@ public class TransactionSynchronizationTest extends SearchTestBase {
 
 		@Field
 		@Transient
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		public String getFailing() {
 			throw new IllegalStateException( "Simulated failure" );
 		}

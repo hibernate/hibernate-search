@@ -68,6 +68,9 @@ public class Dad {
 
 	@Field(store = Store.YES)
 	@Transient
+	@IndexingDependency(derivedFrom = @ObjectPath({
+			@PropertyValue(propertyName = "grandpa"), @PropertyValue(propertyName = "id")
+	}))
 	public Long getGrandpaId() {
 		return grandpa != null ? grandpa.getId() : null;
 	}

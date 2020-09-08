@@ -9,6 +9,9 @@ package org.hibernate.search.test.spatial;
 import javax.persistence.Embeddable;
 
 import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -21,6 +24,10 @@ public class Position {
 	double longitude;
 
 	@Spatial
+	@IndexingDependency(derivedFrom = {
+			@ObjectPath(@PropertyValue(propertyName = "latitude")),
+			@ObjectPath(@PropertyValue(propertyName = "longitude"))
+	})
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

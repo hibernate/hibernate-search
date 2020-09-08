@@ -16,6 +16,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -43,7 +46,11 @@ public class POI {
 	Double longitude;
 
 	@Spatial(store = Store.YES)
-	@Embedded
+	@Embedded // Leaving this because it was there in Search 5, but it's being ignored by ORM, which considers the method transient.
+	@IndexingDependency(derivedFrom = {
+			@ObjectPath(@PropertyValue(propertyName = "latitude")),
+			@ObjectPath(@PropertyValue(propertyName = "longitude"))
+	})
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

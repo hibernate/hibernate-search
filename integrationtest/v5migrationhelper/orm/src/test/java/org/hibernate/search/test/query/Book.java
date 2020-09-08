@@ -30,6 +30,8 @@ import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 /**
  * @author Emmanuel Bernard
@@ -104,6 +106,7 @@ public class Book {
 	@Transient
 	@Field(name = "id_forStringSort", analyze = Analyze.NO)
 	@SortableField(forField = "id_forStringSort")
+	@IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "id")))
 	public String getIdAsString() {
 		return String.valueOf( id );
 	}
