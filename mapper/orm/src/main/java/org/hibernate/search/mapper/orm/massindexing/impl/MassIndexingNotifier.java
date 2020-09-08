@@ -48,13 +48,6 @@ class MassIndexingNotifier {
 		failureHandler.handle( contextBuilder.build() );
 	}
 
-	void notifyRunnableFailure(Error exception, String operation) {
-		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
-		contextBuilder.throwable( exception );
-		contextBuilder.failingOperation( operation );
-		failureHandler.handle( contextBuilder.build() );
-	}
-
 	void notifyEntitiesLoaded(int size) {
 		monitor.entitiesLoaded( size );
 	}
@@ -68,18 +61,18 @@ class MassIndexingNotifier {
 	}
 
 	<T> void notifyEntityIndexingFailure(HibernateOrmMassIndexingIndexedTypeContext<T> type,
-			Session session, T entity, Throwable throwable) {
-		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( throwable );
+			Session session, T entity, Exception exception) {
+		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( exception );
 		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
 		entityIndexingFailureCount.increment();
 
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
-		contextBuilder.throwable( throwable );
+		contextBuilder.throwable( exception );
 		// Add minimal information here, but information we're sure we can get
 		contextBuilder.failingOperation( log.massIndexerIndexingInstance( type.jpaEntityName() ) );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
-		EntityReference entityReference = extractReferenceOrSuppress( type, session, entity, throwable );
+		EntityReference entityReference = extractReferenceOrSuppress( type, session, entity, exception );
 		if ( entityReference != null ) {
 			contextBuilder.entityReference( entityReference );
 			recordedFailure.entityReference = entityReference;

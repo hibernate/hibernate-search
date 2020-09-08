@@ -78,14 +78,7 @@ abstract class FailureHandledRunnable implements Runnable {
 				e.addSuppressed( e2 );
 			}
 
-			try {
-				notifyFailure( e );
-			}
-			catch (Error e2) {
-				e.addSuppressed( e2 );
-			}
-
-			// Also propagate the exception
+			// Just propagate the error
 			throw e;
 		}
 		finally {
@@ -123,13 +116,6 @@ abstract class FailureHandledRunnable implements Runnable {
 	}
 
 	protected void notifyFailure(RuntimeException exception) {
-		notifier.notifyRunnableFailure(
-				exception,
-				log.massIndexerOperation()
-		);
-	}
-
-	protected void notifyFailure(Error exception) {
 		notifier.notifyRunnableFailure(
 				exception,
 				log.massIndexerOperation()
