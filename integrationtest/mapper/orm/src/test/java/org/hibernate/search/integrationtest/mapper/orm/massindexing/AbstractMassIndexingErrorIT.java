@@ -27,8 +27,6 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
@@ -65,54 +63,36 @@ public abstract class AbstractMassIndexingErrorIT {
 	public void indexing() {
 		SessionFactory sessionFactory = setup();
 
-		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
-		String exceptionMessage = "Indexing failure";
-		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
+		String errorMessage = "Indexing error";
 
-		expectEntityIndexingFailureHandling(
-				entityName, entityReferenceAsString,
-				exceptionMessage, failingOperationAsString
-		);
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageContainingAll(
-								"1 entities could not be indexed",
-								"See the logs for details.",
-								"First failure on entity 'Book#2': ",
-								exceptionMessage
-						)
-						.hasCauseInstanceOf( SimulatedError.class ),
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
+						.hasMessage( errorMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.ERROR ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
+				expectIndexingWorks( ExecutionExpectation.ERROR )
 		);
 
-		assertEntityIndexingFailureHandling(
-				entityName, entityReferenceAsString,
-				exceptionMessage, failingOperationAsString
-		);
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void getId() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "getId failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "getId error";
 
-		expectEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				ExecutionExpectation.ERROR, ExecutionExpectation.STOP,
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
@@ -120,157 +100,147 @@ public abstract class AbstractMassIndexingErrorIT {
 				// no final refresh && flush
 		);
 
-		assertEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void getTitle() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "getTitle failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "getTitle error";
 
-		expectEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.ERROR,
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.STOP )
 		);
 
-		assertEntityGetterFailureHandling( exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void dropAndCreateSchema_exception() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "DROP_AND_CREATE failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "DROP_AND_CREATE error";
 
-		expectMassIndexerOperationFailureHandling( SearchException.class, exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer().dropAndCreateSchemaOnStart( true ),
 				ThreadExpectation.NOT_CREATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-								.typeContext( Book.class.getName() )
-								.failure( exceptionMessage )
-								.build() ),
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
+						.hasMessage( errorMessage ),
 				expectSchemaManagementWorkException( StubSchemaManagementWork.Type.DROP_AND_CREATE )
 		);
 
-		assertMassIndexerOperationFailureHandling( SearchException.class, exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void purge() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "PURGE failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "PURGE error";
 
-		expectMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.ERROR )
 		);
 
-		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void mergeSegmentsBefore() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "MERGE_SEGMENTS failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "MERGE_SEGMENTS error";
 
-		expectMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.ERROR )
 		);
 
-		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void mergeSegmentsAfter() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "MERGE_SEGMENTS failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "MERGE_SEGMENTS error";
 
-		expectMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
 						.mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.ERROR )
 		);
 
-		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void flush() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "FLUSH failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "FLUSH error";
 
-		expectMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.ERROR )
 		);
 
-		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		assertNoFailureHandling();
 	}
 
 	@Test
 	public void refresh() {
 		SessionFactory sessionFactory = setup();
 
-		String exceptionMessage = "REFRESH failure";
-		String failingOperationAsString = "MassIndexer operation";
+		String errorMessage = "REFRESH error";
 
-		expectMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
+		expectNoFailureHandling();
 
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( exceptionMessage ),
+						.hasMessage( errorMessage ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -278,102 +248,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.ERROR )
 		);
 
-		assertMassIndexerOperationFailureHandling( SimulatedError.class, exceptionMessage, failingOperationAsString );
-	}
-
-	@Test
-	public void indexingAndFlush() {
-		SessionFactory sessionFactory = setup();
-
-		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
-		String failingEntityIndexingExceptionMessage = "Indexing failure";
-		String failingEntityIndexingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
-		String failingMassIndexerOperationExceptionMessage = "FLUSH failure";
-		String failingMassIndexerOperationAsString = "MassIndexer operation";
-
-		expectEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
-				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
-				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
-		);
-
-		doMassIndexingWithFailure(
-				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
-				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
-						// Indexing failure should also be mentioned as a suppressed exception
-						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
-						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-								.isInstanceOf( SearchException.class )
-								.hasMessageContainingAll(
-										"1 entities could not be indexed",
-										"See the logs for details.",
-										"First failure on entity 'Book#2': ",
-										failingEntityIndexingExceptionMessage
-								)
-								.hasCauseInstanceOf( SimulatedError.class )
-						),
-				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.ERROR ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.ERROR )
-		);
-
-		assertEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
-				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
-				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
-		);
-	}
-
-	@Test
-	public void indexingAndRefresh() {
-		SessionFactory sessionFactory = setup();
-
-		String entityName = Book.NAME;
-		String entityReferenceAsString = Book.NAME + "#2";
-		String failingEntityIndexingExceptionMessage = "Indexing failure";
-		String failingEntityIndexingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
-		String failingMassIndexerOperationExceptionMessage = "REFRESH failure";
-		String failingMassIndexerOperationAsString = "MassIndexer operation";
-
-		expectEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
-				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
-				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
-		);
-
-		doMassIndexingWithFailure(
-				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
-				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
-						.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
-						// Indexing failure should also be mentioned as a suppressed exception
-						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
-						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-								.isInstanceOf( SearchException.class )
-								.hasMessageContainingAll(
-										"1 entities could not be indexed",
-										"See the logs for details.",
-										"First failure on entity 'Book#2': ",
-										failingEntityIndexingExceptionMessage
-								)
-								.hasCauseInstanceOf( SimulatedError.class )
-						),
-				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.ERROR ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.ERROR )
-		);
-
-		assertEntityIndexingAndMassIndexerOperationFailureHandling(
-				entityName, entityReferenceAsString,
-				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
-				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
-		);
+		assertNoFailureHandling();
 	}
 
 	protected abstract String getBackgroundFailureHandlerReference();
@@ -386,39 +261,15 @@ public abstract class AbstractMassIndexingErrorIT {
 	protected void assertAfterSetup() {
 	}
 
-	protected abstract void expectEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString);
+	protected abstract void expectNoFailureHandling();
 
-	protected abstract void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
-			String exceptionMessage, String failingOperationAsString);
+	protected abstract void assertNoFailureHandling();
 
-	protected abstract void expectEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString);
-
-	protected abstract void assertEntityGetterFailureHandling(String exceptionMessage, String failingOperationAsString);
-
-	protected abstract void expectMassIndexerOperationFailureHandling(
-			Class<? extends Throwable> exceptionType, String exceptionMessage,
-			String failingOperationAsString);
-
-	protected abstract void assertMassIndexerOperationFailureHandling(
-			Class<? extends Throwable> exceptionType, String exceptionMessage,
-			String failingOperationAsString);
-
-	protected abstract void expectEntityIndexingAndMassIndexerOperationFailureHandling(
-			String entityName, String entityReferenceAsString,
-			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
-			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString);
-
-	protected abstract void assertEntityIndexingAndMassIndexerOperationFailureHandling(
-			String entityName, String entityReferenceAsString,
-			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
-			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString);
-
-	private void doMassIndexingWithFailure(MassIndexer massIndexer,
+	private void doMassIndexingWithError(MassIndexer massIndexer,
 			ThreadExpectation threadExpectation,
 			Consumer<Throwable> thrownExpectation,
 			Runnable ... expectationSetters) {
-		doMassIndexingWithFailure(
+		doMassIndexingWithError(
 				massIndexer,
 				threadExpectation,
 				thrownExpectation,
@@ -427,13 +278,13 @@ public abstract class AbstractMassIndexingErrorIT {
 		);
 	}
 
-	private void doMassIndexingWithFailure(MassIndexer massIndexer,
+	private void doMassIndexingWithError(MassIndexer massIndexer,
 			ThreadExpectation threadExpectation,
 			Consumer<Throwable> thrownExpectation,
 			ExecutionExpectation book2GetIdExpectation, ExecutionExpectation book2GetTitleExpectation,
 			Runnable ... expectationSetters) {
-		Book.failOnBook2GetId.set( ExecutionExpectation.ERROR.equals( book2GetIdExpectation ) );
-		Book.failOnBook2GetTitle.set( ExecutionExpectation.ERROR.equals( book2GetTitleExpectation ) );
+		Book.errorOnBook2GetId.set( ExecutionExpectation.ERROR.equals( book2GetIdExpectation ) );
+		Book.errorOnBook2GetTitle.set( ExecutionExpectation.ERROR.equals( book2GetTitleExpectation ) );
 		AssertionError assertionError = null;
 		try {
 			MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
@@ -469,8 +320,8 @@ public abstract class AbstractMassIndexingErrorIT {
 			throw e;
 		}
 		finally {
-			Book.failOnBook2GetId.set( false );
-			Book.failOnBook2GetTitle.set( false );
+			Book.errorOnBook2GetId.set( false );
+			Book.errorOnBook2GetTitle.set( false );
 
 			if ( assertionError == null ) {
 				switch ( threadExpectation ) {
@@ -498,7 +349,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	private Runnable expectSchemaManagementWorkException(StubSchemaManagementWork.Type type) {
 		return () -> {
 			CompletableFuture<?> failingFuture = new CompletableFuture<>();
-			failingFuture.completeExceptionally( new SimulatedError( type.name() + " failure" ) );
+			failingFuture.completeExceptionally( new SimulatedError( type.name() + " error" ) );
 			backendMock.expectSchemaManagementWorks( Book.NAME )
 					.work( type, failingFuture );
 		};
@@ -513,7 +364,7 @@ public abstract class AbstractMassIndexingErrorIT {
 					break;
 				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
-					failingFuture.completeExceptionally( new SimulatedError( type.name() + " failure" ) );
+					failingFuture.completeExceptionally( new SimulatedError( type.name() + " error" ) );
 					backendMock.expectIndexScaleWorks( Book.NAME )
 							.indexScaleWork( type, failingFuture );
 					break;
@@ -546,7 +397,7 @@ public abstract class AbstractMassIndexingErrorIT {
 					break;
 				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
-					failingFuture.completeExceptionally( new SimulatedError( "Indexing failure" ) );
+					failingFuture.completeExceptionally( new SimulatedError( "Indexing error" ) );
 					backendMock.expectWorksAnyOrder(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
@@ -623,8 +474,8 @@ public abstract class AbstractMassIndexingErrorIT {
 
 		public static final String NAME = "Book";
 
-		private static final AtomicBoolean failOnBook2GetId = new AtomicBoolean( false );
-		private static final AtomicBoolean failOnBook2GetTitle = new AtomicBoolean( false );
+		private static final AtomicBoolean errorOnBook2GetId = new AtomicBoolean( false );
+		private static final AtomicBoolean errorOnBook2GetTitle = new AtomicBoolean( false );
 
 		private Integer id;
 
@@ -643,8 +494,8 @@ public abstract class AbstractMassIndexingErrorIT {
 
 		@Id // This must be on the getter, so that Hibernate Search uses getters instead of direct field access
 		public Integer getId() {
-			if ( id == 2 && failOnBook2GetId.get() ) {
-				throw new SimulatedError( "getId failure" );
+			if ( id == 2 && errorOnBook2GetId.get() ) {
+				throw new SimulatedError( "getId error" );
 			}
 			return id;
 		}
@@ -655,8 +506,8 @@ public abstract class AbstractMassIndexingErrorIT {
 
 		@GenericField
 		public String getTitle() {
-			if ( id == 2 && failOnBook2GetTitle.get() ) {
-				throw new SimulatedError( "getTitle failure" );
+			if ( id == 2 && errorOnBook2GetTitle.get() ) {
+				throw new SimulatedError( "getTitle error" );
 			}
 			return title;
 		}
