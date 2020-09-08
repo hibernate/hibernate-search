@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -27,7 +26,6 @@ public class SimpleParentEntity {
 	private String name;
 
 	@OneToOne
-	@ContainedIn
 	private SimpleChildEntity child;
 
 	protected SimpleParentEntity() {

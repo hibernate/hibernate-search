@@ -33,7 +33,6 @@ public class Entity2ForDoc0 {
 	private int optlock;
 
 	@javax.persistence.ManyToOne(cascade = { }, fetch = javax.persistence.FetchType.LAZY)
-	@org.hibernate.search.annotations.ContainedIn
 	private Entity1ForDoc0 entity1;
 
 	@Basic

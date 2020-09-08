@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
@@ -32,7 +31,6 @@ class Villain {
 	private Integer id;
 
 	@OneToOne
-	@ContainedIn
 	private Hero hero;
 
 	@Field

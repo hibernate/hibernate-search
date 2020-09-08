@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 
@@ -29,7 +28,6 @@ public class State {
 	@Field
 	private String name;
 
-	@ContainedIn
 	@OneToOne(mappedBy = "state", cascade = CascadeType.ALL)
 	private StateCandidate candidate;
 

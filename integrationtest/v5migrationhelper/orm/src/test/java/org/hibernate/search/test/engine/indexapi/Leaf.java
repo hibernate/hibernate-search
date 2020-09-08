@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Indexed;
 
 /**
@@ -27,7 +26,6 @@ public class Leaf {
 	private int id;
 
 	@ManyToOne
-	@ContainedIn
 	private Tree tree;
 
 	public int getId() {

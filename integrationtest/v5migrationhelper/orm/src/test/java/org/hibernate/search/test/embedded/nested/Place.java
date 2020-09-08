@@ -15,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -35,7 +34,6 @@ public class Place {
 	@IndexedEmbedded
 	private Address address;
 
-	@ContainedIn
 	@ManyToMany(cascade = { CascadeType.ALL }, mappedBy = "placesVisited")
 	private Set<Person> visitedBy;
 

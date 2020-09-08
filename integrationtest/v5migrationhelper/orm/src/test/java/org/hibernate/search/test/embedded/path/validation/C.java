@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
 /**
@@ -26,11 +25,9 @@ public class C {
 	public int id;
 
 	@OneToOne(mappedBy = "c")
-	@ContainedIn
 	public B b;
 
 	@OneToOne(mappedBy = "skipped")
-	@ContainedIn
 	public B b2;
 
 	@Field

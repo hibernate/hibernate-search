@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -54,7 +53,6 @@ public class ParentOfBirthEvent {
 		this.parent = parent;
 	}
 
-	@ContainedIn
 	@ManyToOne(cascade = CascadeType.ALL)
 	public Event getEvent() {
 		return event;

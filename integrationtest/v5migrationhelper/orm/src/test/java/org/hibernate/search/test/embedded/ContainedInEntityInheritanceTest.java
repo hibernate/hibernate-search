@@ -20,7 +20,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -100,7 +99,6 @@ public class ContainedInEntityInheritanceTest extends SearchTestBase {
 	@MappedSuperclass
 	private static class AbstractContained {
 		@OneToOne(mappedBy = "contained")
-		@ContainedIn
 		Containing containing;
 
 		@Field

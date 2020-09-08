@@ -16,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
@@ -30,7 +29,6 @@ public class Attribute {
 	private long id;
 
 	@ManyToOne
-	@ContainedIn
 	private Product product;
 
 	@OneToMany(mappedBy = "attribute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

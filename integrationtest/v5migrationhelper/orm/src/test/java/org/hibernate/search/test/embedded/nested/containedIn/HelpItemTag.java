@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
@@ -34,7 +33,6 @@ public class HelpItemTag {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "helpItem", nullable = false)
-	@ContainedIn
 	private HelpItem helpItem;
 
 	@ManyToOne(fetch = FetchType.LAZY)

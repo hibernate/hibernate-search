@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
 /**
@@ -39,7 +38,6 @@ public class Tag {
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "tag")
-	@ContainedIn
 	private List<HelpItemTag> helpItems;
 
 	public Long getId() {

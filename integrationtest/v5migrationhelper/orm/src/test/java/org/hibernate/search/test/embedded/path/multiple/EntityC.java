@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 
@@ -27,11 +26,9 @@ class EntityC {
 	public int id;
 
 	@OneToOne(mappedBy = "indexed")
-	@ContainedIn
 	public EntityB b;
 
 	@OneToOne(mappedBy = "skipped")
-	@ContainedIn
 	public EntityB b2;
 
 	@Fields({ @Field(name = "renamedSkipped"), @Field(name = "renamed") })

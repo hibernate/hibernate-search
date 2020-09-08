@@ -18,7 +18,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
@@ -152,7 +151,6 @@ public class SpatialContainedInTest extends SearchInitializationTestBase {
 		@Id
 		private Long id;
 
-		@ContainedIn
 		@OneToOne(mappedBy = "actorLocation")
 		private Actor actor;
 
