@@ -10,13 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.test.SearchInitializationTestBase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,7 +26,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author Hardy Ferentschik
  */
-public class TokenizationTest {
+public class TokenizationTest extends SearchInitializationTestBase {
 	private static final String DEFAULT_FIELD_NAME = "default";
 
 	@Rule
@@ -35,16 +34,10 @@ public class TokenizationTest {
 
 	@Test
 	public void testWarningLoggedForInconsistentFieldConfiguration() throws Exception {
-		Configuration config = new Configuration();
-		config.addAnnotatedClass( Product.class );
-
-		config.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
-		config.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
-
 		thrown.expectMessage( "The index schema node '" + DEFAULT_FIELD_NAME + "' was added twice" );
 		thrown.expectMessage( Product.class.getName() );
 
-		config.buildSessionFactory();
+		init( Product.class );
 	}
 
 	@Entity
