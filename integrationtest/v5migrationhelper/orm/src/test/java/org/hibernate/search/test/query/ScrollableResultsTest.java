@@ -19,8 +19,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -31,12 +31,13 @@ import org.junit.Test;
  */
 public class ScrollableResultsTest {
 
-	private FullTextSessionBuilder builder;
+	@Rule
+	public FullTextSessionBuilder builder = new FullTextSessionBuilder();
+
 	private FullTextSession sess;
 
 	@Before
 	public void setUp() {
-		builder = new FullTextSessionBuilder();
 		builder
 			.addAnnotatedClass( AlternateBook.class )
 			.addAnnotatedClass( Employee.class )
@@ -52,11 +53,6 @@ public class ScrollableResultsTest {
 			sess.persist( new Employee( i , "Rossi", "dept. num. " + i ) );
 		}
 		tx.commit();
-	}
-
-	@After
-	public void tearDown() {
-		builder.close();
 	}
 
 	/**

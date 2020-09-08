@@ -39,7 +39,7 @@ import org.junit.runners.model.Statement;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class FullTextSessionBuilder implements AutoCloseable, TestRule {
+public class FullTextSessionBuilder implements TestRule {
 
 	private final V5MigrationHelperOrmSetupHelper setupHelper = V5MigrationHelperOrmSetupHelper.create();
 
@@ -89,23 +89,6 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	}
 
 	/**
-	 * Closes the SessionFactory.
-	 * Make sure you close all sessions first
-	 */
-	@Override
-	public void close() {
-		if ( sessionFactory == null ) {
-			throw new java.lang.IllegalStateException( "sessionFactory not yet built" );
-		}
-		try {
-			sessionFactory.close();
-		}
-		finally {
-			sessionFactory = null;
-		}
-	}
-
-	/**
 	 * Builds the sessionFactory as configured so far.
 	 */
 	public FullTextSessionBuilder build() {
@@ -152,7 +135,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 					base.evaluate();
 				}
 				finally {
-					close();
+					sessionFactory = null;
 				}
 			}
 		};
