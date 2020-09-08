@@ -122,11 +122,6 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		getNotifier().notifyIndexingCompletedWithFailure( exception );
 	}
 
-	@Override
-	protected void notifyFailure(Error exception) {
-		getNotifier().notifyIndexingCompletedWithFailure( exception );
-	}
-
 	private void cancelPendingTasks() {
 		for ( Future<?> task : indexingFutures ) {
 			if ( !task.isDone() ) {

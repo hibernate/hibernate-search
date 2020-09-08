@@ -29,6 +29,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -218,7 +219,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 				notifier.notifyEntityIndexingFailure(
 						type,
 						session, entities.get( i ),
-						Futures.getThrowableNow( future )
+						Throwables.expectException( Futures.getThrowableNow( future ) )
 				);
 			}
 			else {
