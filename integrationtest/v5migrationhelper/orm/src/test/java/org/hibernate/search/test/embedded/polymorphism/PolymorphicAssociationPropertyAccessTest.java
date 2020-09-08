@@ -19,7 +19,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -164,7 +163,6 @@ public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 	static class DerivedLevel2 extends Level2 {
 
 		@OneToOne
-		@ContainedIn
 		private Level1 level1Parent;
 
 		public Level1 getLevel1Parent() {
@@ -190,7 +188,6 @@ public class PolymorphicAssociationPropertyAccessTest extends SearchTestBase {
 		private String name;
 
 		@OneToOne(fetch = FetchType.LAZY)
-		@ContainedIn
 		private Level2 level2Parent;
 
 		public Integer getId() {

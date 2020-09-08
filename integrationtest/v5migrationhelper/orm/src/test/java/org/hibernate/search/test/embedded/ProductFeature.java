@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
 /**
@@ -30,7 +29,6 @@ public class ProductFeature {
 	private String name;
 
 	@ManyToOne
-	@ContainedIn
 	private AbstractProduct product;
 
 	// Some other fields justifying this class as an entity...

@@ -12,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
@@ -26,11 +25,9 @@ public class B {
 	public int id;
 
 	@OneToOne(mappedBy = "b")
-	@ContainedIn
 	public A a;
 
 	@OneToOne(mappedBy = "b2")
-	@ContainedIn
 	public A a2;
 
 	@OneToOne

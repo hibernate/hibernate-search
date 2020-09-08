@@ -11,8 +11,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 /**
  * @author Davide D'Alto
@@ -28,6 +30,6 @@ class FieldRenamedEmbeddedEntity {
 	public String field;
 
 	@OneToOne
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "embedded")))
 	public FieldRenamedContainerEntity container;
 }

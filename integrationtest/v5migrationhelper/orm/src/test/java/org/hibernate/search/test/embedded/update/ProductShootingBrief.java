@@ -22,6 +22,9 @@ import javax.persistence.Transient;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.testsupport.AnalysisNames;
 
 @Entity
@@ -81,6 +84,15 @@ public class ProductShootingBrief {
 
 	@Transient
 	@Field(analyzer = @Analyzer(definition = AnalysisNames.ANALYZER_STANDARD))
+	@IndexingDependency(derivedFrom = {
+			@ObjectPath({@PropertyValue(propertyName = "articles"),
+					@PropertyValue(propertyName = "productReferenceCodeWithColorCollection")}),
+			@ObjectPath({@PropertyValue(propertyName = "models"),
+					@PropertyValue(propertyName = "productReferenceCodeCollection")}),
+			@ObjectPath({@PropertyValue(propertyName = "models"),
+					@PropertyValue(propertyName = "articles"),
+					@PropertyValue(propertyName = "productReferenceCodeWithColorCollection")})
+	})
 	public Collection<String> getReferenceCodeCollection() {
 		Collection<String> referenceCodes = new ArrayList<String>();
 

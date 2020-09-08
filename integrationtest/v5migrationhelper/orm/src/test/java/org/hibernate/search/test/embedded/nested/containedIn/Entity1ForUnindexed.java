@@ -38,7 +38,6 @@ public class Entity1ForUnindexed implements Serializable {
 	private int optlock;
 
 	@javax.persistence.OneToMany(mappedBy = "entity1", cascade = { })
-	@org.hibernate.search.annotations.ContainedIn
 	@org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
 	private java.util.List<Entity2ForUnindexed> entities2 = new java.util.ArrayList<Entity2ForUnindexed>();
 

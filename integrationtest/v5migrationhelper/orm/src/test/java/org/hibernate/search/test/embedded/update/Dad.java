@@ -15,11 +15,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 
 @Entity
@@ -70,7 +72,7 @@ public class Dad {
 		return grandpa != null ? grandpa.getId() : null;
 	}
 
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "dad")))
 	@OneToMany
 	public Set<Son> getSons() {
 		return sons;

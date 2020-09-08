@@ -15,7 +15,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Entity
@@ -45,7 +44,6 @@ public class Event implements Serializable {
 		this.parentsOf = parentsOf;
 	}
 
-	@ContainedIn
 	@OneToMany(mappedBy = "birthEvent")
 	public Set<Person> getChildren() {
 		return children;

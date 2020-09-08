@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
 /**
@@ -31,7 +30,6 @@ public class Address {
 	@Field
 	private String city;
 
-	@ContainedIn
 	@OneToMany(mappedBy = "address")
 	private Set<Place> places;
 

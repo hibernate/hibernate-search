@@ -17,9 +17,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 @Entity
 @Indexed
@@ -37,7 +39,6 @@ public class ProductArticle {
 	private ProductModel model;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@ContainedIn
 	private ProductShootingBrief shootingBrief;
 
 	protected ProductArticle() {
@@ -85,6 +86,14 @@ public class ProductArticle {
 
 	@Transient
 	@Field
+	@IndexingDependency(derivedFrom = {
+			@ObjectPath({@PropertyValue(propertyName = "model"),
+					@PropertyValue(propertyName = "mainReferenceCode"),
+					@PropertyValue(propertyName = "rawValue")}),
+			@ObjectPath({@PropertyValue(propertyName = "model"),
+					@PropertyValue(propertyName = "additionalReferenceCodes"),
+					@PropertyValue(propertyName = "rawValue")})
+	})
 	public Collection<String> getProductReferenceCodeWithColorCollection() {
 		Collection<String> productReferenceCodeWithColorCollection = new ArrayList<String>();
 
@@ -94,12 +103,6 @@ public class ProductArticle {
 		}
 
 		return Collections.<String>unmodifiableCollection( productReferenceCodeWithColorCollection );
-	}
-
-	@Transient
-	@ContainedIn
-	private ProductShootingBrief getModelShootingBrief() {
-		return model.getShootingBrief();
 	}
 
 	@Transient

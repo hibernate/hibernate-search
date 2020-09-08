@@ -17,12 +17,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 @Entity
 @Indexed(index = "Person")
@@ -50,7 +52,7 @@ public class Person implements Serializable {
 		this.id = id;
 	}
 
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "parent")))
 	@OneToMany(cascade = { CascadeType.ALL })
 	public Set<ParentOfBirthEvent> getParentOfBirthEvents() {
 		return parentOfBirthEvents;

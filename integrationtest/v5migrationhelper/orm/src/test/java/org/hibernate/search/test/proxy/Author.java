@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.Proxy;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -48,7 +47,6 @@ public class Author implements IAuthor {
 		this.name = name;
 	}
 
-	@ContainedIn
 	@ManyToOne(targetEntity = Book.class, fetch = FetchType.LAZY)
 	public IBook getBook() {
 		return book;

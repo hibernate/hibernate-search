@@ -17,7 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
 /**
@@ -55,7 +54,6 @@ public class BusStop {
 	}
 
 	@ManyToMany(mappedBy = "stops", cascade = CascadeType.ALL)
-	@ContainedIn
 	public Set<BusLine> getBusses() {
 		return busses;
 	}

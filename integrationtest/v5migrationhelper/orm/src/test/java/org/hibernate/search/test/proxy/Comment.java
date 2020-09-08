@@ -9,7 +9,6 @@ package org.hibernate.search.test.proxy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 
 import javax.persistence.Column;
@@ -52,7 +51,6 @@ public class Comment implements IComment {
 	@Override
 	@ManyToOne(targetEntity = Profile.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "profileid")
-	@ContainedIn
 	public IProfile getProfile() {
 		if ( parent == null && getRootComment() != null ) {
 			return getRootComment().getProfile();

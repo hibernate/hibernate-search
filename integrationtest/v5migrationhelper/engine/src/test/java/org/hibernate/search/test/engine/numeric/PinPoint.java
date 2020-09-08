@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.test.engine.numeric;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 /**
  * @author Gustavo Fernandes
@@ -25,7 +27,7 @@ class PinPoint {
 	@Field(store = Store.YES)
 	private Integer stars;
 
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "pinPoints")))
 	private Location location;
 
 	public PinPoint(int id, int stars, Location location) {

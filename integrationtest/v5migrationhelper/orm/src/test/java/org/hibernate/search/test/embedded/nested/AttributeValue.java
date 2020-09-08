@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Store;
 
@@ -28,7 +27,6 @@ public class AttributeValue {
 	private long id;
 
 	@ManyToOne(targetEntity = Attribute.class, fetch = FetchType.EAGER)
-	@ContainedIn
 	private Attribute attribute;
 
 	@Column(name = "att_value")

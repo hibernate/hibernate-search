@@ -18,10 +18,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 /**
  * @author Davide D'Alto
@@ -98,7 +100,7 @@ public class Human {
 		this.parents = parents;
 	}
 
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "parents")))
 	@ManyToOne
 	public Human getChild() {
 		return child;

@@ -25,11 +25,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 @Entity
 @Table(name = "T_CONTACT")
@@ -59,12 +61,12 @@ public class Contact implements Serializable {
 	@Type(type = "java.util.Date")
 	private Date lastUpdatedOn;
 
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contact")))
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@Type(type = "java.util.Set")
 	private Set<Address> addresses;
 
-	@ContainedIn
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contact")))
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@Type(type = "java.util.Set")
 	private Set<Phone> phoneNumbers;

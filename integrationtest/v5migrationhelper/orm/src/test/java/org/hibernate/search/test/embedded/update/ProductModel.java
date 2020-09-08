@@ -22,12 +22,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 
 @Entity
 @Indexed
@@ -45,11 +45,9 @@ public class ProductModel {
 	private List<ProductReferenceCode> additionalReferenceCodes = new ArrayList<ProductReferenceCode>();
 
 	@OneToMany(mappedBy = "model", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@ContainedIn
 	private Set<ProductArticle> articles = new HashSet<ProductArticle>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@ContainedIn
 	private ProductShootingBrief shootingBrief;
 
 	protected ProductModel() {
@@ -103,6 +101,12 @@ public class ProductModel {
 	}
 
 	@Field
+	@IndexingDependency(derivedFrom = {
+			@ObjectPath({@PropertyValue(propertyName = "mainReferenceCode"),
+					@PropertyValue(propertyName = "rawValue")}),
+			@ObjectPath({@PropertyValue(propertyName = "additionalReferenceCodes"),
+					@PropertyValue(propertyName = "rawValue")})
+	})
 	public Collection<String> getProductReferenceCodeCollection() {
 		Collection<String> productReferenceCodeCollection = new ArrayList<String>();
 
