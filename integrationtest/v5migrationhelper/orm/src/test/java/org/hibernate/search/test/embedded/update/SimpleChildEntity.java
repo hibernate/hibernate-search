@@ -14,6 +14,9 @@ import javax.persistence.OneToOne;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
 @Entity
 @Indexed
@@ -34,6 +37,9 @@ public class SimpleChildEntity {
 	}
 
 	@Field(analyze = Analyze.NO)
+	@IndexingDependency(derivedFrom = @ObjectPath({
+			@PropertyValue(propertyName = "parent"), @PropertyValue(propertyName = "name")
+	}))
 	public String getParentName() {
 		return parent.getName();
 	}

@@ -23,6 +23,9 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -124,6 +127,10 @@ public class TransientFieldsDirtyTest extends SearchTestBase {
 
 		@Transient
 		@Field(analyze = Analyze.NO)
+		@IndexingDependency(derivedFrom = {
+				@ObjectPath(@PropertyValue(propertyName = "a")),
+				@ObjectPath(@PropertyValue(propertyName = "b"))
+		})
 		public String getAplusB() {
 			return "" + ( a + b );
 		}

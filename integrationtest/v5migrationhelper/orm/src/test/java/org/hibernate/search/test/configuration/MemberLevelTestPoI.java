@@ -10,6 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.spatial.Coordinates;
 
 @Entity
@@ -24,6 +27,10 @@ public class MemberLevelTestPoI {
 	private Double latitude;
 	private Double longitude;
 
+	@IndexingDependency(derivedFrom = {
+			@ObjectPath(@PropertyValue(propertyName = "latitude")),
+			@ObjectPath(@PropertyValue(propertyName = "longitude"))
+	})
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

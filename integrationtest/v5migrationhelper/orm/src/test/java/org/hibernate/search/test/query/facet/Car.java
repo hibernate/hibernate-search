@@ -19,6 +19,9 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.testsupport.AnalysisNames;
 
 /**
@@ -78,6 +81,7 @@ public class Car {
 
 	@Field(name = CUBIC_CAPACITY_STRING, analyze = Analyze.NO)
 	@Facet(name = CUBIC_CAPACITY_STRING_FACET_STRING_ENCODING, forField = CUBIC_CAPACITY_STRING)
+	@IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "cubicCapacity")))
 	public String getCubicCapacityString() {
 		return cubicCapacity == null ? null : cubicCapacity.toString();
 	}
