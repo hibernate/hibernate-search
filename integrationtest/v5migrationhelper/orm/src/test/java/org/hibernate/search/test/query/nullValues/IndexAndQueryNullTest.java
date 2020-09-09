@@ -8,14 +8,10 @@
 package org.hibernate.search.test.query.nullValues;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
@@ -24,7 +20,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
@@ -78,39 +73,6 @@ public class IndexAndQueryNullTest extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<Value> valueList = fullTextQuery.list();
 		assertEquals( "Wrong number of results", 1, valueList.size() );
-
-		tx.commit();
-		fullTextSession.close();
-	}
-
-	@Test
-	public void testProjectedValueGetsConvertedToNull() throws Exception {
-		Value nullValue = new Value( null );
-
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
-		getSession().save( nullValue );
-		tx.commit();
-
-		fullTextSession.clear();
-		tx = fullTextSession.beginTransaction();
-
-		Query query = new MatchAllDocsQuery();
-		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
-		fullTextQuery.setProjection(
-				"id",
-				"value"
-		);
-		fullTextQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
-		List<?> mappedResults = fullTextQuery.list();
-		assertTrue( "Wrong result size", mappedResults.size() == 1 );
-
-		Map<?, ?> map = (Map<?, ?>) mappedResults.get( 0 );
-		Integer id = (Integer) map.get( "id" );
-		assertNotNull( id );
-
-		String value = (String) map.get( "value" );
-		assertEquals( "The null token should be converted back to null", null, value );
 
 		tx.commit();
 		fullTextSession.close();
