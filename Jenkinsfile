@@ -221,6 +221,8 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.7,7.x)', mavenProfile: 'elasticsearch-7.7',
 							jdkTool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD)
 			],
+			// Note that each of these environments will only be tested if the appropriate
+			// environment variable with the AWS ES Service URL is defined in CI.
 			esAws: [
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
