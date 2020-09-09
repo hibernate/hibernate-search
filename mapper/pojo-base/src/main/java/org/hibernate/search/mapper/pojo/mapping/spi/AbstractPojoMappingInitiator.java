@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Annotation
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingConfigurationContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 
@@ -49,6 +50,9 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	private final BridgeResolver.Builder bridgeResolverBuilder;
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
+
+	private ContainerExtractorBinder extractorBinder;
+	private BridgeResolver bridgeResolver;
 
 	protected AbstractPojoMappingInitiator(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
@@ -105,20 +109,21 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		ContainerExtractorRegistry containerExtractorRegistry = containerExtractorRegistryBuilder.build();
+		extractorBinder = new ContainerExtractorBinder( buildContext.beanResolver(),
+				containerExtractorRegistry, typePatternMatcherFactory );
+		bridgeResolver = bridgeResolverBuilder.build();
+
+		PojoMappingConfigurationContext configurationContext = new PojoMappingConfigurationContextImpl( extractorBinder );
+
 		for ( PojoMappingConfigurationContributor delegate : delegates ) {
-			delegate.configure( buildContext, configurationCollector );
+			delegate.configure( buildContext, configurationContext, configurationCollector );
 		}
 	}
 
 	@Override
 	public Mapper<MPBS> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
-		ContainerExtractorRegistry containerExtractorRegistry = containerExtractorRegistryBuilder.build();
-		ContainerExtractorBinder extractorBinder = new ContainerExtractorBinder( buildContext.beanResolver(),
-				containerExtractorRegistry, typePatternMatcherFactory );
-
-		BridgeResolver bridgeResolver = bridgeResolverBuilder.build();
-
 		return new PojoMapper<>(
 				buildContext, contributorProvider,
 				introspector,

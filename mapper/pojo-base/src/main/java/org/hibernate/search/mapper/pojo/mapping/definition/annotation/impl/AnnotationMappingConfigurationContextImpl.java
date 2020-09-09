@@ -19,6 +19,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -54,7 +55,7 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext,
+	public void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		BeanResolver beanResolver = buildContext.beanResolver();
 		FailureCollector failureCollector = buildContext.failureCollector();

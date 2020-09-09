@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -34,7 +35,7 @@ class JavaBeanTypeConfigurationContributor implements PojoMappingConfigurationCo
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext,
+	public void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		for ( Map.Entry<Class<?>, String> entry : entityNameByType.entrySet() ) {
 			PojoRawTypeModel<?> typeModel = introspector.typeModel( entry.getKey() );

@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtrac
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -48,7 +49,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext,
+	public void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		PropertyDelegatesCollector delegatesCollector = new PropertyDelegatesCollector();
 
