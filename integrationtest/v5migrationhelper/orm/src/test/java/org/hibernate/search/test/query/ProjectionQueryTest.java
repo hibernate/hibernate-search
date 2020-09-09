@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -324,43 +323,6 @@ public class ProjectionQueryTest extends SearchTestBase {
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
 		assertTrue( "SCORE incorrect", projection[4] instanceof Float );
 		assertEquals( "legacy ID incorrect", 1003, projection[5] );
-	}
-
-	@Test
-	public void testProjectionWithIterate() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		Transaction tx;
-		s.clear();
-		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-
-		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection(
-				"id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
-				FullTextQuery.ID
-		);
-
-		int counter = 0;
-
-		for ( Iterator<?> iter = hibQuery.iterate(); iter.hasNext(); ) {
-			Object[] projection = (Object[]) iter.next();
-			assertNotNull( projection );
-			counter++;
-			assertEquals( "dept incorrect", "ITech", projection[2] );
-			assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
-			assertTrue( "SCORE incorrect", projection[4] instanceof Float );
-		}
-		assertEquals( "incorrect number of results returned", 4, counter );
-
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
-		tx.commit();
-		s.close();
 	}
 
 	@Test

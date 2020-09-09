@@ -106,13 +106,9 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		return list();
 	}
 
-	/**
-	 * Return an iterator on the results.
-	 * Retrieve the object one by one (initialize it during the next() operation)
-	 */
 	@Override
 	public Iterator iterate() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		throw new UnsupportedOperationException( "iterate() is not implemented in Hibernate Search queries. Use scroll() instead." );
 	}
 
 	@Override

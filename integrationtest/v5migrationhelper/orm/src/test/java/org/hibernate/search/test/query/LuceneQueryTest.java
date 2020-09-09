@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -186,41 +185,6 @@ public class LuceneQueryTest extends SearchTestBase {
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "first result out of limit", 0, result.size() );
-
-		tx.commit();
-		fullTextSession.close();
-	}
-
-	@Test
-	public void testIterator() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
-
-		Query query = parser.parse( "summary:noword" );
-		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		Iterator result = hibQuery.iterate();
-		assertNotNull( result );
-		assertFalse( result.hasNext() );
-
-		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		result = hibQuery.iterate();
-		assertNotNull( result );
-		int index = 0;
-		while ( result.hasNext() ) {
-			index++;
-			fullTextSession.delete( result.next() );
-		}
-		assertEquals( 2, index );
-
-		fullTextSession.flush();
-
-		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		result = hibQuery.iterate();
-		assertNotNull( result );
-		assertFalse( result.hasNext() );
 
 		tx.commit();
 		fullTextSession.close();
@@ -545,25 +509,6 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
 		result = hibQuery.list();
 		assertEquals( 0, result.size() );
-
-		tx.commit();
-		fullTextSession.close();
-	}
-
-	@Test
-	public void testIterateEmptyHits() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
-
-		Query query = parser.parse( "dept:XXX" );
-		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
-		Iterator iter = hibQuery.iterate();
-		assertFalse( iter.hasNext() );
-
-		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
-		iter = hibQuery.iterate();
-		assertFalse( iter.hasNext() );
 
 		tx.commit();
 		fullTextSession.close();
