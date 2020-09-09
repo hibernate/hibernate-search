@@ -20,14 +20,13 @@ import java.util.Map;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.apache.lucene.search.SortField;
 
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.graph.RootGraph;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -70,9 +69,9 @@ public class ProjectionQueryTest extends SearchTestBase {
 		Query query = qb.keyword().onField( "lastName" ).matching( "Roberto" ).createQuery();
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Husband.class );
 		hibQuery.setProjection( FullTextQuery.THIS );
-		Criteria fetchingStrategy = s.createCriteria( Husband.class );
-		fetchingStrategy.setFetchMode( "spouse", FetchMode.JOIN );
-		hibQuery.setCriteriaQuery( fetchingStrategy );
+		RootGraph<Husband> graph = s.createEntityGraph( Husband.class );
+		graph.addAttributeNodes( "spouse" );
+		hibQuery.applyLoadGraph( graph );
 
 		List<?> result = hibQuery.list();
 		assertNotNull( result );
