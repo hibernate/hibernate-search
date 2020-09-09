@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 public class PropertyMappingAnnotationProcessorContextImpl
 		extends AbstractMappingAnnotationProcessorContext
@@ -23,7 +24,8 @@ public class PropertyMappingAnnotationProcessorContextImpl
 	private final PojoMappingConfigurationContext configurationContext;
 
 	public PropertyMappingAnnotationProcessorContextImpl(PojoPropertyModel<?> propertyModel,
-			PojoMappingConfigurationContext configurationContext) {
+			AnnotationHelper annotationHelper, PojoMappingConfigurationContext configurationContext) {
+		super( annotationHelper );
 		this.propertyModel = propertyModel;
 		this.configurationContext = configurationContext;
 	}
@@ -51,6 +53,6 @@ public class PropertyMappingAnnotationProcessorContextImpl
 
 	@Override
 	public Stream<Annotation> allAnnotations() {
-		return propertyModel.annotations();
+		return propertyModel.annotations().flatMap( annotationHelper::expandRepeatableContainingAnnotation );
 	}
 }

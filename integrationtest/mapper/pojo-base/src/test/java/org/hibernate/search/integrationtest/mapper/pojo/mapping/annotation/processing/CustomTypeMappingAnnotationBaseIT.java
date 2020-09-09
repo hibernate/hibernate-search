@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -165,6 +166,8 @@ public class CustomTypeMappingAnnotationBaseIT {
 		final String index1Name = "index1";
 		final String index2Name = "index2";
 		final String index3Name = "index3";
+		final String index4Name = "index4";
+		final String index5Name = "index5";
 		@Indexed(index = index1Name)
 		@AnnotatedElementAwareAnnotation
 		@AnalyzerAnnotation(name = "foo")
@@ -187,6 +190,26 @@ public class CustomTypeMappingAnnotationBaseIT {
 			Integer id;
 			Integer integer;
 		}
+		@Indexed(index = index4Name)
+		@AnnotatedElementAwareAnnotation
+		@MultiFieldAnnotation.List({
+				@MultiFieldAnnotation(name = "long1"),
+				@MultiFieldAnnotation(name = "long2")
+		})
+		class IndexedEntityType4 {
+			@DocumentId
+			Integer id;
+			Long longProperty;
+		}
+		@Indexed(index = index5Name)
+		@AnnotatedElementAwareAnnotation
+		@MultiFieldAnnotation(name = "long3")
+		@MultiFieldAnnotation(name = "long4")
+		class IndexedEntityType5 {
+			@DocumentId
+			Integer id;
+			Long longProperty;
+		}
 
 		backendMock.expectSchema( index1Name, b -> b
 				.field( "myText", String.class, b2 -> b2.analyzerName( "foo" ) )
@@ -197,9 +220,18 @@ public class CustomTypeMappingAnnotationBaseIT {
 		backendMock.expectSchema( index3Name, b -> b
 				.field( "myInteger", Integer.class )
 		);
+		backendMock.expectSchema( index4Name, b -> b
+				.field( "long1", Long.class )
+				.field( "long2", Long.class )
+		);
+		backendMock.expectSchema( index5Name, b -> b
+				.field( "long3", Long.class )
+				.field( "long4", Long.class )
+		);
 
 		SearchMapping mapping = setupHelper.start()
-				.setup( IndexedEntityType1.class, IndexedEntityType2.class, IndexedEntityType3.class );
+				.setup( IndexedEntityType1.class, IndexedEntityType2.class, IndexedEntityType3.class,
+						IndexedEntityType4.class, IndexedEntityType5.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -232,6 +264,13 @@ public class CustomTypeMappingAnnotationBaseIT {
 				else if ( annotatedElement.javaClass().getName().endsWith( "IndexedEntityType3" ) ) {
 					mapping.property( "integer" ).genericField( "myInteger" );
 				}
+				else if ( annotatedElement.javaClass().getName().endsWith( "IndexedEntityType4" )
+						|| annotatedElement.javaClass().getName().endsWith( "IndexedEntityType5" ) ) {
+					annotatedElement.allAnnotations()
+							.filter( a -> MultiFieldAnnotation.class.equals( a.annotationType() ) )
+							.map( a -> ( (MultiFieldAnnotation) a ).name() )
+							.forEach( name -> mapping.property( "longProperty" ).genericField( name ) );
+				}
 			}
 		}
 	}
@@ -241,6 +280,22 @@ public class CustomTypeMappingAnnotationBaseIT {
 	private @interface AnalyzerAnnotation {
 
 		String name();
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.TYPE})
+	@Repeatable(MultiFieldAnnotation.List.class)
+	// Must be public in order for Hibernate Search to be able to access List#value
+	public @interface MultiFieldAnnotation {
+
+		String name();
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ElementType.TYPE})
+		@interface List {
+			MultiFieldAnnotation[] value();
+		}
 
 	}
 

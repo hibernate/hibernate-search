@@ -14,9 +14,16 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 public abstract class AbstractMappingAnnotationProcessorContext
 		implements MappingAnnotationProcessorContext {
+
+	protected final AnnotationHelper annotationHelper;
+
+	protected AbstractMappingAnnotationProcessorContext(AnnotationHelper annotationHelper) {
+		this.annotationHelper = annotationHelper;
+	}
 
 	@Override
 	public Optional<PojoModelPathValueNode> toPojoModelPathValueNode(ObjectPath objectPath) {
