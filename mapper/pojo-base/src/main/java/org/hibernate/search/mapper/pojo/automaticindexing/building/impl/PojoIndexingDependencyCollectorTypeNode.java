@@ -124,8 +124,14 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 
 	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
 		if ( lastEntityNode != this ) {
-			throw new AssertionFailure( "collectDependency() called on a non-entity node" );
+			if ( parentNode == null ) {
+				throw new AssertionFailure( "collectDependency() called on a non-entity root node?" );
+			}
+			// Just propagate the dependency to parents until we reach a derived value or an entity type.
+			parentNode.collectDependency( dirtyPathFromEntityType );
+			return;
 		}
+
 		PojoRawTypeModel<? super T> rawType = modelPathFromLastEntityNode.getTypeModel().rawType();
 		if ( parentNode == null ) {
 			/*

@@ -16,6 +16,8 @@ abstract class AbstractPojoIndexingDependencyCollectorValueNode extends PojoInde
 		super( buildingHelper );
 	}
 
+	abstract void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType);
+
 	/**
 	 * Make sure that whenever the value represented by {@code dependencyPathFromInverseSideEntityTypeNode} changes
 	 * in the entity at the root of {@code inverseSideEntityTypeNodeBuilder},
