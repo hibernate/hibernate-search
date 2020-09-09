@@ -10,13 +10,10 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.search.annotations.Indexed;
-
 /**
  * @author Gunnar Morling
  */
 @MappedSuperclass
-@Indexed
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class School extends EducationalInstitution {
 
