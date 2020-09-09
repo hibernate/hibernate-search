@@ -292,4 +292,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 39, value = "Cannot use this ScrollableResults instance: it is closed.")
 	SearchException cannotUseClosedScrollableResults();
+
+	@Message(id = ID_OFFSET_2 + 40, value = "Found multiple entities of type '%1$s' with '%2$s' set to '%3$s'."
+				+ " '%2$s' is the document ID and must be assigned unique values.")
+	SearchException foundMultipleEntitiesForDocumentId(String entityName, String documentIdSourcePropertyName,
+			Object id);
 }

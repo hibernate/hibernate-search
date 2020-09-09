@@ -94,7 +94,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 			EntityReference reference = documentIdSourceValueToReference.get( documentIdSourceValue );
 
-			entitiesByReference.put( reference, loadedEntity );
+			Object previous = entitiesByReference.put( reference, loadedEntity );
+			if ( previous != null ) {
+				throw log.foundMultipleEntitiesForDocumentId( reference.name(), documentIdSourcePropertyName,
+						reference.id() );
+			}
 		}
 	}
 
