@@ -77,7 +77,6 @@ public class TimeoutTest extends SearchTestBase {
 
 		assertCorrectNumberOfClocksNoTimeout();
 		assertTimeoutOccursOnList();
-		assertTimeoutOccursOnIterate();
 		assertTimeoutOccursOnScroll();
 
 		tx.commit();
@@ -123,23 +122,6 @@ public class TimeoutTest extends SearchTestBase {
 		hibernateQuery.setTimeout( 10, TimeUnit.MICROSECONDS );
 		try {
 			hibernateQuery.scroll();
-			fail( "timeout exception should happen" );
-		}
-		catch (QueryTimeoutException e) {
-			//good
-		}
-		catch (Exception e) {
-			fail( "Expected a QueryTimeoutException" );
-		}
-		fts.clear();
-	}
-
-	private void assertTimeoutOccursOnIterate() {
-		FullTextQuery hibernateQuery = fts.createFullTextQuery( allSwatchClocksQuery, Clock.class );
-		hibernateQuery.setTimeout( 10, TimeUnit.MICROSECONDS );
-
-		try {
-			hibernateQuery.iterate();
 			fail( "timeout exception should happen" );
 		}
 		catch (QueryTimeoutException e) {

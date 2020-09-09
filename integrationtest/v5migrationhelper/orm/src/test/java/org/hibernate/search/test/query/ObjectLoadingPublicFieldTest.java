@@ -9,7 +9,6 @@ package org.hibernate.search.test.query;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -41,7 +40,7 @@ import org.junit.Test;
  * <ul>
  * <li>Single result or multiple results
  * <li>Single class or multiple classes
- * <li>list() without projection, list() with THIS projection, or iterate()
+ * <li>list() without projection or list() with THIS projection
  * </ul>
  *
  * @author Yoann Rodiere
@@ -103,10 +102,6 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		result = fullTextQuery.list();
 		assertPopulated( result );
 
-		fullTextSession.clear();
-		fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery, A.class );
-		assertPopulated( fullTextQuery.iterate() );
-
 		tx.commit();
 		fullTextSession.close();
 	}
@@ -129,10 +124,6 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		result = fullTextQuery.list();
 		assertPopulated( result );
 
-		fullTextSession.clear();
-		fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, A.class );
-		assertPopulated( fullTextQuery.iterate() );
-
 		tx.commit();
 		fullTextSession.close();
 	}
@@ -154,10 +145,6 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		result = fullTextQuery.list();
 		assertPopulated( result );
 
-		fullTextSession.clear();
-		fullTextQuery = fullTextSession.createFullTextQuery( fieldBarQuery, A.class, B.class );
-		assertPopulated( fullTextQuery.iterate() );
-
 		tx.commit();
 		fullTextSession.close();
 	}
@@ -178,10 +165,6 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 				.setProjection( ProjectionConstants.THIS );
 		result = fullTextQuery.list();
 		assertPopulated( result );
-
-		fullTextSession.clear();
-		fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery, A.class, B.class );
-		assertPopulated( fullTextQuery.iterate() );
 
 		tx.commit();
 		fullTextSession.close();
@@ -208,10 +191,6 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		result = fullTextQuery.list();
 		assertPopulated( result );
 
-		fullTextSession.clear();
-		fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery );
-		assertPopulated( fullTextQuery.iterate() );
-
 		tx.commit();
 		fullTextSession.close();
 	}
@@ -233,19 +212,8 @@ public class ObjectLoadingPublicFieldTest extends SearchTestBase {
 		result = fullTextQuery.list();
 		assertPopulated( result );
 
-		fullTextSession.clear();
-		fullTextQuery = fullTextSession.createFullTextQuery( fieldFooQuery );
-		assertPopulated( fullTextQuery.iterate() );
-
 		tx.commit();
 		fullTextSession.close();
-	}
-
-	private void assertPopulated(Iterator<?> iterator) {
-		while ( iterator.hasNext() ) {
-			Object result = iterator.next();
-			assertPopulated( result );
-		}
 	}
 
 	private void assertPopulated(List<?> results) {
