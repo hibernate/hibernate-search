@@ -17,8 +17,14 @@ import java.util.stream.Stream;
  */
 public interface MappingAnnotatedElement {
 
+	/**
+	 * @return The Java class corresponding to the raw type of the annotated element.
+	 */
 	Class<?> javaClass();
 
+	/**
+	 * @return All annotations declared on the annotated element.
+	 */
 	Stream<Annotation> allAnnotations();
 
 }
