@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 
 public interface PojoMappingConfigurationContributor {
 
-	void configure(MappingBuildContext buildContext,
+	void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector);
 
 }

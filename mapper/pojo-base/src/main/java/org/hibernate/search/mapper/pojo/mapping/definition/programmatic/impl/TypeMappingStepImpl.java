@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -32,7 +33,7 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext,
+	public void configure(MappingBuildContext buildContext, PojoMappingConfigurationContext configurationContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		configurationCollector.collectContributor( typeModel, this );
 	}
