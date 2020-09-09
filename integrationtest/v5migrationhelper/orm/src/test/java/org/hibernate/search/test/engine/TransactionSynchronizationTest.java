@@ -7,23 +7,21 @@
 
 package org.hibernate.search.test.engine;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.bridge.builtin.EnumBridge;
 import org.hibernate.search.test.SearchTestBase;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
@@ -32,16 +30,15 @@ public class TransactionSynchronizationTest extends SearchTestBase {
 
 	@org.junit.Test
 	public void testProperExceptionPropagation() throws Exception {
-		/**
-		 * This test relies on the fact that a bridge accepting an incompatible type raise
-		 * an exception when used.
+		/*
+		 * This test relies on the fact that Hibernate Search needs to call getFailing()
+		 * during indexing, and that this method will throw an exception.
 		 */
 		FullTextSession fts = Search.getFullTextSession( openSession() );
 		boolean raised = false;
 		final Transaction transaction = fts.beginTransaction();
 		try {
 			Test test = new Test();
-			test.setIncorrectType( "not a class" );
 			fts.persist( test );
 			transaction.commit();
 			fail( "An exception should have been raised" );
@@ -78,15 +75,10 @@ public class TransactionSynchronizationTest extends SearchTestBase {
 
 		private Integer id;
 
-		@Field(bridge = @FieldBridge(impl = EnumBridge.class))
-		public String getIncorrectType() {
-			return incorrectType;
+		@Field
+		@Transient
+		public String getFailing() {
+			throw new IllegalStateException( "Simulated failure" );
 		}
-
-		public void setIncorrectType(String incorrectType) {
-			this.incorrectType = incorrectType;
-		}
-
-		private String incorrectType;
 	}
 }
