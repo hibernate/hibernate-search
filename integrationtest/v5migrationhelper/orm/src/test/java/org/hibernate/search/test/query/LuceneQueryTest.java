@@ -448,7 +448,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		Book book = (Book) result.get( 0 );
 		assertFalse( "Association should not be initialized", Hibernate.isInitialized( book.getAuthors() ) );
 
-		result = fullTextSession.createFullTextQuery( query ).setCriteriaQuery(
+		result = fullTextSession.createFullTextQuery( query, Book.class ).setCriteriaQuery(
 				fullTextSession.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN )
 		).list();
 		assertNotNull( result );
