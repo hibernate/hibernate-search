@@ -478,60 +478,6 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testMultipleEntityPerIndex() throws Exception {
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		Transaction tx = fullTextSession.beginTransaction();
-		AlternateBook alternateBook = new AlternateBook(
-				1, "La chute de la petite reine a travers les yeux de Festina"
-		);
-		fullTextSession.save( alternateBook );
-		tx.commit();
-		fullTextSession.clear();
-		tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
-
-		Query query = parser.parse( "summary:Festina" );
-		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit class filter", 1, result.size() );
-
-		query = parser.parse( "summary:Festina" );
-		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		Iterator it = hibQuery.iterate();
-		assertTrue( it.hasNext() );
-		assertNotNull( it.next() );
-		assertFalse( it.hasNext() );
-
-		query = parser.parse( "summary:Festina" );
-		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		ScrollableResults sr = hibQuery.scroll();
-		assertTrue( sr.first() );
-		assertNotNull( sr.get() );
-		assertFalse( sr.next() );
-		sr.close();
-
-		query = parser.parse( "summary:Festina OR brand:seiko" );
-		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
-		hibQuery.setMaxResults( 2 );
-		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with explicit class filter and limit", 2, result.size() );
-
-		query = parser.parse( "summary:Festina" );
-		hibQuery = fullTextSession.createFullTextQuery( query );
-		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query with no class filter", 2, result.size() );
-		for ( Object element : result ) {
-			assertTrue( Hibernate.isInitialized( element ) );
-		}
-
-		tx.commit();
-		fullTextSession.close();
-	}
-
-	@Test
 	public void testCriteria() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -661,7 +607,6 @@ public class LuceneQueryTest extends SearchTestBase {
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
-				AlternateBook.class,
 				Clock.class,
 				Author.class,
 				Employee.class
