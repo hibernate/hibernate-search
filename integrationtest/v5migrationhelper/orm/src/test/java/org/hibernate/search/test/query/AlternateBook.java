@@ -19,7 +19,7 @@ import org.hibernate.search.annotations.Store;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index = "Book")
+@Indexed(index = "AlternateBook")
 public class AlternateBook {
 
 	@Id
