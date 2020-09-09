@@ -17,6 +17,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,6 +30,7 @@ public class ContainedInReindexPropagationTest extends SearchTestBase {
 
 	// see HSEARCH-662
 	@Test
+	@Ignore("HSEARCH-4001: we need to use ReindexOnUpdate.SHALLOW for Dad.grandpa")
 	public void testUpdatingContainedInEntityPropagatesToAllEntities() throws Exception {
 		// source to move dads from
 		Grandpa source = new Grandpa( "grandpaSource" );
