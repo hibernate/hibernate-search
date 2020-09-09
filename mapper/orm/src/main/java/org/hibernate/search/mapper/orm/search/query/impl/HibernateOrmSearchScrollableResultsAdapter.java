@@ -172,6 +172,9 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 
 	@Override
 	public int getRowNumber() {
+		if ( afterLast ) {
+			return -1;
+		}
 		return currentIndexInScroll;
 	}
 
