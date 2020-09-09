@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
+import org.hibernate.graph.RootGraph;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -435,7 +435,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testCriteria() throws Exception {
+	public void testNoGraph() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
@@ -444,16 +444,103 @@ public class LuceneQueryTest extends SearchTestBase {
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
-		assertEquals( "Query with no explicit criteria", 1, result.size() );
+		assertEquals( "Query with no explicit entity graph", 1, result.size() );
 		Book book = (Book) result.get( 0 );
 		assertFalse( "Association should not be initialized", Hibernate.isInitialized( book.getAuthors() ) );
 
-		result = fullTextSession.createFullTextQuery( query, Book.class ).setCriteriaQuery(
-				fullTextSession.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN )
-		).list();
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testLoadGraph() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina" );
+
+		RootGraph<Book> graph = fullTextSession.createEntityGraph( Book.class );
+		graph.addAttributeNodes( "authors" );
+
+		List result = fullTextSession.createFullTextQuery( query, Book.class )
+				.applyLoadGraph( graph )
+				.list();
 		assertNotNull( result );
-		assertEquals( "Query with explicit criteria", 1, result.size() );
-		book = (Book) result.get( 0 );
+		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		Book book = (Book) result.get( 0 );
+		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
+		assertEquals( 1, book.getAuthors().size() );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testFetchGraph() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina" );
+
+		RootGraph<Book> graph = fullTextSession.createEntityGraph( Book.class );
+		graph.addAttributeNodes( "authors" );
+
+		List result = fullTextSession.createFullTextQuery( query, Book.class )
+				.applyFetchGraph( graph )
+				.list();
+		assertNotNull( result );
+		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		Book book = (Book) result.get( 0 );
+		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
+		assertEquals( 1, book.getAuthors().size() );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testLoadGraphHint() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina" );
+
+		RootGraph<Book> graph = fullTextSession.createEntityGraph( Book.class );
+		graph.addAttributeNodes( "authors" );
+
+		List result = fullTextSession.createFullTextQuery( query, Book.class )
+				.setHint( "javax.persistence.loadgraph", graph )
+				.list();
+		assertNotNull( result );
+		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		Book book = (Book) result.get( 0 );
+		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
+		assertEquals( 1, book.getAuthors().size() );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testFetchGraphHint() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina" );
+
+		RootGraph<Book> graph = fullTextSession.createEntityGraph( Book.class );
+		graph.addAttributeNodes( "authors" );
+
+		List result = fullTextSession.createFullTextQuery( query, Book.class )
+				.setHint( "javax.persistence.fetchgraph", graph )
+				.list();
+		assertNotNull( result );
+		assertEquals( "Query with explicit entity graph", 1, result.size() );
+		Book book = (Book) result.get( 0 );
 		assertTrue( "Association should be initialized", Hibernate.isInitialized( book.getAuthors() ) );
 		assertEquals( 1, book.getAuthors().size() );
 

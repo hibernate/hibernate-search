@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.FlushModeType;
 
 import org.apache.lucene.search.Sort;
-import org.hibernate.Criteria;
+import org.hibernate.graph.GraphSemantic;
+import org.hibernate.graph.RootGraph;
 import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -56,7 +57,17 @@ public interface FullTextQuery extends org.hibernate.search.jpa.FullTextQuery, Q
 	FullTextQuery setSort(Sort sort);
 
 	@Override
-	FullTextQuery setCriteriaQuery(Criteria criteria);
+	FullTextQuery applyGraph(RootGraph graph, GraphSemantic semantic);
+
+	@Override
+	default FullTextQuery applyFetchGraph(RootGraph graph) {
+		return applyGraph( graph, GraphSemantic.FETCH );
+	}
+
+	@Override
+	default FullTextQuery applyLoadGraph(RootGraph graph) {
+		return applyGraph( graph, GraphSemantic.LOAD );
+	}
 
 	@Override
 	FullTextQuery setProjection(String... fields);

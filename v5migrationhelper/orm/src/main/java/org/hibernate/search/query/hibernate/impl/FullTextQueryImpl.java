@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -22,13 +23,14 @@ import javax.persistence.Parameter;
 import javax.persistence.QueryTimeoutException;
 import javax.persistence.TemporalType;
 
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.graph.GraphSemantic;
+import org.hibernate.graph.RootGraph;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
@@ -76,12 +78,16 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	private Integer fetchSize = null;
 	private EntityLoadingCacheLookupStrategy cacheLookupStrategy = null;
+	private List<EntityGraphHint> entityGraphHints = new ArrayList<>();
 	private final Consumer<SearchLoadingOptionsStep> loadingOptionsContributor = o -> {
 		if ( cacheLookupStrategy != null ) {
 			o.cacheLookupStrategy( cacheLookupStrategy );
 		}
 		if ( fetchSize != null ) {
 			o.fetchSize( fetchSize );
+		}
+		for ( EntityGraphHint hint : entityGraphHints ) {
+			o.graph( hint.graph, hint.semantic );
 		}
 	};
 
@@ -171,8 +177,9 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	@Override
-	public FullTextQueryImpl setCriteriaQuery(Criteria criteria) {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+	public FullTextQueryImpl applyGraph(RootGraph graph, GraphSemantic semantic) {
+		entityGraphHints.add( new EntityGraphHint<>( graph, semantic ) );
+		return this;
 	}
 
 	@Override
@@ -246,6 +253,12 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 			else if ( value instanceof Number ) {
 				setTimeout( ( (Number) value ).longValue(), TimeUnit.MILLISECONDS );
 			}
+		}
+		else if ( "javax.persistence.fetchgraph".equals( hintName ) ) {
+			applyGraph( (RootGraph) value, GraphSemantic.FETCH );
+		}
+		else if ( "javax.persistence.loadgraph".equals( hintName ) ) {
+			applyGraph( (RootGraph) value, GraphSemantic.LOAD );
 		}
 		return this;
 	}
