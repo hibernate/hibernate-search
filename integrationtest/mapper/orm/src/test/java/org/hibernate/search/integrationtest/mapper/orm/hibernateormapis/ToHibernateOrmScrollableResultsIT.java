@@ -104,7 +104,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				}
 
 				assertThat( scroll.next() ).isFalse();
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -113,7 +113,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				// Call next() again after reaching the end: should not do anything
 				assertThat( scroll.next() ).isFalse();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -254,7 +254,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				}
 
 				assertThat( scroll.next() ).isFalse();
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -300,7 +300,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				}
 
 				assertThat( scroll.next() ).isFalse();
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -399,7 +399,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.scroll( 10000 ) ).isFalse();
 				backendMock.verifyExpectationsMet();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -408,7 +408,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				// Calling scroll(<positive number>) again after reaching the end should not do anything
 				assertThat( scroll.scroll( 0 ) ).isFalse();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -416,7 +416,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 				assertThat( scroll.scroll( 1 ) ).isFalse();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -559,7 +559,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.setRowNumber( 10000 ) ).isFalse();
 				backendMock.verifyExpectationsMet();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -869,7 +869,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				// next() still works after a call to last()
 				assertThat( scroll.next() ).isFalse();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -907,7 +907,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 				scroll.afterLast();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -950,7 +950,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.scroll( ENTITY_COUNT + 1 ) ).isFalse();
 				backendMock.verifyExpectationsMet();
 
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
@@ -959,7 +959,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				scroll.afterLast();
 
 				// We're still on the same element
-				assertThat( scroll.getRowNumber() ).isEqualTo( Integer.MAX_VALUE );
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
 				assertThat( scroll.isFirst() ).isFalse();
 				assertThat( scroll.isLast() ).isFalse();
 				assertThat( scroll.get( 0 ) ).isNull();
