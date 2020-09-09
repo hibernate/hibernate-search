@@ -99,7 +99,7 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 		assertNotNull( result );
 		Object[] projection = (Object[]) result.get( 0 );
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[0] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[0] ).getFields().size() );
 
 		tx.commit();
 	}
@@ -124,7 +124,7 @@ public class LuceneProjectionQueryTest extends SearchTestBase {
 				"Document fields should not be lazy on DOCUMENT projection",
 				"Jackson", ( (Document) projection[1] ).getField( "lastname" ).stringValue()
 		);
-		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[1] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[1] ).getFields().size() );
 
 		tx.commit();
 	}
