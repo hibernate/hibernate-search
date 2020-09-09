@@ -12,13 +12,15 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedType;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 public class TypeMappingAnnotationProcessorContextImpl
 		extends AbstractMappingAnnotationProcessorContext
 		implements TypeMappingAnnotationProcessorContext, MappingAnnotatedType {
 	private final PojoRawTypeModel<?> typeModel;
 
-	public TypeMappingAnnotationProcessorContextImpl(PojoRawTypeModel<?> typeModel) {
+	public TypeMappingAnnotationProcessorContextImpl(PojoRawTypeModel<?> typeModel, AnnotationHelper annotationHelper) {
+		super( annotationHelper );
 		this.typeModel = typeModel;
 	}
 
@@ -34,6 +36,6 @@ public class TypeMappingAnnotationProcessorContextImpl
 
 	@Override
 	public Stream<Annotation> allAnnotations() {
-		return typeModel.annotations();
+		return typeModel.annotations().flatMap( annotationHelper::expandRepeatableContainingAnnotation );
 	}
 }

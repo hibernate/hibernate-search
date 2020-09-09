@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.proc
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -186,6 +187,16 @@ public class CustomPropertyMappingAnnotationBaseIT {
 			@AnnotatedElementAwareAnnotation
 			@AnalyzerAnnotation(name = "foobar")
 			Collection<String> textCollection;
+			@AnnotatedElementAwareAnnotation
+			@MultiFieldAnnotation.List({
+					@MultiFieldAnnotation(name = "long1"),
+					@MultiFieldAnnotation(name = "long2")
+			})
+			Long longWithContainerAnnotation;
+			@AnnotatedElementAwareAnnotation
+			@MultiFieldAnnotation(name = "long3")
+			@MultiFieldAnnotation(name = "long4")
+			Long longWithRepeatedAnnotation;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
@@ -194,6 +205,10 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				.field( "myInteger", Integer.class )
 				.field( "myTextMapKeys", String.class, b2 -> b2.multiValued( true ).analyzerName( "bar" ) )
 				.field( "myTextCollection", String.class, b2 -> b2.multiValued( true ).analyzerName( "foobar" ) )
+				.field( "long1", Long.class )
+				.field( "long2", Long.class )
+				.field( "long3", Long.class )
+				.field( "long4", Long.class )
 		);
 
 		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
@@ -255,6 +270,13 @@ public class CustomPropertyMappingAnnotationBaseIT {
 					mapping.fullTextField( "myTextCollection" )
 							.analyzer( analyzer.get() );
 				}
+				else if ( Long.class.equals( annotatedElement.javaClass() ) ) {
+					assertThat( annotatedElement.name() ).startsWith( "longWith" );
+					annotatedElement.allAnnotations()
+							.filter( a -> MultiFieldAnnotation.class.equals( a.annotationType() ) )
+							.map( a -> ( (MultiFieldAnnotation) a ).name() )
+							.forEach( mapping::genericField );
+				}
 			}
 		}
 	}
@@ -264,6 +286,22 @@ public class CustomPropertyMappingAnnotationBaseIT {
 	private @interface AnalyzerAnnotation {
 
 		String name();
+
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.FIELD, ElementType.METHOD})
+	@Repeatable(MultiFieldAnnotation.List.class)
+	// Must be public in order for Hibernate Search to be able to access List#value
+	public @interface MultiFieldAnnotation {
+
+		String name();
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ElementType.FIELD, ElementType.METHOD})
+		@interface List {
+			MultiFieldAnnotation[] value();
+		}
 
 	}
 

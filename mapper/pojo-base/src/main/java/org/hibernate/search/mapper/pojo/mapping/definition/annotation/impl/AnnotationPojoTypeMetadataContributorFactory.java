@@ -104,7 +104,8 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			return false;
 		}
 
-		TypeMappingAnnotationProcessorContext context = new TypeMappingAnnotationProcessorContextImpl( typeModel );
+		TypeMappingAnnotationProcessorContext context = new TypeMappingAnnotationProcessorContextImpl(
+				typeModel, annotationHelper );
 
 		try ( BeanHolder<? extends TypeMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {
@@ -130,7 +131,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		}
 
 		PropertyMappingAnnotationProcessorContext context =
-				new PropertyMappingAnnotationProcessorContextImpl( propertyModel, configurationContext );
+				new PropertyMappingAnnotationProcessorContextImpl( propertyModel, annotationHelper, configurationContext );
 
 		try ( BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {
