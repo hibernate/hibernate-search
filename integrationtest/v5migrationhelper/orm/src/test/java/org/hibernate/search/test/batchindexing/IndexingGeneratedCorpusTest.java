@@ -32,6 +32,7 @@ import java.lang.invoke.MethodHandles;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -118,6 +119,7 @@ public class IndexingGeneratedCorpusTest {
 	}
 
 	@Test
+	@Ignore("HSEARCH-3998 needs to be solved first")
 	public void testBatchIndexing() throws InterruptedException, IOException {
 		verifyResultNumbers(); //initial count of entities should match expectations
 		purgeAll(); // empty indexes
