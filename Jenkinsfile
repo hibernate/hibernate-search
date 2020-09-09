@@ -234,7 +234,7 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.0', status: BuildEnvironmentStatus.SUPPORTED)
+					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3', status: BuildEnvironmentStatus.SUPPORTED)
 			]
 	])
 
