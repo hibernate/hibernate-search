@@ -71,6 +71,11 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 	}
 
 	@Override
+	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
+		parentNode.collectDependency( dirtyPathFromEntityType );
+	}
+
+	@Override
 	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();

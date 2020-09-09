@@ -127,6 +127,19 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		doCollectDependency( null );
 	}
 
+	@Override
+	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
+		if ( derivedFrom.isEmpty() ) {
+			parentNode.getParentNode().collectDependency( dirtyPathFromEntityType );
+		}
+		else {
+			// This value is derived from other properties.
+			// Any part of this value is assumed to be derived from the same properties:
+			// we don't care about which part in particular.
+			collectDependency();
+		}
+	}
+
 	void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
 		if ( initialNodeCollectingDependency != null ) {
 			if ( initialNodeCollectingDependency.unboundModelPathFromLastTypeNode.equals( unboundModelPathFromLastTypeNode ) ) {
@@ -154,7 +167,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 
 		if ( ReindexOnUpdate.DEFAULT.equals( reindexOnUpdate ) ) {
 			if ( derivedFrom.isEmpty() ) {
-				lastEntityNode.collectDependency( this.modelPathFromLastEntityNode );
+				parentNode.getParentNode().collectDependency( this.modelPathFromLastEntityNode );
 			}
 			else {
 				/*
