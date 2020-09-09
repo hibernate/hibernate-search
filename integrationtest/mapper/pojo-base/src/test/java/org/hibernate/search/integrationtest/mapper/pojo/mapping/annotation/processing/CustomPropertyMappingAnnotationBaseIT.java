@@ -13,10 +13,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedProperty;
@@ -175,12 +180,20 @@ public class CustomPropertyMappingAnnotationBaseIT {
 			String keyword;
 			@AnnotatedElementAwareAnnotation
 			Integer integer;
+			@AnnotatedElementAwareAnnotation
+			@AnalyzerAnnotation(name = "bar")
+			Map<String, Integer> textToIntMap;
+			@AnnotatedElementAwareAnnotation
+			@AnalyzerAnnotation(name = "foobar")
+			Collection<String> textCollection;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myText", String.class, b2 -> b2.analyzerName( "foo" ) )
 				.field( "myKeyword", String.class )
 				.field( "myInteger", Integer.class )
+				.field( "myTextMapKeys", String.class, b2 -> b2.multiValued( true ).analyzerName( "bar" ) )
+				.field( "myTextCollection", String.class, b2 -> b2.multiValued( true ).analyzerName( "foobar" ) )
 		);
 
 		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
@@ -215,6 +228,32 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				else if ( Integer.class.equals( annotatedElement.javaClass() ) ) {
 					assertThat( annotatedElement.name() ).isEqualTo( "integer" );
 					mapping.genericField( "myInteger" );
+				}
+				else if ( annotatedElement.javaClass(
+						ContainerExtractorPath.explicitExtractor( BuiltinContainerExtractors.MAP_KEY ) )
+						.filter( Predicate.isEqual( String.class ) ).isPresent() ) {
+					assertThat( annotatedElement.name() ).isEqualTo( "textToIntMap" );
+					Optional<String> analyzer = annotatedElement.allAnnotations()
+							.filter( a -> AnalyzerAnnotation.class.equals( a.annotationType() ) )
+							.map( a -> ( (AnalyzerAnnotation) a ).name() )
+							.reduce( (a, b) -> {
+								throw new IllegalStateException( "should not happen" );
+							} );
+					mapping.fullTextField( "myTextMapKeys" )
+							.extractor( BuiltinContainerExtractors.MAP_KEY )
+							.analyzer( analyzer.get() );
+				}
+				else if ( annotatedElement.javaClass( ContainerExtractorPath.defaultExtractors() )
+						.filter( Predicate.isEqual( String.class ) ).isPresent() ) {
+					assertThat( annotatedElement.name() ).isEqualTo( "textCollection" );
+					Optional<String> analyzer = annotatedElement.allAnnotations()
+							.filter( a -> AnalyzerAnnotation.class.equals( a.annotationType() ) )
+							.map( a -> ( (AnalyzerAnnotation) a ).name() )
+							.reduce( (a, b) -> {
+								throw new IllegalStateException( "should not happen" );
+							} );
+					mapping.fullTextField( "myTextCollection" )
+							.analyzer( analyzer.get() );
 				}
 			}
 		}

@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -34,12 +35,14 @@ import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 class AnnotationPojoTypeMetadataContributorFactory {
 
 	private final FailureCollector rootFailureCollector;
+	private final PojoMappingConfigurationContext configurationContext;
 	private final AnnotationHelper annotationHelper;
 	private final AnnotationProcessorProvider annotationProcessorProvider;
 
 	AnnotationPojoTypeMetadataContributorFactory(BeanResolver beanResolver, FailureCollector rootFailureCollector,
-			AnnotationHelper annotationHelper) {
+			PojoMappingConfigurationContext configurationContext, AnnotationHelper annotationHelper) {
 		this.rootFailureCollector = rootFailureCollector;
+		this.configurationContext = configurationContext;
 		this.annotationHelper = annotationHelper;
 		this.annotationProcessorProvider = new AnnotationProcessorProvider( beanResolver, rootFailureCollector );
 	}
@@ -127,7 +130,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		}
 
 		PropertyMappingAnnotationProcessorContext context =
-				new PropertyMappingAnnotationProcessorContextImpl( propertyModel );
+				new PropertyMappingAnnotationProcessorContextImpl( propertyModel, configurationContext );
 
 		try ( BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>> processorHolder =
 				processorOptional.get() ) {

@@ -61,7 +61,8 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 		FailureCollector failureCollector = buildContext.failureCollector();
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.annotationValueReadHandleFactory() );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
-				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, annotationHelper );
+				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, configurationContext,
+						annotationHelper );
 
 		/*
 		 * For types that were explicitly requested for annotation scanning and their supertypes,

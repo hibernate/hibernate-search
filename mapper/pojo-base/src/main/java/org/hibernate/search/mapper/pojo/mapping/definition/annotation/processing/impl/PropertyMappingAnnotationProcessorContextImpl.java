@@ -7,19 +7,25 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.annotation.Annotation;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotatedProperty;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 public class PropertyMappingAnnotationProcessorContextImpl
 		extends AbstractMappingAnnotationProcessorContext
 		implements PropertyMappingAnnotationProcessorContext, MappingAnnotatedProperty {
 	private final PojoPropertyModel<?> propertyModel;
+	private final PojoMappingConfigurationContext configurationContext;
 
-	public PropertyMappingAnnotationProcessorContextImpl(PojoPropertyModel<?> propertyModel) {
+	public PropertyMappingAnnotationProcessorContextImpl(PojoPropertyModel<?> propertyModel,
+			PojoMappingConfigurationContext configurationContext) {
 		this.propertyModel = propertyModel;
+		this.configurationContext = configurationContext;
 	}
 
 	@Override
@@ -30,6 +36,12 @@ public class PropertyMappingAnnotationProcessorContextImpl
 	@Override
 	public Class<?> javaClass() {
 		return propertyModel.typeModel().rawType().typeIdentifier().javaClass();
+	}
+
+	@Override
+	public Optional<Class<?>> javaClass(ContainerExtractorPath extractorPath) {
+		return configurationContext.extractedValueType( propertyModel.typeModel(), extractorPath )
+				.map( type -> type.rawType().typeIdentifier().javaClass() );
 	}
 
 	@Override
