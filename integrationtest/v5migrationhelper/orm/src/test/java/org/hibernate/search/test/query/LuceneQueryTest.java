@@ -292,10 +292,6 @@ public class LuceneQueryTest extends SearchTestBase {
 		result = results.get();
 		assertEquals( "incorrect entityInfo returned", 1004, result[0] );
 
-		results.scroll( -2 );
-		result = results.get();
-		assertEquals( "incorrect entityInfo returned", 1002, result[0] );
-
 		tx.commit();
 		fullTextSession.close();
 	}
@@ -329,9 +325,14 @@ public class LuceneQueryTest extends SearchTestBase {
 		result = results.get();
 		assertNull( result );
 
-		results.scroll( -8 );
+		results.close();
+
+		results = hibQuery.scroll();
+
+		results.beforeFirst();
+		results.next();
 		result = results.get();
-		assertNull( result );
+		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
 
 		// And test a bad forward scroll.
 		results.scroll( 10 );
@@ -410,21 +411,13 @@ public class LuceneQueryTest extends SearchTestBase {
 		results.next();
 		assertTrue( "beforeFirst() pointer incorrect", results.isFirst() );
 
+		results.last();
+		assertTrue( "last() pointer incorrect", results.isLast() );
+
 		results.afterLast();
-		results.previous();
-		assertTrue( "afterLast() pointer incorrect", results.isLast() );
+		assertEquals( "afterLast() pointer incorrect", -1, results.getRowNumber() );
 
-		// Let's see if a bad reverse scroll screws things up
-		results.scroll( -8 );
-		results.next();
-		assertTrue( "large negative scroll() pointer incorrect", results.isFirst() );
-
-		// And test a bad forward scroll.
-		results.scroll( 10 );
-		results.previous();
-		assertTrue( "large positive scroll() pointer incorrect", results.isLast() );
-
-		// Finally, let's test a REAL screwup.
+		// Let's test a REAL screwup.
 		hibQuery.setFirstResult( 3 );
 		hibQuery.setMaxResults( 1 );
 

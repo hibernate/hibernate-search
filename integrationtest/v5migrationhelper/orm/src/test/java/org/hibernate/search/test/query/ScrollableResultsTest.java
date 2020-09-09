@@ -64,16 +64,19 @@ public class ScrollableResultsTest {
 		QueryBuilder qb = sess.getSearchFactory().buildQueryBuilder().forEntity( AlternateBook.class ).get();
 		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
 		Sort sort = qb.sort().byField( "id" ).createSort();
-		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, AlternateBook.class )
-			.setSort( sort )
-			.setFetchSize( 10 )
-			.setFirstResult( 20 )
-			.setMaxResults( 111 )
-			.scroll();
+		FullTextQuery query = sess
+				.createFullTextQuery( tq, AlternateBook.class )
+				.setSort( sort )
+				.setFetchSize( 10 )
+				.setFirstResult( 20 )
+				.setMaxResults( 111 );
+		ScrollableResults scrollableResults = query.scroll();
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		assertTrue( scrollableResults.last() );
 		assertEquals( 110, scrollableResults.getRowNumber() );
+		scrollableResults.close();
+
+		scrollableResults = query.scroll();
 		scrollableResults.beforeFirst();
 		int position = scrollableResults.getRowNumber();
 		while ( scrollableResults.next() ) {
@@ -86,39 +89,6 @@ public class ScrollableResultsTest {
 			assertTrue( sess.contains( book ) );
 		}
 		assertEquals( 110, position );
-		scrollableResults.close();
-		tx.commit();
-	}
-
-	/**
-	 * Verify inverse-order scrolling.
-	 * TODO to verify correct FetchSize behavior I've been debugging
-	 * the behavior; we should add a mock library to automate this kind of tests.
-	 */
-	@Test
-	public void testScrollingBackwards() {
-		Transaction tx = sess.beginTransaction();
-		QueryBuilder qb = sess.getSearchFactory().buildQueryBuilder().forEntity( AlternateBook.class ).get();
-		TermQuery tq = new TermQuery( new Term( "summary", "number" ) );
-		Sort sort = qb.sort().byField( "id" ).createSort();
-		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, AlternateBook.class )
-			.setSort( sort )
-			.setFetchSize( 10 )
-			.scroll();
-		scrollableResults.beforeFirst();
-		// initial position should be -1 as in Hibernate Core
-		assertEquals( -1, scrollableResults.getRowNumber() );
-		assertTrue( scrollableResults.last() );
-		int position = scrollableResults.getRowNumber();
-		assertEquals( 323, position );
-		while ( scrollableResults.previous() ) {
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
-			assertEquals( --position, book.getId().intValue() );
-			assertEquals( "book about the number " + position, book.getSummary() );
-		}
-		assertEquals( 0, position );
-		assertEquals( -1, scrollableResults.getRowNumber() );
 		scrollableResults.close();
 		tx.commit();
 	}
@@ -151,21 +121,6 @@ public class ScrollableResultsTest {
 		}
 		//verifies it did scroll to the end:
 		assertEquals( 323, position );
-		//assert the entities are re-attached after eviction:
-		while ( scrollableResults.previous() ) {
-			position--;
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
-			assertTrue( sess.contains( book ) );
-		}
-		assertEquals( -1, position );
-		sess.clear();
-		//assert the entities are re-attached after Session.clear:
-		while ( scrollableResults.next() ) {
-			position++;
-			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
-			assertTrue( sess.contains( book ) );
-		}
-		assertEquals( 323, position );
 		tx.commit();
 	}
 
@@ -181,20 +136,23 @@ public class ScrollableResultsTest {
 		TermQuery tq = new TermQuery( new Term( "dept", "num" ) );
 		//the tests relies on the results being returned sorted by id:
 		Sort sort = qb.sort().byField( "id" ).createSort();
-		ScrollableResults scrollableResults = sess
-			.createFullTextQuery( tq, Employee.class )
-			.setProjection(
-					FullTextQuery.OBJECT_CLASS,
-					FullTextQuery.ID,
-					FullTextQuery.THIS,
-					"lastname",
-					FullTextQuery.THIS
-					)
-			.setFetchSize( 10 )
-			.setSort( sort )
-			.scroll();
+		FullTextQuery query = sess.createFullTextQuery( tq, Employee.class )
+				.setProjection(
+						FullTextQuery.OBJECT_CLASS,
+						FullTextQuery.ID,
+						FullTextQuery.THIS,
+						"lastname",
+						FullTextQuery.THIS
+				)
+				.setFetchSize( 10 )
+				.setSort( sort );
+
+		ScrollableResults scrollableResults = query.scroll();
 		scrollableResults.last();
 		assertEquals( 132, scrollableResults.getRowNumber() );
+		scrollableResults.close();
+
+		scrollableResults = query.scroll();
 		scrollableResults.beforeFirst();
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		int position = scrollableResults.getRowNumber();
@@ -216,17 +174,6 @@ public class ScrollableResultsTest {
 		}
 		//verify we scrolled to the end:
 		assertEquals( 132, position );
-		// and now the other way around, checking entities are attached again:
-		while ( scrollableResults.previous() ) {
-			position--;
-			Object[] objs = scrollableResults.get();
-			assertTrue( objs[2] instanceof Employee );
-			sess.contains( objs[2] );
-			assertTrue( objs[4] instanceof Employee );
-			sess.contains( objs[4] );
-			assertTrue( objs[2] == objs[4] );
-		}
-		assertEquals( -1, position );
 		scrollableResults.close();
 		tx.commit();
 	}
