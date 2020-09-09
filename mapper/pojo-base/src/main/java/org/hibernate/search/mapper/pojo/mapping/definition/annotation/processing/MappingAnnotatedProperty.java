@@ -14,6 +14,11 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
  */
 public interface MappingAnnotatedProperty extends MappingAnnotatedElement {
 
+	/**
+	 * @return The name of the annotated property.
+	 * In the case of a getter method, the name does not include the "get" prefix
+	 * and the first character is lowercased.
+	 */
 	String name();
 
 }
