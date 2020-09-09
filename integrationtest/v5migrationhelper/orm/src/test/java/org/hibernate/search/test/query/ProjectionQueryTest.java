@@ -167,9 +167,9 @@ public class ProjectionQueryTest extends SearchTestBase {
 		projection = projections.get();
 		assertNull( projection );
 
-		projections.previous();
-		projection = projections.get();
-		checkProjectionLast( projection, s );
+		projections.close();
+
+		projections = hibQuery.scroll();
 
 		projections.first();
 		projection = projections.get();
@@ -178,10 +178,6 @@ public class ProjectionQueryTest extends SearchTestBase {
 		projections.scroll( 2 );
 		projection = projections.get();
 		checkProjection2( projection, s );
-
-		projections.scroll( -5 );
-		projection = projections.get();
-		assertNull( projection );
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
