@@ -60,11 +60,6 @@ public final class Environment {
 	public static final String WORKER_EXECUTION = WORKER_PREFIX + "execution";
 
 	/**
-	 * Defines the maximum number of indexing operation batched per transaction
-	 */
-	public static final String QUEUEINGPROCESSOR_BATCHSIZE = "hibernate.search.batch_size";
-
-	/**
 	 * define the reader prefix
 	 */
 	public static final String READER_PREFIX = "reader";

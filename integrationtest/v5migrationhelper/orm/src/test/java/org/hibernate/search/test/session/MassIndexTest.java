@@ -18,8 +18,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
@@ -36,53 +34,6 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  */
 public class MassIndexTest extends SearchTestBase {
-
-	@Test
-	public void testBatchSize() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		final int loop = 14;
-		s.doWork( new Work() {
-			@Override
-			public void execute(Connection connection) throws SQLException {
-				for ( int i = 0; i < loop; i++ ) {
-					Statement statmt = connection.createStatement();
-						statmt.executeUpdate( "insert into Domain(id, name) values( + "
-								+ ( i + 1 ) + ", 'sponge" + i + "')" );
-						statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
-								+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) + ")" );
-						statmt.close();
-					}
-				}
-		} );
-		tx.commit();
-		s.close();
-
-		//check non created object does get found!!1
-		s = Search.getFullTextSession( openSession() );
-		tx = s.beginTransaction();
-		ScrollableResults results = s.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );
-		int index = 0;
-		while ( results.next() ) {
-			index++;
-			s.index( results.get( 0 ) );
-			if ( index % 5 == 0 ) {
-				s.clear();
-			}
-		}
-		tx.commit(); // if you get a LazyInitializationException, that's because we clear() the session in the loop.. it only works with a batch size of 5 (the point of the test)
-		s.clear();
-		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "noDefaultField", TestConstants.stopAnalyzer );
-		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
-		assertEquals( 14, result.size() );
-		for ( Object object : result ) {
-			s.delete( object );
-		}
-		tx.commit();
-		s.close();
-	}
-
 
 	@Test
 	public void testTransactional() throws Exception {
@@ -229,7 +180,6 @@ public class MassIndexTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( Environment.QUEUEINGPROCESSOR_BATCHSIZE, "5" );
 		cfg.put( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
