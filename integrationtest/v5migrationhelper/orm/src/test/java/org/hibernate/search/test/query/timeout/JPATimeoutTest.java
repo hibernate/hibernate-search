@@ -12,11 +12,14 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.QueryTimeoutException;
 
 import org.apache.lucene.search.Query;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
 
@@ -30,26 +33,35 @@ import static org.junit.Assert.assertFalse;
  */
 public class JPATimeoutTest extends JPATestCase {
 
+	private Query slowQuery;
+
+	@Override
+	@Before
+	public void setUp() {
+		super.setUp();
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+		QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
+		BooleanJunction junction = builder.bool();
+		junction.must( builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery() );
+		// Lots of clauses on different fields, to make the query slow
+		for ( String fieldName : Clock.FIELD_NAMES ) {
+			junction.must( builder.keyword().onField( fieldName ).matching( Clock.BUZZ_WORDS ).createQuery() );
+		}
+		slowQuery = junction.createQuery();
+		storeClocks( em );
+		em.close();
+	}
+
 	@Test
 	public void testQueryTimeoutException() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
-		em.getTransaction().begin();
-		for ( long i = 0; i < 1000; i++ ) {
-			Clock clock = new Clock( Long.valueOf( i ), "Model cat A" + i, ( i % 2 == 0 ) ? "Seiko" : "Swatch", Long.valueOf( 2000 + i ) );
-			em.persist( clock );
-		}
-		em.getTransaction().commit();
-
-		em.clear();
 
 		em.getTransaction().begin();
-		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
-		Query query = builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery();
-		FullTextQuery hibernateQuery = em.createFullTextQuery( query, Clock.class );
+		FullTextQuery hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 
 		hibernateQuery.setHint( "javax.persistence.query.timeout", 1 );
 		try {
-			hibernateQuery.getResultSize();
+			hibernateQuery.getResultList();
 			fail( "timeout exception should happen" );
 		}
 		catch (QueryTimeoutException e) {
@@ -73,26 +85,16 @@ public class JPATimeoutTest extends JPATestCase {
 	@Test
 	public void testLimitFetchingTime() {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
-		em.getTransaction().begin();
-		for ( long i = 0; i < 1000; i++ ) {
-			Clock clock = new Clock( Long.valueOf( i ), "Model cat A" + i, ( i % 2 == 0 ) ? "Seiko" : "Swatch", Long.valueOf( 2000 + i ) );
-			em.persist( clock );
-		}
-		em.getTransaction().commit();
-
-		em.clear();
 
 		em.getTransaction().begin();
 		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
-		Query query = builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery();
-		FullTextQuery hibernateQuery = em.createFullTextQuery( query, Clock.class );
+		FullTextQuery hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		List results = hibernateQuery.getResultList();
 		assertEquals( 500, results.size() );
 
 		em.clear();
 
-		query = builder.keyword().onField( "brand" ).matching( "Swatch" ).createQuery();
-		hibernateQuery = em.createFullTextQuery( query, Clock.class );
+		hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 1, TimeUnit.NANOSECONDS );
 		List result = hibernateQuery.getResultList();
 		System.out.println( "Result size early: " + result.size() );
@@ -106,7 +108,7 @@ public class JPATimeoutTest extends JPATestCase {
 
 		//We cannot test intermediate limit, Lucene / hibernate: too unpredictable
 
-//		hibernateQuery = fts.createFullTextQuery( query, Clock.class );
+//		hibernateQuery = fts.createFullTextQuery( slowQuery, Clock.class );
 //		hibernateQuery.limitFetchingTime( 1000, TimeUnit.NANOSECONDS );
 //		results = hibernateQuery.list();
 //		System.out.println("Result size partial: " + results.size() );
@@ -115,7 +117,7 @@ public class JPATimeoutTest extends JPATestCase {
 //
 //		fts.clear();
 
-		hibernateQuery = em.createFullTextQuery( query, Clock.class );
+		hibernateQuery = em.createFullTextQuery( slowQuery, Clock.class );
 		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );
 		results = hibernateQuery.getResultList();
 		assertEquals( "Test below limit termination", 500, results.size() );
@@ -141,5 +143,26 @@ public class JPATimeoutTest extends JPATestCase {
 	protected void configure(Map cfg) {
 		cfg.put( "hibernate.jdbc.batch_size", "1000" );
 		super.configure( cfg );
+	}
+
+	/**
+	 * Use to add some initial data
+	 *
+	 * @param em the fulltext session
+	 */
+	private static void storeClocks(FullTextEntityManager em) {
+		em.getTransaction().begin();
+		for ( int i = 0; i < 1000; i++ ) {
+			Clock clock = new Clock(
+					(long) i,
+					"Model cat A" + i,
+					( i % 2 == 0 ) ? "Seiko" : "Swatch",
+					(long) ( i + 2000 ),
+					Clock.TEXTS[i % 3]
+			);
+			em.persist( clock );
+		}
+		em.getTransaction().commit();
+		em.clear();
 	}
 }
