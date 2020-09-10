@@ -16,11 +16,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.persistence.QueryTimeoutException;
+
 import org.hibernate.ScrollableResults;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.type.Type;
 
@@ -79,12 +82,12 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 			return false;
 		}
 		if ( currentChunk == null ) { // Very first call
-			currentChunk = scroll.next();
+			currentChunk = nextChunk();
 		}
 		int currentChunkSize = currentChunk.hits().size();
 		while ( currentIndexInCurrentChunk >= currentChunkSize && currentChunk.hasHits() ) {
 			currentIndexInCurrentChunk -= currentChunkSize;
-			currentChunk = scroll.next();
+			currentChunk = nextChunk();
 			currentChunkSize = currentChunk.hits().size();
 		}
 		if ( currentIndexInCurrentChunk >= currentChunk.hits().size() ) {
@@ -94,7 +97,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 		currentHit = currentChunk.hits().get( currentIndexInCurrentChunk );
 		if ( currentIndexInCurrentChunk == ( currentChunkSize - 1 ) ) {
 			// Fetch the next chunk in order to be able to implement isLast()
-			currentChunk = scroll.next();
+			currentChunk = nextChunk();
 			currentIndexInCurrentChunk = -1;
 		}
 		return true;
@@ -314,6 +317,15 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 	@Override
 	public int getNumberOfTypes() {
 		throw columnTypesNotSupported();
+	}
+
+	private SearchScrollResult<H> nextChunk() {
+		try {
+			return scroll.next();
+		}
+		catch (SearchTimeoutException e) {
+			throw new QueryTimeoutException( e );
+		}
 	}
 
 	private UnsupportedOperationException columnTypesNotSupported() {
