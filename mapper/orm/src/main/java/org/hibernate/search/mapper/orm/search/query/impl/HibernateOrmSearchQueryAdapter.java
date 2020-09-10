@@ -43,6 +43,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityGraphHint;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
@@ -212,7 +213,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		}
 
 		int chunkSize = loadingOptions.fetchSize();
-		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults() );
+		return new HibernateOrmSearchScrollableResultsAdapter<>( delegate.scroll( chunkSize ), getMaxResults(),
+				ScrollHitExtractor.singleObject() );
 	}
 
 	@Override
@@ -434,4 +436,5 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	private static RootGraph<?> hintValueToEntityGraph(Object value) {
 		return (RootGraph) value;
 	}
+
 }

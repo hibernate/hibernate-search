@@ -39,10 +39,12 @@ import org.hibernate.query.spi.QueryImplementor;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.impl.V5MigrationOrmSearchIntegratorAdapter;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter;
+import org.hibernate.search.mapper.orm.search.query.spi.HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -119,10 +121,11 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 
 	@Override
 	public ScrollableResultsImplementor scroll() {
-		return new HibernateOrmSearchScrollableResultsAdapter<>(
-				hSearchQuery.scroll( fetchSize != null ? fetchSize : 100 ),
-				maxResults != null ? maxResults : Integer.MAX_VALUE
-		);
+		SearchScroll<?> scroll = hSearchQuery.scroll(
+				fetchSize != null ? fetchSize : 100 );
+		return new HibernateOrmSearchScrollableResultsAdapter<>( scroll,
+				maxResults != null ? maxResults : Integer.MAX_VALUE,
+				Search5ScrollHitExtractor.INSTANCE );
 	}
 
 	@Override
@@ -521,4 +524,32 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		return "FullTextQueryImpl(" + getQueryString() + ")";
 	}
 
+	private static final class Search5ScrollHitExtractor
+			implements ScrollHitExtractor<Object> {
+
+		private static final Search5ScrollHitExtractor INSTANCE = new Search5ScrollHitExtractor();
+
+		@Override
+		public Object[] toArray(Object hit) {
+			if ( hit instanceof Object[] ) {
+				return (Object[]) hit;
+			}
+			else {
+				return new Object[] { hit };
+			}
+		}
+
+		@Override
+		public Object toElement(Object hit, int index) {
+			if ( hit instanceof Object[] ) {
+				return ( (Object[]) hit )[index];
+			}
+			else if ( index != 0 ) {
+				throw new IndexOutOfBoundsException();
+			}
+			else {
+				return hit;
+			}
+		}
+	}
 }

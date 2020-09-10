@@ -33,6 +33,7 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 
 	private final SearchScroll<H> scroll;
 	private final int maxResults;
+	private final ScrollHitExtractor<? super H> hitExtractor;
 	private SearchScrollResult<H> currentChunk;
 	private H currentHit;
 	private int currentIndexInScroll;
@@ -40,9 +41,11 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 	private boolean afterLast;
 	private boolean closed;
 
-	public HibernateOrmSearchScrollableResultsAdapter(SearchScroll<H> scroll, int maxResults) {
+	public HibernateOrmSearchScrollableResultsAdapter(SearchScroll<H> scroll, int maxResults,
+			ScrollHitExtractor<? super H> hitExtractor) {
 		this.scroll = scroll;
 		this.maxResults = maxResults;
+		this.hitExtractor = hitExtractor;
 		this.currentChunk = null;
 		this.currentHit = null;
 		this.currentIndexInScroll = -1;
@@ -205,16 +208,16 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 		if ( currentIndexInScroll < 0 || afterLast ) {
 			return null;
 		}
-		return new Object[]{ currentHit };
+		return hitExtractor.toArray( currentHit );
 	}
 
 	@Override
 	public Object get(int i) {
 		checkNotClosed();
-		if ( i != 0 ) {
-			throw new IndexOutOfBoundsException();
+		if ( currentIndexInScroll < 0 || afterLast ) {
+			return null;
 		}
-		return currentHit;
+		return hitExtractor.toElement( currentHit, i );
 	}
 
 	@Override
@@ -341,4 +344,32 @@ public class HibernateOrmSearchScrollableResultsAdapter<H> implements Scrollable
 		}
 	}
 
+	public interface ScrollHitExtractor<H> {
+		Object[] toArray(H hit);
+		Object toElement(H hit, int index);
+
+		@SuppressWarnings({ "unchecked", "rawtypes" }) // The instance works for any H
+		static <H> ScrollHitExtractor<H> singleObject() {
+			return (ScrollHitExtractor) SingleObjectScrollHitExtractor.INSTANCE;
+		}
+	}
+
+	private static final class SingleObjectScrollHitExtractor<H>
+			implements HibernateOrmSearchScrollableResultsAdapter.ScrollHitExtractor<H> {
+
+		private static final SingleObjectScrollHitExtractor<Object> INSTANCE = new SingleObjectScrollHitExtractor<>();
+
+		@Override
+		public Object[] toArray(H hit) {
+			return new Object[] { hit };
+		}
+
+		@Override
+		public Object toElement(H hit, int index) {
+			if ( index > 0 ) {
+				throw new IndexOutOfBoundsException();
+			}
+			return hit;
+		}
+	}
 }
