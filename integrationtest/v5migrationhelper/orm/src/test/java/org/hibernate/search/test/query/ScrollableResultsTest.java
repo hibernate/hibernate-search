@@ -68,20 +68,19 @@ public class ScrollableResultsTest {
 				.createFullTextQuery( tq, AlternateBook.class )
 				.setSort( sort )
 				.setFetchSize( 10 )
-				.setFirstResult( 20 )
 				.setMaxResults( 111 );
 		ScrollableResults scrollableResults = query.scroll();
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		assertTrue( scrollableResults.last() );
-		assertEquals( 110, scrollableResults.getRowNumber() );
+		assertEquals( 130, scrollableResults.getRowNumber() );
 		scrollableResults.close();
 
 		scrollableResults = query.scroll();
-		scrollableResults.beforeFirst();
+		scrollableResults.scroll( 20 );
 		int position = scrollableResults.getRowNumber();
 		while ( scrollableResults.next() ) {
 			position++;
-			int bookId = position + 20;
+			int bookId = position;
 			assertEquals( position, scrollableResults.getRowNumber() );
 			AlternateBook book = (AlternateBook) scrollableResults.get()[0];
 			assertEquals( bookId, book.getId().intValue() );
