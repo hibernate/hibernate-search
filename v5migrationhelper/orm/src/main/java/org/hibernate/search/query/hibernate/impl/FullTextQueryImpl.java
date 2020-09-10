@@ -93,6 +93,8 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 		}
 	};
 
+	private ResultTransformer resultTransformer;
+
 	public FullTextQueryImpl(Query luceneQuery, SessionImplementor session,
 			V5MigrationOrmSearchIntegratorAdapter searchIntegrator,
 			V5MigrationSearchSession<SearchLoadingOptionsStep> searchSession,
@@ -154,7 +156,13 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	}
 
 	protected List doHibernateSearchList() {
-		return hSearchQuery.fetch();
+		List list = hSearchQuery.fetch();
+
+		if ( resultTransformer != null ) {
+			list = resultTransformer.transformList( list );
+		}
+
+		return list;
 	}
 
 	@Override
@@ -390,7 +398,14 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 	@Deprecated
 	@Override
 	public FullTextQueryImpl setResultTransformer(ResultTransformer transformer) {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		resultTransformer = transformer;
+		if ( transformer != null ) {
+			hSearchQuery.tupleTransformer( (tuple, fields) -> resultTransformer.transformTuple( tuple, fields ) );
+		}
+		else {
+			hSearchQuery.tupleTransformer( null );
+		}
+		return this;
 	}
 
 	/*
@@ -549,6 +564,40 @@ public class FullTextQueryImpl extends AbstractProducedQuery implements FullText
 			}
 			else {
 				return hit;
+			}
+		}
+	}
+
+	private static final class ResultTransformerScrollHitExtractor
+			implements ScrollHitExtractor<Object[]> {
+
+		private final ResultTransformer resultTransformer;
+		private final String[] aliases;
+
+		private ResultTransformerScrollHitExtractor(ResultTransformer resultTransformer, String[] aliases) {
+			this.resultTransformer = resultTransformer;
+			this.aliases = aliases;
+		}
+
+		@Override
+		public Object[] toArray(Object[] hit) {
+			Object transformed = resultTransformer.transformTuple( hit, aliases );
+			if ( transformed instanceof Object[] ) {
+				return (Object[]) transformed;
+			}
+			else {
+				return new Object[] { transformed };
+			}
+		}
+
+		@Override
+		public Object toElement(Object[] hit, int index) {
+			Object transformed = resultTransformer.transformTuple( hit, aliases );
+			if ( transformed instanceof Object[] ) {
+				return ((Object[]) transformed)[index];
+			}
+			else {
+				return transformed;
 			}
 		}
 	}
