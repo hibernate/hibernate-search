@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
@@ -26,6 +28,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.stat.Statistics;
 import org.junit.Before;
 import org.junit.Test;
@@ -267,7 +270,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testFetchSizeDefaultFirstAndMax() throws Exception {
+	public void testFetchSizeDefaultMax() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -297,7 +300,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testFetchSizeNonDefaultFirstAndMax() throws Exception {
+	public void testFetchSizeNonDefaultMax() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -307,14 +310,17 @@ public class LuceneQueryTest extends SearchTestBase {
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
-		hibQuery.setFirstResult( 1 );
-		hibQuery.setMaxResults( 3 );
+		hibQuery.setMaxResults( 4 );
 		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
 		results.next();
 		Object[] result = results.get();
+		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
+
+		results.next();
+		result = results.get();
 		assertEquals( "incorrect entityInfo returned", 1002, result[0] );
 
 		results.scroll( 2 );
@@ -344,7 +350,7 @@ public class LuceneQueryTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testFetchSizeNonDefaultFirstAndMaxNoHits() throws Exception {
+	public void testFetchSizeNonDefaultMaxNoHits() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
@@ -353,7 +359,6 @@ public class LuceneQueryTest extends SearchTestBase {
 		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
-		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 3 );
 
 		ScrollableResults results = hibQuery.scroll();
@@ -405,7 +410,6 @@ public class LuceneQueryTest extends SearchTestBase {
 		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 
-
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
 		results.next();
@@ -418,17 +422,39 @@ public class LuceneQueryTest extends SearchTestBase {
 		assertEquals( "afterLast() pointer incorrect", -1, results.getRowNumber() );
 
 		// Let's test a REAL screwup.
-		hibQuery.setFirstResult( 3 );
-		hibQuery.setMaxResults( 1 );
+		hibQuery.setMaxResults( 4 );
 
 		results = hibQuery.scroll();
-		results.first();
+		results.scroll( 4 );
 		Object[] result = results.get();
 		assertEquals( 1004, result[0] );
 
 		results.last();
 		result = results.get();
 		assertEquals( 1004, result[0] );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testScrollFirstResult() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Employee.class ).get();
+
+		Query query = parser.parse( "dept:ITech" );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
+		hibQuery.setSort( qb.sort().byField( "id" ).createSort() );
+		hibQuery.setProjection( "id", "lastname", "dept" );
+
+		hibQuery.setFirstResult( 3 );
+		hibQuery.setMaxResults( 1 );
+
+		assertThatThrownBy( () -> hibQuery.scroll() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Cannot use firstResult > 0 with scrolls" );
 
 		tx.commit();
 		fullTextSession.close();
@@ -563,7 +589,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		Object[] projection = projections.get();
 		assertNull( projection );
 
-		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
+		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setMaxResults( 20 );
 
 		projections = hibQuery.scroll();
 		projections.beforeFirst();
