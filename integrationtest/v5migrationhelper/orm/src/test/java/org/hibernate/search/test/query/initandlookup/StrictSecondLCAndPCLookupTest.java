@@ -19,8 +19,10 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +34,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class StrictSecondLCAndPCLookupTest extends SearchTestBase {
 
+	@Rule
+	public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch();
+
 	@Test
 	public void testStaleCacheWithAsyncIndexer() {
 		Session session = openSession();
@@ -40,14 +45,14 @@ public class StrictSecondLCAndPCLookupTest extends SearchTestBase {
 		statistics.setStatisticsEnabled( true );
 		setData( session, statistics );
 
-		// TODO HSEARCH-3282 disable index updates
+		indexingSwitch.enable( false ); // disable processing of index updates
 		Transaction tx = session.beginTransaction();
 		List list = session.createCriteria( StrictKernel.class ).list();
 		assertThat( list ).hasSize( 2 );
 		session.delete( list.get( 0 ) );
 		tx.commit();
 		session.clear();
-		// TODO HSEARCH-3282 re-enable index updates
+		indexingSwitch.enable( true );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery allKernelsQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() )

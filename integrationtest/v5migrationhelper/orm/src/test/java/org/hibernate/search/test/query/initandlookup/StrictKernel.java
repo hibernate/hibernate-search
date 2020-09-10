@@ -15,7 +15,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
 
 /**
  * @author Emmanuel Bernard
@@ -24,7 +25,9 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Cacheable(true)
 @Cache( usage = CacheConcurrencyStrategy.READ_WRITE )
-@Indexed
+@org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed(
+		routingBinder = @RoutingBinderRef(type = StaticIndexingSwitch.Binder.class)
+)
 public class StrictKernel {
 
 	@Id

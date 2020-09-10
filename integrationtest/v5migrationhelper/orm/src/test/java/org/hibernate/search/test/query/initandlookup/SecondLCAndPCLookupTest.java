@@ -23,8 +23,10 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -33,6 +35,9 @@ import org.junit.Test;
  * @author Emmanuel Bernard
  */
 public class SecondLCAndPCLookupTest extends SearchTestBase {
+
+	@Rule
+	public StaticIndexingSwitch indexingSwitch = new StaticIndexingSwitch();
 
 	@Test
 	public void testQueryWoLookup() throws Exception {
@@ -179,14 +184,14 @@ public class SecondLCAndPCLookupTest extends SearchTestBase {
 		statistics.setStatisticsEnabled( true );
 		setData( session, statistics );
 
-		// TODO HSEARCH-3282 disable index updates
+		indexingSwitch.enable( false ); // disable processing of index updates
 		Transaction tx = session.beginTransaction();
 		List list = session.createCriteria( Kernel.class ).list();
 		assertThat( list ).hasSize( 2 );
 		session.delete( list.get( 0 ) );
 		tx.commit();
 		session.clear();
-		// TODO HSEARCH-3282 re-enable index updates
+		indexingSwitch.enable( true );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery allKernelsQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() )
