@@ -71,11 +71,6 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy
 			return fromPersistenceContext;
 		}
 
-		if ( cacheAccess == null ) {
-			// This type is not cached.
-			return null;
-		}
-
 		/*
 		 * Note we must call this method specifically,
 		 * and not sessionFactory.getCache().containsEntity() which is unaware of the session
