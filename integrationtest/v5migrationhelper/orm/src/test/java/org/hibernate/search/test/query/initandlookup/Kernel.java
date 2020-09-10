@@ -15,7 +15,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.StaticIndexingSwitch;
 
 /**
  * @author Emmanuel Bernard
@@ -23,8 +24,9 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Cacheable(true)
 @Cache( usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE )
-@Indexed
-// TODO HSEARCH-3282 add routing bridge to enable/disable indexing on-demand
+@org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed(
+		routingBinder = @RoutingBinderRef(type = StaticIndexingSwitch.Binder.class)
+)
 public class Kernel {
 
 	@Id
