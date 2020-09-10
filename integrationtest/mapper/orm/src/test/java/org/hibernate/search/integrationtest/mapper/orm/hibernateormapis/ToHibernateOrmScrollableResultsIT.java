@@ -14,9 +14,11 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.QueryTimeoutException;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -30,6 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
@@ -1008,6 +1011,31 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThatThrownBy( () -> scroll.last() ).satisfies( exceptionExpectations );
 				assertThatThrownBy( () -> scroll.afterLast() ).satisfies( exceptionExpectations );
 				assertThatThrownBy( () -> scroll.first() ).satisfies( exceptionExpectations );
+			}
+		} );
+	}
+
+	@Test
+	public void timeout() {
+		withinSession( sessionFactory, session -> {
+			backendMock.expectScrollObjects( Collections.singletonList( IndexedEntity.NAME ),
+					DEFAULT_FETCH_SIZE, b -> b.failAfter( 200, TimeUnit.MILLISECONDS ) );
+			try ( ScrollableResults scroll = createSimpleQuery( session )
+					.setHint( "javax.persistence.query.timeout", 200 )
+					.scroll() ) {
+				backendMock.verifyExpectationsMet();
+
+				assertThat( scroll.getRowNumber() ).isEqualTo( -1 );
+
+				SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
+
+				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
+						StubNextScrollWorkBehavior.failing( () -> timeoutException ) );
+				assertThatThrownBy( scroll::next )
+						.isInstanceOf( QueryTimeoutException.class )
+						.hasCause( timeoutException );
+
+				expectScrollClose();
 			}
 		} );
 	}
