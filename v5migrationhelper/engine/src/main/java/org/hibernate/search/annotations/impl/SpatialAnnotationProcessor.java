@@ -7,7 +7,6 @@
 package org.hibernate.search.annotations.impl;
 
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.impl.CoordinatesBridge;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
@@ -35,7 +34,10 @@ public class SpatialAnnotationProcessor implements TypeMappingAnnotationProcesso
 		return new CoordinatesBridge.Binder()
 				.fieldName( annotation.name() )
 				.markerSet( annotation.name() )
-				.projectable( Store.YES.equals( annotation.store() ) ? Projectable.YES : Projectable.NO );
+				// The "distance" projection used to be available regardless of configuration,
+				// so we need to always mark the field as projectable.
+				// As a nasty side-effect, the field will always be stored, regardless of the "store" attribute...
+				.projectable( Projectable.YES );
 	}
 
 }
