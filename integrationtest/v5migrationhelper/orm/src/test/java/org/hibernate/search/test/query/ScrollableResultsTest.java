@@ -72,7 +72,7 @@ public class ScrollableResultsTest {
 		ScrollableResults scrollableResults = query.scroll();
 		assertEquals( -1, scrollableResults.getRowNumber() );
 		assertTrue( scrollableResults.last() );
-		assertEquals( 130, scrollableResults.getRowNumber() );
+		assertEquals( 110, scrollableResults.getRowNumber() );
 		scrollableResults.close();
 
 		scrollableResults = query.scroll();
