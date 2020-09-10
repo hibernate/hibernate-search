@@ -23,7 +23,7 @@ import javax.persistence.Id;
 
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
@@ -496,8 +496,8 @@ public class SortTest extends SearchTestBase {
 		private final int[] field1Values;
 		private final int[] field2Values;
 
-		private NumericDocValues currentReaderValuesField1;
-		private NumericDocValues currentReaderValuesField2;
+		private SortedNumericDocValues currentReaderValuesField1;
+		private SortedNumericDocValues currentReaderValuesField2;
 		private int bottom;
 		private Integer topValue;
 
@@ -532,7 +532,7 @@ public class SortTest extends SearchTestBase {
 		public int compareBottom(int doc) throws IOException {
 			int v;
 			if ( currentReaderValuesField1.advanceExact( doc ) && currentReaderValuesField2.advanceExact( doc ) ) {
-				v = (int) ( currentReaderValuesField1.longValue() + currentReaderValuesField2.longValue() );
+				v = (int) ( currentReaderValuesField1.nextValue() + currentReaderValuesField2.nextValue() );
 			}
 			else {
 				v = Integer.MAX_VALUE;
@@ -547,11 +547,11 @@ public class SortTest extends SearchTestBase {
 
 		@Override
 		public void copy(int slot, int doc) throws IOException {
-			int v1 = (int) ( currentReaderValuesField1.advanceExact( doc ) ? currentReaderValuesField1.longValue()
+			int v1 = (int) ( currentReaderValuesField1.advanceExact( doc ) ? currentReaderValuesField1.nextValue()
 					: Integer.MAX_VALUE );
 			field1Values[slot] = v1;
 
-			int v2 = (int) ( currentReaderValuesField2.advanceExact( doc ) ? currentReaderValuesField2.longValue()
+			int v2 = (int) ( currentReaderValuesField2.advanceExact( doc ) ? currentReaderValuesField2.nextValue()
 					: Integer.MAX_VALUE );
 			field2Values[slot] = v2;
 		}
@@ -559,8 +559,8 @@ public class SortTest extends SearchTestBase {
 		@Override
 		protected void doSetNextReader(LeafReaderContext context) throws IOException {
 			final LeafReader reader = context.reader();
-			currentReaderValuesField1 = reader.getNumericDocValues( field1 );
-			currentReaderValuesField2 = reader.getNumericDocValues( field2 );
+			currentReaderValuesField1 = reader.getSortedNumericDocValues( field1 );
+			currentReaderValuesField2 = reader.getSortedNumericDocValues( field2 );
 		}
 
 		@Override
