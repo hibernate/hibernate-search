@@ -184,4 +184,6 @@ public interface HSQuery extends ProjectionConstants {
 	 */
 	HSQuery setSpatialParameters(Coordinates center, String fieldName);
 
+	HSQuery tupleTransformer(TupleTransformer tupleTransformer);
+
 }

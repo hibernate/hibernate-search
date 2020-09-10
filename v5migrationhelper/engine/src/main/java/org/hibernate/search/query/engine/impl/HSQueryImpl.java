@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.TupleTransformer;
 import org.hibernate.search.query.engine.spi.V5MigrationSearchSession;
 import org.hibernate.search.scope.spi.V5MigrationSearchScope;
 import org.hibernate.search.spatial.Coordinates;
@@ -61,6 +62,8 @@ public class HSQueryImpl<LOS> implements HSQuery {
 
 	private boolean partialResult;
 	private Integer resultSize;
+
+	private TupleTransformer tupleTransformer;
 
 	public HSQueryImpl(V5MigrationSearchScope scope, V5MigrationSearchSession<LOS> session, Query query,
 			Consumer<LOS> loadOptionsContributor) {
@@ -189,6 +192,12 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		return this;
 	}
 
+	@Override
+	public HSQuery tupleTransformer(TupleTransformer tupleTransformer) {
+		this.tupleTransformer = tupleTransformer;
+		return this;
+	}
+
 	private SearchQuery<?> createSearchQuery() {
 		SearchProjection<?> projection = createCompositeProjection();
 		if ( sort == null ) {
@@ -215,15 +224,24 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	}
 
 	private SearchProjection<?> createCompositeProjection() {
+		SearchProjectionFactory<?, ?> factory = scope.projection();
+
 		if ( projectedFields == null || projectedFields.length == 0 ) {
-			return scope.projection().entity().toProjection();
+			// No tuple, so we ignore the tupleTransformer (Search 5 behavior)
+			return factory.entity().toProjection();
 		}
 
 		SearchProjection<?>[] projections = new SearchProjection[projectedFields.length];
 		for ( int i = 0; i < projectedFields.length; i++ ) {
 			projections[i] = createProjection( projectedFields[i] );
 		}
-		return scope.projection().composite( List::toArray, projections ).toProjection();
+
+		if ( tupleTransformer != null ) {
+			return factory.composite( list -> tupleTransformer.transform( list.toArray(), projectedFields ), projections ).toProjection();
+		}
+		else {
+			return factory.composite( List::toArray, projections ).toProjection();
+		}
 	}
 
 	private SearchProjection<?> createProjection(String field) {
