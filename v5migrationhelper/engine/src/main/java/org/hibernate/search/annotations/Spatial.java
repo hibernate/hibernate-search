@@ -14,6 +14,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.SpatialAnnotationProcessor;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
@@ -59,10 +62,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
+ * @deprecated If the latitude/longitude of the element annotated with {@link Spatial} are mutable,
+ * annotate these properties annotated with {@link Latitude}/{@link Longitude},
+ * and use {@link GeoPointBinding} instead of {@link Spatial}.
+ * If the latitude/longitude of the element annotated with {@link Spatial} are immutable,
+ * you can alternatively implement {@link GeoPoint} instead
+ * of {@link org.hibernate.search.spatial.Coordinates} and simply use {@link GenericField} on properties of this type.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
+@Deprecated
 @Repeatable(Spatials.class)
 @TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class))
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class))

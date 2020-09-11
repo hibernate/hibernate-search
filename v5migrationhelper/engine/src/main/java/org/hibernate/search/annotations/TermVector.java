@@ -6,11 +6,17 @@
  */
 package org.hibernate.search.annotations;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+
 /**
  * Defines the term vector storing strategy
  *
  * @author John Griffin
+ * @deprecated Use Hibernate Search 6's full-text field annotation ({@link FullTextField})
+ * and enable/disable term vectors with <code>{@link FullTextField#termVector() @FullTextField(termVector = TermVector.YES)}</code>
+ * instead.
  */
+@Deprecated
 public enum TermVector {
 	/**
 	 * Store term vectors.

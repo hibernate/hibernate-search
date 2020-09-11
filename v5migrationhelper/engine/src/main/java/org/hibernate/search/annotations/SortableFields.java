@@ -16,10 +16,12 @@ import java.lang.annotation.Target;
  * Defines several sortable fields.
  *
  * @author Gunnar Morling
+ * @deprecated See the deprecation note on {@link SortableField}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
+@Deprecated
 public @interface SortableFields {
 
 	/**

@@ -19,6 +19,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.FieldAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 
@@ -27,10 +30,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @deprecated Use Hibernate Search 6's field annotations instead:
+ * <ul>
+ *     <li>{@link FullTextField} for text fields with an analyzer.</li>
+ *     <li>{@link KeywordField} for text fields with a normalizer.</li>
+ *     <li>{@link GenericField} for non-text fields.</li>
+ * </ul>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
+@Deprecated
 @Repeatable(Fields.class)
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FieldAnnotationProcessor.class))
 public @interface Field {

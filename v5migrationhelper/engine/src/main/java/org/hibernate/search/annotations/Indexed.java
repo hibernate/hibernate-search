@@ -16,9 +16,14 @@ import org.hibernate.search.annotations.impl.IndexedAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 
+/**
+ * @deprecated Use Hibernate Search 6's {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}
+ * instead.
+ */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
 @Documented
+@Deprecated
 @TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedAnnotationProcessor.class))
 public @interface Indexed {
 	/**
