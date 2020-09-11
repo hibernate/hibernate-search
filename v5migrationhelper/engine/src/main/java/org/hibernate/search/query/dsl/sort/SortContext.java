@@ -6,13 +6,24 @@
  */
 package org.hibernate.search.query.dsl.sort;
 
+import java.util.function.Function;
+
 import org.apache.lucene.search.SortField;
+
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.util.common.SearchException;
 
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
+ * @deprecated Instead of using Hibernate Search 5 APIs, get a {@code org.hibernate.search.mapper.orm.session.SearchSession}
+ * using {@code org.hibernate.search.mapper.orm.Search#session(org.hibernate.Session)},
+ * create a {@link SearchQuery} with {@code org.hibernate.search.mapper.orm.session.SearchSession#search(Class)},
+ * and define your sorts using {@link SearchQueryOptionsStep#sort(Function)}.
+ * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
  */
+@Deprecated
 public interface SortContext {
 
 	/**

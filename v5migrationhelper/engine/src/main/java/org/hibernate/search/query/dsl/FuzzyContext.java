@@ -9,7 +9,9 @@ package org.hibernate.search.query.dsl;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	/**
 	 * field / property the term query is executed on

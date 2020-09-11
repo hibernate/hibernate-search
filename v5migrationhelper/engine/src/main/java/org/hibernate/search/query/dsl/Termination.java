@@ -11,7 +11,9 @@ import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface Termination<T> {
 	/**
 	 * Return the lucene query representing the operation

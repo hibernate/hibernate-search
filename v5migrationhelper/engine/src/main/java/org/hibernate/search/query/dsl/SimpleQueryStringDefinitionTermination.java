@@ -9,6 +9,10 @@ package org.hibernate.search.query.dsl;
 
 import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 
+/**
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
+ */
+@Deprecated
 public interface SimpleQueryStringDefinitionTermination {
 
 	/**

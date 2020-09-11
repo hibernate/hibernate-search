@@ -10,7 +10,9 @@ import org.hibernate.search.spatial.Coordinates;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface WithinContext {
 
 	/**

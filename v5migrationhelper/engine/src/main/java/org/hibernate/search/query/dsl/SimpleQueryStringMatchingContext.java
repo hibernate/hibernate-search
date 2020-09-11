@@ -8,8 +8,10 @@
 package org.hibernate.search.query.dsl;
 
 /**
-* @author Guillaume Smet
+ * @author Guillaume Smet
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
 */
+@Deprecated
 public interface SimpleQueryStringMatchingContext extends SimpleQueryStringDefinitionTermination {
 	/**
 	 * Boost the field to a given value

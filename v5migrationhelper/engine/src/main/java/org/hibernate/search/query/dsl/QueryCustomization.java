@@ -13,7 +13,9 @@ import org.apache.lucene.search.Query;
  * Operations common to all types of queries
  *
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface QueryCustomization<T> {
 
 	/**

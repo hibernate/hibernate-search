@@ -9,7 +9,9 @@ package org.hibernate.search.query.dsl;
 
 /**
  * @author Guillaume Smet
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface SimpleQueryStringContext extends QueryCustomization<SimpleQueryStringContext> {
 	/**
 	 * @param field The field name the query is executed on

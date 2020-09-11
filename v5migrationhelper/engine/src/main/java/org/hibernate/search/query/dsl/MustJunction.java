@@ -12,7 +12,9 @@ package org.hibernate.search.query.dsl;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface MustJunction extends BooleanJunction<MustJunction> {
 	/**
 	 * Negate the must clause.

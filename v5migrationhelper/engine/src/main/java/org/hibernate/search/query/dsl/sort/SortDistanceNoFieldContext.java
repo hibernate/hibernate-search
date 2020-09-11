@@ -11,7 +11,9 @@ import org.hibernate.search.annotations.Spatial;
 /**
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
+ * @deprecated See the deprecation note on {@link SortContext}.
  */
+@Deprecated
 public interface SortDistanceNoFieldContext {
 
 	/**
