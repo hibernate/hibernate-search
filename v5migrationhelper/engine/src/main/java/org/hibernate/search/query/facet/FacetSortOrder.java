@@ -7,11 +7,15 @@
 
 package org.hibernate.search.query.facet;
 
+import org.hibernate.search.query.dsl.FacetContext;
+
 /**
  * Specifies the order in which the facets are returned.
  *
  * @author Hardy Ferentschik
+ * @deprecated See the deprecation note on {@link FacetContext}.
  */
+@Deprecated
 public enum FacetSortOrder {
 	/**
 	 * Facets are returned by count with the lowest count first

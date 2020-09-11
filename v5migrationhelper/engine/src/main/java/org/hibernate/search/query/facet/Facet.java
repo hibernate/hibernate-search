@@ -7,11 +7,15 @@
 
 package org.hibernate.search.query.facet;
 
+import org.hibernate.search.query.dsl.FacetContext;
+
 /**
  * A single facet (field value and count).
  *
  * @author Hardy Ferentschik
+ * @deprecated See the deprecation note on {@link FacetContext}.
  */
+@Deprecated
 public interface Facet {
 	/**
 	 * @return the faceting name this {@code Facet}	belongs to.

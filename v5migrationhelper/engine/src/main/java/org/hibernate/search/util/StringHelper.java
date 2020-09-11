@@ -15,7 +15,9 @@ import java.util.Iterator;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @deprecated Will be removed without replacement.
  */
+@Deprecated
 public final class StringHelper {
 
 	private StringHelper() { /* static methods only - hide constructor */

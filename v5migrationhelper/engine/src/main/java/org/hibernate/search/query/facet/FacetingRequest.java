@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.query.facet;
 
+import org.hibernate.search.query.dsl.FacetContext;
+
 /**
  * Faceting request interface.
  *
  * @author Hardy Ferentschik
+ * @deprecated See the deprecation note on {@link FacetContext}.
  */
+@Deprecated
 public interface FacetingRequest {
 	/**
 	 * @return the name of this faceting request. The faceting name can be an arbitrary string.

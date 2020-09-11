@@ -25,7 +25,9 @@ import java.lang.invoke.MethodHandles;
  * <p>Taken and modified from <i>Lucene in Action</i>.
  *
  * @author Hardy Ferentschik
+ * @deprecated Will be removed without replacement.
  */
+@Deprecated
 public final class AnalyzerUtils {
 
 	private AnalyzerUtils() {

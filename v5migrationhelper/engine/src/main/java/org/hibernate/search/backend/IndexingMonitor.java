@@ -8,7 +8,9 @@ package org.hibernate.search.backend;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
+ * @deprecated See the deprecation note on {@link org.hibernate.search.batchindexing.MassIndexerProgressMonitor}.
  */
+@Deprecated
 public interface IndexingMonitor {
 
 	/**
