@@ -180,64 +180,92 @@ stage('Configure') {
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkBuildEnvironment(version: '8', buildJdkTool: 'OpenJDK 11 Latest',
 							testJdkRelease: '8', testJdkTool: 'OpenJDK 8 Latest',
-							status: BuildEnvironmentStatus.SUPPORTED),
+							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '11', buildJdkTool: 'OpenJDK 11 Latest',
-							status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
 					new JdkBuildEnvironment(version: '14', buildJdkTool: 'OpenJDK 14 Latest',
-							status: BuildEnvironmentStatus.SUPPORTED),
+							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
-							status: BuildEnvironmentStatus.SUPPORTED),
+							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
-							status: BuildEnvironmentStatus.SUPPORTED)
+							condition: TestCondition.AFTER_MERGE)
 			],
 			compiler: [
-					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: BuildEnvironmentStatus.SUPPORTED),
+					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
+							condition: TestCondition.AFTER_MERGE),
 			],
 			database: [
-					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: BuildEnvironmentStatus.SUPPORTED),
-					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: BuildEnvironmentStatus.SUPPORTED)
+					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2',
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
+					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb',
+							condition: TestCondition.AFTER_MERGE),
+					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql',
+							condition: TestCondition.AFTER_MERGE)
 			],
 			esLocal: [
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.AFTER_MERGE),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
 					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
 					new EsLocalBuildEnvironment(versionRange: '[6.0,6.2)', mavenProfile: 'elasticsearch-6.0',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
-					// ES 6.3 has a bug that prevents IndexingIT from passing. See https://github.com/elastic/elasticsearch/issues/32395
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.ON_DEMAND),
+					// ES 6.3 has a bug that prevents IndexingIT from passing.
+					// See https://github.com/elastic/elasticsearch/issues/32395
 					new EsLocalBuildEnvironment(versionRange: '[6.3,6.4)', mavenProfile: 'elasticsearch-6.3',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[6.4,6.7)', mavenProfile: 'elasticsearch-6.4',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.AFTER_MERGE),
 					new EsLocalBuildEnvironment(versionRange: '[6.7,7.0)', mavenProfile: 'elasticsearch-6.7',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.0/7.1/7.2 to make the build quicker.
 					// The only difference with 7.3+ is they have a bug in their BigInteger support.
 					new EsLocalBuildEnvironment(versionRange: '[7.0,7.3)', mavenProfile: 'elasticsearch-7.0',
-							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[7.3,7.7)', mavenProfile: 'elasticsearch-7.3',
-							jdkTool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+							jdkTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.AFTER_MERGE),
 					new EsLocalBuildEnvironment(versionRange: '[7.7,7.x)', mavenProfile: 'elasticsearch-7.7',
-							jdkTool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD)
+							jdkTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.BEFORE_MERGE,
+							isDefault: true),
 			],
 			// Note that each of these environments will only be tested if the appropriate
 			// environment variable with the AWS ES Service URL is defined in CI.
 			esAws: [
-					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0',
+							condition: TestCondition.AFTER_MERGE),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
 					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
-					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.EXPERIMENTAL),
-					// ES 6.3 has a bug that prevents IndexingIT from passing. See https://github.com/elastic/elasticsearch/issues/32395
-					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.3', status: BuildEnvironmentStatus.EXPERIMENTAL),
-					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.4', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.4', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7', status: BuildEnvironmentStatus.SUPPORTED)
+					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0',
+							condition: TestCondition.ON_DEMAND),
+					// ES 6.3 has a bug that prevents IndexingIT from passing.
+					// See https://github.com/elastic/elasticsearch/issues/32395
+					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.3',
+							condition: TestCondition.ON_DEMAND),
+					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.4',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.4',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.7',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3',
+							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
+							condition: TestCondition.AFTER_MERGE),
 			]
 	])
 
@@ -272,7 +300,6 @@ stage('Configure') {
 							choices: """AUTOMATIC
 DEFAULT
 SUPPORTED
-EXPERIMENTAL
 ALL""",
 							defaultValue: 'AUTOMATIC',
 							description: """A set of environments that must be checked.
@@ -648,24 +675,31 @@ stage('Deploy') {
 
 // Job-specific helpers
 
-enum BuildEnvironmentStatus {
-	// For environments used as part of the default build (tested on all branches)
-	USED_IN_DEFAULT_BUILD,
-	// For environments that are expected to work correctly (tested on master and maintenance branches)
-	SUPPORTED,
-	// For environments that may not work correctly (only tested when explicitly requested through job parameters)
-	EXPERIMENTAL;
+enum TestCondition {
+	// For environments that are expected to work correctly
+	// before merging into master or maintenance branches.
+	// Tested on master and maintenance branches, on feature branches, and for PRs.
+	BEFORE_MERGE,
+	// For environments that are expected to work correctly,
+	// but are considered too resource-intensive to test them on pull requests.
+	// Tested on master and maintenance branches only.
+	// Not tested on feature branches or PRs.
+	AFTER_MERGE,
+	// For environments that may not work correctly.
+	// Only tested when explicitly requested through job parameters.
+	ON_DEMAND;
 
 	// Work around JENKINS-33023
 	// See https://issues.jenkins-ci.org/browse/JENKINS-33023?focusedCommentId=325738&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-325738
-	public BuildEnvironmentStatus() {}
+	public TestCondition() {}
 }
 
 abstract class BuildEnvironment {
-	BuildEnvironmentStatus status
+	boolean isDefault = false
+	TestCondition condition
 	String toString() { getTag() }
 	abstract String getTag()
-	boolean isDefault() { status == BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD }
+	boolean isDefault() { isDefault }
 	boolean requiresDefaultBuildArtifacts() { true }
 
 	String getMavenJdkTool(def allEnvironments) {
@@ -766,40 +800,46 @@ void keepOnlyEnvironmentsMatchingFilter(String regex) {
 }
 
 void keepOnlyEnvironmentsFromSet(String environmentSetName) {
-	boolean enableDefaultBuildEnv = false
-	boolean enableNonDefaultSupportedBuildEnv = false
-	boolean enableExperimentalBuildEnv = false
+	boolean enableDefaultEnv = false
+	boolean enableBeforeMergeEnvs = false
+	boolean enableAfterMergeEnvs = false
+	boolean enableOnDemandEnvs = false
 	switch (environmentSetName) {
 		case 'DEFAULT':
-			enableDefaultBuildEnv = true
+			enableDefaultEnv = true
 			break
 		case 'SUPPORTED':
-			enableDefaultBuildEnv = true
-			enableNonDefaultSupportedBuildEnv = true
+			enableDefaultEnv = true
+			enableBeforeMergeEnvs = true
+			enableAfterMergeEnvs = true
 			break
 		case 'ALL':
-			enableDefaultBuildEnv = true
-			enableNonDefaultSupportedBuildEnv = true
-			enableExperimentalBuildEnv = true
+			enableDefaultEnv = true
+			enableBeforeMergeEnvs = true
+			enableAfterMergeEnvs = true
+			enableOptional = true
 			break
 		case 'EXPERIMENTAL':
-			enableExperimentalBuildEnv = true
+			enableOptional = true
 			break
 		case 'AUTOMATIC':
 			if (params.RELEASE_VERSION) {
-				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
+				echo "Releasing version '$params.RELEASE_VERSION'."
 			} else if (helper.scmSource.pullRequest) {
-				echo "Enabling only the default build in the default environment for pull request $helper.scmSource.pullRequest.id"
-				enableDefaultBuildEnv = true
+				echo "Building pull request '$helper.scmSource.pullRequest.id'"
+				enableDefaultEnv = true
+				enableBeforeMergeEnvs = true
 			} else if (helper.scmSource.branch.primary) {
-				echo "Enabling builds on all supported environments for primary branch '$helper.scmSource.branch.name'"
-				enableDefaultBuildEnv = true
-				enableNonDefaultSupportedBuildEnv = true
-				echo "Enabling legacy integration tests in the default environment for primary branch '$helper.scmSource.branch.name'"
+				echo "Building primary branch '$helper.scmSource.branch.name'"
+				enableDefaultEnv = true
+				enableBeforeMergeEnvs = true
+				enableAfterMergeEnvs = true
+				echo "Legacy integration tests are enabled for the default build environment."
 				enableDefaultBuildLegacyIT = true
 			} else {
-				echo "Enabling only the default build in the default environment for feature branch $helper.scmSource.branch.name"
-				enableDefaultBuildEnv = true
+				echo "Building feature branch '$helper.scmSource.branch.name'"
+				enableDefaultEnv = true
+				enableBeforeMergeEnvs = true
 			}
 			break
 		default:
@@ -811,15 +851,11 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 	// Filter environments
 
 	environments.content.each { key, envSet ->
-		if (!enableDefaultBuildEnv) {
-			envSet.enabled.remove(envSet.default)
-		}
-		if (!enableNonDefaultSupportedBuildEnv) {
-			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.SUPPORTED }
-		}
-		if (!enableExperimentalBuildEnv) {
-			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.EXPERIMENTAL }
-		}
+		envSet.enabled.removeAll { buildEnv -> ! (
+				enableDefaultEnv && buildEnv.isDefault ||
+				enableBeforeMergeEnvs && buildEnv.condition == TestCondition.BEFORE_MERGE ||
+				enableAfterMergeEnvs && buildEnv.condition == TestCondition.AFTER_MERGE ||
+						enableOnDemandEnvs && buildEnv.condition == TestCondition.ON_DEMAND ) }
 	}
 }
 
