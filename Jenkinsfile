@@ -180,7 +180,7 @@ stage('Configure') {
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.BEFORE_MERGE),
 			],
 			database: [
 					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2',
@@ -700,9 +700,6 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 			enableDefaultEnv = true
 			enableBeforeMergeEnvs = true
 			enableAfterMergeEnvs = true
-			enableOptional = true
-			break
-		case 'EXPERIMENTAL':
 			enableOptional = true
 			break
 		case 'AUTOMATIC':
