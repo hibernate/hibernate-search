@@ -11,7 +11,6 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.testsupport.AnalysisNames;
 
 import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
-import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
@@ -38,10 +37,6 @@ class V5MigrationHelperTestDefaultLuceneAnalysisConfigurer implements LuceneAnal
 				.tokenizer( WhitespaceTokenizerFactory.class );
 		context.analyzer( AnalysisNames.ANALYZER_WHITESPACE_LOWERCASE_ASCIIFOLDING ).custom()
 				.tokenizer( WhitespaceTokenizerFactory.class )
-				.tokenFilter( LowerCaseFilterFactory.class )
-				.tokenFilter( ASCIIFoldingFilterFactory.class );
-		context.analyzer( AnalysisNames.ANALYZER_KEYWORD_LOWERCASE_ASCIIFOLDING ).custom()
-				.tokenizer( KeywordTokenizerFactory.class )
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( ASCIIFoldingFilterFactory.class );
 		context.analyzer( AnalysisNames.ANALYZER_STANDARD ).instance( new StandardAnalyzer() );
