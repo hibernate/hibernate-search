@@ -47,6 +47,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 	private final Query query;
 	private final Consumer<LOS> loadOptionsContributor;
 	private final SearchPredicate predicate;
+	private final FacetManagerImpl facetManager;
 
 	private String[] projectedFields;
 	private SearchSort sort;
@@ -72,6 +73,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		this.query = query;
 		this.loadOptionsContributor = loadOptionsContributor;
 		this.predicate = scope.predicate().extension( LuceneExtension.get() ).fromLuceneQuery( query ).toPredicate();
+		this.facetManager = new FacetManagerImpl( this );
 	}
 
 	@Override
@@ -131,7 +133,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 
 	@Override
 	public FacetManager getFacetManager() {
-		throw new UnsupportedOperationException( "To be implemented by delegating to Search 6 APIs." );
+		return facetManager;
 	}
 
 	@Override
@@ -146,12 +148,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 
 	@Override
 	public List<?> fetch() {
-		SearchResult<?> result = createSearchQuery().fetch( offset, limit );
-		// Use the lower bound in case truncateAfter() was used and the timeout was reached.
-		// In all other cases, this will yield the exact hit count.
-		resultSize = Math.toIntExact( result.total().hitCountLowerBound() );
-		partialResult = result.timedOut();
-		return result.hits();
+		return doFetch( offset, limit );
 	}
 
 	@Override
@@ -198,6 +195,16 @@ public class HSQueryImpl<LOS> implements HSQuery {
 		return this;
 	}
 
+	List<?> doFetch(int offset, Integer limit) {
+		SearchResult<?> result = createSearchQuery().fetch( offset, limit );
+		// Use the lower bound in case truncateAfter() was used and the timeout was reached.
+		// In all other cases, this will yield the exact hit count.
+		resultSize = Math.toIntExact( result.total().hitCountLowerBound() );
+		partialResult = result.timedOut();
+		facetManager.setFacetResults( result );
+		return result.hits();
+	}
+
 	private SearchQuery<?> createSearchQuery() {
 		SearchProjection<?> projection = createCompositeProjection();
 		if ( sort == null ) {
@@ -220,6 +227,7 @@ public class HSQueryImpl<LOS> implements HSQuery {
 					break;
 			}
 		}
+		optionsStep = facetManager.contributeAggregations( optionsStep );
 		return optionsStep.toQuery();
 	}
 

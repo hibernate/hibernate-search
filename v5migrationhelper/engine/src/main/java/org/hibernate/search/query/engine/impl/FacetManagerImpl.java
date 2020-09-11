@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
@@ -25,7 +27,7 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The map of currently active/enabled facet requests.
 	 */
-	private Map<String, FacetingRequest> facetRequests;
+	private Map<String, FacetingRequestImpl<?>> facetRequests;
 
 	/**
 	 * Keeps track of faceting results. This map gets populated once the query gets executed and needs to be
@@ -36,9 +38,9 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The query from which this manager was retrieved
 	 */
-	private final Object query;
+	private final HSQueryImpl<?> query;
 
-	public FacetManagerImpl(Object query) {
+	public FacetManagerImpl(HSQueryImpl<?> query) {
 		this.query = query;
 	}
 
@@ -47,7 +49,7 @@ public class FacetManagerImpl implements FacetManager {
 		if ( facetRequests == null ) {
 			facetRequests = new HashMap<>();
 		}
-		facetRequests.put( facetingRequest.getFacetingName(), (FacetingRequestImpl) facetingRequest );
+		facetRequests.put( facetingRequest.getFacetingName(), (FacetingRequestImpl<?>) facetingRequest );
 		facetsHaveChanged();
 		return this;
 	}
@@ -65,47 +67,57 @@ public class FacetManagerImpl implements FacetManager {
 
 	@Override
 	public List<Facet> getFacets(String facetingName) {
-		// if there are no facet requests we don't have to do anything
-		if ( facetRequests == null || facetRequests.isEmpty() || !facetRequests.containsKey( facetingName ) ) {
+		if ( !hasFacets() ) {
 			return Collections.emptyList();
 		}
-
-		List<Facet> facets = null;
-		if ( facetResults != null ) {
-			facets = facetResults.get( facetingName );
-		}
-		if ( facets != null ) {
-			return facets;
-		}
-		// TODO HSEARCH-3282 request aggregation results (potentially cached) from query
-		//query.extractFacetResults();
-		//handle edge case of an empty index
 		if ( facetResults == null ) {
+			query.doFetch( 0, 0 );
+		}
+		List<Facet> facets = facetResults.get( facetingName );
+		if ( facets == null ) {
 			return Collections.emptyList();
 		}
-		List<Facet> results = facetResults.get( facetingName );
-		if ( results != null ) {
-			return results;
+		return facets;
+	}
+
+	<LOS> SearchQueryOptionsStep<?, ?, LOS, ?, ?> contributeAggregations(SearchQueryOptionsStep<?, ?, LOS, ?, ?> optionsStep) {
+		if ( !hasFacets() ) {
+			return optionsStep;
 		}
-		else {
-			return Collections.emptyList();
+		for ( FacetingRequestImpl<?> facetRequest : facetRequests.values() ) {
+			optionsStep = requestAggregation( optionsStep, facetRequest );
+		}
+		return optionsStep;
+	}
+
+	void setFacetResults(SearchResult<?> result) {
+		if ( !hasFacets() ) {
+			return;
+		}
+		this.facetResults = new HashMap<>();
+		for ( Map.Entry<String, FacetingRequestImpl<?>> entry : facetRequests.entrySet() ) {
+			List<Facet> facets = extractFacets( result, entry.getValue() );
+			this.facetResults.put( entry.getKey(), facets );
 		}
 	}
 
-	public Map<String, FacetingRequest> getFacetRequests() {
-		return facetRequests != null ? facetRequests : Collections.<String, FacetingRequest>emptyMap();
+	private boolean hasFacets() {
+		return facetRequests != null && !facetRequests.isEmpty();
 	}
 
-	public void setFacetResults(Map<String, List<Facet>> facetResults) {
-		this.facetResults = facetResults;
+	private <LOS, A> SearchQueryOptionsStep<?, ?, LOS, ?, ?> requestAggregation(SearchQueryOptionsStep<?, ?, LOS, ?, ?> optionsStep,
+			FacetingRequestImpl<A> facetRequest) {
+		return optionsStep.aggregation( facetRequest.getKey(), facetRequest::requestAggregation );
 	}
 
-	void facetsHaveChanged() {
+	private <A> List<Facet> extractFacets(SearchResult<?> result, FacetingRequestImpl<A> facetRequest) {
+		A aggregation = result.aggregation( facetRequest.getKey() );
+		return facetRequest.toFacets( aggregation );
+	}
+
+	private void facetsHaveChanged() {
 		this.facetResults = null;
-		// TODO HSEARCH-3282 clear cached aggregation results from query
-		//query.clearCachedResults();
 	}
-
 }
 
 

@@ -15,6 +15,8 @@ import java.util.List;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.common.data.Range;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
@@ -100,10 +102,8 @@ class FacetBuildingContext<T> {
 		assertValidRangeType( type );
 		FacetRange<T> facetRange = new FacetRange<T>(
 				type,
-				rangeStart,
-				rangeEnd,
-				includeRangeStart,
-				includeRangeEnd,
+				Range.between( rangeStart, includeRangeStart ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED,
+						rangeEnd, includeRangeEnd ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED ),
 				fieldName
 		);
 		rangeList.add( facetRange );

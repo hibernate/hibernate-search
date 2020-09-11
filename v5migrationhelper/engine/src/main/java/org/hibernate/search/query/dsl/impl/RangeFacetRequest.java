@@ -6,14 +6,23 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeMoreStep;
+import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.query.engine.impl.FacetComparators;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.util.common.data.Range;
 
 /**
  * @author Hardy Ferentschik
  */
-public class RangeFacetRequest<T> extends FacetingRequestImpl {
+public class RangeFacetRequest<T> extends FacetingRequestImpl<Map<Range<T>, Long>> {
 	private final List<FacetRange<T>> facetRangeList;
 
 	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges) {
@@ -24,15 +33,34 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 		this.facetRangeList = facetRanges;
 	}
 
-	public List<FacetRange<T>> getFacetRangeList() {
-		return facetRangeList;
+	@Override
+	public AggregationFinalStep<Map<Range<T>, Long>> requestAggregation(SearchAggregationFactory factory) {
+		RangeAggregationRangeStep<?, ?, T> rangeStep = factory
+				.range().field( getFieldName(), getFacetValueType() );
+		RangeAggregationRangeMoreStep<?, ?, ?, T> rangeMoreStep = null;
+		for ( FacetRange<T> facetRange : facetRangeList ) {
+			rangeMoreStep = rangeStep.range( facetRange.range() );
+			rangeStep = rangeMoreStep;
+		}
+		return rangeMoreStep;
 	}
 
 	@Override
-	public Facet createFacet(String absoluteFieldPath, String value, int count) {
-		int facetIndex = findFacetRangeIndex( value );
-		FacetRange<T> range = facetRangeList.get( facetIndex );
-		return new RangeFacetImpl<>( getFacetingName(), getFieldName(), absoluteFieldPath, range, count, facetIndex );
+	public List<Facet> toFacets(Map<Range<T>, Long> aggregation) {
+		List<Facet> result = new ArrayList<>( aggregation.size() );
+		for ( Map.Entry<Range<T>, Long> entry : aggregation.entrySet() ) {
+			int facetIndex = findFacetRangeIndex( entry.getKey() );
+			int count = Math.toIntExact( entry.getValue() );
+			if ( count == 0 && !includeZeroCounts ) {
+				continue;
+			}
+			FacetRange<T> range = facetRangeList.get( facetIndex );
+			result.add( new RangeFacetImpl<>( getFacetingName(), getFieldName(), range, count ) );
+		}
+		if ( !sort.equals( FacetSortOrder.RANGE_DEFINITION_ORDER ) ) {
+			result.sort( FacetComparators.get( sort ) );
+		}
+		return result;
 	}
 
 	@Override
@@ -42,10 +70,20 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 				"} " + super.toString();
 	}
 
-	private int findFacetRangeIndex(String value) {
+	private Class<T> getFacetValueType() {
+		// safe since we have at least one facet range set
+		T o = facetRangeList.get( 0 ).getMin();
+		if ( o == null ) {
+			o = facetRangeList.get( 0 ).getMax();
+		}
+
+		return (Class<T>) o.getClass();
+	}
+
+	private int findFacetRangeIndex(Range<T> range) {
 		int index = 0;
 		for ( FacetRange<T> facetRange : facetRangeList ) {
-			if ( facetRange.getRangeString().equals( value ) ) {
+			if ( facetRange.range().equals( range ) ) {
 				return index;
 			}
 			index++;
