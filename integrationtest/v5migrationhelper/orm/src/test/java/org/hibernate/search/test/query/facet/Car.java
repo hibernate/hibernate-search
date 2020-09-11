@@ -13,12 +13,8 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Facet;
-import org.hibernate.search.annotations.Facets;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Normalizer;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -48,15 +44,8 @@ public class Car {
 	@Facet
 	private String color;
 
-	@Fields({
-		@Field(analyze = Analyze.NO, store = Store.YES),
-		@Field(name = "facetNameCollision", store = Store.YES, normalizer = @Normalizer(definition = COLLATING_NORMALIZER_NAME))
-	})
-	@Facets({
-		@Facet,
-		@Facet(forField = "facetNameCollision")
-	})
-	@SortableField(forField = "facetNameCollision")
+	@Field(analyze = Analyze.NO, store = Store.YES)
+	@Facet
 	private String make;
 
 	@Field
