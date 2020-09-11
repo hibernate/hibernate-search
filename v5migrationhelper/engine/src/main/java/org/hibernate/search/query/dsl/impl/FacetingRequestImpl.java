@@ -7,6 +7,11 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.List;
+
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -15,12 +20,13 @@ import org.hibernate.search.query.facet.FacetingRequest;
  * Base class for faceting requests.
  *
  * @author Hardy Ferentschik
+ * @param <A> The type of aggregations
  */
-public abstract class FacetingRequestImpl implements FacetingRequest {
+public abstract class FacetingRequestImpl<A> implements FacetingRequest {
 	/**
-	 * A user specified name for the facet request
+	 * A user specified key for the facet request
 	 */
-	private final String name;
+	private final AggregationKey<A> key;
 
 	/**
 	 * The document facet name to facet on (@Facet.name)
@@ -30,18 +36,18 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 	/**
 	 * Specified in which order the facets will be returned
 	 */
-	private FacetSortOrder sort = FacetSortOrder.COUNT_DESC;
+	protected FacetSortOrder sort = FacetSortOrder.COUNT_DESC;
 
 	/**
 	 * Whether a facet value with 0 occurrences
 	 */
-	private boolean includeZeroCounts = false;
+	protected boolean includeZeroCounts = false;
 
 	/**
 	 * The maximum number of {@link Facet}s to return for this request. A negative value means that all
 	 * facets will be included
 	 */
-	private int maxNumberOfFacets = 1;
+	protected int maxNumberOfFacets = 1;
 
 	public FacetingRequestImpl(String name, String fieldName) {
 		if ( name == null ) {
@@ -50,13 +56,17 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		if ( fieldName == null ) {
 			throw new IllegalArgumentException( "The field name cannot be null" );
 		}
-		this.name = name;
+		this.key = AggregationKey.of( name );
 		this.fieldName = fieldName;
 	}
 
 	@Override
 	public String getFacetingName() {
-		return name;
+		return key.name();
+	}
+
+	public AggregationKey<A> getKey() {
+		return key;
 	}
 
 	@Override
@@ -82,7 +92,9 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		this.maxNumberOfFacets = maxNumberOfFacets;
 	}
 
-	public abstract Facet createFacet(String absoluteFieldPath, String value, int count);
+	public abstract AggregationFinalStep<A> requestAggregation(SearchAggregationFactory factory);
+
+	public abstract List<Facet> toFacets(A aggregation);
 
 	@Override
 	public boolean hasZeroCountsIncluded() {
@@ -97,7 +109,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "FacetingRequest" );
-		sb.append( "{name='" ).append( name ).append( '\'' );
+		sb.append( "{name='" ).append( key.name() ).append( '\'' );
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( ", sort=" ).append( sort );
 		sb.append( ", includeZeroCounts=" ).append( includeZeroCounts );

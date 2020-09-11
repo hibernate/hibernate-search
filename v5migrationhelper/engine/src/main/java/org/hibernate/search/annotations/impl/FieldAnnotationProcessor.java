@@ -10,13 +10,16 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.SortableField;
@@ -24,6 +27,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.impl.TruncatingCalendarBridge;
 import org.hibernate.search.bridge.builtin.impl.TruncatingDateBridge;
 import org.hibernate.search.bridge.builtin.impl.Truncation;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -96,6 +100,24 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 			genericOptionsStep = genericOptionsStep.valueBridge( valueBridge );
 		}
 
+		List<String> facetNames = facetNames( name, context );
+		for ( String facetName : facetNames ) {
+			if ( facetName.isEmpty() || facetName.equals( name ) ) {
+				genericOptionsStep = genericOptionsStep.aggregable( Aggregable.YES );
+			}
+			else {
+				PropertyMappingGenericFieldOptionsStep facetOptionsStep = mapping.genericField( facetName )
+						.aggregable( Aggregable.YES )
+						.searchable( Searchable.NO );
+				if ( valueBridge != null ) {
+					facetOptionsStep = facetOptionsStep.valueBridge( valueBridge );
+				}
+				if ( indexNullAs != null ) {
+					facetOptionsStep = facetOptionsStep.indexNullAs( indexNullAs );
+				}
+			}
+		}
+
 		return genericOptionsStep;
 	}
 
@@ -142,6 +164,10 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 			throw log.cannotUseAnalyzerOnSortableField( analyzerOrDefault );
 		}
 
+		if ( !facetNames( name, context ).isEmpty() ) {
+			throw log.cannotUseAnalyzerOnFacetField( analyzerOrDefault );
+		}
+
 		String indexNullAs = indexNullAs( annotation, context );
 		if ( indexNullAs != null ) {
 			throw log.cannotUseIndexNullAsAndAnalyzer( analyzerOrDefault, indexNullAs );
@@ -165,6 +191,24 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 		String indexNullAs = indexNullAs( annotation, context );
 		if ( indexNullAs != null ) {
 			keywordOptionsStep = keywordOptionsStep.indexNullAs( indexNullAs );
+		}
+
+		List<String> facetNames = facetNames( name, context );
+		for ( String facetName : facetNames ) {
+			if ( facetName.isEmpty() || facetName.equals( name ) ) {
+				keywordOptionsStep = keywordOptionsStep.aggregable( Aggregable.YES );
+			}
+			else {
+				PropertyMappingKeywordFieldOptionsStep facetOptionsStep = mapping.keywordField( facetName )
+						.aggregable( Aggregable.YES )
+						.searchable( Searchable.NO );
+				if ( normalizer != null ) {
+					facetOptionsStep = facetOptionsStep.normalizer( normalizer );
+				}
+				if ( indexNullAs != null ) {
+					facetOptionsStep = facetOptionsStep.indexNullAs( indexNullAs );
+				}
+			}
 		}
 
 		return keywordOptionsStep;
@@ -213,6 +257,17 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 				.map( a -> ( (SortableField) a ).forField() )
 				.anyMatch( forField -> forField.equals( fieldName )
 						|| forField.isEmpty() && fieldName.equals( annotatedProperty.name() ) );
+	}
+
+	private List<String> facetNames(String fieldName, PropertyMappingAnnotationProcessorContext context) {
+		MappingAnnotatedProperty annotatedProperty = context.annotatedElement();
+		return annotatedProperty.allAnnotations()
+				.filter( a -> Facet.class.equals( a.annotationType() ) )
+				.map( a -> (Facet) a )
+				.filter( a -> a.forField().equals( fieldName )
+						|| a.forField().isEmpty() && fieldName.equals( annotatedProperty.name() ) )
+				.map( Facet::name )
+				.collect( Collectors.toList() );
 	}
 
 	// Converts the Search 5 Norms type to the Search 6 Norms type

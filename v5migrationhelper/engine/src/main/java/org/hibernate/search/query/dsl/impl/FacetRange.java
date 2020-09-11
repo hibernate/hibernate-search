@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.util.common.data.Range;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
+
 /**
  * @author Hardy Ferentschik
  */
@@ -15,51 +18,36 @@ public class FacetRange<T> {
 	private static final String MAX_INCLUDED = "]";
 	private static final String MAX_EXCLUDED = ")";
 
-	private static final String IDENTIFIER_INCLUDED = "i";
-	private static final String IDENTIFIER_EXCLUDED = "e";
-	private static final String IDENTIFIER_SEPARATOR = "_";
-
-	private final T min;
-	private final T max;
-	private final boolean includeMin;
-	private final boolean includeMax;
+	private final Range<T> range;
 	private final String rangeString;
 	private final String fieldName;
 	private final Class<?> rangeType;
 
-	public FacetRange(Class<?> rangeType,
-			T min,
-			T max,
-			boolean includeMin,
-			boolean includeMax,
-			String fieldName) {
-		if ( max == null && min == null ) {
-			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
-		}
-
-		this.min = min;
-		this.max = max;
-		this.includeMax = includeMax;
-		this.includeMin = includeMin;
+	public FacetRange(Class<?> rangeType, Range<T> range, String fieldName) {
+		this.range = range;
 		this.fieldName = fieldName;
 		this.rangeString = buildRangeString();
 		this.rangeType = rangeType;
 	}
 
+	public Range<T> range() {
+		return range;
+	}
+
 	public T getMin() {
-		return min;
+		return range.lowerBoundValue().orElse( null );
 	}
 
 	public T getMax() {
-		return max;
+		return range.upperBoundValue().orElse( null );
 	}
 
 	public boolean isMinIncluded() {
-		return includeMin;
+		return RangeBoundInclusion.INCLUDED.equals( range.lowerBoundInclusion() );
 	}
 
 	public boolean isMaxIncluded() {
-		return includeMax;
+		return RangeBoundInclusion.INCLUDED.equals( range.upperBoundInclusion() );
 	}
 
 	public String getRangeString() {
@@ -68,20 +56,20 @@ public class FacetRange<T> {
 
 	private String buildRangeString() {
 		StringBuilder builder = new StringBuilder();
-		if ( includeMin ) {
+		if ( isMinIncluded() ) {
 			builder.append( MIN_INCLUDED );
 		}
 		else {
 			builder.append( MIN_EXCLUDED );
 		}
-		if ( min != null ) {
-			builder.append( min );
+		if ( getMin() != null ) {
+			builder.append( getMin() );
 		}
 		builder.append( ", " );
-		if ( max != null ) {
-			builder.append( max );
+		if ( getMax() != null ) {
+			builder.append( getMax() );
 		}
-		if ( includeMax ) {
+		if ( isMaxIncluded() ) {
 			builder.append( MAX_INCLUDED );
 		}
 		else {
@@ -90,40 +78,13 @@ public class FacetRange<T> {
 		return builder.toString();
 	}
 
-	/**
-	 * @return a string suitable to use as an identifier.
-	 */
-	public String getIdentifier() {
-		StringBuilder builder = new StringBuilder();
-		if ( includeMin ) {
-			builder.append( IDENTIFIER_INCLUDED );
-		}
-		else {
-			builder.append( IDENTIFIER_EXCLUDED );
-		}
-		if ( min != null ) {
-			builder.append( min );
-		}
-		builder.append( IDENTIFIER_SEPARATOR );
-		if ( max != null ) {
-			builder.append( max );
-		}
-		if ( includeMax ) {
-			builder.append( IDENTIFIER_INCLUDED );
-		}
-		else {
-			builder.append( IDENTIFIER_EXCLUDED );
-		}
-		return builder.toString();
-	}
-
 	@Override
 	public String toString() {
 		return "FacetRange"
-				+ "{min=" + min
-				+ ", max=" + max
-				+ ", includeMin=" + includeMin
-				+ ", includeMax=" + includeMax
+				+ "{min=" + getMin()
+				+ ", max=" + getMax()
+				+ ", includeMin=" + isMinIncluded()
+				+ ", includeMax=" + isMaxIncluded()
 				+ ", fieldName='" + fieldName + '\''
 				+ ", rangeType=" + rangeType + '}';
 	}

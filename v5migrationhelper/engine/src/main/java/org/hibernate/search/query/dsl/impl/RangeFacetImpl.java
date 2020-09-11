@@ -18,19 +18,9 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	 */
 	private final FacetRange<T> range;
 
-	/**
-	 * The index of the specified ranges
-	 */
-	private final int rangeIndex;
-
-	RangeFacetImpl(String facetingName, String facetFieldName, String sourceFieldName, FacetRange<T> range, int count, int index) {
-		super( facetingName, facetFieldName, sourceFieldName, range.getRangeString(), count );
+	RangeFacetImpl(String facetingName, String absoluteFieldPath, FacetRange<T> range, int count) {
+		super( facetingName, absoluteFieldPath, range.getRangeString(), count );
 		this.range = range;
-		this.rangeIndex = index;
-	}
-
-	public int getRangeIndex() {
-		return rangeIndex;
 	}
 
 	@Override
@@ -51,14 +41,6 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	@Override
 	public boolean isIncludeMax() {
 		return range.isMaxIncluded();
-	}
-
-	private Object getNonNullMinOrMax(FacetRange<T> range) {
-		Object o = range.getMin();
-		if ( o == null ) {
-			o = range.getMax();
-		}
-		return o;
 	}
 
 }

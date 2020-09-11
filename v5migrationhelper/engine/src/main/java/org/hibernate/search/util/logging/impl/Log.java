@@ -115,4 +115,10 @@ public interface Log extends BaseHibernateSearchLogger {
 			" because multiple analyzers were found: %1$s.")
 	SearchException unableToOverrideQueryAnalyzerWithMoreThanOneAnalyzerForSimpleQueryStringQueries(
 			Collection<String> analyzers);
+
+	@Message(id = 407, value = "Cannot apply an analyzer on a faceted field. Use a normalizer instead. Analyzer: '%1$s'."
+			+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+			+ " one with an analyzer and no corresponding @Facet,"
+			+ " and one with a normalizer and corresponding @Facet(forField = ...).")
+	SearchException cannotUseAnalyzerOnFacetField(String analyzerName);
 }
