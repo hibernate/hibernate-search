@@ -249,7 +249,6 @@ stage('Configure') {
 DEFAULT
 SUPPORTED
 ALL""",
-							defaultValue: 'AUTOMATIC',
 							description: """A set of environments that must be checked.
 'AUTOMATIC' picks a different set of environments based on the branch name and whether a release is being performed.
 'DEFAULT' means a single build with the default environment expected by the Maven configuration,
