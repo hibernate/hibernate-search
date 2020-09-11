@@ -46,35 +46,6 @@ public class StringFacetingTest extends AbstractFacetTest {
 		assertFacet( facetList.get( 4 ), "Ford", 1 );
 	}
 
-	/**
-	 * Asserts that a sortable field with collation (whose value is analyzed)
-	 * doesn't conflict with a facet, even if the sortable field and the facet have
-	 * conflicting (identical) names.
-	 *
-	 * This makes sense because both features use DocValues internally, and we'd
-	 * like to make sure Lucene doesn't mix the two.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2376")
-	public void testStringFacetingWithNameCollision() throws Exception {
-		FacetingRequest request = queryBuilder( Car.class ).facet()
-				.name( "manufacturer" )
-				.onField( "facetNameCollision" )
-				.discrete()
-				.includeZeroCounts( false )
-				.createFacetingRequest();
-		FullTextQuery query = matchAll( request );
-
-		List<Facet> facetList = query.getFacetManager().getFacets( "manufacturer" );
-		assertEquals( "Wrong number of facets", 5, facetList.size() );
-
-		assertFacet( facetList.get( 0 ), "Honda", 13 );
-		assertFacet( facetList.get( 1 ), "BMW", 12 );
-		assertFacet( facetList.get( 2 ), "Mercedes", 12 );
-		assertFacet( facetList.get( 3 ), "Toyota", 12 );
-		assertFacet( facetList.get( 4 ), "Ford", 1 );
-	}
-
 	private void assertFacet(Facet facet, String expectedMake, int expectedCount) {
 		assertEquals( "Wrong facet value", expectedMake, facet.getValue() );
 		assertEquals( "Wrong facet count", expectedCount, facet.getCount() );
