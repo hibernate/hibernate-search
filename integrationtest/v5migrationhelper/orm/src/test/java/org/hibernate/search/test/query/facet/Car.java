@@ -18,6 +18,7 @@ import org.hibernate.search.annotations.Facets;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortableField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -55,7 +56,7 @@ public class Car {
 		@Facet,
 		@Facet(name = "facetNameCollision")
 	})
-
+	@SortableField
 	private String make;
 
 	@Field
