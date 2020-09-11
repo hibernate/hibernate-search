@@ -54,9 +54,9 @@ public class Car {
 	})
 	@Facets({
 		@Facet,
-		@Facet(name = "facetNameCollision")
+		@Facet(forField = "facetNameCollision")
 	})
-	@SortableField
+	@SortableField(forField = "facetNameCollision")
 	private String make;
 
 	@Field
