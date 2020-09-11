@@ -10,7 +10,9 @@ package org.hibernate.search.query.dsl;
 /**
  * @author Emmanuel Bernard
  * @param <T> the type of customization required for the field
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface FieldCustomization<T> {
 	/**
 	 * Boost the field to a given value

@@ -68,7 +68,9 @@ import org.apache.lucene.search.Query;
  * </code></pre>
  *
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomization<T>, Termination {
 	/**
 	 * The boolean query results should match the subquery

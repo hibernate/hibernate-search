@@ -9,7 +9,9 @@ package org.hibernate.search.query.dsl;
 
 /**
 * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
 */
+@Deprecated
 public interface TermFuzzy extends TermTermination {
 	/**
 	 * Threshold above which two terms are considered similar enough.

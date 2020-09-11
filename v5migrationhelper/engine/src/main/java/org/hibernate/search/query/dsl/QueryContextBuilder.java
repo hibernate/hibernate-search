@@ -23,7 +23,9 @@ package org.hibernate.search.query.dsl;
  * underlying analyzer (for a given field) used to build queries.
  *
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface QueryContextBuilder {
 	//TODO make a forEntities
 

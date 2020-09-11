@@ -11,7 +11,9 @@ import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface AllContext extends QueryCustomization<AllContext>, Termination<AllContext> {
 	/**
 	 * Exclude the documents matching these queries

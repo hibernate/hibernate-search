@@ -11,7 +11,9 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 
 /**
  * @author Hardy Ferentschik
+ * @deprecated See the deprecation note on {@link FacetContext}.
  */
+@Deprecated
 public interface FacetParameterContext extends FacetTermination {
 	/**
 	 * @param sort the sort order for the returned facets.

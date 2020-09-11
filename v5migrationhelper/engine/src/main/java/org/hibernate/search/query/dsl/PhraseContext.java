@@ -9,7 +9,9 @@ package org.hibernate.search.query.dsl;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface PhraseContext extends QueryCustomization<PhraseContext> {
 	/**
 	 * Sets the number of other words permitted between words in query phrase.

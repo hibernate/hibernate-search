@@ -8,8 +8,10 @@
 package org.hibernate.search.query.dsl;
 
 /**
-* @author Emmanuel Bernard
+ * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
 */
+@Deprecated
 public interface TermMatchingContext extends FieldCustomization<TermMatchingContext> {
 	/**
 	 * Value searched in the field or fields.

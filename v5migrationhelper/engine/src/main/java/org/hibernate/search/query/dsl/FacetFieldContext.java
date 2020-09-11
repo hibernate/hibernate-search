@@ -9,7 +9,9 @@ package org.hibernate.search.query.dsl;
 
 /**
  * @author Hardy Ferentschik
+ * @deprecated See the deprecation note on {@link FacetContext}.
  */
+@Deprecated
 public interface FacetFieldContext {
 	/**
 	 *

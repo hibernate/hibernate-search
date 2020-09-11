@@ -9,7 +9,9 @@ package org.hibernate.search.query.dsl;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated See the deprecation note on {@link QueryBuilder}.
  */
+@Deprecated
 public interface RangeContext extends QueryCustomization<RangeContext> {
 	/**
 	 * @param fieldName field/property the term query is executed on
