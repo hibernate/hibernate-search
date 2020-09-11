@@ -71,7 +71,7 @@ public class SearchQueryEntityLoadingNonUniqueDocumentIdIT {
 	@Indexed
 	private static class IndexedEntity {
 
-		private static final String NAME = "Indexed";
+		static final String NAME = "Indexed";
 
 		@Id
 		private Long id;
