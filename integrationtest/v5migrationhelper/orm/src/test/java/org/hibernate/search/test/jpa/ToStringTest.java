@@ -18,7 +18,6 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -72,11 +71,8 @@ public class ToStringTest extends JPATestCase {
 	}
 
 	private void assertToStringContainsLuceneQueryInformation(String fullTextQueryToString) {
-		String queryString = ContextHelper.getSearchIntegrator( fullTextSession )
-				.createHSQuery( luceneQuery, Foo.class )
-				.getQueryString();
 		assertThat( "Unexpected toString implementation. The string should contain a string representation of the internal query.",
-				fullTextQueryToString, CoreMatchers.containsString( queryString ) );
+				fullTextQueryToString, CoreMatchers.containsString( luceneQuery.toString() ) );
 	}
 
 	@Entity
