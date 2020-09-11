@@ -16,7 +16,6 @@ public final class AnalysisNames {
 	public static final String NORMALIZER_LOWERCASE_ASCIIFOLDING = "lower_asciifolding";
 	public static final String ANALYZER_WHITESPACE = "whitespace";
 	public static final String ANALYZER_WHITESPACE_LOWERCASE_ASCIIFOLDING = "whitespace_lower_asciifolding";
-	public static final String ANALYZER_KEYWORD_LOWERCASE_ASCIIFOLDING = "keyword_lower_asciifolding";
 	public static final String ANALYZER_STANDARD = "standard";
 	public static final String ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP = "same_base_as_ngram";
 	public static final String ANALYZER_STANDARD_STANDARD_LOWERCASE_STOP_NGRAM_3 = "ngram";
