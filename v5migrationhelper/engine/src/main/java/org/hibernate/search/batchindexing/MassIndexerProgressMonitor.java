@@ -22,7 +22,14 @@ import org.hibernate.search.backend.IndexingMonitor;
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
+ * @deprecated Instead of using Hibernate Search 5 APIs, get a {@code org.hibernate.search.mapper.orm.session.SearchSession}
+ * using {@code org.hibernate.search.mapper.orm.Search#session(org.hibernate.Session)},
+ * create a mass indexer with {@code org.hibernate.search.mapper.orm.session.SearchSession#massIndexer(Class[])},
+ * and implement the interface {@code org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor}
+ * in your monitor.
+ * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
  */
+@Deprecated
 public interface MassIndexerProgressMonitor extends IndexingMonitor {
 
 	/**

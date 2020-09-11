@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.query.facet;
 
+import org.hibernate.search.query.dsl.FacetContext;
+
 /**
  * @author Hardy Ferentschik
+ * @deprecated See the deprecation note on {@link FacetContext}.
  */
+@Deprecated
 public interface RangeFacet<T> extends Facet {
 	/**
 	 * @return the lower boundary of this range
