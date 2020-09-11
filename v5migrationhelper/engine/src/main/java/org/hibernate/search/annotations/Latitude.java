@@ -22,10 +22,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
+ * @deprecated Use Hibernate Search 6's {@link org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude}
+ * instead. See also the javadoc of {@link Spatial}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD, ElementType.METHOD } )
 @Documented
+@Deprecated
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeAnnotationProcessor.class))
 public @interface Latitude {
 	/**

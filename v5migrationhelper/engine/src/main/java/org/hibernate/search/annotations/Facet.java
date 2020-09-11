@@ -13,15 +13,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+
 /**
  * Extension annotation for {@code @Field} enabling it for faceting.
  *
  * @author Hardy Ferentschik
  * @hsearch.experimental : This feature is experimental
+ * @deprecated Use Hibernate Search 6's field annotations ({@link GenericField}, {@link KeywordField},
+ * {@link FullTextField}, ...)
+ * and enable faceting with <code>{@link GenericField#aggregable() @GenericField(aggregable = Aggregable.YES)}</code>
+ * instead.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
+@Deprecated
 @Repeatable(Facets.class)
 public @interface Facet {
 

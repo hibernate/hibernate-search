@@ -19,10 +19,14 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 /**
  * Specifies that an association ({@code @*To*}, {@code @Embedded}, {@code @CollectionOfEmbedded}) is to be indexed in
  * the root entity index. This allows queries involving associated objects properties.
+ *
+ * @deprecated Use Hibernate Search 6's {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded}
+ * instead.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
+@Deprecated
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexedEmbeddedAnnotationProcessor.class))
 public @interface IndexedEmbedded {
 

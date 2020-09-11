@@ -22,10 +22,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * Note that @{link org.hibernate.search.bridge.FieldBridge#get} must return the Entity id
  *
  * @author Emmanuel Bernard
+ * @deprecated Use Hibernate Search 6's {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId}
+ * instead.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
+@Deprecated
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdAnnotationProcessor.class))
 public @interface DocumentId {
 }

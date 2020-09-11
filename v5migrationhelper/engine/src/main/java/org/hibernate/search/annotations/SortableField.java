@@ -13,6 +13,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+
 /**
  * Makes a property sortable.
  * <p>
@@ -24,10 +28,16 @@ import java.lang.annotation.Target;
  * consumption. Therefore it's strongly recommended to declare each required sort field.
  *
  * @author Gunnar Morling
+ * @deprecated Use Hibernate Search 6's field annotations ({@link GenericField}, {@link KeywordField}, ...)
+ * and enable sorts with <code>{@link GenericField#sortable() @GenericField(sortable = Sortable.YES)}</code>
+ * instead.
+ * Note that {@link FullTextField} cannot be marked as sortable, but you can define a {@link KeywordField}
+ * alongside your {@link FullTextField}, with a different name, and that field can be marked as sortable.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
+@Deprecated
 @Repeatable(SortableFields.class)
 public @interface SortableField {
 

@@ -17,10 +17,12 @@ import java.lang.annotation.Target;
  *
  * @author Hardy Ferentschik
  * @hsearch.experimental : This feature is experimental
+ * @deprecated See the deprecation note on {@link Facet}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
+@Deprecated
 public @interface Facets {
 	/**
 	 * @return an array if {@code Facet} instances
