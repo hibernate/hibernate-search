@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.test.engine.worker;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
@@ -18,8 +17,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
@@ -34,16 +31,10 @@ import org.junit.runners.JUnit4;
  * @author Sanne Grinovero
  */
 @RunWith(JUnit4.class) // CustomRunner messes with @Rule
-public class WorkerTestCase extends SearchTestBase {
+public abstract class WorkerTestCase extends SearchTestBase {
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
-
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-				AutomaticIndexingSynchronizationStrategyNames.ASYNC );
-	}
 
 	@Test
 	public void testConcurrency() throws Exception {
