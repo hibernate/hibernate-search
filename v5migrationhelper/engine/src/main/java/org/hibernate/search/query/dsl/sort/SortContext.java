@@ -30,11 +30,13 @@ public interface SortContext {
 	 * Order elements by their relevance score.
 	 *
 	 * <p>The default order is <strong>descending</strong>, i.e. higher scores come first.
+	 * @return a context instance for building the sort
 	 */
 	SortScoreContext byScore();
 
 	/**
 	 * Order elements by their internal index order.
+	 * @return a context instance for building the sort
 	 */
 	SortOrderTermination byIndexOrder();
 
@@ -44,6 +46,7 @@ public interface SortContext {
 	 * <p>The default order is <strong>ascending</strong>.
 	 *
 	 * @param fieldName The name of the index field to sort by
+	 * @return a context instance for building the sort
 	 * @throws SearchException If the sort field type could not be automatically determined.
 	 */
 	SortFieldContext byField(String fieldName);
@@ -56,6 +59,7 @@ public interface SortContext {
 	 * <p>The distance is computed between the value of a field carrying coordinates
 	 * (to be provided in the {@link SortDistanceNoFieldContext next context})
 	 * and reference coordinates.
+	 * @return a context instance for building the sort
 	 */
 	SortDistanceNoFieldContext byDistance();
 
@@ -65,6 +69,7 @@ public interface SortContext {
 	 * <p>The sort order (ascending/descending) is defined in <code>sortField</code>
 	 *
 	 * @param sortField The sort field to be added to the sort list.
+	 * @return a context instance for building the sort
 	 */
 	SortNativeContext byNative(SortField sortField);
 }

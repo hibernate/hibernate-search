@@ -14,11 +14,13 @@ package org.hibernate.search.query.dsl.sort;
 public interface SortOrder<T> {
 	/**
 	 * Sort in ascending order.
+	 * @return {@code this} for method chaining
 	 */
 	T asc();
 
 	/**
 	 * Sort in descending order.
+	 * @return {@code this} for method chaining
 	 */
 	T desc();
 }

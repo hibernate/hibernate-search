@@ -22,6 +22,7 @@ public interface SortDistanceNoFieldContext {
 	 * a {@link Spatial} field) and reference coordinates, to be provided in the
 	 * {@link SortDistanceFieldContext next context}.
 	 * @param fieldName The name of the index field carrying the spatial coordinates.
+	 * @return {@code this} for method chaining
 	 */
 	SortDistanceFieldContext onField(String fieldName);
 
