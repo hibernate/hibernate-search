@@ -165,6 +165,26 @@ public @interface IndexedEmbedded {
 	int maxDepth() default -1;
 
 	/**
+	 * Whether the identifier of embedded objects should be included as an index field.
+	 * <p>
+	 * The index field will defined as if the following annotation was put on the identifier property
+	 * of the embedded type:
+	 * {@code @GenericField(searchable = Searchable.YES, projectable = Projectable.YES)}.
+	 * The name of the index field will be the name of the identifier property.
+	 * Its bridge will be the identifier bridge applied to the identifier property using {@link DocumentId} if any,
+	 * or the default value bridge for the property type by default.
+	 * <p>
+	 * If you need more advanced mapping (custom name, custom bridge, sortable, ...),
+	 * define the field explicitly in the embedded type by annotating the identifier property
+	 * with {@link GenericField} or a similar field annotation,
+	 * and make sure the field is included by {@code @IndexedEmbedded} by configuring
+	 * {@link #includeDepth()} and/or {@link #includePaths()}.
+	 *
+	 * @return Whether the identifier of embedded objects should be included as an index field.
+	 */
+	boolean includeEmbeddedObjectId() default false;
+
+	/**
 	 * @return How the structure of the object field created for this indexed-embedded
 	 * is preserved upon indexing.
 	 * @see ObjectStructure

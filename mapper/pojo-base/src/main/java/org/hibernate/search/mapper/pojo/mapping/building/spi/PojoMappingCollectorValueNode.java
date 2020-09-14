@@ -19,6 +19,6 @@ public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
 			String relativeFieldName, FieldModelContributor fieldModelContributor);
 
 	void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix, ObjectStructure structure,
-			Integer includeDepth, Set<String> includePaths, Class<?> targetType);
+			Integer includeDepth, Set<String> includePaths, boolean includeEmbeddedObjectId, Class<?> targetType);
 
 }
