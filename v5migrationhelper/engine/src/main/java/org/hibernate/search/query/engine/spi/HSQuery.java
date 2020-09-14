@@ -48,7 +48,9 @@ import org.hibernate.search.spatial.Coordinates;
  * </pre>
  *
  * @author Emmanuel Bernard
+ * @deprecated This class will be removed without replacement. Use actual API instead.
  */
+@Deprecated
 public interface HSQuery extends ProjectionConstants {
 
 	/**

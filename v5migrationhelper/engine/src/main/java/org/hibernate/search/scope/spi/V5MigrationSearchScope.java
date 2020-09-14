@@ -15,6 +15,10 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
+/**
+ * @deprecated This class will be removed without replacement. Use actual API instead.
+ */
+@Deprecated
 public interface V5MigrationSearchScope {
 
 	Set<Class<?>> targetTypes();

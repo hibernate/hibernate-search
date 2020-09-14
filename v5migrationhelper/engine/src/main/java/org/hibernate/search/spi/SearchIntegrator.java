@@ -27,7 +27,9 @@ import org.apache.lucene.search.Query;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @deprecated This class will be removed without replacement. Use actual API instead.
  */
+@Deprecated
 public interface SearchIntegrator {
 
 	V5MigrationSearchScope scope(Class<?> ... targetTypes);
