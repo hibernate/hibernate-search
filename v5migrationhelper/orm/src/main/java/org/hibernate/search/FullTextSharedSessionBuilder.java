@@ -8,13 +8,21 @@ package org.hibernate.search;
 
 import java.sql.Connection;
 
+import javax.persistence.EntityManager;
+
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Interceptor;
+import org.hibernate.Session;
 import org.hibernate.SharedSessionBuilder;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated Will be removed without replacement, as Hibernate Search sessions ({@link SearchSession})
+ * no longer extend JPA's {@link EntityManager} interface or Hibernate ORM's {@link Session}.
+ * To get access to a Hibernate Search 6 session, use {@link org.hibernate.search.mapper.orm.Search#session(Session)}.
  */
+@Deprecated
 public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder interceptor();

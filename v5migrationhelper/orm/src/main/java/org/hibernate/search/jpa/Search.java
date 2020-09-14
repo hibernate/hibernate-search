@@ -20,7 +20,9 @@ import java.lang.invoke.MethodHandles;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @deprecated Use {@link org.hibernate.search.mapper.orm.Search} instead.
  */
+@Deprecated
 public final class Search {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
@@ -37,7 +39,9 @@ public final class Search {
 	 * @param em the entityManager instance to use
 	 * @return a FullTextEntityManager, wrapping the passed EntityManager
 	 * @throws IllegalArgumentException if passed null
+	 * @deprecated Use {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)} instead.
 	 */
+	@Deprecated
 	public static FullTextEntityManager getFullTextEntityManager(EntityManager em) {
 		if ( em == null ) {
 			throw log.getNullEntityManagerPassedToFullEntityManagerCreationException();

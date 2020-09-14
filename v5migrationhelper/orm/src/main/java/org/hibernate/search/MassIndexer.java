@@ -9,7 +9,9 @@ package org.hibernate.search;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
+import org.hibernate.Session;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 
 /**
  * A MassIndexer is useful to rebuild the indexes from the
@@ -18,7 +20,12 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
  * indexedEmbedded properties are scrolled from database.
  *
  * @author Sanne Grinovero
+ * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+ * using {@link org.hibernate.search.mapper.orm.Search#session(Session)},
+ * then create a mass indexer with {@link SearchSession#massIndexer(Class[])}.
+ * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
  */
+@Deprecated
 public interface MassIndexer {
 
 	/**

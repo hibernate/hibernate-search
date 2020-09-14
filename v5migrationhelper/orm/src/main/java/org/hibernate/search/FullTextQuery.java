@@ -7,13 +7,26 @@
 package org.hibernate.search;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
 import org.apache.lucene.search.Sort;
+
+import org.hibernate.Session;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
+import org.hibernate.query.Query;
 import org.hibernate.query.spi.QueryImplementor;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.spatial.Coordinates;
@@ -26,12 +39,27 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
+ * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+ * using {@link org.hibernate.search.mapper.orm.Search#session(Session)},
+ * then create a {@link SearchQuery} with {@link SearchSession#search(Class)}.
+ * If you really need an adapter to Hibernate ORM's {@link Query} type,
+ * convert that {@link SearchQuery} using {@link org.hibernate.search.mapper.orm.Search#toOrmQuery(SearchQuery)},
+ * but be aware that only part of the contract is implemented.
+ * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
  */
+@Deprecated
 @SuppressWarnings("rawtypes") // We extend the raw version of QueryImplementor on purpose, see HSEARCH-2564
 public interface FullTextQuery extends org.hibernate.search.jpa.FullTextQuery, QueryImplementor {
 
 	/**
 	 * defines a result transformer used during projection, the Aliases provided are the projection aliases.
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(Session)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
+	 * See in particular the composite projection, which allows applying a function to another projection:
+	 * {@link SearchProjectionFactory#composite(Function, ProjectionFinalStep)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	@Deprecated
 	@Override
@@ -90,6 +118,16 @@ public interface FullTextQuery extends org.hibernate.search.jpa.FullTextQuery, Q
 	@Override
 	FullTextQuery setFlushMode(FlushModeType flushMode);
 
+	/**
+	 * {@inheritDoc}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your loading options using {@link SearchQueryOptionsStep#loading(Consumer)}.
+	 * To set the equivalent to {@link #setFetchSize(int)} in Hibernate Search 6,
+	 * use {@link SearchLoadingOptionsStep#fetchSize(int)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
+	 */
 	@Override
 	FullTextQuery setFetchSize(int i);
 
