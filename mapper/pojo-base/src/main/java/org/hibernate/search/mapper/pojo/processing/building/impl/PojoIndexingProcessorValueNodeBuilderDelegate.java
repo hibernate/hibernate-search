@@ -104,11 +104,13 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		);
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			AbstractPojoIndexingProcessorTypeNodeBuilder<V, ?> nestedProcessorBuilder;
+			// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
+			PojoIndexedEmbeddedIdentityMappingCollector identityMappingCollector =
+					new PojoIndexedEmbeddedIdentityMappingCollector();
 			if ( targetType == null ) {
 				nestedProcessorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
 						modelPath.type(), mappingHelper, nestedBindingContext,
-						// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-						Optional.empty(),
+						identityMappingCollector,
 						nestedBindingContext.parentIndexObjectReferences()
 				);
 			}
@@ -116,8 +118,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				PojoRawTypeModel<?> castedType = mappingHelper.introspector().typeModel( targetType );
 				nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(
 						modelPath.castedType( castedType ), mappingHelper, nestedBindingContext,
-						// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-						Optional.empty(),
+						identityMappingCollector,
 						nestedBindingContext.parentIndexObjectReferences()
 				);
 			}

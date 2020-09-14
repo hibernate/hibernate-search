@@ -38,7 +38,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends AbstractPojoProcessorNodeBuilder
 		implements PojoMappingCollectorTypeNode {
 
-	private final Optional<PojoIdentityMappingCollector> identityMappingCollector;
+	private final PojoIdentityMappingCollector identityMappingCollector;
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
 	private final Collection<BoundTypeBridge<U>> boundBridges = new ArrayList<>();
@@ -48,7 +48,7 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 
 	public AbstractPojoIndexingProcessorTypeNodeBuilder(
 			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext,
-			Optional<PojoIdentityMappingCollector> identityMappingCollector,
+			PojoIdentityMappingCollector identityMappingCollector,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences) {
 		super( mappingHelper, bindingContext );
 		this.identityMappingCollector = identityMappingCollector;
@@ -64,9 +64,7 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	@Override
 	@Deprecated
 	public void routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder builder) {
-		if ( identityMappingCollector.isPresent() ) {
-			identityMappingCollector.get().routingKeyBridge( getModelPath(), builder );
-		}
+		identityMappingCollector.routingKeyBridge( getModelPath(), builder );
 	}
 
 	@Override

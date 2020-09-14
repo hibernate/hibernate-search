@@ -30,7 +30,7 @@ import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIdentityMap
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollector {
+class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollector {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
@@ -45,7 +45,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	Optional<PojoPropertyModel<?>> documentIdSourceProperty;
 	BoundRoutingBridge<E> routingBridge;
 
-	PojoIdentityMappingCollectorImpl(PojoRawTypeModel<E> typeModel,
+	PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
 			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,

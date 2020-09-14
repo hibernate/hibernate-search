@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -43,7 +42,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 	private final MappedIndexManagerBuilder indexManagerBuilder;
 	private final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
-	private final PojoIdentityMappingCollectorImpl<E> identityMappingCollector;
+	private final PojoRootIdentityMappingCollector<E> identityMappingCollector;
 	private final PojoIndexingProcessorOriginalTypeNodeBuilder<E> processorBuilder;
 
 	private PojoIndexingProcessor<E> preBuiltIndexingProcessor;
@@ -61,7 +60,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		this.typeModel = typeModel;
 		this.indexManagerBuilder = indexManagerBuilder;
 		this.extendedMappingCollector = extendedMappingCollector;
-		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl<>(
+		this.identityMappingCollector = new PojoRootIdentityMappingCollector<>(
 				typeModel,
 				entityTypeMetadata,
 				mappingHelper,
@@ -72,7 +71,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		this.processorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
 				mappingHelper, indexManagerBuilder.rootBindingContext(),
-				Optional.of( identityMappingCollector ),
+				identityMappingCollector,
 				Collections.emptyList()
 		);
 	}
@@ -84,7 +83,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( PojoIndexingProcessorOriginalTypeNodeBuilder::closeOnFailure, processorBuilder );
-			closer.push( PojoIdentityMappingCollectorImpl::closeOnFailure, identityMappingCollector );
+			closer.push( PojoRootIdentityMappingCollector::closeOnFailure, identityMappingCollector );
 			closer.push( PojoIndexingProcessor::close, preBuiltIndexingProcessor );
 			closed = true;
 		}
