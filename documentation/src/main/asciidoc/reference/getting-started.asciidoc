@@ -28,6 +28,12 @@ for more detailed and up-to-date information.
 |Hibernate ORM *{hibernateVersion}*.
 |JPA (for the ORM mapper)
 |JPA *{jpaVersion}*.
+|Apache Lucene (for the Lucene backend)
+|Lucene *{luceneVersion}*.
+|Elasticsearch server (for the Elasticsearch backend)
+|Elasticsearch *{elasticsearchCompatibleVersions}*.
+Other minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) may work
+but are not given priority for bugfixes and new features.
 |===============
 
 [TIP]
