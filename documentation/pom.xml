@@ -261,8 +261,11 @@
                         <hibernateVersion>${version.org.hibernate}</hibernateVersion>
                         <hibernateDocUrl>${documentation.org.hibernate.url}</hibernateDocUrl>
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
+                        <luceneVersion>${version.org.apache.lucene}</luceneVersion>
                         <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
                         <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
+                        <elasticsearchCompatibleVersions>${version.org.elasticsearch.compatible.text}</elasticsearchCompatibleVersions>
+                        <elasticsearchOtherPotentiallyCompatibleVersions>${version.org.elasticsearch.compatible.potentially.text}</elasticsearchOtherPotentiallyCompatibleVersions>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>
