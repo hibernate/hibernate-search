@@ -328,7 +328,6 @@
             - or the name of the declaring type ends with 'Provider';
             - or the name of the declaring type ends with 'ConfigurationProperty';
             - or the name of the declaring type ends with 'ConfigurationPropertySource'.
-            in which case the type may just be a marker (to be used in annotations for example).
         </description>
         <cypher><![CDATA[
             MATCH
