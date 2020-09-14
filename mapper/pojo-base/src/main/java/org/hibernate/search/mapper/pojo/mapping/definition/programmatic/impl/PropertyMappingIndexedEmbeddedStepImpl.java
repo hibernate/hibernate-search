@@ -38,8 +38,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	private ObjectStructure structure = ObjectStructure.DEFAULT;
 
 	private Integer includeDepth;
-
 	private final Set<String> includePaths = new HashSet<>();
+	private boolean includeEmbeddedObjectId = false;
 
 	private Class<?> targetType;
 
@@ -70,7 +70,8 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 			actualPrefix = prefix;
 		}
 		collector.value( extractorPath ).indexedEmbedded(
-				definingTypeModel, actualPrefix, structure, includeDepth, includePaths, targetType
+				definingTypeModel, actualPrefix, structure, includeDepth, includePaths, includeEmbeddedObjectId,
+				targetType
 		);
 	}
 
@@ -99,6 +100,12 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	@Override
 	public PropertyMappingIndexedEmbeddedStep includePaths(Collection<String> paths) {
 		this.includePaths.addAll( paths );
+		return this;
+	}
+
+	@Override
+	public PropertyMappingIndexedEmbeddedStep includeEmbeddedObjectId(boolean include) {
+		this.includeEmbeddedObjectId = include;
 		return this;
 	}
 

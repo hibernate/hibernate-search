@@ -83,7 +83,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	@Override
 	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
 			ObjectStructure structure,
-			Integer includeDepth, Set<String> includePaths,
+			Integer includeDepth, Set<String> includePaths, boolean includeEmbeddedObjectId,
 			Class<?> targetType) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
@@ -94,6 +94,10 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				definingTypeModel, defaultedRelativePrefix, structure,
 				includeDepth, includePaths
 		);
+
+		if ( includeEmbeddedObjectId ) {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
 
 		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
 				definition, multiValuedFromContainerExtractor

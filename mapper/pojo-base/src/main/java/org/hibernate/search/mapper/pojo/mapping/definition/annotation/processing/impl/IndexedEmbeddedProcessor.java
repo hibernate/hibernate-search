@@ -83,6 +83,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 				.structure( structure )
 				.includeDepth( cleanedUpIncludeDepth )
 				.includePaths( cleanedUpIncludePaths )
+				.includeEmbeddedObjectId( annotation.includeEmbeddedObjectId() )
 				.targetType( cleanedUpTargetType );
 	}
 }
