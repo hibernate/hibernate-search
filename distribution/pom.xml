@@ -63,6 +63,16 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-documentation</artifactId>
             <scope>provided</scope>
             <type>pom</type>
@@ -119,6 +129,8 @@
                         -->
                         <id>generate-javadoc</id>
                         <configuration>
+                            <!-- We don't include the v5migrationhelper modules here,
+                                 so as not to confuse the documentation with obsolete API -->
                             <sourcepath>
                                 ${basedir}/../engine/src/main/java;
                                 ${basedir}/../util/common/src/main/java;
