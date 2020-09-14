@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.query.engine.spi;
 
+/**
+ * @deprecated This class will be removed without replacement. Use actual API instead.
+ */
+@Deprecated
 public interface TupleTransformer {
 	Object transform(Object[] tuple, String[] projectedFields);
 }
