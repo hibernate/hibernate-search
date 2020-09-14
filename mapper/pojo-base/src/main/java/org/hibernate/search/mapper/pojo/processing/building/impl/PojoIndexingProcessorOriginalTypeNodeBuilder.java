@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -30,7 +29,7 @@ public class PojoIndexingProcessorOriginalTypeNodeBuilder<T> extends AbstractPoj
 	public PojoIndexingProcessorOriginalTypeNodeBuilder(
 			BoundPojoModelPathTypeNode<T> modelPath,
 			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext,
-			Optional<PojoIdentityMappingCollector> identityMappingCollector,
+			PojoIdentityMappingCollector identityMappingCollector,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences) {
 		super( mappingHelper, bindingContext, identityMappingCollector, parentIndexObjectReferences );
 		this.modelPath = modelPath;
