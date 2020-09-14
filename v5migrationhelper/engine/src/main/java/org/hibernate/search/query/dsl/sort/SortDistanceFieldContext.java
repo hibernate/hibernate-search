@@ -24,6 +24,7 @@ public interface SortDistanceFieldContext {
 	 *
 	 * @param coordinates The reference coordinates to which the distance
 	 * will be computed for each document.
+	 * @return {@code this} for method chaining
 	 */
 	SortDistanceFieldAndReferenceContext fromCoordinates(Coordinates coordinates);
 
@@ -33,6 +34,7 @@ public interface SortDistanceFieldContext {
 	 *
 	 * @param latitude The reference latitude, part of the coordinates
 	 * to which the distance will be computed for each document.
+	 * @return {@code this} for method chaining
 	 */
 	SortLatLongContext fromLatitude(double latitude);
 

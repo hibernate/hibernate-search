@@ -16,6 +16,7 @@ public interface SortFieldContext extends SortAdditionalSortFieldContext, SortOr
 
 	/**
 	 * Describe how to treat missing values when doing the sorting.
+	 * @return a context to specify the behavior for missing values
 	 */
 	SortMissingValueContext<SortFieldContext> onMissingValue();
 

@@ -20,6 +20,7 @@ public interface SortLatLongContext {
 	 *
 	 * @param longitude The reference longitude, part of the coordinates
 	 * to which the distance will be computed for each document.
+	 * @return {@code this} for method chaining
 	 */
 	SortDistanceFieldAndReferenceContext andLongitude(double longitude);
 }

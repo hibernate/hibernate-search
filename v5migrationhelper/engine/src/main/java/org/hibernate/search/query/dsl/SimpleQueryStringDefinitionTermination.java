@@ -17,6 +17,8 @@ public interface SimpleQueryStringDefinitionTermination {
 
 	/**
 	 * Simple query string passed to the {@link SimpleQueryParser}.
+	 * @param simpleQueryString The query string
+	 * @return {@code this} for method chaining
 	 */
 	SimpleQueryStringTermination matching(String simpleQueryString);
 

@@ -24,6 +24,7 @@ public interface SortAdditionalSortFieldContext {
 	 *
 	 * <p>The default order is <strong>descending</strong>, i.e. higher scores come first.
 	 *
+	 * @return a context instance for building the sort
 	 * @see SortContext#byScore()
 	 */
 	SortScoreContext andByScore();
@@ -31,6 +32,7 @@ public interface SortAdditionalSortFieldContext {
 	/**
 	 * Order elements by their internal index order.
 	 *
+	 * @return a context instance for building the sort
 	 * @see SortContext#byIndexOrder()
 	 */
 	SortOrderTermination andByIndexOrder();
@@ -41,6 +43,7 @@ public interface SortAdditionalSortFieldContext {
 	 * <p>The default order is <strong>ascending</strong>.
 	 *
 	 * @param fieldName The name of the index field to sort by
+	 * @return a context instance for building the sort
 	 * @throws SearchException If the sort field type could not be automatically determined.
 	 * @see SortContext#byField(String)
 	 */
@@ -55,6 +58,7 @@ public interface SortAdditionalSortFieldContext {
 	 * (to be provided in the {@link SortDistanceNoFieldContext next context})
 	 * and reference coordinates.
 	 *
+	 * @return a context instance for building the sort
 	 * @see SortContext#byDistance()
 	 */
 	SortDistanceNoFieldContext andByDistance();
@@ -65,6 +69,7 @@ public interface SortAdditionalSortFieldContext {
 	 * <p>The sort order (ascending/descending) is defined in <code>sortField</code>
 	 *
 	 * @param sortField The sort field to be added to the sort list.
+	 * @return a context instance for building the sort
 	 * @see SortContext#byNative(SortField)
 	 */
 	SortNativeContext andByNative(SortField sortField);

@@ -18,6 +18,7 @@ public interface SortTermination {
 
 	/**
 	 * Return the Lucene {@code Sort} corresponding to the requested sort.
+	 * @return the created sort
 	 */
 	Sort createSort();
 

@@ -11,7 +11,6 @@ import org.apache.lucene.search.Query;
 
 /**
  * Represents a boolean query that can contains one or more elements to join
- * <p>
  * <h3 id="minimumshouldmatch">"minimumShouldMatch" constraints</h3>
  * <p>
  * "minimumShouldMatch" constraints define a minimum number of "should" clauses that have to match
