@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
@@ -17,31 +18,44 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Test common use cases of the {@code @IndexedEmbedded} annotation.
@@ -1023,6 +1037,366 @@ public class IndexedEmbeddedBaseIT {
 			}
 		} )
 				.isInstanceOf( ClassCastException.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId
+			String theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Id" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "theId", "level1Id" )
+				)
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_nonEntity() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId
+			String theId;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Id" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "theId", "level1Id" )
+				)
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_fieldNameConflict() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId
+			String theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+			@GenericField(name = "theId")
+			String someProperty;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						// We'll just declare two fields with the same name,
+						// and will expect the backend to raise an exception
+						// (that is, when it's not a stub backend).
+						.field( "theId", String.class )
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_multiValued() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId
+			String theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			List<IndexedEmbeddedLevel1> level1;
+			public IndexedEntity(int id, String level1Id1, String level1Id2) {
+				this.id = id;
+				this.level1 = Arrays.asList( new IndexedEmbeddedLevel1(), new IndexedEmbeddedLevel1() );
+				this.level1.get( 0 ).theId = level1Id1;
+				this.level1.get( 0 ).containing = this;
+				this.level1.get( 1 ).theId = level1Id2;
+				this.level1.get( 1 ).containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.multiValued( true )
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Id1", "level1Id2" ),
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "theId", "level1Id1" ) )
+						.objectField( "level1", b2 -> b2
+								.field( "theId", "level1Id2" ) )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_noIdentifierBridge() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId
+			Long theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, Long level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						// The ID is a long, and there is no custom bridge on the ID,
+						// so the ID field will be a long, too
+						.field( "theId", Long.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, 4242L ),
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "theId", 4242L ) )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_identifierBinder() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId(identifierBinder = @IdentifierBinderRef(type = MyCustomIdentifierBinder.class))
+			Long theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, Long level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						// The ID is a long, and there is an identifier bridge on the DocumentId,
+						// so the ID field will be generated with the identifier bridge, and thus will be a String.
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, 4242L ),
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "theId", "4243" ) )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_identifierBridge() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyCustomIdentifierBinder.Bridge.class))
+			Long theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, Long level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						// The ID is a long, and there is an identifier bridge on the DocumentId,
+						// so the ID field will be generated with the identifier bridge, and thus will be a String.
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, 4242L ),
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "theId", "4243" ) )
+		);
+	}
+
+	public static class MyCustomIdentifierBinder implements IdentifierBinder {
+		@Override
+		public void bind(IdentifierBindingContext<?> context) {
+			assertThat( context.bridgedElement() ).isNotNull();
+			assertThat( context.beanResolver() ).isNotNull();
+			context.bridge( Long.class, new Bridge() );
+		}
+
+		public static class Bridge implements IdentifierBridge<Long> {
+			@Override
+			public String toDocumentIdentifier(Long propertyValue,
+					IdentifierBridgeToDocumentIdentifierContext context) {
+				assertThat( context ).isNotNull();
+				return String.valueOf( propertyValue + 1 );
+			}
+
+			@Override
+			public Long fromDocumentIdentifier(String documentIdentifier,
+					IdentifierBridgeFromDocumentIdentifierContext context) {
+				assertThat( context ).isNotNull();
+				return Long.parseLong( documentIdentifier ) - 1;
+			}
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3071")
+	public void includeEmbeddedObjectId_targetType() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId
+			String theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true, targetType = IndexedEmbeddedLevel1.class)
+			Object level1;
+			public IndexedEntity(int id, String level1Id) {
+				this.id = id;
+				IndexedEmbeddedLevel1 level1 = new IndexedEmbeddedLevel1();
+				this.level1 = level1;
+				level1.theId = level1Id;
+				level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Id" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "theId", "level1Id" )
+				)
+		);
 	}
 
 	@Test
