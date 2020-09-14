@@ -328,6 +328,7 @@
             - or the name of the declaring type ends with 'Provider';
             - or the name of the declaring type ends with 'ConfigurationProperty';
             - or the name of the declaring type ends with 'ConfigurationPropertySource'.
+            - or the name of the declaring type ends with: 'ScrollableResultsAdapter'.
         </description>
         <cypher><![CDATA[
             MATCH
@@ -342,6 +343,7 @@
                 AND NOT type.name ENDS WITH "Provider"
                 AND NOT type.name ENDS WITH "ConfigurationProperty"
                 AND NOT type.name ENDS WITH "ConfigurationPropertySource"
+                AND NOT type.name ENDS WITH "ScrollableResultsAdapter"
             RETURN
                 type, method
         ]]></cypher>
