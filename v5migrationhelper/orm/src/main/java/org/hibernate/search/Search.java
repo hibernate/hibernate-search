@@ -17,7 +17,9 @@ import java.lang.invoke.MethodHandles;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @deprecated Use {@link org.hibernate.search.mapper.orm.Search} instead.
  */
+@Deprecated
 public final class Search {
 
 	private static final Log log = LoggerFactory.make( MethodHandles.lookup() );
@@ -33,7 +35,9 @@ public final class Search {
 	 * @param session the hibernate ORM session
 	 * @return the new FullTextSession, based on the passed Session
 	 * @throws IllegalArgumentException if passed null
+	 * @deprecated Use {@link org.hibernate.search.mapper.orm.Search#session(Session)} instead.
 	 */
+	@Deprecated
 	public static FullTextSession getFullTextSession(Session session) {
 		if ( session == null ) {
 			throw log.getNullSessionPassedToFullTextSessionCreationException();

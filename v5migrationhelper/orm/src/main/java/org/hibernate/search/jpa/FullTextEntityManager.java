@@ -10,14 +10,26 @@ import java.io.Serializable;
 
 import javax.persistence.EntityManager;
 
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 
 /**
  * Extends an EntityManager with Full-Text operations
  *
  * @author Emmanuel Bernard
+ * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+ * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)}.
+ * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
  */
+@Deprecated
 public interface FullTextEntityManager extends EntityManager {
 
 	/**
@@ -31,7 +43,15 @@ public interface FullTextEntityManager extends EntityManager {
 	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene wuery.
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * then create a {@link SearchQuery} with {@link SearchSession#search(Class)}.
+	 * If you really need an adapter to Hibernate ORM's {@link Query} type,
+	 * convert that {@link SearchQuery} using {@link org.hibernate.search.mapper.orm.Search#toOrmQuery(SearchQuery)},
+	 * but be aware that only part of the contract is implemented.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
 
 	/**
@@ -43,12 +63,22 @@ public interface FullTextEntityManager extends EntityManager {
 	 * @param entity The entity to index - must not be <code>null</code>.
 	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * then get the indexing plan for that session using {@link SearchSession#indexingPlan()},
+	 * then add/update/remove entities to/from the index using
+	 * {@link SearchIndexingPlan#addOrUpdate(Object)},
+	 * {@link SearchIndexingPlan#delete(Object)},
+	 * or {@link SearchIndexingPlan#purge(Class, Object, String)}.
 	 */
+	@Deprecated
 	<T> void index(T entity);
 
 	/**
 	 * @return the <code>SearchFactory</code> instance.
+	 * @deprecated See the deprecation note on {@link SearchFactory}.
 	 */
+	@Deprecated
 	SearchFactory getSearchFactory();
 
 	/**
@@ -61,7 +91,17 @@ public interface FullTextEntityManager extends EntityManager {
 	 * @param id The id of the entity to delete.
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
+	 *
+	 * @deprecated To purge all instances of a given type, see the deprecation note on {@link #purgeAll(Class)}.
+	 * To purge a specific instance, instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * then get the indexing plan for that session using {@link SearchSession#indexingPlan()},
+	 * then add/update/remove entities to/from the index using
+	 * {@link SearchIndexingPlan#addOrUpdate(Object)},
+	 * {@link SearchIndexingPlan#delete(Object)},
+	 * or {@link SearchIndexingPlan#purge(Class, Object, String)}.
 	 */
+	@Deprecated
 	<T> void purge(Class<T> entityType, Serializable id);
 
 	/**
@@ -71,12 +111,24 @@ public interface FullTextEntityManager extends EntityManager {
 	 * @param entityType The class of the entities to remove.
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
+	 *
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchScope}
+	 * using {@link SearchSession#scope(Class)} or {@link SearchMapping#scope(Class)},
+	 * then a {@link SearchWorkspace} using {@link SearchScope#workspace()},
+	 * then call {@link SearchWorkspace#purge()} to purge all indexes in scope.
 	 */
+	@Deprecated
 	<T> void purgeAll(Class<T> entityType);
 
 	/**
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * then get the indexing plan for that session using {@link SearchSession#indexingPlan()},
+	 * then force the immediate execution of indexing operations
+	 * using {@link SearchIndexingPlan#execute()}.
 	 */
+	@Deprecated
 	void flushToIndexes();
 
 	/**
@@ -86,7 +138,12 @@ public interface FullTextEntityManager extends EntityManager {
 	 *
 	 * @param types optionally restrict the operation to selected types
 	 * @return a new MassIndexer
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(Session)},
+	 * then create a mass indexer with {@link SearchSession#massIndexer(Class[])}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	MassIndexer createIndexer(Class<?>... types);
 
 }

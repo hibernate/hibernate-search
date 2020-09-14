@@ -7,14 +7,30 @@
 package org.hibernate.search.jpa;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.Query;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Sort;
 
+import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -26,7 +42,15 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
+ * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+ * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+ * then create a {@link SearchQuery} with {@link SearchSession#search(Class)}.
+ * If you really need an adapter to JPA's {@link Query},
+ * convert that {@link SearchQuery} using {@link org.hibernate.search.mapper.orm.Search#toJpaQuery(SearchQuery)},
+ * but be aware that only part of the contract is implemented.
+ * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
  */
+@Deprecated
 public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
@@ -38,7 +62,13 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param sort The lucene sort object.
 	 *
 	 * @return this for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your sorts using {@link SearchQueryOptionsStep#sort(Function)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery setSort(Sort sort);
 
 	/**
@@ -50,7 +80,13 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * may be not in sync with the database at the time of query.
 	 *
 	 * @return the number of hits for this search
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and get the total hit count ("result size") using {@link SearchQuery#fetchTotalHitCount()}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	int getResultSize();
 
 	/**
@@ -65,7 +101,13 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param fields the fields to use for projection
 	 * @return {@code this} for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery setProjection(String... fields);
 
 	/**
@@ -76,7 +118,14 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param fieldName name of the spatial field
 	 *
 	 * @return {@code this} for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
+	 * See in particular the distance projection: {@link SearchProjectionFactory#distance(String, GeoPoint)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName);
 
 	/**
@@ -86,12 +135,28 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param fieldName name of the spatial field
 	 *
 	 * @return {@code this} for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
+	 * See in particular the distance projection: {@link SearchProjectionFactory#distance(String, GeoPoint)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery setSpatialParameters(Coordinates center, String fieldName);
 
 	/**
 	 * @return return the manager for all faceting related operations
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your facets (now called aggregations)
+	 * using {@link SearchQueryOptionsStep#aggregation(AggregationKey, Function)}.
+	 * You can then fetch the query result using {@link SearchQuery#fetch(Integer)}
+	 * and get each aggregation using {@link SearchResult#aggregation(AggregationKey)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FacetManager getFacetManager();
 
 	/**
@@ -99,7 +164,15 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param transformer the {@link ResultTransformer} to use during projection
 	 * @return {@code this} for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your projections using {@link SearchQuerySelectStep#select(Function)}.
+	 * See in particular the composite projection, which allows applying a function to another projection:
+	 * {@link SearchProjectionFactory#composite(Function, ProjectionFinalStep)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
 	/**
@@ -110,7 +183,16 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param entityId The identifier of the entity whose match should be explained.
 	 *
 	 * @return Lucene {@link Explanation}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * convert it to a {@link org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery}
+	 * by passing {@link LuceneExtension#get()} to {@link SearchQuery#extension(SearchQueryExtension)},
+	 * and get the explanation using {@link org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery#explain(Object)}.
+	 * Note the {@code explain} methods now expect an entity ID, not the internal Lucene docId.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	Explanation explain(Object entityId);
 
 	/**
@@ -126,6 +208,13 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param timeout time out period
 	 * @param timeUnit time out unit
 	 * @return {@code this} for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * set a "truncation" timeout using {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)},
+	 * and get the {@link SearchResult} with {@link SearchQuery#fetch(Integer)}.
+	 * You'll be able to check whether the result is partial or not using {@link SearchResult#timedOut()}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit);
 
@@ -133,7 +222,15 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @return When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns {@code true}
 	 *         if partial results are returned (ie if the time limit has been reached
 	 *         and the result fetching process has been terminated.
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * set a "truncation" timeout using {@link SearchQueryOptionsStep#truncateAfter(long, TimeUnit)},
+	 * and get the {@link SearchResult} with {@link SearchQuery#fetch(Integer)}.
+	 * You'll be able to check whether the result is partial or not using {@link SearchResult#timedOut()}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	boolean hasPartialResults();
 
 	/**
@@ -149,12 +246,37 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param lookupMethod lookup method
 	 * @param retrievalMethod how to initilize an object
 	 * @return {@code this} for method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and define your loading options using {@link SearchQueryOptionsStep#loading(Consumer)}.
+	 * To set the equivalent to {@link ObjectLookupMethod} in Hibernate Search 6,
+	 * use {@link SearchLoadingOptionsStep#cacheLookupStrategy(EntityLoadingCacheLookupStrategy)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
 	FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod);
 
+	/**
+	 * {@inheritDoc}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and pass the hit limit ("maxResults") when fetching results using
+	 * {@link SearchQuery#fetch(Integer)}, {@link SearchQuery#fetch(Integer, Integer)},
+	 * {@link SearchQuery#fetchHits(Integer)} or {@link SearchQuery#fetch(Integer, Integer)}.
+	 */
 	@Override
 	FullTextQuery setMaxResults(int maxResult);
 
+	/**
+	 * {@inheritDoc}
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and pass the hit offset ("firstResult") when fetching results using
+	 * {@link SearchQuery#fetch(Integer)}, {@link SearchQuery#fetch(Integer, Integer)},
+	 * {@link SearchQuery#fetchHits(Integer)} or {@link SearchQuery#fetch(Integer, Integer)}.
+	 */
 	@Override
 	FullTextQuery setFirstResult(int var1);
 
@@ -173,7 +295,13 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param timeUnit time out unit
 	 *
 	 * @return {@code this} to allow method chaining
+	 * @deprecated Instead of using Hibernate Search 5 APIs, get a {@link SearchSession}
+	 * using {@link org.hibernate.search.mapper.orm.Search#session(EntityManager)},
+	 * create a search query with {@link SearchSession#search(Class)},
+	 * and set a "failure" timeout using {@link SearchQueryOptionsStep#failAfter(long, TimeUnit)}.
+	 * Refer to the <a href="https://hibernate.org/search/documentation/migrate/6.0/">migration guide</a> for more information.
 	 */
+	@Deprecated
 	FullTextQuery setTimeout(long timeout, TimeUnit timeUnit);
 
 }
