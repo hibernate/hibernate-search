@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
+import org.hibernate.search.util.common.logging.impl.TypeFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
@@ -462,5 +464,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 79, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName,
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 80,
+			value = "Bridge '%1$s' implements ValueBridge<V, F>,"
+					+ " but sets the generic type parameter F to '%2$s'."
+					+ " The field type can only be inferred automatically"
+					+ " when this type parameter is set to a raw class."
+					+ " Use a ValueBinder to set the field type explicitly,"
+					+ " or set the type parameter F to a definite, raw type.")
+	SearchException invalidGenericParameterToInferFieldType(Object bridge, @FormatWith(TypeFormatter.class) Type type);
 
 }

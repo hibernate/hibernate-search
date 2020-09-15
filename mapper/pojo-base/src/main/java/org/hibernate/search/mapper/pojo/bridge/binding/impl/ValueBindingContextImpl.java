@@ -36,7 +36,6 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
-import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		implements ValueBindingContext<V> {
@@ -184,16 +183,21 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 	private <F> IndexFieldTypeOptionsStep<?, F> inferFieldType(ValueBridge<?, F> bridge) {
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
 		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-		Class<F> returnType =
-				(Class<F>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
-						.map( ReflectionUtils::getRawType )
-						.orElseThrow( () -> new AssertionFailure(
-								"Could not auto-detect the return type for value bridge '"
-										+ bridge + "'."
-										+ " There is a bug in Hibernate Search, please report it."
-						) );
+		Class<F> returnType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
+				.map( type -> {
+					if ( type instanceof Class ) {
+						return (Class<F>) type;
+					}
+					else {
+						throw log.invalidGenericParameterToInferFieldType( bridge, type );
+					}
+				} )
+				.orElseThrow( () -> new AssertionFailure(
+						"Could not auto-detect the return type for value bridge '"
+								+ bridge + "'."
+								+ " There is a bug in Hibernate Search, please report it."
+				) );
 		return indexFieldTypeFactory.as( returnType );
 	}
 
