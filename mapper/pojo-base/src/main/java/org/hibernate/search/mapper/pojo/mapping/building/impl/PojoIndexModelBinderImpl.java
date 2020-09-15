@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridg
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.IdentifierBindingContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.DefaultIdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.PropertyBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBindingContextImpl;
@@ -102,7 +102,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			defaultedBinder = bridgeResolver.resolveIdentifierBinderForType( identifierTypeModel );
 		}
 
-		IdentifierBindingContextImpl<I> bindingContext = new IdentifierBindingContextImpl<>(
+		DefaultIdentifierBindingContext<I> bindingContext = new DefaultIdentifierBindingContext<>(
 				beanResolver,
 				introspector,
 				indexedEntityBindingContext,
