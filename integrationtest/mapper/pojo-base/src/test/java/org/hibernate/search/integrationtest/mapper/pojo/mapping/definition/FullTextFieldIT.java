@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -356,6 +357,32 @@ public class FullTextFieldIT {
 				);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3243")
+	public void customBridge_implicitFieldType_generic() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@FullTextField(analyzer = ANALYZER_NAME,
+					valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
+			String property;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".property" )
+						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements ValueBridge<V, F>,"
+								+ " but sets the generic type parameter F to 'T'."
+								+ " The field type can only be inferred automatically"
+								+ " when this type parameter is set to a raw class."
+								+ " Use a ValueBinder to set the field type explicitly,"
+								+ " or set the type parameter F to a definite, raw type." )
+						.build() );
+	}
+
 	private <E, P, F> void doTestValidMapping(Class<E> entityType,
 			BiFunction<Integer, P, E> newEntityFunction,
 			Class<P> propertyType, Class<F> indexedFieldType,
@@ -407,6 +434,20 @@ public class FullTextFieldIT {
 			public void bind(ValueBindingContext<?> context) {
 				context.bridge( WrappedValue.class, new InvalidTypeBridge(), context.typeFactory().asInteger() );
 			}
+		}
+	}
+
+	public static class GenericTypeBridge<T> implements ValueBridge<String, T> {
+		private static final String TOSTRING = "<GenericTypeBridge toString() result>";
+
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		@Override
+		public T toIndexedValue(String value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}
 

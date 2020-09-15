@@ -29,6 +29,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendExtension;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -154,7 +155,6 @@ public class GenericFieldIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-
 	@Test
 	public void customBridge_implicitFieldType() {
 		@Indexed(index = INDEX_NAME)
@@ -189,7 +189,6 @@ public class GenericFieldIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-
 	@Test
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
@@ -215,6 +214,31 @@ public class GenericFieldIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3243")
+	public void customBridge_implicitFieldType_generic() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
+			String property;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".property" )
+						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements ValueBridge<V, F>,"
+								+ " but sets the generic type parameter F to 'T'."
+								+ " The field type can only be inferred automatically"
+								+ " when this type parameter is set to a raw class."
+								+ " Use a ValueBinder to set the field type explicitly,"
+								+ " or set the type parameter F to a definite, raw type." )
+						.build() );
 	}
 
 	public static class ValidTypeBridge implements ValueBridge<WrappedValue, String> {
@@ -245,6 +269,20 @@ public class GenericFieldIT {
 						context.typeFactory().extension( StubBackendExtension.get() ).asNonStandard( Integer.class )
 				);
 			}
+		}
+	}
+
+	public static class GenericTypeBridge<T> implements ValueBridge<String, T> {
+		private static final String TOSTRING = "<GenericTypeBridge toString() result>";
+
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		@Override
+		public T toIndexedValue(String value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}
 
