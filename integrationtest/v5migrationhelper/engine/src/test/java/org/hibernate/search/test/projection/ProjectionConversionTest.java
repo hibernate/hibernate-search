@@ -63,8 +63,12 @@ public class ProjectionConversionTest {
 		embedded.longEncodedAsText = String.valueOf( 21L );
 		embedded.unstoredField = "unstoredFieldEmbedded";
 
+		ConflictingMappedType second = new ConflictingMappedType();
+		second.id = "a string";
+
 		entity.embedded = embedded;
 		embedded.containing = entity;
+		entity.second = second;
 
 		helper.add( entity );
 	}
@@ -95,8 +99,18 @@ public class ProjectionConversionTest {
 	}
 
 	@Test
+	public void projectingEmbeddedIdByPropertyName() {
+		projectionTestHelper( "embedded.id", Long.valueOf( 2L ) );
+	}
+
+	@Test
 	public void projectingEmbeddedIdOnOverloadedMapping() {
 		projectionTestHelper( "embedded.stringTypedId", Long.valueOf( 2L ) );
+	}
+
+	@Test
+	public void projectingOnConflictingMappedIdField() {
+		projectionTestHelper( "second.id", "a string" );
 	}
 
 	@Test
@@ -112,7 +126,9 @@ public class ProjectionConversionTest {
 							projectingExplicitId();
 							projectingIdOnOverloadedMapping();
 							projectingIntegerField();
+							projectingEmbeddedIdByPropertyName();
 							projectingEmbeddedIdOnOverloadedMapping();
+							projectingOnConflictingMappedIdField();
 						}
 					};
 				}
@@ -144,13 +160,25 @@ public class ProjectionConversionTest {
 
 		@IndexedEmbedded(
 				includePaths = {
-					"stringTypedId"
-				}
+					"id", "stringTypedId"
+				},
+				includeEmbeddedObjectId = true
 		)
 		ExampleEntity embedded;
 
 		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "embedded")))
 		ExampleEntity containing;
+
+		@IndexedEmbedded(includeEmbeddedObjectId = true)
+		ConflictingMappedType second;
+
+	}
+
+	@Indexed
+	public static class ConflictingMappedType {
+
+		@DocumentId
+		String id;
 
 	}
 

@@ -225,6 +225,20 @@ public class SimpleQueryStringDSLTest {
 				.matchesNone();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3039")
+	public void testSearchOnEmbeddedObjectId() {
+		QueryBuilder qb = getCoffeeQueryBuilder();
+
+		Query query = qb.simpleQueryString()
+				.onFields( "maker.id" )
+				.matching( "Stable" )
+				.createQuery();
+
+		helper.assertThat( query ).from( Coffee.class )
+				.matchesUnorderedIds( "Dharkan", "Arpeggio", "Decaffeinato" );
+	}
+
 	private QueryBuilder getCoffeeQueryBuilder() {
 		return helper.queryBuilder( Coffee.class );
 	}
