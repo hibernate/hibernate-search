@@ -70,11 +70,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		// TODO HSEARCH-3947 Check (and in case avoid) huge arrays are created for collectors when a query does not have an upper bound limit
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs,
-				totalHitCountThreshold
-		);
-
-		luceneCollectors.collectMatchingDocs( offset, limit );
+		LuceneCollectors luceneCollectors = collectMatchingDocs(
+				indexSearcher, metadataResolver, offset, limit, maxDocs, totalHitCountThreshold );
 
 		LuceneExtractableSearchResult<H> extractableSearchResult = new LuceneExtractableSearchResult<>(
 				requestContext, indexSearcher,
@@ -93,10 +90,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		int offset = 0;
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, maxDocs,
-				Integer.MAX_VALUE );
-
-		luceneCollectors.collectMatchingDocs( offset, limit );
+		LuceneCollectors luceneCollectors = collectMatchingDocs(
+				indexSearcher, metadataResolver, offset, limit, maxDocs, Integer.MAX_VALUE );
 
 		return new LuceneExtractableSearchResult<>(
 				requestContext, indexSearcher,
@@ -133,6 +128,15 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public void setTimeoutManager(LuceneTimeoutManager timeoutManager) {
 		this.timeoutManager = timeoutManager;
+	}
+
+	private LuceneCollectors collectMatchingDocs(IndexSearcher indexSearcher,
+			IndexReaderMetadataResolver metadataResolver, int offset, Integer limit,
+			int maxDocs, int totalHitCountThreshold) throws IOException {
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver,
+				maxDocs, totalHitCountThreshold );
+		luceneCollectors.collectMatchingDocs( offset, limit );
+		return luceneCollectors;
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
