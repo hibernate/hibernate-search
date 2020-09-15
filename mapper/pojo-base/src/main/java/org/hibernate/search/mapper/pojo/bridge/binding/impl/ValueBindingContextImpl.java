@@ -92,7 +92,6 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		try {
 			PojoRawTypeModel<V2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
-			// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
 			if ( !valueTypeModel.rawType().isSubTypeOf( expectedValueTypeModel ) ) {
 				throw log.invalidInputTypeForBridge( bridgeHolder.get(), valueTypeModel );
 			}
