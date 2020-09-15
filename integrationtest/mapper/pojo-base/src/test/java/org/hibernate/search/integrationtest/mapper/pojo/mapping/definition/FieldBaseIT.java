@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
@@ -22,13 +24,15 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test common use cases of the {@code @GenericField} annotation.
+ * Test common use cases of the {@code @*Field} annotations.
+ * <p>
+ * {@code @GenericField} is used in these tests, but other field annotations are expected to work the same,
+ * because they rely on the same code internally.
  * <p>
  * Does not test default bridges, which are tested in {@link FieldDefaultBridgeBaseIT}.
  * <p>
@@ -46,7 +50,7 @@ public class FieldBaseIT {
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void error_unableToResolveDefaultValueBridgeFromSourceType() {
+	public void valueBridge_default_noMatch() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -54,7 +58,7 @@ public class FieldBaseIT {
 			@GenericField
 			Object myProperty;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -71,7 +75,7 @@ public class FieldBaseIT {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassRaw() {
+	public void valueBridge_default_noMatch_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -79,7 +83,7 @@ public class FieldBaseIT {
 			@GenericField
 			Enum myProperty;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -94,7 +98,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassWithWildcard() {
+	public void valueBridge_default_noMatch_enumSuperClassWithWildcard() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -102,7 +106,7 @@ public class FieldBaseIT {
 			@GenericField
 			Enum<?> myProperty;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -117,7 +121,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassWithParameters() {
+	public void valueBridge_default_noMatch_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -125,7 +129,7 @@ public class FieldBaseIT {
 			@GenericField
 			Enum<EnumForEnumSuperClassTest> myProperty;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -146,14 +150,14 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_invalidInputTypeForValueBridge() {
+	public void valueBridge_invalidInputType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
 			@GenericField(valueBridge = @ValueBridgeRef(type = MyStringBridge.class))
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -169,7 +173,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_invalidInputTypeForValueBridge_implicitContainerExtractor() {
+	public void valueBridge_invalidInputType_implicitContainerExtractor() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -177,7 +181,7 @@ public class FieldBaseIT {
 			@GenericField(valueBridge = @ValueBridgeRef(type = MyStringBridge.class))
 			List<Integer> numbers;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -193,7 +197,7 @@ public class FieldBaseIT {
 	}
 
 	public static class MyStringBridge implements ValueBridge<String, String> {
-		private static String TOSTRING = "<MyStringBridge toString() result>";
+		private static final String TOSTRING = "<MyStringBridge toString() result>";
 		@Override
 		public String toIndexedValue(String value,
 				ValueBridgeToIndexedValueContext context) {
@@ -206,7 +210,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_definingBothBridgeReferenceAndBinderReference() {
+	public void valueBridge_valueBinder() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
@@ -216,7 +220,7 @@ public class FieldBaseIT {
 			)
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -274,7 +278,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_indexNullAs_noParsing() {
+	public void indexNullAs_noParsing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
@@ -283,7 +287,7 @@ public class FieldBaseIT {
 			Integer integer;
 		}
 
-		Assertions.assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "does not support parsing a value from a String" )
 				.hasMessageContaining( "integer" );
