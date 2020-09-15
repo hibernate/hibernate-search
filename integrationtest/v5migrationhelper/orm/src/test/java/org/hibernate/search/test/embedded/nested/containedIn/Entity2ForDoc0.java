@@ -13,8 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
-import org.hibernate.search.annotations.Field;
-
 /**
  * @author grolland
  */
@@ -24,7 +22,6 @@ import org.hibernate.search.annotations.Field;
 public class Entity2ForDoc0 {
 
 	@Id
-	@Field(name = "uid_field")
 	@GeneratedValue //(generator = "ids_generator2", strategy = GenerationType.SEQUENCE)
 	@Column(name = "universalid")//"uid" is a keywork in Oracle
 	private long uid;

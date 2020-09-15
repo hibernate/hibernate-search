@@ -28,7 +28,6 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Store;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.test.SearchTestBase;
@@ -161,7 +160,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		public void setLastName(String lastName) { this.lastName = lastName; }
 		private String lastName;
 
-		@IndexedEmbedded
+		@IndexedEmbedded(includeEmbeddedObjectId = true)
 		@OneToOne(cascade = CascadeType.ALL)
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		public Truck getTruck() { return truck; }
@@ -183,7 +182,6 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 
 		@Id
 		@GeneratedValue
-		@Field(store = Store.YES)
 		public Long getId() { return id; }
 		public void setId(Long id) { this.id = id; }
 		private Long id;
