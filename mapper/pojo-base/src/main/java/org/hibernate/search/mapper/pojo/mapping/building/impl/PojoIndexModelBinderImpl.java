@@ -33,15 +33,18 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 
 public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
@@ -61,6 +64,18 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		this.extractorBinder = extractorBinder;
 		this.bridgeResolver = bridgeResolver;
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
+	}
+
+	@Override
+	public <T> Optional<BoundPojoModelPathPropertyNode<T, ?>> createEntityIdPropertyPath(PojoTypeModel<T> type) {
+		Optional<String> entityIdPropertyName = typeAdditionalMetadataProvider
+				.get( type.rawType() )
+				.getEntityTypeMetadata()
+				.flatMap( PojoEntityTypeAdditionalMetadata::getEntityIdPropertyName );
+		if ( !entityIdPropertyName.isPresent() ) {
+			return Optional.empty();
+		}
+		return Optional.of( BoundPojoModelPath.root( type ).property( entityIdPropertyName.get() ) );
 	}
 
 	@Override
