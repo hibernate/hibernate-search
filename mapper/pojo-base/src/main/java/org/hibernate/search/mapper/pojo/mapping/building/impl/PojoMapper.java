@@ -228,7 +228,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 
 		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( indexedEntityType,
-				entityTypeMetadata, mappingHelper, indexManagerBuilder,
+				mappingHelper, indexManagerBuilder,
 				delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName, indexName ),
 				providedIdentifierBridge, routingBridge, mappingHelper.beanResolver() );
 

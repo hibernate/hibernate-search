@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * Binds a mapping to a given entity model and index model
@@ -45,6 +46,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  *
  */
 public interface PojoIndexModelBinder {
+
+	<T> Optional<BoundPojoModelPathPropertyNode<T, ?>> createEntityIdPropertyPath(PojoTypeModel<T> type);
 
 	<C> BoundContainerExtractorPath<C, ?> bindExtractorPath(
 			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath);

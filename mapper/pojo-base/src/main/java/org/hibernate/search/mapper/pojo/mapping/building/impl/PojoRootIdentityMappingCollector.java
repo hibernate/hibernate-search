@@ -20,8 +20,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImp
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PropertyIdentifierMapping;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ProvidedIdentifierMapping;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -39,14 +37,12 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private final BeanResolver beanResolver;
-	private final BoundPojoModelPathPropertyNode<?, ?> entityIdPropertyPath;
 
 	IdentifierMappingImplementor<?, E> identifierMapping;
 	Optional<PojoPropertyModel<?>> documentIdSourceProperty;
 	BoundRoutingBridge<E> routingBridge;
 
 	PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
-			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
@@ -57,14 +53,6 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 		this.bindingContext = bindingContext;
 		this.providedIdentifierBridge = providedIdentifierBridge;
 		this.beanResolver = beanResolver;
-
-		Optional<String> entityIdPropertyName = entityTypeMetadata.getEntityIdPropertyName();
-		if ( entityIdPropertyName.isPresent() ) {
-			this.entityIdPropertyPath = BoundPojoModelPath.root( typeModel ).property( entityIdPropertyName.get() );
-		}
-		else {
-			this.entityIdPropertyPath = null;
-		}
 		this.routingBridge = routingBridge;
 	}
 
@@ -104,20 +92,26 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 	}
 
 	void applyDefaults() {
-		if ( identifierMapping == null ) {
-			// Assume a provided ID if requested
-			if ( providedIdentifierBridge != null ) {
-				identifierMapping = ProvidedIdentifierMapping.get( beanResolver.resolve( providedIdentifierBridge ) );
-				documentIdSourceProperty = Optional.empty();
-			}
-			// Fall back to the entity ID if possible
-			else if ( entityIdPropertyPath != null ) {
-				identifierBridge( entityIdPropertyPath, null );
-			}
-			else {
-				throw log.missingIdentifierMapping( typeModel );
-			}
+		if ( identifierMapping != null ) {
+			return;
 		}
+
+		// Assume a provided ID if requested
+		if ( providedIdentifierBridge != null ) {
+			identifierMapping = ProvidedIdentifierMapping.get( beanResolver.resolve( providedIdentifierBridge ) );
+			documentIdSourceProperty = Optional.empty();
+			return;
+		}
+
+		// Fall back to the entity ID if possible
+		Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
+				.createEntityIdPropertyPath( typeModel );
+		if ( entityIdPropertyPath.isPresent() ) {
+			identifierBridge( entityIdPropertyPath.get(), null );
+			return;
+		}
+
+		throw log.missingIdentifierMapping( typeModel );
 	}
 
 }

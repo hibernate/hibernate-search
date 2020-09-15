@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExte
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -50,7 +49,6 @@ class PojoIndexedTypeManagerBuilder<E> {
 	private boolean closed = false;
 
 	PojoIndexedTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
-			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			MappedIndexManagerBuilder indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
@@ -62,7 +60,6 @@ class PojoIndexedTypeManagerBuilder<E> {
 		this.extendedMappingCollector = extendedMappingCollector;
 		this.identityMappingCollector = new PojoRootIdentityMappingCollector<>(
 				typeModel,
-				entityTypeMetadata,
 				mappingHelper,
 				indexManagerBuilder.rootBindingContext(),
 				providedIdentifierBridge, routingBridge,
