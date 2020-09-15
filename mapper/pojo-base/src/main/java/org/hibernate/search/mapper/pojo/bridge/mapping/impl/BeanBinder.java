@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -15,16 +17,19 @@ import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
-import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 /**
  * A binder that simply retrieves the bridge as a bean from the bean provider.
  */
 public final class BeanBinder
 		implements IdentifierBinder, ValueBinder {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanReference<?> beanReference;
 
@@ -70,10 +75,16 @@ public final class BeanBinder
 	private <B extends IdentifierBridge<I>, I> void doBind(BeanHolder<B> bridgeHolder, IdentifierBindingContext<?> context) {
 		IdentifierBridge<I> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
 		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-		Class<I> bridgeParameterType = (Class<I>) bridgeTypeContext.resolveTypeArgument( IdentifierBridge.class, 0 )
-				.map( ReflectionUtils::getRawType )
+		Class<I> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( IdentifierBridge.class, 0 )
+				.map( type -> {
+					if ( type instanceof Class ) {
+						return (Class<I>) type;
+					}
+					else {
+						throw log.invalidGenericParameterToInferIdentifierType( bridge, type );
+					}
+				} )
 				.orElseThrow( () -> new AssertionFailure(
 						"Could not auto-detect the input type for identifier bridge '"
 						+ bridge + "'."
@@ -85,10 +96,16 @@ public final class BeanBinder
 	private <B extends ValueBridge<V, F>, V, F> void doBind(BeanHolder<B> bridgeHolder, ValueBindingContext<?> context) {
 		ValueBridge<V, F> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
 		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-		Class<V> bridgeParameterType = (Class<V>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
-				.map( ReflectionUtils::getRawType )
+		Class<V> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
+				.map( type -> {
+					if ( type instanceof Class ) {
+						return (Class<V>) type;
+					}
+					else {
+						throw log.invalidGenericParameterToInferValueType( bridge, type );
+					}
+				} )
 				.orElseThrow( () -> new AssertionFailure(
 						"Could not auto-detect the input type for value bridge '"
 						+ bridge + "'."
