@@ -21,6 +21,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -162,6 +163,59 @@ public class DocumentIdBaseIT {
 		}
 		@Override
 		public String toDocumentIdentifier(String propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3243")
+	public void identifierBridge_invalidInputType_superType() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyNumberBridge.class))
+			Object id;
+		}
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure( "Bridge '" + MyNumberBridge.TOSTRING + "' cannot be applied to input type '"
+								+ Object.class.getName() + "'" )
+						.build() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3243")
+	public void identifierBridge_invalidInputType_subType() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyNumberBridge.class))
+			Integer id;
+		}
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure( "Bridge '" + MyNumberBridge.TOSTRING + "' cannot be applied to input type '"
+								+ Integer.class.getName() + "'" )
+						.build() );
+	}
+
+	public static class MyNumberBridge implements IdentifierBridge<Number> {
+		private static final String TOSTRING = "<MyNumberBridge toString() result>";
+		@Override
+		public Number fromDocumentIdentifier(String documentIdentifier,
+				IdentifierBridgeFromDocumentIdentifierContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toDocumentIdentifier(Number propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 		@Override
