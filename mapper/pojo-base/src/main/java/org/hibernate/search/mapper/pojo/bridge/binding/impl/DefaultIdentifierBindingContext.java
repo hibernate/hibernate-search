@@ -58,9 +58,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	public <I2> void bridge(Class<I2> expectedValueType, BeanHolder<? extends IdentifierBridge<I2>> bridgeHolder) {
 		try {
 			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
-			// TODO HSEARCH-3243 we're checking that the bridge parameter type is a subtype, but we really should be checking it
-			//  is either the same type or a generic type parameter that can represent the same type.
-			if ( !identifierTypeModel.rawType().isSubTypeOf( expectedValueTypeModel ) ) {
+			if ( !identifierTypeModel.rawType().equals( expectedValueTypeModel ) ) {
 				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel );
 			}
 
