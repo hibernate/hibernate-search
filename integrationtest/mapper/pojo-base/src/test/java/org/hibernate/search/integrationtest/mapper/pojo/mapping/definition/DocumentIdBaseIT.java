@@ -251,6 +251,49 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3243")
+	public void identifierBridge_implicitInputType_generic() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = GenericTypeBridge.class))
+			Integer id;
+		}
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements IdentifierBridge<I>,"
+								+ " but sets the generic type parameter I to 'T'."
+								+ " The expected identifier type can only be inferred automatically"
+								+ " when this type parameter is set to a raw class."
+								+ " Use an IdentifierBinder to set the expected identifier type explicitly,"
+								+ " or set the type parameter I to a definite, raw type." )
+						.build()
+				);
+	}
+
+	public static class GenericTypeBridge<T> implements IdentifierBridge<T> {
+		private static final String TOSTRING = "<GenericTypeBridge toString() result>";
+
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		@Override
+		public String toDocumentIdentifier(T propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+
+		@Override
+		public T fromDocumentIdentifier(String documentIdentifier,
+				IdentifierBridgeFromDocumentIdentifierContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
+
+	@Test
 	public void missing() {
 		@Indexed
 		class IndexedEntity {

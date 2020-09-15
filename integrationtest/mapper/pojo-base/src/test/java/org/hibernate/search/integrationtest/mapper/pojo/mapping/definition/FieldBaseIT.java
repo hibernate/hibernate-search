@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -234,6 +235,44 @@ public class FieldBaseIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3243")
+	public void valueBridge_implicitInputType_generic() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			@GenericField(valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
+			Integer id;
+		}
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements ValueBridge<V, F>,"
+								+ " but sets the generic type parameter V to 'T'."
+								+ " The expected value type can only be inferred automatically"
+								+ " when this type parameter is set to a raw class."
+								+ " Use a ValueBinder to set the expected value type explicitly,"
+								+ " or set the type parameter V to a definite, raw type." )
+						.build()
+				);
+	}
+
+	public static class GenericTypeBridge<T> implements ValueBridge<T, String> {
+		private static final String TOSTRING = "<GenericTypeBridge toString() result>";
+
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		@Override
+		public String toIndexedValue(T value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
 	}
 
 	@Test
