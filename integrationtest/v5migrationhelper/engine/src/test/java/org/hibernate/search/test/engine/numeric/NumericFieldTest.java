@@ -14,6 +14,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.dsl.RangeMatchingContext;
@@ -181,6 +182,8 @@ public class NumericFieldTest {
 	}
 
 	private static class Score {
+		@DocumentId
+		@NumericField
 		Integer id;
 
 		@Field(name = "beta", store = Store.YES)
