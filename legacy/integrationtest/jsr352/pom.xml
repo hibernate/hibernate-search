@@ -32,16 +32,6 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-elasticsearch</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-elasticsearch-aws</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-testing</artifactId>
             <scope>test</scope>
         </dependency>
@@ -176,36 +166,12 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>jsr352-elasticsearch-it</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
-                        <configuration>
-                            <reportsDirectory>target/failsafe-reports/elasticsearch</reportsDirectory>
-                            <systemPropertyVariables>
-                                <org.hibernate.search.jsr352.persistence_unit>elasticsearch_pu</org.hibernate.search.jsr352.persistence_unit>
-                            </systemPropertyVariables>
-                            <excludedGroups>
-                                org.hibernate.search.testsupport.junit.SkipOnElasticsearch
-                            </excludedGroups>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>jsr352-it-verify</id>
                         <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- Elasticsearch -->
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.alexcojocaru</groupId>
-                <artifactId>elasticsearch-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

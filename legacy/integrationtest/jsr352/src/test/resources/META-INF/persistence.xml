@@ -23,40 +23,6 @@
             <property name="hibernate.search.default.directory_provider" value="local-heap" />
         </properties>
     </persistence-unit>
-    <persistence-unit name="elasticsearch_pu" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <properties>
-            <property name="hibernate.dialect" value="${db.dialect}" />
-            <property name="hibernate.connection.driver_class" value="${jdbc.driver}" />
-            <property name="hibernate.connection.url" value="${jdbc.url}" />
-            <property name="hibernate.connection.user" value="${jdbc.user}" />
-            <property name="hibernate.connection.password" value="${jdbc.pass}" />
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.session_factory_name" value="primary_session_factory" />
-            <property name="hibernate.session_factory_name_is_jndi" value="false" />
-
-            <property name="hibernate.search.indexing_strategy" value="manual" />
-            <property name="hibernate.search.default.indexmanager" value="elasticsearch"/>
-            <property name="hibernate.search.default.elasticsearch.host" value="${test.elasticsearch.connection.hosts}"/>
-            <property name="hibernate.search.default.elasticsearch.username"
-                      value="${test.elasticsearch.connection.username}"/>
-            <property name="hibernate.search.default.elasticsearch.password"
-                      value="${test.elasticsearch.connection.password}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.signing.enabled"
-                      value="${test.elasticsearch.connection.aws.signing.enabled}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.signing.access_key"
-                      value="${test.elasticsearch.connection.aws.signing.access_key}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.signing.secret_key"
-                      value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
-            <property name="hibernate.search.default.elasticsearch.aws.signing.region"
-                      value="${test.elasticsearch.connection.aws.signing.region}"/>
-            <property name="hibernate.search.default.elasticsearch.required_index_status" value="yellow"/>
-            <property name="hibernate.search.default.elasticsearch.index_schema_management_strategy"
-                      value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.default.elasticsearch.refresh_after_write" value="true"/>
-            <property name="hibernate.search.default.elasticsearch.log.json_pretty_printing" value="true"/>
-        </properties>
-    </persistence-unit>
     <persistence-unit name="unused_pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
