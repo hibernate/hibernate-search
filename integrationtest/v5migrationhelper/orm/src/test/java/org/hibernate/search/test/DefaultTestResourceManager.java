@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
@@ -68,7 +69,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		if ( sessionFactory == null ) {
 			sessionFactory = buildSessionFactory();
 			Map settings = sessionFactory.getServiceRegistry().getService( ConfigurationService.class ).getSettings();
-			baseIndexDir = Path.of( (String) settings.get( "hibernate.search.backend.directory.root" ) );
+			baseIndexDir = Paths.get( (String) settings.get( "hibernate.search.backend.directory.root" ) );
 		}
 		else {
 			throw new IllegalStateException( "there should be no SessionFactory initialized at this point" );
