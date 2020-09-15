@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -19,7 +21,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,13 +40,13 @@ public class DocumentIdBaseIT {
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType() {
+	public void identifierBridge_default_noMatch() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
 			Object id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -62,13 +63,13 @@ public class DocumentIdBaseIT {
 
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassRaw() {
+	public void identifierBridge_default_noMatch_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
 			Enum id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -83,13 +84,13 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithWildcard() {
+	public void identifierBridge_default_noMatch_enumSuperClassWithWildcard() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
 			Enum<?> id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -104,13 +105,13 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithParameters() {
+	public void identifierBridge_default_noMatch_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId
 			Enum<EnumForEnumSuperClassTest> id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -131,13 +132,13 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void error_invalidInputTypeForIdentifierBridge() {
+	public void identifierBridge_invalidInputType() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyStringBridge.class))
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -153,7 +154,7 @@ public class DocumentIdBaseIT {
 	}
 
 	public static class MyStringBridge implements IdentifierBridge<String> {
-		private static String TOSTRING = "<MyStringBridge toString() result>";
+		private static final String TOSTRING = "<MyStringBridge toString() result>";
 		@Override
 		public String fromDocumentIdentifier(String documentIdentifier,
 				IdentifierBridgeFromDocumentIdentifierContext context) {
@@ -170,7 +171,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void error_definingBothBridgeReferenceAndBinderReference() {
+	public void identifierBridge_identifierBinder() {
 		@Indexed
 		class IndexedEntity {
 			@DocumentId(
@@ -179,7 +180,7 @@ public class DocumentIdBaseIT {
 			)
 			Object id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -196,12 +197,12 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void error_missing() {
+	public void missing() {
 		@Indexed
 		class IndexedEntity {
 			Object id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
