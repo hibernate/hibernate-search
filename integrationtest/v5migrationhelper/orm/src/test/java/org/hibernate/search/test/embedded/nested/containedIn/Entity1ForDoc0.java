@@ -30,7 +30,7 @@ public class Entity1ForDoc0 implements Serializable {
 	private static final long serialVersionUID = -3191273589083411349L;
 
 	@Id
-	@Field(name = "uid_field")
+	@Field
 	@GeneratedValue //(generator = "ids_generator1", strategy = GenerationType.SEQUENCE)
 	@Column(name = "universalid")//"uid" is a keywork in Oracle
 	private long uid;
