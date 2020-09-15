@@ -66,9 +66,14 @@ i.e. the value passed to the underlying backend.
 |====
 |Property type|Value of document identifiers
 |java.lang.String|Unchanged
+|java.lang.Character, char|`toString()`
+|java.lang.Byte, byte|`toString()`
 |java.lang.Short, short|`toString()`
 |java.lang.Integer, int|`toString()`
 |java.lang.Long, long|`toString()`
+|java.lang.Float, float|`toString()`
+|java.lang.Double, double|`toString()`
+|java.lang.Boolean, boolean|`toString()`
 |java.math.BigInteger|`toString()`
 |All enum types|`name()`
 |java.util.UUID|`toString()`
