@@ -26,6 +26,8 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathOriginalTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -95,29 +97,30 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				includeDepth, includePaths
 		);
 
-		if ( includeEmbeddedObjectId ) {
-			throw new UnsupportedOperationException( "Not implemented yet" );
-		}
-
 		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
 				definition, multiValuedFromContainerExtractor
 		);
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			AbstractPojoIndexingProcessorTypeNodeBuilder<V, ?> nestedProcessorBuilder;
 			// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-			PojoIndexedEmbeddedIdentityMappingCollector identityMappingCollector =
-					new PojoIndexedEmbeddedIdentityMappingCollector();
+			PojoIndexedEmbeddedIdentityMappingCollector<?> identityMappingCollector;
 			if ( targetType == null ) {
+				BoundPojoModelPathOriginalTypeNode<V> typeModelPath = modelPath.type();
+				identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
+						typeModelPath.getTypeModel().rawType(), mappingHelper );
 				nestedProcessorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
-						modelPath.type(), mappingHelper, nestedBindingContext,
+						typeModelPath, mappingHelper, nestedBindingContext,
 						identityMappingCollector,
 						nestedBindingContext.parentIndexObjectReferences()
 				);
 			}
 			else {
 				PojoRawTypeModel<?> castedType = mappingHelper.introspector().typeModel( targetType );
+				BoundPojoModelPathCastedTypeNode<V, ?> typeModelPath = modelPath.castedType( castedType );
+				identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
+						typeModelPath.getTypeModel().rawType(), mappingHelper );
 				nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(
-						modelPath.castedType( castedType ), mappingHelper, nestedBindingContext,
+						typeModelPath, mappingHelper, nestedBindingContext,
 						identityMappingCollector,
 						nestedBindingContext.parentIndexObjectReferences()
 				);
@@ -128,10 +131,13 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 			Set<PojoTypeMetadataContributor> contributors = mappingHelper.contributorProvider()
 					.get( targetTypeModel.rawType() );
-			if ( contributors.isEmpty() ) {
+			if ( !includeEmbeddedObjectId && contributors.isEmpty() ) {
 				throw log.invalidIndexedEmbedded( targetTypeModel );
 			}
 			contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+			if ( includeEmbeddedObjectId ) {
+				identityMappingCollector.contributeIdentifierField( nestedProcessorBuilder );
+			}
 		} );
 	}
 

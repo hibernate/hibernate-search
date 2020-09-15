@@ -147,5 +147,4 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 			throw e;
 		}
 	}
-
 }
