@@ -474,4 +474,22 @@ public interface Log extends BasicLogger {
 					+ " or set the type parameter F to a definite, raw type.")
 	SearchException invalidGenericParameterToInferFieldType(Object bridge, @FormatWith(TypeFormatter.class) Type type);
 
+	@Message(id = ID_OFFSET_2 + 81,
+			value = "Bridge '%1$s' implements IdentifierBridge<I>,"
+					+ " but sets the generic type parameter I to '%2$s'."
+					+ " The expected identifier type can only be inferred automatically"
+					+ " when this type parameter is set to a raw class."
+					+ " Use an IdentifierBinder to set the expected identifier type explicitly,"
+					+ " or set the type parameter I to a definite, raw type.")
+	SearchException invalidGenericParameterToInferIdentifierType(Object bridge, @FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = ID_OFFSET_2 + 82,
+			value = "Bridge '%1$s' implements ValueBridge<V, F>,"
+					+ " but sets the generic type parameter V to '%2$s'."
+					+ " The expected value type can only be inferred automatically"
+					+ " when this type parameter is set to a raw class."
+					+ " Use a ValueBinder to set the expected value type explicitly,"
+					+ " or set the type parameter V to a definite, raw type.")
+	SearchException invalidGenericParameterToInferValueType(Object bridge, @FormatWith(TypeFormatter.class) Type type);
+
 }

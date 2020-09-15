@@ -387,11 +387,12 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		}
 	}
 
-	public static class FirstCollectionElementBridge implements ValueBridge<Collection<String>, String> {
+	@SuppressWarnings("rawtypes")
+	public static class FirstCollectionElementBridge implements ValueBridge<Collection, String> {
 		@Override
-		public String toIndexedValue(Collection<String> value,
+		public String toIndexedValue(Collection value,
 				ValueBridgeToIndexedValueContext context) {
-			return value == null || value.isEmpty() ? null : value.iterator().next();
+			return value == null || value.isEmpty() ? null : (String) value.iterator().next();
 		}
 	}
 
