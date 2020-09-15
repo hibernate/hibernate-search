@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.identifiertovalue.impl.IdentifierBinderToValueBinderAdapter;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -61,12 +62,10 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 			}
 		}
 
-		if ( identifierBinder != null ) {
-			throw new UnsupportedOperationException( "Not implemented yet" );
-		}
 		embeddedTypeNodeBuilder.property( identifierModelPath.getPropertyModel().name() )
 				.value( ContainerExtractorPath.defaultExtractors() )
-				.valueBinder( null, null,
+				.valueBinder( identifierBinder == null ? null : new IdentifierBinderToValueBinderAdapter( identifierBinder ),
+						null,
 						context -> context.standardTypeOptionsStep().searchable( Searchable.YES )
 								.projectable( Projectable.YES ) );
 	}

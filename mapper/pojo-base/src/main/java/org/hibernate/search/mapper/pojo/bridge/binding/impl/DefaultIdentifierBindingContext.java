@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
+public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 		implements IdentifierBindingContext<I> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -38,7 +38,7 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 
 	private PartialBinding<I> partialBinding;
 
-	public IdentifierBindingContextImpl(BeanResolver beanResolver,
+	public DefaultIdentifierBindingContext(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
 			IndexedEntityBindingContext indexedEntityBindingContext,
 			PojoGenericTypeModel<I> valueTypeModel) {
