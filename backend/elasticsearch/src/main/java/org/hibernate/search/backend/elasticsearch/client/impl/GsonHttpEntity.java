@@ -221,10 +221,9 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 		triggerFullWrite();
 		if ( nextBodyToEncodeIndex == bodyParts.size() ) {
 			writer.flush();
-			// The buffer's current content size is the final content size,
-			// as we know the entire content has been encoded already,
-			// and we also know no content was consumed from the buffer yet.
-			hintContentLength( writer.byteBufferContentSize() );
+			// The buffer's content length so far is the final content length,
+			// as we know the entire content has been encoded already.
+			hintContentLength( writer.contentLength() );
 		}
 	}
 

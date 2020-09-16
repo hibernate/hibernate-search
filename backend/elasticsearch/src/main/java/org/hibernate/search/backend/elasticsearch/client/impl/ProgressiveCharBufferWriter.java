@@ -70,6 +70,8 @@ class ProgressiveCharBufferWriter extends Writer {
 	 */
 	private boolean flowControlPushingBack = false;
 
+	private int contentLength = 0;
+
 	public ProgressiveCharBufferWriter(Charset charset, int charBufferSize, int pageSize) {
 		this.charsetEncoder = charset.newEncoder();
 		this.pageSize = pageSize;
@@ -167,29 +169,12 @@ class ProgressiveCharBufferWriter extends Writer {
 	}
 
 	/**
-	 * @return The current size of content stored in the byte buffer, in bytes.
-	 * This does not include the content that has already been written to the {@link #setOutput(ContentEncoder) output},
-	 * nor the content of the char buffer (which can be flushed using {@link #flush()}).
+	 * @return The length of the content stored in the byte buffers so far, in bytes.
+	 * This does include the content that has already been written to the {@link #setOutput(ContentEncoder) output},
+	 * but not the content of the char buffer (which can be flushed to byte buffers using {@link #flush()}).
 	 */
-	public int byteBufferContentSize() {
-		int contentSize = 0;
-		/*
-		 * We cannot just multiply the number of pages by the page size,
-		 * because the encoder may overflow without filling a page in some
-		 * cases (for instance when there's only 1 byte of space available in
-		 * the buffer, and the encoder needs to write two bytes for a single char).
-		 */
-		for ( ByteBuffer page : needWritingPages ) {
-			contentSize += page.remaining();
-		}
-		if ( currentPage != null ) {
-			/*
-			 * Add the size of the current page using position(),
-			 * since it hasn't been flipped yet.
-			 */
-			contentSize += currentPage.position();
-		}
-		return contentSize;
+	public int contentLength() {
+		return contentLength;
 	}
 
 	private void writeToByteBuffer(CharBuffer input) throws IOException {
@@ -197,7 +182,9 @@ class ProgressiveCharBufferWriter extends Writer {
 			if ( currentPage == null ) {
 				currentPage = ByteBuffer.allocate( pageSize );
 			}
+			int initialPagePosition = currentPage.position();
 			CoderResult coderResult = charsetEncoder.encode( input, currentPage, false );
+			contentLength += ( currentPage.position() - initialPagePosition );
 			if ( coderResult.equals( CoderResult.UNDERFLOW ) ) {
 				return;
 			}
