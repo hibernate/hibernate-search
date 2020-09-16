@@ -201,9 +201,9 @@
         <version.org.elasticsearch.client>${version.org.elasticsearch.main}</version.org.elasticsearch.client>
         <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.main.majorVersion}.${parsed-version.org.elasticsearch.main.minorVersion}</documentation.org.elasticsearch.url>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
-        <version.uk.co.lucasweb.aws-v4-signer-java>1.3</version.uk.co.lucasweb.aws-v4-signer-java>
-        <!-- Jackson: used by the Elasticsearch REST client and in tests (wiremock, ...) -->
-        <version.com.fasterxml.jackson>2.9.10</version.com.fasterxml.jackson>
+        <version.software.amazon.awssdk>2.14.18</version.software.amazon.awssdk>
+        <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
+        <version.com.fasterxml.jackson>2.10.4</version.com.fasterxml.jackson>
         <!--
              In the past, there has been jackson-databind bugfix releases without any jackson-core release,
              so we had to use different versions, e.g. jackson-core 2.9.9 and jackson-databind 2.9.9.3.
@@ -211,6 +211,10 @@
              even though they may have the same value from time to time.
          -->
         <version.com.fasterxml.jackson.databind>${version.com.fasterxml.jackson}</version.com.fasterxml.jackson.databind>
+        <!-- Reactive-streams: used by the AWS SDK -->
+        <version.org.reactivestreams.reactive-streams>1.0.2</version.org.reactivestreams.reactive-streams>
+        <!-- slf4j: used by the AWS SDK -->
+        <version.org.slf4j>1.7.30</version.org.slf4j>
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.4.21.Final</version.org.hibernate>
@@ -235,7 +239,6 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.log4j>1.2.17</version.log4j>
         <version.junit>4.13</version.junit>
         <version.org.hamcrest>2.2</version.org.hamcrest>
@@ -687,9 +690,9 @@
                 <version>${version.com.google.code.gson}</version>
             </dependency>
             <dependency>
-                <groupId>uk.co.lucasweb</groupId>
-                <artifactId>aws-v4-signer-java</artifactId>
-                <version>${version.uk.co.lucasweb.aws-v4-signer-java}</version>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>auth</artifactId>
+                <version>${version.software.amazon.awssdk}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
@@ -785,6 +788,16 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${version.com.fasterxml.jackson.databind}</version>
             </dependency>
+            <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>${version.org.reactivestreams.reactive-streams}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version.org.slf4j}</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
@@ -872,12 +885,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${version.org.apache.commons.lang3}</version>
-            </dependency>
-            <dependency>
-                <!-- Dependency management is necessary for Wiremock in particular (it has internal dependency divergence) -->
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${version.org.slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
@@ -1005,16 +1012,6 @@
                         <configuration>
                             <propertyPrefix>parsed-version.com.google.code.gson</propertyPrefix>
                             <versionString>${version.com.google.code.gson}</versionString>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>parse-aws-v4-signer-java-version</id>
-                        <goals>
-                            <goal>parse-version</goal>
-                        </goals>
-                        <configuration>
-                            <propertyPrefix>parsed-version.uk.co.lucasweb.aws-v4-signer-java</propertyPrefix>
-                            <versionString>${version.uk.co.lucasweb.aws-v4-signer-java}</versionString>
                         </configuration>
                     </execution>
                     <execution>

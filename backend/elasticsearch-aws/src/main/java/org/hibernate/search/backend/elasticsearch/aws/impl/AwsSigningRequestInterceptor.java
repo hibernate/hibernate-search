@@ -6,88 +6,136 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.http.Header;
+import org.apache.commons.codec.Charsets;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.NameValuePair;
 import org.apache.http.RequestLine;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HttpContext;
-import uk.co.lucasweb.aws.v4.signer.Signer;
-import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
+import org.apache.http.protocol.HttpCoreContext;
+import software.amazon.awssdk.auth.signer.Aws4Signer;
+import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
+import software.amazon.awssdk.http.ContentStreamProvider;
+import software.amazon.awssdk.http.SdkHttpFullRequest;
+import software.amazon.awssdk.http.SdkHttpMethod;
 
 class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final Set<String> HEADERS_TO_SIGN = CollectionHelper.asImmutableSet(
-			AwsHeaders.HOST,
-			AwsHeaders.X_AMZ_DATE_HEADER_NAME,
-			AwsHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME
-	);
+	private final Aws4Signer signer;
+	private final Aws4SignerParams signerParams;
 
-	private final AwsCredentials credentials;
-	private final String region;
-	private final String service;
-
-	AwsSigningRequestInterceptor(String accessKey, String secretKey, String region, String service) {
-		this.credentials = new AwsCredentials( accessKey, secretKey );
-		this.region = region;
-		this.service = service;
+	AwsSigningRequestInterceptor(Aws4SignerParams signerParams) {
+		this.signer = Aws4Signer.create();
+		this.signerParams = signerParams;
 	}
 
 	@Override
-	public void process(HttpRequest request, HttpContext context) {
+	public void process(HttpRequest request, HttpContext context) throws IOException {
+		try ( HttpEntityContentStreamProvider contentStreamProvider = extractEntityContent( request ) ) {
+			sign( request, context, contentStreamProvider );
+		}
+	}
+
+	private void sign(HttpRequest request, HttpContext context, HttpEntityContentStreamProvider contentStreamProvider) {
+		SdkHttpFullRequest awsRequest = toAwsRequest( request, context, contentStreamProvider );
+
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "HTTP request (before signing): %s", request );
+			log.tracef( "AWS request (before signing): %s", awsRequest );
 		}
 
-		LocalDateTime now = LocalDateTime.now( ZoneOffset.UTC );
-		request.addHeader( AwsHeaders.X_AMZ_DATE_HEADER_NAME, AwsHeaders.toAmzDate( now ) );
+		awsRequest = signer.sign( awsRequest, signerParams );
 
-		String contentHash = (String) context.getAttribute( AwsPayloadHashingRequestInterceptor.CONTEXT_ATTRIBUTE_HASH );
-		request.addHeader( AwsHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME, contentHash );
-
-		request.addHeader( AwsHeaders.AUTHORIZATION, sign( request, contentHash ) );
+		// The AWS SDK added some headers.
+		// Let's just override the existing headers with whatever the AWS SDK came up with.
+		// We don't expect signing to affect anything else (path, query, content, ...).
+		for ( Map.Entry<String, List<String>> header : awsRequest.headers().entrySet() ) {
+			String name = header.getKey();
+			boolean first = true;
+			for ( String value : header.getValue() ) {
+				if ( first ) {
+					request.setHeader( name, value );
+					first = false;
+				}
+				else {
+					request.addHeader( name, value );
+				}
+			}
+		}
 
 		if ( log.isTraceEnabled() ) {
+			log.tracef( "AWS request (after signing): %s", awsRequest );
 			log.tracef( "HTTP request (after signing): %s", request );
 		}
 	}
 
-	private String sign(HttpRequest request, String contentHash) {
+	private SdkHttpFullRequest toAwsRequest(HttpRequest request, HttpContext context, ContentStreamProvider contentStreamProvider) {
+		SdkHttpFullRequest.Builder awsRequestBuilder = SdkHttpFullRequest.builder();
+
+		HttpCoreContext coreContext = HttpCoreContext.adapt( context );
+		HttpHost targetHost = coreContext.getTargetHost();
+		awsRequestBuilder.host( targetHost.getHostName() );
+		awsRequestBuilder.protocol( targetHost.getSchemeName() );
+
 		RequestLine requestLine = request.getRequestLine();
-		uk.co.lucasweb.aws.v4.signer.HttpRequest signerRequestLine =
-				new uk.co.lucasweb.aws.v4.signer.HttpRequest( requestLine.getMethod(), requestLine.getUri() );
+		awsRequestBuilder.method( SdkHttpMethod.fromValue( requestLine.getMethod() ) );
 
-		Signer.Builder builder = Signer.builder()
-				.awsCredentials( credentials )
-				.region( region );
-
-		for ( String headerName : HEADERS_TO_SIGN ) {
-			Stream<String> stream = Arrays.stream( request.getHeaders( headerName ) )
-					.map( Header::getValue );
-
-			// Unspecified behavior: AWS does some extra normalization on the "host" header
-			if ( AwsHeaders.HOST.equalsIgnoreCase( headerName ) ) {
-				stream = stream.map( AwsNormalization::normalizeHost );
-			}
-
-			stream.forEach( v -> builder.header( headerName, v ) );
+		String pathAndQuery = requestLine.getUri();
+		String path;
+		List<NameValuePair> queryParameters;
+		int queryStart = pathAndQuery.indexOf( '?' );
+		if ( queryStart >= 0 ) {
+			path = pathAndQuery.substring( 0, queryStart );
+			queryParameters = URLEncodedUtils.parse( pathAndQuery.substring( queryStart + 1 ), Charsets.UTF_8 );
+		}
+		else {
+			path = pathAndQuery;
+			queryParameters = Collections.emptyList();
 		}
 
-		Signer signer = builder.build( signerRequestLine, service, contentHash );
+		awsRequestBuilder.encodedPath( path );
+		for ( NameValuePair param : queryParameters ) {
+			awsRequestBuilder.appendRawQueryParameter( param.getName(), param.getValue() );
+		}
 
-		return signer.getSignature();
+		// Do NOT copy the headers, as the AWS SDK will sometimes sign some headers
+		// that are not properly taken into account by the AWS servers (e.g. content-length).
+
+		awsRequestBuilder.contentStreamProvider( contentStreamProvider );
+
+		return awsRequestBuilder.build();
+	}
+
+	private HttpEntityContentStreamProvider extractEntityContent(HttpRequest request) {
+		if ( request instanceof HttpEntityEnclosingRequest ) {
+			HttpEntity entity = ( (HttpEntityEnclosingRequest) request ).getEntity();
+			if ( entity == null ) {
+				return null;
+			}
+			if ( !entity.isRepeatable() ) {
+				throw new AssertionFailure( "Cannot sign AWS requests with non-repeatable entities" );
+			}
+			return new HttpEntityContentStreamProvider( entity );
+		}
+		else {
+			return null;
+		}
 	}
 
 }

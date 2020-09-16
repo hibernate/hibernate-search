@@ -29,8 +29,8 @@
             <artifactId>hibernate-search-backend-elasticsearch</artifactId>
         </dependency>
         <dependency>
-            <groupId>uk.co.lucasweb</groupId>
-            <artifactId>aws-v4-signer-java</artifactId>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
         </dependency>
     </dependencies>
 </project>
