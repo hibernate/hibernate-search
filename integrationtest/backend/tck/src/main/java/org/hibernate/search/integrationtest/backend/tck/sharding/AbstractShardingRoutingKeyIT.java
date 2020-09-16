@@ -19,13 +19,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,10 +103,6 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 				.hasSize( documentCountPerRoutingKey )
 				.containsExactlyInAnyOrder( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
 
-		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
-			return;
-		}
-
 		/*
 		 * Two routing keys => all documents indexed with these routing keys should be returned,
 		 * and only those documents.
@@ -170,11 +164,6 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_twoRoutingKeys() {
-		Assume.assumeTrue(
-				"Passing multiple routing keys is not supported in this configuration",
-				TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys()
-		);
-
 		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
 		Set<String> twoRoutingKeys = CollectionHelper.asImmutableSet( iterator.next(), iterator.next() );
 
@@ -196,11 +185,6 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3824")
 	public void purge_allRoutingKeys() {
-		Assume.assumeTrue(
-				"Passing multiple routing keys is not supported in this configuration",
-				TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys()
-		);
-
 		index.createWorkspace().purge( routingKeys ).join();
 
 		// All routing keys => all documents should be purged
