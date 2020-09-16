@@ -6,7 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
+import java.util.function.Function;
+
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
+import software.amazon.awssdk.regions.Region;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
@@ -45,24 +50,25 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 			return;
 		}
 
-		String accessKey = getMandatory( ACCESS_KEY, propertySource );
-		String secretKey = getMandatory( SECRET_KEY, propertySource );
-		String region = getMandatory( REGION, propertySource );
+		String accessKey = getMandatory( ACCESS_KEY, propertySource, Function.identity() );
+		String secretKey = getMandatory( SECRET_KEY, propertySource, Function.identity() );
+		Region region = getMandatory( REGION, propertySource, Region::of );
+		Aws4SignerParams signerParams = Aws4SignerParams.builder()
+				.awsCredentials( AwsBasicCredentials.create( accessKey, secretKey ) )
+				.signingRegion( region )
+				.signingName( ELASTICSEARCH_SERVICE_NAME )
+				.build();
 
-		AwsPayloadHashingRequestInterceptor payloadHashingInterceptor =
-				new AwsPayloadHashingRequestInterceptor();
-		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor(
-				accessKey, secretKey, region,
-				ELASTICSEARCH_SERVICE_NAME
-		);
+		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( signerParams );
 
-		builder.addInterceptorFirst( payloadHashingInterceptor );
 		builder.addInterceptorLast( signingInterceptor );
 	}
 
-	private <T> T getMandatory(OptionalConfigurationProperty<T> property, ConfigurationPropertySource propertySource) {
-		return property.getOrThrow(
+	private <T, R> R getMandatory(OptionalConfigurationProperty<T> property, ConfigurationPropertySource propertySource,
+			Function<T, R> transform) {
+		return property.getAndMapOrThrow(
 				propertySource,
+				transform,
 				key -> new IllegalStateException(
 						"AWS request signing is enabled, but mandatory property '" + key + "' is not set"
 				)
