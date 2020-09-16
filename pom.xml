@@ -164,6 +164,8 @@
         <module>mapper/orm</module>
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
+        <module>batch-jsr352/core</module>
+        <module>batch-jsr352/jberet</module>
         <module>util/internal/integrationtest</module>
         <module>parents/integrationtest</module>
         <module>integrationtest</module>
@@ -591,6 +593,16 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-batch-jsr352-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-batch-jsr352-jberet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -801,6 +813,13 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.org.slf4j}</version>
+            </dependency>
+
+            <!-- JBeret used by batch-jsr352 jberet module -->
+            <dependency>
+                <groupId>org.jberet</groupId>
+                <artifactId>jberet-core</artifactId>
+                <version>${version.org.jberet}</version>
             </dependency>
 
             <!-- Test -->
