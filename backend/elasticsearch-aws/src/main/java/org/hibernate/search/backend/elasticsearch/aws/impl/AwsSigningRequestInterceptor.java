@@ -27,7 +27,7 @@ import org.apache.http.RequestLine;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
-import software.amazon.awssdk.auth.signer.Aws4Signer;
+import software.amazon.awssdk.auth.signer.Aws4UnsignedPayloadSigner;
 import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.http.SdkHttpFullRequest;
@@ -37,11 +37,11 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Aws4Signer signer;
+	private final Aws4UnsignedPayloadSigner signer;
 	private final Aws4SignerParams signerParams;
 
 	AwsSigningRequestInterceptor(Aws4SignerParams signerParams) {
-		this.signer = Aws4Signer.create();
+		this.signer = Aws4UnsignedPayloadSigner.create();
 		this.signerParams = signerParams;
 	}
 
