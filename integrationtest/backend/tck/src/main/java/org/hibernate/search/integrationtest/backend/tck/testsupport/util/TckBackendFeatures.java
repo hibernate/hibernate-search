@@ -30,10 +30,6 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsManyRoutingKeys() {
-		return true;
-	}
-
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
 		return false;
 	}

@@ -48,10 +48,6 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		);
 	}
 
-	public boolean isAwsSigningEnabled() {
-		return awsSigningEnabled;
-	}
-
 	public void addToBackendProperties(Map<String, ? super String> properties) {
 		properties.put( "hosts", hosts );
 		properties.put( "protocol", protocol );
