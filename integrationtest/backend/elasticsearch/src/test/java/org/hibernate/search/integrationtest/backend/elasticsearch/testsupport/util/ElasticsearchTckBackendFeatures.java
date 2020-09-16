@@ -11,7 +11,6 @@ import java.math.BigInteger;
 
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 
@@ -50,12 +49,6 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// TODO HSEARCH-3959 Elasticsearch does not normalizes arguments passed to the range predicate
 		//   for text fields.
 		return false;
-	}
-
-	@Override
-	public boolean supportsManyRoutingKeys() {
-		// TODO HSEARCH-3655 AWS signing fails when using multiple routing keys
-		return ! ElasticsearchTestHostConnectionConfiguration.get().isAwsSigningEnabled();
 	}
 
 	@Override
