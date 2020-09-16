@@ -93,14 +93,14 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	private long contentLength;
 
 	/**
-	 * We can lazily compute the contentLenght, but we need to avoid changing the value
+	 * We can lazily compute the contentLength, but we need to avoid changing the value
 	 * we report over time as this confuses the Apache HTTP client as it initially defines
 	 * the encoding strategy based on this, then assumes it can rely on this being
 	 * a constant.
 	 * After the {@link #getContentLength()} was invoked at least once, freeze
 	 * the value.
 	 */
-	private boolean contentlengthWasProvided = false;
+	private boolean contentLengthWasProvided = false;
 
 	/**
 	 * Since flow control might hint to stop producing data,
@@ -142,7 +142,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 	@Override
 	public long getContentLength() {
-		this.contentlengthWasProvided = true;
+		this.contentLengthWasProvided = true;
 		return this.contentLength;
 	}
 
@@ -288,7 +288,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	}
 
 	private void hintContentLength(long contentLength) {
-		if ( !contentlengthWasProvided ) {
+		if ( !contentLengthWasProvided ) {
 			this.contentLength = contentLength;
 		}
 	}
