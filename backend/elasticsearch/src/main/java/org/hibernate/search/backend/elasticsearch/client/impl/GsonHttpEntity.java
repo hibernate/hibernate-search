@@ -159,10 +159,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 
 	@Override
 	public InputStream getContent() {
-		//This could be implemented but would be sub-optimal compared to using produceContent().
-		//We therefore prefer throwing the exception so that we can easily spot unintended usage via tests.
-		throw new UnsupportedOperationException( "Not implemented! Expected to produce content only over produceContent(),"
-				+ " or writeTo(OutputStream) if blocking calls are acceptable for your use case." );
+		return new HttpAsyncContentProducerInputStream( this, BYTE_BUFFER_PAGE_SIZE );
 	}
 
 	@Override
