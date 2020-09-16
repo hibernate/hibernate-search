@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -13,6 +14,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
@@ -23,6 +26,8 @@ import uk.co.lucasweb.aws.v4.signer.Signer;
 import uk.co.lucasweb.aws.v4.signer.credentials.AwsCredentials;
 
 class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Set<String> HEADERS_TO_SIGN = CollectionHelper.asImmutableSet(
 			AwsHeaders.HOST,
@@ -42,6 +47,10 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 
 	@Override
 	public void process(HttpRequest request, HttpContext context) {
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "HTTP request (before signing): %s", request );
+		}
+
 		LocalDateTime now = LocalDateTime.now( ZoneOffset.UTC );
 		request.addHeader( AwsHeaders.X_AMZ_DATE_HEADER_NAME, AwsHeaders.toAmzDate( now ) );
 
@@ -49,6 +58,10 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 		request.addHeader( AwsHeaders.X_AMZ_CONTENT_SHA256_HEADER_NAME, contentHash );
 
 		request.addHeader( AwsHeaders.AUTHORIZATION, sign( request, contentHash ) );
+
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "HTTP request (after signing): %s", request );
+		}
 	}
 
 	private String sign(HttpRequest request, String contentHash) {
