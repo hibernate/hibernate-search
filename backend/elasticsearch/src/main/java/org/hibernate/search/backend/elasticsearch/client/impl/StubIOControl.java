@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import org.apache.http.nio.IOControl;
 
-final class StubIOControl implements IOControl {
+public final class StubIOControl implements IOControl {
 	public static final StubIOControl INSTANCE = new StubIOControl();
 
 	private StubIOControl() {
