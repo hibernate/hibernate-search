@@ -282,9 +282,6 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 		// Design note: we could finally know the content length in bytes at this point
 		// (we had an accumulator in previous versions) but that's always pointless
 		// as the HTTP CLient will request the size before starting produce content.
-
-		//Allow to repeat the content rendering from the beginning:
-		this.nextBodyToEncodeIndex = 0;
 	}
 
 	private void hintContentLength(long contentLength) {
