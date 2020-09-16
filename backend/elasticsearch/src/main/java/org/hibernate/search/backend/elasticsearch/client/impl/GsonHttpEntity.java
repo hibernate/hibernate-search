@@ -276,12 +276,18 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 			//Just quit: return control to the caller and trust we'll be called again.
 			return;
 		}
-		// If we haven't aborted yet, we finished!
-		encoder.complete();
 
-		// Design note: we could finally know the content length in bytes at this point
-		// (we had an accumulator in previous versions) but that's always pointless
-		// as the HTTP CLient will request the size before starting produce content.
+		// If we haven't aborted yet, we finished!
+
+		// The buffer's content length so far is the final content length,
+		// as we know the entire content has been encoded already.
+		// Hint at the content length.
+		// Note this is only useful if produceContent was called by some process
+		// that is not the HTTP client itself (e.g. for request signing),
+		// because the HTTP Client itself will request the size before it starts writing content.
+		hintContentLength( writer.contentLength() );
+
+		encoder.complete();
 	}
 
 	private void hintContentLength(long contentLength) {
