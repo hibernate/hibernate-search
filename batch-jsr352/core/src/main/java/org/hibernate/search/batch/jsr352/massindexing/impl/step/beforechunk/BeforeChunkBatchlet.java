@@ -23,6 +23,7 @@ import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters.
 import org.hibernate.search.batch.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -62,14 +63,14 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
-				// TODO HSEARCH-3269 purge
+				Search.session( session ).workspace().purge();
 
 				// This is necessary because the batchlet is not executed inside a transaction
-				// TODO HSEARCH-3269 flush
+				Search.session( session ).workspace().flush();
 
 				if ( optimizeAfterPurge ) {
 					log.startOptimization();
-					// TODO HSEARCH-3269 merge segments
+					Search.session( session ).workspace().mergeSegments();
 				}
 			}
 		}

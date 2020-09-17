@@ -22,6 +22,7 @@ import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters.
 import org.hibernate.search.batch.jsr352.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -58,7 +59,7 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 			session = PersistenceUtil.openSession( emf, tenantId );
-			// TODO HSEARCH-3269 merge segments
+			Search.session( this.session ).workspace().mergeSegments();
 		}
 		return null;
 	}
