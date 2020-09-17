@@ -12,8 +12,6 @@ import java.util.Collection;
 
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
-import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
@@ -100,14 +98,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	@Message(id = 404, value = "indexNullAs is not supported for analyzed fields."
 			+ " Trying to define the analyzer: '%1$s' together with indexNullAs: '%2$s'.")
 	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs);
-
-	@LogMessage(level = Logger.Level.WARN)
-	@Message(id = 405, value = "No analyzer was defined on an analyzed @Field; using the default analyzer '%1$s'."
-			+ " Make sure you defined analyzer '%1$s' in your LuceneAnalysisConfigurer, or bootstrap will fail."
-			+ " Alternatively, specify an analyzer explicitly in the @Field annotation:"
-			+ " this is what the new @FullTextField annotation of Hibernate Search 6 will expect,"
-			+ " since it doesn't have any default for the analyzer. %2$s")
-	void noAnalyzerDefinedOnPropertyUsingDefault(String name, @FormatWith(EventContextFormatter.class) EventContext eventContext);
 
 	@Message(id = 406, value = "For simple query string queries, if one field has its analyzer overridden," +
 			" all fields must have the same analyzers." +

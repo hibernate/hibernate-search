@@ -32,7 +32,6 @@ class V5MigrationHelperTestDefaultLuceneAnalysisConfigurer implements LuceneAnal
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( ASCIIFoldingFilterFactory.class );
 
-		context.analyzer( "default" ).instance( new StandardAnalyzer() );
 		context.analyzer( AnalysisNames.ANALYZER_WHITESPACE ).custom()
 				.tokenizer( WhitespaceTokenizerFactory.class );
 		context.analyzer( AnalysisNames.ANALYZER_WHITESPACE_LOWERCASE_ASCIIFOLDING ).custom()
