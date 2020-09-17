@@ -14,8 +14,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.Predicate;
 
-import org.hibernate.criterion.Criterion;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.EntityTypeDescriptor;
 
 /**
@@ -34,7 +34,7 @@ public class JobContextData {
 	 */
 	private Map<String, EntityTypeDescriptor> entityTypeDescriptorMap;
 
-	private Set<Criterion> customQueryCriteria;
+	private Set<Predicate> customQueryCriteria;
 
 	public JobContextData() {
 		entityTypeDescriptorMap = new HashMap<>();
@@ -80,11 +80,11 @@ public class JobContextData {
 		return getEntityTypeDescriptor( entityName ).getJavaClass();
 	}
 
-	public Set<Criterion> getCustomQueryCriteria() {
+	public Set<Predicate> getCustomQueryCriteria() {
 		return customQueryCriteria;
 	}
 
-	public void setCustomQueryCriteria(Set<Criterion> criteria) {
+	public void setCustomQueryCriteria(Set<Predicate> criteria) {
 		this.customQueryCriteria = criteria;
 	}
 

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.batch.jsr352.massindexing.impl.step.lucene;
 
-import org.hibernate.Criteria;
-
 /**
  * The index scope of a given entity type.
  *
@@ -19,7 +17,7 @@ public enum IndexScope {
 	 */
 	HQL,
 	/**
-	 * Index entities restricted the {@link Criteria} given by user.
+	 * Index entities restricted the {@link javax.persistence.criteria.Predicate} given by user.
 	 */
 	CRITERIA,
 	/**

@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.batch.jsr352.massindexing.impl.util;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  * Provides ID-based, order-sensitive restrictions
@@ -23,20 +25,20 @@ public interface IdOrder {
 	 * @param idObj The ID all results should be greater than.
 	 * @return A "greater than" restriction on the ID.
 	 */
-	Criterion idGreater(Object idObj);
+	Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj);
 
 	/**
 	 * @param idObj The ID all results should be greater than or equal to.
 	 * @return A "greater or equal" restriction on the ID.
 	 */
-	Criterion idGreaterOrEqual(Object idObj);
+	Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj);
 
 	/**
 	 * @param idObj The ID all results should be lesser than.
 	 * @return A "lesser than" restriction on the ID.
 	 */
-	Criterion idLesser(Object idObj);
+	Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj);
 
-	void addAscOrder(Criteria criteria);
+	void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root);
 
 }

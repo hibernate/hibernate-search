@@ -24,16 +24,18 @@ import javax.batch.api.partition.PartitionPlanImpl;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Criteria;
-import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.query.Query;
 import org.hibernate.search.batch.jsr352.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters.Defaults;
@@ -158,14 +160,14 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 					break;
 
 				case CRITERIA:
-					partitionBounds = buildPartitionUnitsFrom( ss, entityTypeDescriptors.get( 0 ),
+					partitionBounds = buildPartitionUnitsFrom( emf, ss, entityTypeDescriptors.get( 0 ),
 							jobData.getCustomQueryCriteria(), maxResults, idFetchSize, rowsPerPartition,
 							IndexScope.CRITERIA );
 					break;
 
 				case FULL_ENTITY:
 					for ( EntityTypeDescriptor entityTypeDescriptor : entityTypeDescriptors ) {
-						partitionBounds.addAll( buildPartitionUnitsFrom( ss, entityTypeDescriptor,
+						partitionBounds.addAll( buildPartitionUnitsFrom( emf, ss, entityTypeDescriptor,
 								Collections.emptySet(), maxResults, idFetchSize, rowsPerPartition,
 								IndexScope.FULL_ENTITY ) );
 					}
@@ -207,8 +209,8 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		}
 	}
 
-	private List<PartitionBound> buildPartitionUnitsFrom(StatelessSession ss,
-			EntityTypeDescriptor entityTypeDescriptor, Set<Criterion> customQueryCriteria,
+	private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, StatelessSession ss,
+			EntityTypeDescriptor entityTypeDescriptor, Set<Predicate> customQueryCriteria,
 			Integer maxResults, int fetchSize, int rowsPerPartition,
 			IndexScope indexScope) {
 		Class<?> javaClass = entityTypeDescriptor.getJavaClass();
@@ -217,19 +219,31 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 		Object lowerID = null;
 		Object upperID = null;
 
-		Criteria criteria = new CriteriaImpl( javaClass.getName(), (SharedSessionContractImplementor) ss );
-		entityTypeDescriptor.getIdOrder().addAscOrder( criteria );
+		CriteriaBuilder builder = emf.getCriteriaBuilder();
+		CriteriaQuery<?> criteria = builder.createQuery( javaClass );
+		Root<?> root = criteria.from( javaClass );
 
-		if ( maxResults != null ) {
-			criteria.setMaxResults( maxResults );
-		}
-		criteria.setProjection( Projections.id() )
-				.setFetchSize( fetchSize )
+		entityTypeDescriptor.getIdOrder().addAscOrder( builder, criteria, root );
+
+		EntityType<?> model = root.getModel();
+		Class<?> javaType = model.getIdType().getJavaType();
+
+		@SuppressWarnings("rawtypes")
+		SingularAttribute singularAttribute = model.getId( javaType );
+		criteria.select( root.get( singularAttribute ) );
+
+		Query<?> query = ss.createQuery( criteria );
+
+		query.setFetchSize( fetchSize )
 				.setReadOnly( true )
 				.setCacheable( false )
-				.setLockMode( LockMode.NONE );
+				.setLockMode( LockModeType.NONE );
 
-		try ( ScrollableResults scroll = criteria.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
+		if ( maxResults != null ) {
+			query.setMaxResults( maxResults );
+		}
+
+		try ( ScrollableResults scroll = query.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
 			/*
 			 * The scroll results are originally positioned *before* the first element,
 			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the

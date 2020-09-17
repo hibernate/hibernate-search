@@ -15,14 +15,14 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.Predicate;
 
 import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.search.batch.jsr352.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.SerializationUtil;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.ValidationUtil;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -107,7 +107,7 @@ public final class MassIndexingJob {
 		private Integer checkpointInterval;
 		private Integer rowsPerPartition;
 		private Integer maxThreads;
-		private Set<Criterion> customQueryCriteria;
+		private Set<Predicate> customQueryCriteria;
 		private String customQueryHql;
 		private Integer maxResultsPerEntity;
 		private String tenantId;
@@ -331,22 +331,22 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Add criterion to construct a customized selection of mass-indexing under the criteria approach. You
-		 * can call this method multiple times to add multiple criteria: only entities matching every criterion
+		 * Add predicate to construct a customized selection of mass-indexing under the criteria approach. You
+		 * can call this method multiple times to add multiple criteria: only entities matching every predicate
 		 * will be indexed. However, mixing this approach with the HQL restriction is not allowed.
 		 *
-		 * @param criterion criterion.
+		 * @param predicate predicate.
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder restrictedBy(Criterion criterion) {
+		public ParametersBuilder restrictedBy(Predicate predicate) {
 			if ( customQueryHql != null ) {
 				throw new IllegalArgumentException( "Cannot use HQL approach and Criteria approach in the same time." );
 			}
-			if ( criterion == null ) {
-				throw new NullPointerException( "The criterion is null." );
+			if ( predicate == null ) {
+				throw new NullPointerException( "The predicate is null." );
 			}
-			customQueryCriteria.add( criterion );
+			customQueryCriteria.add( predicate );
 			return this;
 		}
 
@@ -453,7 +453,7 @@ public final class MassIndexingJob {
 					);
 				}
 				catch (IOException e) {
-					throw log.failedToSerializeJobParameter( Criteria.class, e );
+					throw log.failedToSerializeJobParameter( Predicate.class, e );
 				}
 			}
 

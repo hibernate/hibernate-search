@@ -15,13 +15,12 @@ import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.query.Query;
 import org.hibernate.search.batch.jsr352.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.massindexing.impl.JobContextData;
@@ -68,7 +67,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 
-			Set<Criterion> customQueryCriteria = jobData.getCustomQueryCriteria();
+			Set<Predicate> customQueryCriteria = jobData.getCustomQueryCriteria();
 			IndexScope indexScope = PersistenceUtil.getIndexScope( customQueryHql, customQueryCriteria );
 			BiFunction<Session, Class<?>, Long> rowCountFunction;
 			switch ( indexScope ) {
@@ -108,13 +107,16 @@ public class StepProgressSetupListener extends AbstractStepListener {
 		stepContext.setPersistentUserData( stepProgress );
 	}
 
-	private static Long rowCountCriteria(Session session, Class<?> entityType, Set<Criterion> customQueryCriteria) {
-		Criteria criteria = new CriteriaImpl( entityType.getName(), session.unwrap( SessionImplementor.class ) );
+	private static Long rowCountCriteria(Session session, Class<?> entityType, Set<Predicate> predicates) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Long> criteria = builder.createQuery( Long.class );
+		criteria.select( builder.count( criteria.from( entityType ) ) );
+		criteria.where( predicates.toArray( new Predicate[predicates.size()] ) );
 
-		customQueryCriteria.forEach( c -> criteria.add( c ) );
-
-		return (Long) criteria.setProjection( Projections.rowCount() )
-				.setCacheable( false )
+		Query<Long> query = session.createQuery( criteria );
+		query.setCacheable( false )
 				.uniqueResult();
+
+		return query.getSingleResult();
 	}
 }
