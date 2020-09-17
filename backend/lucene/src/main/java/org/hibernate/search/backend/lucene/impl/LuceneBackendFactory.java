@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneDefaultAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
@@ -138,24 +139,24 @@ public class LuceneBackendFactory implements BackendFactory {
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
 			Version luceneVersion) {
 		try {
+			LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
+					luceneVersion,
+					buildContext.classResolver(),
+					buildContext.resourceResolver()
+			);
+			LuceneAnalysisConfigurationContextImpl collector =
+					new LuceneAnalysisConfigurationContextImpl( analysisComponentFactory );
+			// Add default definitions first, so that they can be overridden
+			LuceneDefaultAnalysisConfigurer.INSTANCE.configure( collector );
 			// Apply the user-provided analysis configurer if necessary
 			final BeanResolver beanResolver = buildContext.beanResolver();
-			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
-					.map( holder -> {
+			ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
+					.ifPresent( holder -> {
 						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
-							LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
-									luceneVersion,
-									buildContext.classResolver(),
-									buildContext.resourceResolver()
-							);
-							LuceneAnalysisConfigurationContextImpl collector =
-									new LuceneAnalysisConfigurationContextImpl( analysisComponentFactory );
 							configurerHolder.get().configure( collector );
-							return new LuceneAnalysisDefinitionRegistry( collector );
 						}
-					} )
-					// Otherwise just use an empty registry
-					.orElseGet( LuceneAnalysisDefinitionRegistry::new );
+					} );
+			return new LuceneAnalysisDefinitionRegistry( collector );
 		}
 		catch (Exception e) {
 			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );

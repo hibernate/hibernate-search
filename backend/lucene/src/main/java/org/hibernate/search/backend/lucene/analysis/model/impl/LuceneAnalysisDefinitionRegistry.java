@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,13 +30,6 @@ public final class LuceneAnalysisDefinitionRegistry {
 	private final Map<String, Analyzer> analyzerDefinitions;
 
 	private final Map<String, Analyzer> normalizerDefinitions;
-
-	public LuceneAnalysisDefinitionRegistry() {
-		// Nothing to do: we're creating an empty registry
-		similarity = createDefaultSimilarity();
-		analyzerDefinitions = Collections.emptyMap();
-		normalizerDefinitions = Collections.emptyMap();
-	}
 
 	public LuceneAnalysisDefinitionRegistry(LuceneAnalysisDefinitionContributor contributor) {
 		similarity = contributor.getSimilarity().orElseGet( LuceneAnalysisDefinitionRegistry::createDefaultSimilarity );
