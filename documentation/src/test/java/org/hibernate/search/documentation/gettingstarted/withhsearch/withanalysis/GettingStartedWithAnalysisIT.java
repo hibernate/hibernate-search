@@ -76,8 +76,7 @@ public class GettingStartedWithAnalysisIT {
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match()
 							.fields( "title", "authors.name" )
-							.matching( "refactor" )
-					)
+							.matching( "refactor" ) )
 					.fetch( 20 );
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
@@ -94,8 +93,7 @@ public class GettingStartedWithAnalysisIT {
 				SearchResult<Book> result = searchSession.search( Book.class )
 						.where( f -> f.match()
 								.fields( "title", "authors.name" )
-								.matching( term )
-						)
+								.matching( term ) )
 						.fetch( 20 );
 				assertThat( result.hits() ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
