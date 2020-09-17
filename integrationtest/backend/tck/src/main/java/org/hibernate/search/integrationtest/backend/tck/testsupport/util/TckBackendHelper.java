@@ -14,6 +14,19 @@ public interface TckBackendHelper {
 
 	TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy();
 
+	/**
+	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisBuiltinIT}.
+	 */
+	TckBackendSetupStrategy createAnalysisNotConfiguredBackendSetupStrategy();
+
+	/**
+	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisBuiltinOverrideIT}.
+	 */
+	TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy();
+
+	/**
+	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisCustomIT}.
+	 */
 	TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy();
 
 	TckBackendSetupStrategy createNoShardingBackendSetupStrategy();
