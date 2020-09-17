@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -57,7 +58,7 @@ public @interface FullTextField {
 	 * @return A reference to the analyzer to use for this field.
 	 * See the documentation of your backend to know how to define analyzers.
 	 */
-	String analyzer();
+	String analyzer() default AnalyzerNames.DEFAULT;
 
 	/**
 	 * @return A reference to a different analyzer, overriding the {@link #analyzer()},
