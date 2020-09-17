@@ -8,8 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.analysis;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -18,9 +16,9 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SingleFieldDocumentBuilder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -92,7 +90,7 @@ public class AnalysisCustomIT {
 	public void normalizer_keyword() {
 		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_NOOP );
 		initData( b -> {
-			b.document( "empty" );
+			b.emptyDocument( "empty" );
 			b.document( "1", "word" );
 			b.document( "2", "WORD" );
 			b.document( "3", "wôrd" );
@@ -115,7 +113,7 @@ public class AnalysisCustomIT {
 	public void normalizer_lowercase() {
 		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_LOWERCASE );
 		initData( b -> {
-			b.document( "empty" );
+			b.emptyDocument( "empty" );
 			b.document( "1", "word" );
 			b.document( "2", "WORD" );
 			b.document( "3", "wôrd" );
@@ -140,7 +138,7 @@ public class AnalysisCustomIT {
 	public void normalizer_pattern_replacing() {
 		setupWithNormalizer( AnalysisDefinitions.NORMALIZER_PATTERN_REPLACING );
 		initData( b -> {
-			b.document( "empty" );
+			b.emptyDocument( "empty" );
 			b.document( "1", "word" );
 			b.document( "2", "WORD" );
 			b.document( "3", "wôrd" );
@@ -163,7 +161,7 @@ public class AnalysisCustomIT {
 	public void analyzer_keyword() {
 		setupWithAnalyzer( AnalysisDefinitions.ANALYZER_NOOP );
 		initData( b -> {
-			b.document( "empty" );
+			b.emptyDocument( "empty" );
 			b.document( "1", "word" );
 			b.document( "2", "WORD" );
 			b.document( "3", "wôrd" );
@@ -186,7 +184,7 @@ public class AnalysisCustomIT {
 	public void analyzer_whitespace_lowercase() {
 		setupWithAnalyzer( AnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE );
 		initData( b -> {
-			b.document( "empty" );
+			b.emptyDocument( "empty" );
 			b.document( "1", "word" );
 			b.document( "2", "WORD" );
 			b.document( "3", "wôrd" );
@@ -213,7 +211,7 @@ public class AnalysisCustomIT {
 	public void analyzer_patterns_stopword() {
 		setupWithAnalyzer( AnalysisDefinitions.ANALYZER_PATTERNS_STOPWORD );
 		initData( b -> {
-			b.document( "empty" );
+			b.emptyDocument( "empty" );
 			b.document( "1", "word1,word2 word3" );
 			b.document( "2", "word1 stopword" );
 			b.document( "3", "word2,word3" );
@@ -259,25 +257,10 @@ public class AnalysisCustomIT {
 		setupHelper.start().withIndex( index ).setup();
 	}
 
-	private void initData(Consumer<AnalysisITDocumentBuilder> valueContributor) {
-		IndexBinding binding = index.binding();
-		BulkIndexer indexer = index.bulkIndexer();
-		List<String> documentIds = new ArrayList<>();
-		valueContributor.accept(
-				(String documentId, String ... fieldValues) -> {
-					documentIds.add( documentId );
-					indexer.add( documentId, document -> {
-						for ( String fieldValue : fieldValues ) {
-							document.addValue( binding.field.reference, fieldValue );
-						}
-					} );
-				}
-		);
-		indexer.join();
-	}
-
-	interface AnalysisITDocumentBuilder {
-		void document(String documentId, String ... fieldValues);
+	private void initData(Consumer<SingleFieldDocumentBuilder<String>> valueContributor) {
+		index.bulkIndexer()
+				.add( index.binding().field.reference, valueContributor )
+				.join();
 	}
 
 	private static class IndexBinding {
