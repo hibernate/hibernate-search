@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
+import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
@@ -35,6 +36,18 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
+	}
+
+	@Override
+	public TckBackendSetupStrategy createAnalysisNotConfiguredBackendSetupStrategy() {
+		return new LuceneTckBackendSetupStrategy()
+				.setProperty( "analysis.configurer", null );
+	}
+
+	@Override
+	public TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy() {
+		return new LuceneTckBackendSetupStrategy()
+				.setProperty( "analysis.configurer", AnalysisBuiltinOverrideITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
