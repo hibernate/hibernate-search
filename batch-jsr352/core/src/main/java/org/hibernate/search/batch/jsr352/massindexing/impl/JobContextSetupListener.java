@@ -28,8 +28,8 @@ import javax.batch.api.listener.AbstractJobListener;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.criteria.Predicate;
 
-import org.hibernate.Criteria;
 import org.hibernate.search.batch.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.inject.scope.spi.HibernateSearchJobScoped;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters.Defaults;
@@ -200,7 +200,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 		SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode, Defaults.CACHE_MODE );
 
 		if ( StringHelper.isNotEmpty( serializedCustomQueryCriteria ) ) {
-			SerializationUtil.parseParameter( Criteria.class, CUSTOM_QUERY_HQL, serializedCustomQueryCriteria );
+			SerializationUtil.parseParameter( Predicate.class, CUSTOM_QUERY_HQL, serializedCustomQueryCriteria );
 		}
 	}
 

@@ -16,6 +16,7 @@ import static org.hibernate.search.batch.jsr352.massindexing.impl.util.MassIndex
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Set;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemReader;
@@ -25,17 +26,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
-import org.hibernate.LockMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.query.Query;
 import org.hibernate.search.batch.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.inject.scope.spi.HibernateSearchPartitionScoped;
@@ -358,30 +358,38 @@ public class EntityReader extends AbstractItemReader {
 		Class<?> entityType = jobData.getEntityType( entityName );
 		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
 		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
-		Set<Criterion> customQueryCriteria = jobData.getCustomQueryCriteria();
+		Set<Predicate> customQueryCriteria = jobData.getCustomQueryCriteria();
 
 		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entityType );
 		IdOrder idOrder = typeDescriptor.getIdOrder();
 
 		return (session, lastCheckpointInfo) -> {
-			Criteria criteria = new CriteriaImpl( entityType.getName(), session.unwrap( SessionImplementor.class ) );
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<?> criteria = builder.createQuery( entityType );
+			Root<?> root = criteria.from( entityType );
 
 			// build orders for this entity
-			idOrder.addAscOrder( criteria );
+			idOrder.addAscOrder( builder, criteria, root );
+
+			ArrayList<Predicate> predicates = new ArrayList<>( customQueryCriteria.size() + 1 );
 
 			// build criteria using job context data
-			customQueryCriteria.forEach( c -> criteria.add( c ) );
+			predicates.addAll( customQueryCriteria );
 
 			// build criteria using bounds
 			if ( upperBound != null ) {
-				criteria.add( idOrder.idLesser( upperBound ) );
+				predicates.add( idOrder.idLesser( builder, root, upperBound ) );
 			}
 			if ( lastCheckpointInfo != null ) {
-				criteria.add( idOrder.idGreater( lastCheckpointInfo.getLastProcessedEntityId() ) );
+				predicates.add( idOrder.idGreater( builder, root, lastCheckpointInfo.getLastProcessedEntityId() ) );
 			}
 			else if ( lowerBound != null ) {
-				criteria.add( idOrder.idGreaterOrEqual( lowerBound ) );
+				predicates.add( idOrder.idGreaterOrEqual( builder, root, lowerBound ) );
 			}
+
+			criteria.where( predicates.toArray( new Predicate[predicates.size()] ) );
+
+			Query<?> query = session.createQuery( criteria );
 
 			if ( maxResults != null ) {
 				int remaining;
@@ -391,16 +399,17 @@ public class EntityReader extends AbstractItemReader {
 				else {
 					remaining = maxResults;
 				}
-				criteria.setMaxResults( remaining );
+				query.setMaxResults( remaining );
 			}
 
-			return criteria.setReadOnly( true )
-					.setCacheable( false )
-					.setLockMode( LockMode.NONE )
-					.setFlushMode( FlushMode.MANUAL )
-					.setCacheMode( cacheMode )
-					.setFetchSize( entityFetchSize )
-					.scroll( ScrollMode.FORWARD_ONLY );
+			return query
+				.setReadOnly( true )
+				.setCacheable( false )
+				.setLockMode( LockModeType.NONE )
+				.setCacheMode( cacheMode )
+				.setHibernateFlushMode( FlushMode.MANUAL )
+				.setFetchSize( entityFetchSize )
+				.scroll( ScrollMode.FORWARD_ONLY );
 		};
 	}
 
