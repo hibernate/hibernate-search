@@ -105,8 +105,7 @@ public class GettingStartedWithoutAnalysisIT {
 					.where( scope.predicate().match() // <4>
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
-							.toPredicate()
-					)
+							.toPredicate() )
 					.fetch( 20 ); // <5>
 
 			long totalHitCount = result.total().hitCount(); // <6>
@@ -119,8 +118,7 @@ public class GettingStartedWithoutAnalysisIT {
 					.where( scope.predicate().match()
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
-							.toPredicate()
-					)
+							.toPredicate() )
 			// tag::searching-objects[]
 					.fetchHits( 20 ); // <8>
 			// Not shown: commit the transaction and close the entity manager
@@ -141,8 +139,7 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.where( f -> f.match() // <3>
 							.fields( "title", "authors.name" )
-							.matching( "Refactoring: Improving the Design of Existing Code" )
-					)
+							.matching( "Refactoring: Improving the Design of Existing Code" ) )
 					.fetch( 20 ); // <4>
 
 			long totalHitCount = result.total().hitCount(); // <5>
@@ -154,8 +151,7 @@ public class GettingStartedWithoutAnalysisIT {
 					searchSession.search( Book.class )
 							.where( f -> f.match()
 									.fields( "title", "authors.name" )
-									.matching( "Refactoring: Improving the Design of Existing Code" )
-							)
+									.matching( "Refactoring: Improving the Design of Existing Code" ) )
 			// tag::searching-lambdas[]
 					.fetchHits( 20 ); // <7>
 			// Not shown: commit the transaction and close the entity manager
@@ -176,8 +172,7 @@ public class GettingStartedWithoutAnalysisIT {
 			long totalHitCount = searchSession.search( Book.class )
 					.where( f -> f.match()
 							.fields( "title", "authors.name" )
-							.matching( "Refactoring: Improving the Design of Existing Code" )
-					)
+							.matching( "Refactoring: Improving the Design of Existing Code" ) )
 					.fetchTotalHitCount(); // <1>
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]
