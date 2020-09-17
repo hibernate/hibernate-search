@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.loading.spi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +37,19 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 
 	@Override
 	public LoadingResult<R, E> loadBlocking(TimeoutManager timeoutManager) {
-		List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference )
-				.collect( Collectors.toList() );
+		List<? extends E> loadedObjects;
+		if ( referencesToLoad.isEmpty() ) {
+			// Avoid the call to the objectLoader:
+			// it may be expensive even if there are no references to load.
+			loadedObjects = Collections.emptyList();
+		}
+		else {
+			List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference )
+					.collect( Collectors.toList() );
+			loadedObjects = objectLoader.loadBlocking( converted, timeoutManager );
+		}
 
-		return new DefaultLoadingResult<>( objectLoader.loadBlocking( converted, timeoutManager ),
-				documentReferenceConverter );
+		return new DefaultLoadingResult<>( loadedObjects, documentReferenceConverter );
 	}
 
 	private static class DefaultLoadingResult<R, E> implements LoadingResult<R, E> {
