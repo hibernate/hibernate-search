@@ -27,7 +27,7 @@ public class Person extends AbstractEntity<Integer> {
 	private Integer id;
 
 	@Basic(optional = false)
-	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
+	@FullTextField
 	@KeywordField(
 			name = "firstName_sort",
 			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
@@ -36,7 +36,7 @@ public class Person extends AbstractEntity<Integer> {
 	private String firstName;
 
 	@Basic(optional = false)
-	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
+	@FullTextField
 	@KeywordField(
 			name = "lastName_sort",
 			normalizer = LibraryAnalyzers.NORMALIZER_SORT,

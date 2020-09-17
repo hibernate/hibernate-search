@@ -40,7 +40,7 @@ public class Library extends AbstractEntity<Integer> {
 
 	@Basic
 	// TODO HSEARCH-3465 use multi-fields here
-	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
+	@FullTextField
 	@KeywordField(
 			name = "name_sort",
 			normalizer = LibraryAnalyzers.NORMALIZER_SORT,

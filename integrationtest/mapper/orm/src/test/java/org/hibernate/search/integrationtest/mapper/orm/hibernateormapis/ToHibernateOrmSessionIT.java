@@ -150,7 +150,7 @@ public class ToHibernateOrmSessionIT {
 		@Id
 		private Integer id;
 
-		@FullTextField(analyzer = "myAnalyzer")
+		@FullTextField
 		private String text;
 
 		@Override

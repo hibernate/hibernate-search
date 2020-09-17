@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -48,8 +49,6 @@ import org.junit.Test;
 public class FullTextFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
-	private static final String ANALYZER_NAME = "myAnalyzer";
-	private static final String SEARCH_ANALYZER_NAME = "mySearchAnalyzer";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -63,12 +62,12 @@ public class FullTextFieldIT {
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME)
+			@FullTextField
 			String value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "value", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "value", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -80,12 +79,12 @@ public class FullTextFieldIT {
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(name = "explicitName", analyzer = ANALYZER_NAME)
+			@FullTextField(name = "explicitName")
 			String value;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "explicitName", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "explicitName", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -97,7 +96,7 @@ public class FullTextFieldIT {
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(name = "invalid.withdot", analyzer = ANALYZER_NAME)
+			@FullTextField(name = "invalid.withdot")
 			String value;
 		}
 
@@ -122,7 +121,7 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME)
+			@FullTextField
 			String myProperty;
 			IndexedEntity(int id, String myProperty) {
 				this.id = id;
@@ -140,26 +139,25 @@ public class FullTextFieldIT {
 
 	@Test
 	public void norms() {
-
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.YES)
+			@FullTextField(norms = Norms.YES)
 			String norms;
-			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.NO)
+			@FullTextField(norms = Norms.NO)
 			String noNorms;
-			@FullTextField(analyzer = ANALYZER_NAME, norms = Norms.DEFAULT)
+			@FullTextField(norms = Norms.DEFAULT)
 			String defaultNorms;
-			@FullTextField(analyzer = ANALYZER_NAME)
+			@FullTextField
 			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "norms", String.class, f -> f.analyzerName( ANALYZER_NAME ).norms( Norms.YES ) )
-				.field( "noNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ).norms( Norms.NO ) )
-				.field( "defaultNorms", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
-				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "norms", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).norms( Norms.YES ) )
+				.field( "noNorms", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).norms( Norms.NO ) )
+				.field( "defaultNorms", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+				.field( "implicit", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -167,26 +165,25 @@ public class FullTextFieldIT {
 
 	@Test
 	public void searchable() {
-
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.YES)
+			@FullTextField(searchable = Searchable.YES)
 			String searchable;
-			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.NO)
+			@FullTextField(searchable = Searchable.NO)
 			String unsearchable;
-			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.DEFAULT)
+			@FullTextField(searchable = Searchable.DEFAULT)
 			String useDefault;
-			@FullTextField(analyzer = ANALYZER_NAME)
+			@FullTextField
 			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "searchable", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchable( Searchable.YES ) )
-				.field( "unsearchable", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchable( Searchable.NO ) )
-				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
-				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "searchable", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).searchable( Searchable.YES ) )
+				.field( "unsearchable", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).searchable( Searchable.NO ) )
+				.field( "useDefault", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+				.field( "implicit", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -194,29 +191,28 @@ public class FullTextFieldIT {
 
 	@Test
 	public void termVector() {
-
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.YES)
+			@FullTextField(termVector = TermVector.YES)
 			String termVector;
-			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.NO)
+			@FullTextField(termVector = TermVector.NO)
 			String noTermVector;
-			@FullTextField(analyzer = ANALYZER_NAME, termVector = TermVector.WITH_POSITIONS_OFFSETS)
+			@FullTextField(termVector = TermVector.WITH_POSITIONS_OFFSETS)
 			String moreOptions;
-			@FullTextField(analyzer = ANALYZER_NAME, searchable = Searchable.DEFAULT)
+			@FullTextField(searchable = Searchable.DEFAULT)
 			String useDefault;
-			@FullTextField(analyzer = ANALYZER_NAME)
+			@FullTextField
 			String implicit;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "termVector", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.YES ) )
-				.field( "noTermVector", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.NO ) )
-				.field( "moreOptions", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) )
-				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
-				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "termVector", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).termVector( TermVector.YES ) )
+				.field( "noTermVector", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).termVector( TermVector.NO ) )
+				.field( "moreOptions", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) )
+				.field( "useDefault", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+				.field( "implicit", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -224,16 +220,18 @@ public class FullTextFieldIT {
 
 	@Test
 	public void searchAnalyzer() {
+		final String searchAnalyzerName = "searchAnalyzerName";
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity	{
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME, searchAnalyzer = SEARCH_ANALYZER_NAME)
+			@FullTextField(searchAnalyzer = searchAnalyzerName)
 			String text;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "text", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchAnalyzerName( SEARCH_ANALYZER_NAME ) )
+				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT )
+						.searchAnalyzerName( searchAnalyzerName ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -245,13 +243,12 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
+			@FullTextField(valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
 			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "wrap", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "wrap", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -263,13 +260,12 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			@FullTextField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
 			WrappedValue wrap;
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "wrap", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+				.field( "wrap", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -281,7 +277,7 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME)
+			@FullTextField
 			Integer myProperty;
 		}
 		assertThatThrownBy(
@@ -307,8 +303,7 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
+			@FullTextField(valueBridge = @ValueBridgeRef(type = InvalidTypeBridge.class))
 			WrappedValue wrap;
 		}
 
@@ -335,8 +330,7 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
+			@FullTextField(valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
 			WrappedValue wrap;
 		}
 
@@ -364,8 +358,7 @@ public class FullTextFieldIT {
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
-			@FullTextField(analyzer = ANALYZER_NAME,
-					valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
+			@FullTextField(valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
 			String property;
 		}
 
@@ -389,7 +382,7 @@ public class FullTextFieldIT {
 			P propertyValue, F indexedFieldValue) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "myProperty", indexedFieldType, b2 -> b2.analyzerName( ANALYZER_NAME ) )
+				.field( "myProperty", indexedFieldType, b2 -> b2.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		SearchMapping mapping = setupHelper.start().setup( entityType );
 		backendMock.verifyExpectationsMet();
