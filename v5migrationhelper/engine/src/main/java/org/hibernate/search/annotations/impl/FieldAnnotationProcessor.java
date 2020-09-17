@@ -27,6 +27,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.impl.TruncatingCalendarBridge;
 import org.hibernate.search.bridge.builtin.impl.TruncatingDateBridge;
 import org.hibernate.search.bridge.builtin.impl.Truncation;
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -50,7 +51,6 @@ import org.hibernate.search.util.logging.impl.Log;
 
 public class FieldAnnotationProcessor implements PropertyMappingAnnotationProcessor<Field> {
 	private static final String LEGACY_DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
-	private static final String DEFAULT_ANALYZER_NAME = "default";
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -231,12 +231,7 @@ public class FieldAnnotationProcessor implements PropertyMappingAnnotationProces
 				.map( a -> ( (Analyzer) a ).definition() )
 				.filter( a -> !a.isEmpty() )
 				.findAny();
-		if ( propertyLevelAnalyzer.isPresent() ) {
-			return propertyLevelAnalyzer.get();
-		}
-
-		log.noAnalyzerDefinedOnPropertyUsingDefault( DEFAULT_ANALYZER_NAME, context.eventContext() );
-		return DEFAULT_ANALYZER_NAME;
+		return propertyLevelAnalyzer.orElse( AnalyzerNames.DEFAULT );
 	}
 
 	private String indexNullAs(Field annotation, PropertyMappingAnnotationProcessorContext context) {
