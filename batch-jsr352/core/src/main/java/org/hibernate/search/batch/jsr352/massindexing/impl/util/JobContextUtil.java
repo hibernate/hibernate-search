@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Set;
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.Predicate;
 
-import org.hibernate.criterion.Criterion;
 import org.hibernate.search.batch.jsr352.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.batch.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.logging.impl.Log;
@@ -98,7 +98,7 @@ public final class JobContextUtil {
 		List<EntityTypeDescriptor> descriptors = PersistenceUtil.createDescriptors( emf, entityTypesToIndex );
 
 		@SuppressWarnings("unchecked")
-		Set<Criterion> criteria = SerializationUtil.parseParameter( Set.class, CUSTOM_QUERY_CRITERIA, serializedCustomQueryCriteria );
+		Set<Predicate> criteria = SerializationUtil.parseParameter( Set.class, CUSTOM_QUERY_CRITERIA, serializedCustomQueryCriteria );
 		if ( criteria == null ) {
 			criteria = Collections.emptySet();
 		}

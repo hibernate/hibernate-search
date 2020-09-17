@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.batch.jsr352.massindexing.impl.util;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  * Order over a single ID attribute.
@@ -28,23 +28,23 @@ public class SingularIdOrder implements IdOrder {
 	}
 
 	@Override
-	public Criterion idGreater(Object idObj) {
-		return Restrictions.gt( idPropertyName, idObj );
+	public Predicate idGreater(CriteriaBuilder builder, Root<?> root, Object idObj) {
+		return builder.greaterThan( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
 	}
 
 	@Override
-	public Criterion idGreaterOrEqual(Object idObj) {
-		return Restrictions.ge( idPropertyName, idObj );
+	public Predicate idGreaterOrEqual(CriteriaBuilder builder, Root<?> root, Object idObj) {
+		return builder.greaterThanOrEqualTo( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
 	}
 
 	@Override
-	public Criterion idLesser(Object idObj) {
-		return Restrictions.lt( idPropertyName, idObj );
+	public Predicate idLesser(CriteriaBuilder builder, Root<?> root, Object idObj) {
+		return builder.lessThan( root.get( idPropertyName ), (Comparable<? super Object>) idObj );
 	}
 
 	@Override
-	public void addAscOrder(Criteria criteria) {
-		criteria.addOrder( Order.asc( idPropertyName ) );
+	public void addAscOrder(CriteriaBuilder builder, CriteriaQuery<?> criteria, Root<?> root) {
+		criteria.orderBy( builder.asc( root.get( idPropertyName ) ) );
 	}
 
 }
