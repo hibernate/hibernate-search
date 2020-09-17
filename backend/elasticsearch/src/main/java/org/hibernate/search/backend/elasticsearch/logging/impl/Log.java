@@ -163,10 +163,6 @@ public interface Log extends BasicLogger {
 	)
 	void usingPasswordOverHttp();
 
-	@Message(id = ID_OFFSET_2 + 74,
-			value = "Multiple analyzer definitions with the same name: '%1$s'. The analyzer names must be unique.")
-	SearchException analyzerNamingConflict(String remoteName);
-
 	@Message(id = ID_OFFSET_2 + 75,
 			value = "Error while applying analysis configuration: %1$s")
 	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e,
@@ -209,10 +205,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 85,
 			value = "Hibernate Search may not work correctly, because an unknown Elasticsearch version runs on the Elasticsearch cluster: '%s'." )
 	void unknownElasticsearchVersion(ElasticsearchVersion version);
-
-	@Message(id = ID_OFFSET_2 + 86,
-			value = "Multiple normalizer definitions with the same name: '%1$s'. The normalizer names must be unique.")
-	SearchException normalizerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_2 + 89,
 			value = "Failed to parse Elasticsearch response. Status code was '%1$d', status phrase was '%2$s'.")

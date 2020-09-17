@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 public class LuceneAnalysisConfigurerIT {
 
@@ -78,58 +77,6 @@ public class LuceneAnalysisConfigurerIT {
 	private static class SimulatedFailure extends RuntimeException {
 		SimulatedFailure(String message) {
 			super( message );
-		}
-	}
-
-	@Test
-	public void error_analyzer_namingConflict() {
-		Assertions.assertThatThrownBy(
-				() -> setup( AnalyzerNamingConflictConfigurer.class.getName() )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
-						.failure(
-								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple analyzer definitions with the same name",
-								"'analyzerName'"
-						)
-						.build()
-				);
-	}
-
-	public static class AnalyzerNamingConflictConfigurer implements LuceneAnalysisConfigurer {
-		@Override
-		public void configure(LuceneAnalysisConfigurationContext context) {
-			context.analyzer( "analyzerName" ).custom();
-			context.analyzer( "anotherAnalyzerName" ).custom();
-			context.analyzer( "analyzerName" ).instance( new StandardAnalyzer() );
-		}
-	}
-
-	@Test
-	public void error_normalizer_namingConflict() {
-		Assertions.assertThatThrownBy(
-				() -> setup( NormalizerNamingConflictConfigurer.class.getName() )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.defaultBackendContext()
-						.failure(
-								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple normalizer definitions with the same name",
-								"'normalizerName'"
-						)
-						.build()
-				);
-	}
-
-	public static class NormalizerNamingConflictConfigurer implements LuceneAnalysisConfigurer {
-		@Override
-		public void configure(LuceneAnalysisConfigurationContext context) {
-			context.normalizer( "normalizerName" ).custom();
-			context.normalizer( "anotherNormalizerName" ).custom();
-			context.normalizer( "normalizerName" ).instance( new StandardAnalyzer() );
 		}
 	}
 

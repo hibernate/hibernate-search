@@ -84,60 +84,6 @@ public class ElasticsearchAnalysisConfigurerIT {
 	}
 
 	@Test
-	public void error_analyzer_namingConflict() {
-		Assertions.assertThatThrownBy(
-				() -> setup( AnalyzerNamingConflictConfigurer.class.getName() )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
-						.failure(
-								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple analyzer definitions with the same name",
-								"'analyzerName'"
-						)
-						.build()
-				);
-	}
-
-	public static class AnalyzerNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
-		@Override
-		public void configure(ElasticsearchAnalysisConfigurationContext context) {
-			context.analyzer( "analyzerName" ).custom().tokenizer( "whitespace" );
-			context.analyzer( "anotherAnalyzerName" ).custom().tokenizer( "whitespace" );
-			context.analyzer( "analyzerName" ).type( "someType" );
-		}
-	}
-
-	@Test
-	public void error_normalizer_namingConflict() {
-		Assertions.assertThatThrownBy(
-				() -> setup( NormalizerNamingConflictConfigurer.class.getName() )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( TYPE_NAME )
-						.indexContext( INDEX_NAME )
-						.failure(
-								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple normalizer definitions with the same name",
-								"'normalizerName'"
-						)
-						.build()
-				);
-	}
-
-	public static class NormalizerNamingConflictConfigurer implements ElasticsearchAnalysisConfigurer {
-		@Override
-		public void configure(ElasticsearchAnalysisConfigurationContext context) {
-			context.normalizer( "normalizerName" ).custom();
-			context.normalizer( "anotherNormalizerName" ).custom();
-			context.normalizer( "normalizerName" ).custom();
-		}
-	}
-
-	@Test
 	public void error_tokenizer_namingConflict() {
 		Assertions.assertThatThrownBy(
 				() -> setup( TokenizerNamingConflictConfigurer.class.getName() )
