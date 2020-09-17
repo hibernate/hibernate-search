@@ -17,7 +17,6 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysi
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -66,7 +65,6 @@ public class LuceneBackendFactory implements BackendFactory {
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
 		BackendThreads backendThreads = null;
-		BeanHolder<? extends DirectoryProvider> directoryProviderHolder = null;
 
 		try {
 			backendThreads = new BackendThreads( eventContext.render() );
@@ -91,7 +89,6 @@ public class LuceneBackendFactory implements BackendFactory {
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( BeanHolder::close, directoryProviderHolder )
 					.push( BackendThreads::onStop, backendThreads );
 			throw e;
 		}
