@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.jsr352.jberet.impl;
+package org.hibernate.search.batch.jsr352.jberet.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
+import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJob;
 
 import org.jberet.spi.JobXmlResolver;
 import org.jberet.tools.AbstractJobXmlResolver;
