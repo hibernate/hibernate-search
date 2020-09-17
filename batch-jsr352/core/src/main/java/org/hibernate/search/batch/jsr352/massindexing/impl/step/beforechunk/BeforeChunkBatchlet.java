@@ -16,13 +16,13 @@ import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.Session;
 import org.hibernate.search.batch.jsr352.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.massindexing.impl.JobContextData;
-import org.hibernate.search.batch.jsr352.massindexing.impl.util.PersistenceUtil;
 import org.hibernate.search.batch.jsr352.massindexing.impl.util.SerializationUtil;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -61,16 +61,15 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 		if ( purgeAllOnStart ) {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
-			try ( Session session = PersistenceUtil.openSession( emf, tenantId ) ) {
-				// TODO HSEARCH-3269 purge
+			SearchWorkspace workspace = Search.mapping( emf ).scope( Object.class ).workspace( tenantId );
+			workspace.purge();
 
-				// This is necessary because the batchlet is not executed inside a transaction
-				// TODO HSEARCH-3269 flush
+			// This is necessary because the batchlet is not executed inside a transaction
+			workspace.flush();
 
-				if ( optimizeAfterPurge ) {
-					log.startOptimization();
-					// TODO HSEARCH-3269 merge segments
-				}
+			if ( optimizeAfterPurge ) {
+				log.startOptimization();
+				workspace.mergeSegments();
 			}
 		}
 		return null;
