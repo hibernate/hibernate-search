@@ -219,6 +219,24 @@ public class FullTextFieldIT {
 	}
 
 	@Test
+	public void analyzer() {
+		final String analyzerName = "analyzerName";
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			@DocumentId
+			Integer id;
+			@FullTextField(analyzer = analyzerName)
+			String text;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( analyzerName ) )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void searchAnalyzer() {
 		final String searchAnalyzerName = "searchAnalyzerName";
 		@Indexed(index = INDEX_NAME)
@@ -231,6 +249,26 @@ public class FullTextFieldIT {
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT )
+						.searchAnalyzerName( searchAnalyzerName ) )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void analyzer_searchAnalyzer() {
+		final String analyzerName = "analyzerName";
+		final String searchAnalyzerName = "searchAnalyzerName";
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			@DocumentId
+			Integer id;
+			@FullTextField(analyzer = analyzerName, searchAnalyzer = searchAnalyzerName)
+			String text;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( analyzerName )
 						.searchAnalyzerName( searchAnalyzerName ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
