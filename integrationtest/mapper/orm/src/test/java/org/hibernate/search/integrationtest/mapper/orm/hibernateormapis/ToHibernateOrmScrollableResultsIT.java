@@ -1099,7 +1099,7 @@ public class ToHibernateOrmScrollableResultsIT {
 		@GenericField
 		private Integer id;
 
-		@FullTextField(analyzer = "myAnalyzer")
+		@FullTextField
 		private String text;
 
 		@Override

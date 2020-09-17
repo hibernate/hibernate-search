@@ -40,7 +40,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private Integer id;
 
 	@Basic
-	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
+	@FullTextField
 	@KeywordField(
 			name = "title_sort",
 			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
@@ -52,7 +52,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private String author;
 
 	@Basic
-	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
+	@FullTextField
 	private String summary;
 
 	/**

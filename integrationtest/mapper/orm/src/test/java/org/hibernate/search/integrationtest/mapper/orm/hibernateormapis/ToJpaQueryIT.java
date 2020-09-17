@@ -450,7 +450,7 @@ public class ToJpaQueryIT {
 		@Id
 		private Integer id;
 
-		@FullTextField(analyzer = "myAnalyzer")
+		@FullTextField
 		private String text;
 
 		@OneToOne(fetch = FetchType.EAGER)
@@ -503,7 +503,7 @@ public class ToJpaQueryIT {
 		@Id
 		private Integer id;
 
-		@FullTextField(analyzer = "myAnalyzer")
+		@FullTextField
 		private String text;
 
 		@OneToOne(mappedBy = "containedEager")

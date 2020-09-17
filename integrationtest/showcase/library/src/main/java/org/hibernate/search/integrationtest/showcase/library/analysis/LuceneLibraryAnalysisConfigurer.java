@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationC
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.springframework.stereotype.Component;
 
 @Component("luceneAnalysisConfigurer")
@@ -20,7 +19,6 @@ public class LuceneLibraryAnalysisConfigurer implements LuceneAnalysisConfigurer
 
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
-		context.analyzer( LibraryAnalyzers.ANALYZER_DEFAULT ).instance( new StandardAnalyzer() );
 		context.normalizer( LibraryAnalyzers.NORMALIZER_SORT ).custom()
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( ASCIIFoldingFilterFactory.class );
