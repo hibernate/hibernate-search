@@ -54,18 +54,14 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 		contributor.contribute( new ElasticsearchAnalysisDefinitionCollector() {
 			@Override
 			public void collect(String name, AnalyzerDefinition definition) {
-				AnalyzerDefinition previous = analyzerDefinitions.putIfAbsent( name, definition );
-				if ( previous != null && previous != definition ) {
-					throw log.analyzerNamingConflict( name );
-				}
+				// Override if existing
+				analyzerDefinitions.put( name, definition );
 			}
 
 			@Override
 			public void collect(String name, NormalizerDefinition definition) {
-				NormalizerDefinition previous = normalizerDefinitions.putIfAbsent( name, definition );
-				if ( previous != null && previous != definition ) {
-					throw log.normalizerNamingConflict( name );
-				}
+				// Override if existing
+				normalizerDefinitions.put( name, definition );
 			}
 
 			@Override

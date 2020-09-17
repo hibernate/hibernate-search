@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -19,8 +18,6 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerOp
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerTypeStep;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionCollector;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
@@ -28,8 +25,6 @@ import org.apache.lucene.search.similarities.Similarity;
 
 public class LuceneAnalysisConfigurationContextImpl
 		implements LuceneAnalysisConfigurationContext, LuceneAnalysisDefinitionContributor {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneAnalysisComponentFactory factory;
 
@@ -102,17 +97,13 @@ public class LuceneAnalysisConfigurationContextImpl
 	}
 
 	private void addAnalyzer(String name, LuceneAnalyzerBuilder definition) {
-		LuceneAnalysisComponentBuilder<Analyzer> existing = analyzers.putIfAbsent( name, definition );
-		if ( existing != null ) {
-			throw log.analyzerDefinitionNamingConflict( name );
-		}
+		// Override if existing
+		analyzers.put( name, definition );
 	}
 
 	private void addNormalizer(String name, LuceneAnalyzerBuilder definition) {
-		LuceneAnalysisComponentBuilder<Analyzer> existing = normalizers.putIfAbsent( name, definition );
-		if ( existing != null ) {
-			throw log.normalizerDefinitionNamingConflict( name );
-		}
+		// Override if existing
+		normalizers.putIfAbsent( name, definition );
 	}
 
 }

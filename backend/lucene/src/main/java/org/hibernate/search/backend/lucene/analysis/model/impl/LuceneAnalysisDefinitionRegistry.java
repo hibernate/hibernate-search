@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.BM25Similarity;
@@ -22,8 +18,6 @@ import org.apache.lucene.search.similarities.Similarity;
  *
  */
 public final class LuceneAnalysisDefinitionRegistry {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Similarity similarity;
 
@@ -38,18 +32,14 @@ public final class LuceneAnalysisDefinitionRegistry {
 		contributor.contribute( new LuceneAnalysisDefinitionCollector() {
 			@Override
 			public void collectAnalyzer(String name, Analyzer analyzer) {
-				Analyzer previous = analyzerDefinitions.putIfAbsent( name, analyzer );
-				if ( previous != null && previous != analyzer ) {
-					throw log.analyzerDefinitionNamingConflict( name );
-				}
+				// Override if existing
+				analyzerDefinitions.put( name, analyzer );
 			}
 
 			@Override
 			public void collectNormalizer(String name, Analyzer normalizer) {
-				Analyzer previous = normalizerDefinitions.putIfAbsent( name, normalizer );
-				if ( previous != null && previous != normalizer ) {
-					throw log.normalizerDefinitionNamingConflict( name );
-				}
+				// Override if existing
+				normalizerDefinitions.put( name, normalizer );
 			}
 		} );
 	}
