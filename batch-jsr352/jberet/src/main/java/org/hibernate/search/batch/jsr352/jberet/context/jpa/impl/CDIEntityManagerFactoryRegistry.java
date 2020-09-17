@@ -4,8 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.jsr352.jberet.context.jpa.impl;
+package org.hibernate.search.batch.jsr352.jberet.context.jpa.impl;
 
+import java.lang.invoke.MethodHandles;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Instance;
@@ -21,10 +22,9 @@ import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
-import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.jsr352.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+import org.hibernate.search.batch.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
+import org.hibernate.search.batch.jsr352.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An {@link EntityManagerFactoryRegistry} that retrieves the entity manager factory

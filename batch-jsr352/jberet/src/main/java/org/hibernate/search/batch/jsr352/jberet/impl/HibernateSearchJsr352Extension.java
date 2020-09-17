@@ -4,10 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.jsr352.jberet.impl;
+package org.hibernate.search.batch.jsr352.jberet.impl;
 
 import java.lang.annotation.Annotation;
-
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
@@ -19,11 +18,12 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 
-import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchJobScoped;
-import org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchPartitionScoped;
-import org.hibernate.search.jsr352.massindexing.impl.JobContextSetupListener;
-import org.hibernate.search.jsr352.massindexing.impl.steps.lucene.EntityReader;
+import org.hibernate.search.batch.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
+import org.hibernate.search.batch.jsr352.inject.scope.spi.HibernateSearchJobScoped;
+import org.hibernate.search.batch.jsr352.inject.scope.spi.HibernateSearchPartitionScoped;
+import org.hibernate.search.batch.jsr352.massindexing.impl.JobContextSetupListener;
+import org.hibernate.search.batch.jsr352.massindexing.impl.step.lucene.EntityReader;
+
 import org.jberet.cdi.JobScoped;
 import org.jberet.cdi.PartitionScoped;
 
