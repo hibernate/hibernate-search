@@ -11,20 +11,18 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -293,86 +291,70 @@ public class CompositeSearchSortIT {
 	}
 
 	private void initData() {
+		IndexBinding binding = index.binding();
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> {
-					index.binding().identicalForFirstTwo.write( document, "aaa" );
-					index.binding().identicalForLastTwo.write( document, "aaa" );
+					document.addValue( binding.identicalForFirstTwo.reference, "aaa" );
+					document.addValue( binding.identicalForLastTwo.reference, "aaa" );
 
-					DocumentElement flattened = document.addObject( index.binding().flattenedObject );
-					index.binding().flattenedField.write( flattened, "aaa" );
-					DocumentElement nested = document.addObject( index.binding().nestedObject );
-					index.binding().nestedField.write( nested, "bbb" );
+					DocumentElement flattened = document.addObject( binding.flattenedObject );
+					flattened.addValue( binding.flattenedField.reference, "aaa" );
+					DocumentElement nested = document.addObject( binding.nestedObject );
+					nested.addValue( binding.nestedField.reference, "bbb" );
 				} )
 				.add( DOCUMENT_2, document -> {
-					index.binding().identicalForFirstTwo.write( document, "aaa" );
-					index.binding().identicalForLastTwo.write( document, "bbb" );
+					document.addValue( binding.identicalForFirstTwo.reference, "aaa" );
+					document.addValue( binding.identicalForLastTwo.reference, "bbb" );
 
-					DocumentElement flattened = document.addObject( index.binding().flattenedObject );
-					index.binding().flattenedField.write( flattened, "bbb" );
-					DocumentElement nested = document.addObject( index.binding().nestedObject );
-					index.binding().nestedField.write( nested, "aaa" );
+					DocumentElement flattened = document.addObject( binding.flattenedObject );
+					flattened.addValue( binding.flattenedField.reference, "bbb" );
+					DocumentElement nested = document.addObject( binding.nestedObject );
+					nested.addValue( binding.nestedField.reference, "aaa" );
 				} )
 				.add( DOCUMENT_3, document -> {
-					index.binding().identicalForFirstTwo.write( document, "bbb" );
-					index.binding().identicalForLastTwo.write( document, "bbb" );
+					document.addValue( binding.identicalForFirstTwo.reference, "bbb" );
+					document.addValue( binding.identicalForLastTwo.reference, "bbb" );
 
-					DocumentElement flattened = document.addObject( index.binding().flattenedObject );
-					index.binding().flattenedField.write( flattened, "aaa" );
-					DocumentElement nested = document.addObject( index.binding().nestedObject );
-					index.binding().nestedField.write( nested, "aaa" );
+					DocumentElement flattened = document.addObject( binding.flattenedObject );
+					flattened.addValue( binding.flattenedField.reference, "aaa" );
+					DocumentElement nested = document.addObject( binding.nestedObject );
+					nested.addValue( binding.nestedField.reference, "aaa" );
 				} )
 				.join();
 	}
 
 	private static class IndexBinding {
-		final MainFieldModel<String> identicalForFirstTwo;
-		final MainFieldModel<String> identicalForLastTwo;
-		final MainFieldModel<String> string3;
+		final SimpleFieldModel<String> identicalForFirstTwo;
+		final SimpleFieldModel<String> identicalForLastTwo;
+		final SimpleFieldModel<String> string3;
 
 		final IndexObjectFieldReference flattenedObject;
-		final MainFieldModel<String> flattenedField;
+		final SimpleFieldModel<String> flattenedField;
 		final IndexObjectFieldReference nestedObject;
-		final MainFieldModel<String> nestedField;
+		final SimpleFieldModel<String> nestedField;
 
 		IndexBinding(IndexSchemaElement root) {
-			identicalForFirstTwo = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
+			identicalForFirstTwo = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.sortable( Sortable.YES ) )
 					.map( root, "identicalForFirstTwo" );
-			identicalForLastTwo = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
+			identicalForLastTwo = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.sortable( Sortable.YES ) )
 					.map( root, "identicalForLastTwo" );
-			string3 = MainFieldModel.mapper( f -> f.asString() )
+			string3 = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE )
 					.map( root, "string3" );
 
 			IndexSchemaObjectField flattened = root.objectField( "flattened", ObjectStructure.FLATTENED );
 			flattenedObject = flattened.toReference();
-			flattenedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
+			flattenedField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.sortable( Sortable.YES ) )
 					.map( flattened, "field" );
 
 			IndexSchemaObjectField nested = root.objectField( "nested", ObjectStructure.NESTED );
 			nestedObject = nested.toReference();
-			nestedField = MainFieldModel.mapper( f -> f.asString().sortable( Sortable.YES ) )
+			nestedField = SimpleFieldModel.mapper( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.sortable( Sortable.YES ) )
 					.map( nested, "field" );
 		}
 	}
 
-	private static class MainFieldModel<T> {
-		static <LT> StandardFieldMapper<LT, MainFieldModel<LT>> mapper(
-				Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, LT>> configuration) {
-			return StandardFieldMapper.of(
-					configuration,
-					(reference, name) -> new MainFieldModel<>( reference, name )
-			);
-		}
-
-		final IndexFieldReference<T> reference;
-		final String relativeFieldName;
-
-		private MainFieldModel(IndexFieldReference<T> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
-		}
-
-		void write(DocumentElement documentElement, T value) {
-			documentElement.addValue( reference, value );
-		}
-	}
 }

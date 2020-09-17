@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
@@ -254,12 +254,13 @@ public class AnalysisCustomIT {
 	}
 
 	private void setup(String fieldName,
-			Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
+			Function<StringIndexFieldTypeOptionsStep<?>, StandardIndexFieldTypeOptionsStep<?, String>> typeContributor) {
 		index = SimpleMappedIndex.of( ctx -> new IndexBinding( ctx, fieldName, typeContributor ) );
 		setupHelper.start().withIndex( index ).setup();
 	}
 
 	private void initData(Consumer<AnalysisITDocumentBuilder> valueContributor) {
+		IndexBinding binding = index.binding();
 		BulkIndexer indexer = index.bulkIndexer();
 		List<String> documentIds = new ArrayList<>();
 		valueContributor.accept(
@@ -267,7 +268,7 @@ public class AnalysisCustomIT {
 					documentIds.add( documentId );
 					indexer.add( documentId, document -> {
 						for ( String fieldValue : fieldValues ) {
-							index.binding().field.write( document, fieldValue );
+							document.addValue( binding.field.reference, fieldValue );
 						}
 					} );
 				}
@@ -280,30 +281,14 @@ public class AnalysisCustomIT {
 	}
 
 	private static class IndexBinding {
-		final MainFieldModel field;
+		final SimpleFieldModel<String> field;
 
 		IndexBinding(IndexSchemaElement root, String fieldName,
-				Function<StringIndexFieldTypeOptionsStep<?>, IndexFieldTypeFinalStep<String>> typeContributor) {
-			IndexFieldReference<String> reference = root.field(
-					fieldName,
-					f -> typeContributor.apply( f.asString() )
-			)
-					.toReference();
-			this.field = new MainFieldModel( reference, fieldName );
+				Function<StringIndexFieldTypeOptionsStep<?>, StandardIndexFieldTypeOptionsStep<?, String>> typeContributor) {
+			this.field = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> typeContributor.apply( f.asString() ) )
+					.map( root, fieldName );
 		}
 	}
 
-	private static class MainFieldModel {
-		private final IndexFieldReference<String> reference;
-		final String relativeFieldName;
-
-		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
-		}
-
-		public void write(DocumentElement target, String value) {
-			target.addValue( reference, value );
-		}
-	}
 }
