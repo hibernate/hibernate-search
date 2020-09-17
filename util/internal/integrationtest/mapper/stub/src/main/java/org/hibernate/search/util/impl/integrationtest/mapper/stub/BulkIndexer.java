@@ -11,9 +11,11 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -66,6 +68,22 @@ public class BulkIndexer {
 		for ( StubDocumentProvider documentProvider : documentProviders ) {
 			add( documentProvider );
 		}
+		return this;
+	}
+
+	public <T> BulkIndexer add(IndexFieldReference<T> fieldReference,
+			Consumer<SingleFieldDocumentBuilder<T>> valueContributor) {
+		valueContributor.accept( new SingleFieldDocumentBuilder<T>() {
+			@Override
+			public void emptyDocument(String documentId) {
+				add( documentProvider( documentId, document -> { } ) );
+			}
+
+			@Override
+			public void document(String documentId, T fieldValue) {
+				add( documentProvider( documentId, document -> document.addValue( fieldReference, fieldValue ) ) );
+			}
+		} );
 		return this;
 	}
 
