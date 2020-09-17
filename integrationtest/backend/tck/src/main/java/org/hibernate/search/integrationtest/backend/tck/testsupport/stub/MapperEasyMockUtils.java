@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -65,11 +66,14 @@ public final class MapperEasyMockUtils {
 			}
 		}
 
-		expect( objectLoaderMock.loadBlocking(
-				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) ), notNull() ) )
-				.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
-						.map( context.loadingMap::get )
-						.collect( Collectors.toList() ) );
+		Set<R> keysToLoad = context.loadingMap.keySet();
+		if ( !keysToLoad.isEmpty() ) {
+			expect( objectLoaderMock.loadBlocking(
+					EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( keysToLoad ) ), notNull() ) )
+					.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
+							.map( context.loadingMap::get )
+							.collect( Collectors.toList() ) );
+		}
 	}
 
 	public static class HitMappingDefinitionContext<R, E> {
