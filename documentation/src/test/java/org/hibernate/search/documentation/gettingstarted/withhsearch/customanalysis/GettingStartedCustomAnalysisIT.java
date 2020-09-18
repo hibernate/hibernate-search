@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis;
+package org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
@@ -25,9 +25,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GettingStartedWithAnalysisIT {
+public class GettingStartedCustomAnalysisIT {
 
-	private final String persistenceUnitName = "GettingStartedWithAnalysisIT_" + BACKEND_TYPE;
+	private final String persistenceUnitName = "GettingStartedCustomAnalysisIT_" + BACKEND_TYPE;
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -59,6 +59,8 @@ public class GettingStartedWithAnalysisIT {
 
 			Book book = new Book();
 			book.setTitle( "Refactoring: Improving the Design of Existing Code" );
+			book.setIsbn( "978-0-58-600835-5" );
+			book.setPageCount( 200 );
 			book.getAuthors().add( author );
 			author.getBooks().add( book );
 
@@ -76,7 +78,7 @@ public class GettingStartedWithAnalysisIT {
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.where( f -> f.match()
 							.fields( "title", "authors.name" )
-							.matching( "refactor" ) )
+							.matching( "refactored" ) )
 					.fetch( 20 );
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
@@ -89,7 +91,7 @@ public class GettingStartedWithAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
-			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
+			for ( String term : new String[] { "Refactor", "refactors", "refactor", "refactoring" } ) {
 				SearchResult<Book> result = searchSession.search( Book.class )
 						.where( f -> f.match()
 								.fields( "title", "authors.name" )

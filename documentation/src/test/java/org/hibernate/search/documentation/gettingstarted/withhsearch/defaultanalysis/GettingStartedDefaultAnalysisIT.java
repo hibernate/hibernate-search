@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.gettingstarted.withhsearch.withoutanalysis;
+package org.hibernate.search.documentation.gettingstarted.withhsearch.defaultanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
@@ -29,9 +29,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GettingStartedWithoutAnalysisIT {
+public class GettingStartedDefaultAnalysisIT {
 
-	private final String persistenceUnitName = "GettingStartedWithoutAnalysisIT_" + BACKEND_TYPE;
+	private final String persistenceUnitName = "GettingStartedDefaultAnalysisIT_" + BACKEND_TYPE;
 
 	private EntityManagerFactory entityManagerFactory;
 
@@ -67,6 +67,8 @@ public class GettingStartedWithoutAnalysisIT {
 
 			Book book = new Book();
 			book.setTitle( "Refactoring: Improving the Design of Existing Code" );
+			book.setIsbn( "978-0-58-600835-5" );
+			book.setPageCount( 200 );
 			book.getAuthors().add( author );
 			author.getBooks().add( book );
 
@@ -104,7 +106,7 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchResult<Book> result = searchSession.search( scope ) // <3>
 					.where( scope.predicate().match() // <4>
 							.fields( "title", "authors.name" )
-							.matching( "Refactoring: Improving the Design of Existing Code" )
+							.matching( "refactoring" )
 							.toPredicate() )
 					.fetch( 20 ); // <5>
 
@@ -117,7 +119,7 @@ public class GettingStartedWithoutAnalysisIT {
 					searchSession.search( scope )
 					.where( scope.predicate().match()
 							.fields( "title", "authors.name" )
-							.matching( "Refactoring: Improving the Design of Existing Code" )
+							.matching( "refactoring" )
 							.toPredicate() )
 			// tag::searching-objects[]
 					.fetchHits( 20 ); // <8>
@@ -139,7 +141,7 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
 					.where( f -> f.match() // <3>
 							.fields( "title", "authors.name" )
-							.matching( "Refactoring: Improving the Design of Existing Code" ) )
+							.matching( "refactoring" ) )
 					.fetch( 20 ); // <4>
 
 			long totalHitCount = result.total().hitCount(); // <5>
@@ -151,7 +153,7 @@ public class GettingStartedWithoutAnalysisIT {
 					searchSession.search( Book.class )
 							.where( f -> f.match()
 									.fields( "title", "authors.name" )
-									.matching( "Refactoring: Improving the Design of Existing Code" ) )
+									.matching( "refactoring" ) )
 			// tag::searching-lambdas[]
 					.fetchHits( 20 ); // <7>
 			// Not shown: commit the transaction and close the entity manager
@@ -172,7 +174,7 @@ public class GettingStartedWithoutAnalysisIT {
 			long totalHitCount = searchSession.search( Book.class )
 					.where( f -> f.match()
 							.fields( "title", "authors.name" )
-							.matching( "Refactoring: Improving the Design of Existing Code" ) )
+							.matching( "refactoring" ) )
 					.fetchTotalHitCount(); // <1>
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.gettingstarted.withhsearch.withoutanalysis;
+package org.hibernate.search.documentation.gettingstarted.withhsearch.defaultanalysis;
 
 // tag::include[]
 
@@ -15,9 +15,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
 @Indexed // <1>
@@ -27,11 +29,17 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@GenericField // <3>
+	@FullTextField // <3>
 	private String title;
 
+	@KeywordField // <4>
+	private String isbn;
+
+	@GenericField // <5>
+	private int pageCount;
+
 	@ManyToMany
-	@IndexedEmbedded // <4>
+	@IndexedEmbedded // <6>
 	private Set<Author> authors = new HashSet<>();
 
 	public Book() {
@@ -51,6 +59,22 @@ public class Book {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getIsbn() {
+		return isbn;
+	}
+
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+
+	public int getPageCount() {
+		return pageCount;
+	}
+
+	public void setPageCount(int pageCount) {
+		this.pageCount = pageCount;
 	}
 
 	public Set<Author> getAuthors() {

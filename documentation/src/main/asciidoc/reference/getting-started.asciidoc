@@ -206,18 +206,26 @@ Below is an example of how the model above can be mapped.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/Book.java[tags=include;!getters-setters]
 ----
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/Author.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/Author.java[tags=include;!getters-setters]
 ----
 <1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
 <2> By default, the JPA `@Id` is used to generate a document identifier.
-<3> `@GenericField` maps a property to an index field with the same name and type.
-As such, the field is indexed in a way that only allows exact matches;
-full-text matches will be discussed in a moment.
-<4> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
+<3> `@FullTextField` maps a property to a full-text index field with the same name and type.
+Full-text fields are broken down into tokens and normalized (lowercased, ...).
+Here we're relying on default analysis configuration,
+but most applications need to customize it;
+this will be addressed further down.
+<4> `@KeywordField` maps a property to a non-analyzed index field.
+Useful for identifiers, for example.
+<5> Hibernate Search is not just for full-text search: you can index non-`String` types with the `@GenericField` annotation,
+A <<mapper-orm-directfieldmapping-supported-types,broad range of property types>> are supported out-of-the-box,
+such as primitive types (`int`, `double`, ...) and their boxed counterpart (`Integer`, `Double`, ...),
+enums, date/time types, `BigInteger`/`BigDecimal`, etc.
+<6> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
 into the indexed form of the embedding entity.
 +
 Here, the `Author` class defines a single indexed field, `name`.
@@ -226,17 +234,18 @@ will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
 and the books will be reindexed automatically whenever the `name` property of their author changes.
 See <<mapper-orm-indexedembedded>> for more information.
-<5> Entities that are only `@IndexedEmbedded` in other entities,
+<7> Entities that are only `@IndexedEmbedded` in other entities,
 but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
 ====
 
 This is a very simple example, but is enough to get started.
 Just remember that Hibernate Search allows more complex mappings:
 
-* Other `@*Field` annotations exist, some of them allowing full-text search,
+* Multiple `@*Field` annotations exist, some of them allowing full-text search,
 some of them allowing finer-grained configuration for field of a certain type.
 You can find out more about `@*Field` annotations in <<mapper-orm-directfieldmapping>>.
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
+This allows the mapping of types that are not supported out-of-the-box.
 See <<mapper-orm-bridge>> for more information.
 
 [[getting-started-initialization]]
@@ -281,7 +290,7 @@ To that end, you can use the mass indexer API, as shown in the following code:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=manual-index]
 ----
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create an "indexer", passing the entity types you want to index.
@@ -303,7 +312,7 @@ Thus this code would transparently populate your index:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=indexing]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=indexing]
 ----
 ====
 
@@ -327,13 +336,15 @@ Once the data is indexed, you can perform search queries.
 
 The following code will prepare a search query targeting the index for the `Book` entity,
 filtering the results so that at least one field among `title` and `authors.name`
-matches the string `Refactoring: Improving the Design of Existing Code` *exactly*.
+contains the string `refactoring`.
+The matches are implicitly on words ("tokens") instead of the full string,
+and are case-insensitive: that's because the targeted fields are *full-text* fields.
 
 .Using Hibernate Search to query the indexes
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-lambdas]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-lambdas]
 ----
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Initiate a search query on the index mapped to the `Book` entity.
@@ -353,7 +364,7 @@ but it will be a bit more verbose:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-objects]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=searching-objects]
 ----
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create a "search scope", representing the indexed types that will be queried.
@@ -373,7 +384,7 @@ It is possible to get just the total hit count, using `fetchTotalHitCount()`.
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=counting]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/defaultanalysis/GettingStartedDefaultAnalysisIT.java[tags=counting]
 ----
 <1> Fetch the total hit count.
 ====
@@ -385,10 +396,13 @@ See <<search-dsl-projection>> for more information.
 [[getting-started-analysis]]
 == Analysis
 
-Exact matches are well and good, but obviously not what you would expect from a full-text search engine.
+Full-text search allows fast matches on words in a case-insensitive way,
+which is one step further than substring search in a relational database.
+But it can get much better: what if we want a search with the term "refactored"
+to match our book whose title contains "refactoring"?
+That's possible with custom analysis.
 
-For non-exact matches, you will need to configure *analysis*,
-i.e. how text is supposed to be processed when indexing and searching.
+Analysis is how text is supposed to be processed when indexing and searching.
 This involves _analyzers_,
 which are made up of three types of components, applied one after the other:
 
@@ -400,8 +414,15 @@ which are made up of three types of components, applied one after the other:
 `[A, GREAT, résume]` => `[great, resume]`.
 
 There are built-in analyzers,
-but it is generally better to build your own
-by picking the filters and tokenizer most suited to your specific needs.
+in particular the default one, which will:
+
+* tokenize (split) the input according to the Word Break rules
+of the http://unicode.org/reports/tr29/[Unicode Text Segmentation algorithm];
+* filter (normalize) tokens by turning uppercase letters to lowercase.
+
+The default analyzer is a good fit for most language, but is not very advanced.
+To get the most of analysis, you will need to define a custom analyzer
+by picking the tokenizer and filters most suited to your specific needs.
 
 The following paragraphs will explain how to configure and use
 a simple yet reasonably useful analyzer.
@@ -432,7 +453,7 @@ The examples below show how to define an analyzer with these components, dependi
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/MyLuceneAnalysisConfigurer.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/customanalysis/MyLuceneAnalysisConfigurer.java[tags=include]
 ----
 [source, XML, indent=0, subs="+callouts"]
 ----
@@ -452,7 +473,7 @@ as it is unlikely to lead to useful results on proper nouns.
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/customanalysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
 ----
 [source, XML, indent=0, subs="+callouts"]
 ----
@@ -476,11 +497,11 @@ Once analysis is configured, the mapping must be adapted to assign the relevant 
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/customanalysis/Book.java[tags=include;!getters-setters]
 ----
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/Author.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/customanalysis/Author.java[tags=include;!getters-setters]
 ----
 <1> Replace the `@GenericField` annotation with `@FullTextField`,
 and set the `analyzer` parameter to the name of the custom analyzer configured earlier.
@@ -502,7 +523,7 @@ after you changed the Hibernate Search mapping of your entities.
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/GettingStartedWithAnalysisIT.java[tags=searching]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/customanalysis/GettingStartedCustomAnalysisIT.java[tags=searching]
 ----
 ====
 
