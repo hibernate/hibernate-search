@@ -134,17 +134,17 @@ and their respective `lib` subdirectories.
 [[getting-started-configuration]]
 == Configuration
 
-Once you have added all required dependencies to your application you have to add a couple of
-properties to your Hibernate ORM configuration file.
+Once you have added all required dependencies to your application,
+it's time to have a look at the configuration file.
 
 [TIP]
 ====
-In case you are a Hibernate ORM new timer we recommend you start link:http://hibernate.org/quick-start.html[there]
+If you are new to Hibernate ORM, we recommend you start link:http://hibernate.org/quick-start.html[there]
 to implement entity persistence in your application,
 and only then come back here to add Hibernate Search indexing.
 ====
 
-The properties are sourced from Hibernate ORM,
+The configuration properties of Hibernate Search are sourced from Hibernate ORM,
 so they can be added to any file from which Hibernate ORM takes its configuration:
 
 * A `hibernate.properties` file in your classpath.
@@ -217,11 +217,12 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 <3> `@GenericField` maps a property to an index field with the same name and type.
 As such, the field is indexed in a way that only allows exact matches;
 full-text matches will be discussed in a moment.
-<4> `@IndexedEmbedded` allows to "embed" the indexed form of associated objects (entities or embeddables)
+<4> `@IndexedEmbedded` "embeds" the indexed form of associated objects (entities or embeddables)
 into the indexed form of the embedding entity.
++
 Here, the `Author` class defines a single indexed field, `name`.
 Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
-will add a single `authors.name` field to the `Book` index.
+will add a single field named `authors.name` to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
 and the books will be reindexed automatically whenever the `name` property of their author changes.
 See <<mapper-orm-indexedembedded>> for more information.
@@ -283,8 +284,9 @@ To that end, you can use the mass indexer API, as shown in the following code:
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
 ----
 <1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
-<2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
-<3> It is possible to set the number of threads to be used. For the complete option list see <<mapper-orm-indexing-massindexer>>.
+<2> Create an "indexer", passing the entity types you want to index.
+To index all entity types, call `massIndexer()` without any argument.
+<3> It is possible to set the number of threads to be used. For the complete list of options see <<mapper-orm-indexing-massindexer>>.
 <4> Invoke the batch indexing process.
 ====
 
@@ -365,7 +367,7 @@ The predicate is created using the same search scope as the query.
 you can also call `fetchHits()` directly.
 ====
 
-It is possible to get just the total hit count, using `fetchTotalHitCount()` method.
+It is possible to get just the total hit count, using `fetchTotalHitCount()`.
 
 .Using Hibernate Search to count the matches
 ====
@@ -378,7 +380,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 
 Note that, while the examples above retrieved hits as managed entities,
 it is just one of the possible hit types.
-See <<search-dsl-query>> for more information.
+See <<search-dsl-projection>> for more information.
 
 [[getting-started-analysis]]
 == Analysis
@@ -390,7 +392,7 @@ i.e. how text is supposed to be processed when indexing and searching.
 This involves _analyzers_,
 which are made up of three types of components, applied one after the other:
 
-* (rarely) zero or more character filters, to clean up the input text:
+* zero or (rarely) more character filters, to clean up the input text:
 `A <strong>GREAT</strong> résume` => `A GREAT résume`.
 * a tokenizer, to split the input text into words, called "tokens":
 `A GREAT résume` => `[A, GREAT, résume]`.
@@ -420,7 +422,7 @@ and you want to get hits for any of the following search terms:
 One way to achieve this is to use an analyzer with the following components:
 
 * A "standard" tokenizer, which splits words at whitespaces, punctuation characters and hyphens.
-It is a good general purpose tokenizer.
+It is a good general-purpose tokenizer.
 * A "lowercase" filter, which converts every character to lowercase.
 * A "snowball" filter, which applies language-specific https://en.wikipedia.org/wiki/Stemming[stemming].
 
@@ -486,7 +488,7 @@ and set the `analyzer` parameter to the name of the custom analyzer configured e
 
 That's it! Now, once the entities will be reindexed, you will be able to search for the terms
 "Refactor", "refactors", "refactored" or "refactoring",
-and the book with the title "Refactoring: Improving the Design of Existing Code"
+and the book entitled "Refactoring: Improving the Design of Existing Code"
 will show up in the results.
 
 [IMPORTANT]
@@ -506,7 +508,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 
 == What's next
 
-The above paragraphs helped you getting an overview of Hibernate Search.
+The above paragraphs gave you an overview of Hibernate Search.
 The next step after this tutorial is to get more familiar
 with the overall architecture of Hibernate Search (<<architecture>>)
 and explore the basic features in more detail.
@@ -515,11 +517,18 @@ Two topics which were only briefly touched in this tutorial
 were analysis configuration (<<concepts-analysis>>) and bridges (<<mapper-orm-bridge>>).
 Both are important features required for more fine-grained indexing.
 
-Other features that you will probably want to use include
-<<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>,
-<<search-dsl-aggregation,aggregations>>,
-and <<mapper-orm-schema-management,schema management>>.
+When it comes to initializing your index, you will be interested
+in <<mapper-orm-schema-management,schema management>>
+and <<mapper-orm-indexing-massindexer,mass indexing>>.
 
-If you want to see an example project using Hibernate Search,
-you can also have a look at the link:https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library["Library" showcase],
-a sample application using Hibernate Search in a Spring Boot environment.
+When querying, you will probably want to know more about
+<<search-dsl-predicate,predicates>>,
+<<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>,
+<<search-dsl-aggregation,aggregations>>.
+
+You can also have a look at sample applications:
+
+* The link:https://github.com/quarkusio/quarkus-quickstarts/tree/master/hibernate-search-elasticsearch-quickstart[Quarkus quickstart],
+a sample application using Hibernate Search with the [Quarkus](https://quarkus.io/) framework.
+* The link:https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library["Library" showcase],
+a sample application using Hibernate Search with the [Spring Boot](https://spring.io/projects/spring-boot) framework.

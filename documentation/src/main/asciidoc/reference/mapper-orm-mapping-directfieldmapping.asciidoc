@@ -73,8 +73,9 @@ match fields ignoring diacritics,
 +
 Full-text fields must be assigned an <<mapper-orm-directfieldmapping-analyzer,analyzer>>, referenced by its name.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
-Moreover, you can define <<mapper-orm-directfieldmapping-search-analyzer,a specific analyzer>>
-a search analyzer to analyze searched terms differently.
++
+Note you can also define <<mapper-orm-directfieldmapping-search-analyzer,a search analyzer>>
+to analyze searched terms differently.
 +
 IMPORTANT: Full-text fields cannot be sorted on.
 If you need to sort on the value of a property,
@@ -202,6 +203,7 @@ See <<concepts-analysis>> for more details about analyzers and full-text analysi
 [[mapper-orm-directfieldmapping-search-analyzer]] `searchAnalyzer`::
 An optional different analyzer, overriding the one defined with the `analyzer` attribute,
 to use only when analyzing searched terms.
++
 If not defined, the analyzer assigned to `analyzer` will be used.
 +
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
