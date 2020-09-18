@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.batch.jsr352.massindexing.MassIndexingJob;
+import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 
 import org.jberet.spi.JobXmlResolver;
 import org.jberet.tools.AbstractJobXmlResolver;

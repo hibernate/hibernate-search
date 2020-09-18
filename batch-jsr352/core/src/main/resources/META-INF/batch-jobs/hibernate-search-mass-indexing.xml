@@ -9,7 +9,7 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
 
     <listeners>
-        <listener ref="org.hibernate.search.batch.jsr352.massindexing.impl.JobContextSetupListener">
+        <listener ref="org.hibernate.search.batch.jsr352.core.massindexing.spi.JobContextSetupListener">
             <properties>
                 <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
                 <property name="entityManagerFactoryReference" value="#{jobParameters['entityManagerFactoryReference']}" />
@@ -33,7 +33,7 @@
     </listeners>
 
     <step id="beforeChunk" next="produceLuceneDoc">
-        <batchlet ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.beforechunk.BeforeChunkBatchlet">
+        <batchlet ref="org.hibernate.search.batch.jsr352.core.massindexing.step.beforechunk.impl.BeforeChunkBatchlet">
             <properties>
                 <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
@@ -44,7 +44,7 @@
 
     <step id="produceLuceneDoc" next="afterChunk">
         <listeners>
-            <listener ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.StepProgressSetupListener">
+            <listener ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.StepProgressSetupListener">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="customQueryHQL" value="#{jobParameters['customQueryHQL']}" />
@@ -53,7 +53,7 @@
         </listeners>
         <!-- Here we use the property from the partition plan, so that defaults are correctly applied -->
         <chunk item-count="#{partitionPlan['checkpointInterval']}">
-            <reader ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.EntityReader">
+            <reader ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader">
                 <properties>
                 	<!-- Used to re-create the job context data as necessary -->
 	                <property name="entityManagerFactoryNamespace" value="#{jobParameters['entityManagerFactoryNamespace']}" />
@@ -76,21 +76,16 @@
                     <property name="maxResultsPerEntity" value="#{jobParameters['maxResultsPerEntity']}" />
                 </properties>
             </reader>
-            <processor ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.LuceneDocProducer">
-                <properties>
-                    <property name="entityName" value="#{partitionPlan['entityName']}" />
-                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
-                </properties>
-            </processor>
-            <writer ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.LuceneDocWriter">
+            <writer ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.EntityWriter">
                 <properties>
                     <property name="entityName" value="#{partitionPlan['entityName']}" />
                     <property name="partitionId" value="#{partitionPlan['partitionId']}" />
+                    <property name="tenantId" value="#{jobParameters['tenantId']}" />
                 </properties>
             </writer>
         </chunk>
         <partition>
-            <mapper ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.PartitionMapper">
+            <mapper ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
@@ -101,13 +96,13 @@
                     <property name="rowsPerPartition" value="#{jobParameters['rowsPerPartition']}" />
                 </properties>
             </mapper>
-            <collector ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.ProgressCollector" />
-            <analyzer ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.lucene.ProgressAggregator" />
+            <collector ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.ProgressCollector" />
+            <analyzer ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.ProgressAggregator" />
         </partition>
     </step>
 
     <step id="afterChunk">
-        <batchlet ref="org.hibernate.search.batch.jsr352.massindexing.impl.steps.afterchunk.AfterChunkBatchlet">
+        <batchlet ref="org.hibernate.search.batch.jsr352.core.massindexing.step.afterchunk.impl.AfterChunkBatchlet">
             <properties>
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
                 <property name="tenantId" value="#{jobParameters['tenantId']}" />
