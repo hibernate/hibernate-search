@@ -46,6 +46,8 @@ public class GettingStartedWithoutHibernateSearchIT {
 
 			Book book = new Book();
 			book.setTitle( "Refactoring: Improving the Design of Existing Code" );
+			book.setIsbn( "978-0-58-600835-5" );
+			book.setPageCount( 200 );
 			book.getAuthors().add( author );
 			author.getBooks().add( book );
 

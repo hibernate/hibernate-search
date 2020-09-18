@@ -5,7 +5,7 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 // tag::include[]
-package org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis;
+package org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
