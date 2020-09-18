@@ -62,6 +62,9 @@ public final class ExplicitDocIdsQuery extends Query {
 				DocIdSetIterator matchingDocs = ExplicitDocIdSetIterator.of(
 						sortedDocIds, context.docBase, context.reader().maxDoc()
 				);
+				if ( matchingDocs == null ) {
+					return null; // Skip this leaf
+				}
 				return new ConstantScoreScorer( this, this.score(), scoreMode, matchingDocs );
 			}
 

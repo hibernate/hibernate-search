@@ -13,7 +13,7 @@ final class ExplicitDocIdSetIterator extends DocIdSetIterator {
 	static DocIdSetIterator of(int[] sortedTopLevelDocIds, int leafDocBase, int leafMaxLeafId) {
 		int firstIndex = findFirstGreaterThanOrEqualTo( sortedTopLevelDocIds, leafDocBase );
 		if ( firstIndex < 0 ) {
-			return DocIdSetIterator.empty();
+			return null;
 		}
 		else {
 			return new ExplicitDocIdSetIterator( sortedTopLevelDocIds, leafDocBase, firstIndex, leafMaxLeafId );
