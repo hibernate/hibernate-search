@@ -446,6 +446,8 @@ One way to achieve this is to use an analyzer with the following components:
 It is a good general-purpose tokenizer.
 * A "lowercase" filter, which converts every character to lowercase.
 * A "snowball" filter, which applies language-specific https://en.wikipedia.org/wiki/Stemming[stemming].
+* Finally, an "ascii-folding" filter, which replaces characters with diacritics ("é", "à", ...)
+with their ASCII equivalent ("e", "a", ...).
 
 The examples below show how to define an analyzer with these components, depending on the backend you picked.
 
