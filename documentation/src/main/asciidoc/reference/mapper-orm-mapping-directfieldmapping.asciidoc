@@ -71,7 +71,8 @@ match fields regardless of case,
 match fields ignoring diacritics,
 ...
 +
-Full-text fields must be assigned an <<mapper-orm-directfieldmapping-analyzer,analyzer>>, referenced by its name.
+Full-text fields should assigned an <<mapper-orm-directfieldmapping-analyzer,analyzer>>, referenced by its name.
+By default the analyzer named `default` will be used.
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 +
 Note you can also define <<mapper-orm-directfieldmapping-search-analyzer,a search analyzer>>
@@ -197,6 +198,8 @@ in the section <<mapper-orm-containerextractor>>.
 [[mapper-orm-directfieldmapping-analyzer]] `analyzer`::
 The analyzer to apply to field values when indexing and querying.
 Only available on `@FullTextField`.
++
+By default, the analyzer named `default` will be used.
 +
 See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 
