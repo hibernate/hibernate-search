@@ -22,15 +22,15 @@ import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
-import org.hibernate.search.batch.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
-import org.hibernate.search.batch.jsr352.logging.impl.Log;
+import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
+import org.hibernate.search.batch.jsr352.jberet.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An {@link EntityManagerFactoryRegistry} that retrieves the entity manager factory
  * from the CDI context by its bean name.
  * <p>
- * When calling {@link #getDefault()}, the single registered EntityManagerFactory bean
+ * When calling {@link #useDefault()}, the single registered EntityManagerFactory bean
  * will be returned, or if there is none the entity manager factory will be retrieved
  * using a {@literal @PersistenceUnit annotation}.
  * <p>
@@ -96,7 +96,7 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 	private BeanManager beanManager;
 
 	@Override
-	public EntityManagerFactory getDefault() {
+	public EntityManagerFactory useDefault() {
 		if ( entityManagerFactoryInstance.isUnsatisfied() ) {
 			try {
 				return getVetoedBeanReference( beanManager, PersistenceUnitAccessor.class ).entityManagerFactory;
