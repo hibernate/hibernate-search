@@ -73,7 +73,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_0, SEGMENT_1_DOC_1 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
-		Assertions.assertThat( TopDocs.merge( segment0Query.luceneSort(), 10, allTopDocs ).scoreDocs )
+		Assertions.assertThat( TopDocs.merge( 10, allTopDocs ).scoreDocs )
 				.containsExactly(
 						allTopDocs[1].scoreDocs[0], // SEGMENT_1_DOC_0
 						allTopDocs[0].scoreDocs[0], // SEGMENT_0_DOC_0
@@ -82,7 +82,9 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				);
 	}
 
-	// Also check ascending order, to be sure the above didn't just pass by chance
+	// Also check ascending order:
+	// 1. to be sure the above didn't just pass by chance;
+	// 2. because the TopDocs merging method is not the same in that case.
 	@Test
 	public void asc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_0 );

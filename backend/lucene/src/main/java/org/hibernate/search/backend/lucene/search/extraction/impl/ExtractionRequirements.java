@@ -58,10 +58,8 @@ public final class ExtractionRequirements {
 				new CollectorSet.Builder( executionContext, timeoutManager );
 
 		if ( maxDocs > 0 ) {
-			if ( sort == null ) {
-				topDocsCollector = TopScoreDocCollector.create(
-						maxDocs, totalHitCountThreshold
-				);
+			if ( sort == null || isDescendingScoreSort( sort ) ) {
+				topDocsCollector = TopScoreDocCollector.create( maxDocs, totalHitCountThreshold );
 			}
 			else {
 				if ( requireScore ) {
@@ -99,6 +97,15 @@ public final class ExtractionRequirements {
 				requiredCollectorForTopDocsFactories,
 				timeoutManager
 		);
+	}
+
+	private boolean isDescendingScoreSort(Sort sort) {
+		SortField[] fields = sort.getSort();
+		return fields.length == 1 && isDescendingScoreSort( fields[0] );
+	}
+
+	private boolean isDescendingScoreSort(SortField sortField) {
+		return SortField.Type.SCORE == sortField.getType() && !sortField.getReverse();
 	}
 
 	private Integer getScoreSortFieldIndexOrNull(Sort sort) {
