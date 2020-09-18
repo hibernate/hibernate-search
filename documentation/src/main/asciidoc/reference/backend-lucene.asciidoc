@@ -571,6 +571,9 @@ to only return search hits for the current tenant.
 both when indexing (document processing)
 and when searching (query processing).
 
+The Lucene backend comes with some <<backend-lucene-analysis-builtin,defaults>>,
+but analysis also be configured explicitly.
+
 To configure analysis in a Lucene backend, you will need to:
 
 * Define a class that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
@@ -583,8 +586,20 @@ and the configurer will be able to take advantage of a DSL to define
 <<backend-lucene-analysis-analyzers,analyzers and normalizers>> or even (for more advanced use) the <<backend-lucene-analysis-similarity,similarity>>.
 See below for examples.
 
+[[backend-lucene-analysis-builtin]]
+=== Built-in analyzers and normalizers
+
+Built-in analyzers and normalizers are available out-of-the box and don't require explicit configuration.
+If necessary, they can be overridden by defining your own analyzer/normalizer with the same name.
+
+The Lucene backend comes with a single built-in analyzer, named `default`.
+It is used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
+Unless overridden explicitly, this analyzer uses a `standard` tokenizer and a `lowercase` filter.
+
+The Lucene backend does not provide any built-in normalizer.
+
 [[backend-lucene-analysis-analyzers]]
-=== Analyzers and normalizers
+=== Custom analyzers and normalizers
 
 The context passed to the configurer exposes a DSL to define analyzers and normalizers:
 
@@ -609,17 +624,6 @@ include::{resourcesdir}/analysis/lucene-simple.properties[]
 <1> Assign the configurer to the backend using a Hibernate Search configuration property.
 ====
 
-It is also possible to assign a name to a built-in analyzer,
-or a custom analyzer implementation:
-
-.Naming an analyzer instance in the Lucene backend
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedLuceneAnalysisConfigurer.java[tags=instance]
-----
-====
-
 [TIP]
 ====
 To know which analyzers, character filters, tokenizers and token filters are available,
@@ -627,6 +631,16 @@ either browse the Lucene Javadoc or read the corresponding section on the
 link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).
+====
+
+It is also possible to assign a name to an analyzer instance:
+
+.Naming an analyzer instance in the Lucene backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedLuceneAnalysisConfigurer.java[tags=instance]
+----
 ====
 
 [[backend-lucene-analysis-similarity]]
