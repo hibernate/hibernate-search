@@ -81,7 +81,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 		);
 
 		staticChildrenForParent.add( fieldNode );
-		collector.collectFieldNode( fieldNode.absolutePath(), fieldNode );
+		collector.collect( fieldNode.absolutePath(), fieldNode );
 
 		reference.setSchemaNode( fieldNode );
 	}
