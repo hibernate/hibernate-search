@@ -80,12 +80,12 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
 			@Override
-			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaValueFieldNode<?> node) {
+			public void collect(String absoluteFieldPath, LuceneIndexSchemaValueFieldNode<?> node) {
 				fieldNodes.put( absoluteFieldPath, node );
 			}
 
 			@Override
-			public void collectObjectFieldNode(String absolutePath, LuceneIndexSchemaObjectFieldNode node) {
+			public void collect(String absolutePath, LuceneIndexSchemaObjectFieldNode node) {
 				objectFieldNodes.put( absolutePath, node );
 			}
 

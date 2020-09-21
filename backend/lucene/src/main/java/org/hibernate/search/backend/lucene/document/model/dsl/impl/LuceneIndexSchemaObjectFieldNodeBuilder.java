@@ -81,7 +81,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 		);
 
 		staticChildrenForParent.add( node );
-		collector.collectObjectFieldNode( absoluteFieldPath, node );
+		collector.collect( absoluteFieldPath, node );
 
 		reference.setSchemaNode( node );
 
