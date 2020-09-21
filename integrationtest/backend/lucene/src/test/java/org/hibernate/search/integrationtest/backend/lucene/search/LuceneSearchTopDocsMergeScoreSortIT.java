@@ -65,8 +65,8 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	public void desc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_0 );
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_1 );
-		LuceneSearchResult segment0Result = segment0Query.fetch( 10 );
-		LuceneSearchResult segment1Result = segment1Query.fetch( 10 );
+		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );
+		LuceneSearchResult<DocumentReference> segment1Result = segment1Query.fetch( 10 );
 		assertThat( segment0Result )
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_0_DOC_0, SEGMENT_0_DOC_1 );
 		assertThat( segment1Result )
@@ -87,8 +87,8 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 	public void asc() {
 		LuceneSearchQuery<DocumentReference> segment0Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_0 );
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_1 );
-		LuceneSearchResult segment0Result = segment0Query.fetch( 10 );
-		LuceneSearchResult segment1Result = segment1Query.fetch( 10 );
+		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );
+		LuceneSearchResult<DocumentReference> segment1Result = segment1Query.fetch( 10 );
 		assertThat( segment0Result )
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_0_DOC_1, SEGMENT_0_DOC_0 );
 		assertThat( segment1Result )
@@ -113,7 +113,8 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.toQuery();
 	}
 
-	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult ... results) {
+	@SafeVarargs
+	private TopFieldDocs[] retrieveTopDocs(LuceneSearchQuery<?> query, LuceneSearchResult<DocumentReference> ... results) {
 		Sort sort = query.luceneSort();
 		TopFieldDocs[] allTopDocs = new TopFieldDocs[results.length];
 		for ( int i = 0; i < results.length; i++ ) {
