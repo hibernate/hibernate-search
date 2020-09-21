@@ -19,17 +19,17 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -179,6 +179,16 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 		return resultOrNull;
+	}
+
+	@Override
+	public boolean hasNestedDocuments() {
+		for ( LuceneScopeIndexManagerContext element : elements() ) {
+			if ( element.model().hasNestedDocuments() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
