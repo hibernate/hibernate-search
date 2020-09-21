@@ -174,7 +174,10 @@ public class LuceneSearchQueryBuilder<H>
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
-		luceneQueryBuilder.add( Queries.mainDocumentQuery(), Occur.FILTER );
+		if ( searchContext.indexes().hasNestedDocuments() ) {
+			// HSEARCH-4018: this filter has a (small) cost, so we only add it if necessary.
+			luceneQueryBuilder.add( Queries.mainDocumentQuery(), Occur.FILTER );
+		}
 		if ( !routingKeys.isEmpty() ) {
 			Query routingKeysQuery = Queries.anyTerm( MetadataFields.routingKeyFieldName(), routingKeys );
 			luceneQueryBuilder.add( routingKeysQuery, Occur.FILTER );

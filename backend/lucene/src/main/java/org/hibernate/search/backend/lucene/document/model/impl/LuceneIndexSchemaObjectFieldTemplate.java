@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.util.Collections;
-
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
+
+import java.util.Collections;
 
 
 public class LuceneIndexSchemaObjectFieldTemplate
@@ -33,5 +33,9 @@ public class LuceneIndexSchemaObjectFieldTemplate
 				// TODO HSEARCH-3905 we don't know the children, so we should find another way to implement the exists predicate
 				Collections.emptyList()
 		);
+	}
+
+	public ObjectStructure structure() {
+		return structure;
 	}
 }

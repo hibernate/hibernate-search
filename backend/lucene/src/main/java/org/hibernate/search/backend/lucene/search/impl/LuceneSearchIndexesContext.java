@@ -29,6 +29,8 @@ public interface LuceneSearchIndexesContext {
 
 	LuceneSearchValueFieldContext<?> field(String absoluteFieldPath);
 
+	boolean hasNestedDocuments();
+
 	void checkNestedField(String absoluteFieldPath);
 
 	List<String> nestedPathHierarchyForObject(String absoluteFieldPath);

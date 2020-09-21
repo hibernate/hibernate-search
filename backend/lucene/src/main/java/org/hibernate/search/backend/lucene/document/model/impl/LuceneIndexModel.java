@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -42,6 +43,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	private final List<IndexFieldDescriptor> staticFields;
 	private final List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates;
 	private final List<LuceneIndexSchemaValueFieldTemplate> valueFieldTemplates;
+	private final boolean hasNestedDocuments;
 	private final ConcurrentMap<String, LuceneIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, LuceneIndexSchemaValueFieldNode<?>> dynamicValueFieldNodesCache = new ConcurrentHashMap<>();
 
@@ -74,6 +76,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		this.searchAnalyzer = new SearchScopedAnalyzer();
 		this.objectFieldTemplates = objectFieldTemplates;
 		this.valueFieldTemplates = valueFieldTemplates;
+		this.hasNestedDocuments = initHasNestedDocuments();
 	}
 
 	@Override
@@ -127,6 +130,10 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		LuceneIndexSchemaValueFieldNode<?> node =
 				getNode( valueFieldNodes, valueFieldTemplates, dynamicValueFieldNodesCache, absolutePath );
 		return node == null ? null : filter.filter( node, node.inclusion() );
+	}
+
+	public boolean hasNestedDocuments() {
+		return hasNestedDocuments;
 	}
 
 	public Analyzer getIndexingAnalyzer() {
@@ -223,6 +230,31 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 			}
 
 			return analyzer;
+		}
+	}
+
+	private boolean initHasNestedDocuments() {
+		for ( LuceneIndexSchemaObjectFieldNode node : objectFieldNodes.values() ) {
+			if ( isNested( node.structure() ) ) {
+				return true;
+			}
+		}
+		for ( LuceneIndexSchemaObjectFieldTemplate template : objectFieldTemplates ) {
+			if ( isNested( template.structure() ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isNested(ObjectStructure structure) {
+		switch ( structure ) {
+			case NESTED:
+				return true;
+			case FLATTENED:
+			case DEFAULT:
+			default:
+				return false;
 		}
 	}
 }
