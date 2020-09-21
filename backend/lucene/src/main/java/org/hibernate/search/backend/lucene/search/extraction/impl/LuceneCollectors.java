@@ -27,6 +27,7 @@ import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
+import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.search.TotalHits;
 
@@ -156,6 +157,21 @@ public class LuceneCollectors {
 	}
 
 	private void extractTopDocs(TopDocsCollector<?> topDocsCollector, int offset, Integer limit) {
+		if ( offset >= topDocsCollector.getTotalHits() ) {
+			// Hack.
+			// In this case, we cannot execute the code below as Lucene considers we passed incorrect arguments
+			// and returns a TopDocs instance with no ScoreDocs (correct)
+			// and a total hit count set to 0 (not always correct).
+			// Also, we cannot reconstruct the total hit count from just the collector
+			// since we don't have access to the relation (EQUAL/GT_OR_EQUAL).
+			// So we get just one topDoc, and infer everything from there.
+			TopDocs firstTopDoc = topDocsCollector.topDocs( 0, 1 );
+			topDocs = firstTopDoc instanceof TopFieldDocs
+					? new TopFieldDocs( firstTopDoc.totalHits, new FieldDoc[0], ( (TopFieldDocs) firstTopDoc ).fields )
+					: new TopDocs( firstTopDoc.totalHits, new ScoreDoc[0] );
+			return;
+		}
+
 		if ( limit == null ) {
 			topDocs = topDocsCollector.topDocs( offset );
 		}
