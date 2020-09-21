@@ -47,7 +47,7 @@ public final class ExtractionRequirements {
 			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager,
 			int totalHitCountThreshold)
 			throws IOException {
-		TopDocsCollector<?> topDocsCollector;
+		TopDocsCollector<?> topDocsCollector = null;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
@@ -79,7 +79,11 @@ public final class ExtractionRequirements {
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
 		}
 
-		if ( totalHitCountThreshold == Integer.MAX_VALUE ) {
+		if ( topDocsCollector == null ) {
+			// Normally the topDocsCollector collects the total hit count,
+			// but if it's not there, we need a separate collector.
+			// Note that adding this collector can have a significant cost in some situations
+			// (e.g. for queries matching many hits), so we only add it if it's really necessary.
 			TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollector );
 		}
