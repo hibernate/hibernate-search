@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -98,8 +99,11 @@ public class FieldContainerExtractorBaseIT {
 	public static class MyContainerExtractor<T> implements ContainerExtractor<MyContainer<T>, T> {
 		public static final String NAME = "my-container-extractor";
 		@Override
-		public Stream<T> extract(MyContainer<T> container) {
-			return container == null ? Stream.empty() : container.toStream();
+		public void extract(MyContainer<T> container, Consumer<T> consumer) {
+			if ( container == null ) {
+				return;
+			}
+			container.toStream().forEach( consumer );
 		}
 	}
 
@@ -160,7 +164,7 @@ public class FieldContainerExtractorBaseIT {
 	private static class RawContainerExtractor implements ContainerExtractor {
 		public static final String NAME = "raw-container-extractor";
 		@Override
-		public Stream extract(Object container) {
+		public void extract(Object container, Consumer consumer) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}

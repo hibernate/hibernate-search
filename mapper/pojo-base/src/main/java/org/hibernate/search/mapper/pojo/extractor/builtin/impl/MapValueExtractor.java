@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -19,7 +19,12 @@ public class MapValueExtractor<T> implements ContainerExtractor<Map<?, T>, T> {
 	}
 
 	@Override
-	public Stream<T> extract(Map<?, T> container) {
-		return container == null ? Stream.empty() : container.values().stream();
+	public void extract(Map<?, T> container, Consumer<T> consumer) {
+		if ( container == null ) {
+			return;
+		}
+		for ( T element : container.values() ) {
+			consumer.accept( element );
+		}
 	}
 }

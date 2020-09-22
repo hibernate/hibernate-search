@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.extractor;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -32,14 +32,14 @@ public interface ContainerExtractor<C, V> {
 
 	/**
 	 * @param container A container to extract values from.
-	 * @return A stream of values extracted from the given container.
-	 * The stream will be {@link Stream#close()} by the caller.
+	 * @param consumer A consumer for values extracted from the container.
 	 */
-	Stream<V> extract(C container);
+	void extract(C container, Consumer<V> consumer);
 
 	/**
-	 * @return {@code true} if this extractor's {@link #extract(Object)} method may return streams with more than one value.
-	 * {@code false} if it will never return streams with more than one value.
+	 * @return {@code true} if this extractor's {@link #extract(Object, Consumer)}
+	 * method may call the consumer multiple times.
+	 * {@code false} if it will always call the {@code consumer} either zero or one time for a given container.
 	 */
 	default boolean multiValued() {
 		return true;

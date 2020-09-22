@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.util.stream.Stream;
-
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Closer;
@@ -56,11 +54,9 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, C dirty, S dirtinessState) {
-		try ( Stream<V> stream = extractorHolder.get().extract( dirty ) ) {
-			stream.forEach( containerElement -> resolveEntitiesToReindexForContainerElement(
-					collector, runtimeIntrospector, containerElement, dirtinessState
-			) );
-		}
+		extractorHolder.get().extract( dirty, containerElement -> resolveEntitiesToReindexForContainerElement(
+				collector, runtimeIntrospector, containerElement, dirtinessState
+		) );
 	}
 
 	private void resolveEntitiesToReindexForContainerElement(PojoReindexingCollector collector,

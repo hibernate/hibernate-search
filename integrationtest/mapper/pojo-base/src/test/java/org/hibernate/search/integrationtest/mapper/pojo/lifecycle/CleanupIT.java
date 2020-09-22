@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotEquals;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
@@ -515,7 +514,7 @@ public class CleanupIT {
 		}
 
 		@Override
-		public Stream<Object> extract(Object container) {
+		public void extract(Object container, Consumer<Object> consumer) {
 			throw new UnsupportedOperationException( "Unexpected runtime use" );
 		}
 	}
