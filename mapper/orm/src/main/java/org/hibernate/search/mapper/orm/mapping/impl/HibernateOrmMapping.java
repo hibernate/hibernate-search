@@ -58,7 +58,6 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -242,11 +241,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public HibernateOrmMapping toConcreteType() {
 		return this;
-	}
-
-	@Override
-	public PojoIndexer createIndexer(SessionImplementor sessionImplementor) {
-		return HibernateOrmSearchSession.get( this, sessionImplementor ).createIndexer();
 	}
 
 	@Override
