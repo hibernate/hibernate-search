@@ -131,7 +131,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 			class IndexedEntity {
 				@DocumentId
 				private Integer id;
-				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY))
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_OBJECT))
 				private String[] myProperty;
 
 				private IndexedEntity(int id, String[] myProperty) {

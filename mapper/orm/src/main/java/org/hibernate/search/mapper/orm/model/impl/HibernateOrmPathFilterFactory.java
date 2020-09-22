@@ -305,7 +305,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 
 	private Value resolveExtractor(org.hibernate.mapping.Collection collectionValue, String extractorName) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
-			if ( extractorName == null || BuiltinContainerExtractors.ARRAY.equals( extractorName ) ) {
+			if ( extractorName == null || BuiltinContainerExtractors.ARRAY_OBJECT.equals( extractorName ) ) {
 				return collectionValue.getElement();
 			}
 		}
