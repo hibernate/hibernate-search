@@ -72,6 +72,94 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void booleanArray() {
+		doTest(
+				testModelProvider.booleanArray(),
+				Boolean.class, true,
+				new boolean[] { true, false, true, true },
+				true, false, true, true
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void charArray() {
+		doTest(
+				testModelProvider.charArray(),
+				String.class, true, // The Character bridge maps them as Strings
+				new char[] { 'a', 'b', 'c', 'd', '0', '\n', '*' },
+				"a", "b", "c", "d", "0", "\n", "*"
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void byteArray() {
+		doTest(
+				testModelProvider.byteArray(),
+				Byte.class, true,
+				new byte[] { (byte) 0, (byte) 128, (byte) -15 },
+				(byte) 0, (byte) 128, (byte) -15
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void shortArray() {
+		doTest(
+				testModelProvider.shortArray(),
+				Short.class, true,
+				new short[] { (short) 0, (short) 56782, (short) -15 },
+				(short) 0, (short) 56782, (short) -15
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void intArray() {
+		doTest(
+				testModelProvider.intArray(),
+				Integer.class, true,
+				new int[] { 0, 14, Integer.MAX_VALUE, -55454, Integer.MIN_VALUE, 954466 },
+				0, 14, Integer.MAX_VALUE, -55454, Integer.MIN_VALUE, 954466
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void longArray() {
+		doTest(
+				testModelProvider.longArray(),
+				Long.class, true,
+				new long[] { 0L, 14L, Long.MAX_VALUE, -55454L, Long.MIN_VALUE, 954466L },
+				0L, 14L, Long.MAX_VALUE, -55454L, Long.MIN_VALUE, 954466L
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void floatArray() {
+		doTest(
+				testModelProvider.floatArray(),
+				Float.class, true,
+				new float[] { 0.0f, 14.48f, Float.MAX_VALUE, -55454.0f, Float.MIN_VALUE, -Float.MAX_VALUE, -Float.MIN_VALUE },
+				0.0f, 14.48f, Float.MAX_VALUE, -55454.0f, Float.MIN_VALUE, -Float.MAX_VALUE, -Float.MIN_VALUE
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3997")
+	public void doubleArray() {
+		doTest(
+				testModelProvider.doubleArray(),
+				Double.class, true,
+				new double[] { 0.0, 14.48, Double.MAX_VALUE, -55454.0, Double.MIN_VALUE, -Double.MAX_VALUE, -Double.MIN_VALUE },
+				0.0, 14.48, Double.MAX_VALUE, -55454.0, Double.MIN_VALUE, -Double.MAX_VALUE, -Double.MIN_VALUE
+		);
+	}
+
+	@Test
 	public void iterable() {
 		doTest(
 				testModelProvider.iterable(),
@@ -364,6 +452,14 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 	interface TestModelProvider {
 		TestModel<?, String[]> objectArray();
+		TestModel<?, char[]> charArray();
+		TestModel<?, boolean[]> booleanArray();
+		TestModel<?, byte[]> byteArray();
+		TestModel<?, short[]> shortArray();
+		TestModel<?, int[]> intArray();
+		TestModel<?, long[]> longArray();
+		TestModel<?, float[]> floatArray();
+		TestModel<?, double[]> doubleArray();
 		TestModel<?, Iterable<String>> iterable();
 		TestModel<?, Collection<String>> collection();
 		TestModel<?, List<String>> list();

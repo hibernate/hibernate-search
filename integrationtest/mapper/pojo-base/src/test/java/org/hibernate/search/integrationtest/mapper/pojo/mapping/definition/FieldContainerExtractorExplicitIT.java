@@ -143,6 +143,142 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		}
 
 		@Override
+		public TestModel<?, char[]> charArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_CHAR))
+				private char[] myProperty;
+
+				private IndexedEntity(int id, char[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, boolean[]> booleanArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_BOOLEAN))
+				private boolean[] myProperty;
+
+				private IndexedEntity(int id, boolean[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, byte[]> byteArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_BYTE))
+				private byte[] myProperty;
+
+				private IndexedEntity(int id, byte[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, short[]> shortArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_SHORT))
+				private short[] myProperty;
+
+				private IndexedEntity(int id, short[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, int[]> intArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_INT))
+				private int[] myProperty;
+
+				private IndexedEntity(int id, int[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, long[]> longArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_LONG))
+				private long[] myProperty;
+
+				private IndexedEntity(int id, long[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, float[]> floatArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_FLOAT))
+				private float[] myProperty;
+
+				private IndexedEntity(int id, float[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, double[]> doubleArray() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				@DocumentId
+				private Integer id;
+				@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.ARRAY_DOUBLE))
+				private double[] myProperty;
+
+				private IndexedEntity(int id, double[] myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
 		public TestModel<?, Iterable<String>> iterable() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
