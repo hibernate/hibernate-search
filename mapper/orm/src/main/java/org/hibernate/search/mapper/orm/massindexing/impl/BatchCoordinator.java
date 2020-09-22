@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -22,8 +21,6 @@ import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaMan
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.SingularAttribute;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)
@@ -36,8 +33,8 @@ public class BatchCoordinator extends FailureHandledRunnable {
 
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
-	// Entity types to reindex, guaranteed not to be subtypes of each other.
-	private final Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes;
+	// Disjoint groups of entity types.
+	private final List<MassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
@@ -57,7 +54,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
-			Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes,
+			List<MassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
 			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean mergeSegmentsOnFinish,
@@ -66,7 +63,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		super( notifier );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
-		this.rootEntityTypes = rootEntityTypes;
+		this.typeGroupsToIndex = typeGroupsToIndex;
 		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
 
@@ -139,8 +136,9 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private void doBatchWork() throws InterruptedException {
 		ExecutorService executor = mappingContext.threadPoolProvider()
 				.newFixedThreadPool( typesToIndexInParallel, MassIndexerImpl.THREAD_NAME_PREFIX + "Workspace" );
-		for ( HibernateOrmMassIndexingIndexedTypeContext<?> type : rootEntityTypes ) {
-			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( type ), executor ) );
+
+		for ( MassIndexingIndexedTypeGroup<?> typeGroup : typeGroupsToIndex ) {
+			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( typeGroup ), executor ) );
 		}
 		executor.shutdown();
 
@@ -150,13 +148,10 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		);
 	}
 
-	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(HibernateOrmMassIndexingIndexedTypeContext<E> type) {
-		EntityType<E> typeDescriptor = type.entityTypeDescriptor();
-		SingularAttribute<? super E, ?> idAttributeOfType = typeDescriptor.getId( typeDescriptor.getIdType().getJavaType() );
-
+	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(MassIndexingIndexedTypeGroup<E> typeGroup) {
 		return new BatchIndexingWorkspace<>(
 				mappingContext, sessionContext, getNotifier(),
-				type, idAttributeOfType,
+				typeGroup.commonSuperType(), typeGroup.idAttribute(),
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize,
 				objectsLimit, idFetchSize, transactionTimeout

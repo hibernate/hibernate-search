@@ -7,16 +7,13 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.CacheMode;
-import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
@@ -43,7 +40,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 
-	private final Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes;
+	private final List<MassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
@@ -70,39 +67,10 @@ public class MassIndexerImpl implements MassIndexer {
 			PojoScopeWorkspace scopeWorkspace) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
-		this.rootEntityTypes = toRootEntityTypes( targetedIndexedTypes );
+		this.typeGroupsToIndex = MassIndexingIndexedTypeGroup.disjoint( targetedIndexedTypes );
 		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
-	}
-
-	/*
-	 * From the set of targeted types a new set is built, removing all subtypes of indexed entities.
-	 */
-	private static Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRootEntityTypes(
-			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypeContexts) {
-		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> cleaned = new LinkedHashSet<>();
-		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRemove = new HashSet<>();
-		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
-		for ( HibernateOrmMassIndexingIndexedTypeContext<?> typeContext : targetedIndexedTypeContexts ) {
-			EntityPersister entityPersister = typeContext.entityPersister();
-			boolean typeIsOk = true;
-			for ( HibernateOrmMassIndexingIndexedTypeContext<?> existing : cleaned ) {
-				EntityPersister existingEntityPersister = existing.entityPersister();
-				if ( HibernateOrmUtils.isSuperTypeOf( existingEntityPersister, entityPersister ) ) {
-					typeIsOk = false;
-					break;
-				}
-				if ( HibernateOrmUtils.isSuperTypeOf( entityPersister, existingEntityPersister ) ) {
-					toRemove.add( existing );
-				}
-			}
-			if ( typeIsOk ) {
-				cleaned.add( typeContext );
-			}
-		}
-		cleaned.removeAll( toRemove );
-		log.debugf( "Targets for indexing job: %s", cleaned );
-		return cleaned;
+		log.debugf( "Targets for mass indexing: %s", typeGroupsToIndex );
 	}
 
 	@Override
@@ -110,7 +78,7 @@ public class MassIndexerImpl implements MassIndexer {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
-		this.typesToIndexInParallel = Math.min( numberOfThreads, rootEntityTypes.size() );
+		this.typesToIndexInParallel = Math.min( numberOfThreads, typeGroupsToIndex.size() );
 		return this;
 	}
 
@@ -208,7 +176,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return new BatchCoordinator(
 				mappingContext, sessionContext,
 				notifier,
-				rootEntityTypes, scopeSchemaManager, scopeWorkspace,
+				typeGroupsToIndex, scopeSchemaManager, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				mergeSegmentsOnFinish, dropAndCreateSchemaOnStart, purgeAtStart, mergeSegmentsAfterPurge,
