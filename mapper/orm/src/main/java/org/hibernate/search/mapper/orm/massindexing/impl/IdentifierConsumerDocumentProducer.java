@@ -27,6 +27,7 @@ import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -110,15 +111,15 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	}
 
 	private void loadAndIndexAllFromQueue(SessionImplementor session) throws SystemException, NotSupportedException {
-		// The search session will be closed automatically with the ORM session
-		PojoIndexer indexer = mappingContext.createIndexer( session );
+		HibernateOrmScopeSessionContext sessionContext = mappingContext.sessionContext( session );
+		PojoIndexer indexer = sessionContext.createIndexer();
 		try {
 			List<I> idList;
 			do {
 				idList = source.take();
 				if ( idList != null ) {
 					log.tracef( "received list of ids %s", idList );
-					loadAndIndexList( idList, session, indexer );
+					loadAndIndexList( idList, sessionContext, indexer );
 				}
 			}
 			while ( idList != null );
@@ -129,8 +130,10 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	private void loadAndIndexList(List<I> listIds, SessionImplementor session, PojoIndexer indexer)
+	private void loadAndIndexList(List<I> listIds, HibernateOrmMassIndexingSessionContext sessionContext,
+			PojoIndexer indexer)
 			throws InterruptedException, NotSupportedException, SystemException {
+		SessionImplementor session = sessionContext.session();
 		try {
 			beginTransaction( session );
 
@@ -147,7 +150,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 					.setHibernateFlushMode( FlushMode.MANUAL )
 					.setFetchSize( listIds.size() );
 
-			indexList( session, indexer, query.getResultList() );
+			indexList( sessionContext, indexer, query.getResultList() );
 			session.clear();
 		}
 		finally {
@@ -183,7 +186,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	private void indexList(Session session, PojoIndexer indexer, List<E> entities) throws InterruptedException {
+	private void indexList(HibernateOrmMassIndexingSessionContext sessionContext, PojoIndexer indexer, List<E> entities)
+			throws InterruptedException {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
 		}
@@ -209,7 +213,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			if ( future.isCompletedExceptionally() ) {
 				notifier.notifyEntityIndexingFailure(
 						type,
-						session, entities.get( i ),
+						sessionContext, entities.get( i ),
 						Throwables.expectException( Futures.getThrowableNow( future ) )
 				);
 			}

@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
+import javax.persistence.EntityManager;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 public interface HibernateOrmMassIndexingMappingContext {
@@ -20,6 +21,6 @@ public interface HibernateOrmMassIndexingMappingContext {
 
 	FailureHandler failureHandler();
 
-	PojoIndexer createIndexer(SessionImplementor sessionImplementor);
+	HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager);
 
 }
