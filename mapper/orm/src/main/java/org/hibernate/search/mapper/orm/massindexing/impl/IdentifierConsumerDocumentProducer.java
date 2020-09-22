@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -197,7 +198,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		for ( int i = 0; i < entities.size(); i++ ) {
 			final E entity = entities.get( i );
-			indexingFutures[i] = index( indexer, entity );
+			indexingFutures[i] = index( sessionContext, indexer, entity );
 		}
 
 		Futures.unwrappedExceptionGet(
@@ -211,9 +212,12 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			CompletableFuture<?> future = indexingFutures[i];
 
 			if ( future.isCompletedExceptionally() ) {
+				E entity = entities.get( i );
 				notifier.notifyEntityIndexingFailure(
-						type,
-						sessionContext, entities.get( i ),
+						// We don't try to detect the exact entity type here,
+						// because that could fail if the type is not indexed
+						// (which should not happen, but well... failures should not happen to begin with).
+						type, sessionContext, entity,
 						Throwables.expectException( Futures.getThrowableNow( future ) )
 				);
 			}
@@ -225,7 +229,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		notifier.notifyDocumentsAdded( successfulEntities );
 	}
 
-	private CompletableFuture<?> index(PojoIndexer indexer, E entity) throws InterruptedException {
+	private CompletableFuture<?> index(HibernateOrmMassIndexingSessionContext sessionContext,
+			PojoIndexer indexer, E entity) throws InterruptedException {
 		// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
 		// raised the InterruptedException
 		if ( Thread.currentThread().isInterrupted() ) {
@@ -234,7 +239,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		CompletableFuture<?> future;
 		try {
-			future = indexer.add( type.typeIdentifier(), null, null, entity,
+			PojoRawTypeIdentifier<? extends E> typeIdentifier = detectTypeIdentifier( sessionContext, entity );
+			future = indexer.add( typeIdentifier, null, null, entity,
 					// Commit and refresh are handled globally after all documents are indexed.
 					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 		}
@@ -248,6 +254,11 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		notifier.notifyDocumentBuilt();
 
 		return future;
+	}
+
+	private PojoRawTypeIdentifier<? extends E> detectTypeIdentifier(
+			HibernateOrmMassIndexingSessionContext sessionContext, E entity) {
+		return sessionContext.runtimeIntrospector().detectEntityType( entity );
 	}
 
 }
