@@ -316,9 +316,6 @@ public abstract class AbstractFieldContainerExtractorIT {
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
-
-		// Searching
-		// TODO HSEARCH-3361 + HSEARCH-1895 also test projections going through the extractor
 	}
 
 	final <E, P, F> void doTestExpectMissing(TestModel<E, P> testModel,
