@@ -32,7 +32,7 @@ class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
 	}
 
 	public CallBehavior<CompletableFuture<?>> verify(IndexScaleWorkCall actualCall) {
-		String whenThisWorkWasExpected = "when an index-scope work on index '" + indexName
+		String whenThisWorkWasExpected = "when an index-scale work on index '" + indexName
 				+ "' was expected";
 		StubIndexScaleWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
@@ -48,6 +48,6 @@ class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
 
 	@Override
 	public String toString() {
-		return "index-scope work on index " + indexName + "'; work = " + work;
+		return "index-scale work on index '" + indexName + "'; work = " + work;
 	}
 }
