@@ -39,6 +39,11 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	}
 
 	@Override
+	public String toString() {
+		return typeIdentifier().toString();
+	}
+
+	@Override
 	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
 	}
