@@ -251,7 +251,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	private String getExtractorName(org.hibernate.mapping.Collection collectionValue) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			// Caution if you add other if ( ... instanceof ) branches: Array extends List!
-			return BuiltinContainerExtractors.ARRAY;
+			return BuiltinContainerExtractors.ARRAY_OBJECT;
 		}
 		else if ( collectionValue instanceof org.hibernate.mapping.Map ) {
 			// See contributeModelPropertyNode(), we only care about map values, not about keys

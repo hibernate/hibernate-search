@@ -51,7 +51,7 @@ public final class ContainerExtractorRegistry {
 		addDefaultExtractor( BuiltinContainerExtractors.OPTIONAL_INT, OptionalIntValueExtractor.class );
 		addDefaultExtractor( BuiltinContainerExtractors.OPTIONAL_LONG, OptionalLongValueExtractor.class );
 		addDefaultExtractor( BuiltinContainerExtractors.OPTIONAL_DOUBLE, OptionalDoubleValueExtractor.class );
-		addDefaultExtractor( BuiltinContainerExtractors.ARRAY, ArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_OBJECT, ArrayElementExtractor.class );
 
 		addNonDefaultExtractor( BuiltinContainerExtractors.MAP_KEY, MapKeyExtractor.class );
 	}

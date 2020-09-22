@@ -17,9 +17,15 @@ public class BuiltinContainerExtractors {
 	}
 
 	/**
-	 * The name of an extractor that extracts elements from an object array.
+	 * The name of an extractor that extracts elements from an array of objects ({@code Object[]}, {@code Integer[]}, ...).
 	 */
-	public static final String ARRAY = "array";
+	public static final String ARRAY_OBJECT = "array-object";
+	/**
+	 * The name of an extractor that extracts elements from an array of objects ({@code Object[]}, {@code Integer[]}, ...).
+	 * @deprecated Use {@link #ARRAY_OBJECT} instead.
+	 */
+	@Deprecated
+	public static final String ARRAY = ARRAY_OBJECT;
 	/**
 	 * The name of an extractor that extracts elements from a {@link java.util.Collection}.
 	 */
