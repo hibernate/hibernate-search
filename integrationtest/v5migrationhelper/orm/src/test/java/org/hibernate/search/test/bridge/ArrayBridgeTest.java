@@ -12,7 +12,6 @@ import java.util.List;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -35,7 +34,6 @@ import static org.junit.Assert.assertNotNull;
  *
  * @author Davide D'Alto
  */
-@Ignore("HSEARCH-3997 needs to be solved first, because of the float[] field")
 public class ArrayBridgeTest extends SearchTestBase {
 
 	private FullTextSession fullTextSession;
