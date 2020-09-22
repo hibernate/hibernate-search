@@ -388,7 +388,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 		SearchMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
 
-		// Indexing
+		// Indexing with non-null, non-empty value
 		try ( SearchSession session = mapping.createSession() ) {
 			E entity1 = testModel.newEntity( 1, propertyValue );
 
@@ -401,6 +401,18 @@ public abstract class AbstractFieldContainerExtractorIT {
 									firstIndexedFieldValues, (Object[]) otherIndexedFieldValues
 							)
 					)
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Indexing with null value
+		try ( SearchSession session = mapping.createSession() ) {
+			E entity1 = testModel.newEntity( 2, null );
+
+			session.indexingPlan().add( entity1 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "2", b -> { } )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();

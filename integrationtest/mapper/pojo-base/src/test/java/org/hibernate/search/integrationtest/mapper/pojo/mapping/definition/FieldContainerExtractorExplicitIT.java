@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -115,12 +117,26 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 				this.myProperty = myProperty;
 			}
 		}
-		doTest(
-				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
-				String.class, false,
-				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
-				STRING_VALUE_1
+
+		// Schema
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "myProperty", String.class )
 		);
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		// Indexing
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity1 = new IndexedEntity( 1,
+					CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ) );
+
+			session.indexingPlan().add( entity1 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "myProperty", STRING_VALUE_1 ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	private static final class ExplicitContainerExtractorTestModelProvider implements TestModelProvider {
