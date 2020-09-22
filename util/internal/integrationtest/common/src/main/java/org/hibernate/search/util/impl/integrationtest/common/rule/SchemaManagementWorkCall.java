@@ -37,7 +37,7 @@ class SchemaManagementWorkCall extends Call<SchemaManagementWorkCall> {
 	}
 
 	public CallBehavior<CompletableFuture<?>> verify(SchemaManagementWorkCall actualCall) {
-		String whenThisWorkWasExpected = "when an index-scope work on index '" + indexName
+		String whenThisWorkWasExpected = "when a schema management work on index '" + indexName
 				+ "' was expected";
 		StubSchemaManagementWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
@@ -52,6 +52,6 @@ class SchemaManagementWorkCall extends Call<SchemaManagementWorkCall> {
 
 	@Override
 	public String toString() {
-		return "index-scope work on index " + indexName + "'; work = " + work;
+		return "schema management work on index '" + indexName + "'; work = " + work;
 	}
 }
