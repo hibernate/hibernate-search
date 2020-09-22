@@ -48,13 +48,13 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final List<CallBehavior<Void>> stopBackendBehaviors = new ArrayList<>();
 
+	private final Map<String, CallQueue<IndexScaleWorkCall>> indexScaleWorkCalls = new HashMap<>();
+
 	private final Map<String, CallQueue<SchemaDefinitionCall>> schemaDefinitionCalls = new HashMap<>();
 
 	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
 	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
-
-	private final CallQueue<IndexScaleWorkCall> indexScaleWorkCalls = new CallQueue<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -96,8 +96,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
-	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls() {
-		return indexScaleWorkCalls;
+	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls(String indexName) {
+		return indexScaleWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
 	CallQueue<SearchWorkCall<?>> getSearchWorkCalls() {
@@ -125,9 +125,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		createBackendBehaviors.clear();
 		stopBackendBehaviors.clear();
 		schemaDefinitionCalls.clear();
+		indexScaleWorkCalls.clear();
 		schemaManagementWorkCall.clear();
 		documentWorkCalls.clear();
-		indexScaleWorkCalls.reset();
 		searchCalls.reset();
 		countCalls.reset();
 		scrollCalls.reset();
@@ -141,9 +141,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	void verifyExpectationsMet() {
 		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		indexScaleWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
 		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
-		indexScaleWorkCalls.verifyExpectationsMet();
 		searchCalls.verifyExpectationsMet();
 		countCalls.verifyExpectationsMet();
 		scrollCalls.verifyExpectationsMet();
@@ -258,11 +258,12 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work) {
-		return indexScaleWorkCalls.verify(
-				new IndexScaleWorkCall( indexName, work ),
-				IndexScaleWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-		);
+		return getIndexScaleWorkCalls( indexName )
+				.verify(
+						new IndexScaleWorkCall( indexName, work ),
+						IndexScaleWorkCall::verify,
+						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+				);
 	}
 
 	@Override
