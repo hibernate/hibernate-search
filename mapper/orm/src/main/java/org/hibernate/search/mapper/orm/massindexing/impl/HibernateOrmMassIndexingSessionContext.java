@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 
 public interface HibernateOrmMassIndexingSessionContext {
@@ -14,5 +15,7 @@ public interface HibernateOrmMassIndexingSessionContext {
 	SessionImplementor session();
 
 	PojoIndexer createIndexer();
+
+	PojoRuntimeIntrospector runtimeIntrospector();
 
 }
