@@ -151,7 +151,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(MassIndexingIndexedTypeGroup<E> typeGroup) {
 		return new BatchIndexingWorkspace<>(
 				mappingContext, sessionContext, getNotifier(),
-				typeGroup.commonSuperType(), typeGroup.idAttribute(),
+				typeGroup.commonSuperType(), typeGroup.idAttribute(), typeGroup.includedIndexedTypesOrEmpty(),
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize,
 				objectsLimit, idFetchSize, transactionTimeout
