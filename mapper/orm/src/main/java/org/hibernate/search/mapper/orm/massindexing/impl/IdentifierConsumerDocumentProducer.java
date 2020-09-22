@@ -98,7 +98,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			session.setHibernateFlushMode( FlushMode.MANUAL );
 			session.setCacheMode( cacheMode );
 			session.setDefaultReadOnly( true );
-			loadAllFromQueue( session );
+			loadAndIndexAllFromQueue( session );
 		}
 		catch (Exception exception) {
 			notifier.notifyRunnableFailure(
@@ -109,7 +109,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		log.trace( "finished" );
 	}
 
-	private void loadAllFromQueue(SessionImplementor session) throws SystemException, NotSupportedException {
+	private void loadAndIndexAllFromQueue(SessionImplementor session) throws SystemException, NotSupportedException {
 		// The search session will be closed automatically with the ORM session
 		PojoIndexer indexer = mappingContext.createIndexer( session );
 		try {
@@ -118,7 +118,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 				idList = source.take();
 				if ( idList != null ) {
 					log.tracef( "received list of ids %s", idList );
-					loadList( idList, session, indexer );
+					loadAndIndexList( idList, session, indexer );
 				}
 			}
 			while ( idList != null );
@@ -129,16 +129,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	/**
-	 * Loads a list of entities of defined type using their identifiers.
-	 * entities are then transformed into Lucene Documents
-	 * and forwarded to the indexing backend.
-	 *
-	 * @param listIds the list of entity identifiers (of type
-	 * @param session the session to be used
-	 * @param indexer the indexer to be used
-	 */
-	private void loadList(List<I> listIds, SessionImplementor session, PojoIndexer indexer)
+	private void loadAndIndexList(List<I> listIds, SessionImplementor session, PojoIndexer indexer)
 			throws InterruptedException, NotSupportedException, SystemException {
 		try {
 			beginTransaction( session );
@@ -156,7 +147,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 					.setHibernateFlushMode( FlushMode.MANUAL )
 					.setFetchSize( listIds.size() );
 
-			indexAllQueue( session, indexer, query.getResultList() );
+			indexList( session, indexer, query.getResultList() );
 			session.clear();
 		}
 		finally {
@@ -192,7 +183,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	private void indexAllQueue(Session session, PojoIndexer indexer, List<E> entities) throws InterruptedException {
+	private void indexList(Session session, PojoIndexer indexer, List<E> entities) throws InterruptedException {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
 		}
