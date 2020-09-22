@@ -13,7 +13,7 @@ import javax.persistence.OneToOne;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.AutomaticIndexingBridgeAccessorsIT;
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge.AutomaticIndexingBridgeAccessorsIT;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;

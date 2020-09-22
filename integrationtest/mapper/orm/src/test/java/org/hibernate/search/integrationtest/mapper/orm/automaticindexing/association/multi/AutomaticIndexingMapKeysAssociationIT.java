@@ -4,23 +4,33 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.multi;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
+import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association.AbstractAutomaticIndexingAssociationIT;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -30,25 +40,25 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 
 /**
  * Test automatic indexing based on Hibernate ORM entity events
- * when a List association is involved.
+ * when a Map-keys association is involved.
  * <p>
  * See {@link AbstractAutomaticIndexingAssociationIT} for more details on how this test is designed.
  */
-public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexingMultiAssociationIT<
-		AutomaticIndexingListAssociationIT.IndexedEntity,
-		AutomaticIndexingListAssociationIT.ContainingEntity,
-		AutomaticIndexingListAssociationIT.ContainedEntity,
-		List<AutomaticIndexingListAssociationIT.ContainedEntity>,
-		List<AutomaticIndexingListAssociationIT.ContainingEntity>
+public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticIndexingMultiAssociationIT<
+		AutomaticIndexingMapKeysAssociationIT.IndexedEntity,
+		AutomaticIndexingMapKeysAssociationIT.ContainingEntity,
+		AutomaticIndexingMapKeysAssociationIT.ContainedEntity,
+		Map<AutomaticIndexingMapKeysAssociationIT.ContainedEntity, String>,
+		List<AutomaticIndexingMapKeysAssociationIT.ContainingEntity>
 		> {
 
-	public AutomaticIndexingListAssociationIT() {
-		super( new ListAssociationModelPrimitives() );
+	public AutomaticIndexingMapKeysAssociationIT() {
+		super( new MapKeysAssociationModelPrimitives() );
 	}
 
-	private static class ListAssociationModelPrimitives
+	private static class MapKeysAssociationModelPrimitives
 			implements MultiAssociationModelPrimitives<IndexedEntity, ContainingEntity, ContainedEntity,
-						List<ContainedEntity>, List<ContainingEntity>> {
+						Map<ContainedEntity, String>, List<ContainingEntity>> {
 
 		@Override
 		public String getIndexName() {
@@ -102,22 +112,22 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
-		public List<ContainedEntity> newContainedAssociation(List<ContainedEntity> original) {
-			return new ArrayList<>( original );
+		public Map<ContainedEntity, String> newContainedAssociation(Map<ContainedEntity, String> original) {
+			return new LinkedHashMap<>( original );
 		}
 
 		@Override
-		public void addContained(List<ContainedEntity> containedEntities, ContainedEntity containedEntity) {
-			containedEntities.add( containedEntity );
+		public void addContained(Map<ContainedEntity, String> containedEntities, ContainedEntity containedEntity) {
+			containedEntities.put( containedEntity, containedEntity.getIndexedField() + "_value" );
 		}
 
 		@Override
-		public void removeContained(List<ContainedEntity> containedEntities, ContainedEntity containedEntity) {
+		public void removeContained(Map<ContainedEntity, String> containedEntities, ContainedEntity containedEntity) {
 			containedEntities.remove( containedEntity );
 		}
 
 		@Override
-		public void clearContained(List<ContainedEntity> containedEntities) {
+		public void clearContained(Map<ContainedEntity, String> containedEntities) {
 			containedEntities.clear();
 		}
 
@@ -137,13 +147,13 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
-		public List<ContainedEntity> getContainedIndexedEmbedded(ContainingEntity containingEntity) {
+		public Map<ContainedEntity, String> getContainedIndexedEmbedded(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbedded();
 		}
 
 		@Override
 		public void setContainedIndexedEmbedded(ContainingEntity containingEntity,
-				List<ContainedEntity> containedEntities) {
+				Map<ContainedEntity, String> containedEntities) {
 			containingEntity.setContainedIndexedEmbedded( containedEntities );
 		}
 
@@ -153,13 +163,13 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
-		public List<ContainedEntity> getContainedNonIndexedEmbedded(ContainingEntity containingEntity) {
+		public Map<ContainedEntity, String> getContainedNonIndexedEmbedded(ContainingEntity containingEntity) {
 			return containingEntity.getContainedNonIndexedEmbedded();
 		}
 
 		@Override
 		public void setContainedNonIndexedEmbedded(ContainingEntity containingEntity,
-				List<ContainedEntity> containedEntities) {
+				Map<ContainedEntity, String> containedEntities) {
 			containingEntity.setContainedNonIndexedEmbedded( containedEntities );
 		}
 
@@ -169,13 +179,13 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
-		public List<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
 
 		@Override
 		public void setContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity,
-				List<ContainedEntity> containedEntities) {
+				Map<ContainedEntity, String> containedEntities) {
 			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntities );
 		}
 
@@ -185,7 +195,7 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
-		public List<ContainedEntity> getContainedUsedInCrossEntityDerivedProperty(
+		public Map<ContainedEntity, String> getContainedUsedInCrossEntityDerivedProperty(
 				ContainingEntity containingEntity) {
 			return containingEntity.getContainedUsedInCrossEntityDerivedProperty();
 		}
@@ -197,8 +207,8 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public List<ContainedEntity> getContainedIndexedEmbeddedWithCast(ContainingEntity containingEntity) {
-			return (List) containingEntity.getContainedIndexedEmbeddedWithCast();
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedWithCast(ContainingEntity containingEntity) {
+			return (Map) containingEntity.getContainedIndexedEmbeddedWithCast();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -280,29 +290,73 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		})
 		private ContainingEntity child;
 
-		@ManyToMany
-		@JoinTable(name = "indexed_containedIndexedEmbedded")
-		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
-		private List<ContainedEntity> containedIndexedEmbedded = new ArrayList<>();
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@IndexedEmbedded(
+				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
+				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+		)
+		private Map<ContainedEntity, String> containedIndexedEmbedded = new LinkedHashMap<>();
 
-		@ManyToMany
-		@JoinTable(name = "indexed_containedNonIndexedEmbedded")
-		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedNonIndexedEmbedded",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<ContainedEntity, String> containedNonIndexedEmbedded = new LinkedHashMap<>();
 
-		@ManyToMany
-		@JoinTable(name = "indexed_indexedEmbeddedNoReindexOnUpdateContained")
-		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
-		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
-		private List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedNoReindexOnUpdate",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@IndexedEmbedded(
+				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
+				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+		)
+		@IndexingDependency(
+				reindexOnUpdate = ReindexOnUpdate.NO,
+				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+		)
+		private Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
-		@ManyToMany
-		@JoinTable(name = "indexed_containedUsedInCrossEntityDerivedProperty")
-		private List<ContainedEntity> containedUsedInCrossEntityDerivedProperty = new ArrayList<>();
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedUsedInCrossEntityDerivedProperty",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<ContainedEntity, String> containedUsedInCrossEntityDerivedProperty = new LinkedHashMap<>();
 
-		@ManyToMany(targetEntity = ContainedEntity.class)
-		@JoinTable(name = "indexed_containedIndexedEmbeddedWithCast")
-		@IndexedEmbedded(includePaths = "indexedField", targetType = ContainedEntity.class)
-		private List<Object> containedIndexedEmbeddedWithCast = new ArrayList<>();
+		@ElementCollection
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedWithCast",
+				joinColumns = @JoinColumn(name = "mapHolder")
+		)
+		@MapKeyClass(ContainedEntity.class)
+		@MapKeyJoinColumn(name = "map_key")
+		@Column(name = "value")
+		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		@IndexedEmbedded(
+				includePaths = { "indexedField" },
+				extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY),
+				targetType = ContainedEntity.class
+		)
+		private Map<Object, String> containedIndexedEmbeddedWithCast = new LinkedHashMap<>();
 
 		public Integer getId() {
 			return id;
@@ -328,41 +382,36 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 			this.child = child;
 		}
 
-		public List<ContainedEntity> getContainedIndexedEmbedded() {
+		public Map<ContainedEntity, String> getContainedIndexedEmbedded() {
 			return containedIndexedEmbedded;
 		}
 
-		public void setContainedIndexedEmbedded(List<ContainedEntity> containedIndexedEmbedded) {
+		public void setContainedIndexedEmbedded(Map<ContainedEntity, String> containedIndexedEmbedded) {
 			this.containedIndexedEmbedded = containedIndexedEmbedded;
 		}
 
-		public List<ContainedEntity> getContainedNonIndexedEmbedded() {
+		public Map<ContainedEntity, String> getContainedNonIndexedEmbedded() {
 			return containedNonIndexedEmbedded;
 		}
 
-		public void setContainedNonIndexedEmbedded(List<ContainedEntity> containedNonIndexedEmbedded) {
+		public void setContainedNonIndexedEmbedded(Map<ContainedEntity, String> containedNonIndexedEmbedded) {
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 
-		public List<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
+		public Map<ContainedEntity, String> getContainedIndexedEmbeddedNoReindexOnUpdate() {
 			return containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public void setContainedIndexedEmbeddedNoReindexOnUpdate(
-				List<ContainedEntity> containedIndexedEmbeddedNoReindexOnUpdate) {
+				Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate) {
 			this.containedIndexedEmbeddedNoReindexOnUpdate = containedIndexedEmbeddedNoReindexOnUpdate;
 		}
 
-		public List<ContainedEntity> getContainedUsedInCrossEntityDerivedProperty() {
+		public Map<ContainedEntity, String> getContainedUsedInCrossEntityDerivedProperty() {
 			return containedUsedInCrossEntityDerivedProperty;
 		}
 
-		public void setContainedUsedInCrossEntityDerivedProperty(
-				List<ContainedEntity> containedUsedInCrossEntityDerivedProperty) {
-			this.containedUsedInCrossEntityDerivedProperty = containedUsedInCrossEntityDerivedProperty;
-		}
-
-		public List<Object> getContainedIndexedEmbeddedWithCast() {
+		public Map<Object, String> getContainedIndexedEmbeddedWithCast() {
 			return containedIndexedEmbeddedWithCast;
 		}
 
@@ -370,17 +419,23 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
+						@PropertyValue(
+								propertyName = "containedUsedInCrossEntityDerivedProperty",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
-						@PropertyValue(propertyName = "containedUsedInCrossEntityDerivedProperty"),
+						@PropertyValue(
+								propertyName = "containedUsedInCrossEntityDerivedProperty",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
 		})
 		public Optional<String> getCrossEntityDerivedField() {
-			return computeDerived(
-					containedUsedInCrossEntityDerivedProperty.stream().flatMap( c -> Stream.of(
+			return AbstractAutomaticIndexingAssociationIT.computeDerived(
+					containedUsedInCrossEntityDerivedProperty.keySet().stream().flatMap( c -> Stream.of(
 							c.getFieldUsedInCrossEntityDerivedField1(),
 							c.getFieldUsedInCrossEntityDerivedField2()
 					) )
@@ -402,24 +457,79 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		@Id
 		private Integer id;
 
-		@ManyToMany(mappedBy = "containedIndexedEmbedded")
+		/*
+		 * No mappedBy here. The inverse side of associations modeled by a Map key cannot use mappedBy.
+		 * If they do, Hibernate assumes that map *values* are the opposite side of the association,
+		 * and ends up adding all kind of wrong foreign keys.
+		 */
+		@ManyToMany
+		@JoinTable(name = "contained_mapHolder")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbedded",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
 		private List<ContainingEntity> containingAsIndexedEmbedded = new ArrayList<>();
 
-		@ManyToMany(mappedBy = "containedNonIndexedEmbedded")
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
+		@JoinTable(name = "contained_nonIndexedMapHolder")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
-		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
+		@JoinTable(name = "contained_indexedNoReindexOnUpdateMapHolder")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
-		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
+		/*
+		 * No mappedBy here, same reasons as above.
+		 */
+		@ManyToMany
 		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedUsedInCrossEntityDerivedProperty",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
 
-		@ManyToMany(mappedBy = "containedIndexedEmbeddedWithCast", targetEntity = ContainingEntity.class)
+		/*
+		 * No mappedBy here. The inverse side of associations modeled by a Map key cannot use mappedBy.
+		 * If they do, Hibernate assumes that map *values* are the opposite side of the association,
+		 * and ends up adding all kind of wrong foreign keys.
+		 */
+		@ManyToMany(targetEntity = ContainingEntity.class)
+		@JoinTable(name = "contained_withCastMapHolder")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
+		@AssociationInverseSide(
+				inversePath = @ObjectPath(
+						@PropertyValue(
+								propertyName = "containedIndexedEmbeddedWithCast",
+								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
+						)
+				)
+		)
 		private List<Object> containingAsIndexedEmbeddedWithCast = new ArrayList<>();
 
 		@Basic
@@ -551,7 +661,7 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 				@ObjectPath(@PropertyValue(propertyName = "fieldUsedInContainedDerivedField2"))
 		})
 		public Optional<String> getContainedDerivedField() {
-			return computeDerived( Stream.of( fieldUsedInContainedDerivedField1, fieldUsedInContainedDerivedField2 ) );
+			return AbstractAutomaticIndexingAssociationIT.computeDerived( Stream.of( fieldUsedInContainedDerivedField1, fieldUsedInContainedDerivedField2 ) );
 		}
 	}
 
