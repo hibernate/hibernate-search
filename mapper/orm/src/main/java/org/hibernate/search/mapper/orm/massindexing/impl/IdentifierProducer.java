@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -50,6 +51,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 
 	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
 	private final SingularAttribute<? super E, I> idAttributeOfType;
+	private final Set<Class<? extends E>> includedTypesFilter;
 
 	private final ProducerConsumerQueue<List<I>> destination;
 	private final int batchSize;
@@ -72,12 +74,14 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			int objectLoadingBatchSize,
 			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
+			Set<Class<? extends E>> includedTypesFilter,
 			long objectsLimit, int idFetchSize) {
 		this.sessionFactory = sessionFactory;
 		this.tenantId = tenantId;
 		this.notifier = notifier;
 		this.type = type;
 		this.idAttributeOfType = idAttributeOfType;
+		this.includedTypesFilter = includedTypesFilter;
 		this.destination = fromIdentifierListToEntities;
 		this.batchSize = objectLoadingBatchSize;
 		this.objectsLimit = objectsLimit;
@@ -181,6 +185,9 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 
 		Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
 		criteriaQuery.select( criteriaBuilder.count( root ) );
+		if ( !includedTypesFilter.isEmpty() ) {
+			criteriaQuery.where( root.type().in( includedTypesFilter ) );
+		}
 
 		return session.createQuery( criteriaQuery )
 				.setCacheable( false );
@@ -193,6 +200,9 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
 		Path<I> idPath = root.get( idAttributeOfType );
 		criteriaQuery.select( idPath );
+		if ( !includedTypesFilter.isEmpty() ) {
+			criteriaQuery.where( root.type().in( includedTypesFilter ) );
+		}
 
 		return session.createQuery( criteriaQuery )
 				.setCacheable( false )

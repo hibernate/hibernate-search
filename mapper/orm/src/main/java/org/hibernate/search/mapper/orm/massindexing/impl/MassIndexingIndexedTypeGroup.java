@@ -85,6 +85,20 @@ class MassIndexingIndexedTypeGroup<E> {
 		return typeDescriptor.getId( typeDescriptor.getIdType().getJavaType() );
 	}
 
+	public Set<Class<? extends E>> includedIndexedTypesOrEmpty() {
+		if ( commonSuperType.entityPersister().getEntityMetamodel().getSubclassEntityNames().size()
+				== includedTypes.size() ) {
+			// All types are included, no need to filter.
+			return Collections.emptySet();
+		}
+
+		Set<Class<? extends E>> classes = new HashSet<>( includedTypes.size() );
+		for ( HibernateOrmMassIndexingIndexedTypeContext<? extends E> includedType : includedTypes ) {
+			classes.add( includedType.entityTypeDescriptor().getJavaType() );
+		}
+		return classes;
+	}
+
 	/**
 	 * Merge this group with the other group if
 	 * the other group's {@code commonSuperType} represents a supertype or subtype

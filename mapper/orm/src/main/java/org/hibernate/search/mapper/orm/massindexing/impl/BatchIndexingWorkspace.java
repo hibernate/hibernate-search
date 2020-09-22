@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -40,6 +41,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
 	private final SingularAttribute<? super E, I> idAttributeOfType;
+	private final Set<Class<? extends E>> includedTypesFilter;
 
 	private final ProducerConsumerQueue<List<I>> primaryKeyStream;
 
@@ -61,6 +63,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
 			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
+			Set<Class<? extends E>> includedTypesFilter,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
@@ -70,6 +73,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 		this.type = type;
 		this.idAttributeOfType = idAttributeOfType;
+		this.includedTypesFilter = includedTypesFilter;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
 
@@ -133,7 +137,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 						getNotifier(),
 						primaryKeyStream,
 						objectLoadingBatchSize,
-						type, idAttributeOfType,
+						type, idAttributeOfType, includedTypesFilter,
 						objectsLimit,
 						idFetchSize
 				),
