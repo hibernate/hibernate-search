@@ -16,7 +16,14 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
-import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.BooleanArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ByteArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CharArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.DoubleArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.FloatArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.IntArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.LongArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ObjectArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.IterableElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapKeyExtractor;
@@ -25,6 +32,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalDoubleVal
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalIntValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalLongValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ShortArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -51,7 +59,15 @@ public final class ContainerExtractorRegistry {
 		addDefaultExtractor( BuiltinContainerExtractors.OPTIONAL_INT, OptionalIntValueExtractor.class );
 		addDefaultExtractor( BuiltinContainerExtractors.OPTIONAL_LONG, OptionalLongValueExtractor.class );
 		addDefaultExtractor( BuiltinContainerExtractors.OPTIONAL_DOUBLE, OptionalDoubleValueExtractor.class );
-		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_OBJECT, ArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_CHAR, CharArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_BOOLEAN, BooleanArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_BYTE, ByteArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_SHORT, ShortArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_INT, IntArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_LONG, LongArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_FLOAT, FloatArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_DOUBLE, DoubleArrayElementExtractor.class );
+		addDefaultExtractor( BuiltinContainerExtractors.ARRAY_OBJECT, ObjectArrayElementExtractor.class );
 
 		addNonDefaultExtractor( BuiltinContainerExtractors.MAP_KEY, MapKeyExtractor.class );
 	}

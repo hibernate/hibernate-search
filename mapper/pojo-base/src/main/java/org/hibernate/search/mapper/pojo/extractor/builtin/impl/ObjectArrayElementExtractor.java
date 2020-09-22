@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
-public class ArrayElementExtractor<T> implements ContainerExtractor<T[], T> {
+public class ObjectArrayElementExtractor<T> implements ContainerExtractor<T[], T> {
 	@Override
 	public String toString() {
 		return BuiltinContainerExtractors.ARRAY_OBJECT;

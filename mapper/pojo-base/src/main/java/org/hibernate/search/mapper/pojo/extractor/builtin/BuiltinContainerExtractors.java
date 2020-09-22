@@ -27,6 +27,38 @@ public class BuiltinContainerExtractors {
 	@Deprecated
 	public static final String ARRAY = ARRAY_OBJECT;
 	/**
+	 * The name of an extractor that extracts elements from an array of primitive chars ({@code char[]}).
+	 */
+	public static final String ARRAY_CHAR = "array-char";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive booleans ({@code boolean[]}).
+	 */
+	public static final String ARRAY_BOOLEAN = "array-boolean";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive bytes ({@code byte[]}).
+	 */
+	public static final String ARRAY_BYTE = "array-byte";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive shorts ({@code short[]}).
+	 */
+	public static final String ARRAY_SHORT = "array-short";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive integers ({@code int[]}).
+	 */
+	public static final String ARRAY_INT = "array-int";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive longs ({@code long[]}).
+	 */
+	public static final String ARRAY_LONG = "array-long";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive floats ({@code float[]}).
+	 */
+	public static final String ARRAY_FLOAT = "array-float";
+	/**
+	 * The name of an extractor that extracts elements from an array of primitive double ({@code double[]}).
+	 */
+	public static final String ARRAY_DOUBLE = "array-double";
+	/**
 	 * The name of an extractor that extracts elements from a {@link java.util.Collection}.
 	 */
 	public static final String COLLECTION = "collection";
