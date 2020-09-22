@@ -30,6 +30,11 @@ class JavaBeanIndexedTypeContext<E>
 	}
 
 	@Override
+	public String toString() {
+		return typeIdentifier().toString();
+	}
+
+	@Override
 	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
 	}
