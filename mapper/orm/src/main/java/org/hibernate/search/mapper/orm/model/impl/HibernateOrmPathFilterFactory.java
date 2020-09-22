@@ -146,6 +146,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<String>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Set<String> PRIMITIVE_EXTRACTOR_NAMES = CollectionHelper.asImmutableSet(
+			BuiltinContainerExtractors.ARRAY_CHAR,
+			BuiltinContainerExtractors.ARRAY_BOOLEAN,
+			BuiltinContainerExtractors.ARRAY_BYTE,
+			BuiltinContainerExtractors.ARRAY_SHORT,
+			BuiltinContainerExtractors.ARRAY_INT,
+			BuiltinContainerExtractors.ARRAY_LONG,
+			BuiltinContainerExtractors.ARRAY_FLOAT,
+			BuiltinContainerExtractors.ARRAY_DOUBLE
+	);
 
 	private final PersistentClass persistentClass;
 
@@ -304,7 +314,12 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	}
 
 	private Value resolveExtractor(org.hibernate.mapping.Collection collectionValue, String extractorName) {
-		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
+		if ( collectionValue instanceof org.hibernate.mapping.PrimitiveArray ) {
+			if ( extractorName == null || PRIMITIVE_EXTRACTOR_NAMES.contains( extractorName ) ) {
+				return collectionValue.getElement();
+			}
+		}
+		else if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			if ( extractorName == null || BuiltinContainerExtractors.ARRAY_OBJECT.equals( extractorName ) ) {
 				return collectionValue.getElement();
 			}
